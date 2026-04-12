@@ -2,6 +2,7 @@
   "name": "sitepow-store",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,12 +10,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
     "@tanstack/react-query": "^5.97.0",
     "@tanstack/react-query-devtools": "^5.97.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.1",
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
+    "pg": "^8.20.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -25,12 +30,20 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.97.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^20",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.2",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "prisma": "^7.7.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
