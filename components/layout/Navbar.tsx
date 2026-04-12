@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { NAVBAR_ITEMS } from '@/constants/navbar'
+import { LockIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -15,11 +16,14 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { ListItem } from './ListItem'
+import { LogoBrand } from '../LogoBrand'
+import { ListItem } from './_components/ListItem'
 
 export function Navbar() {
   return (
     <nav className="container mx-auto flex items-center justify-between px-10 py-5">
+      <LogoBrand />
+
       <NavigationMenu>
         <NavigationMenuList>
           {NAVBAR_ITEMS.map((item, idx) => (
@@ -31,13 +35,9 @@ export function Navbar() {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-100 gap-3 p-4 md:w-125 md:grid-cols-2 lg:w-150">
-                      {item.children.map((child) => (
-                        <ListItem
-                          key={child.href}
-                          title={child.title}
-                          href={child.href}
-                        >
-                          {child.description}
+                      {item.children.map(({ description, image, ...rest }) => (
+                        <ListItem key={rest.href} {...rest}>
+                          {description}
                         </ListItem>
                       ))}
                     </ul>
@@ -61,8 +61,9 @@ export function Navbar() {
 
       <div className="flex gap-5">
         <Link href={'/login'}>
-          <Button variant="ghost" size="lg">
-            เข้าสู่ระบบ
+          <Button variant="secondary" size="lg">
+            <LockIcon />
+            <p>เข้าสู่ระบบ</p>
           </Button>
         </Link>
         <Link href={'/register'}>

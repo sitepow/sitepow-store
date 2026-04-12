@@ -7,16 +7,16 @@ import { cn } from '@/lib/utils'
 
 import './globals.css'
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-ibm-plex-sans-thai-looped',
+  variable: '--font-sans',
 })
 
 export const metadata: Metadata = {
-  title: 'Sitepow: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+  title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
   description:
     'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
   keywords: [
@@ -38,7 +38,13 @@ export default function RootLayout({
   return (
     <html
       lang="th"
-      className={cn('h-full', 'antialiased', ibmPlexSansThaiLooped.variable, "font-sans", inter.variable)}
+      className={cn(
+        'h-full',
+        'antialiased',
+        ibmPlexSansThaiLooped.variable,
+        'font-sans',
+        inter.variable,
+      )}
     >
       <body className="flex min-h-full flex-col">
         <QueryProviders>{children}</QueryProviders>
