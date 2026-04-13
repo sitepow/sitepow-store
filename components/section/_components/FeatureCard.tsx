@@ -10,7 +10,7 @@ export function FeatureCard({ title, description, image }: FeatureCardProps) {
       <h3 className="text-2xl font-bold">{title}</h3>
       <p className="opacity-50">{description}</p>
 
-      {image && <div className="mt-5 h-96 bg-gray-200" />}
+      {image && <div className="mt-5 h-96 rounded-sm bg-gray-200" />}
     </div>
   )
 }

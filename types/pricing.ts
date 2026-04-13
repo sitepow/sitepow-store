@@ -21,3 +21,18 @@ export interface PricingPlanProps {
   buttonText: string
   isPopular?: boolean
 }
+
+export interface PricingFeature {
+  label: string
+  access: boolean[]
+}
+
+export interface PricingCategory {
+  name: string
+  features: PricingFeature[]
+}
+
+export interface PricingTables {
+  tiers: string[]
+  categories: PricingCategory[]
+}
