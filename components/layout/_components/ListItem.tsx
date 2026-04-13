@@ -16,7 +16,7 @@ export function ListItem({
       <NavigationMenuLink asChild>
         <Link href={href}>
           <div className="flex flex-col gap-1 text-sm">
-            {icon}
+            <div className="text-primary">{icon}</div>
             <div className="leading-none font-medium">{title}</div>
             <div className="text-muted-foreground line-clamp-2">{children}</div>
           </div>

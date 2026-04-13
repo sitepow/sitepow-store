@@ -1,13 +1,15 @@
 import {
-  BarChart3,
-  Box,
-  ClipboardList,
-  CreditCard,
-  Handshake,
-  MessageSquareText,
-  Store,
-  TicketPercent,
-  Users,
+  BarChart3Icon,
+  BoxIcon,
+  ClipboardListIcon,
+  CreditCardIcon,
+  GlobeIcon,
+  HandshakeIcon,
+  MessageSquareTextIcon,
+  PaletteIcon,
+  StoreIcon,
+  TicketPercentIcon,
+  UsersIcon,
 } from 'lucide-react'
 
 export const NAVBAR_ITEMS = [
@@ -19,72 +21,87 @@ export const NAVBAR_ITEMS = [
         title: 'ระบบจัดการสต็อก',
         href: '/features/inventory',
         description: 'จัดการสินค้าได้ง่ายๆ ในที่เดียว',
-        icon: <Box size={20} />,
-        image: '/no-image.png',
+        icon: <BoxIcon />,
+        image: '/',
       },
       {
         title: 'หน้าร้านออนไลน์',
         href: '/features/storefront',
         description:
           'เว็บไซต์ขายสินค้าส่วนตัว รองรับการจ่ายเงินและคำนวณค่าส่งอัตโนมัติ',
-        icon: <Store size={20} />,
-        image: '/no-image.png',
+        icon: <StoreIcon />,
+        image: '/',
       },
       {
         title: 'ระบบจัดการออเดอร์',
         href: '/features/order-management',
         description:
-          'รวมออเดอร์จากทุก Platform ไว้ที่เดียว พิมพ์ใบปะหน้าได้ทันที',
-        icon: <ClipboardList size={20} />,
-        image: '/no-image.png',
+          'รวมออเดอร์จากทุกช่องทาง ไว้ที่เดียว พิมพ์ใบปะหน้าได้ทันที',
+        icon: <ClipboardListIcon />,
+        image: '/',
       },
       {
         title: 'วิเคราะห์ยอดขายเชิงลึก',
         href: '/features/analytics',
         description:
           'สรุปรายได้ กำไร และสินค้าขายดีผ่าน Dashboard ที่เข้าใจง่ายที่สุด',
-        icon: <BarChart3 size={20} />,
-        image: '/no-image.png',
+        icon: <BarChart3Icon />,
+        image: '/',
       },
       {
         title: 'ระบบชำระเงินครบวงจร',
         href: '/features/payments',
         description:
           'รองรับโอนเงิน, บัตรเครดิต, และ PromptPay พร้อมระบบยืนยันสลิปอัตโนมัติ',
-        icon: <CreditCard size={20} />,
-        image: '/no-image.png',
+        icon: <CreditCardIcon />,
+        image: '/',
       },
       {
         title: 'ระบบสมาชิก & CRM',
         href: '/features/crm',
         description:
           'สะสมแต้ม จัดกลุ่มลูกค้า และทำโปรโมชั่นเฉพาะบุคคล เพื่อกระตุ้นการซื้อซ้ำ',
-        icon: <Users size={20} />,
-        image: '/no-image.png',
+        icon: <UsersIcon />,
+        image: '/',
       },
       {
         title: 'คูปองและโปรโมชั่น',
         href: '/features/promotions',
         description:
           'สร้างโค้ดส่วนลด ซื้อ 1 แถม 1 หรือจัด Flash Sale ได้เองตามใจชอบ',
-        icon: <TicketPercent size={20} />,
-        image: '/no-image.png',
+        icon: <TicketPercentIcon />,
+        image: '/',
       },
       {
         title: 'ระบบจัดการตัวแทน',
         href: '/features/affiliate',
-        description:
-          'เพิ่มยอดขายด้วยระบบตัวแทนจำหน่าย (Dropship) พร้อมระบบคำนวณคอมมิชชัน',
-        icon: <Handshake size={20} />,
-        image: '/no-image.png',
+        description: 'เพิ่มยอดขายด้วยระบบตัวแทนจำหน่าย พร้อมระบบคำนวณคอมมิชชัน',
+        icon: <HandshakeIcon />,
+        image: '/',
       },
       {
         title: 'เชื่อมต่อแชท',
         href: '/features/chat',
         description:
           'ปิดการขายได้ไวกว่าเดิมด้วยระบบตอบกลับอัตโนมัติและระบบรับออเดอร์ในแชท',
-        icon: <MessageSquareText size={20} />,
-        image: '/no-image.png',
+        icon: <MessageSquareTextIcon />,
+        image: '/',
+      },
+      {
+        title: 'ปรับแต่งดีไซน์ตามใจชอบ',
+        href: '/features/customization',
+        description:
+          'เปลี่ยนธีม ปรับโทนสี และจัดวางเลย์เอาต์หน้าร้านให้เป็นเอกลักษณ์ในสไตล์คุณ',
+        icon: <PaletteIcon />,
+        image: '/',
+      },
+      {
+        title: 'รองรับการขายทั่วโลก',
+        href: '/features/multi-currency',
+        description:
+          'รับชำระเงินได้กว่า 135+ สกุลเงินทั่วโลก พร้อมระบบแปลงค่าเงินอัตโนมัติผ่าน Stripe',
+        icon: <GlobeIcon />,
+        image: '/',
       },
     ],
   },
