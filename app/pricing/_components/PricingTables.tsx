@@ -1,0 +1,62 @@
+import React from 'react'
+
+import { PRICING_TABLES } from '@/constants/pricing'
+
+import { SectionContainer } from '@/components/SectionContainer'
+import { CheckCircleIcon } from '@/components/icon/CheckCircle'
+import { CloseCircleIcon } from '@/components/icon/CloseCircle'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+export function PricingTables() {
+  return (
+    <SectionContainer>
+      <h2 className="max-w-2xl text-4xl leading-tight font-bold">
+        <span className="text-primary">เปรียบเทียบ</span> ความสามารถของแต่ละ
+        Package
+      </h2>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>เลือก Package ที่เหมาะกับคุณ</TableHead>
+            {PRICING_TABLES.tiers.map((tier) => (
+              <TableHead key={tier}>{tier}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {PRICING_TABLES.categories.map((category) => (
+            <React.Fragment key={category.name}>
+              <TableRow>
+                <TableCell
+                  colSpan={PRICING_TABLES.tiers.length + 1}
+                  className="bg-gray-100 text-start font-semibold"
+                >
+                  {category.name}
+                </TableCell>
+              </TableRow>
+
+              {category.features.map((feature, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-start">{feature.label}</TableCell>
+                  {feature.access.map((hasAccess, i) => (
+                    <TableCell key={i} className="text-center">
+                      {hasAccess ? <CheckCircleIcon /> : <CloseCircleIcon />}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </React.Fragment>
+          ))}
+        </TableBody>
+      </Table>
+    </SectionContainer>
+  )
+}

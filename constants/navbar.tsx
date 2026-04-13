@@ -7,8 +7,10 @@ import {
   HandshakeIcon,
   MessageSquareTextIcon,
   PaletteIcon,
+  Share2Icon,
   StoreIcon,
   TicketPercentIcon,
+  TruckIcon,
   UsersIcon,
 } from 'lucide-react'
 
@@ -101,6 +103,22 @@ export const NAVBAR_ITEMS = [
         description:
           'รับชำระเงินได้กว่า 135+ สกุลเงินทั่วโลก พร้อมระบบแปลงค่าเงินอัตโนมัติผ่าน Stripe',
         icon: <GlobeIcon />,
+        image: '/',
+      },
+      {
+        title: 'เชื่อมต่อ Marketplace',
+        href: '/features/marketplace-integration',
+        description:
+          'ซิงค์สต็อกและสินค้ากับ Shopee และ Lazada แบบ Real-time ไม่ต้องลงของซ้ำซ้อน',
+        icon: <Share2Icon />,
+        image: '/',
+      },
+      {
+        title: 'จัดการขนส่งอัตโนมัติ',
+        href: '/features/logistics',
+        description:
+          'เชื่อมต่อ Flash, J&T และไปรษณีย์ไทย เรียกพัสดุและแจ้งเลข Tracking อัตโนมัติ',
+        icon: <TruckIcon />,
         image: '/',
       },
     ],

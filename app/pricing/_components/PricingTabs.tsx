@@ -5,7 +5,7 @@ import { PRICING_OPTIONS } from '@/constants/pricing'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-import { usePricingStore } from '../pricing.store'
+import { usePricingStore } from '../store'
 
 export function PricingTabs() {
   const { selectedTab, setSelectedTab } = usePricingStore()

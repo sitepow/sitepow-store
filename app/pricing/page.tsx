@@ -1,8 +1,8 @@
-import { SectionContainer } from '@/components/SectionContainer'
 import { MainLayout } from '@/components/layout/Layout'
 import { PricingSection } from '@/components/section/Pricing'
 
 import { PricingPackages } from './_components/PricingPackages'
+import { PricingTables } from './_components/PricingTables'
 import { PricingTabs } from './_components/PricingTabs'
 
 export default function PricingPage() {
@@ -10,9 +10,8 @@ export default function PricingPage() {
     <MainLayout className="flex flex-col items-center gap-5">
       <PricingSection />
       <PricingTabs />
-      <SectionContainer>
-        <PricingPackages />
-      </SectionContainer>
+      <PricingPackages />
+      <PricingTables />
     </MainLayout>
   )
 }

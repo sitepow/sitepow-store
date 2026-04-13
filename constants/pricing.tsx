@@ -122,3 +122,134 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     buttonText: 'จัดเต็มทุกฟีเจอร์กับ Ultimate',
   },
 ]
+
+export const PRICING_TABLES = {
+  tiers: ['Free', 'Pro', 'Ultimate'],
+  categories: [
+    {
+      name: 'ช่องทางการขาย',
+      features: [
+        {
+          label: 'Website (Traffic สูงสุด 3,000 pageviews/ชม.)',
+          access: [true, true, true],
+        },
+        {
+          label: 'Mobile Site / Facebook Shop / Instagram / Line Shopping',
+          access: [true, true, true],
+        },
+        {
+          label: 'ระบบ Cashier สร้างใบสั่งซื้อด้วยตนเอง',
+          access: [false, true, true],
+        },
+        {
+          label: 'CheckoutPage (จำนวนลิงก์พิเศษ)',
+          access: ['-', '1', '5'],
+        },
+        {
+          label: 'Affiliate ระบบติดตามออเดอร์จากผู้แนะนำ',
+          access: [false, false, '5'],
+        },
+        {
+          label: 'E-Marketplace (Lazada, Shopee, TikTok Shop)',
+          access: [false, false, true],
+        },
+      ],
+    },
+    {
+      name: 'การจัดการสินค้า',
+      features: [
+        {
+          label: 'จำนวนสินค้าในร้าน',
+          access: ['15', 'Unlimited', 'Unlimited'],
+        },
+        {
+          label: 'จำนวนรูปต่อ 1 สินค้า',
+          access: ['1', '10', '10'],
+        },
+        {
+          label: 'ระบบ Stock & คลังสินค้าเต็มรูปแบบ',
+          access: [false, true, true],
+        },
+        {
+          label: 'ระบบจัดการตัวเลือกสินค้า (Add-on/Attribution)',
+          access: [false, true, true],
+        },
+        {
+          label: 'Import/Export ข้อมูลผ่าน Excel',
+          access: [false, true, true],
+        },
+      ],
+    },
+    {
+      name: 'การตั้งค่าและจัดการร้าน',
+      features: [
+        {
+          label: 'จำนวนผู้ดูแลร้าน',
+          access: ['1', '10', '50'],
+        },
+        {
+          label: 'ตรวจสอบความเคลื่อนไหวของผู้ดูแลร้าน',
+          access: [false, true, true],
+        },
+        {
+          label: 'รองรับหลายภาษา (ไทย, อังกฤษ, จีน, ญี่ปุ่น, ลาว)',
+          access: [true, true, true],
+        },
+        {
+          label: 'ออกใบกำกับภาษีเต็มรูป / e-Tax',
+          access: [true, true, true],
+        },
+        {
+          label: 'จำกัดการเข้าถึงร้าน (Member Gate)',
+          access: [false, false, true],
+        },
+      ],
+    },
+    {
+      name: 'การตลาด และ CRM',
+      features: [
+        {
+          label: 'ติดตั้ง Third party plugin (Pixel, GA, TikTok Tag)',
+          access: [true, true, true],
+        },
+        {
+          label: 'ระบบสมาชิก พร้อม Digital Member Card',
+          access: [false, false, true],
+        },
+        {
+          label: 'ระบบสะสมแต้มแลกของรางวัล',
+          access: [false, false, true],
+        },
+        {
+          label: 'รหัสส่วนลด / Super Discount',
+          access: [true, true, true],
+        },
+        {
+          label: 'Flash Sale / Dynamic Pricing',
+          access: [false, true, true],
+        },
+      ],
+    },
+    {
+      name: 'การจัดส่งและชำระเงิน',
+      features: [
+        {
+          label: 'โอนเงินธนาคาร / เก็บเงินปลายทาง (COD)',
+          access: [true, true, true],
+        },
+        {
+          label: 'เชื่อมต่อ Payment Gateway & ขนส่งชั้นนำ',
+          access: [false, true, true],
+        },
+        {
+          label: 'คำนวณค่าส่งอัตโนมัติตามน้ำหนัก',
+          access: [false, true, true],
+        },
+        {
+          label: 'พิมพ์ใบปะหน้าผ่าน Thermal Printer',
+          access: [false, true, true],
+        },
+      ],
+    },
+  ],
+}

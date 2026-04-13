@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { calculatePlanPrice, formatCurrency } from '@/lib/pricing'
 
-import { usePricingStore } from '../pricing.store'
+import { usePricingStore } from '../store'
 
 export function PricingCard({
   title,
