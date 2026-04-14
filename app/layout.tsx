@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_Thai_Looped, Inter } from 'next/font/google'
 
+import { BASE_FAVICON } from '@/constants/favicon'
 import { QueryProviders } from '@/providers/QueryProviders'
 
 import { cn } from '@/lib/utils'
@@ -28,6 +29,11 @@ export const metadata: Metadata = {
     'โปรแกรมสต็อกสินค้า',
     'E-commerce Platform Thailand',
   ],
+  icons: {
+    icon: BASE_FAVICON,
+    shortcut: BASE_FAVICON,
+    apple: BASE_FAVICON,
+  },
 }
 
 export default function RootLayout({

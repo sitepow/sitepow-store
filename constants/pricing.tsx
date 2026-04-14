@@ -94,7 +94,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
   {
     title: 'Ultimate',
     description: 'ที่สุดของการตลาดขั้นสูงและการขายแบบ Omnichannel',
-    price: '2,890.00',
+    price: '1,490.00',
     currency: 'THB / เดือน',
     seed: 'legend',
     features: [

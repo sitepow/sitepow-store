@@ -1,0 +1,66 @@
+import { Discount, DiscountType, Product } from '@/types/sites/product'
+
+export const calculateNetPrice = ({
+  price,
+  discount,
+}: {
+  price: number
+  discount?: Discount
+}): number => {
+  if (!discount || !discount.active) {
+    return price
+  }
+
+  switch (discount.type) {
+    case DiscountType.PERCENTAGE:
+      return price - (price * discount.amount) / 100
+    case DiscountType.FIXED:
+      return Math.max(0, price - discount.amount)
+    default:
+      return price
+  }
+}
+
+export const useCalculateProduct = (product: Product) => {
+  const variants = product?.variants || []
+
+  if (variants.length === 0) {
+    return {
+      original: { min: 0, max: 0, avg: 0 },
+      net: { min: 0, max: 0, avg: 0 },
+      hasDiscount: false,
+    }
+  }
+
+  const originalPrices = variants.map((variant) => variant.price)
+  const netPrices = variants.map((variant) =>
+    calculateNetPrice({ price: variant.price, discount: variant.discount }),
+  )
+
+  const getStats = (prices: number[]) => {
+    const min = Math.min(...prices)
+    const max = Math.max(...prices)
+    const avg = prices.reduce((a, b) => a + b, 0) / prices.length
+    return { min, max, avg }
+  }
+
+  const originalStats = getStats(originalPrices)
+  const netStats = getStats(netPrices)
+
+  const hasDiscount = netPrices.some(
+    (netPrice, index) => netPrice < originalPrices[index],
+  )
+
+  return {
+    price: {
+      original: originalStats,
+      net: netStats,
+    },
+    hasDiscount,
+    maxDiscountPercent: hasDiscount
+      ? Math.round(
+          ((originalStats.max - netStats.min) / originalStats.max) * 100,
+        )
+      : 0,
+  }
+}

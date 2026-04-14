@@ -1,5 +1,10 @@
 import { StoreLayout } from './_components/layout/Layout'
+import { ProductsSection } from './_components/section/Products'
 
 export default function StoreHomePage() {
-  return <StoreLayout />
+  return (
+    <StoreLayout>
+      <ProductsSection />
+    </StoreLayout>
+  )
 }

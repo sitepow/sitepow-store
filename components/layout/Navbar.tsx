@@ -36,7 +36,7 @@ export function Navbar() {
                   <NavigationMenuContent>
                     <ul className="grid w-100 gap-3 p-4 md:w-125 md:grid-cols-2 lg:w-150">
                       {item.children.map(({ description, image, ...rest }) => (
-                        <ListItem key={rest.href} {...rest}>
+                        <ListItem key={rest.title} {...rest}>
                           {description}
                         </ListItem>
                       ))}

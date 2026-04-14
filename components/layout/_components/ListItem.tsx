@@ -16,9 +16,13 @@ export function ListItem({
       <NavigationMenuLink asChild>
         <Link href={href}>
           <div className="flex flex-col gap-1 text-sm">
-            <div className="text-primary mb-2.5">{icon}</div>
+            {icon && <div className="text-primary mb-2.5">{icon}</div>}
             <div className="leading-none font-medium">{title}</div>
-            <div className="text-muted-foreground line-clamp-2">{children}</div>
+            {children && (
+              <div className="text-muted-foreground line-clamp-2">
+                {children}
+              </div>
+            )}
           </div>
         </Link>
       </NavigationMenuLink>
