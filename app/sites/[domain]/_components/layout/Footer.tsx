@@ -62,6 +62,10 @@ export function StoreFooter() {
           </div>
         </div>
       </div>
+
+      <div className="mb-5 flex items-center justify-center gap-2.5">
+        protected & managed by <LogoBrand />
+      </div>
     </footer>
   )
 }

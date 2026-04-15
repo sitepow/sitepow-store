@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
-import { IBM_Plex_Sans_Thai_Looped, Inter } from 'next/font/google'
+import {
+  Dancing_Script,
+  IBM_Plex_Sans_Thai_Looped,
+  Inter,
+} from 'next/font/google'
 
 import { BASE_FAVICON } from '@/constants/favicon'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -14,6 +18,11 @@ const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
+})
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin'],
+  variable: '--font-signature',
 })
 
 export const metadata: Metadata = {
@@ -48,6 +57,7 @@ export default function RootLayout({
         'h-full',
         'antialiased',
         ibmPlexSansThaiLooped.variable,
+        dancingScript.variable,
         'font-sans',
         inter.variable,
       )}

@@ -4,6 +4,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8bd6-8766-77eb-828e-17cf227b9293',
     categoryId: '019d8c50-5e3a-7df1-8de0-e260f4f4f8dd',
+    slug: 't-shirt-limited-x-logitech',
     title: 'เสื้อยืดลิมิเต็ด x Logitech',
     image: '/images/tshirt-logi.jpg',
     variants: [
@@ -60,6 +61,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c01-4475-7f91-8f5c-99d8d646a782',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    slug: 'logitech-mx-master-3s',
     title: 'Logitech MX Master 3S',
     image: '/images/mx-master-3s.jpg',
     variants: [
@@ -116,6 +118,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c0a-7b32-7011-89d2-17cf227b3456',
     categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
+    slug: 'iced-americano',
     title: 'อเมริกาโน่เย็น (Iced Americano)',
     image: '/images/coffee.jpg',
     variants: [
@@ -178,6 +181,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c22-3a5b-77f1-8888-17cf227b9abc',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
+    slug: 'steam-wallet-code-global',
     title: 'Steam Wallet Code (Global)',
     image: '/images/steam-card.jpg',
     variants: [
@@ -238,6 +242,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c30-1111-7abc-8888-17cf227b9001',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    slug: 'custom-mechanical-keyboard-k8',
     title: 'Custom Mechanical Keyboard K8',
     image: '/images/keyboard-k8.jpg',
     variants: [
@@ -289,6 +294,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c35-2222-7abc-9999-17cf227b9002',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
+    slug: 'gaming-chair-ergo-v2',
     title: 'Gaming Chair Ergo-V2',
     image: '/images/chair-ergo.jpg',
     variants: [
@@ -329,6 +335,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c40-3333-7abc-1111-17cf227b9003',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
+    slug: 'netflix-premium-shared',
     title: 'Netflix Premium (Shared Account)',
     image: '/images/netflix.jpg',
     variants: [
@@ -369,6 +376,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c45-4444-7abc-2222-17cf227b9004',
     categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
+    slug: 'molly-space-x-spongebob-limited',
     title: 'Molly Space x SpongeBob (Limited Edition)',
     image: '/images/molly-spongebob.jpg',
     variants: [
@@ -421,6 +429,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c4a-5555-7abc-3333-17cf227b9005',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    slug: 'sony-wh-1000xm5-wireless-noise-cancelling',
     title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
     image: '/images/sony-xm5.jpg',
     variants: [
@@ -468,6 +477,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c4f-6666-7abc-4444-17cf227b9006',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
+    slug: 'minimal-desk-mat',
     title: 'แผ่นรองเม้าส์แบบยาว (Minimal Desk Mat)',
     image: '/images/deskmat.jpg',
     variants: [
@@ -504,10 +514,10 @@ export const PRODUCTS: Product[] = [
       tags: ['desk-setup', 'accessory', 'work-from-home'],
     },
   },
-  // ... ต่อจากรายการก่อนหน้า
   {
     productId: '019d8c55-7777-7abc-5555-17cf227b9007',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    slug: 'ipad-pro-m4-2024',
     title: 'iPad Pro M4 (2024)',
     image: '/images/ipad-pro-m4.jpg',
     variants: [
@@ -568,6 +578,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c5a-8888-7abc-6666-17cf227b9008',
     categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
+    slug: 'signature-butter-croissant',
     title: 'ครัวซองต์เนยสด (Signature Croissant)',
     image: '/images/croissant.jpg',
     variants: [
@@ -620,6 +631,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c60-9999-7abc-7777-17cf227b9009',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
+    slug: 'youtube-premium-family-share',
     title: 'YouTube Premium (Family Plan Share)',
     image: '/images/youtube-premium.jpg',
     variants: [
@@ -664,6 +676,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c65-aaaa-7abc-8888-17cf227b9010',
     categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
+    slug: 'lego-star-wars-the-razor-crest',
     title: 'LEGO Star Wars: The Razor Crest',
     image: '/images/lego-starwars.jpg',
     variants: [
@@ -700,6 +713,7 @@ export const PRODUCTS: Product[] = [
   {
     productId: '019d8c6a-bbbb-7abc-9999-17cf227b9011',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
+    slug: 'electric-standing-smart-desk',
     title: 'โต๊ะคอมพิวเตอร์ปรับระดับไฟฟ้า (Smart Desk)',
     image: '/images/standing-desk.jpg',
     variants: [

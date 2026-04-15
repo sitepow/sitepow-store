@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 
 export function StoreNavbar() {
   return (
-    <nav className="container mx-auto flex flex-col gap-5 px-10 py-5">
+    <nav className="container mx-auto flex flex-col gap-5 border-b border-gray-100 px-10 py-5">
       <div className="flex items-center justify-between">
         <LogoBrand />
 

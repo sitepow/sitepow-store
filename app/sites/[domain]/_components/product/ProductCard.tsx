@@ -9,14 +9,17 @@ import { formatCurrency } from '@/lib/pricing'
 import { useCalculateProduct } from '@/lib/product'
 import { cn } from '@/lib/utils'
 
-const productCardVariants = cva('h-full rounded-xl transition-all', {
-  variants: {
-    variant: {
-      outline: 'border border-gray-100',
-      shadow: 'shadow-airy',
+const productCardVariants = cva(
+  'h-full rounded-xl transition-all group hover:border hover:border-primary/50',
+  {
+    variants: {
+      variant: {
+        outline: 'border border-gray-100',
+        shadow: 'shadow-airy ',
+      },
     },
   },
-})
+)
 
 interface ProductCardProps
   extends Product, VariantProps<typeof productCardVariants> {
@@ -32,7 +35,7 @@ export function ProductCard({
     useCalculateProduct(product)
 
   return (
-    <Link href="/product">
+    <Link href={`/products/${product.slug}`}>
       <div className={cn(productCardVariants({ variant }), className)}>
         <div className="relative">
           <div className="mb-2.5 h-52 w-full rounded-xl bg-gray-200" />
@@ -45,15 +48,17 @@ export function ProductCard({
           )}
         </div>
 
-        <h3 className="line-clamp-2">{product.title}</h3>
+        <h3 className="group-hover:text-primary line-clamp-2">
+          {product.title}
+        </h3>
 
         {hasDiscount && (
-          <span className="text-muted-foreground text-sm line-through">
+          <span className="text-muted-foreground group-hover:text-primary text-sm line-through">
             {formatCurrency(price?.original?.min || 0)}
           </span>
         )}
 
-        <div className="flex items-end justify-center gap-2">
+        <div className="group-hover:text-primary flex items-end justify-center gap-2">
           <data value={price?.net?.min} className="text-2xl font-bold">
             {formatCurrency(price?.net?.min || 0)}
           </data>

@@ -1,3 +1,5 @@
+import { StoreLayout } from '../_components/layout/Layout'
+
 export default function StoreCartPage() {
-  return <div />
+  return <StoreLayout></StoreLayout>
 }

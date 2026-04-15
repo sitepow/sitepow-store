@@ -47,6 +47,7 @@ export interface Product {
   productId: string
   categoryId: string
   title: string
+  slug: string
   image: string
   variants: ProductVariant[]
   options: ProductOption[]
