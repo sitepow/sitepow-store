@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
 import { Product } from '@/types/sites/product'
+import { formatCurrency } from '@/utils/pricing'
 import { type VariantProps, cva } from 'class-variance-authority'
 
 import { Badge } from '@/components/ui/badge'
 
-import { formatCurrency } from '@/lib/pricing'
-import { useCalculateProduct } from '@/lib/product'
+import { useCalculateProduct } from '@/utils/product'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(

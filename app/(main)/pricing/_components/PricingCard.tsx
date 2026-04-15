@@ -3,11 +3,10 @@ import Image from 'next/image'
 
 import { PRICING_VALUE } from '@/constants/pricing'
 import { PricingPlanProps } from '@/types/pricing'
+import { calculatePlanPrice, formatCurrency } from '@/utils/pricing'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-
-import { calculatePlanPrice, formatCurrency } from '@/lib/pricing'
 
 import { usePricingStore } from '../store'
 
