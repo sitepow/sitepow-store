@@ -17,6 +17,10 @@ export const PRODUCTS: Product[] = [
           amount: 10,
           active: true,
         },
+        rewardPoints: {
+          amount: 50,
+          isActive: true,
+        },
         stock: 15,
         sku: 'SP-TSH-WHT-M',
       },
@@ -235,7 +239,6 @@ export const PRODUCTS: Product[] = [
       platform: 'Steam',
       region: 'Global / Thailand',
       instructions: 'กรอกรหัส 15 หลักในหน้า Redeem ของ Steam',
-      is_digital: true,
       tags: ['game', 'top-up', 'steam'],
     },
   },
@@ -367,7 +370,6 @@ export const PRODUCTS: Product[] = [
     ],
     addons: [],
     metadata: {
-      is_digital: true,
       platform: 'Netflix',
       delivery_method: 'Email Login',
       tags: ['digital', 'streaming', 'netflix'],
@@ -668,7 +670,6 @@ export const PRODUCTS: Product[] = [
     ],
     addons: [],
     metadata: {
-      is_digital: true,
       delivery_method: 'Email Invitation',
       tags: ['digital', 'subscription', 'youtube'],
     },

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -33,6 +34,9 @@ export default async function StoreProductDescriptionPage({
   const { slug } = await params
   const product = PRODUCTS.find((product) => product.slug === slug) as Product
   const { price } = calculateProduct(product)
+
+  const hasSpecs = Object.keys(product.metadata).some((key) => key !== 'tags')
+  const hasTags = product.metadata.tags && product.metadata.tags.length > 0
 
   return (
     <StoreLayout>
@@ -65,6 +69,60 @@ export default async function StoreProductDescriptionPage({
               <div className="size-20 rounded-xl bg-gray-100" />
               <div className="size-20 rounded-xl bg-gray-100" />
               <div className="size-20 rounded-xl bg-gray-100" />
+              <div className="size-20 rounded-xl bg-gray-100" />
+            </div>
+
+            <div className="mt-10 space-y-6">
+              {hasSpecs && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold">ข้อมูลจำเพาะ</h3>
+                    <Separator className="flex-1" />
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
+                    {Object.entries(product.metadata).map(([key, value]) => {
+                      if (key === 'tags') return null
+
+                      return (
+                        <div key={key} className="flex flex-col border-b pb-2">
+                          <span className="text-muted-foreground text-sm capitalize">
+                            {key.replace(/_/g, ' ')}
+                          </span>
+                          <span className="font-medium text-slate-900 capitalize">
+                            {Array.isArray(value)
+                              ? value
+                                  .map((v) =>
+                                    typeof v === 'object'
+                                      ? `${v.label}: ${v.value}`
+                                      : v,
+                                  )
+                                  .join(', ')
+                              : String(value)}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+
+              {hasTags && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold">แท็กสินค้า</h3>
+                    <Separator className="flex-1" />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-4">
+                    {(product.metadata.tags ?? []).map((tag) => (
+                      <Badge key={tag} variant="outline" className="capitalize">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -82,6 +140,12 @@ export default async function StoreProductDescriptionPage({
                 </data>
                 <span className="mb-0.5 text-xl font-bold">THB</span>
               </div>
+
+              <p>
+                ซื้อสินค้านี้รับ{' '}
+                <span className="text-primary text-lg font-bold">+ 50</span>{' '}
+                แต้มสะสม
+              </p>
             </div>
 
             {product?.variants?.length !== 0 && <Separator />}
@@ -104,6 +168,7 @@ export default async function StoreProductDescriptionPage({
                     >
                       {variant.title}
                     </Label>
+
                     <span className="text-sm font-semibold">
                       {formatCurrency(variant.price)}
                     </span>
@@ -122,9 +187,12 @@ export default async function StoreProductDescriptionPage({
                       {option.title}
                     </Label>
                     {option.require && (
-                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-600">
-                        จำเป็น
-                      </span>
+                      <Badge
+                        variant="outline"
+                        className="border-primary text-primary"
+                      >
+                        * จำเป็น
+                      </Badge>
                     )}
                   </div>
                   <RadioGroup defaultValue={option.choices[0].name}>
@@ -145,7 +213,7 @@ export default async function StoreProductDescriptionPage({
                             {choice.name}
                           </Label>
                           {choice.extraPrice > 0 && (
-                            <span className="text-primary text-sm">
+                            <span className="text-primary text-sm font-semibold">
                               +{formatCurrency(choice.extraPrice)}
                             </span>
                           )}

@@ -3,6 +3,11 @@ export enum DiscountType {
   FIXED = 'Fixed',
 }
 
+export interface RewardPoints {
+  amount: number
+  isActive: boolean
+}
+
 export interface Discount {
   type: DiscountType
   amount: number
@@ -28,6 +33,7 @@ export interface ProductVariant {
   discount?: Discount
   stock: number
   sku: string
+  rewardPoints?: RewardPoints
 }
 
 export interface ProductAddon {
