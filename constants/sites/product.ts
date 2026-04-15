@@ -3,6 +3,7 @@ import { DiscountType, Product } from '@/types/sites/product'
 export const PRODUCTS: Product[] = [
   {
     productId: '019d8bd6-8766-77eb-828e-17cf227b9293',
+    categoryId: '019d8c50-5e3a-7df1-8de0-e260f4f4f8dd',
     title: 'เสื้อยืดลิมิเต็ด x Logitech',
     image: '/images/tshirt-logi.jpg',
     variants: [
@@ -58,6 +59,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c01-4475-7f91-8f5c-99d8d646a782',
+    categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     title: 'Logitech MX Master 3S',
     image: '/images/mx-master-3s.jpg',
     variants: [
@@ -113,6 +115,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c0a-7b32-7011-89d2-17cf227b3456',
+    categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
     title: 'อเมริกาโน่เย็น (Iced Americano)',
     image: '/images/coffee.jpg',
     variants: [
@@ -174,6 +177,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c22-3a5b-77f1-8888-17cf227b9abc',
+    categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
     title: 'Steam Wallet Code (Global)',
     image: '/images/steam-card.jpg',
     variants: [
@@ -233,6 +237,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c30-1111-7abc-8888-17cf227b9001',
+    categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     title: 'Custom Mechanical Keyboard K8',
     image: '/images/keyboard-k8.jpg',
     variants: [
@@ -241,6 +246,11 @@ export const PRODUCTS: Product[] = [
         title: 'Blue Switch / RGB',
         price: 2490.0,
         stock: 12,
+        discount: {
+          type: DiscountType.PERCENTAGE,
+          amount: 6,
+          active: true,
+        },
         sku: 'KB-K8-BLUE',
       },
       {
@@ -278,6 +288,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c35-2222-7abc-9999-17cf227b9002',
+    categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
     title: 'Gaming Chair Ergo-V2',
     image: '/images/chair-ergo.jpg',
     variants: [
@@ -317,6 +328,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c40-3333-7abc-1111-17cf227b9003',
+    categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
     title: 'Netflix Premium (Shared Account)',
     image: '/images/netflix.jpg',
     variants: [
@@ -346,7 +358,7 @@ export const PRODUCTS: Product[] = [
         ],
       },
     ],
-    addons: [], // ไม่มีแอดออน
+    addons: [],
     metadata: {
       is_digital: true,
       platform: 'Netflix',
@@ -356,6 +368,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c45-4444-7abc-2222-17cf227b9004',
+    categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
     title: 'Molly Space x SpongeBob (Limited Edition)',
     image: '/images/molly-spongebob.jpg',
     variants: [
@@ -403,6 +416,337 @@ export const PRODUCTS: Product[] = [
       series: 'Space Molly',
       is_limited: true,
       tags: ['toy', 'collectible', 'arttoy'],
+    },
+  },
+  {
+    productId: '019d8c4a-5555-7abc-3333-17cf227b9005',
+    categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
+    image: '/images/sony-xm5.jpg',
+    variants: [
+      {
+        variantId: 'v-sony-black',
+        title: 'Black',
+        price: 14990.0,
+        discount: {
+          type: DiscountType.FIXED,
+          amount: 2000,
+          active: true,
+        },
+        stock: 12,
+        sku: 'SNY-XM5-BLK',
+      },
+      {
+        variantId: 'v-sony-silver',
+        title: 'Platinum Silver',
+        price: 14990.0,
+        stock: 8,
+        sku: 'SNY-XM5-SLV',
+      },
+    ],
+    options: [],
+    addons: [
+      {
+        addonId: 'a-sony-1',
+        title: 'Sony Care+ ประกันอุบัติเหตุ 2 ปี',
+        price: 1290.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-sony-2',
+        title: 'ขาตั้งหูฟัง Aluminum Stand',
+        price: 590.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      brand: 'Sony',
+      features: ['Active Noise Cancelling', '30 Hours Battery'],
+      tags: ['audio', 'headphones', 'sony'],
+    },
+  },
+  {
+    productId: '019d8c4f-6666-7abc-4444-17cf227b9006',
+    categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
+    title: 'แผ่นรองเม้าส์แบบยาว (Minimal Desk Mat)',
+    image: '/images/deskmat.jpg',
+    variants: [
+      {
+        variantId: 'v-mat-gray',
+        title: 'Felt Grey / 90x40cm',
+        price: 450.0,
+        stock: 50,
+        sku: 'ACC-MAT-GRY',
+      },
+      {
+        variantId: 'v-mat-leather',
+        title: 'Vegan Leather / 80x40cm',
+        price: 690.0,
+        stock: 30,
+        sku: 'ACC-MAT-LTH',
+      },
+    ],
+    options: [
+      {
+        title: 'สกรีนชื่อเล่น (Custom Laser)',
+        maxSelect: 1,
+        require: false,
+        choices: [
+          { name: 'ไม่รับสกรีน', extraPrice: 0 },
+          { name: 'สกรีนชื่อ (ไม่เกิน 10 ตัวอักษร)', extraPrice: 100 },
+        ],
+      },
+    ],
+    addons: [],
+    metadata: {
+      material: 'Eco-Friendly',
+      style: 'Minimalist',
+      tags: ['desk-setup', 'accessory', 'work-from-home'],
+    },
+  },
+  // ... ต่อจากรายการก่อนหน้า
+  {
+    productId: '019d8c55-7777-7abc-5555-17cf227b9007',
+    categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
+    title: 'iPad Pro M4 (2024)',
+    image: '/images/ipad-pro-m4.jpg',
+    variants: [
+      {
+        variantId: 'v-ipad-11-256',
+        title: '11-inch / 256GB / Wi-Fi',
+        price: 39900.0,
+        stock: 10,
+        sku: 'APL-IPD-11-256',
+      },
+      {
+        variantId: 'v-ipad-13-512',
+        title: '13-inch / 512GB / Wi-Fi',
+        price: 52900.0,
+        discount: {
+          type: DiscountType.PERCENTAGE,
+          amount: 5,
+          active: true,
+        },
+        stock: 5,
+        sku: 'APL-IPD-13-512',
+      },
+    ],
+    options: [
+      {
+        title: 'ประเภทกระจกหน้าจอ',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'Standard Glass', extraPrice: 0 },
+          {
+            name: 'Nano-texture Glass (เฉพาะรุ่น 1TB ขึ้นไป)',
+            extraPrice: 4000,
+          },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'a-ipad-1',
+        title: 'Apple Pencil Pro',
+        price: 4990.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-ipad-2',
+        title: 'Magic Keyboard',
+        price: 11990.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      brand: 'Apple',
+      display: 'Ultra Retina XDR',
+      tags: ['tablet', 'apple', 'gadget'],
+    },
+  },
+  {
+    productId: '019d8c5a-8888-7abc-6666-17cf227b9008',
+    categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
+    title: 'ครัวซองต์เนยสด (Signature Croissant)',
+    image: '/images/croissant.jpg',
+    variants: [
+      {
+        variantId: 'v-crois-plain',
+        title: 'Plain Butter',
+        price: 85.0,
+        stock: 20,
+        sku: 'BAKE-CRO-PLN',
+      },
+      {
+        variantId: 'v-crois-almond',
+        title: 'Almond Cream',
+        price: 125.0,
+        stock: 15,
+        sku: 'BAKE-CRO-ALM',
+      },
+    ],
+    options: [
+      {
+        title: 'ระดับความร้อน',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'อุ่นร้อนพร้อมทาน', extraPrice: 0 },
+          { name: 'รับแบบเย็น (ไปอุ่นเอง)', extraPrice: 0 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'a-crois-1',
+        title: 'วิปครีมสด',
+        price: 25.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-crois-2',
+        title: 'แยมสตรอว์เบอร์รี่โฮมเมด',
+        price: 30.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      calories: '280 kcal',
+      contains_dairy: true,
+      tags: ['bakery', 'food', 'dessert'],
+    },
+  },
+  {
+    productId: '019d8c60-9999-7abc-7777-17cf227b9009',
+    categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
+    title: 'YouTube Premium (Family Plan Share)',
+    image: '/images/youtube-premium.jpg',
+    variants: [
+      {
+        variantId: 'v-yt-1m',
+        title: '1 เดือน',
+        price: 59.0,
+        stock: 500,
+        sku: 'DG-YT-1M',
+      },
+      {
+        variantId: 'v-yt-12m',
+        title: '1 ปี (คุ้มสุด)',
+        price: 590.0,
+        discount: {
+          type: DiscountType.FIXED,
+          amount: 100,
+          active: true,
+        },
+        stock: 100,
+        sku: 'DG-YT-12M',
+      },
+    ],
+    options: [
+      {
+        title: 'วิธีการรับสิทธิ์',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'ใช้เมลเดิม (ส่งคำเชิญเข้า Family)', extraPrice: 0 },
+          { name: 'รับเมลใหม่จากทางร้าน', extraPrice: 0 },
+        ],
+      },
+    ],
+    addons: [],
+    metadata: {
+      is_digital: true,
+      delivery_method: 'Email Invitation',
+      tags: ['digital', 'subscription', 'youtube'],
+    },
+  },
+  {
+    productId: '019d8c65-aaaa-7abc-8888-17cf227b9010',
+    categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
+    title: 'LEGO Star Wars: The Razor Crest',
+    image: '/images/lego-starwars.jpg',
+    variants: [
+      {
+        variantId: 'v-lego-rzr',
+        title: 'Standard Box',
+        price: 21500.0,
+        stock: 2,
+        sku: 'TOY-LEGO-SW-01',
+      },
+    ],
+    options: [],
+    addons: [
+      {
+        addonId: 'a-lego-1',
+        title: 'ตู้โชว์อะคริลิคฐานไม้ไฟ LED',
+        price: 2500.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-lego-2',
+        title: 'บริการต่อให้โดยผู้เชี่ยวชาญ',
+        price: 1500.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      brand: 'LEGO',
+      pieces: '6187',
+      recommended_age: '18+',
+      tags: ['toy', 'lego', 'starwars', 'collector'],
+    },
+  },
+  {
+    productId: '019d8c6a-bbbb-7abc-9999-17cf227b9011',
+    categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
+    title: 'โต๊ะคอมพิวเตอร์ปรับระดับไฟฟ้า (Smart Desk)',
+    image: '/images/standing-desk.jpg',
+    variants: [
+      {
+        variantId: 'v-desk-140',
+        title: 'Size 140x70cm / สีไม้ Oak',
+        price: 12900.0,
+        stock: 4,
+        sku: 'FUR-DSK-140-OAK',
+      },
+      {
+        variantId: 'v-desk-160',
+        title: 'Size 160x80cm / สีดำ Matte Black',
+        price: 14500.0,
+        stock: 3,
+        sku: 'FUR-DSK-160-BLK',
+      },
+    ],
+    options: [
+      {
+        title: 'แผงควบคุม (Controller)',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'ปุ่มกดธรรมดา Up-Down', extraPrice: 0 },
+          { name: 'หน้าจอ Digital (บันทึกได้ 4 ระดับ)', extraPrice: 800 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'a-desk-1',
+        title: 'ช่องจัดเก็บสายไฟใต้โต๊ะ',
+        price: 450.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-desk-2',
+        title: 'ล้อเลื่อนแบบล็อคได้ (4 ชิ้น)',
+        price: 350.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      brand: 'ErgoHome',
+      warranty: '5 Years Motor Warranty',
+      tags: ['furniture', 'office', 'ergonomic'],
     },
   },
 ]

@@ -45,6 +45,7 @@ export interface ProductMetadata {
 
 export interface Product {
   productId: string
+  categoryId: string
   title: string
   image: string
   variants: ProductVariant[]
