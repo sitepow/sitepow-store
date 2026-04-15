@@ -117,7 +117,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c0a-7b32-7011-89d2-17cf227b3456',
-    categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c222',
     slug: 'iced-americano',
     title: 'อเมริกาโน่เย็น (Iced Americano)',
     image: '/images/coffee.jpg',
@@ -577,7 +577,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     productId: '019d8c5a-8888-7abc-6666-17cf227b9008',
-    categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c222',
     slug: 'signature-butter-croissant',
     title: 'ครัวซองต์เนยสด (Signature Croissant)',
     image: '/images/croissant.jpg',
@@ -761,6 +761,174 @@ export const PRODUCTS: Product[] = [
       brand: 'ErgoHome',
       warranty: '5 Years Motor Warranty',
       tags: ['furniture', 'office', 'ergonomic'],
+    },
+  },
+  {
+    productId: '019d8d55-1234-77eb-8f5c-99d8d646a001',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
+    slug: 'somtum-pala-premium',
+    title: 'ส้มตำปูปลาร้า (สูตรนัวพิเศษ)',
+    image: '/images/somtum-pala.jpg',
+    variants: [
+      {
+        variantId: 'v-st-pala-01',
+        title: 'ชุดมาตรฐาน',
+        price: 75.0,
+        stock: 999,
+        sku: 'SP-ST-PALA',
+      },
+    ],
+    options: [
+      {
+        title: 'ระดับความเผ็ด',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'ไม่เผ็ด (พริก 0 เม็ด)', extraPrice: 0 },
+          { name: 'เผ็ดน้อย (พริก 2 เม็ด)', extraPrice: 0 },
+          { name: 'เผ็ดปกติ (พริก 5 เม็ด)', extraPrice: 0 },
+          { name: 'เผ็ดจัด (พริก 10 เม็ด)', extraPrice: 0 },
+          { name: 'เผ็ดตายไม่เอาเรื่อง (พริก 20 เม็ด)', extraPrice: 15 },
+        ],
+      },
+      {
+        title: 'ระดับความนัว (ปลาร้า)',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'นัวปกติ', extraPrice: 0 },
+          { name: 'นัวพิเศษ (เพิ่มน้ำปลาร้า)', extraPrice: 5 },
+          { name: 'ไม่ใส่ปลาร้า (ตำไทยแทน)', extraPrice: 0 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'add-01',
+        title: 'ขนมจีน',
+        price: 15.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'add-02',
+        title: 'แคบหมูไร้มัน',
+        price: 20.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      tags: ['spicy', 'thai-food', 'somtum'],
+    },
+  },
+  {
+    productId: '019d8d55-5678-77eb-8f5c-99d8d646a002',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
+    slug: 'holy-basil-wagyu-beef',
+    title: 'ข้าวกะเพราเนื้อวากิว (Wagyu Basil Rice)',
+    image: '/images/wagyu-basil.jpg',
+    variants: [
+      {
+        variantId: 'v-wg-basil-01',
+        title: 'Wagyu Ground (เนื้อสับ)',
+        price: 185.0,
+        stock: 50,
+        sku: 'SP-WG-BSL-S',
+      },
+      {
+        variantId: 'v-wg-basil-02',
+        title: 'Wagyu Sliced (เนื้อชิ้น)',
+        price: 220.0,
+        stock: 30,
+        sku: 'SP-WG-BSL-L',
+      },
+    ],
+    options: [
+      {
+        title: 'ความสุกของเนื้อ',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'Medium Rare', extraPrice: 0 },
+          { name: 'Medium', extraPrice: 0 },
+          { name: 'Well Done', extraPrice: 0 },
+        ],
+      },
+      {
+        title: 'ความเผ็ด',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'เผ็ดน้อย', extraPrice: 0 },
+          { name: 'เผ็ดปกติ', extraPrice: 0 },
+          { name: 'เผ็ดมาก (พริกแห้ง)', extraPrice: 0 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'add-egg-duck',
+        title: 'ไข่ดาวเป็ดลาวา',
+        price: 25.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      tags: ['premium', 'beef', 'lunch'],
+    },
+  },
+  {
+    productId: '019d8d55-9012-77eb-8f5c-99d8d646a003',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
+    slug: 'salmon-yum-thai-style',
+    title: 'ยำแซลมอนสด (Thai-Style Salmon Salad)',
+    image: '/images/salmon-yum.jpg',
+    variants: [
+      {
+        variantId: 'v-salmon-01',
+        title: 'Size M (150g)',
+        price: 290.0,
+        stock: 20,
+        sku: 'SP-SAL-M',
+      },
+      {
+        variantId: 'v-salmon-02',
+        title: 'Size L (300g)',
+        price: 550.0,
+        stock: 10,
+        sku: 'SP-SAL-L',
+      },
+    ],
+    options: [
+      {
+        title: 'น้ำยำ',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'น้ำยำสูตรปลาร้า', extraPrice: 0 },
+          { name: 'น้ำยำสูตรซีฟู้ดมะนาวสด', extraPrice: 0 },
+        ],
+      },
+      {
+        title: 'ระดับความเผ็ด',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'เผ็ดน้อย', extraPrice: 0 },
+          { name: 'เผ็ดกลาง', extraPrice: 0 },
+          { name: 'เผ็ดมาก', extraPrice: 0 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'add-ไหลบัว',
+        title: 'เพิ่มไหลบัวกรอบ',
+        price: 30.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      tags: ['seafood', 'spicy', 'clean-food'],
     },
   },
 ]

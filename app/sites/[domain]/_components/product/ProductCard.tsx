@@ -2,11 +2,11 @@ import Link from 'next/link'
 
 import { Product } from '@/types/sites/product'
 import { formatCurrency } from '@/utils/pricing'
+import { calculateProduct } from '@/utils/product'
 import { type VariantProps, cva } from 'class-variance-authority'
 
 import { Badge } from '@/components/ui/badge'
 
-import { useCalculateProduct } from '@/utils/product'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
@@ -31,8 +31,7 @@ export function ProductCard({
   className,
   ...product
 }: ProductCardProps) {
-  const { hasDiscount, price, maxDiscountPercent } =
-    useCalculateProduct(product)
+  const { hasDiscount, price, maxDiscountPercent } = calculateProduct(product)
 
   return (
     <Link href={`/products/${product.slug}`}>

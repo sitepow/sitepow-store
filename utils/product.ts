@@ -21,7 +21,7 @@ export const calculateNetPrice = ({
   }
 }
 
-export const useCalculateProduct = (product: Product) => {
+export const calculateProduct = (product: Product) => {
   const variants = product?.variants || []
 
   if (variants.length === 0) {

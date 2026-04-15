@@ -29,8 +29,10 @@ export const calculatePlanPrice = (
 }
 
 export const formatCurrency = (num: number) => {
-  return num.toLocaleString(undefined, {
+  return num.toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+    // style: 'currency',
+    // currency: 'THB',
   })
 }

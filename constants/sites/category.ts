@@ -18,12 +18,19 @@ export const CATEGORIES: Category[] = [
       'https://images.unsplash.com/photo-1591238372408-8b98667c0460?q=80&w=687',
   },
   {
-    categoryId: '019d8c50-5e3a-7df1-8de2-a110b220c333',
-    title: 'Food & Beverages',
-    slug: 'food-beverages',
-    description: 'เครื่องดื่ม กาแฟสด และเบเกอรี่',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
+    title: 'Delicious Food',
+    slug: 'delicious-food',
+    description: 'อาหารจานหลัก ส้มตำ ยำ และเมนูเลิศรส',
     image:
-      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000',
+  },
+  {
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c222',
+    title: 'Coffee & Drinks',
+    slug: 'coffee-drinks',
+    description: 'กาแฟสด Specialty คาเฟ่ และเครื่องดื่มดับกระหาย',
+    image: 'https://images.unsplash.com/photo-1644348178246-8097c8f50fce?w=600',
   },
   {
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
