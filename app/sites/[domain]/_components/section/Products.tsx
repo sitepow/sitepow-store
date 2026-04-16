@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { PRODUCTS } from '@/constants/sites/product'
 import { ArrowRightIcon } from 'lucide-react'
 
@@ -17,10 +19,12 @@ export function ProductsSection() {
         })}
       </div>
 
-      <Button variant="outline">
-        <span>ดูทั้งหมด</span>
-        <ArrowRightIcon />
-      </Button>
+      <Link href={'/products'}>
+        <Button variant="outline">
+          <span>ดูทั้งหมด</span>
+          <ArrowRightIcon />
+        </Button>
+      </Link>
     </SectionContainer>
   )
 }
