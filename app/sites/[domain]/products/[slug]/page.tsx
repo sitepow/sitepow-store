@@ -9,11 +9,15 @@ import {
   ChevronLeft,
   HeartIcon,
   MinusIcon,
+  Play,
   PlusIcon,
   Share2Icon,
+  Star,
+  User2,
 } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,6 +27,7 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
+import { Progress } from '@/components/ui/progress'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 
@@ -44,9 +49,12 @@ export default async function StoreProductDescriptionPage({
         <div className="grid w-full grid-cols-12 items-start gap-10 text-start">
           <div className="sticky top-5 col-span-7 flex flex-col gap-5">
             <div className="flex items-center justify-between">
-              <Link href={'/'}>
-                <Button variant="outline">
-                  <ChevronLeft />
+              <Link href={'/products'}>
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-primary -ml-4"
+                >
+                  <ChevronLeft className="mr-2 size-4" />
                   <span>ย้อนกลับ</span>
                 </Button>
               </Link>
@@ -123,6 +131,140 @@ export default async function StoreProductDescriptionPage({
                   </div>
                 </>
               )}
+            </div>
+
+            <div className="mt-20 space-y-8">
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold">รีวิวจากลูกค้า</h3>
+                <Separator className="flex-1" />
+              </div>
+
+              <div className="flex flex-col gap-8 rounded-2xl border bg-slate-50/50 p-6 sm:flex-row">
+                <div className="flex flex-col items-center justify-center space-y-2 border-slate-200 sm:border-r sm:pr-8">
+                  <span className="text-5xl font-bold text-slate-900">4.8</span>
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={18}
+                        fill={i < 4 ? 'currentColor' : 'none'}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-muted-foreground text-xs font-medium">
+                    120 รีวิวทั้งหมด
+                  </span>
+                </div>
+
+                <div className="flex-1 space-y-2.5">
+                  {[5, 4, 3, 2, 1].map((star) => (
+                    <div key={star} className="flex items-center gap-4 text-sm">
+                      <span className="w-3 font-semibold text-slate-700">
+                        {star}
+                      </span>
+                      <Progress
+                        value={star === 5 ? 85 : star === 4 ? 10 : 5}
+                        className="h-2"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-10 pt-4">
+                {[
+                  {
+                    id: 1,
+                    user: 'สมชาย รักดี',
+                    rating: 5,
+                    date: '12 เม.ย. 2026',
+                    comment:
+                      'สินค้าคุณภาพดีมากครับ การแพ็คของมาอย่างดี จัดส่งไวมาก แนะนำเลย!',
+                    images: [
+                      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
+                    ],
+                    video: null,
+                  },
+                  {
+                    id: 2,
+                    user: 'Jane Doe',
+                    rating: 4,
+                    date: '10 เม.ย. 2026',
+                    comment:
+                      'ใช้งานได้ดีตามสเปคที่แจ้งไว้ สีสวยถูกใจมากค่ะ แต่ขนส่งแอบช้านิดหน่อย',
+                    images: [
+                      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
+                    ],
+                    video: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                  },
+                ].map((review) => (
+                  <div key={review.id} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-8 border">
+                          <AvatarImage src="" />
+                          <AvatarFallback>
+                            <User2 size={16} />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm leading-none font-bold text-slate-900">
+                            {review.user}
+                          </p>
+                          <div className="mt-1.5 flex text-yellow-400">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={12}
+                                fill={
+                                  i < review.rating ? 'currentColor' : 'none'
+                                }
+                              />
+                            ))}
+                          </div>
+                          <span className="text-muted-foreground text-xs">
+                            {review.date}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            | ตัวเลือกสินค้า: กางเกง (50 ชิ้น) M = 6-11 กก.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-sm leading-relaxed text-slate-600">
+                      {review.comment}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2.5">
+                      {review.video && (
+                        <div className="group relative size-24 cursor-pointer overflow-hidden rounded-xl bg-slate-100">
+                          {/* <video
+                            src={review.video}
+                            className="h-full w-full object-cover"
+                          /> */}
+                          <div className="absolute inset-0 flex items-center justify-center transition-colors group-hover:bg-black/40">
+                            <Play className="size-7 fill-white text-white" />
+                          </div>
+                        </div>
+                      )}
+                      {review.images.map((img, i) => (
+                        <div
+                          key={i}
+                          className="size-24 overflow-hidden rounded-xl bg-slate-50"
+                        >
+                          {/* <img
+                            src={img}
+                            alt="review"
+                            className="size-full object-cover"
+                          /> */}
+                        </div>
+                      ))}
+                    </div>
+                    <Separator className="mt-6 opacity-50" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

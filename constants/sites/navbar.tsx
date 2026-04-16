@@ -5,31 +5,31 @@ export const STORE_NAVBAR_ITEMS = [
     children: [
       {
         title: 'รายละเอียดร้าน',
-        href: '/',
+        href: '/about',
       },
       {
         title: 'คำถามที่พบบ่อย',
-        href: '/',
+        href: '/faqs',
       },
       {
         title: 'คะแนนร้านค้า',
-        href: '/',
+        href: '/customer-reviews',
       },
       {
         title: 'วิธีการสั่งซื้อ',
-        href: '/',
+        href: '/description',
       },
       {
         title: 'นโยบายความเป็นส่วนตัว',
-        href: '/',
+        href: '/privacy-policy',
       },
       {
         title: 'นโยบายการคืนสินค้า',
-        href: '/',
+        href: '/refund-return-policy',
       },
     ],
   },
-  { title: 'การสั่งซื้อของฉัน', href: '/' },
-  { title: 'บทความทั้งหมด', href: '/' },
-  { title: 'ติดต่อร้านค้า', href: '/' },
+  { title: 'การสั่งซื้อของฉัน', href: '/order' },
+  { title: 'บทความทั้งหมด', href: '/blogs' },
+  { title: 'ติดต่อร้านค้า', href: '/contact-us' },
 ]

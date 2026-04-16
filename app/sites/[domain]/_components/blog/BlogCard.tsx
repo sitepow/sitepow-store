@@ -26,18 +26,35 @@ const blogCardVariants = cva(
 interface BlogCardProps
   extends Partial<Blog>, VariantProps<typeof blogCardVariants> {
   className?: string
+  isFeatured?: boolean
 }
 
-export function BlogCard({ variant, className, title, slug }: BlogCardProps) {
+export function BlogCard({
+  variant,
+  className,
+  title,
+  slug,
+  isFeatured,
+}: BlogCardProps) {
   return (
     <Link href={`/blogs/${slug}`}>
       <div className={cn(blogCardVariants({ variant }), className)}>
-        <div className="mb-2.5 h-52 w-full overflow-hidden rounded-t-xl bg-gray-200">
+        <div
+          className={cn(
+            'mb-2.5 h-52 w-full overflow-hidden rounded-t-xl bg-gray-200',
+            isFeatured && 'h-[82%]',
+          )}
+        >
           <div className="mb-2.5 h-52 w-full rounded-xl bg-gray-200" />
         </div>
 
-        <div className="p-4 pt-0">
-          <h3 className="group-hover:text-primary mb-2 line-clamp-2 text-xl leading-tight font-bold">
+        <div className={cn('p-4 pt-0', isFeatured && 'h-32 shrink-0')}>
+          <h3
+            className={cn(
+              'group-hover:text-primary mb-2 line-clamp-2 text-xl leading-tight font-bold',
+              isFeatured && 'mx-auto w-sm',
+            )}
+          >
             {title || 'Untitled Blog Post'}
           </h3>
 

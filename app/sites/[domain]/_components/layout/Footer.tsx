@@ -52,10 +52,16 @@ export function StoreFooter() {
 
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
             <div className="flex gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-gray-600 hover:underline">
+              <a
+                href="/privacy-policy"
+                className="hover:text-gray-600 hover:underline"
+              >
                 นโยบายความเป็นส่วนตัว
               </a>
-              <a href="#" className="hover:text-gray-600 hover:underline">
+              <a
+                href="/refund-return-policy"
+                className="hover:text-gray-600 hover:underline"
+              >
                 นโยบายการคืนสินค้า
               </a>
             </div>

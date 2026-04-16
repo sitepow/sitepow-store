@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { PRODUCTS } from '@/constants/sites/product'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
@@ -50,10 +52,12 @@ export function CategorySection({ categoryId, title, image }: Category) {
               </div>
             ))}
 
-            <Button variant="outline">
-              <span>ดูทั้งหมด</span>
-              <ArrowRightIcon />
-            </Button>
+            <Link href={'/products'}>
+              <Button variant="outline">
+                <span>ดูทั้งหมด</span>
+                <ArrowRightIcon />
+              </Button>
+            </Link>
           </div>
 
           <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-10 bg-linear-to-l from-white to-transparent" />
