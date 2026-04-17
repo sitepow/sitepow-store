@@ -34,7 +34,7 @@ export function ProductFilterControl() {
   const currentMaxPrice = Math.ceil(maxRaw / 100) * 100
 
   return (
-    <aside className="sticky top-5 col-span-3 w-full shrink-0 space-y-8">
+    <aside className="sticky top-40 col-span-3 w-full shrink-0 space-y-8">
       <Accordion
         type="multiple"
         defaultValue={['categories', 'price', 'brands']}

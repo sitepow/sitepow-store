@@ -1,4 +1,5 @@
 import { ComponentProps } from 'react'
+import { Toaster } from 'react-hot-toast'
 
 import { cn } from '@/lib/utils'
 
@@ -13,7 +14,9 @@ export function StoreLayout({
   return (
     <div className="flex flex-col gap-10">
       <StoreNavbar />
-      <main className={cn(className)} {...props}>
+
+      <Toaster />
+      <main className={cn(className, 'mt-36')} {...props}>
         {children}
       </main>
       <StoreFooter />

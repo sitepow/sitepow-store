@@ -39,7 +39,7 @@ export function ProductCard({
         <div className="relative">
           <div className="mb-2.5 h-52 w-full rounded-xl bg-gray-200" />
           {hasDiscount && (
-            <Badge className="absolute top-0 right-0 size-14 rounded-full text-center">
+            <Badge className="absolute top-0 right-0 size-12 rounded-full text-center">
               OFF
               <br />
               {maxDiscountPercent}%

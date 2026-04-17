@@ -14,7 +14,7 @@ import { ProductCard } from '../../_components/product/ProductCard'
 
 export function ProductFilterResults() {
   return (
-    <div className="sticky top-5 col-span-9 flex flex-1 flex-col gap-5">
+    <div className="sticky top-40 col-span-9 flex flex-1 flex-col gap-5">
       <div className="mb-6 flex items-center justify-between">
         <p className="text-muted-foreground">
           แสดงทั้งหมด <span>{PRODUCTS.length}</span> รายการ

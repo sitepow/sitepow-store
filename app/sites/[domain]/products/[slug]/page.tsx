@@ -20,13 +20,13 @@ export default async function StoreProductDescriptionPage({
     <StoreLayout>
       <SectionContainer>
         <div className="grid w-full grid-cols-12 items-start gap-10 text-start">
-          <div className="sticky top-5 col-span-7 flex flex-col gap-5">
+          <div className="sticky top-40 col-span-7 flex flex-col gap-5">
             <ProductGallery />
             <ProductSpecification />
             <ProductReviewLists />
           </div>
 
-          <div className="sticky top-5 col-span-5 flex flex-col gap-5">
+          <div className="sticky top-40 col-span-5 flex flex-col gap-5">
             <ProductPurchasePanel product={product} />
           </div>
         </div>
