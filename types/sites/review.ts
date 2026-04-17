@@ -4,7 +4,7 @@ export interface ReviewCategory {
 }
 
 export interface Review {
-  id: number
+  reviewId: string
   user: string
   avatar?: string
   rating: number
@@ -13,11 +13,9 @@ export interface Review {
   comment: string
   images: string[]
   video: string | null
-
   variantId: string
   variantTitle: string
   sku: string
-
   selectedOptions?: {
     title: string
     name: string

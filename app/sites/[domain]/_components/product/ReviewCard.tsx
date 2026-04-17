@@ -1,4 +1,5 @@
 import { Review } from '@/types/sites/review'
+import { getRatingLabel } from '@/utils/review'
 import { User2Icon } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -33,14 +34,25 @@ export function ReviewCard({ review }: { review: Review }) {
                       {opt.title}: {opt.name}
                     </span>
                   ))}
-                  <span>(SKU: {review.sku})</span>
+                  <span>({review.sku})</span>
                 </div>
               )}
+            </div>
+
+            <div className="text-muted-foreground mt-2.5 flex flex-col gap-1 text-xs">
+              {review?.categories?.map((category) => {
+                return (
+                  <span key={category.label}>
+                    {category?.label}: {getRatingLabel(category.rating)}
+                  </span>
+                )
+              })}
             </div>
           </div>
         </div>
       </div>
-      <p className="text-sm leading-relaxed text-slate-600">{review.comment}</p>
+
+      <p className="text-sm leading-relaxed">{review.comment}</p>
       <ReviewMedia images={review.images} video={review.video} />
       <Separator className="mt-6 opacity-50" />
     </div>

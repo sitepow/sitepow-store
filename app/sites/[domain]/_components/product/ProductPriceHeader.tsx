@@ -23,7 +23,6 @@ export function ProductPriceHeader() {
           <data value={totalPrice} className="text-5xl font-bold">
             {formatCurrency(totalPrice || 0)}
           </data>
-          <span className="mb-0.5 text-xl font-bold">THB</span>
         </div>
 
         {points > 0 && (

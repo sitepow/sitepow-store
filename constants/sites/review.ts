@@ -2,7 +2,7 @@ import { Review } from '@/types/sites/review'
 
 export const REVIEWS: Review[] = [
   {
-    id: 1,
+    reviewId: '018ee96f-7500-777e-8000-01d0f50b4a7d',
     user: 'สมชาย รักดี',
     rating: 5,
     categories: [
@@ -16,7 +16,7 @@ export const REVIEWS: Review[] = [
       'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
     ],
     video: null,
-    variantId: 'v-pants-xl-001',
+    variantId: '018ee972-e400-7aa0-8000-33a8220f1b2c',
     variantTitle: 'แบบกางเกง ไซส์ XL',
     sku: 'PANTS-XL-WHITE',
     selectedOptions: [
@@ -25,7 +25,7 @@ export const REVIEWS: Review[] = [
     ],
   },
   {
-    id: 2,
+    reviewId: '018ee96f-c100-755c-b000-3f48a0f9a2e1',
     user: 'Jane Doe',
     rating: 4,
     categories: [
@@ -40,7 +40,7 @@ export const REVIEWS: Review[] = [
       'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
     ],
     video: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    variantId: 'v-tape-l-002',
+    variantId: '018ee973-1f00-7bb2-9000-44b933102c3d',
     variantTitle: 'แบบเทป ไซส์ L',
     sku: 'TAPE-L-BLACK',
     selectedOptions: [

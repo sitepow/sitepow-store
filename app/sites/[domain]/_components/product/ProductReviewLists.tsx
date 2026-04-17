@@ -3,7 +3,7 @@ import { REVIEWS } from '@/constants/sites/review'
 import { Separator } from '@/components/ui/separator'
 
 import { ProductReviewRating } from './ProductReviewRating'
-import { ReviewCard } from './review/ReviewCard'
+import { ReviewCard } from './ReviewCard'
 
 export function ProductReviewLists() {
   return (
@@ -17,7 +17,7 @@ export function ProductReviewLists() {
 
       <div className="space-y-10 pt-4">
         {REVIEWS.map((review) => (
-          <ReviewCard key={review.id} review={review} />
+          <ReviewCard key={review.reviewId} review={review} />
         ))}
       </div>
     </div>

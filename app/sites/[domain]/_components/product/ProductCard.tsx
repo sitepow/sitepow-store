@@ -61,7 +61,6 @@ export function ProductCard({
           <data value={net?.min} className="text-2xl font-bold">
             {formatCurrency(net?.min || 0)}
           </data>
-          <span className="mb-0.5 text-sm font-bold">THB</span>
         </div>
       </div>
     </Link>

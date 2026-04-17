@@ -2,7 +2,7 @@ import { REVIEWS } from '@/constants/sites/review'
 
 import { Progress } from '@/components/ui/progress'
 
-import { StarRating } from './review/StarRating'
+import { StarRating } from './StarRating'
 
 export function ProductReviewRating() {
   const totalReviews = REVIEWS.length
