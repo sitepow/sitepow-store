@@ -116,6 +116,7 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
 
   getTotalPrice: () => {
     const state = get()
+
     if (!state.selectedVariant) {
       return 0
     }

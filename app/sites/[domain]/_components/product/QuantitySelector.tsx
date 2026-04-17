@@ -20,7 +20,7 @@ export function QuantitySelector({
   value,
   onChange,
   min = 1,
-  max = 99,
+  max = Number.MAX_SAFE_INTEGER,
 }: QuantitySelectorProps) {
   const handleDecrement = () => {
     if (value > min) onChange(value - 1)
