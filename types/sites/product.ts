@@ -36,6 +36,11 @@ export interface ProductVariant {
   rewardPoints?: RewardPoints
 }
 
+export interface ProductImages {
+  imageId: string
+  url: string
+  isPrimary: boolean
+}
 export interface ProductAddon {
   addonId: string
   title: string
@@ -54,9 +59,22 @@ export interface Product {
   categoryId: string
   title: string
   slug: string
-  image: string
+  images: ProductImages[]
   variants: ProductVariant[]
   options: ProductOption[]
   addons: ProductAddon[]
   metadata: ProductMetadata
+}
+
+export interface PriceStats {
+  min: number
+  max: number
+  avg: number
+}
+
+export interface CalculatedProduct {
+  original: PriceStats
+  net: PriceStats
+  hasDiscount: boolean
+  maxDiscountPercent: number
 }

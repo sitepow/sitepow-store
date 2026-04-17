@@ -31,7 +31,7 @@ export function ProductCard({
   className,
   ...product
 }: ProductCardProps) {
-  const { hasDiscount, price, maxDiscountPercent } = calculateProduct(product)
+  const { hasDiscount, net, maxDiscountPercent } = calculateProduct(product)
 
   return (
     <Link href={`/products/${product.slug}`}>
@@ -53,13 +53,13 @@ export function ProductCard({
 
         {hasDiscount && (
           <span className="text-muted-foreground group-hover:text-primary text-sm line-through">
-            {formatCurrency(price?.original?.min || 0)}
+            {formatCurrency(net?.min || 0)}
           </span>
         )}
 
         <div className="group-hover:text-primary flex items-end justify-center gap-2">
-          <data value={price?.net?.min} className="text-2xl font-bold">
-            {formatCurrency(price?.net?.min || 0)}
+          <data value={net?.min} className="text-2xl font-bold">
+            {formatCurrency(net?.min || 0)}
           </data>
           <span className="mb-0.5 text-sm font-bold">THB</span>
         </div>

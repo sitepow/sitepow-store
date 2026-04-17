@@ -1,4 +1,9 @@
-import { Discount, DiscountType, Product } from '@/types/sites/product'
+import {
+  CalculatedProduct,
+  Discount,
+  DiscountType,
+  Product,
+} from '@/types/sites/product'
 
 export const calculateNetPrice = ({
   price,
@@ -21,7 +26,7 @@ export const calculateNetPrice = ({
   }
 }
 
-export const calculateProduct = (product: Product) => {
+export const calculateProduct = (product: Product): CalculatedProduct => {
   const variants = product?.variants || []
 
   if (variants.length === 0) {
@@ -29,6 +34,7 @@ export const calculateProduct = (product: Product) => {
       original: { min: 0, max: 0, avg: 0 },
       net: { min: 0, max: 0, avg: 0 },
       hasDiscount: false,
+      maxDiscountPercent: 0,
     }
   }
 
@@ -51,16 +57,25 @@ export const calculateProduct = (product: Product) => {
     (netPrice, index) => netPrice < originalPrices[index],
   )
 
+  const discountPercentages = variants.map((variant) => {
+    if (variant.price === 0) {
+      return 0
+    }
+
+    const net = calculateNetPrice({
+      price: variant.price,
+      discount: variant.discount,
+    })
+
+    return ((variant.price - net) / variant.price) * 100
+  })
+
   return {
-    price: {
-      original: originalStats,
-      net: netStats,
-    },
+    original: originalStats,
+    net: netStats,
     hasDiscount,
     maxDiscountPercent: hasDiscount
-      ? Math.round(
-          ((originalStats.max - netStats.min) / originalStats.max) * 100,
-        )
+      ? Math.round(Math.max(...discountPercentages))
       : 0,
   }
 }

@@ -52,10 +52,7 @@ export function StoreNavbar() {
       </div>
 
       <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          className="flex gap-2.5 text-lg font-bold opacity-50"
-        >
+        <Button variant="outline">
           <span>หมวดหมู่สินค้า</span>
           <ChevronDownIcon />
         </Button>

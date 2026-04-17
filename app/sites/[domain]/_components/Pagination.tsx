@@ -13,7 +13,7 @@ export function StorePagination() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" />
+          <PaginationPrevious text="ก่อนหน้า" href="#" />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink href="#">1</PaginationLink>
@@ -30,7 +30,7 @@ export function StorePagination() {
           <PaginationEllipsis />
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext text="ถัดไป" href="#" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

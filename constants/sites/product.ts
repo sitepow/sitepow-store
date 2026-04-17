@@ -6,7 +6,43 @@ export const PRODUCTS: Product[] = [
     categoryId: '019d8c50-5e3a-7df1-8de0-e260f4f4f8dd',
     slug: 't-shirt-limited-x-logitech',
     title: 'เสื้อยืดลิมิเต็ด x Logitech',
-    image: '/images/tshirt-logi.jpg',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     variants: [
       {
         variantId: '019d8bd6-b16c-7df1-bde0-e260f4f4f8dd',
@@ -66,8 +102,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c01-4475-7f91-8f5c-99d8d646a782',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     slug: 'logitech-mx-master-3s',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Logitech MX Master 3S',
-    image: '/images/mx-master-3s.jpg',
     variants: [
       {
         variantId: '019d8c01-5e8a-788b-a342-990838890212',
@@ -123,8 +195,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c0a-7b32-7011-89d2-17cf227b3456',
     categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c222',
     slug: 'iced-americano',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'อเมริกาโน่เย็น (Iced Americano)',
-    image: '/images/coffee.jpg',
     variants: [
       {
         variantId: '019d8c0a-8a12-7882-b111-e260f4f4f001',
@@ -186,8 +294,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c22-3a5b-77f1-8888-17cf227b9abc',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
     slug: 'steam-wallet-code-global',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Steam Wallet Code (Global)',
-    image: '/images/steam-card.jpg',
     variants: [
       {
         variantId: '019d8c22-4e11-7882-b333-e260f4f4f001',
@@ -246,8 +390,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c30-1111-7abc-8888-17cf227b9001',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     slug: 'custom-mechanical-keyboard-k8',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Custom Mechanical Keyboard K8',
-    image: '/images/keyboard-k8.jpg',
     variants: [
       {
         variantId: 'v-k8-blue',
@@ -298,8 +478,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c35-2222-7abc-9999-17cf227b9002',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
     slug: 'gaming-chair-ergo-v2',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Gaming Chair Ergo-V2',
-    image: '/images/chair-ergo.jpg',
     variants: [
       {
         variantId: 'v-chair-black',
@@ -339,8 +555,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c40-3333-7abc-1111-17cf227b9003',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
     slug: 'netflix-premium-shared',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Netflix Premium (Shared Account)',
-    image: '/images/netflix.jpg',
     variants: [
       {
         variantId: 'v-netflix-30',
@@ -379,8 +631,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c45-4444-7abc-2222-17cf227b9004',
     categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
     slug: 'molly-space-x-spongebob-limited',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Molly Space x SpongeBob (Limited Edition)',
-    image: '/images/molly-spongebob.jpg',
     variants: [
       {
         variantId: 'v-molly-100',
@@ -432,8 +720,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c4a-5555-7abc-3333-17cf227b9005',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     slug: 'sony-wh-1000xm5-wireless-noise-cancelling',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'Sony WH-1000XM5 Wireless Noise Cancelling',
-    image: '/images/sony-xm5.jpg',
     variants: [
       {
         variantId: 'v-sony-black',
@@ -480,8 +804,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c4f-6666-7abc-4444-17cf227b9006',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
     slug: 'minimal-desk-mat',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'แผ่นรองเม้าส์แบบยาว (Minimal Desk Mat)',
-    image: '/images/deskmat.jpg',
     variants: [
       {
         variantId: 'v-mat-gray',
@@ -520,8 +880,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c55-7777-7abc-5555-17cf227b9007',
     categoryId: '019d8c50-5e3a-7df1-8de1-f370f5f5e9ee',
     slug: 'ipad-pro-m4-2024',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'iPad Pro M4 (2024)',
-    image: '/images/ipad-pro-m4.jpg',
     variants: [
       {
         variantId: 'v-ipad-11-256',
@@ -581,8 +977,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c5a-8888-7abc-6666-17cf227b9008',
     categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c222',
     slug: 'signature-butter-croissant',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'ครัวซองต์เนยสด (Signature Croissant)',
-    image: '/images/croissant.jpg',
     variants: [
       {
         variantId: 'v-crois-plain',
@@ -594,6 +1026,10 @@ export const PRODUCTS: Product[] = [
       {
         variantId: 'v-crois-almond',
         title: 'Almond Cream',
+        rewardPoints: {
+          amount: 30,
+          isActive: true,
+        },
         price: 125.0,
         stock: 15,
         sku: 'BAKE-CRO-ALM',
@@ -634,8 +1070,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c60-9999-7abc-7777-17cf227b9009',
     categoryId: '019d8c50-5e3a-7df1-8de3-d440e550f444',
     slug: 'youtube-premium-family-share',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'YouTube Premium (Family Plan Share)',
-    image: '/images/youtube-premium.jpg',
     variants: [
       {
         variantId: 'v-yt-1m',
@@ -678,8 +1150,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c65-aaaa-7abc-8888-17cf227b9010',
     categoryId: '019d8c50-5e3b-7df1-8de5-f880a990e666',
     slug: 'lego-star-wars-the-razor-crest',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'LEGO Star Wars: The Razor Crest',
-    image: '/images/lego-starwars.jpg',
     variants: [
       {
         variantId: 'v-lego-rzr',
@@ -715,8 +1223,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8c6a-bbbb-7abc-9999-17cf227b9011',
     categoryId: '019d8c50-5e3b-7df1-8de4-b660c770d555',
     slug: 'electric-standing-smart-desk',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'โต๊ะคอมพิวเตอร์ปรับระดับไฟฟ้า (Smart Desk)',
-    image: '/images/standing-desk.jpg',
     variants: [
       {
         variantId: 'v-desk-140',
@@ -768,8 +1312,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8d55-1234-77eb-8f5c-99d8d646a001',
     categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
     slug: 'somtum-pala-premium',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'ส้มตำปูปลาร้า (สูตรนัวพิเศษ)',
-    image: '/images/somtum-pala.jpg',
     variants: [
       {
         variantId: 'v-st-pala-01',
@@ -825,8 +1405,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8d55-5678-77eb-8f5c-99d8d646a002',
     categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
     slug: 'holy-basil-wagyu-beef',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'ข้าวกะเพราเนื้อวากิว (Wagyu Basil Rice)',
-    image: '/images/wagyu-basil.jpg',
     variants: [
       {
         variantId: 'v-wg-basil-01',
@@ -881,8 +1497,44 @@ export const PRODUCTS: Product[] = [
     productId: '019d8d55-9012-77eb-8f5c-99d8d646a003',
     categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c111',
     slug: 'salmon-yum-thai-style',
+    images: [
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d30',
+        url: '/',
+        isPrimary: true,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d31',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d32',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d33',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d34',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d35',
+        url: '/',
+        isPrimary: false,
+      },
+      {
+        imageId: '019d99b9-be28-750a-ad13-fab4db7d3d36',
+        url: '/',
+        isPrimary: false,
+      },
+    ],
     title: 'ยำแซลมอนสด (Thai-Style Salmon Salad)',
-    image: '/images/salmon-yum.jpg',
     variants: [
       {
         variantId: 'v-salmon-01',

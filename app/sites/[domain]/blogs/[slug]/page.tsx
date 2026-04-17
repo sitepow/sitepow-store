@@ -9,7 +9,7 @@ import {
   Clock,
   HeartIcon,
   Share2Icon,
-  Tag,
+  TagIcon,
   User2,
 } from 'lucide-react'
 
@@ -100,10 +100,10 @@ export default async function StoreBlogDescriptionPage({
           </article>
 
           <div className="mt-12 flex items-center gap-3 border-t pt-8">
-            <Tag size={18} className="text-muted-foreground" />
             <div className="flex gap-2">
               {['Tech', 'Lifestyle', 'Review'].map((tag) => (
                 <Badge key={tag} variant="outline" className="capitalize">
+                  <TagIcon />
                   {tag}
                 </Badge>
               ))}
