@@ -1,6 +1,9 @@
 'use client'
 
-import { formatNumber } from '@/utils/pricing'
+import Link from 'next/link'
+
+import { getRemainingStock } from '@/utils/cart'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { Minus, Plus, ShoppingCartIcon, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -16,6 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 
 import { useCartStore } from '../../cart/store'
+import { CartCountBadge } from './CartCountBadge'
 
 export function CartDrawer() {
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
@@ -25,18 +29,14 @@ export function CartDrawer() {
     <Drawer direction="right">
       <DrawerTrigger asChild>
         <Button variant="outline" size="lg" className="relative">
-          <ShoppingCartIcon className="h-5 w-5" />
-          {items.length > 0 && (
-            <span className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full text-[10px]">
-              {summary.totalQuantity > 99 ? '+99' : summary.totalQuantity}
-            </span>
-          )}
+          <ShoppingCartIcon className="size-5" />
+          {items.length > 0 && <CartCountBadge total={summary.totalQuantity} />}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="ml-auto h-full w-full max-w-md">
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center gap-2">
-            <ShoppingCartIcon className="h-5 w-5" />
+            <ShoppingCartIcon className="size-5" />
             ตะกร้าสินค้า ({summary.totalQuantity})
           </DrawerTitle>
         </DrawerHeader>
@@ -51,14 +51,7 @@ export function CartDrawer() {
             <div className="space-y-4 py-4">
               {items.map((item) => (
                 <div key={item.cartItemId} className="flex gap-4">
-                  <div className="relative size-20 overflow-hidden rounded-lg border bg-gray-200">
-                    {/* <Image
-                      src={item.image}
-                      alt={item.productTitle}
-                      fill
-                      className="object-cover"
-                    /> */}
-                  </div>
+                  <div className="relative size-20 overflow-hidden rounded-lg border bg-gray-200" />
 
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
@@ -76,11 +69,14 @@ export function CartDrawer() {
                       <p className="text-muted-foreground mt-1 text-xs">
                         {item.variant.title}
                         {item.selectedOptions.length > 0 &&
-                          ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
+                          ` | ${item.selectedOptions.map((option) => option.choiceName).join(', ')}`}
                       </p>
                       {item.selectedAddons.length > 0 && (
                         <p className="text-primary text-[10px]">
-                          + {item.selectedAddons.map((a) => a.title).join(', ')}
+                          +{' '}
+                          {item.selectedAddons
+                            .map((addon) => addon.title)
+                            .join(', ')}
                         </p>
                       )}
                     </div>
@@ -90,7 +86,7 @@ export function CartDrawer() {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-7 w-7"
+                          className="size-7"
                           onClick={() =>
                             updateQuantity(item.cartItemId, item.quantity - 1)
                           }
@@ -104,6 +100,14 @@ export function CartDrawer() {
                           variant="outline"
                           size="icon"
                           className="size-7"
+                          disabled={
+                            item.quantity >=
+                            getRemainingStock(items, {
+                              variantId: item.variant.variantId,
+                              stock: item.variant.stock ?? 0,
+                              excludeCartItemId: item.cartItemId,
+                            })
+                          }
                           onClick={() =>
                             updateQuantity(item.cartItemId, item.quantity + 1)
                           }
@@ -112,7 +116,7 @@ export function CartDrawer() {
                         </Button>
                       </div>
                       <p className="text-sm font-bold">
-                        ฿{formatNumber(item.totalPrice)}
+                        {formatCurrency(item.totalPrice)}
                       </p>
                     </div>
                   </div>
@@ -127,28 +131,30 @@ export function CartDrawer() {
             <div className="space-y-1.5 py-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">รวมราคาสินค้า</span>
-                <span>฿{formatNumber(summary.subtotal)}</span>
+                <span>{formatCurrency(summary.subtotal)}</span>
               </div>
-              <div className="flex justify-between text-sm text-green-600">
+              <div className="text-primary flex justify-between text-sm">
                 <span>ส่วนลด</span>
-                <span>-฿{formatNumber(summary.totalDiscount)}</span>
+                <span>- {formatCurrency(Math.abs(summary.totalDiscount))}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between text-lg font-bold">
                 <span>ราคาสุทธิ</span>
                 <span className="text-primary">
-                  ฿{formatNumber(summary.finalPrice)}
+                  {formatCurrency(summary.finalPrice)}
                 </span>
               </div>
               {summary.totalPoints > 0 && (
-                <p className="text-right text-xs font-medium text-orange-500">
+                <p className="text-primary text-right text-xs font-medium">
                   คุณจะได้รับ {formatNumber(summary.totalPoints)} แต้ม
                 </p>
               )}
             </div>
-            <Button size="lg" className="h-12 w-full text-lg shadow-md">
-              สั่งซื้อสินค้า (฿{formatNumber(summary.finalPrice)})
-            </Button>
+            <Link href={'/cart'}>
+              <Button size="lg" className="h-12 w-full text-lg shadow-md">
+                สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
+              </Button>
+            </Link>
           </DrawerFooter>
         )}
       </DrawerContent>

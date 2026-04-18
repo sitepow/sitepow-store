@@ -1,10 +1,13 @@
 import {
   CalculatedProduct,
-  DiscountType,
   Product,
   ProductVariant,
 } from '@/types/sites/product'
-import { calculateProduct } from '@/utils/product'
+import {
+  calculateProduct,
+  calculateRewardPoints,
+  getVariantNetPrice,
+} from '@/utils/product'
 import { create } from 'zustand'
 
 interface ProductStore {
@@ -103,16 +106,7 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
     set({ quantity: Math.max(1, Math.min(qty, stock)) })
   },
 
-  getVariantPrice: (variant) => {
-    if (!variant.discount || !variant.discount.active) {
-      return variant.price
-    }
-
-    if (variant.discount.type === DiscountType.PERCENTAGE) {
-      return variant.price * (1 - variant.discount.amount / 100)
-    }
-    return Math.max(0, variant.price - variant.discount.amount)
-  },
+  getVariantPrice: (variant) => getVariantNetPrice(variant),
 
   getTotalPrice: () => {
     const state = get()
@@ -121,22 +115,7 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
       return 0
     }
 
-    let unitPrice = state.getVariantPrice(state.selectedVariant)
-
-    Object.entries(state.selectedOptions).forEach(([title, choices]) => {
-      const optionGroup = state.product?.options.find(
-        (option) => option.title === title,
-      )
-      choices.forEach((choiceName) => {
-        const choice = optionGroup?.choices.find(
-          (choice) => choice.name === choiceName,
-        )
-
-        if (choice) {
-          unitPrice += choice.extraPrice
-        }
-      })
-    })
+    let unitPrice = getVariantNetPrice(state.selectedVariant)
 
     state.selectedAddons.forEach((id) => {
       const addon = state.product?.addons.find((addon) => addon.addonId === id)
@@ -149,10 +128,6 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   },
 
   getCurrentPoints: () => {
-    const variant = get().selectedVariant
-    if (variant?.rewardPoints?.isActive) {
-      return variant.rewardPoints.amount * get().quantity
-    }
-    return 0
+    return calculateRewardPoints(get().selectedVariant, get().quantity)
   },
 }))

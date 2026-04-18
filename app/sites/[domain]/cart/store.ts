@@ -1,4 +1,8 @@
+import toast from 'react-hot-toast'
+
 import { CartItem, CartSummary } from '@/types/sites/cart'
+import { getRemainingStock, isSameCartItem } from '@/utils/cart'
+import { calculateRewardPoints } from '@/utils/product'
 import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -22,40 +26,44 @@ export const useCartStore = create<CartStore>()(
       addItem: (newItem) => {
         const { items } = get()
 
-        const optionKey = JSON.stringify(newItem.selectedOptions)
-        const addonKey = JSON.stringify(
-          newItem.selectedAddons.map((a) => a.addonId).sort(),
-        )
+        const remaining = getRemainingStock(items, {
+          variantId: newItem.variant.variantId,
+          stock: newItem.variant.stock ?? 0,
+        })
 
-        const existingItemIndex = items.findIndex(
-          (item) =>
-            item.productId === newItem.productId &&
-            item.variant.variantId === newItem.variant.variantId &&
-            JSON.stringify(item.selectedOptions) === optionKey &&
-            JSON.stringify(item.selectedAddons.map((a) => a.addonId).sort()) ===
-              addonKey,
-        )
+        if (remaining <= 0) {
+          toast.error('สินค้าในสต็อกไม่เพียงพอ')
+          return
+        }
 
-        if (existingItemIndex > -1) {
+        const existingIndex = items.findIndex((item) =>
+          isSameCartItem(item, newItem),
+        )
+        const finalQty = Math.min(newItem.quantity, remaining)
+
+        if (existingIndex > -1) {
           const updatedItems = [...items]
-          const existingItem = updatedItems[existingItemIndex]
-
-          const newQty = existingItem.quantity + newItem.quantity
-          existingItem.quantity = newItem.variant.stock
-            ? Math.min(newQty, newItem.variant.stock)
-            : newQty
-
-          existingItem.totalPrice =
-            existingItem.unitPrice * existingItem.quantity
+          updatedItems[existingIndex].quantity += finalQty
+          updatedItems[existingIndex].totalPrice =
+            updatedItems[existingIndex].unitPrice *
+            updatedItems[existingIndex].quantity
+          updatedItems[existingIndex].rewardPoints = calculateRewardPoints(
+            newItem.variant,
+            updatedItems[existingIndex].quantity,
+          )
           set({ items: updatedItems })
         } else {
           const cartItem: CartItem = {
             ...newItem,
             cartItemId: uuidv7(),
-            totalPrice: newItem.unitPrice * newItem.quantity,
+            quantity: finalQty,
+            totalPrice: newItem.unitPrice * finalQty,
+            rewardPoints: calculateRewardPoints(newItem.variant, finalQty),
           }
           set({ items: [...items, cartItem] })
         }
+
+        toast.success('เพิ่มสินค้าลงในตะกร้าแล้ว')
       },
 
       removeItem: (cartItemId) => {
@@ -65,22 +73,35 @@ export const useCartStore = create<CartStore>()(
       },
 
       updateQuantity: (cartItemId, qty) => {
-        set((state) => ({
-          items: state.items.map((item) => {
-            if (item.cartItemId === cartItemId) {
-              const validatedQty = Math.max(
-                1,
-                item.variant.stock ? Math.min(qty, item.variant.stock) : qty,
-              )
-              return {
-                ...item,
-                quantity: validatedQty,
-                totalPrice: item.unitPrice * validatedQty,
-              }
-            }
-            return item
-          }),
-        }))
+        const { items } = get()
+        const target = items.find((i) => i.cartItemId === cartItemId)
+        if (!target) {
+          return
+        }
+
+        const remaining = getRemainingStock(items, {
+          variantId: target.variant.variantId,
+          stock: target.variant.stock ?? 0,
+          excludeCartItemId: cartItemId,
+        })
+
+        const validatedQty = Math.max(1, Math.min(qty, remaining))
+
+        set({
+          items: items.map((item) =>
+            item.cartItemId === cartItemId
+              ? {
+                  ...item,
+                  quantity: validatedQty,
+                  totalPrice: item.unitPrice * validatedQty,
+                  rewardPoints: calculateRewardPoints(
+                    item.variant,
+                    validatedQty,
+                  ),
+                }
+              : item,
+          ),
+        })
       },
 
       clearCart: () => set({ items: [] }),

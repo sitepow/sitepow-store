@@ -1,7 +1,11 @@
 import toast from 'react-hot-toast'
 
-import { SelectedOption } from '@/types/sites/cart'
+import { calculateUnitPrice, mapSelectedOptions } from '@/utils/cart'
 import { formatNumber } from '@/utils/pricing'
+import {
+  calculateRewardPoints,
+  validateProductRequirements,
+} from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -19,38 +23,36 @@ export function ProductAddToCart() {
     selectedVariant,
     selectedOptions,
     selectedAddons,
-    getTotalPrice,
-    getCurrentPoints,
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
-      toast.error('กรุณาเลือกตัวเลือกสินค้าให้ครบถ้วน')
+      toast.error('กรุณาเลือกรูปแบบสินค้า')
       return
     }
 
-    const mappedOptions: SelectedOption[] = []
-    Object.entries(selectedOptions).forEach(([title, choices]) => {
-      const optionGroup = product.options.find((o) => o.title === title)
-      choices.forEach((choiceName) => {
-        const choice = optionGroup?.choices.find((c) => c.name === choiceName)
-        if (choice) {
-          mappedOptions.push({
-            optionTitle: title,
-            choiceName: choiceName,
-            extraPrice: choice.extraPrice,
-          })
-        }
-      })
-    })
+    const { isValid, missingOptions } = validateProductRequirements(
+      product,
+      selectedOptions,
+    )
 
+    if (!isValid) {
+      toast.error(`กรุณาเลือก ${missingOptions.join(', ')}`)
+      return
+    }
+
+    const mappedOptions = mapSelectedOptions(product, selectedOptions)
     const selectedAddonsData = product.addons.filter((addon) =>
       selectedAddons.includes(addon.addonId),
     )
 
-    const unitPrice = getTotalPrice() / quantity
+    const unitPrice = calculateUnitPrice(
+      selectedVariant,
+      mappedOptions,
+      selectedAddonsData,
+    )
 
     addItem({
       productId: product.productId,
@@ -64,10 +66,8 @@ export function ProductAddToCart() {
       selectedAddons: selectedAddonsData,
       quantity: quantity,
       unitPrice: unitPrice,
-      rewardPoints: getCurrentPoints(),
+      rewardPoints: calculateRewardPoints(selectedVariant, quantity), // ใช้ Utils คำนวณตรงๆ
     })
-
-    toast.success('เพิ่มสินค้าลงในตระกร้าสำเร็จแล้ว')
   }
 
   return (

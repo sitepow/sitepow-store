@@ -3,6 +3,7 @@ import {
   Discount,
   DiscountType,
   Product,
+  ProductVariant,
 } from '@/types/sites/product'
 
 export const calculateNetPrice = ({
@@ -77,5 +78,41 @@ export const calculateProduct = (product: Product): CalculatedProduct => {
     maxDiscountPercent: hasDiscount
       ? Math.round(Math.max(...discountPercentages))
       : 0,
+  }
+}
+
+export const getVariantNetPrice = (variant: ProductVariant): number => {
+  return calculateNetPrice({ price: variant.price, discount: variant.discount })
+}
+
+export const calculateRewardPoints = (
+  variant: ProductVariant | null,
+  quantity: number,
+): number => {
+  if (variant?.rewardPoints?.isActive) {
+    return variant.rewardPoints.amount * quantity
+  }
+  return 0
+}
+
+export const validateProductRequirements = (
+  product: Product,
+  selectedOptions: Record<string, string[]>,
+) => {
+  const missingOptions: string[] = []
+
+  product.options.forEach((option) => {
+    if (option.require) {
+      const selections = selectedOptions[option.title] || []
+
+      if (selections.length === 0) {
+        missingOptions.push(option.title)
+      }
+    }
+  })
+
+  return {
+    isValid: missingOptions.length === 0,
+    missingOptions,
   }
 }
