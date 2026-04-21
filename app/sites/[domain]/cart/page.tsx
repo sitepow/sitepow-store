@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 
+import { getRemainingStock } from '@/utils/cart'
 import { ChevronLeftIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Button } from '@/components/ui/button'
 
+import { CartItemCard } from '../_components/cart/CartItemCard'
 import { StoreLayout } from '../_components/layout/Layout'
 import { useCartStore } from './store'
 
@@ -31,8 +33,31 @@ export default function StoreCartPage() {
               </Link>
             </div>
 
-            <div className="rounded-xl bg-gray-100 px-5 py-2.5 text-start font-bold">
-              <h2>ตะกร้าสินค้า</h2>
+            <div className="flex flex-col rounded-xl border border-gray-100">
+              <div className="rounded-xl bg-gray-100 px-5 py-2.5 text-start font-bold">
+                <h2>ตะกร้าสินค้า</h2>
+              </div>
+
+              <div className="space-y-8 p-5 text-start">
+                {items.map((item) => {
+                  return (
+                    <CartItemCard
+                      key={item.cartItemId}
+                      item={item}
+                      onRemove={removeItem}
+                      onUpdateQuantity={updateQuantity}
+                      isMaxStock={
+                        item.quantity >=
+                        getRemainingStock(items, {
+                          variantId: item.variant.variantId,
+                          stock: item.variant.stock ?? 0,
+                          excludeCartItemId: item.cartItemId,
+                        })
+                      }
+                    />
+                  )
+                })}
+              </div>
             </div>
           </div>
 
