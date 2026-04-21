@@ -1,0 +1,94 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client'
+
+import { useMemo } from 'react'
+import ReactMarkdown from 'react-markdown'
+
+import rehypeRaw from 'rehype-raw'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
+import remarkDirective from 'remark-directive'
+import remarkGfm from 'remark-gfm'
+import { visit } from 'unist-util-visit'
+
+import { cn } from '@/lib/utils'
+
+import { MarkdownComponents } from './MarkdownComponents'
+
+const remarkDirectiveToRehype = () => {
+  return (tree: any) => {
+    visit(tree, (node: any) => {
+      if (
+        node.type === 'containerDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'textDirective'
+      ) {
+        const data = node.data || (node.data = {})
+        data.hName = 'div'
+        data.hProperties = {
+          className: cn('admonition', node.name, node.attributes?.class),
+        }
+      }
+    })
+  }
+}
+
+interface MarkdownRendererProps {
+  content: string
+  fallbackAlt?: string
+  className?: string
+}
+
+export const MarkdownRenderer = ({
+  content,
+  fallbackAlt = 'image',
+  className,
+}: MarkdownRendererProps) => {
+  const components = useMemo(
+    () => MarkdownComponents(fallbackAlt),
+    [fallbackAlt],
+  )
+
+  const sanitizeSchema = useMemo(
+    () => ({
+      ...defaultSchema,
+      tagNames: [
+        ...(defaultSchema.tagNames || []),
+        'mark',
+        'div',
+        'span',
+        'input',
+        'accordion',
+        'accordionheader',
+        'accordioncontent',
+      ],
+      attributes: {
+        ...defaultSchema.attributes,
+        div: [...(defaultSchema.attributes?.div || []), 'className'],
+        input: ['type', 'checked', 'readOnly', 'className'],
+        accordion: ['className', 'open'],
+        accordionheader: ['className'],
+        accordioncontent: ['className'],
+      },
+    }),
+    [],
+  )
+
+  return (
+    <article
+      className={cn(
+        'prose prose-neutral dark:prose-invert mx-auto w-3xl max-w-none text-start',
+        'text-lg tracking-tight antialiased sm:text-xl',
+
+        className,
+      )}
+    >
+      <ReactMarkdown
+        components={components}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
+        remarkPlugins={[remarkGfm, remarkDirective, remarkDirectiveToRehype]}
+      >
+        {content}
+      </ReactMarkdown>
+    </article>
+  )
+}

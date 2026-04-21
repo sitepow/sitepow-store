@@ -19,7 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 
 import { useCartStore } from '../../cart/store'
-import { CartCountBadge } from './CartCountBadge'
+import { CartBadge } from './CartBadge'
 
 export function CartDrawer() {
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
@@ -30,7 +30,7 @@ export function CartDrawer() {
       <DrawerTrigger asChild>
         <Button variant="outline" size="lg" className="relative">
           <ShoppingCartIcon className="size-5" />
-          {items.length > 0 && <CartCountBadge total={summary.totalQuantity} />}
+          {items.length > 0 && <CartBadge total={summary.totalQuantity} />}
         </Button>
       </DrawerTrigger>
       <DrawerContent className="ml-auto h-full w-full max-w-md">
