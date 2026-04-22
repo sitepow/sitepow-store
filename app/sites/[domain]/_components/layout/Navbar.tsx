@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
-import { ChevronDownIcon, LockIcon, SearchIcon } from 'lucide-react'
+import { ChevronDownIcon, LockKeyholeIcon, SearchIcon } from 'lucide-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
 import { ListItem } from '@/components/layout/_components/ListItem'
@@ -38,7 +38,7 @@ export function StoreNavbar() {
             </ButtonGroup>
             <Link href={'/login'}>
               <Button variant="outline" size="lg">
-                <LockIcon />
+                <LockKeyholeIcon />
               </Button>
             </Link>
             <CartDrawer />
