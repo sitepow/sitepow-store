@@ -7,12 +7,12 @@ import Link from 'next/link'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
-  CheckCheckIcon,
-  ChevronLeftIcon,
-  CreditCardIcon,
-  MapPinIcon,
-  TruckIcon,
-} from 'lucide-react'
+  IconCreditCard,
+  IconMapPin,
+  IconShoppingCartCheck,
+  IconTruckDelivery,
+} from '@tabler/icons-react'
+import { ChevronLeftIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Button } from '@/components/ui/button'
@@ -37,10 +37,10 @@ export default function StoreCartPage() {
   const summary = getCartSummary()
 
   const stepIcons = {
-    address: MapPinIcon,
-    shipping: TruckIcon,
-    payment: CreditCardIcon,
-    review: CheckCheckIcon,
+    address: IconMapPin,
+    shipping: IconTruckDelivery,
+    payment: IconCreditCard,
+    review: IconShoppingCartCheck,
   }
 
   const shippingMethods = [
