@@ -20,9 +20,11 @@ import { Button } from '@/components/ui/button'
 import { CircularProgress } from '../_components/CircularProgress'
 import { CartItemCard } from '../_components/cart/CartItemCard'
 import { CartSummary } from '../_components/cart/CartSummary'
+import { SummaryRow } from '../_components/cart/SummaryRow'
 import { StoreLayoutLite } from '../_components/layout/lite/LayoutLite'
 import { CheckoutSection } from './_components/CheckoutSection'
 import { CustomerAddressForm } from './_components/CustomerAddressForm'
+import { DiscountForm } from './_components/DiscountForm'
 import { RadioCard } from './_components/RadioCard'
 import { useCartStore } from './store'
 
@@ -104,7 +106,20 @@ export default function StoreCartPage() {
     'payment',
     'review',
   ]
+
   const progressValue = ((stepsOrder.indexOf(activeSection) + 1) / 4) * 100
+
+  const goToNextIncompleteStep = () => {
+    if (!selectedAddress) {
+      setActiveSection('address')
+    } else if (!selectedShipping) {
+      setActiveSection('shipping')
+    } else if (!selectedPayment) {
+      setActiveSection('payment')
+    } else {
+      setActiveSection('review')
+    }
+  }
 
   return (
     <StoreLayoutLite>
@@ -167,7 +182,7 @@ export default function StoreCartPage() {
             <CheckoutSection
               title="1. ที่อยู่สำหรับการจัดส่ง"
               isActive={activeSection === 'address'}
-              isCompleted={activeSection !== 'address'}
+              isCompleted={!!selectedAddressData}
               onEdit={() => setActiveSection('address')}
             >
               <div className="space-y-4">
@@ -192,7 +207,8 @@ export default function StoreCartPage() {
 
                 <Button
                   className="w-full"
-                  onClick={() => setActiveSection('shipping')}
+                  disabled={!selectedAddressData}
+                  onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
@@ -211,7 +227,7 @@ export default function StoreCartPage() {
             <CheckoutSection
               title="2. เลือกช่องทางจัดส่ง"
               isActive={activeSection === 'shipping'}
-              isCompleted={stepsOrder.indexOf(activeSection) > 1}
+              isCompleted={!!selectedShipping}
               onEdit={() => setActiveSection('shipping')}
             >
               <div className="space-y-4">
@@ -229,7 +245,8 @@ export default function StoreCartPage() {
                 </div>
                 <Button
                   className="w-full"
-                  onClick={() => setActiveSection('payment')}
+                  disabled={!selectedShippingData}
+                  onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
@@ -249,7 +266,7 @@ export default function StoreCartPage() {
             <CheckoutSection
               title="3. วิธีชำระเงิน"
               isActive={activeSection === 'payment'}
-              isCompleted={!!selectedPayment && activeSection !== 'payment'}
+              isCompleted={!!selectedPayment}
               onEdit={() => setActiveSection('payment')}
             >
               <div className="space-y-3">
@@ -267,7 +284,7 @@ export default function StoreCartPage() {
                 <Button
                   className="mt-2 h-11 w-full"
                   disabled={!selectedPayment}
-                  onClick={() => setActiveSection('review')}
+                  onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
@@ -284,6 +301,7 @@ export default function StoreCartPage() {
             </CheckoutSection>
 
             <div className="shadow-airy rounded-xl border border-gray-100 bg-white p-5">
+              <SummaryRow label="ส่วนลด" value={<DiscountForm />} />
               <CartSummary summary={summary} />
               <Button
                 className="mt-6 h-12 w-full text-lg"

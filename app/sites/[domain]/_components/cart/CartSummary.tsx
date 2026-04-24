@@ -6,6 +6,9 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 
+import { SummaryRow } from './SummaryRow'
+import { SummaryTotal } from './SummaryTotal'
+
 interface CartSummaryData {
   subtotal: number
   totalDiscount: number
@@ -16,37 +19,6 @@ interface CartSummaryData {
 interface CartSummaryProps {
   summary: CartSummaryData
   className?: string
-}
-
-function SummaryRow({
-  label,
-  value,
-  isDiscount = false,
-}: {
-  label: string
-  value: string | number
-  isDiscount?: boolean
-}) {
-  return (
-    <div
-      className={cn(
-        'flex justify-between text-sm',
-        isDiscount && 'text-primary',
-      )}
-    >
-      <span className={'text-muted-foreground'}>{label}</span>
-      <span>{isDiscount ? `- ${value}` : value}</span>
-    </div>
-  )
-}
-
-function SummaryTotal({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-lg font-bold">
-      <span>{label}</span>
-      <span className="text-primary">{value}</span>
-    </div>
-  )
 }
 
 export function CartSummary({ summary, className }: CartSummaryProps) {
