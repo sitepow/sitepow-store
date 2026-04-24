@@ -22,7 +22,7 @@ import { SummaryRow } from '../../_components/cart/SummaryRow'
 import { SummaryTotal } from '../../_components/cart/SummaryTotal'
 
 export function DiscountForm() {
-  const [points, setPoints] = useState([0])
+  const [points, setPoints] = useState([MAX_POINTS])
   const maxDiscountTHB = MAX_POINTS * POINT_RATE
   const useDiscountTHB = points[0] * POINT_RATE
 
