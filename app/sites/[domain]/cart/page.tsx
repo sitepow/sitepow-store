@@ -17,24 +17,25 @@ import { ChevronLeftIcon } from 'lucide-react'
 import { SectionContainer } from '@/components/SectionContainer'
 import { Button } from '@/components/ui/button'
 
-import { cn } from '@/lib/utils'
-
 import { CircularProgress } from '../_components/CircularProgress'
 import { CartItemCard } from '../_components/cart/CartItemCard'
 import { CartSummary } from '../_components/cart/CartSummary'
 import { StoreLayoutLite } from '../_components/layout/lite/LayoutLite'
 import { CheckoutSection } from './_components/CheckoutSection'
 import { CustomerAddressForm } from './_components/CustomerAddressForm'
+import { RadioCard } from './_components/RadioCard'
 import { useCartStore } from './store'
 
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
+  const summary = getCartSummary()
+
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
   const [selectedShipping, setSelectedShipping] = useState<string | null>(null)
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState<CheckoutStep>('address')
-  const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
-  const summary = getCartSummary()
 
   const stepIcons = {
     address: IconMapPin,
@@ -42,6 +43,19 @@ export default function StoreCartPage() {
     payment: IconCreditCard,
     review: IconShoppingCartCheck,
   }
+
+  const addresses = [
+    {
+      id: 'addr_1',
+      title: 'คุณสมชาย สายเสมอ',
+      description: '123/45 หมู่บ้านตัวอย่าง ถ.สุขุมวิท เขตวัฒนา กรุงเทพฯ 10110',
+    },
+    {
+      id: 'addr_2',
+      title: 'คุณสมหญิง จริงใจ (ที่ทำงาน)',
+      description: 'อาคารออฟฟิศชั้น 20 ถ.รัชดาภิเษก เขตห้วยขวาง กรุงเทพฯ 10310',
+    },
+  ]
 
   const shippingMethods = [
     {
@@ -75,6 +89,14 @@ export default function StoreCartPage() {
       description: 'แจ้งโอนเงินผ่านระบบหลังชำระ',
     },
   ]
+
+  const selectedAddressData = addresses.find((a) => a.id === selectedAddress)
+  const selectedShippingData = shippingMethods.find(
+    (m) => m.id === selectedShipping,
+  )
+  const selectedPaymentData = paymentMethods.find(
+    (p) => p.id === selectedPayment,
+  )
 
   const stepsOrder: CheckoutStep[] = [
     'address',
@@ -155,9 +177,19 @@ export default function StoreCartPage() {
                   </span>
                   <CustomerAddressForm />
                 </div>
-                <div className="text-muted-foreground flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-gray-100 text-sm">
-                  ยังไม่ได้เลือกที่อยู่
+
+                <div className="grid gap-2">
+                  {addresses.map((addr) => (
+                    <RadioCard
+                      key={addr.id}
+                      title={addr.title}
+                      description={addr.description}
+                      isSelected={selectedAddress === addr.id}
+                      onSelect={() => setSelectedAddress(addr.id)}
+                    />
+                  ))}
                 </div>
+
                 <Button
                   className="w-full"
                   onClick={() => setActiveSection('shipping')}
@@ -165,12 +197,15 @@ export default function StoreCartPage() {
                   ดำเนินการต่อ
                 </Button>
               </div>
-              <div className="text-sm">
-                <p className="font-medium">คุณสมชาย สายเสมอ</p>
-                <p className="text-muted-foreground text-xs">
-                  123/45 หมู่บ้านตัวอย่าง ถ.สุขุมวิท กรุงเทพฯ 10110
-                </p>
-              </div>
+
+              {selectedAddressData && (
+                <RadioCard
+                  title={selectedAddressData.title}
+                  description={selectedAddressData.description}
+                  isSelected={true}
+                  onSelect={() => {}}
+                />
+              )}
             </CheckoutSection>
 
             <CheckoutSection
@@ -181,47 +216,16 @@ export default function StoreCartPage() {
             >
               <div className="space-y-4">
                 <div className="grid gap-2">
-                  {shippingMethods.map((method) => {
-                    const isSelected = selectedShipping === method.id
-                    return (
-                      <div
-                        key={method.id}
-                        onClick={() => setSelectedShipping(method.id)}
-                        className={cn(
-                          'cursor-pointer rounded-xl border p-4 text-start transition-all',
-                          isSelected
-                            ? 'border-primary bg-primary/5 ring-primary'
-                            : 'border-gray-200 bg-white hover:border-gray-300',
-                        )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p
-                              className={cn(
-                                'text-sm font-bold',
-                                isSelected ? 'text-primary' : 'text-gray-700',
-                              )}
-                            >
-                              {method.title} ({formatCurrency(method.price)})
-                            </p>
-                            <p className="text-muted-foreground mt-0.5 text-xs">
-                              {method.description}
-                            </p>
-                          </div>
-                          <div
-                            className={cn(
-                              'flex size-5 items-center justify-center rounded-full border-2 transition-colors',
-                              isSelected ? 'border-primary' : 'border-gray-300',
-                            )}
-                          >
-                            {isSelected && (
-                              <div className="bg-primary size-2.5 rounded-full" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
+                  {shippingMethods.map((method) => (
+                    <RadioCard
+                      key={method.id}
+                      title={method.title}
+                      description={method.description}
+                      price={method.price}
+                      isSelected={selectedShipping === method.id}
+                      onSelect={() => setSelectedShipping(method.id)}
+                    />
+                  ))}
                 </div>
                 <Button
                   className="w-full"
@@ -230,9 +234,16 @@ export default function StoreCartPage() {
                   ดำเนินการต่อ
                 </Button>
               </div>
-              <div className="text-sm font-medium">
-                Standard Delivery (฿40.00)
-              </div>
+
+              {selectedShippingData && (
+                <RadioCard
+                  title={selectedShippingData.title}
+                  description={selectedShippingData.description}
+                  price={selectedShippingData.price}
+                  isSelected={true}
+                  onSelect={() => {}}
+                />
+              )}
             </CheckoutSection>
 
             <CheckoutSection
@@ -243,47 +254,15 @@ export default function StoreCartPage() {
             >
               <div className="space-y-3">
                 <div className="grid gap-2">
-                  {paymentMethods.map((method) => {
-                    const isSelected = selectedPayment === method.id
-                    return (
-                      <div
-                        key={method.id}
-                        onClick={() => setSelectedPayment(method.id)}
-                        className={cn(
-                          'cursor-pointer rounded-xl border p-4 text-start transition-all',
-                          isSelected
-                            ? 'border-primary bg-primary/5 ring-primary'
-                            : 'border-gray-200 bg-white hover:border-gray-300',
-                        )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p
-                              className={cn(
-                                'text-sm font-bold',
-                                isSelected ? 'text-primary' : 'text-gray-700',
-                              )}
-                            >
-                              {method.title}
-                            </p>
-                            <p className="text-muted-foreground mt-0.5 text-xs">
-                              {method.description}
-                            </p>
-                          </div>
-                          <div
-                            className={cn(
-                              'flex size-5 items-center justify-center rounded-full border-2 transition-colors',
-                              isSelected ? 'border-primary' : 'border-gray-300',
-                            )}
-                          >
-                            {isSelected && (
-                              <div className="bg-primary size-2.5 rounded-full" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
+                  {paymentMethods.map((method) => (
+                    <RadioCard
+                      key={method.id}
+                      title={method.title}
+                      description={method.description}
+                      isSelected={selectedPayment === method.id}
+                      onSelect={() => setSelectedPayment(method.id)}
+                    />
+                  ))}
                 </div>
                 <Button
                   className="mt-2 h-11 w-full"
@@ -293,10 +272,15 @@ export default function StoreCartPage() {
                   ดำเนินการต่อ
                 </Button>
               </div>
-              <div className="text-sm font-medium">
-                {paymentMethods.find((p) => p.id === selectedPayment)?.title ||
-                  'ยังไม่ได้เลือก'}
-              </div>
+
+              {selectedPaymentData && (
+                <RadioCard
+                  title={selectedPaymentData.title}
+                  description={selectedPaymentData.description}
+                  isSelected={true}
+                  onSelect={() => {}}
+                />
+              )}
             </CheckoutSection>
 
             <div className="shadow-airy rounded-xl border border-gray-100 bg-white p-5">

@@ -58,7 +58,7 @@ export function CheckoutSection({
       <div
         className={cn(
           'transition-all duration-300',
-          isActive ? 'p-5 opacity-100' : 'h-0 overflow-hidden opacity-0',
+          isActive ? 'px-5 py-3 opacity-100' : 'h-0 overflow-hidden opacity-0',
         )}
       >
         {isActive && editView}
