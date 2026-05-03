@@ -15,9 +15,9 @@ export default function RegisterPage() {
             title={'สมัครเปิดร้านค้าของคุณที่นี่'}
             description={
               <>
-                ทดลองใช้งาน{' '}
-                <span className="text-bold text-primary">Ultimate package</span>{' '}
-                ฟรี 14 วัน
+                เพื่อขอทดลองใช้งาน{' '}
+                <span className="text-bold text-primary">Pro Package</span> ฟรี
+                14 วัน ยังไม่ต้องชำระเงิน ไม่มีข้อผูกมัด
               </>
             }
           />

@@ -69,7 +69,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     seed: 'expert',
     features: [
       {
-        text: 'AI Vision ช่วยลงของและเขียนคำบรรยาย',
+        text: 'AI Vision ช่วยลงของ (100 ครั้ง/เดือน)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
@@ -99,6 +99,10 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     currency: 'THB',
     seed: 'legend',
     features: [
+      {
+        text: 'AI Vision ช่วยลงของ (500 ครั้ง/เดือน)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
       {
         text: 'ซิงค์สต็อก Shopee & Lazada Real-time',
         icon: <IconShoppingBag size={18} stroke={1.5} />,
@@ -167,6 +171,84 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         { label: 'ระบบคูปองส่วนลด', access: [true, true, true] },
         { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, true] },
+      ],
+    },
+  ],
+}
+
+export const PROFIT_COMPARISON = {
+  columns: [
+    'เลือกช่องการการขาย',
+    'ขายใน Marketplace (ส้ม/ฟ้า)',
+    'ขายที่ Sitepow Store',
+  ],
+  categories: [
+    {
+      name: 'ต้นทุนและกำไร',
+      features: [
+        {
+          label: 'ค่าธรรมเนียม (GP)',
+          values: ['15% - 25% (หักทุกออเดอร์)', '0% (ไม่หักเลยสักบาท)'],
+        },
+        {
+          label: 'รายได้สุทธิ',
+          values: [
+            'ยิ่งขายดี ยิ่งโดนหักเยอะ',
+            'ยิ่งขายดี กำไรยิ่งเหลือเยอะขึ้น',
+          ],
+        },
+      ],
+    },
+    {
+      name: 'การจัดการร้านค้า',
+      features: [
+        {
+          label: 'การลงสินค้า',
+          values: [
+            'นั่งพิมพ์เอง นึกชื่อเอง',
+            'AI Vision ถ่ายรูปปุ๊บ เจนให้ปั๊บ',
+          ],
+        },
+        {
+          label: 'ฐานลูกค้า',
+          values: [
+            'โดนปิดกั้นการมองเห็น (ต้องจ่ายค่า Ads เพื่อดันให้ลูกค้าเห็น)',
+            'เป็นเจ้าของฐานลูกค้าเอง 100%',
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Case Study 1: ร้านค้าเริ่มต้น (ยอดขาย 100,000.-)',
+      features: [
+        {
+          label: 'เงินที่โดนหักไปฟรีๆ',
+          values: ['~20,000 บาท / เดือน', '0 บาท'],
+        },
+        {
+          label: 'กำไรที่เหลือจริง',
+          values: ['80,000 บาท', '99,010 บาท'],
+        },
+      ],
+    },
+    {
+      name: 'Case Study 2: ร้านค้ามือโปร (ยอดขาย 500,000.-)',
+      features: [
+        {
+          label: 'เงินที่โดนหักไปฟรีๆ',
+          values: ['~100,000 บาท / เดือน', '0 บาท'],
+        },
+        {
+          label: 'สิ่งที่คุณเสียไปใน 1 ปี',
+          values: [
+            'เงิน 1,200,000 บาท (ซื้อรถได้ 1 คัน)',
+            'จ่ายแค่ค่าระบบรายปี ไม่ถึง 1.2 หมื่น',
+          ],
+        },
+        {
+          label: 'กำไรสุทธิที่ได้เพิ่มขึ้น',
+          values: ['หายไป 1 แสนทุกเดือน', 'รับเต็มๆ 5 แสนทุกเดือน'],
+        },
       ],
     },
   ],
