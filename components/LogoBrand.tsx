@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { PackageCheckIcon } from 'lucide-react'
+import { IconPackageImport } from '@tabler/icons-react'
 
 export function LogoBrand() {
   return (
@@ -8,7 +8,7 @@ export function LogoBrand() {
       href="/"
       className="flex items-center gap-2.5 text-2xl font-bold tracking-tight"
     >
-      <PackageCheckIcon size={35} className="text-primary" />
+      <IconPackageImport size={35} stroke={1.5} className="text-primary" />
       <div className="relative">
         <span>Sitepow</span>
         <span className="absolute -top-2 right-0 text-xs before:content-['Store']"></span>

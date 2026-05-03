@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { BASE_FAVICON } from '@/constants/favicon'
 
 type Props = {
-  params: { domain: string }
+  params: Promise<{ domain: string }>
   children: React.ReactNode
 }
 

@@ -1,16 +1,45 @@
-import type { FeatureCard } from '@/types/payment'
+import type { ReactNode } from 'react'
 
-interface FeatureCardProps extends FeatureCard {
+import { FeatureCard as FeatureCardType } from '@/types/payment'
+
+interface FeatureCardProps extends FeatureCardType {
   image?: string
+  icon?: ReactNode
 }
 
-export function FeatureCard({ title, description, image }: FeatureCardProps) {
+export function FeatureCard({
+  title,
+  description,
+  image,
+  icon,
+}: FeatureCardProps) {
   return (
-    <div className="rounded-2xl bg-gray-100 p-5 text-start">
-      <h3 className="text-2xl font-bold">{title}</h3>
-      <p className="opacity-50">{description}</p>
+    <div className="group rounded-2xl border border-gray-100 bg-white p-6 text-start shadow-sm">
+      <div className="mb-4 flex items-center gap-3">
+        {icon && (
+          <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
+            {icon}
+          </div>
+        )}
+      </div>
 
-      {image && <div className="mt-5 h-96 rounded-sm bg-gray-200" />}
+      <h3 className="group-hover:text-primary mb-2 text-2xl font-bold text-gray-900 transition-colors">
+        {title}
+      </h3>
+
+      <p className="text-lg leading-relaxed text-gray-500 opacity-80">
+        {description}
+      </p>
+
+      {image && (
+        <div className="relative mt-6 overflow-hidden rounded-xl border-2 border-dashed border-gray-100">
+          <div className="flex h-48 w-full items-center justify-center">
+            <span className="text-sm font-medium text-gray-400">
+              Preview ของระบบ {title}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

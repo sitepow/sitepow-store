@@ -12,57 +12,147 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id               String   @id @default(dbgenerated("gen_random_uuid()"))
-  email            String   @unique
-  password         String?
-  name             String?
-  registerProvider String?
+model Store {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  ownerId     String
   
-  shops            Shop[]
+  plan        Plan     @default(FREE)
+  aiCredits   Int      @default(10)
   
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  blogs       Blog[]
+  categories  Category[]
+  products    Product[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model Shop {
-  id              String   @id @default(dbgenerated("gen_random_uuid()"))
-  name            String
-  slug            String   @unique
-  domain          String?  @unique
-  description     String?  @db.Text
-  logo            String?
-  banner          String?
+enum Plan {
+  FREE
+  STANDARD
+  PRO
+}
 
-  seoTitle       String?
-  seoDescription String?
-
-  ownerId         String
-  owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  products        Product[]
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  image     String
+  slug      String   @unique
+  tags      String[]
   
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-  @@index([ownerId])
+model Category {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String
+  description String?
+  image       String?
+  
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products    Product[]
 }
 
 model Product {
-  id          String   @id @default(dbgenerated("gen_random_uuid()"))
-  name        String
-  description String?  @db.Text
-  price       Decimal  @db.Decimal(10, 2)
-  stock       Int      @default(0)
-  images      String[]
+  id          String   @id @default(cuid())
+  title       String
+  slug        String
+  metadata    Json?
   
-  seoTitle       String?
-  seoDescription String?
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  images      ProductImage[]
+  variants    ProductVariant[]
+  options     ProductOption[]
+  addons      ProductAddon[]
 
-  shopId      String
-  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([shopId])
+  @@unique([storeId, slug])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  isPrimary Boolean @default(false)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id           String   @id @default(cuid())
+  title        String
+  price        Decimal  @db.Decimal(10, 2)
+  sku          String
+  stock        Int      @default(0)
+  
+  discountType   DiscountType?
+  discountAmount Decimal?      @db.Decimal(10, 2)
+  discountActive Boolean       @default(false)
+  
+  pointsAmount Int      @default(0)
+  pointsActive Boolean  @default(false)
+
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductOption {
+  id        String   @id @default(cuid())
+  title     String
+  maxSelect Int      @default(1)
+  require   Boolean  @default(false)
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  choices   ProductChoice[]
+}
+
+model ProductChoice {
+  id         String   @id @default(cuid())
+  name       String
+  extraPrice Decimal  @db.Decimal(10, 2) @default(0)
+  
+  optionId   String
+  option     ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+}
+
+model ProductAddon {
+  id          String   @id @default(cuid())
+  title       String
+  price       Decimal  @db.Decimal(10, 2)
+  isAvailable Boolean  @default(true)
+  
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model AiLog {
+  id        String   @id @default(cuid())
+  storeId   String
+  action    String 
+  prompt    String   @db.Text
+  cost      Int      @default(1)
+  
+  createdAt DateTime @default(now())
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }

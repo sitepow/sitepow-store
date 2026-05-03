@@ -10,6 +10,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@tabler/icons-react": "^3.41.1",
@@ -27,6 +29,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-hook-form": "^7.75.0",
     "react-hot-toast": "^2.6.0",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
@@ -39,6 +42,7 @@
     "unist-util-visit": "^5.1.0",
     "uuidv7": "^1.2.1",
     "vaul": "^1.1.2",
+    "zod": "^4.4.2",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -58,6 +62,6 @@
     "prisma": "^7.7.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^6.0.3"
   }
 }

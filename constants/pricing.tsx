@@ -1,19 +1,18 @@
 import { PricingOption, PricingPlanProps, PricingTables } from '@/types/pricing'
 import {
-  InfinityIcon,
-  BarChart3Icon,
-  CreditCardIcon,
-  GlobeIcon,
-  HeadphonesIcon,
-  LayersIcon,
-  LayoutDashboardIcon,
-  ShieldCheckIcon,
-  ShoppingBagIcon,
-  StoreIcon,
-  TrophyIcon,
-  Users2Icon,
-  ZapIcon,
-} from 'lucide-react'
+  IconBolt,
+  IconBuildingStore,
+  IconChartBar,
+  IconCircleCheck,
+  IconCreditCard,
+  IconHeadset,
+  IconInfinity,
+  IconLayersIntersect,
+  IconShoppingBag,
+  IconSparkles,
+  IconTrophy,
+  IconWorld,
+} from '@tabler/icons-react'
 
 export const PRICING_VALUE = {
   ONE_MONTH: '1month',
@@ -29,130 +28,146 @@ export const PRICING_OPTIONS: PricingOption[] = [
   {
     value: PRICING_VALUE.TWELVE_MONTHS,
     label: '12 เดือน',
-    discount: '20% OFF',
+    discount: '25% OFF',
   },
 ]
 
 export const PRICING_PLANS: PricingPlanProps[] = [
   {
-    title: 'Free',
-    description: 'เริ่มต้นสร้างตัวตนและทดลองระบบการจัดการพื้นฐาน',
-    price: '0.00',
+    title: 'Starter',
+    description: 'เริ่มต้นขายออนไลน์แบบมืออาชีพ กำไรเต็ม 100% ไม่โดนหัก GP',
+    price: '490',
     currency: 'THB',
-    seed: 'tester',
+    seed: 'starter',
     features: [
       {
-        text: 'ลงสินค้าได้สูงสุด 15 ชิ้น',
-        icon: <LayersIcon size={18} />,
+        text: 'ลงสินค้าได้สูงสุด 50 ชิ้น',
+        icon: <IconLayersIntersect size={18} stroke={1.5} />,
       },
       {
-        text: 'ระบบจัดการออเดอร์พื้นฐาน',
-        icon: <LayoutDashboardIcon size={18} />,
+        text: 'ระบบหน้าร้านออนไลน์ส่วนตัว',
+        icon: <IconBuildingStore size={18} stroke={1.5} />,
       },
       {
-        text: 'เชื่อมต่อ Social Login (SSO)',
-        icon: <Users2Icon size={18} />,
+        text: 'รองรับการรับเงินโอน (Manual)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
       },
       {
-        text: 'รองรับการชำระเงินโอนผ่านธนาคาร',
-        icon: <CreditCardIcon size={18} />,
+        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+        icon: <IconBolt size={18} stroke={1.5} />,
       },
     ],
-    buttonText: 'เริ่มต้นใช้ฟรี',
+    buttonText: 'เริ่มต้นสร้างกำไร',
   },
   {
     title: 'Pro',
-    description: 'ปลดล็อกทุกขีดจำกัดเพื่อยอดขายแบบมืออาชีพ',
-    price: '990.00',
-    currency: 'THB / เดือน',
+    description:
+      'ปลดล็อกพลัง AI และระบบเช็คสลิปอัตโนมัติ เพื่อการขายที่รวดเร็วกว่า',
+    price: '990',
+    currency: 'THB',
     isPopular: true,
     seed: 'expert',
     features: [
       {
+        text: 'AI Vision ช่วยลงของและเขียนคำบรรยาย',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เช็คสลิปอัตโนมัติด้วย Easy Slip',
+        icon: <IconCircleCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เชื่อมต่อ GB Prime Pay (บัตร/PromptPay)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
         text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
-        icon: <InfinityIcon size={18} />,
+        icon: <IconInfinity size={18} stroke={1.5} />,
       },
       {
-        text: '0% คอมมิชชั่น ทุกช่องทาง',
-        icon: <ZapIcon size={18} />,
-      },
-      {
-        text: 'ระบบ Stock & คลังสินค้าเต็มรูปแบบ',
-        icon: <StoreIcon size={18} />,
-      },
-      {
-        text: 'เชื่อมต่อ Payment Gateway & ขนส่ง',
-        icon: <GlobeIcon size={18} />,
-      },
-      {
-        text: 'รายงานวิเคราะห์กำไร - ขาดทุน',
-        icon: <BarChart3Icon size={18} />,
+        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+        icon: <IconChartBar size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'อัปเกรดเป็น Pro เลย',
   },
   {
     title: 'Ultimate',
-    description: 'ที่สุดของการตลาดขั้นสูงและการขายแบบ Omnichannel',
-    price: '1,490.00',
-    currency: 'THB / เดือน',
+    description:
+      'เชื่อมต่อทุก Marketplace และระบบสมาชิกขั้นสูงเพื่อการขายที่ยั่งยืน',
+    price: '1,990',
+    currency: 'THB',
     seed: 'legend',
     features: [
       {
-        text: 'เชื่อมต่อ E-Marketplace (Shopee, Lazada)',
-        icon: <ShoppingBagIcon size={18} />,
+        text: 'ซิงค์สต็อก Shopee & Lazada Real-time',
+        icon: <IconShoppingBag size={18} stroke={1.5} />,
       },
       {
-        text: 'ระบบสมาชิก & Digital Member Card',
-        icon: <TrophyIcon size={18} />,
+        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
+        icon: <IconTrophy size={18} stroke={1.5} />,
       },
       {
-        text: 'ระบบสะสมแต้มแลกของรางวัล',
-        icon: <ShieldCheckIcon size={18} />,
+        text: 'จัดการขนส่งและพิมพ์ใบปะหน้าอัตโนมัติ',
+        icon: <IconWorld size={18} stroke={1.5} />,
       },
       {
-        text: 'เพิ่มผู้ดูแลร้านได้สูงสุด 50 คน',
-        icon: <Users2Icon size={18} />,
-      },
-      {
-        text: 'Customer Support ลำดับพิเศษ',
-        icon: <HeadphonesIcon size={18} />,
+        text: 'Support พิเศษดูแลส่วนตัวตลอด 24 ชม.',
+        icon: <IconHeadset size={18} stroke={1.5} />,
       },
     ],
-    buttonText: 'จัดเต็มทุกฟีเจอร์กับ Ultimate',
+    buttonText: 'จัดเต็มกับ Ultimate',
   },
 ]
 
 export const PRICING_TABLES: PricingTables = {
-  tiers: ['Free', 'Pro', 'Ultimate'],
+  tiers: ['Starter', 'Pro', 'Ultimate'],
   categories: [
     {
-      name: 'ช่องทางการขาย',
-      features: [],
+      name: 'ฟีเจอร์ AI อัจฉริยะ',
+      features: [
+        {
+          label: 'AI ช่วยตั้งชื่อสินค้าจากรูปภาพ',
+          access: [false, true, true],
+        },
+        {
+          label: 'AI ช่วยเขียน Sales Copy ภาษาไทย',
+          access: [false, true, true],
+        },
+      ],
     },
     {
-      name: 'การตั้งค่า และจัดการนโยบายร้าน',
-      features: [],
+      name: 'การชำระเงินและค่าธรรมเนียม',
+      features: [
+        {
+          label: 'รับเงินเข้าบัญชีร้านโดยตรง (0% GP)',
+          access: [true, true, true],
+        },
+        {
+          label: 'ระบบเช็คสลิปอัตโนมัติ (Easy Slip)',
+          access: [false, true, true],
+        },
+        { label: 'เชื่อมต่อ GB Prime Pay', access: [false, true, true] },
+      ],
     },
     {
-      name: 'การจัดการสินค้า',
-      features: [],
+      name: 'การจัดการร้านค้า',
+      features: [
+        { label: 'ลงสินค้าไม่จำกัดจำนวน', access: [false, true, true] },
+        { label: 'ระบบจัดการสต็อกสินค้า', access: [true, true, true] },
+        { label: 'รายงานวิเคราะห์ยอดขายและกำไร', access: [false, true, true] },
+        {
+          label: 'เชื่อมต่อ Marketplace (Shopee/Lazada)',
+          access: [false, false, true],
+        },
+      ],
     },
     {
-      name: 'การจัดการออเดอร์',
-      features: [],
-    },
-    {
-      name: 'การตลาด และ CRM',
-      features: [],
-    },
-    {
-      name: 'การรับชำระเงิน',
-      features: [],
-    },
-    {
-      name: 'การจัดส่งสินค้า',
-      features: [],
+      name: 'การตลาดและลูกค้าสัมพันธ์',
+      features: [
+        { label: 'ระบบคูปองส่วนลด', access: [true, true, true] },
+        { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, true] },
+      ],
     },
   ],
 }

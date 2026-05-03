@@ -20,14 +20,7 @@ export function FeatureSection() {
 
       <div className="grid w-full grid-cols-2 gap-5">
         {featuresList.map((feature, idx) => {
-          return (
-            <FeatureCard
-              key={idx}
-              title={feature.title}
-              description={feature.description}
-              image={feature.image}
-            />
-          )
+          return <FeatureCard key={idx} {...feature} />
         })}
       </div>
     </SectionContainer>

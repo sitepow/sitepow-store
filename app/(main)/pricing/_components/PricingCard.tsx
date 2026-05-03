@@ -71,7 +71,7 @@ export function PricingCard({
 
         {basePrice > 0 && selectedTab !== PRICING_VALUE.ONE_MONTH && (
           <span className="text-xs font-medium opacity-60">
-            เฉลี่ยตก {formatCurrency(averagePerMonth)} / เดือน
+            เฉลี่ย {formatCurrency(averagePerMonth)} / เดือน
           </span>
         )}
       </div>

@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "constants/navbar.tsx"  ],
+, "constants/navbar.tsx", "constants/payment.tsx"  ],
   "exclude": ["node_modules"]
 }
