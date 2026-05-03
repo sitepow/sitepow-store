@@ -3,6 +3,7 @@ import React from 'react'
 import { PRICING_TABLES } from '@/constants/pricing'
 
 import { SectionContainer } from '@/components/SectionContainer'
+import { SectionHeader } from '@/components/SectionHeader'
 import { CheckCircleIcon } from '@/components/icon/CheckCircle'
 import { CloseCircleIcon } from '@/components/icon/CloseCircle'
 import {
@@ -17,10 +18,14 @@ import {
 export function PricingTables() {
   return (
     <SectionContainer>
-      <h2 className="max-w-2xl text-4xl leading-tight font-bold">
-        <span className="text-primary">เปรียบเทียบ</span> ความสามารถของแต่ละ
-        Package
-      </h2>
+      <SectionHeader
+        title={
+          <>
+            <span className="text-primary">เปรียบเทียบ</span> ความสามารถของแต่ละ
+            Package
+          </>
+        }
+      />
 
       <Table>
         <TableHeader>

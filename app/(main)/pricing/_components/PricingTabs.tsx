@@ -11,8 +11,12 @@ export function PricingTabs() {
   const { selectedTab, setSelectedTab } = usePricingStore()
 
   return (
-    <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-      <TabsList>
+    <Tabs
+      value={selectedTab}
+      onValueChange={setSelectedTab}
+      className="w-full px-5 sm:w-fit sm:px-0"
+    >
+      <TabsList className="h-auto w-full justify-start overflow-x-auto overflow-y-hidden p-1 lg:justify-center">
         {PRICING_OPTIONS.map((plan) => {
           return (
             <TabsTrigger className="px-5" key={plan.value} value={plan.value}>

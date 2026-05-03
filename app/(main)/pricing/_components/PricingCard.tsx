@@ -39,12 +39,12 @@ export function PricingCard({
       }`}
     >
       <Image
-        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}`}
+        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&skinColor=fbd3ad`}
         width={32}
         height={32}
         unoptimized
         alt=""
-        className="border-primary mb-2.5 size-32 rounded-full border"
+        className="border-primary bg-primary mb-2.5 size-32 rounded-full border"
       />
 
       <h2 className="text-xl leading-tight font-bold">{title}</h2>

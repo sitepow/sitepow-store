@@ -23,21 +23,17 @@ export function FeatureCard({
         )}
       </div>
 
-      <h3 className="group-hover:text-primary mb-2 text-2xl font-bold text-gray-900 transition-colors">
+      <h3 className="group-hover:text-primary mb-2 text-xl font-bold text-gray-900 transition-colors sm:text-2xl">
         {title}
       </h3>
 
-      <p className="text-lg leading-relaxed text-gray-500 opacity-80">
+      <p className="leading-relaxed text-gray-500 opacity-80 sm:text-lg">
         {description}
       </p>
 
       {image && (
         <div className="relative mt-6 overflow-hidden rounded-xl border-2 border-dashed border-gray-100">
-          <div className="flex h-48 w-full items-center justify-center">
-            <span className="text-sm font-medium text-gray-400">
-              Preview ของระบบ {title}
-            </span>
-          </div>
+          <div className="flex h-48 w-full items-center justify-center" />
         </div>
       )}
     </div>

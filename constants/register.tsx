@@ -1,5 +1,5 @@
 import { RegisterProvide } from '@/types/register'
-import { MailIcon } from 'lucide-react'
+import { IconMail } from '@tabler/icons-react'
 
 import { AppleIcon } from '@/components/icon/Apple'
 import { FacebookIcon } from '@/components/icon/Facebook'
@@ -14,5 +14,8 @@ export const REGISTER_PROVIDERS = [
     name: 'สมัครต่อด้วย Line',
   },
   { icon: <AppleIcon />, name: 'สมัครต่อด้วย Apple ID' },
-  { icon: <MailIcon className="size-8" />, name: 'สมัครต่อด้วย E-mail' },
+  {
+    icon: <IconMail className="size-8" stroke={1.5} />,
+    name: 'สมัครต่อด้วย E-mail',
+  },
 ] as RegisterProvide[]
