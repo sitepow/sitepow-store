@@ -124,8 +124,8 @@ export default function StoreCartPage() {
   return (
     <StoreLayoutLite>
       <SectionContainer>
-        <div className="grid w-full grid-cols-12 items-start gap-5">
-          <div className="sticky top-40 col-span-7 flex flex-col gap-5">
+        <div className="grid w-full items-start gap-5 lg:grid-cols-12">
+          <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-7">
             <div className="flex items-center justify-between">
               <Link href={'/'}>
                 <Button
@@ -164,7 +164,7 @@ export default function StoreCartPage() {
             </div>
           </div>
 
-          <div className="sticky top-28 col-span-5 space-y-4">
+          <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
             <div className="shadow-airy flex items-center gap-5 rounded-xl px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
@@ -186,7 +186,7 @@ export default function StoreCartPage() {
               onEdit={() => setActiveSection('address')}
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
                   <span className="text-muted-foreground text-sm">
                     เลือกที่อยู่ที่ต้องการให้จัดส่ง
                   </span>

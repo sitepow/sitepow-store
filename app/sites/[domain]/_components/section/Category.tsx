@@ -1,16 +1,13 @@
 'use client'
 
-import Link from 'next/link'
-
 import { PRODUCTS } from '@/constants/sites/product'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
 import { Category } from '@/types/sites/category'
-import { ArrowRightIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
-import { Button } from '@/components/ui/button'
 
+import { SeeMoreButton } from '../SeeMoreButton'
 import { ProductCard } from '../product/ProductCard'
 
 export function CategorySection({ categoryId, title, image }: Category) {
@@ -52,12 +49,7 @@ export function CategorySection({ categoryId, title, image }: Category) {
               </div>
             ))}
 
-            <Link href={'/products'}>
-              <Button variant="outline">
-                <span>ดูทั้งหมด</span>
-                <ArrowRightIcon />
-              </Button>
-            </Link>
+            <SeeMoreButton href="/products" />
           </div>
 
           <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-10 bg-linear-to-l from-white to-transparent" />

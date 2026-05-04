@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const blogCardVariants = cva(
-  'h-full rounded-xl transition-all overflow-hidden group',
+  'h-full rounded-xl transition-all overflow-hidden group flex flex-col',
   {
     variants: {
       variant: {
@@ -37,31 +37,41 @@ export function BlogCard({
   isFeatured,
 }: BlogCardProps) {
   return (
-    <Link href={`/blogs/${slug}`}>
+    <Link href={`/blogs/${slug}`} className="block h-full">
       <div className={cn(blogCardVariants({ variant }), className)}>
         <div
           className={cn(
-            'mb-2.5 h-52 w-full overflow-hidden rounded-t-xl bg-gray-200',
-            isFeatured && 'h-[82%]',
+            'w-full overflow-hidden bg-gray-200 transition-all duration-300',
+            isFeatured ? 'h-52 lg:h-[82%]' : 'h-52',
           )}
         >
-          <div className="mb-2.5 h-52 w-full rounded-xl bg-gray-200" />
+          <div className="h-full w-full bg-gray-300 transition-transform duration-500 group-hover:scale-105" />
         </div>
 
-        <div className={cn('p-4 pt-0', isFeatured && 'h-32 shrink-0')}>
+        <div
+          className={cn(
+            'flex flex-1 flex-col p-4',
+            isFeatured && 'lg:h-32 lg:shrink-0 lg:justify-center',
+          )}
+        >
           <h3
             className={cn(
-              'group-hover:text-primary mb-2 line-clamp-2 text-xl leading-tight font-bold',
-              isFeatured && 'mx-auto w-sm',
+              'group-hover:text-primary mb-2 line-clamp-2 text-lg leading-tight font-bold md:text-xl',
+              isFeatured && 'lg:mx-auto lg:w-sm lg:text-center',
             )}
           >
-            {title || 'Untitled Blog Post'}
+            {title!}
           </h3>
 
-          <div className="flex justify-start">
-            <Button variant="link">
-              <span>อ่านต่อ</span>
-              <ArrowRightIcon />
+          <div
+            className={cn(
+              'mt-auto flex justify-start',
+              isFeatured && 'lg:justify-center',
+            )}
+          >
+            <Button variant="link" className="text-primary h-auto p-0">
+              <span className="mr-1">อ่านต่อ</span>
+              <ArrowRightIcon className="size-4" />
             </Button>
           </div>
         </div>

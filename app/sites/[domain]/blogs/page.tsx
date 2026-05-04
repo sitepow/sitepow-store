@@ -12,7 +12,7 @@ export default function StoreBlogsPage() {
       <SectionContainer>
         <h1 className="text-4xl leading-tight font-bold">บทความทั้งหมด</h1>
 
-        <div className="grid w-full grid-cols-3 gap-5">
+        <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {BLOGS.map((blog) => {
             return <BlogCard key={blog.blogId} {...blog} />
           })}

@@ -1,30 +1,23 @@
-import Link from 'next/link'
-
 import { PRODUCTS } from '@/constants/sites/product'
-import { ArrowRightIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
-import { Button } from '@/components/ui/button'
+import { SectionHeader } from '@/components/SectionHeader'
 
+import { SeeMoreButton } from '../SeeMoreButton'
 import { ProductCard } from '../product/ProductCard'
 
 export function ProductsSection() {
   return (
     <SectionContainer>
-      <h2 className="text-4xl leading-tight font-bold">สินค้าใหม่</h2>
+      <SectionHeader title="สินค้าใหม่" />
 
-      <div className="grid w-full grid-cols-4 gap-5">
+      <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {PRODUCTS.map((product) => {
           return <ProductCard key={product.productId} {...product} />
         })}
       </div>
 
-      <Link href={'/products'}>
-        <Button variant="outline">
-          <span>ดูทั้งหมด</span>
-          <ArrowRightIcon />
-        </Button>
-      </Link>
+      <SeeMoreButton href="/products" />
     </SectionContainer>
   )
 }

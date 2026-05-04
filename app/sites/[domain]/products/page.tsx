@@ -8,7 +8,7 @@ export default function StoreProductPage() {
   return (
     <StoreLayout>
       <SectionContainer>
-        <div className="grid w-full grid-cols-12 items-start gap-10">
+        <div className="grid w-full items-start gap-10 xl:grid-cols-12">
           <ProductFilterControl />
           <ProductFilterResults />
         </div>

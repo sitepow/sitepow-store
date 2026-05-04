@@ -1,11 +1,9 @@
-import Link from 'next/link'
-
 import { BLOGS } from '@/constants/sites/blog'
-import { ArrowRightIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
-import { Button } from '@/components/ui/button'
+import { SectionHeader } from '@/components/SectionHeader'
 
+import { SeeMoreButton } from '../SeeMoreButton'
 import { BlogCard } from '../blog/BlogCard'
 
 export function BlogsSection() {
@@ -13,9 +11,9 @@ export function BlogsSection() {
 
   return (
     <SectionContainer>
-      <h2 className="mb-8 text-4xl leading-tight font-bold">บทความล่าสุด</h2>
+      <SectionHeader title="บทความล่าสุด" />
 
-      <div className="grid w-full grid-flow-row-dense grid-cols-4 gap-5">
+      <div className="grid w-full grid-flow-row-dense grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {BLOGS.slice(0, 5).map((blog, index) => {
           const isFirst = index === 0
 
@@ -24,7 +22,7 @@ export function BlogsSection() {
               key={blog.blogId}
               className={
                 isFirst && enableBlogFeature
-                  ? 'col-span-2 row-span-2'
+                  ? 'col-span-1 sm:col-span-2 lg:col-span-2 lg:row-span-2'
                   : 'col-span-1'
               }
             >
@@ -34,14 +32,7 @@ export function BlogsSection() {
         })}
       </div>
 
-      <div className="mt-10">
-        <Link href={'/blogs'}>
-          <Button variant="outline">
-            <span>ดูทั้งหมด</span>
-            <ArrowRightIcon className="ml-2 size-4" />
-          </Button>
-        </Link>
-      </div>
+      <SeeMoreButton href="/blogs" />
     </SectionContainer>
   )
 }

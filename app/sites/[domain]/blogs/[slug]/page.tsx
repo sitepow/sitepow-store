@@ -66,7 +66,7 @@ export default async function StoreBlogDescriptionPage({
               {blog.title}
             </h1>
 
-            <div className="text-muted-foreground flex items-center justify-center gap-6 pt-4 text-sm">
+            <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-6 pt-4 text-sm">
               <div className="flex items-center gap-2">
                 <Avatar className="size-8 border">
                   <AvatarImage src="" />

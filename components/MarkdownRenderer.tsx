@@ -76,8 +76,18 @@ export const MarkdownRenderer = ({
   return (
     <article
       className={cn(
-        'prose prose-neutral dark:prose-invert mx-auto w-3xl max-w-none text-start',
-        'text-lg tracking-tight antialiased sm:text-xl',
+        'prose prose-neutral dark:prose-invert w-full max-w-none text-start md:w-3xl',
+        'prose-base md:prose-lg lg:prose-xl',
+
+        'prose-headings:tracking-tight prose-headings:font-bold',
+        'prose-h1:text-3xl md:prose-h1:text-4xl lg:prose-h1:text-5xl',
+        'prose-h2:text-2xl md:prose-h2:text-3xl',
+
+        'prose-img:rounded-2xl prose-img:shadow-md',
+        'prose-pre:max-w-[90vw] md:prose-pre:max-w-none',
+        'prose-table:block prose-table:overflow-x-auto',
+
+        'leading-relaxed text-slate-700 antialiased dark:text-slate-300',
 
         className,
       )}

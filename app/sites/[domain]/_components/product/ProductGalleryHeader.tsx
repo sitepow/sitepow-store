@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 export function ProductGalleryHeader() {
   return (
-    <div className="flex items-center justify-between">
+    <div className="mt-10 flex items-center justify-between">
       <Link href={'/products'}>
         <Button
           variant="ghost"

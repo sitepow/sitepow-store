@@ -51,7 +51,7 @@ export function StoreFooter() {
           </div>
 
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
-            <div className="flex gap-6 text-sm text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
               <a
                 href="/privacy-policy"
                 className="hover:text-gray-600 hover:underline"
@@ -69,7 +69,7 @@ export function StoreFooter() {
         </div>
       </div>
 
-      <div className="mb-5 flex items-center justify-center gap-2.5">
+      <div className="mb-5 flex flex-wrap items-center justify-center gap-2.5 px-2.5">
         protected & managed by <LogoBrand />
       </div>
     </footer>

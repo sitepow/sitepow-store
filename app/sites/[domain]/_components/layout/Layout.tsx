@@ -16,7 +16,7 @@ export function StoreLayout({
       <StoreNavbar />
 
       <Toaster />
-      <main className={cn(className, 'mt-36')} {...props}>
+      <main className={cn(className, 'mt-20 lg:mt-30')} {...props}>
         {children}
       </main>
       <StoreFooter />
