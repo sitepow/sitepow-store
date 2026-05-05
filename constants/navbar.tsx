@@ -4,11 +4,11 @@ import {
   IconChartBar,
   IconClipboardList,
   IconCreditCard,
+  IconDatabaseImport,
   IconHandClick,
   IconMessage2,
   IconPalette,
   IconPercentage,
-  IconShare,
   IconSparkles,
   IconTicket,
   IconTruckDelivery,
@@ -124,11 +124,11 @@ export const NAVBAR_ITEMS = [
         image: '/',
       },
       {
-        title: 'เชื่อมต่อ Marketplace',
-        href: '/features/marketplace-integration',
+        title: 'จัดการข้อมูลสินค้าอย่างรวดเร็ว',
+        href: '/features/data-management',
         description:
-          'ซิงค์สต็อกและสินค้ากับ Shopee และ Lazada แบบ Real-time ไม่ต้องลงของซ้ำซ้อน',
-        icon: <IconShare size={20} stroke={1.5} />,
+          'รองรับการนำเข้าและส่งออกข้อมูลสินค้าผ่าน CSV/JSON ช่วยให้คุณลงสินค้าจำนวนมากจาก Lazada/Shopee ได้ในไม่กี่นาที',
+        icon: <IconDatabaseImport size={20} stroke={1.5} />,
         image: '/',
       },
       {

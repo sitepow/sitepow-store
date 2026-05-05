@@ -5,10 +5,10 @@ import {
   IconChartBar,
   IconCircleCheck,
   IconCreditCard,
+  IconDatabaseExport,
   IconHeadset,
   IconInfinity,
   IconLayersIntersect,
-  IconShoppingBag,
   IconSparkles,
   IconTrophy,
   IconWorld,
@@ -104,8 +104,8 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'ซิงค์สต็อก Shopee & Lazada Real-time',
-        icon: <IconShoppingBag size={18} stroke={1.5} />,
+        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
+        icon: <IconDatabaseExport size={18} stroke={1.5} />,
       },
       {
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
@@ -161,7 +161,11 @@ export const PRICING_TABLES: PricingTables = {
         { label: 'ระบบจัดการสต็อกสินค้า', access: [true, true, true] },
         { label: 'รายงานวิเคราะห์ยอดขายและกำไร', access: [false, true, true] },
         {
-          label: 'เชื่อมต่อ Marketplace (Shopee/Lazada)',
+          label: 'นำเข้าสินค้าจาก Lazada/Shopee (CSV/JSON)',
+          access: [true, true, true],
+        },
+        {
+          label: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
           access: [false, false, true],
         },
       ],
