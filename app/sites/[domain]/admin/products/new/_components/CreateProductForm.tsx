@@ -12,7 +12,8 @@ import { generateProductAiAction } from '@/actions/product'
 import { DiscountType, MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconImageGeneration } from '@tabler/icons-react'
+import { IconImageGeneration, IconLoader2 } from '@tabler/icons-react'
+import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle, Trash2 } from 'lucide-react'
 import z from 'zod'
 
@@ -98,10 +99,17 @@ export function CreateProductForm() {
     console.log('Submitted Data:', data)
   }
 
-  const aiGen = async () => {
-    try {
-      const data = await generateProductAiAction(form.getValues('title'))
+  const { mutate: handleAiGen, isPending: isPendingAiGen } = useMutation({
+    mutationFn: async () => {
+      const title = form.getValues('title')
 
+      // if (!title) {
+      //   throw new Error('กรุณาระบุชื่อสินค้าก่อนให้ AI ช่วยคิด')
+      // }
+
+      return await generateProductAiAction(title)
+    },
+    onSuccess: (data) => {
       const metadataDynamicFields =
         (data.metadata?.details as MetadataDetail[])?.map((item) => ({
           key: String(item.key),
@@ -115,16 +123,17 @@ export function CreateProductForm() {
         tags: data.metadata?.tags ? data.metadata.tags.join(', ') : '',
         metadata: metadataDynamicFields,
       })
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('AI Gen Error:', error)
-    }
-  }
+    },
+  })
 
   return (
     <FormProvider {...form}>
       <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-          <FieldSet>
+          <FieldSet disabled={isPendingAiGen}>
             <FieldLegend variant="label" className="text-xl font-bold">
               ข้อมูลสินค้าพื้นฐาน
             </FieldLegend>
@@ -206,7 +215,10 @@ export function CreateProductForm() {
             </FieldGroup>
           </FieldSet>
 
-          <FieldSet className="bg-muted/30 rounded-xl border p-6">
+          <FieldSet
+            disabled={isPendingAiGen}
+            className="bg-muted/30 rounded-xl border p-6"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between">
               <FieldLegend variant="label" className="text-lg font-semibold">
                 ตัวเลือกสินค้า (Variants)
@@ -256,7 +268,7 @@ export function CreateProductForm() {
                       </Button>
                     </div>
 
-                    <CardContent className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-12 md:items-start md:gap-3">
+                    <CardContent className="grid grid-cols-1 gap-4 pt-6 md:items-start md:gap-3 lg:grid-cols-12">
                       <div className="md:col-span-5">
                         <Controller
                           name={`variants.${index}.title`}
@@ -458,7 +470,10 @@ export function CreateProductForm() {
             </FieldGroup>
           </FieldSet>
 
-          <FieldSet className="bg-muted/30 rounded-lg border p-4">
+          <FieldSet
+            disabled={isPendingAiGen}
+            className="bg-muted/30 rounded-lg border p-4"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between">
               <FieldLegend className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
@@ -469,7 +484,7 @@ export function CreateProductForm() {
                 size="sm"
                 onClick={() => appendMetadata({ key: '', value: '' })}
               >
-                <CirclePlus className="mr-1 h-4 w-4" /> เพิ่มฟิลด์
+                <CirclePlus className="mr-1 size-4" /> เพิ่มฟิลด์
               </Button>
             </div>
 
@@ -504,7 +519,7 @@ export function CreateProductForm() {
                     size="icon"
                     onClick={() => removeMetadata(index)}
                   >
-                    <Trash2 className="text-destructive h-4 w-4" />
+                    <Trash2 className="text-destructive size-4" />
                   </Button>
                 </div>
               ))}
@@ -524,7 +539,10 @@ export function CreateProductForm() {
             </div>
           </FieldSet>
 
-          <FieldSet className="bg-muted/30 rounded-xl border p-6">
+          <FieldSet
+            disabled={isPendingAiGen}
+            className="bg-muted/30 rounded-xl border p-6"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between">
               <FieldLegend variant="label" className="text-lg font-semibold">
                 บริการเสริม (Addons)
@@ -601,9 +619,17 @@ export function CreateProductForm() {
             <Button type="button" variant="ghost" onClick={() => form.reset()}>
               ล้างฟอร์ม
             </Button>
-            <Button type="button" variant="outline" onClick={aiGen}>
-              <IconImageGeneration className="mr-2 size-4" />
-              ให้ AI ช่วยคิดเนื้อหา
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleAiGen()}
+            >
+              {isPendingAiGen ? (
+                <IconLoader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <IconImageGeneration className="mr-2 size-4" />
+              )}
+              {isPendingAiGen ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
             </Button>
             <Button type="submit">บันทึกสินค้าใหม่</Button>
           </div>
