@@ -48,10 +48,14 @@ export interface ProductAddon {
   isAvailable: boolean
 }
 
+export interface MetadataDetail {
+  key: string | number
+  value: string | number | boolean
+}
+
 export interface ProductMetadata {
-  brand?: string
   tags?: string[]
-  [key: string]: unknown
+  details: MetadataDetail[]
 }
 
 export interface Product {

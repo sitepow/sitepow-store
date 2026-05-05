@@ -9,31 +9,27 @@ export const productFormSchema = z.object({
     .array(
       z.object({
         title: z.string().min(1, 'กรุณาระบุชื่อรุ่น'),
-        price: z.coerce.number().min(0, 'ราคาต้องไม่ต่ำกว่า 0'),
-        stock: z.coerce.number().min(0, 'สต็อกต้องไม่ต่ำกว่า 0'),
+        price: z.number().min(0, 'ราคาต้องไม่ต่ำกว่า 0'),
+        stock: z.number().min(0, 'สต็อกต้องไม่ต่ำกว่า 0'),
         sku: z.string().optional(),
       }),
     )
     .min(1, 'ต้องมีอย่างน้อย 1 ตัวเลือก'),
 
-  addons: z
-    .array(
-      z.object({
-        title: z.string().min(1, 'ระบุชื่อบริการเสริม'),
-        price: z.coerce.number().min(0),
-        isAvailable: z.boolean().default(true),
-      }),
-    )
-    .default([]),
+  addons: z.array(
+    z.object({
+      title: z.string().min(1, 'ระบุชื่อบริการเสริม'),
+      price: z.number().min(0),
+      isAvailable: z.boolean(),
+    }),
+  ),
 
-  metadataFields: z
-    .array(
-      z.object({
-        key: z.string().min(1, 'ระบุชื่อหัวข้อ'),
-        value: z.string().min(1, 'ระบุข้อมูล'),
-      }),
-    )
-    .default([]),
+  metadata: z.array(
+    z.object({
+      key: z.string().min(1, 'ระบุชื่อหัวข้อ'),
+      value: z.string().min(1, 'ระบุข้อมูล'),
+    }),
+  ),
 
   tags: z.string().optional(),
 })
