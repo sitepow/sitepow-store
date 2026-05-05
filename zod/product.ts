@@ -1,3 +1,4 @@
+import { DiscountType } from '@/types/sites/product'
 import z from 'zod'
 
 export const productFormSchema = z.object({
@@ -12,6 +13,15 @@ export const productFormSchema = z.object({
         price: z.number().min(0, 'ราคาต้องไม่ต่ำกว่า 0'),
         stock: z.number().min(0, 'สต็อกต้องไม่ต่ำกว่า 0'),
         sku: z.string().optional(),
+        discount: z.object({
+          active: z.boolean(),
+          type: z.enum(DiscountType),
+          amount: z.number(),
+        }),
+        rewardPoints: z.object({
+          isActive: z.boolean(),
+          amount: z.number(),
+        }),
       }),
     )
     .min(1, 'ต้องมีอย่างน้อย 1 ตัวเลือก'),

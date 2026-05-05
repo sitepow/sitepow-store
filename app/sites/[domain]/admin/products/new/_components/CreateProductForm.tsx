@@ -5,10 +5,11 @@ import {
   FormProvider,
   useFieldArray,
   useForm,
+  useWatch,
 } from 'react-hook-form'
 
 import { generateProductAiAction } from '@/actions/product'
-import { MetadataDetail } from '@/types/sites/product'
+import { DiscountType, MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconImageGeneration } from '@tabler/icons-react'
@@ -34,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 
 import { ProductPreviewContent } from './ProductPreviewContent'
 
@@ -44,7 +46,16 @@ export function CreateProductForm() {
       title: '',
       slug: '',
       categoryId: '',
-      variants: [{ title: 'Standard', price: 0, stock: 0, sku: '' }],
+      variants: [
+        {
+          title: 'Standard',
+          price: 0,
+          stock: 0,
+          sku: '',
+          discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
+          rewardPoints: { isActive: false, amount: 0 },
+        },
+      ],
       addons: [],
       metadata: [{ key: 'brand', value: '' }],
       tags: '',
@@ -76,6 +87,11 @@ export function CreateProductForm() {
   } = useFieldArray({
     control: form.control,
     name: 'metadata',
+  })
+
+  const variantsValues = useWatch({
+    control: form.control,
+    name: 'variants',
   })
 
   const onSubmit = (data: z.infer<typeof productFormSchema>) => {
@@ -200,7 +216,18 @@ export function CreateProductForm() {
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  appendVariant({ title: '', price: 0, stock: 0, sku: '' })
+                  appendVariant({
+                    title: '',
+                    price: 0,
+                    stock: 0,
+                    sku: '',
+                    discount: {
+                      active: false,
+                      type: DiscountType.PERCENTAGE,
+                      amount: 0,
+                    },
+                    rewardPoints: { isActive: false, amount: 0 },
+                  })
                 }
               >
                 <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
@@ -208,104 +235,226 @@ export function CreateProductForm() {
             </div>
 
             <FieldGroup className="space-y-4">
-              {variantFields.map((item, index) => (
-                <Card key={item.id} className="relative overflow-hidden">
-                  <div className="absolute top-2 right-2 md:hidden">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive h-8 w-8"
-                      onClick={() => removeVariant(index)}
-                      disabled={variantFields.length === 1}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
+              {variantFields.map((item, index) => {
+                const isDiscountActive =
+                  variantsValues?.[index]?.discount?.active
+                const isPointsActive =
+                  variantsValues?.[index]?.rewardPoints?.isActive
 
-                  <CardContent className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-12 md:items-start md:gap-3">
-                    <div className="md:col-span-5">
-                      <Controller
-                        name={`variants.${index}.title`}
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                          <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-xs">
-                              ชื่อตัวเลือก (เช่น ไซส์ M / สีขาว)
-                            </FieldLabel>
-                            <Input
-                              {...field}
-                              aria-invalid={fieldState.invalid}
-                            />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
-                          </Field>
-                        )}
-                      />
-                    </div>
-
-                    <div className="md:col-span-3">
-                      <Controller
-                        name={`variants.${index}.price`}
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                          <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-xs">ราคา</FieldLabel>
-                            <Input
-                              {...field}
-                              type="number"
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
-                              aria-invalid={fieldState.invalid}
-                            />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
-                          </Field>
-                        )}
-                      />
-                    </div>
-
-                    <div className="md:col-span-3">
-                      <Controller
-                        name={`variants.${index}.stock`}
-                        control={form.control}
-                        render={({ field, fieldState }) => (
-                          <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel className="text-xs">สต็อก</FieldLabel>
-                            <Input
-                              {...field}
-                              type="number"
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
-                              aria-invalid={fieldState.invalid}
-                            />
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
-                          </Field>
-                        )}
-                      />
-                    </div>
-
-                    <div className="hidden items-end pb-1 md:col-span-1 md:flex md:h-15">
+                return (
+                  <Card key={item.id} className="relative overflow-hidden">
+                    <div className="absolute top-2 right-2 md:hidden">
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:bg-destructive/10"
+                        className="text-destructive h-8 w-8"
                         onClick={() => removeVariant(index)}
                         disabled={variantFields.length === 1}
                       >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+
+                    <CardContent className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-12 md:items-start md:gap-3">
+                      <div className="md:col-span-5">
+                        <Controller
+                          name={`variants.${index}.title`}
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel className="text-xs">
+                                ชื่อตัวเลือก (เช่น ไซส์ M / สีขาว)
+                              </FieldLabel>
+                              <Input
+                                {...field}
+                                aria-invalid={fieldState.invalid}
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
+                        />
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <Controller
+                          name={`variants.${index}.price`}
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel className="text-xs">ราคา</FieldLabel>
+                              <Input
+                                {...field}
+                                type="number"
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                                aria-invalid={fieldState.invalid}
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
+                        />
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <Controller
+                          name={`variants.${index}.stock`}
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel className="text-xs">สต็อก</FieldLabel>
+                              <Input
+                                {...field}
+                                type="number"
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                                aria-invalid={fieldState.invalid}
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-6 border-t pt-6 md:col-span-12 lg:grid-cols-2">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between px-1">
+                            <div className="space-y-0.5">
+                              <span className="text-sm font-medium">
+                                เปิดใช้งานส่วนลด
+                              </span>
+                            </div>
+                            <Controller
+                              name={`variants.${index}.discount.active`}
+                              control={form.control}
+                              render={({ field }) => (
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              )}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <Controller
+                              name={`variants.${index}.discount.type`}
+                              control={form.control}
+                              render={({ field }) => (
+                                <Field>
+                                  <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                                    ประเภท
+                                  </FieldLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    disabled={!isDiscountActive}
+                                  >
+                                    <SelectTrigger className="h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Percentage">
+                                        เปอร์เซ็นต์ (%)
+                                      </SelectItem>
+                                      <SelectItem value="Fixed">
+                                        จำนวนเงิน (฿)
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </Field>
+                              )}
+                            />
+                            <Controller
+                              name={`variants.${index}.discount.amount`}
+                              control={form.control}
+                              render={({ field }) => (
+                                <Field>
+                                  <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                                    มูลค่าส่วนลด
+                                  </FieldLabel>
+                                  <Input
+                                    {...field}
+                                    type="number"
+                                    placeholder="0"
+                                    className="h-9"
+                                    disabled={!isDiscountActive}
+                                    onChange={(e) =>
+                                      field.onChange(Number(e.target.value))
+                                    }
+                                  />
+                                </Field>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 border-l pl-6 max-lg:border-t max-lg:border-l-0 max-lg:pt-6 max-lg:pl-0">
+                          <div className="flex items-center justify-between px-1">
+                            <div className="space-y-0.5">
+                              <span className="text-sm font-medium">
+                                สะสมคะแนน
+                              </span>
+                            </div>
+                            <Controller
+                              name={`variants.${index}.rewardPoints.isActive`}
+                              control={form.control}
+                              render={({ field }) => (
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              )}
+                            />
+                          </div>
+                          <Controller
+                            name={`variants.${index}.rewardPoints.amount`}
+                            control={form.control}
+                            render={({ field }) => (
+                              <Field>
+                                <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                                  คะแนนที่ได้รับ
+                                </FieldLabel>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  placeholder="ระบุจำนวนแต้ม"
+                                  className="h-9"
+                                  disabled={!isPointsActive}
+                                  onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                  }
+                                />
+                              </Field>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="hidden items-end pb-1 md:col-span-1 md:flex md:h-15">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:bg-destructive/10"
+                          onClick={() => removeVariant(index)}
+                          disabled={variantFields.length === 1}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </FieldGroup>
           </FieldSet>
 
