@@ -268,8 +268,8 @@ export function CreateProductForm() {
                       </Button>
                     </div>
 
-                    <CardContent className="grid grid-cols-1 gap-4 pt-6 md:items-start md:gap-3 lg:grid-cols-12">
-                      <div className="md:col-span-5">
+                    <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:items-start md:gap-3 xl:grid-cols-12">
+                      <div className="xl:col-span-5">
                         <Controller
                           name={`variants.${index}.title`}
                           control={form.control}
@@ -290,7 +290,7 @@ export function CreateProductForm() {
                         />
                       </div>
 
-                      <div className="md:col-span-3">
+                      <div className="xl:col-span-3">
                         <Controller
                           name={`variants.${index}.price`}
                           control={form.control}
@@ -313,7 +313,7 @@ export function CreateProductForm() {
                         />
                       </div>
 
-                      <div className="md:col-span-3">
+                      <div className="xl:col-span-3">
                         <Controller
                           name={`variants.${index}.stock`}
                           control={form.control}
@@ -336,7 +336,7 @@ export function CreateProductForm() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 gap-6 border-t pt-6 md:col-span-12 lg:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-6 border-t pt-6 sm:col-span-2 lg:grid-cols-2 xl:col-span-12">
                         <div className="space-y-4">
                           <div className="flex items-center justify-between px-1">
                             <div className="space-y-0.5">
