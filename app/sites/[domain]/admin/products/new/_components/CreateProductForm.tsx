@@ -356,7 +356,7 @@ export function CreateProductForm() {
                             />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                             <Controller
                               name={`variants.${index}.discount.type`}
                               control={form.control}
