@@ -73,6 +73,10 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
+        text: 'AI Visual Search ช่วยพนักงานหาของ (100 ครั้ง/เดือน)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
         text: 'เช็คสลิปอัตโนมัติด้วย Easy Slip',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
@@ -101,6 +105,10 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     features: [
       {
         text: 'AI Vision ช่วยลงของ (500 ครั้ง/เดือน)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
+        text: 'AI Visual Search ช่วยพนักงานหาของ (ไม่จำกัด)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
@@ -177,6 +185,19 @@ export const PRICING_TABLES: PricingTables = {
         { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, true] },
       ],
     },
+    {
+      name: 'ระบบจัดการหน้าร้าน (POS)',
+      features: [
+        {
+          label: 'ระบบ POS ขายหน้าร้านพื้นฐาน',
+          access: [true, true, true],
+        },
+        {
+          label: 'AI Visual Search (หาของจากรูปภาพสำหรับพนักงาน)',
+          access: [false, true, true],
+        },
+      ],
+    },
   ],
 }
 
@@ -211,6 +232,13 @@ export const PROFIT_COMPARISON = {
           values: [
             'นั่งพิมพ์เอง นึกชื่อเอง',
             'AI Vision ถ่ายรูปปุ๊บ เจนให้ปั๊บ',
+          ],
+        },
+        {
+          label: 'เมื่อพนักงานหาของไม่เจอ',
+          values: [
+            'ต้องโทรหาเจ้าของ/ซ้อ (เสียเวลาลูกค้า)',
+            'AI Visual Search ถ่ายรูปแล้วหาเจอทันที',
           ],
         },
         {
