@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 
+import { ImageUploadSection } from './ImageUploadSection'
 import { ProductPreviewContent } from './ProductPreviewContent'
 
 export function CreateProductForm() {
@@ -47,6 +48,7 @@ export function CreateProductForm() {
       title: '',
       slug: '',
       categoryId: '',
+      images: [],
       variants: [
         {
           title: 'Standard',
@@ -215,12 +217,14 @@ export function CreateProductForm() {
             </FieldGroup>
           </FieldSet>
 
+          <ImageUploadSection />
+
           <FieldSet
             disabled={isPendingAiGen}
             className="bg-muted/30 rounded-xl border p-6"
           >
-            <div className="mb-4 flex flex-wrap items-center justify-between">
-              <FieldLegend variant="label" className="text-lg font-semibold">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+              <FieldLegend variant="label" className="text-lg font-bold">
                 ตัวเลือกสินค้า (Variants)
               </FieldLegend>
               <Button
@@ -258,9 +262,8 @@ export function CreateProductForm() {
                     <div className="absolute top-2 right-2 md:hidden">
                       <Button
                         type="button"
-                        variant="ghost"
+                        variant="destructive"
                         size="icon"
-                        className="text-destructive h-8 w-8"
                         onClick={() => removeVariant(index)}
                         disabled={variantFields.length === 1}
                       >
@@ -454,9 +457,8 @@ export function CreateProductForm() {
                       <div className="hidden items-end pb-1 md:col-span-1 md:flex md:h-15">
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
-                          className="text-destructive hover:bg-destructive/10"
                           onClick={() => removeVariant(index)}
                           disabled={variantFields.length === 1}
                         >
@@ -474,7 +476,7 @@ export function CreateProductForm() {
             disabled={isPendingAiGen}
             className="bg-muted/30 rounded-lg border p-4"
           >
-            <div className="mb-4 flex flex-wrap items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
               </FieldLegend>
@@ -515,11 +517,11 @@ export function CreateProductForm() {
                   />
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="destructive"
                     size="icon"
                     onClick={() => removeMetadata(index)}
                   >
-                    <Trash2 className="text-destructive size-4" />
+                    <Trash2 className="size-4" />
                   </Button>
                 </div>
               ))}
@@ -543,8 +545,8 @@ export function CreateProductForm() {
             disabled={isPendingAiGen}
             className="bg-muted/30 rounded-xl border p-6"
           >
-            <div className="mb-4 flex flex-wrap items-center justify-between">
-              <FieldLegend variant="label" className="text-lg font-semibold">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+              <FieldLegend variant="label" className="text-lg font-bold">
                 บริการเสริม (Addons)
               </FieldLegend>
               <Button
@@ -597,9 +599,8 @@ export function CreateProductForm() {
                     </div>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="destructive"
                       size="icon"
-                      className="text-destructive hover:bg-destructive/10"
                       onClick={() => removeAddon(index)}
                     >
                       <Trash2 className="size-4" />

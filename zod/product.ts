@@ -5,7 +5,9 @@ export const productFormSchema = z.object({
   title: z.string().min(5, 'ชื่อสินค้าต้องมีอย่างน้อย 5 ตัวอักษร'),
   slug: z.string().min(3, 'Slug ต้องมีอย่างน้อย 3 ตัวอักษร'),
   categoryId: z.string().min(1, 'กรุณาเลือกหมวดหมู่'),
-
+  images: z
+    .array(z.object({ url: z.string() }))
+    .min(1, 'ต้องมีรูปอย่างน้อย 1 รูป'),
   variants: z
     .array(
       z.object({
