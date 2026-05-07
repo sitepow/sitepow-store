@@ -29,7 +29,7 @@ export function CartDrawer() {
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <Button variant="outline" size="lg" className="relative">
+        <Button variant="outline" size="icon-lg" className="relative">
           <ShoppingCartIcon className="size-5" />
           {items.length > 0 && <CartBadge total={summary.totalQuantity} />}
         </Button>

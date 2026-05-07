@@ -21,8 +21,8 @@ export function ProductReviewRating() {
   })
 
   return (
-    <div className="flex flex-col gap-8 rounded-2xl border bg-slate-50/50 p-6 sm:flex-row">
-      <div className="flex flex-col items-center justify-center space-y-2 border-slate-200 sm:border-r sm:pr-8">
+    <div className="flex flex-col gap-8 rounded-2xl border p-6 sm:flex-row">
+      <div className="flex flex-col items-center justify-center space-y-2 border-gray-100 sm:border-r sm:pr-8">
         <span className="text-5xl font-bold text-slate-900">
           {averageRating}
         </span>

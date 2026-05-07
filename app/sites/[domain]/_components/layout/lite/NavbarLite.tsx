@@ -13,7 +13,7 @@ export function StoreNavbarLite() {
           <LogoBrand />
 
           <Link href={'/login'}>
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="icon-lg">
               <LockKeyholeIcon />
             </Button>
           </Link>

@@ -52,10 +52,10 @@ export default async function StoreBlogDescriptionPage({
             </Link>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="icon" className="rounded-full">
+              <Button variant="outline" size="icon-lg">
                 <HeartIcon className="size-4" />
               </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
+              <Button variant="outline" size="icon-lg">
                 <Share2Icon className="size-4" />
               </Button>
             </div>

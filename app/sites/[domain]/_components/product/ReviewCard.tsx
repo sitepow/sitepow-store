@@ -24,7 +24,7 @@ export function ReviewCard({ review }: { review: Review }) {
             <div className="mt-1.5">
               <StarRating rating={review.rating} />
             </div>
-            <div className="text-muted-foreground mt-1 text-xs">
+            <div className="text-muted-foreground mt-2.5 text-xs">
               <span>{review.date}</span>
               <span>| {review.variantTitle}</span>
               {review.selectedOptions && (
@@ -38,8 +38,7 @@ export function ReviewCard({ review }: { review: Review }) {
                 </div>
               )}
             </div>
-
-            <div className="text-muted-foreground mt-2.5 flex flex-col gap-1 text-xs">
+            <div className="text-muted-foreground mt-2 flex flex-col gap-1 text-xs">
               {review?.categories?.map((category) => {
                 return (
                   <span key={category.label}>
@@ -51,7 +50,6 @@ export function ReviewCard({ review }: { review: Review }) {
           </div>
         </div>
       </div>
-
       <p className="text-sm leading-relaxed">{review.comment}</p>
       <ReviewMedia images={review.images} video={review.video} />
       <Separator className="mt-6 opacity-50" />

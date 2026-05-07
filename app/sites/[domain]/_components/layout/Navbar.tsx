@@ -70,12 +70,16 @@ export function StoreNavbar() {
             <CartDrawer />
 
             <Button
-              variant="ghost"
-              size="icon"
+              variant="outline"
+              size="icon-lg"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden"
             >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              {isMenuOpen ? (
+                <X className="size-4" />
+              ) : (
+                <Menu className="size-4" />
+              )}
             </Button>
           </div>
         </div>

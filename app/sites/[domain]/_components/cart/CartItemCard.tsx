@@ -28,12 +28,13 @@ export function CartItemCard({
               {item.productTitle}
             </h4>
             {onRemove && (
-              <button
+              <Button
+                size="icon"
                 onClick={() => onRemove(item.cartItemId)}
-                className="text-muted-foreground hover:text-destructive"
+                variant="destructive"
               >
                 <Trash2Icon className="size-4" />
-              </button>
+              </Button>
             )}
           </div>
           <p className="text-muted-foreground mt-1 text-xs">

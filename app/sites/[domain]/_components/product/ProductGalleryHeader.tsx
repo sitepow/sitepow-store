@@ -18,11 +18,11 @@ export function ProductGalleryHeader() {
       </Link>
 
       <div className="flex gap-2.5">
-        <Button variant="outline">
-          <HeartIcon />
+        <Button variant="outline" size="icon-lg">
+          <HeartIcon className="size-4" />
         </Button>
-        <Button variant="outline">
-          <Share2Icon />
+        <Button variant="outline" size="icon-lg">
+          <Share2Icon className="size-4" />
         </Button>
       </div>
     </div>
