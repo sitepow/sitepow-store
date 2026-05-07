@@ -5,7 +5,6 @@ import {
   FormProvider,
   useFieldArray,
   useForm,
-  useWatch,
 } from 'react-hook-form'
 
 import { generateProductAiAction } from '@/actions/product'
@@ -36,10 +35,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 
 import { ImageUploadSection } from './ImageUploadSection'
 import { ProductPreviewContent } from './ProductPreviewContent'
+import { VariantItem } from './VariantItem'
 
 export function CreateProductForm() {
   const form = useForm<ProductFormValues>({
@@ -53,8 +52,8 @@ export function CreateProductForm() {
         {
           title: 'Standard',
           price: 0,
-          stock: 0,
           sku: '',
+          stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
           discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
           rewardPoints: { isActive: false, amount: 0 },
         },
@@ -90,11 +89,6 @@ export function CreateProductForm() {
   } = useFieldArray({
     control: form.control,
     name: 'metadata',
-  })
-
-  const variantsValues = useWatch({
-    control: form.control,
-    name: 'variants',
   })
 
   const onSubmit = (data: z.infer<typeof productFormSchema>) => {
@@ -235,8 +229,8 @@ export function CreateProductForm() {
                   appendVariant({
                     title: '',
                     price: 0,
-                    stock: 0,
                     sku: '',
+                    stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
                     discount: {
                       active: false,
                       type: DiscountType.PERCENTAGE,
@@ -251,224 +245,14 @@ export function CreateProductForm() {
             </div>
 
             <FieldGroup className="space-y-4">
-              {variantFields.map((item, index) => {
-                const isDiscountActive =
-                  variantsValues?.[index]?.discount?.active
-                const isPointsActive =
-                  variantsValues?.[index]?.rewardPoints?.isActive
-
-                return (
-                  <Card key={item.id} className="relative overflow-hidden">
-                    <div className="absolute top-2 right-2 md:hidden">
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => removeVariant(index)}
-                        disabled={variantFields.length === 1}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-
-                    <CardContent className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:items-start md:gap-3 xl:grid-cols-12">
-                      <div className="xl:col-span-5">
-                        <Controller
-                          name={`variants.${index}.title`}
-                          control={form.control}
-                          render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel className="text-xs">
-                                ชื่อตัวเลือก (เช่น ไซส์ M / สีขาว)
-                              </FieldLabel>
-                              <Input
-                                {...field}
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )}
-                        />
-                      </div>
-
-                      <div className="xl:col-span-3">
-                        <Controller
-                          name={`variants.${index}.price`}
-                          control={form.control}
-                          render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel className="text-xs">ราคา</FieldLabel>
-                              <Input
-                                {...field}
-                                type="number"
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )}
-                        />
-                      </div>
-
-                      <div className="xl:col-span-3">
-                        <Controller
-                          name={`variants.${index}.stock`}
-                          control={form.control}
-                          render={({ field, fieldState }) => (
-                            <Field data-invalid={fieldState.invalid}>
-                              <FieldLabel className="text-xs">สต็อก</FieldLabel>
-                              <Input
-                                {...field}
-                                type="number"
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                                aria-invalid={fieldState.invalid}
-                              />
-                              {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                              )}
-                            </Field>
-                          )}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-6 border-t pt-6 sm:col-span-2 lg:grid-cols-2 xl:col-span-12">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between px-1">
-                            <div className="space-y-0.5">
-                              <span className="text-sm font-medium">
-                                เปิดใช้งานส่วนลด
-                              </span>
-                            </div>
-                            <Controller
-                              name={`variants.${index}.discount.active`}
-                              control={form.control}
-                              render={({ field }) => (
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              )}
-                            />
-                          </div>
-
-                          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                            <Controller
-                              name={`variants.${index}.discount.type`}
-                              control={form.control}
-                              render={({ field }) => (
-                                <Field>
-                                  <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
-                                    ประเภท
-                                  </FieldLabel>
-                                  <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                    disabled={!isDiscountActive}
-                                  >
-                                    <SelectTrigger className="h-9">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="Percentage">
-                                        เปอร์เซ็นต์ (%)
-                                      </SelectItem>
-                                      <SelectItem value="Fixed">
-                                        จำนวนเงิน (฿)
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </Field>
-                              )}
-                            />
-                            <Controller
-                              name={`variants.${index}.discount.amount`}
-                              control={form.control}
-                              render={({ field }) => (
-                                <Field>
-                                  <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
-                                    มูลค่าส่วนลด
-                                  </FieldLabel>
-                                  <Input
-                                    {...field}
-                                    type="number"
-                                    placeholder="0"
-                                    className="h-9"
-                                    disabled={!isDiscountActive}
-                                    onChange={(e) =>
-                                      field.onChange(Number(e.target.value))
-                                    }
-                                  />
-                                </Field>
-                              )}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-4 border-l pl-6 max-lg:border-t max-lg:border-l-0 max-lg:pt-6 max-lg:pl-0">
-                          <div className="flex items-center justify-between px-1">
-                            <div className="space-y-0.5">
-                              <span className="text-sm font-medium">
-                                สะสมคะแนน
-                              </span>
-                            </div>
-                            <Controller
-                              name={`variants.${index}.rewardPoints.isActive`}
-                              control={form.control}
-                              render={({ field }) => (
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              )}
-                            />
-                          </div>
-                          <Controller
-                            name={`variants.${index}.rewardPoints.amount`}
-                            control={form.control}
-                            render={({ field }) => (
-                              <Field>
-                                <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
-                                  คะแนนที่ได้รับ
-                                </FieldLabel>
-                                <Input
-                                  {...field}
-                                  type="number"
-                                  placeholder="ระบุจำนวนแต้ม"
-                                  className="h-9"
-                                  disabled={!isPointsActive}
-                                  onChange={(e) =>
-                                    field.onChange(Number(e.target.value))
-                                  }
-                                />
-                              </Field>
-                            )}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="hidden items-end pb-1 md:col-span-1 md:flex md:h-15">
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => removeVariant(index)}
-                          disabled={variantFields.length === 1}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+              {variantFields.map((item, index) => (
+                <VariantItem
+                  key={item.id}
+                  index={index}
+                  removeVariant={removeVariant}
+                  isOnlyOne={variantFields.length === 1}
+                />
+              ))}
             </FieldGroup>
           </FieldSet>
 
@@ -527,18 +311,16 @@ export function CreateProductForm() {
               ))}
             </div>
 
-            <div className="mt-4">
-              <Controller
-                name="tags"
-                control={form.control}
-                render={({ field }) => (
-                  <Field>
-                    <FieldLabel>Tags (คั่นด้วยเครื่องหมายคอมม่า)</FieldLabel>
-                    <Input {...field} placeholder="เสื้อผ้า, แฟชั่น, cotton" />
-                  </Field>
-                )}
-              />
-            </div>
+            <Controller
+              name="tags"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>Tags (คั่นด้วยเครื่องหมายคอมม่า)</FieldLabel>
+                  <Input {...field} placeholder="เสื้อผ้า, แฟชั่น, cotton" />
+                </Field>
+              )}
+            />
           </FieldSet>
 
           <FieldSet

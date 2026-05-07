@@ -13,7 +13,6 @@ export const productFormSchema = z.object({
       z.object({
         title: z.string().min(1, 'กรุณาระบุชื่อรุ่น'),
         price: z.number().min(0, 'ราคาต้องไม่ต่ำกว่า 0'),
-        stock: z.number().min(0, 'สต็อกต้องไม่ต่ำกว่า 0'),
         sku: z.string().optional(),
         discount: z.object({
           active: z.boolean(),
@@ -24,10 +23,18 @@ export const productFormSchema = z.object({
           isActive: z.boolean(),
           amount: z.number(),
         }),
+        stocks: z
+          .array(
+            z.object({
+              branchId: z.string().min(1, 'เลือกสาขา'),
+              quantity: z.number().min(0, 'จำนวนห้ามติดลบ'),
+              minStock: z.number().min(0),
+            }),
+          )
+          .min(1, 'ต้องระบุสต็อกอย่างน้อย 1 สาขา'),
       }),
     )
     .min(1, 'ต้องมีอย่างน้อย 1 ตัวเลือก'),
-
   addons: z.array(
     z.object({
       title: z.string().min(1, 'ระบุชื่อบริการเสริม'),
@@ -35,14 +42,12 @@ export const productFormSchema = z.object({
       isAvailable: z.boolean(),
     }),
   ),
-
   metadata: z.array(
     z.object({
       key: z.string().min(1, 'ระบุชื่อหัวข้อ'),
       value: z.string().min(1, 'ระบุข้อมูล'),
     }),
   ),
-
   tags: z.string().optional(),
 })
 
