@@ -12,147 +12,683 @@ datasource db {
   provider = "postgresql"
 }
 
-model Store {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  ownerId     String
-  
-  plan        Plan     @default(FREE)
-  aiCredits   Int      @default(10)
-  
-  blogs       Blog[]
-  categories  Category[]
-  products    Product[]
+model Coupon {
+  id          String  @id @default(cuid())
+  code        String  @unique // เช่น OPENING20, SALEPAGE10
+  description String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  discountType   DiscountType
+  discountAmount Decimal      @db.Decimal(10, 2)
+
+  minOrderAmount Decimal? @db.Decimal(10, 2) // ยอดขั้นต่ำถึงจะใช้ได้
+  maxDiscount    Decimal? @db.Decimal(10, 2) // กรณีลดเป็น % อาจจะจำกัดส่วนลดสูงสุด
+
+  startDate  DateTime
+  endDate    DateTime
+  usageLimit Int?
+  usedCount  Int      @default(0)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order[]
+
+  @@index([storeId])
+  @@index([code])
 }
 
+/**
+ * ประเภทของลูกค้า (Customer Classification)
+ * ใช้สำหรับแยกประเภทเพื่อการออกใบกำกับภาษี และการจัดการข้อมูลสมาชิก
+ */
+enum CustomerType {
+  INDIVIDUAL // ลูกค้าบุคคลธรรมดา: ปกติจะใช้เลขบัตรประชาชน 13 หลัก (ถ้าต้องการใบกำกับภาษี)
+  CORPORATION // ลูกค้านิติบุคคล/บริษัท/ห้างหุ้นส่วน: ต้องมีชื่อบริษัท, เลขผู้เสียภาษี และรหัสสาขา (Branch Code)
+}
+
+model Customer {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  firstName String?
+  lastName  String?
+  phone     String?
+  avatar    String?
+  password  String?
+
+  customerType CustomerType @default(INDIVIDUAL)
+
+  stores    CustomerStore[]
+  reviews   Review[]
+  orders    Order[]
+  cart      Cart?
+  addresses Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CustomerStore {
+  id         String   @id @default(cuid())
+  customerId String
+  storeId    String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  totalSpent   Decimal @default(0) @db.Decimal(10, 2)
+  rewardPoints Int     @default(0)
+
+  @@unique([customerId, storeId])
+}
+
+model Branch {
+  id     String  @id @default(cuid())
+  name   String
+  isMain Boolean @default(false)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  staffs  Staff[]
+  orders  Order[]
+  stocks  ProductStock[]
+  coupons Coupon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Staff {
+  id       String    @id @default(cuid())
+  name     String
+  email    String    @unique
+  password String
+  role     StaffRole @default(CASHIER)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  activityLogs ActivityLog[]
+}
+
+/**
+ * บทบาทของพนักงานภายในร้านค้า (Merchant Staff Roles)
+ */
+enum StaffRole {
+  ADMIN // ผู้ดูแลระบบของร้าน: ทำได้ทุกอย่าง ตั้งแต่จัดการสต็อกจนถึงตั้งค่าร้าน
+  MANAGER // ผู้จัดการ: ดูแลภาพรวมออเดอร์ สต็อก และสาขา แต่ลบร้านหรือตั้งค่าสำคัญไม่ได้
+  CASHIER // พนักงานขาย: เน้นทำรายการขาย (POS) และดูสถานะออเดอร์หน้าบ้าน
+}
+
+enum StoreStatus {
+  ACTIVE
+  MAINTENANCE // ปิดปรับปรุงร้านชั่วคราว
+  SUSPENDED // ถูกระงับโดยระบบ
+}
+
+model Store {
+  id      String @id @default(cuid())
+  name    String
+  slug    String @unique
+  ownerId String
+
+  logo        String?
+  coverImage  String?
+  description String? @db.Text
+
+  phone        String?
+  lineId       String?
+  facebookPage String?
+
+  address         String? @db.Text
+  taxId           String? // เลขผู้เสียภาษีร้าน
+  isVatRegistered Boolean @default(false)
+  vatRate         Decimal @default(7.0) @db.Decimal(10, 2)
+
+  plan            Plan        @default(FREE)
+  status          StoreStatus @default(ACTIVE)
+  balance         Decimal     @default(0) @db.Decimal(10, 2)
+  aiVisionCredits Int         @default(0)
+  aiSearchCredits Int         @default(0)
+
+  platformPoints Int           @default(0)
+  subscription   Subscription?
+  usage          StoreUsage?
+
+  isPointsEnabled  Boolean  @default(false) // เปิด-ปิดระบบแต้ม
+  pointEarningRate Decimal? @db.Decimal(10, 2) // เช่น ซื้อ 100 บาท ได้ 1 แต้ม
+  pointRedeemRate  Decimal? @db.Decimal(10, 2) // เช่น 1 แต้ม มีค่า 1 บาท
+
+  blogs        Blog[]
+  categories   Category[]
+  products     Product[]
+  reviews      Review[]
+  orders       Order[]
+  customers    CustomerStore[]
+  transactions Transaction[]
+  carts        Cart[]
+  aiLogs       AiLog[]
+  branches     Branch[]
+  staffs       Staff[]
+  activityLogs ActivityLog[]
+  coupons      Coupon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id      String @id @default(cuid())
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  plan      Plan
+  status    SubStatus @default(ACTIVE)
+  startDate DateTime  @default(now())
+  endDate   DateTime
+
+  externalId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model StoreUsage {
+  id      String @id @default(cuid())
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  aiVisionUsed Int @default(0)
+  aiSearchUsed Int @default(0)
+  productCount Int @default(0)
+
+  lastResetDate DateTime @default(now())
+}
+
+/**
+ * สถานะของสมาชิก (Subscription Lifecycle)
+ */
+enum SubStatus {
+  ACTIVE // ใช้งานได้ปกติ
+  PAST_DUE // ค้างชำระ (แต่อาจจะยังเปิดให้ใช้แบบจำกัดเวลา Grace Period)
+  CANCELED // ยกเลิกสมาชิกแล้ว (รอหมดอายุตามรอบ)
+  EXPIRED // หมดอายุสมาชิกแล้ว (ระบบควรตัดฟีเจอร์เหลือแค่ FREE)
+}
+
+/**
+ * ระดับสมาชิกของร้านค้า (SaaS Subscription)
+ * ใช้กำหนดความสามารถ (Limits) ของแต่ละร้าน
+ */
 enum Plan {
-  FREE
-  STANDARD
-  PRO
+  FREE // แผนเริ่มต้น: ลงสินค้าได้จำกัด, ไม่มีระบบ AI
+  STANDARD // แผนมาตรฐาน: เพิ่มจำนวนสินค้า, มีระบบ Easy Slip, AI Vision พื้นฐาน
+  PRO // แผนสูงสุด: ทุกอย่าง Unlimited, ระบบ AI ครบวงจร, ระบบ CRM
 }
 
 model Blog {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
-  image     String
-  slug      String   @unique
-  tags      String[]
-  
-  storeId   String
-  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
+  id      String   @id @default(cuid())
+  title   String
+  content String   @db.Text
+  image   String
+  slug    String   @unique
+  tags    String[]
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id          String    @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
   slug        String
   description String?
   image       String?
-  
-  storeId     String
-  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  products    Product[]
+
+  storeId  String
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([storeId, slug])
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String
-  metadata    Json?
-  
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  
-  images      ProductImage[]
-  variants    ProductVariant[]
-  options     ProductOption[]
-  addons      ProductAddon[]
+  id    String @id @default(cuid())
+  title String
+  slug  String
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tags    ProductTag[]
+  details Json?
+
+  weight Float? // กิโลกรัม
+  width  Float? // ซม.
+  height Float? // ซม.
+  length Float? // ซม.
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  images   ProductImage[]
+  variants ProductVariant[]
+  options  ProductOption[]
+  addons   ProductAddon[]
+  reviews  Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([storeId, slug])
+  @@index([categoryId])
+}
+
+model ProductTag {
+  id        String  @id @default(cuid())
+  name      String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, name])
 }
 
 model ProductImage {
   id        String  @id @default(cuid())
   url       String
   isPrimary Boolean @default(false)
-  
+
+  variants ProductVariant[]
+
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductVariant {
-  id           String   @id @default(cuid())
-  title        String
-  price        Decimal  @db.Decimal(10, 2)
-  sku          String
-  stock        Int      @default(0)
-  
+  id    String  @id @default(cuid())
+  title String
+  price Decimal @db.Decimal(10, 2)
+  sku   String
+
   discountType   DiscountType?
   discountAmount Decimal?      @db.Decimal(10, 2)
   discountActive Boolean       @default(false)
-  
-  pointsAmount Int      @default(0)
-  pointsActive Boolean  @default(false)
 
-  productId    String
-  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  pointsAmount Int     @default(0)
+  pointsActive Boolean @default(false)
+
+  imageId String?
+  image   ProductImage? @relation(fields: [imageId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  reviews Review[]
+  stocks  ProductStock[]
 }
 
 model ProductOption {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   title     String
-  maxSelect Int      @default(1)
-  require   Boolean  @default(false)
-  
+  maxSelect Int     @default(1)
+  require   Boolean @default(false)
+
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   choices   ProductChoice[]
 }
 
 model ProductChoice {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   name       String
-  extraPrice Decimal  @db.Decimal(10, 2) @default(0)
-  
-  optionId   String
-  option     ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  extraPrice Decimal @default(0) @db.Decimal(10, 2)
+
+  optionId String
+  option   ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
 }
 
 model ProductAddon {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
-  price       Decimal  @db.Decimal(10, 2)
-  isAvailable Boolean  @default(true)
-  
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price       Decimal @db.Decimal(10, 2)
+  isAvailable Boolean @default(true)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id      String   @id @default(cuid())
+  rating  Int
+  comment String   @db.Text
+  images  String[]
+  video   String?
+  date    DateTime @default(now())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  storeId   String
+  store     Store          @relation(fields: [storeId], references: [id])
+  productId String
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  selectedOptions Json?
+  categories      ReviewCategory[]
+}
+
+model ReviewCategory {
+  id       String @id @default(cuid())
+  label    String
+  rating   Int
+  reviewId String
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * สถานะภาพรวมของออเดอร์
+ */
+enum OrderStatus {
+  PENDING // รอลูกค้าชำระเงิน หรือรอร้านค้าตรวจสอบ
+  PAID // ชำระเงินเรียบร้อยแล้ว (สลิปผ่าน หรือ Gateway ยืนยัน)
+  SHIPPED // สินค้าถูกส่งออกไปแล้ว
+  COMPLETED // จบรายการ (ลูกค้าได้รับของและกดยืนยัน)
+  CANCELLED // ยกเลิกรายการ (โดยลูกค้า หรือร้านค้า)
+}
+
+/**
+ * วิธีการชำระเงินที่ระบบรองรับ
+ */
+enum PaymentMethod {
+  TRANSFER // โอนเงินผ่านธนาคาร (Manual Check หรือ Easy Slip)
+  QR_PROMPTPAY // สแกน QR Code (Dynamic QR / Payment Gateway)
+  CREDIT_CARD // บัตรเครดิต/เดบิต
+  CASH_ON_DELIVERY // เก็บเงินปลายทาง (COD)
+}
+
+/**
+ * สถานะการจัดส่งพัสดุ (เชื่อมโยงกับ Shippop/ขนส่ง)
+ */
+enum DeliveryStatus {
+  PENDING // เตรียมพัสดุ (ยังไม่ได้จองขนส่ง)
+  BOOKED // ออกเลข Tracking Number เรียบร้อยแล้ว
+  PICKING_UP // อยู่ระหว่างรอรถเข้ารับ หรือร้านกำลังไปส่งที่สาขา
+  IN_TRANSIT // พัสดุเข้าสู่ระบบขนส่งแล้ว (กำลังเดินทาง)
+  DELIVERED // พัสดุถึงมือผู้รับเรียบร้อย
+  RETURNED // พัสดุถูกตีกลับ
+  FAILED // การจัดส่งล้มเหลว (เช่น หาบ้านไม่เจอ, ติดต่อผู้รับไม่ได้)
+}
+
+/**
+ * สถานะธุรกรรม
+ */
+enum TransactionType {
+  DEPOSIT // เติมเงิน
+  WITHDRAW // ถอนเงิน
+  SHIPPING_FEE // หักค่าส่ง
+  REFUND // เงินคืน
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  storeId     String
+  store       Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  amount      Decimal         @db.Decimal(10, 2)
+  type        TransactionType
+  description String?
+  orderId     String?
+  createdAt   DateTime        @default(now())
+
+  @@index([storeId])
+}
+
+/**
+ * ประเภทของที่อยู่ (Address Classification)
+ * ใช้สำหรับแยกที่อยู่จัดส่งและที่อยู่ที่ใช้ในเอกสารทางภาษี
+ */
+enum AddressType {
+  SHIPPING // ที่อยู่สำหรับจัดส่งสินค้าเท่านั้น (ใช้พิมพ์ใบปะหน้าพัสดุ)
+  TAX // ที่อยู่สำหรับออกใบกำกับภาษี/ใบเสร็จ (ใช้ในระบบบัญชี)
+  BOTH // ที่อยู่ที่เป็นทั้งที่จัดส่งและที่อยู่ทางภาษีในที่เดียวกัน (Common case สำหรับบุคคลธรรมดา)
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  name    String // ป้ายกำกับ เช่น "ที่อยู่บริษัท", "บ้านพัก"
+  taxName String? // ชื่อผู้เสียภาษี (ชื่อ-นามสกุล หรือ ชื่อบริษัท)
+  phone   String
+
+  addressLine String
+  subDistrict String
+  district    String
+  province    String
+  postalCode  String
+
+  type       AddressType @default(SHIPPING)
+  taxId      String? // เลขประจำตัวผู้เสียภาษี 13 หลัก
+  branchCode String? // รหัสสาขา 5 หลัก (เช่น 00000 สำหรับสำนักงานใหญ่)
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+
+  isTaxInvoiceRequested Boolean @default(false)
+  taxName               String? // ชื่อบริษัท หรือ ชื่อ-นามสกุล
+  taxId                 String? // เลขประจำตัวผู้เสียภาษี 13 หลัก
+  taxAddress            String? // ที่อยู่ตามทะเบียนภาษี
+  taxBranchCode         String? // รหัสสาขา (เช่น 00000 สำหรับสำนักงานใหญ่)
+
+  usedPoints     Int?     @default(0) // จำนวนแต้มที่ลูกค้าใช้ในออเดอร์นี้
+  pointsDiscount Decimal? @default(0) @db.Decimal(10, 2) // มูลค่าเงินที่ลดไปจากการใช้แต้ม
+  earnedPoints   Int?     @default(0) // จำนวนแต้มที่ได้รับจากออเดอร์นี้ (Snapshot ไว้)
+
+  pointRedeemRateSnapshot  Decimal? @db.Decimal(10, 2) // เก็บว่าตอนนั้น 1 แต้ม = กี่บาท
+  pointEarningRateSnapshot Decimal? @db.Decimal(10, 2) // เก็บว่าตอนนั้น กี่บาท = 1 แต้ม
+
+  shippingMethod String?
+  shippingFee    Decimal?       @db.Decimal(10, 2)
+  trackingNumber String?
+  shippopId      String?
+  deliveryStatus DeliveryStatus @default(PENDING)
+
+  paymentMethod PaymentMethod?
+  paymentProof  String?
+  paidAt        DateTime?
+  transactionId String?
+
+  totalWeight Float? // กิโลกรัม
+  width       Float? // ซม.
+  height      Float? // ซม.
+  length      Float? // ซม.
+
+  shippopPurchaseId String? // ID รายการซื้อของ Shippop
+  shippopLabelUrl   String? // URL สำหรับเปิดดูใบปะหน้า (ถ้าเขาให้มาเป็น Link)
+
+  storeId    String
+  store      Store     @relation(fields: [storeId], references: [id])
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  guestEmail           String?
+  guestPhone           String?
+  guestName            String?
+  shippingAddrSnapshot Json?
+  storeSnapshot        Json?
+
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+
+  @@index([storeId])
+  @@index([customerId])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId    String
+  title        String
+  variantId    String
+  variantTitle String
+  quantity     Int
+  price        Decimal @db.Decimal(10, 2)
+
+  @@index([orderId])
+}
+
+model Cart {
+  id         String   @id @default(cuid())
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id     String @id @default(cuid())
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId    String
+  productTitle String
+  image        String
+
+  variantId String
+  variant   Json
+
+  selectedOptions Json?
+  selectedAddons  Json?
+
+  quantity     Int     @default(1)
+  unitPrice    Decimal @db.Decimal(10, 2)
+  totalPrice   Decimal @db.Decimal(10, 2)
+  rewardPoints Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AiLog {
-  id        String   @id @default(cuid())
-  storeId   String
-  action    String 
-  prompt    String   @db.Text
-  cost      Int      @default(1)
-  
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  action  String
+  prompt  String @db.Text
+  cost    Int    @default(1)
+
   createdAt DateTime @default(now())
 }
 
+/**
+ * กิจกรรมต่างๆ ที่เกิดขึ้นในระบบ เพื่อใช้ทำ Audit Log
+ */
+enum LogAction {
+  CHANGE_PLAN // เปลี่ยน Package ให้ร้านค้า
+  ADJUST_CREDITS // ปรับเพิ่ม/ลด Credits AI (Vision/Search)
+  SUSPEND_STORE // สั่งระงับการใช้งานร้านค้า
+  CREATE_ORDER // สร้างออเดอร์ใหม่
+  UPDATE_ORDER_STATUS // เปลี่ยนสถานะออเดอร์ (เช่น PAID -> SHIPPED)
+  CANCEL_ORDER // ยกเลิกออเดอร์
+  RESTOCK_ITEMS // คืนสต็อกจากการยกเลิกออเดอร์
+  UPDATE_STOCK // อัปเดตจำนวนสต็อกสินค้า
+  STOCK_TRANSFER // ย้ายสต็อกสินค้า
+  CREATE_PRODUCT // เพิ่มสินค้าใหม่
+  DELETE_PRODUCT // ลบสินค้า
+  UPDATE_STORE_SETTING // แก้ไขข้อมูลร้าน (ชื่อ, ที่อยู่, เวลาเปิด-ปิด)
+  MANAGE_STAFF // เพิ่ม/ลบ/แก้ไข สิทธิ์ของพนักงาน
+  LOGIN // เข้าสู่ระบบ
+  LOGOUT // ออกจากระบบ
+}
+
+model ActivityLog {
+  id     String    @id @default(cuid())
+  action LogAction
+
+  actorType ActorType
+  staffId   String?
+  staff     Staff?    @relation(fields: [staffId], references: [id])
+
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  entity   String
+  entityId String?
+
+  details Json?
+
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
+  @@index([action])
+}
+
+model ProductStock {
+  id       String @id @default(cuid())
+  quantity Int    @default(0)
+  minStock Int    @default(0)
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([branchId, variantId])
+  @@index([branchId])
+  @@index([variantId])
+}
+
+/**
+ * ประเภทของผู้กระทำในระบบ Log (Who did this?)
+ */
+enum ActorType {
+  SYSTEM // ระบบเป็นคนทำอัตโนมัติ (เช่น AI ตัด Credits, ระบบเปลี่ยนสถานะออเดอร์)
+  SUPER_ADMIN // เจ้าของ Platform (ตัวเราเอง): เข้าไปแก้ไขข้อมูลหรือช่วยเหลือร้านค้า
+  MERCHANT // พนักงานหรือเจ้าของร้านค้า: กิจกรรมที่เกิดขึ้นจากการใช้งานของฝั่งร้านค้า
+}
+
+/**
+ * รูปแบบส่วนลดของสินค้า
+ */
 enum DiscountType {
-  PERCENTAGE
-  FIXED
+  PERCENTAGE // ส่วนลดแบบเปอร์เซ็นต์ (เช่น ลด 10%)
+  FIXED // ส่วนลดแบบจำนวนเงินตรงๆ (เช่น ลด 50 บาท)
 }
