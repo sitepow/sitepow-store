@@ -19,8 +19,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { useCartStore } from '../../cart/store'
 import { CartBadge } from './CartBadge'
-import { CartItemCard } from './CartItemCard'
-import { CartSummary } from './CartSummary'
+import { CartItemCard } from './_components/CartItemCard'
+import { CartSummary } from './_components/CartSummary'
 
 export function CartDrawer() {
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
@@ -74,7 +74,7 @@ export function CartDrawer() {
           <DrawerFooter className="border-t bg-slate-50/50">
             <CartSummary summary={summary} />
             <Link href={'/cart'}>
-              <Button size="lg" className="h-12 w-full text-lg shadow-md">
+              <Button size="lg" className="h-12 w-full shadow-md sm:text-lg">
                 สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
               </Button>
             </Link>

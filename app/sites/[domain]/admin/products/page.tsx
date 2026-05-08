@@ -160,8 +160,8 @@ export default function StoreAdminProducts() {
                             </TooltipProvider>
                           ))}
                         </div>
-                        <p className="text-muted-foreground text-[10px] italic">
-                          รวมทั้งหมด {formatNumber(totalStock)}
+                        <p className="text-muted-foreground text-[10px]">
+                          รวมทั้งหมด: {formatNumber(totalStock)}
                         </p>
                       </div>
                     </TableCell>
