@@ -19,7 +19,7 @@ export function ProductSpecification() {
   const hasTags = (product?.metadata?.tags?.length ?? 0) > 0
 
   return (
-    <div className="mt-10 space-y-6">
+    <div className="space-y-6">
       {hasSpecs && (
         <>
           <div className="flex items-center gap-2">

@@ -19,16 +19,16 @@ export default async function StoreProductDescriptionPage({
   return (
     <StoreLayout>
       <SectionContainer>
-        <div className="grid w-full items-start gap-10 text-start xl:grid-cols-12">
+        <div className="grid w-full items-start gap-x-10 gap-y-5 text-start xl:grid-cols-12">
           <div className="flex flex-col gap-5 xl:col-span-7">
             <ProductGallery />
           </div>
 
-          <div className="flex flex-col gap-5 xl:sticky xl:top-40 xl:col-span-5">
+          <div className="flex flex-col gap-5 xl:sticky xl:top-40 xl:col-span-5 xl:col-start-8 xl:row-start-1 xl:row-end-3">
             <ProductPurchasePanel product={product} />
           </div>
 
-          <div className="flex flex-col gap-5 xl:col-span-7 xl:-mt-96">
+          <div className="xl:col-span-7">
             <ProductSpecification />
             <ProductReviewLists />
           </div>
