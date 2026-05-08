@@ -8,6 +8,7 @@ import { formatCurrency } from '@/utils/pricing'
 import { IconPackage } from '@tabler/icons-react'
 import { Calendar, CreditCard, Eye, Truck, User } from 'lucide-react'
 
+import { SectionContainer } from '@/components/SectionContainer'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -158,7 +159,7 @@ export default function StoreOrderPage() {
 
   return (
     <StoreLayout>
-      <div className="space-y-6 p-6">
+      <SectionContainer className="items-start text-start">
         <DashboardHeader
           title="ออเดอร์ร้านค้า"
           description="จัดการและติดตามสถานะคำสั่งซื้อทั้งหมดในระบบ"
@@ -167,7 +168,7 @@ export default function StoreOrderPage() {
         <Tabs
           defaultValue="ALL"
           onValueChange={setActiveTab}
-          className="space-y-4"
+          className="w-full space-y-4"
         >
           <TabsList className="bg-muted no-scrollbar flex h-auto w-full justify-start overflow-x-auto overflow-y-hidden p-1 sm:w-fit">
             <TabsTrigger
@@ -289,7 +290,7 @@ export default function StoreOrderPage() {
         </Tabs>
 
         <StorePagination />
-      </div>
+      </SectionContainer>
     </StoreLayout>
   )
 }
