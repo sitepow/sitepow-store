@@ -67,9 +67,9 @@ export const ADDRESS_TYPE_TH: Record<AddressType, string> = {
 }
 
 export const PLAN_TH: Record<Plan, string> = {
-  [Plan.FREE]: 'ฟรี',
-  [Plan.STANDARD]: 'มาตรฐาน',
-  [Plan.PRO]: 'โปร',
+  [Plan.STARTER]: 'Starter',
+  [Plan.PRO]: 'Pro',
+  [Plan.ULTIMATE]: 'Ultimate',
 }
 
 export const LOG_ACTION_TH: Record<LogAction, string> = {

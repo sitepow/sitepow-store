@@ -63,11 +63,12 @@ model Customer {
 
   customerType CustomerType @default(INDIVIDUAL)
 
-  stores    CustomerStore[]
-  reviews   Review[]
-  orders    Order[]
-  cart      Cart?
-  addresses Address[]
+  stores         CustomerStore[]
+  reviews        Review[]
+  orders         Order[]
+  cart           Cart?
+  addresses      Address[]
+  contactTickets ContactTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -153,7 +154,7 @@ model Store {
   isVatRegistered Boolean @default(false)
   vatRate         Decimal @default(7.0) @db.Decimal(10, 2)
 
-  plan            Plan        @default(FREE)
+  plan            Plan        @default(STARTER)
   status          StoreStatus @default(ACTIVE)
   balance         Decimal     @default(0) @db.Decimal(10, 2)
   aiVisionCredits Int         @default(0)
@@ -167,19 +168,20 @@ model Store {
   pointEarningRate Decimal? @db.Decimal(10, 2) // เช่น ซื้อ 100 บาท ได้ 1 แต้ม
   pointRedeemRate  Decimal? @db.Decimal(10, 2) // เช่น 1 แต้ม มีค่า 1 บาท
 
-  blogs        Blog[]
-  categories   Category[]
-  products     Product[]
-  reviews      Review[]
-  orders       Order[]
-  customers    CustomerStore[]
-  transactions Transaction[]
-  carts        Cart[]
-  aiLogs       AiLog[]
-  branches     Branch[]
-  staffs       Staff[]
-  activityLogs ActivityLog[]
-  coupons      Coupon[]
+  blogs          Blog[]
+  categories     Category[]
+  products       Product[]
+  reviews        Review[]
+  orders         Order[]
+  customers      CustomerStore[]
+  transactions   Transaction[]
+  carts          Cart[]
+  aiLogs         AiLog[]
+  branches       Branch[]
+  staffs         Staff[]
+  activityLogs   ActivityLog[]
+  coupons        Coupon[]
+  contactTickets ContactTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -227,9 +229,38 @@ enum SubStatus {
  * ใช้กำหนดความสามารถ (Limits) ของแต่ละร้าน
  */
 enum Plan {
-  FREE // แผนเริ่มต้น: ลงสินค้าได้จำกัด, ไม่มีระบบ AI
-  STANDARD // แผนมาตรฐาน: เพิ่มจำนวนสินค้า, มีระบบ Easy Slip, AI Vision พื้นฐาน
-  PRO // แผนสูงสุด: ทุกอย่าง Unlimited, ระบบ AI ครบวงจร, ระบบ CRM
+  STARTER // แผนเริ่มต้น: ลงสินค้าได้จำกัด, ไม่มีระบบ AI
+  PRO // แผนมาตรฐาน: เพิ่มจำนวนสินค้า, มีระบบ Easy Slip, AI Vision พื้นฐาน
+  ULTIMATE // แผนสูงสุด: ทุกอย่าง Unlimited, ระบบ AI ครบวงจร, ระบบ CRM
+}
+
+enum TicketStatus {
+  OPEN // รอร้านค้าอ่าน/ตอบ
+  IN_PROGRESS // กำลังดำเนินการ
+  RESOLVED // แก้ไขปัญหาแล้ว
+  CLOSED // ปิดการติดต่อ
+}
+
+model ContactTicket {
+  id      String       @id @default(cuid())
+  subject String
+  message String       @db.Text
+  status  TicketStatus @default(OPEN)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([customerId])
 }
 
 model Blog {
@@ -543,8 +574,9 @@ model Order {
   shippingAddrSnapshot Json?
   storeSnapshot        Json?
 
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
+  items          OrderItem[]
+  contactTickets ContactTicket[]
+  createdAt      DateTime        @default(now())
 
   @@index([storeId])
   @@index([customerId])
