@@ -1584,4 +1584,135 @@ export const PRODUCTS: Product[] = [
       tags: ['seafood', 'spicy', 'clean-food'],
     },
   },
+  {
+    productId: '019d8d60-cake-7df1-8de0-e260f4f4f001',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c333',
+    slug: 'signature-strawberry-shortcake',
+    images: [
+      {
+        imageId: 'img-cake-1-1',
+        url: '/',
+        isPrimary: true,
+      },
+    ],
+    title: 'สตรอว์เบอร์รี่ชอร์ตเค้ก (Signature Strawberry Shortcake)',
+    variants: [
+      {
+        variantId: 'v-cake-st-05',
+        title: 'ขนาด 0.5 ปอนด์',
+        price: 450.0,
+        stock: 10,
+        sku: 'CAKE-ST-0.5',
+      },
+      {
+        variantId: 'v-cake-st-1',
+        title: 'ขนาด 1 ปอนด์',
+        price: 850.0,
+        stock: 5,
+        sku: 'CAKE-ST-1.0',
+      },
+      {
+        variantId: 'v-cake-st-2',
+        title: 'ขนาด 2 ปอนด์',
+        price: 1550.0,
+        stock: 2,
+        sku: 'CAKE-ST-2.0',
+      },
+    ],
+    options: [
+      {
+        title: 'ข้อความบนหน้าเค้ก (ฟรี)',
+        maxSelect: 1,
+        require: false,
+        choices: [
+          { name: 'ไม่เขียนข้อความ', extraPrice: 0 },
+          { name: 'ระบุในหมายเหตุ (ไม่เกิน 20 ตัวอักษร)', extraPrice: 0 },
+        ],
+      },
+      {
+        title: 'รสชาติเนื้อเค้ก',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'วานิลลาบัตเตอร์', extraPrice: 0 },
+          { name: 'ช็อกโกแลตหน้านิ่ม', extraPrice: 50 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'a-cake-candle',
+        title: 'ชุดเทียนวันเกิดแบบพรีเมียม',
+        price: 35.0,
+        isAvailable: true,
+      },
+      {
+        addonId: 'a-cake-topper',
+        title: 'ป้าย Happy Birthday (อะคริลิค)',
+        price: 120.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      tags: ['bakery', 'cake', 'strawberry', 'birthday'],
+      storage: 'เก็บในตู้เย็นได้ 3-5 วัน',
+      allergen: ['Milk', 'Egg', 'Wheat'],
+    },
+  },
+  {
+    productId: '019d8d65-cake-7df1-8de1-f370f5f5e002',
+    categoryId: '019d8d50-5e3a-7df1-8de2-a110b220c333',
+    slug: 'minimalist-korean-custom-cake',
+    images: [
+      {
+        imageId: 'img-cake-2-1',
+        url: '/',
+        isPrimary: true,
+      },
+    ],
+    title: 'เค้กมินิมอลสไตล์เกาหลี (Custom Korean Cake)',
+    variants: [
+      {
+        variantId: 'v-cake-kr-1',
+        title: 'ขนาด 1 ปอนด์',
+        price: 990.0,
+        stock: 99,
+        sku: 'CAKE-KR-1',
+      },
+    ],
+    options: [
+      {
+        title: 'โทนสีของเค้ก',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'โทนพาสเทล (ชมพู/ฟ้า/เหลือง)', extraPrice: 0 },
+          { name: 'โทนสีเข้ม (แดงก่ำ/กรม/ดำ)', extraPrice: 100 },
+          { name: 'สีขาวมินิมอล', extraPrice: 0 },
+        ],
+      },
+      {
+        title: 'รูปแบบการตกแต่ง',
+        maxSelect: 1,
+        require: true,
+        choices: [
+          { name: 'ปาดสีสไตล์สีน้ำ (Oil Painting)', extraPrice: 0 },
+          { name: 'บีบครีมรอบตัวเค้ก', extraPrice: 150 },
+          { name: 'วาดรูปการ์ตูนลายเส้น', extraPrice: 300 },
+        ],
+      },
+    ],
+    addons: [
+      {
+        addonId: 'a-cake-box',
+        title: 'กล่องใสโชว์ตัวเค้กพรีเมียม',
+        price: 80.0,
+        isAvailable: true,
+      },
+    ],
+    metadata: {
+      tags: ['custom-cake', 'minimal', 'korean-style'],
+      lead_time: 'สั่งล่วงหน้าอย่างน้อย 2 วัน',
+    },
+  },
 ]
