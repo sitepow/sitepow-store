@@ -175,12 +175,6 @@ export default function StoreAdminSettingsPage() {
                 </Field>
               </FieldGroup>
             </CardContent>
-            <CardFooter className="flex justify-end border-t px-6 py-4">
-              <Button type="submit" size="lg">
-                <SaveIcon className="mr-2 size-4" />
-                บันทึกการเปลี่ยนแปลง
-              </Button>
-            </CardFooter>
           </Card>
 
           <Card>
@@ -222,6 +216,12 @@ export default function StoreAdminSettingsPage() {
                 </Field>
               </FieldGroup>
             </CardContent>
+            <CardFooter className="flex justify-end border-t px-6 py-4">
+              <Button type="submit" size="lg">
+                <SaveIcon className="mr-2 size-4" />
+                บันทึกการเปลี่ยนแปลง
+              </Button>
+            </CardFooter>
           </Card>
         </form>
       </div>

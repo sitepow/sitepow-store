@@ -1,22 +1,20 @@
 'use client'
 
+import Link from 'next/link'
+
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
+  AlertCircleIcon,
   CreditCard,
   DollarSign,
   Package,
   TrendingUp,
+  User2,
   Users,
 } from 'lucide-react'
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,19 +25,115 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import { Progress } from '@/components/ui/progress'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+
+import { cn } from '@/lib/utils'
 
 import { DashboardHeader } from '../../_components/DashboardHeader'
 import { StatsCard } from '../../_components/StatsCard'
 import { StoreAdminLayout } from '../../_components/layout/admin/Layout'
 
-const salesData = [
+const SALES_DATA = [
   { name: 'ม.ค.', total: 4500 },
   { name: 'ก.พ.', total: 5200 },
   { name: 'มี.ค.', total: 4800 },
   { name: 'เม.ย.', total: 6100 },
   { name: 'พ.ค.', total: 5900 },
   { name: 'มิ.ย.', total: 7200 },
+]
+
+const chartConfig = {
+  total: {
+    label: 'ยอดขาย',
+    color: 'hsl(var(--primary))',
+  },
+} satisfies ChartConfig
+
+const STATS_DATA = [
+  {
+    title: 'รายได้ทั้งหมด',
+    value: 45231.89,
+    description: '+20.1% จากเดือนที่แล้ว',
+    icon: DollarSign,
+    isCurrency: true,
+  },
+  {
+    title: 'คำสั่งซื้อ',
+    value: 2350,
+    description: '+180.1% จากเดือนที่แล้ว',
+    icon: Package,
+    isCurrency: false,
+  },
+  {
+    title: 'ยอดขายรายวัน',
+    value: 12234,
+    description: '+19% จากเมื่อวาน',
+    icon: CreditCard,
+    isCurrency: false,
+  },
+  {
+    title: 'ลูกค้าใหม่',
+    value: 573,
+    description: '+201 คน ตั้งแต่ชั่วโมงที่แล้ว',
+    icon: Users,
+    isCurrency: false,
+  },
+]
+
+const RECENT_SALES = [
+  {
+    id: 1,
+    name: 'สมชาย รักดี',
+    email: 'somchai.r@email.com',
+    amount: 1999,
+  },
+  {
+    id: 2,
+    name: 'วิภาดา สายชล',
+    email: 'wipada.s@email.com',
+    amount: 2500.5,
+  },
+  {
+    id: 3,
+    name: 'ธนกฤต มั่งมี',
+    email: 'tanakrit.m@email.com',
+    amount: 850,
+  },
+  {
+    id: 4,
+    name: 'ปิยะนุช สดใส',
+    email: 'piyanut.s@email.com',
+    amount: 4200,
+  },
+  {
+    id: 5,
+    name: 'อานนท์ บุญส่ง',
+    email: 'arnon.b@email.com',
+    amount: 1150.25,
+  },
+]
+
+const LOW_STOCK_PRODUCTS = [
+  {
+    id: 'PROD-003',
+    name: 'กระเป๋าผ้า Canvas Eco',
+    inventory: [
+      { branchName: 'สาขาสยาม', stock: 0 },
+      { branchName: 'ออนไลน์', stock: 2 },
+    ],
+  },
+  {
+    id: 'PROD-004',
+    name: 'หมวกแก๊ปสีดำ Basic',
+    inventory: [{ branchName: 'สาขาสยาม', stock: 3 }],
+  },
 ]
 
 export default function StoreAdminDashboardPage() {
@@ -97,30 +191,19 @@ export default function StoreAdminDashboardPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard
-            title="รายได้ทั้งหมด"
-            value="฿45,231.89"
-            description="+20.1% จากเดือนที่แล้ว"
-            icon={DollarSign}
-          />
-          <StatsCard
-            title="คำสั่งซื้อ"
-            value="+2350"
-            description="+180.1% จากเดือนที่แล้ว"
-            icon={Package}
-          />
-          <StatsCard
-            title="ยอดขายรายวัน"
-            value="+12,234"
-            description="+19% จากเมื่อวาน"
-            icon={CreditCard}
-          />
-          <StatsCard
-            title="ลูกค้าใหม่"
-            value="+573"
-            description="+201 คน ตั้งแต่ชั่วโมงที่แล้ว"
-            icon={Users}
-          />
+          {STATS_DATA.map((stat, index) => (
+            <StatsCard
+              key={index}
+              title={stat.title}
+              value={
+                stat.isCurrency
+                  ? formatCurrency(stat.value)
+                  : `+${formatNumber(stat.value)}`
+              }
+              description={stat.description}
+              icon={stat.icon}
+            />
+          ))}
         </div>
 
         <div className="grid gap-4 lg:grid-cols-7">
@@ -131,53 +214,57 @@ export default function StoreAdminDashboardPage() {
                 แสดงยอดขายสุทธิในรอบ 6 เดือนที่ผ่านมา
               </CardDescription>
             </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-87.5 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={salesData}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#e5e7eb"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) => `฿${value}`}
-                    />
-                    <Tooltip
-                      cursor={{ fill: '#f3f4f6' }}
-                      contentStyle={{
-                        borderRadius: '8px',
-                        border: '1px solid #e5e7eb',
-                      }}
-                    />
-                    <Bar
-                      dataKey="total"
-                      fill="currentColor"
-                      radius={[4, 4, 0, 0]}
-                      className="fill-primary"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+            <CardContent>
+              <ChartContainer config={chartConfig}>
+                <AreaChart
+                  accessibilityLayer
+                  data={SALES_DATA}
+                  margin={{
+                    left: 12,
+                    right: 12,
+                  }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    stroke="#888888"
+                    fontSize={12}
+                    tickFormatter={(value) => formatCurrency(value)}
+                    width={60}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="line" />}
+                  />
+                  <Area
+                    dataKey="total"
+                    type="natural"
+                    fill="var(--color-total)"
+                    fillOpacity={0.4}
+                    stroke="var(--color-total)"
+                  />
+                </AreaChart>
+              </ChartContainer>
             </CardContent>
-            <CardFooter className="flex-col items-start gap-2 text-sm">
-              <div className="flex gap-2 leading-none font-medium">
-                ยอดขายพุ่งสูงขึ้น 5.2% ในเดือนนี้{' '}
-                <TrendingUp className="size-4" />
-              </div>
-              <div className="text-muted-foreground leading-none">
-                แสดงข้อมูลสรุปรายได้จากการขายจริง
+            <CardFooter>
+              <div className="flex w-full items-start gap-2 text-sm">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2 leading-none font-medium">
+                    ยอดขายพุ่งสูงขึ้น 5.2% ในเดือนนี้{' '}
+                    <TrendingUp className="size-4" />
+                  </div>
+                  <div className="text-muted-foreground flex items-center gap-2 leading-none">
+                    มกราคม - มิถุนายน 2024
+                  </div>
+                </div>
               </div>
             </CardFooter>
           </Card>
@@ -191,24 +278,91 @@ export default function StoreAdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="flex items-center">
-                    <div className="bg-muted flex size-9 items-center justify-center rounded-full text-xs font-medium">
-                      US
-                    </div>
+                {RECENT_SALES.map((sale) => (
+                  <div key={sale.id} className="flex items-center">
+                    <Avatar className="size-8 border">
+                      <AvatarImage src="" />
+                      <AvatarFallback>
+                        <User2 size={16} />
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="ml-4 space-y-1">
                       <p className="text-sm leading-none font-medium">
-                        ลูกค้าทั่วไป #{item}
+                        {sale.name}
                       </p>
                       <p className="text-muted-foreground text-sm">
-                        customer{item}@email.com
+                        {sale.email}
                       </p>
                     </div>
-                    <div className="ml-auto font-medium">+฿1,999.00</div>
+                    <div className="text-primary ml-auto font-medium">
+                      +{formatCurrency(sale.amount)}
+                    </div>
                   </div>
                 ))}
               </div>
             </CardContent>
+          </Card>
+
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <div className="flex flex-wrap justify-between gap-2.5">
+                <CardTitle>สินค้าใกล้หมด</CardTitle>
+                <Badge variant="destructive">
+                  <AlertCircleIcon />
+                  {LOW_STOCK_PRODUCTS.length} รายการ
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableBody>
+                  {LOW_STOCK_PRODUCTS.map((product) => (
+                    <TableRow key={product.id} className="hover:bg-transparent">
+                      <TableCell className="px-0 py-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm leading-none font-medium">
+                              {product.name}
+                            </p>
+                            <p className="text-muted-foreground text-[10px]">
+                              {product.id}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {product.inventory.map((inv, idx) => (
+                              <Badge
+                                key={idx}
+                                variant="outline"
+                                className="px-1.5 py-0 text-[10px] font-normal"
+                              >
+                                <span className="text-muted-foreground mr-1.5 border-r pr-1.5">
+                                  {inv.branchName}
+                                </span>
+                                <span
+                                  className={cn(
+                                    'font-bold',
+                                    inv.stock === 0
+                                      ? 'text-destructive'
+                                      : 'text-foreground',
+                                  )}
+                                >
+                                  {formatNumber(inv.stock)}
+                                </span>
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full text-xs" asChild>
+                <Link href="/admin/products">ดูคลังสินค้าทั้งหมด</Link>
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       </div>

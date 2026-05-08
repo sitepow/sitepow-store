@@ -14,7 +14,7 @@ export function DashboardHeader({
   ...props
 }: DashboardHeaderProps) {
   return (
-    <div className={cn('mb-8 space-y-1', className)} {...props}>
+    <div className={cn('space-y-1', className)} {...props}>
       <h1 className="text-foreground text-3xl font-bold tracking-tight">
         {title}
       </h1>
