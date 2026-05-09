@@ -15,7 +15,7 @@ import {
 export const NAVBAR_ITEMS = [
   {
     title: 'สิ่งที่จะได้จากการเปิดร้านค้า',
-    href: '/',
+    href: '/features',
     children: [
       {
         title: 'AI อัจฉริยะช่วยลงของ',
