@@ -21,7 +21,7 @@ export function FeatureSection() {
         เพื่อให้คุณได้โฟกัสการขายสินค้าได้อย่างเต็มที่"
       />
 
-      <div className="grid w-full gap-5 sm:grid-cols-2">
+      <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {featuresList.map((feature, idx) => {
           return <FeatureCard key={idx} {...feature} />
         })}

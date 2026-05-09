@@ -9,9 +9,9 @@ import {
   IconHeadset,
   IconInfinity,
   IconLayersIntersect,
+  IconPrinter,
   IconSparkles,
   IconTrophy,
-  IconWorld,
 } from '@tabler/icons-react'
 
 export const PRICING_VALUE = {
@@ -38,7 +38,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     description: 'เริ่มต้นขายออนไลน์แบบมืออาชีพ กำไรเต็ม 100% ไม่โดนหัก GP',
     price: '490',
     currency: 'THB',
-    seed: 'starter',
+    seed: 'tester',
     features: [
       {
         text: 'ลงสินค้าได้สูงสุด 50 ชิ้น',
@@ -51,6 +51,10 @@ export const PRICING_PLANS: PricingPlanProps[] = [
       {
         text: 'รองรับการรับเงินโอน (Manual)',
         icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
+        icon: <IconPrinter size={18} stroke={1.5} />,
       },
       {
         text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
@@ -119,10 +123,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
         icon: <IconTrophy size={18} stroke={1.5} />,
       },
-      {
-        text: 'จัดการขนส่งและพิมพ์ใบปะหน้าอัตโนมัติ',
-        icon: <IconWorld size={18} stroke={1.5} />,
-      },
+
       {
         text: 'Support พิเศษดูแลส่วนตัวตลอด 24 ชม.',
         icon: <IconHeadset size={18} stroke={1.5} />,
@@ -195,6 +196,23 @@ export const PRICING_TABLES: PricingTables = {
         {
           label: 'AI Visual Search (หาของจากรูปภาพสำหรับพนักงาน)',
           access: [false, true, true],
+        },
+      ],
+    },
+    {
+      name: 'ระบบจัดการคำสั่งซื้อและขนส่ง',
+      features: [
+        {
+          label: 'ระบบจัดการสถานะออเดอร์',
+          access: [true, true, true],
+        },
+        {
+          label: 'พิมพ์ใบปะหน้าพัสดุ (พร้อม Packing List)',
+          access: [true, true, true],
+        },
+        {
+          label: 'ระบบบันทึกและแจ้งเลข Tracking ให้ลูกค้า',
+          access: [true, true, true],
         },
       ],
     },

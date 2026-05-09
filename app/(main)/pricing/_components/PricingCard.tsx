@@ -1,4 +1,5 @@
 'use client'
+
 import Image from 'next/image'
 
 import { PRICING_VALUE } from '@/constants/pricing'
@@ -32,7 +33,7 @@ export function PricingCard({
 
   return (
     <section
-      className={`flex flex-col items-center rounded-xl border p-2.5 ${
+      className={`flex flex-col items-center rounded-xl border p-2.5 text-start ${
         isPopular
           ? 'border-primary bg-white shadow-md'
           : 'border-gray-100 bg-gray-50'
@@ -44,7 +45,7 @@ export function PricingCard({
         height={32}
         unoptimized
         alt=""
-        className="border-primary bg-primary mb-2.5 size-32 rounded-full border"
+        className="border-primary mb-2.5 size-32 rounded-full border bg-white"
       />
 
       <h2 className="text-xl leading-tight font-bold">{title}</h2>
@@ -70,7 +71,7 @@ export function PricingCard({
         </div>
 
         {basePrice > 0 && selectedTab !== PRICING_VALUE.ONE_MONTH && (
-          <span className="text-xs font-medium opacity-60">
+          <span className="text-primary text-xs font-medium">
             เฉลี่ย {formatCurrency(averagePerMonth)} / เดือน
           </span>
         )}

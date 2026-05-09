@@ -5,15 +5,11 @@ import {
   IconClipboardList,
   IconCreditCard,
   IconDatabaseImport,
-  IconHandClick,
-  IconMessage2,
-  IconPalette,
   IconPercentage,
   IconSparkles,
   IconTicket,
   IconTruckDelivery,
   IconUsers,
-  IconWorld,
 } from '@tabler/icons-react'
 
 export const NAVBAR_ITEMS = [
@@ -27,7 +23,6 @@ export const NAVBAR_ITEMS = [
         description:
           'แค่ลงรูป AI ช่วยตั้งชื่อและเขียนคำบรรยายสินค้าภาษาไทยที่ปิดการขายได้ทันที',
         icon: <IconSparkles size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'ขายฟรี 0% GP',
@@ -35,14 +30,12 @@ export const NAVBAR_ITEMS = [
         description:
           'รับกำไรเต็มเม็ดเต็มหน่วย ไม่มีการหักค่าธรรมเนียมรายชิ้นเหมือน Marketplace',
         icon: <IconPercentage size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'ระบบจัดการสต็อก',
         href: '/features/inventory',
         description: 'จัดการสินค้าได้ง่ายๆ ในที่เดียว',
         icon: <IconBox size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'หน้าร้านออนไลน์',
@@ -50,7 +43,6 @@ export const NAVBAR_ITEMS = [
         description:
           'เว็บไซต์ขายสินค้าส่วนตัว รองรับการจ่ายเงินและคำนวณค่าส่งอัตโนมัติ',
         icon: <IconBuildingStore size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'ระบบจัดการออเดอร์',
@@ -58,7 +50,6 @@ export const NAVBAR_ITEMS = [
         description:
           'รวมออเดอร์จากทุกช่องทาง ไว้ที่เดียว พิมพ์ใบปะหน้าได้ทันที',
         icon: <IconClipboardList size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'วิเคราะห์ยอดขายเชิงลึก',
@@ -66,15 +57,13 @@ export const NAVBAR_ITEMS = [
         description:
           'สรุปรายได้ กำไร และสินค้าขายดีผ่าน Dashboard ที่เข้าใจง่ายที่สุด',
         icon: <IconChartBar size={20} stroke={1.5} />,
-        image: '/',
       },
       {
-        title: 'ระบบชำระเงินครบวงจร',
+        title: 'ระบบรับชำระเงินหลายรูปแบบ',
         href: '/features/payments',
         description:
-          'รองรับโอนเงิน, บัตรเครดิต, และ PromptPay พร้อมระบบยืนยันสลิปอัตโนมัติ',
+          'รองรับทั้งการโอนเงินผ่านบัญชี และระบบยืนยันสลิปอัตโนมัติ ไม่ต้องมานั่งเช็คยอดเองให้เสียเวลา',
         icon: <IconCreditCard size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'ระบบสมาชิก & CRM',
@@ -82,7 +71,6 @@ export const NAVBAR_ITEMS = [
         description:
           'สะสมแต้ม จัดกลุ่มลูกค้า และทำโปรโมชั่นเฉพาะบุคคล เพื่อกระตุ้นการซื้อซ้ำ',
         icon: <IconUsers size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'คูปองและโปรโมชั่น',
@@ -90,38 +78,6 @@ export const NAVBAR_ITEMS = [
         description:
           'สร้างโค้ดส่วนลด ซื้อ 1 แถม 1 หรือจัด Flash Sale ได้เองตามใจชอบ',
         icon: <IconTicket size={20} stroke={1.5} />,
-        image: '/',
-      },
-      {
-        title: 'ระบบจัดการตัวแทน',
-        href: '/features/affiliate',
-        description: 'เพิ่มยอดขายด้วยระบบตัวแทนจำหน่าย พร้อมระบบคำนวณคอมมิชชัน',
-        icon: <IconHandClick size={20} stroke={1.5} />,
-        image: '/',
-      },
-      {
-        title: 'เชื่อมต่อแชท',
-        href: '/features/chat',
-        description:
-          'ปิดการขายได้ไวกว่าเดิมด้วยระบบตอบกลับอัตโนมัติและระบบรับออเดอร์ในแชท',
-        icon: <IconMessage2 size={20} stroke={1.5} />,
-        image: '/',
-      },
-      {
-        title: 'ปรับแต่งดีไซน์ตามใจชอบ',
-        href: '/features/customization',
-        description:
-          'เปลี่ยนธีม ปรับโทนสี และจัดวางเลย์เอาต์หน้าร้านให้เป็นเอกลักษณ์ในสไตล์คุณ',
-        icon: <IconPalette size={20} stroke={1.5} />,
-        image: '/',
-      },
-      {
-        title: 'รองรับการขายทั่วโลก',
-        href: '/features/multi-currency',
-        description:
-          'รับชำระเงินได้กว่า 135+ สกุลเงินทั่วโลก พร้อมระบบแปลงค่าเงินอัตโนมัติผ่าน GB Prime Pay',
-        icon: <IconWorld size={20} stroke={1.5} />,
-        image: '/',
       },
       {
         title: 'จัดการข้อมูลสินค้าอย่างรวดเร็ว',
@@ -129,15 +85,20 @@ export const NAVBAR_ITEMS = [
         description:
           'รองรับการนำเข้าและส่งออกข้อมูลสินค้าผ่าน CSV/JSON ช่วยให้คุณลงสินค้าจำนวนมากจาก Lazada/Shopee ได้ในไม่กี่นาที',
         icon: <IconDatabaseImport size={20} stroke={1.5} />,
-        image: '/',
       },
       {
-        title: 'จัดการขนส่งอัตโนมัติ',
+        title: 'จัดการการจัดส่ง',
         href: '/features/logistics',
         description:
-          'เชื่อมต่อ Flash, J&T และไปรษณีย์ไทย เรียกพัสดุและแจ้งเลข Tracking อัตโนมัติ',
+          'จัดการสถานะพัสดุ รองรับการกรอกเลข Tracking และส่งแจ้งเตือนให้ลูกค้าผ่านอีเมล/แชท',
         icon: <IconTruckDelivery size={20} stroke={1.5} />,
-        image: '/',
+      },
+      {
+        title: 'ระบบพิมพ์ใบปะหน้าพัสดุ',
+        href: '/features/shipping-labels',
+        description:
+          'พิมพ์ใบปะหน้าพร้อมรายการสินค้าได้ทันที รองรับเครื่องพิมพ์ความร้อน ช่วยให้แพ็คของไวและไม่ส่งผิดคน',
+        icon: <IconClipboardList size={20} stroke={1.5} />,
       },
     ],
   },

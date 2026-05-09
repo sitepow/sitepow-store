@@ -10,13 +10,13 @@ export function PaymentSection() {
       <SectionHeader
         title={
           <>
-            <span className="text-primary">รับเงิน</span> เข้าร้านค้าโดยตรง
-            ด้วยระบบ <span className="text-primary">QR PromptPay</span> และ GB
-            Prime Pay
+            <span className="text-primary">รับเงินไว</span> เงินเข้าบัญชีโดยตรง
+            <br className="hidden md:block" />
+            ด้วยระบบ <span className="text-primary">QR PromptPay</span>{' '}
+            และโอนผ่านธนาคาร
           </>
         }
-        description="Sitepow ช่วยให้คุณรับเงินได้ทันใจผ่านผู้ให้บริการชั้นนำในไทย
-        เงินเข้าบัญชีร้านโดยตรง ไม่ต้องผ่านคนกลาง พร้อมระบบเช็คสลิปอัตโนมัติ"
+        description="เริ่มขายได้ทันทีไม่ต้องรออนุมัติ! รับเงินเข้าบัญชีร้านค้าโดยตรง ไม่ต้องผ่านคนกลาง พร้อมระบบเช็คสลิปอัตโนมัติที่ช่วยให้คุณทำงานง่ายขึ้น"
       />
 
       <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">

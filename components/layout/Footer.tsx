@@ -51,7 +51,7 @@ export function Footer() {
           </div>
 
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
-            <div className="flex gap-6 text-sm text-gray-400">
+            <div className="flex flex-wrap justify-center gap-5 text-sm text-gray-400 sm:gap-6">
               <a href="#" className="hover:text-gray-600 hover:underline">
                 นโยบายความเป็นส่วนตัว
               </a>
