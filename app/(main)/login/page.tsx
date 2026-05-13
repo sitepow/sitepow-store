@@ -1,3 +1,6 @@
+'use client'
+
+import { loginWithSocial } from '@/actions/auth'
 import { LOGIN_PROVIDERS } from '@/constants/login'
 
 import { ContentDivider } from '@/components/ContentDivider'
@@ -8,6 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 export default function LoginPage() {
+  const handleLogin = async (providerId: string) => {
+    await loginWithSocial(providerId)
+  }
+
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 text-center sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
@@ -55,7 +62,10 @@ export default function LoginPage() {
               <div className="flex w-full flex-wrap justify-center gap-4">
                 {LOGIN_PROVIDERS.map((provider, idx) => (
                   <div key={idx} className="shrink-0">
-                    <SSOButton {...provider} />
+                    <SSOButton
+                      onClick={() => handleLogin(provider.id)}
+                      {...provider}
+                    />
                   </div>
                 ))}
               </div>

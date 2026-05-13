@@ -1,3 +1,8 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+
+import { loginWithSocial } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 
 import { SSOButton } from '@/components/SSOButton'
@@ -5,6 +10,16 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { SupportContact } from '@/components/SupportContact'
 
 export default function RegisterPage() {
+  const router = useRouter()
+
+  const handleRegister = async (providerId: string) => {
+    if (providerId === 'local') {
+      router.push('/register/email')
+    } else {
+      await loginWithSocial(providerId)
+    }
+  }
+
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 text-center sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
@@ -30,7 +45,10 @@ export default function RegisterPage() {
                     key={idx}
                     className="w-full transition-transform active:scale-[0.98]"
                   >
-                    <SSOButton {...provider} />
+                    <SSOButton
+                      onClick={() => handleRegister(provider.id)}
+                      {...provider}
+                    />
                   </div>
                 ))}
               </div>
