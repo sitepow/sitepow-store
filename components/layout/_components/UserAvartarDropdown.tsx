@@ -1,6 +1,7 @@
 import { ComponentProps } from 'react'
 
-import { logout } from '@/actions/auth'
+import { signOut } from 'next-auth/react'
+
 import { BASE_FAVICON } from '@/constants/favicon'
 import { useSession } from '@/hooks/use-session'
 import {
@@ -38,7 +39,10 @@ export function UserAvartarDropdown({
   const { user } = useSession()
 
   const handleLogout = async () => {
-    await logout()
+    await signOut({
+      callbackUrl: '/',
+      redirect: true,
+    })
   }
 
   return (
