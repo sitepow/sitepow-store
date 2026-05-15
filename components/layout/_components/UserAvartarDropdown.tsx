@@ -65,7 +65,10 @@ export function UserAvartarDropdown({
           <div className="flex flex-col space-y-1">
             <p className="text-sm leading-none font-medium">ร้านค้าของคุณ</p>
             <p className="text-muted-foreground text-xs leading-none">
-              {user?.email}
+              {user?.email}{' '}
+              {!user?.isEmailVerified && (
+                <span className="text-orange-500">(โปรดยืนยันอีเมลของคุณ)</span>
+              )}
             </p>
           </div>
         </DropdownMenuLabel>

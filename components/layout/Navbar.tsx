@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { useSession } from '@/hooks/use-session'
-import { LockIcon, Menu, X } from 'lucide-react'
+import { AlertCircleIcon, LockIcon, Menu, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -22,13 +22,14 @@ import {
 import { cn } from '@/lib/utils'
 
 import { LogoBrand } from '../LogoBrand'
+import { Alert, AlertAction, AlertDescription, AlertTitle } from '../ui/alert'
 import { Separator } from '../ui/separator'
 import { ListItem } from './_components/ListItem'
 import { UserAvartarDropdown } from './_components/UserAvartarDropdown'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { isAuthenticated } = useSession()
+  const { isAuthenticated, user } = useSession()
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -178,6 +179,22 @@ export function Navbar() {
             )}
           </div>
         </div>
+
+        {user && !user?.isEmailVerified && (
+          <Alert className="w-full rounded-none shadow-none">
+            <AlertCircleIcon />
+            <AlertTitle className="text-orange-500">
+              มีสิ่งที่ต้องดำเนินการตอนนี้
+            </AlertTitle>
+            <AlertDescription>
+              โปรดกรอกรหัสยืนยันที่ส่งไปยังอีเมลของคุณเพื่อเปิดใช้งานบัญชี
+              (หากไม่พบในกล่องขาเข้า โปรดตรวจสอบใน อีเมลขยะ หรือ ถังขยะ)
+            </AlertDescription>
+            <AlertAction>
+              <Button variant="outline">ยืนยันอีเมล</Button>
+            </AlertAction>
+          </Alert>
+        )}
       </header>
 
       <div className="h-18.25 lg:h-20.25" />

@@ -16,7 +16,12 @@ import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
 import { SupportContact } from '@/components/SupportContact'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -60,7 +65,7 @@ export function RegisterForm() {
     if (providerId === 'credentials') {
       setIsCredentials(true)
     } else {
-      await signIn('providerId')
+      await signIn(providerId)
     }
   }
 
@@ -96,6 +101,10 @@ export function RegisterForm() {
                     required: 'โปรดระบุ E-mail ของคุณ',
                   })}
                 />
+                <FieldDescription>
+                  โปรดใช้อีเมลจริงเท่านั้น
+                  เนื่องจากระบบจะส่งลิงค์ยืนยันไปให้หลังจากสมัครสมาชิกสำเร็จแล้ว
+                </FieldDescription>
                 <FieldError>{errors?.email?.message}</FieldError>
               </Field>
 

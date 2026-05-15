@@ -48,6 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id as string
         token.role = user.role
+        token.isEmailVerified = user.isEmailVerified as boolean | null
       }
       return token
     },
@@ -55,6 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role
+        session.user.isEmailVerified = token.isEmailVerified as boolean | null
       }
       return session
     },
