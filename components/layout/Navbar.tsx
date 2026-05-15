@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { NAVBAR_ITEMS } from '@/constants/navbar'
+import { useSession } from '@/hooks/use-session'
 import { LockIcon, Menu, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -23,9 +24,11 @@ import { cn } from '@/lib/utils'
 import { LogoBrand } from '../LogoBrand'
 import { Separator } from '../ui/separator'
 import { ListItem } from './_components/ListItem'
+import { UserAvartarDropdown } from './_components/UserAvartarDropdown'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isAuthenticated } = useSession()
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -78,19 +81,27 @@ export function Navbar() {
             </NavigationMenu>
           </div>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <Link href="/login">
-              <Button variant="secondary" className="flex gap-2 font-bold">
-                <LockIcon size={18} />
-                เข้าสู่ระบบ
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button className="font-bold">สมัครเปิดร้าน</Button>
-            </Link>
-          </div>
+          {!isAuthenticated && (
+            <div className="hidden items-center gap-4 lg:flex">
+              <Link href="/login">
+                <Button variant="secondary" className="flex gap-2 font-bold">
+                  <LockIcon size={18} />
+                  เข้าสู่ระบบ
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button className="font-bold">สมัครเปิดร้าน</Button>
+              </Link>
+            </div>
+          )}
 
-          <div className="lg:hidden">
+          {isAuthenticated && (
+            <UserAvartarDropdown className="hidden lg:block" />
+          )}
+
+          <div className="flex items-center gap-2 lg:hidden">
+            {isAuthenticated && <UserAvartarDropdown />}
+
             <Button
               variant="ghost"
               size="icon"
@@ -147,22 +158,24 @@ export function Navbar() {
               <Separator />
             </div>
 
-            <div className="flex flex-col gap-3 pt-4 pb-10">
-              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="secondary"
-                  className="w-full justify-center gap-2 py-7 text-lg font-bold"
-                >
-                  <LockIcon size={20} />
-                  เข้าสู่ระบบ
-                </Button>
-              </Link>
-              <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full justify-center py-7 text-lg font-bold">
-                  สมัครเปิดร้าน
-                </Button>
-              </Link>
-            </div>
+            {!isAuthenticated && (
+              <div className="flex flex-col gap-3 pt-4 pb-10">
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Button
+                    variant="secondary"
+                    className="w-full justify-center gap-2 py-7 text-lg font-bold"
+                  >
+                    <LockIcon size={20} />
+                    เข้าสู่ระบบ
+                  </Button>
+                </Link>
+                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full justify-center py-7 text-lg font-bold">
+                    สมัครเปิดร้าน
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>

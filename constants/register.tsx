@@ -14,7 +14,7 @@ export const REGISTER_PROVIDERS = [
     name: 'สมัครต่อด้วย Line',
   },
   {
-    id: 'local',
+    id: 'credentials',
     icon: <IconMail className="size-8" stroke={1.5} />,
     name: 'สมัครต่อด้วย E-mail',
   },

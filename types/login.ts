@@ -4,3 +4,7 @@ export interface LoginProvide {
   id: string
   icon: ReactNode
 }
+export interface LoginFormInputs {
+  email: string
+  password: string
+}

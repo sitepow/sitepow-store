@@ -1,3 +1,5 @@
+import { Toaster } from 'react-hot-toast'
+
 import type { Metadata } from 'next'
 import {
   Dancing_Script,
@@ -7,6 +9,7 @@ import {
 
 import { BASE_FAVICON } from '@/constants/favicon'
 import { QueryProviders } from '@/providers/QueryProviders'
+import { SessionProviders } from '@/providers/SessionProviders'
 
 import { cn } from '@/lib/utils'
 
@@ -63,7 +66,10 @@ export default function RootLayout({
       )}
     >
       <body className="flex min-h-full flex-col">
-        <QueryProviders>{children}</QueryProviders>
+        <Toaster />
+        <SessionProviders>
+          <QueryProviders>{children}</QueryProviders>
+        </SessionProviders>
       </body>
     </html>
   )

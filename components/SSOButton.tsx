@@ -11,12 +11,13 @@ interface SSOButtonProps
     LoginProvide,
     Omit<ComponentPropsWithoutRef<'div'>, 'id'> {}
 
-export function SSOButton({ icon, name, ...props }: SSOButtonProps) {
+export function SSOButton({ icon, name, className, ...props }: SSOButtonProps) {
   return (
     <div
       className={cn(
         'group flex min-w-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-gray-200 py-2.5',
         name && 'w-full px-5',
+        className,
       )}
       {...props}
     >

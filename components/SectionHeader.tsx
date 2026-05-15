@@ -1,13 +1,23 @@
-import { ReactNode } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 
-interface SectionHeaderProps {
+import { cn } from '@/lib/utils'
+
+interface SectionHeaderProps extends Omit<ComponentProps<'div'>, 'title'> {
   title: ReactNode
   description?: ReactNode
 }
 
-export function SectionHeader({ title, description }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  description,
+  className,
+  ...props
+}: SectionHeaderProps) {
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div
+      className={cn('flex flex-col items-center gap-4', className)}
+      {...props}
+    >
       <h2 className="max-w-2xl text-2xl leading-tight font-bold text-gray-900 sm:text-4xl">
         {title}
       </h2>

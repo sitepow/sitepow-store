@@ -1,15 +1,36 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import type { PropsWithChildren } from "react";
-import { QUERY_RETRY_COUNT, QUERY_TIMES } from "@/constants/query";
+import { useState } from 'react'
+import type { PropsWithChildren } from 'react'
+import toast from 'react-hot-toast'
+
+import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/query'
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const QueryProviders = ({ children }: PropsWithChildren) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        queryCache: new QueryCache({
+          onError: (error) => {
+            if (error?.message) {
+              toast.error(error?.message)
+            }
+          },
+        }),
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            if (error?.message) {
+              toast.error(error?.message)
+            }
+          },
+        }),
         defaultOptions: {
           queries: {
             staleTime: QUERY_TIMES.STALE_TIME_MS,
@@ -19,16 +40,16 @@ const QueryProviders = ({ children }: PropsWithChildren) => {
           },
         },
       }),
-  );
+  )
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {process.env.NODE_ENV === "development" && (
+      {process.env.NODE_ENV === 'development' && (
         <ReactQueryDevtools initialIsOpen={false} />
       )}
     </QueryClientProvider>
-  );
-};
+  )
+}
 
-export { QueryProviders };
+export { QueryProviders }

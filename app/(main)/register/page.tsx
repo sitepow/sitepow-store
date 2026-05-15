@@ -1,32 +1,56 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
-import { loginWithSocial } from '@/actions/auth'
+import { loginWithSocial, registerWithCredentials } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
+import { RegisterFormInputs } from '@/types/register'
+import { useMutation } from '@tanstack/react-query'
+import { ArrowLeftIcon } from 'lucide-react'
 
 import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
 import { SupportContact } from '@/components/SupportContact'
+import { Button } from '@/components/ui/button'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 export default function RegisterPage() {
-  const router = useRouter()
+  const [isCredentials, setIsCredentials] = useState<boolean>(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormInputs>({
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  })
+
+  const { mutate } = useMutation({
+    mutationFn: registerWithCredentials,
+  })
 
   const handleRegister = async (providerId: string) => {
-    if (providerId === 'local') {
-      router.push('/register/email')
+    if (providerId === 'credentials') {
+      setIsCredentials(true)
     } else {
       await loginWithSocial(providerId)
     }
   }
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 text-center sm:p-10 lg:max-w-7xl">
+    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
         <div className="hidden w-full rounded-l-3xl bg-gray-200 lg:block" />
 
         <div className="sm:shadow-airy flex w-full flex-col items-center gap-8 rounded-3xl bg-white px-0 py-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl">
           <SectionHeader
+            className="text-center"
             title={'สมัครเปิดร้านค้าของคุณที่นี่'}
             description={
               <>
@@ -37,25 +61,82 @@ export default function RegisterPage() {
             }
           />
 
-          <div className="w-full max-w-md space-y-8">
-            <div className="space-y-6">
-              <div className="flex w-full flex-col gap-4">
-                {REGISTER_PROVIDERS.map((provider, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full transition-transform active:scale-[0.98]"
-                  >
-                    <SSOButton
-                      onClick={() => handleRegister(provider.id)}
-                      {...provider}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+          {isCredentials && (
+            <form
+              onSubmit={handleSubmit((data) => mutate(data))}
+              className="flex w-full flex-col gap-3"
+            >
+              <Field>
+                <FieldLabel>E-mail</FieldLabel>
+                <Input
+                  placeholder="ระบุ E-mail ของคุณ"
+                  className="h-12 rounded-xl"
+                  {...register('email', {
+                    required: 'โปรดระบุ E-mail ของคุณ',
+                  })}
+                />
+                <FieldError>{errors?.email?.message}</FieldError>
+              </Field>
 
-            <div className="pt-4">
-              <p className="text-sm text-slate-500">
+              <Field>
+                <FieldLabel>รหัสผ่าน</FieldLabel>
+                <Input
+                  type="password"
+                  placeholder="ระบุรหัสผ่าน"
+                  className="h-12 rounded-xl"
+                  {...register('password', { required: 'โปรดระบุรหัสผ่าน' })}
+                />
+                <FieldError>{errors?.password?.message}</FieldError>
+              </Field>
+
+              <Field>
+                <FieldLabel>ยืนยันรหัสผ่าน</FieldLabel>
+                <Input
+                  type="password"
+                  placeholder="ระบุรหัสผ่านเดิมอีกครั้ง"
+                  className="h-12 rounded-xl"
+                  {...register('confirmPassword', {
+                    required: 'โปรดระบุรหัสผ่านอีกครั้ง',
+                  })}
+                />
+                <FieldError>{errors?.confirmPassword?.message}</FieldError>
+              </Field>
+
+              <div className="mt-2 grid grid-cols-12 gap-2">
+                <Button
+                  className="col-span-4"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setIsCredentials(false)}
+                >
+                  <ArrowLeftIcon /> ย้อนกลับ
+                </Button>
+                <Button className="col-span-8" size="lg">
+                  สมัครสมาชิก
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {!isCredentials && (
+            <div className="w-full max-w-md space-y-8">
+              <div className="space-y-6">
+                <div className="flex w-full flex-col gap-4">
+                  {REGISTER_PROVIDERS.map((provider, idx) => (
+                    <div
+                      key={idx}
+                      className="w-full transition-transform active:scale-[0.98]"
+                    >
+                      <SSOButton
+                        onClick={() => handleRegister(provider.id)}
+                        {...provider}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-center text-sm text-slate-500">
                 มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
                 <a
                   href="/login"
@@ -65,13 +146,11 @@ export default function RegisterPage() {
                 </a>
               </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
-      <div className="mt-2">
-        <SupportContact />
-      </div>
+      <SupportContact />
     </div>
   )
 }
