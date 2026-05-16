@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
+import { useSession } from '@/hooks/use-session'
 import {
   ChevronDownIcon,
   LockKeyholeIcon,
@@ -13,6 +14,7 @@ import {
   X,
 } from 'lucide-react'
 
+import { EmailVerified } from '@/components/EmailVerified'
 import { LogoBrand } from '@/components/LogoBrand'
 import { ListItem } from '@/components/layout/_components/ListItem'
 import { Button } from '@/components/ui/button'
@@ -32,9 +34,11 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
 import { CartDrawer } from '../cart/CartDrawer'
+import { BuyerAvatarDropdown } from './_components/BuyerAvatarDropdown'
 
 export function StoreNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isAuthenticated, user } = useSession()
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -60,12 +64,16 @@ export function StoreNavbar() {
               </ButtonGroup>
             </div>
 
-            <Link href={'/login'} className="hidden lg:block">
-              <Button variant="outline" size="lg">
-                <LockKeyholeIcon className="mr-2" />
-                เข้าสู่ระบบ
-              </Button>
-            </Link>
+            {!isAuthenticated && (
+              <Link href={'/login'} className="hidden lg:block">
+                <Button variant="outline" size="lg">
+                  <LockKeyholeIcon className="mr-2" />
+                  เข้าสู่ระบบ
+                </Button>
+              </Link>
+            )}
+
+            {isAuthenticated && <BuyerAvatarDropdown />}
 
             <CartDrawer />
 
@@ -187,17 +195,21 @@ export function StoreNavbar() {
 
           <Separator />
 
-          <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-            <Button
-              variant="outline"
-              className="w-full gap-3 border-2 py-8 text-lg font-bold"
-            >
-              <LockKeyholeIcon size={22} />
-              เข้าสู่ระบบ / สมัครสมาชิก
-            </Button>
-          </Link>
+          {!isAuthenticated && (
+            <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+              <Button
+                variant="outline"
+                className="w-full gap-3 border-2 py-8 text-lg font-bold"
+              >
+                <LockKeyholeIcon size={22} />
+                เข้าสู่ระบบ / สมัครสมาชิก
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
+
+      {user && !user?.isEmailVerified && <EmailVerified />}
     </header>
   )
 }

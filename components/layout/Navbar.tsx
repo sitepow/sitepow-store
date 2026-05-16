@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { useSession } from '@/hooks/use-session'
-import { AlertCircleIcon, LockIcon, Menu, X } from 'lucide-react'
+import { LockIcon, Menu, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -21,11 +21,11 @@ import {
 
 import { cn } from '@/lib/utils'
 
+import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
-import { Alert, AlertAction, AlertDescription, AlertTitle } from '../ui/alert'
 import { Separator } from '../ui/separator'
 import { ListItem } from './_components/ListItem'
-import { UserAvartarDropdown } from './_components/UserAvartarDropdown'
+import { MerchantAvatarDropdown } from './_components/MerchantAvatarDropdown'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -97,11 +97,11 @@ export function Navbar() {
           )}
 
           {isAuthenticated && (
-            <UserAvartarDropdown className="hidden lg:block" />
+            <MerchantAvatarDropdown className="hidden lg:block" />
           )}
 
           <div className="flex items-center gap-2 lg:hidden">
-            {isAuthenticated && <UserAvartarDropdown />}
+            {isAuthenticated && <MerchantAvatarDropdown />}
 
             <Button
               variant="ghost"
@@ -180,21 +180,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {user && !user?.isEmailVerified && (
-          <Alert className="w-full rounded-none shadow-none">
-            <AlertCircleIcon />
-            <AlertTitle className="text-orange-500">
-              มีสิ่งที่ต้องดำเนินการตอนนี้
-            </AlertTitle>
-            <AlertDescription>
-              โปรดกรอกรหัสยืนยันที่ส่งไปยังอีเมลของคุณเพื่อเปิดใช้งานบัญชี
-              (หากไม่พบในกล่องขาเข้า โปรดตรวจสอบใน อีเมลขยะ หรือ ถังขยะ)
-            </AlertDescription>
-            <AlertAction>
-              <Button variant="outline">ยืนยันอีเมล</Button>
-            </AlertAction>
-          </Alert>
-        )}
+        {user && !user?.isEmailVerified && <EmailVerified />}
       </header>
 
       <div className="h-18.25 lg:h-20.25" />

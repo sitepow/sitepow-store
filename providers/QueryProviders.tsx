@@ -30,6 +30,12 @@ const QueryProviders = ({ children }: PropsWithChildren) => {
               toast.error(error?.message)
             }
           },
+          onSuccess: (result: unknown) => {
+            if (result && typeof result === 'object' && 'message' in result) {
+              const response = result as { message: string }
+              toast.success(response.message)
+            }
+          },
         }),
         defaultOptions: {
           queries: {

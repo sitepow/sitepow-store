@@ -1,6 +1,9 @@
+'use client'
+
 import { ComponentProps } from 'react'
 
 import { signOut } from 'next-auth/react'
+import Link from 'next/link'
 
 import { BASE_FAVICON } from '@/constants/favicon'
 import { useSession } from '@/hooks/use-session'
@@ -30,12 +33,12 @@ import {
 
 import { cn } from '@/lib/utils'
 
-type UserAvartarDropdownProps = ComponentProps<typeof Avatar>
+type MerchantAvatarDropdownProps = ComponentProps<typeof Avatar>
 
-export function UserAvartarDropdown({
+export function MerchantAvatarDropdown({
   className,
   ...props
-}: UserAvartarDropdownProps) {
+}: MerchantAvatarDropdownProps) {
   const { user } = useSession()
 
   const handleLogout = async () => {
@@ -75,44 +78,62 @@ export function UserAvartarDropdown({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
-          <IconLayoutDashboard className="mr-2 stroke-[1.5]" /> แดชบอร์ด
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconLayoutDashboard className="mr-2 stroke-[1.5]" /> แดชบอร์ด
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconUser className="mr-2 stroke-[1.5]" /> โปรไฟล์ส่วนตัว
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconUser className="mr-2 stroke-[1.5]" /> โปรไฟล์ส่วนตัว
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconBuildingStore className="mr-2 stroke-[1.5]" />
-          ข้อมูลร้านค้า
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <IconCreditCard className="mr-2 stroke-[1.5]" />
-          การสมัครสมาชิก
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconSparkles className="mr-2 stroke-[1.5]" /> เครดิต AI
-          (Vision/Search)
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconCoin className="mr-2 stroke-[1.5]" /> ระบบแต้มสะสม
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconTicket className="mr-2 stroke-[1.5]" /> คูปองส่วนลด
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconBuildingStore className="mr-2 stroke-[1.5]" /> ข้อมูลร้านค้า
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
-          <IconHierarchy2 className="mr-2 stroke-[1.5]" /> จัดการสาขา
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconCreditCard className="mr-2 stroke-[1.5]" /> การสมัครสมาชิก
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconHistory className="mr-2 stroke-[1.5]" /> ประวัติกิจกรรม
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconSparkles className="mr-2 stroke-[1.5]" /> เครดิต AI
+            (Vision/Search)
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <IconSettings className="mr-2 stroke-[1.5]" /> ตั้งค่าระบบ
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconCoin className="mr-2 stroke-[1.5]" /> ระบบแต้มสะสม
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconTicket className="mr-2 stroke-[1.5]" /> คูปองส่วนลด
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconHierarchy2 className="mr-2 stroke-[1.5]" /> จัดการสาขา
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconHistory className="mr-2 stroke-[1.5]" /> ประวัติกิจกรรม
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="" className="flex w-full cursor-pointer items-center">
+            <IconSettings className="mr-2 stroke-[1.5]" /> ตั้งค่าระบบ
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
