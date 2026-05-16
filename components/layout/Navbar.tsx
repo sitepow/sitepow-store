@@ -31,6 +31,8 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
 
+  const isEmailVerified = user && user?.isEmailVerified
+
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden'
@@ -180,7 +182,7 @@ export function Navbar() {
           </div>
         </div>
 
-        {user && !user?.isEmailVerified && <EmailVerified />}
+        {!isEmailVerified && <EmailVerified />}
       </header>
 
       <div className="h-18.25 lg:h-20.25" />
