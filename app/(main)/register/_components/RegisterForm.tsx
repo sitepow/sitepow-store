@@ -8,6 +8,7 @@ import { signIn } from 'next-auth/react'
 
 import { registerUser } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
+import { UserRole } from '@/generated/prisma/enums'
 import { RegisterFormInputs } from '@/types/register'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeftIcon } from 'lucide-react'
@@ -89,7 +90,9 @@ export function RegisterForm() {
 
           {isCredentials && (
             <form
-              onSubmit={handleSubmit((data) => mutate(data))}
+              onSubmit={handleSubmit((data) =>
+                mutate({ ...data, userRole: UserRole.MERCHANT }),
+              )}
               className="flex w-full flex-col gap-3"
             >
               <Field>

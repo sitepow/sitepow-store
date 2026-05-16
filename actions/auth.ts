@@ -1,12 +1,13 @@
 'use server'
 
+import { UserRole } from '@/generated/prisma/enums'
 import { RegisterFormInputs } from '@/types/register'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/lib/prisma'
 
 export async function registerUser(values: RegisterFormInputs) {
-  const { email, password, confirmPassword } = values
+  const { email, password, confirmPassword, userRole } = values
 
   if (password !== confirmPassword) {
     throw new Error('รหัสผ่านไม่ตรงกัน')
@@ -22,10 +23,20 @@ export async function registerUser(values: RegisterFormInputs) {
 
   const hashedPassword = await bcrypt.hash(password, 12)
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       password: hashedPassword,
+      role: userRole,
     },
   })
+
+  if (userRole === UserRole.CUSTOMER) {
+    await prisma.customer.create({
+      data: {
+        email,
+        userId: user.id,
+      },
+    })
+  }
 }

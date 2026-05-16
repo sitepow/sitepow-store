@@ -59,7 +59,9 @@ model Customer {
   lastName  String?
   phone     String?
   avatar    String?
-  password  String?
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   customerType CustomerType @default(INDIVIDUAL)
 
@@ -72,7 +74,6 @@ model Customer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users     User[]
 }
 
 model CustomerStore {
@@ -146,22 +147,21 @@ model User {
   isEmailVerified Boolean? @default(false)
   role            UserRole @default(CUSTOMER)
 
-  staffProfile Staff? @relation(fields: [staffId], references: [id])
+  staffProfile    Staff?
+  customerProfile Customer?
 
-  customerProfile Customer? @relation(fields: [customerId], references: [id])
-
-  accounts   Account[]
-  sessions   Session[]
-  staffId    String?
-  customerId String?
+  accounts Account[]
+  sessions Session[]
 }
 
 model Staff {
-  id       String    @id @default(cuid())
-  name     String
-  email    String    @unique
-  password String
-  role     StaffRole @default(CASHIER)
+  id    String    @id @default(cuid())
+  name  String
+  email String    @unique
+  role  StaffRole @default(CASHIER)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -170,7 +170,6 @@ model Staff {
   branch   Branch? @relation(fields: [branchId], references: [id])
 
   activityLogs ActivityLog[]
-  users        User[]
 }
 
 /**
