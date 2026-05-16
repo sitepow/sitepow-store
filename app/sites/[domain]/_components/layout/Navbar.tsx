@@ -40,7 +40,7 @@ export function StoreNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
 
-  const isEmailVerified = user && user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -212,10 +212,10 @@ export function StoreNavbar() {
           </div>
         </div>
 
-        {!isEmailVerified && <EmailVerified />}
+        {isEmailUnverified && <EmailVerified />}
       </header>
 
-      {!isEmailVerified && <div className="h-10" />}
+      {isEmailUnverified && <div className="h-10" />}
     </>
   )
 }

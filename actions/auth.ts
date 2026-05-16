@@ -1,8 +1,15 @@
 'use server'
 
+import {
+  MILLISECONDS_PER_MINUTE,
+  OTP_EXPIRY_MINUTES,
+  OTP_MAX_RANGE,
+  OTP_MIN_RANGE,
+} from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { RegisterFormInputs } from '@/types/register'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 import { prisma } from '@/lib/prisma'
 
@@ -61,12 +68,17 @@ export async function registerUser(values: RegisterFormInputs) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 12)
+  const otp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
+  const otpDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+  const otpExpires = new Date(Date.now() + otpDurationInMs)
 
   const user = await prisma.user.create({
     data: {
       email,
       password: hashedPassword,
       role: userRole,
+      otp: otp,
+      otpExpires: otpExpires,
     },
   })
 

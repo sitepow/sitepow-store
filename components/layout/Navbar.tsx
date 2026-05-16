@@ -31,7 +31,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
 
-  const isEmailVerified = user && user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -182,13 +182,13 @@ export function Navbar() {
           </div>
         </div>
 
-        {!isEmailVerified && <EmailVerified />}
+        {isEmailUnverified && <EmailVerified />}
       </header>
 
       <div
         className={cn(
           'h-18.25 lg:h-20.25',
-          !isEmailVerified && 'h-35 lg:h-26.25',
+          isEmailUnverified && 'h-35 lg:h-26.25',
         )}
       />
     </>

@@ -44,12 +44,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id as string
         token.role = user.role
         token.isEmailVerified = user.isEmailVerified as boolean | null
       }
+
+      if (trigger === 'update' && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: String(token.id) },
+          select: { isEmailVerified: true, role: true },
+        })
+
+        if (dbUser) {
+          token.isEmailVerified = dbUser.isEmailVerified
+          token.role = dbUser.role
+        }
+      }
+
       return token
     },
     async session({ session, token }) {

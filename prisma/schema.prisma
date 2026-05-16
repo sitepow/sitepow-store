@@ -139,13 +139,15 @@ model Session {
 }
 
 model User {
-  id              String   @id @default(cuid())
-  email           String?  @unique
+  id              String    @id @default(cuid())
+  email           String?   @unique
   password        String?
   name            String?
   image           String?
-  isEmailVerified Boolean? @default(false)
-  role            UserRole @default(CUSTOMER)
+  otp             String?
+  otpExpires      DateTime?
+  isEmailVerified Boolean?  @default(false)
+  role            UserRole  @default(CUSTOMER)
 
   staffProfile    Staff?
   customerProfile Customer?
