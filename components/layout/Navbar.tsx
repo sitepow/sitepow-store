@@ -185,7 +185,12 @@ export function Navbar() {
         {!isEmailVerified && <EmailVerified />}
       </header>
 
-      <div className="h-18.25 lg:h-20.25" />
+      <div
+        className={cn(
+          'h-18.25 lg:h-20.25',
+          !isEmailVerified && 'h-35 lg:h-26.25',
+        )}
+      />
     </>
   )
 }

@@ -215,7 +215,7 @@ export function StoreNavbar() {
         {!isEmailVerified && <EmailVerified />}
       </header>
 
-      {!isEmailVerified && <div className="h-18.25 lg:h-20.25" />}
+      {!isEmailVerified && <div className="h-10" />}
     </>
   )
 }

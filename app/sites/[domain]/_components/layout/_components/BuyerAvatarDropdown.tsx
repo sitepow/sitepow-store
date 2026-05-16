@@ -1,24 +1,14 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import { ComponentProps, Fragment } from 'react'
 
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
 import { BASE_FAVICON } from '@/constants/favicon'
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { useSession } from '@/hooks/use-session'
-import {
-  IconCoin,
-  IconHeart,
-  IconHistory,
-  IconLogout,
-  IconMapPin,
-  IconPackage,
-  IconSettings,
-  IconTicket,
-  IconUser,
-  IconWallet,
-} from '@tabler/icons-react'
+import { IconLogout } from '@tabler/icons-react'
 
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -79,59 +69,24 @@ export function BuyerAvatarDropdown({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconPackage className="mr-2 stroke-[1.5]" /> การซื้อของฉัน
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconUser className="mr-2 stroke-[1.5]" /> โปรไฟล์ส่วนตัว
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconMapPin className="mr-2 stroke-[1.5]" /> ที่อยู่จัดส่ง
-          </Link>
-        </DropdownMenuItem>
+        {BUYER_NAVIGATION.map((item) => {
+          const Icon = item.icon
 
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconWallet className="mr-2 stroke-[1.5]" /> กระเป๋าเงิน /
-            ช่องทางชำระเงิน
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconCoin className="mr-2 stroke-[1.5]" /> แต้มสะสมของฉัน
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconTicket className="mr-2 stroke-[1.5]" /> โค้ดส่วนลดของฉัน
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconHeart className="mr-2 stroke-[1.5]" /> สินค้าที่ถูกใจ
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconHistory className="mr-2 stroke-[1.5]" /> สินค้าที่ดูเมื่อเร็วๆ
-            นี้
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="" className="flex w-full cursor-pointer items-center">
-            <IconSettings className="mr-2 stroke-[1.5]" /> ตั้งค่าบัญชี
-          </Link>
-        </DropdownMenuItem>
+          return (
+            <Fragment key={item.value}>
+              {item.hasSeparatorBefore && <DropdownMenuSeparator />}
+              <DropdownMenuItem asChild>
+                <Link
+                  href={item.href}
+                  className="flex w-full cursor-pointer items-center"
+                >
+                  <Icon className="mr-2 stroke-[1.5]" size={18} />
+                  {item.label}
+                </Link>
+              </DropdownMenuItem>
+            </Fragment>
+          )
+        })}
 
         <DropdownMenuSeparator />
 
@@ -140,7 +95,7 @@ export function BuyerAvatarDropdown({
           className="cursor-pointer"
           onClick={handleLogout}
         >
-          <IconLogout className="mr-2 stroke-[1.5]" /> ออกจากระบบ
+          <IconLogout className="mr-2 stroke-[1.5]" size={18} /> ออกจากระบบ
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
