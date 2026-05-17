@@ -5,12 +5,12 @@ import { type VariantProps, cva } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const pageTabHeaderVariants = cva(
-  'flex flex-wrap items-center justify-between border-b pb-5',
+  'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-6 mb-6',
   {
     variants: {
       variant: {
-        default: '',
-        secondary: 'pb-3',
+        default: 'pb-6 mb-6',
+        secondary: 'pb-4 mb-4 border-b border-border/40',
       },
     },
     defaultVariants: {
@@ -21,14 +21,14 @@ const pageTabHeaderVariants = cva(
 
 interface PageTabHeaderProps
   extends ComponentProps<'div'>, VariantProps<typeof pageTabHeaderVariants> {
-  icon: ComponentType<{ className?: string; size?: number }>
+  icon?: ComponentType<{ className?: string; size?: number }>
   title: string
-  description: string
+  description?: string
   endContent?: ReactNode
 }
 
 export function PageTabHeader({
-  icon,
+  icon: Icon,
   title,
   description,
   endContent,
@@ -36,41 +36,53 @@ export function PageTabHeader({
   variant,
   ...props
 }: PageTabHeaderProps) {
-  const Icon = icon
-
   const isSecondary = variant === 'secondary'
-  const iconSize = isSecondary ? 20 : 24
+  const iconSize = isSecondary ? 18 : 22
 
   return (
     <div
       className={cn(pageTabHeaderVariants({ variant, className }))}
       {...props}
     >
-      <div>
-        <div className="flex items-center gap-2">
-          <Icon
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <div
             className={cn(
-              isSecondary
-                ? 'text-foreground'
-                : 'fill-amber-500/20 text-amber-500',
+              'border-border/50 bg-muted/30 flex items-center justify-center rounded-lg border',
+              isSecondary ? 'p-1.5' : 'mt-0.5 p-2',
             )}
-            size={iconSize}
-          />
+          >
+            <Icon
+              className={cn(
+                isSecondary ? 'text-muted-foreground' : 'text-foreground/80',
+              )}
+              size={iconSize}
+            />
+          </div>
+        )}
+
+        <div className="space-y-1">
           <h2
             className={cn(
-              'text-foreground font-bold tracking-tight',
-              isSecondary ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl',
+              'text-foreground font-semibold tracking-tight',
+              isSecondary ? 'text-lg' : 'text-xl md:text-2xl',
             )}
           >
             {title}
           </h2>
+          {description && (
+            <p className="text-muted-foreground/90 max-w-2xl text-sm leading-relaxed font-normal">
+              {description}
+            </p>
+          )}
         </div>
-        <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-          {description}
-        </p>
       </div>
 
-      {endContent}
+      {endContent && (
+        <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
+          {endContent}
+        </div>
+      )}
     </div>
   )
 }
