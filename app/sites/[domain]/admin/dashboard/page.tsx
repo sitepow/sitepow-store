@@ -156,8 +156,18 @@ export default function StoreAdminDashboardPage() {
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xl font-bold">Pro Package</span>
-                    <Badge variant="secondary">กำลังใช้งาน</Badge>
-                    <Badge variant="secondary">เปิดใช้งาน EasySlip</Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-600 text-white hover:bg-green-600"
+                    >
+                      เปิดใช้งาน
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="border-primary/30 text-primary bg-primary/5 text-xs font-semibold"
+                    >
+                      เปิดใช้งาน EasySlip
+                    </Badge>
                   </div>
                 </div>
               </div>

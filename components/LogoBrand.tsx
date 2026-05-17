@@ -1,12 +1,22 @@
+import { ComponentProps } from 'react'
+
 import Link from 'next/link'
 
 import { IconPackageImport } from '@tabler/icons-react'
 
-export function LogoBrand() {
+import { cn } from '@/lib/utils'
+
+type LogoBrandProps = Omit<ComponentProps<typeof Link>, 'href'>
+
+export function LogoBrand({ className, ...props }: LogoBrandProps) {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2.5 text-2xl font-bold tracking-tight"
+      className={cn(
+        'flex items-center gap-2.5 text-2xl font-bold tracking-tight',
+        className,
+      )}
+      {...props}
     >
       <IconPackageImport size={35} stroke={1.5} className="text-primary" />
       <div className="relative">

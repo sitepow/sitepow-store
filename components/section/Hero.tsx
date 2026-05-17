@@ -1,13 +1,18 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
+import { useSession } from '@/hooks/use-session'
 
 import { HeroHeader } from '../HeroHeader'
 import { LogoBrand } from '../LogoBrand'
 import { Button } from '../ui/button'
 
 export function HeroSection() {
+  const { isAuthenticated } = useSession()
+
   return (
     <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden pt-20 pb-96 text-center">
       <HeroHeader
@@ -19,16 +24,18 @@ export function HeroSection() {
         }
       />
 
-      <div className="flex gap-2.5">
-        <Link href="/register">
-          <Button size="lg">สมัครเปิดร้าน</Button>
-        </Link>
-        <Link href="/pricing">
-          <Button variant="secondary" size="lg">
-            ดูราคา
-          </Button>
-        </Link>
-      </div>
+      {!isAuthenticated && (
+        <div className="flex gap-2.5">
+          <Link href="/register">
+            <Button size="lg">สมัครเปิดร้าน</Button>
+          </Link>
+          <Link href="/pricing">
+            <Button variant="secondary" size="lg">
+              ดูราคา
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <div className="absolute -bottom-10 left-1/2">
         <div className="relative">

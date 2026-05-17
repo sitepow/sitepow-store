@@ -75,7 +75,7 @@ export function MerchantAvatarDropdown({
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
                 <Link
-                  href={item.href}
+                  href={`/merchant?tab=${item.tab}`}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />

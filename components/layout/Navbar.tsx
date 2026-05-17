@@ -99,7 +99,15 @@ export function Navbar() {
           )}
 
           {isAuthenticated && (
-            <MerchantAvatarDropdown className="hidden lg:block" />
+            <div className="hidden items-center gap-4 lg:flex">
+              <MerchantAvatarDropdown className="hidden lg:block" />
+              <Link href="/merchant">
+                <Button variant="secondary" className="flex gap-2 font-bold">
+                  <LockIcon size={18} />
+                  จัดการร้านค้าของคุณ
+                </Button>
+              </Link>
+            </div>
           )}
 
           <div className="flex items-center gap-2 lg:hidden">
