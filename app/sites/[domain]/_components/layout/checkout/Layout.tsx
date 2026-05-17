@@ -2,16 +2,16 @@ import { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { StoreNavbarLite } from './NavbarLite'
+import { StoreNavbarCheckout } from './Navbar'
 
-export function StoreLayoutLite({
+export function StoreLayoutCheckout({
   children,
   className,
   ...props
 }: ComponentProps<'main'>) {
   return (
     <div className="flex flex-col gap-10">
-      <StoreNavbarLite />
+      <StoreNavbarCheckout />
 
       <main className={cn(className, 'mt-20')} {...props}>
         {children}

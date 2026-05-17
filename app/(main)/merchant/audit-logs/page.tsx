@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
-import { IconEye, IconHistory } from '@tabler/icons-react'
+import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { IconEye, IconFilter, IconHistory } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -101,7 +102,7 @@ const MOCK_ACTIVITY_LOGS: ActivityLogItem[] = [
   },
 ]
 
-export function AuditLogsContent() {
+export default function MerchantAuditLogsPage() {
   const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
   const [actionFilter, setActionFilter] = useState<string>('all')
   const [actorFilter, setActorFilter] = useState<string>('all')
@@ -137,14 +138,17 @@ export function AuditLogsContent() {
   }
 
   return (
-    <div className="space-y-5">
+    <MerchantLayout>
       <PageTabHeader
         icon={IconHistory}
         title="ประวัติกิจกรรมระบบ"
         description="ตรวจสอบบันทึก Log การกระทำและเข้าถึงข้อมูลอย่างละเอียด เพื่อความโปร่งใสและการรักษาความปลอดภัยภายในองค์กร"
         endContent={
           <Field className="w-fit">
-            <FieldLabel>กรองตามร้านค้า</FieldLabel>
+            <FieldLabel>
+              <IconFilter size={14} />
+              กรองตามร้านค้า
+            </FieldLabel>
             <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
               <SelectTrigger className="bg-background w-full lg:w-60">
                 <SelectValue placeholder="เลือกบัญชีร้านค้า" />
@@ -245,6 +249,6 @@ export function AuditLogsContent() {
         onOpenChange={setIsDialogOpen}
         logItem={activeLogItem}
       />
-    </div>
+    </MerchantLayout>
   )
 }

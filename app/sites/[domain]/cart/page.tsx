@@ -21,7 +21,7 @@ import { CircularProgress } from '../_components/CircularProgress'
 import { CartItemCard } from '../_components/cart/_components/CartItemCard'
 import { CartSummary } from '../_components/cart/_components/CartSummary'
 import { SummaryRow } from '../_components/cart/_components/SummaryRow'
-import { StoreLayoutLite } from '../_components/layout/lite/LayoutLite'
+import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout'
 import { CheckoutSection } from './_components/CheckoutSection'
 import { CustomerAddressForm } from './_components/CustomerAddressForm'
 import { DiscountForm } from './_components/DiscountForm'
@@ -122,7 +122,7 @@ export default function StoreCartPage() {
   }
 
   return (
-    <StoreLayoutLite>
+    <StoreLayoutCheckout>
       <SectionContainer>
         <div className="grid w-full items-start gap-5 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-7">
@@ -314,6 +314,6 @@ export default function StoreCartPage() {
           </div>
         </div>
       </SectionContainer>
-    </StoreLayoutLite>
+    </StoreLayoutCheckout>
   )
 }

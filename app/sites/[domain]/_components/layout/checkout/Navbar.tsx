@@ -5,7 +5,7 @@ import { LockKeyholeIcon } from 'lucide-react'
 import { LogoBrand } from '@/components/LogoBrand'
 import { Button } from '@/components/ui/button'
 
-export function StoreNavbarLite() {
+export function StoreNavbarCheckout() {
   return (
     <div className="fixed z-50 w-full bg-white">
       <nav className="container mx-auto flex flex-col gap-5 border-b border-gray-100 px-10 py-5">
