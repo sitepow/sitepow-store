@@ -28,7 +28,6 @@ export function ProfileAvartar({
       className={cn('h-fit overflow-hidden text-center', className)}
       {...props}
     >
-      <div className="from-primary/20 to-primary/5 -mt-8 h-32 bg-linear-to-r" />
       <CardContent className="relative flex flex-col items-center">
         <div className="group relative">
           <div className="border-background bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full">
