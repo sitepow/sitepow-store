@@ -7,6 +7,7 @@ import { IconEye, IconFilter, IconHistory } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
@@ -166,7 +167,6 @@ export default function MerchantAuditLogsPage() {
           </Field>
         }
       />
-
       <AuditLogFilters
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
@@ -175,75 +175,59 @@ export default function MerchantAuditLogsPage() {
         actionFilter={actionFilter}
         onActionFilterChange={setActionFilter}
       />
-
       <div className="overflow-hidden rounded-xl border">
         <Table>
-          <TableHeader className="bg-muted/50 text-xs">
+          <TableHeader>
             <TableRow>
-              <TableHead className="w-40">เวลาที่บันทึก</TableHead>
-              <TableHead className="w-32.5">ประเภทเหตุการณ์</TableHead>
-              <TableHead className="w-30">ผู้กระทำ</TableHead>
-              <TableHead className="min-w-40">ผู้ดำเนินการ</TableHead>
-              <TableHead className="min-w-37.5">Target Entity</TableHead>
-              <TableHead className="w-30">IP Address</TableHead>
-              <TableHead className="w-17.5 text-center">ดูข้อมูล</TableHead>
+              <TableHead>เวลาที่บันทึก</TableHead>
+              <TableHead>ประเภทเหตุการณ์</TableHead>
+              <TableHead>ผู้กระทำ</TableHead>
+              <TableHead>ผู้ดำเนินการ</TableHead>
+              <TableHead>Target Entity</TableHead>
+              <TableHead>IP Address</TableHead>
+              <TableHead>ดูข้อมูล</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLogs.length === 0 ? (
-              <TableEmptyRow
-                title="ไม่พบข้อมูลประวัติบันทึกกิจกรรม"
-                description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
-                colSpan={7}
-              />
-            ) : (
+            {filteredLogs?.length !== 0 &&
               filteredLogs.map((log) => (
-                <TableRow
-                  key={log.id}
-                  className="hover:bg-muted/40 text-xs transition-colors"
-                >
-                  <TableCell className="text-muted-foreground font-mono">
-                    {log.createdAt}
-                  </TableCell>
+                <TableRow key={log.id}>
+                  <TableCell>{log.createdAt}</TableCell>
                   <TableCell>
                     <ActionBadge action={log.action} />
                   </TableCell>
                   <TableCell>
                     <ActorBadge actorType={log.actorType} />
                   </TableCell>
-                  <TableCell className="text-foreground font-medium">
-                    {log.staffName}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-mono">
-                    <span className="text-foreground font-sans font-medium">
-                      {log.entity}
-                    </span>
+                  <TableCell>{log.staffName}</TableCell>
+                  <TableCell className="space-x-2">
+                    <span>{log.entity}</span>
                     {log.entityId && (
-                      <span className="bg-muted text-muted-foreground ml-1.5 rounded border px-1.5 py-0.5 text-[10px] font-medium">
-                        {log.entityId}
-                      </span>
+                      <Badge variant="outline">{log.entityId}</Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-muted-foreground font-mono">
-                    {log.ipAddress || '-'}
-                  </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell>{log.ipAddress || '-'}</TableCell>
+                  <TableCell>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="hover:text-foreground hover:bg-muted text-muted-foreground/70 h-7 w-7 rounded-md"
                       onClick={() => handleOpenDetails(log)}
                     >
                       <IconEye size={14} />
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))
+              ))}
+            {filteredLogs?.length === 0 && (
+              <TableEmptyRow
+                title="ไม่พบข้อมูลประวัติบันทึกกิจกรรม"
+                description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
+                colSpan={7}
+              />
             )}
           </TableBody>
         </Table>
       </div>
-
       <AuditLogDetailDialog
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}

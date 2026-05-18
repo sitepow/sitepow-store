@@ -29,7 +29,6 @@ export function MerchantLayout({ children }: PropsWithChildren) {
         <SidebarHeader className="mx-auto py-5">
           <LogoBrand />
         </SidebarHeader>
-
         <SidebarContent>
           {MERCHANT_NAVIGATION.map((item) => {
             const url = `/merchant/${item.value}`
@@ -51,7 +50,6 @@ export function MerchantLayout({ children }: PropsWithChildren) {
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-
       <main className="w-full space-y-5 p-5">
         <SidebarTrigger />
         {children}

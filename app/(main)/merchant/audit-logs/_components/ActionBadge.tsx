@@ -43,10 +43,7 @@ export function ActionBadge({ action }: ActionBadgeProps) {
   }
 
   return (
-    <Badge
-      variant={getVariant(action)}
-      className="px-2 py-0.5 text-[11px] font-medium whitespace-nowrap"
-    >
+    <Badge variant={getVariant(action)} className="whitespace-nowrap">
       {label}
     </Badge>
   )
