@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
 import { IconEye, IconFilter, IconHistory } from '@tabler/icons-react'
 
@@ -228,6 +229,7 @@ export default function MerchantAuditLogsPage() {
           </TableBody>
         </Table>
       </div>
+      <StorePagination />
       <AuditLogDetailDialog
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}

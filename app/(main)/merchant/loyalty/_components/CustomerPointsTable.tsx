@@ -2,6 +2,7 @@
 
 import { ComponentProps } from 'react'
 
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -129,6 +130,7 @@ export function CustomerPointsTable({
             </TableBody>
           </Table>
         </div>
+        <StorePagination />
       </CardContent>
     </Card>
   )
