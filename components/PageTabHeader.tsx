@@ -5,7 +5,7 @@ import { type VariantProps, cva } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const pageTabHeaderVariants = cva(
-  'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-6 mb-6',
+  'flex flex-wrap gap-4 sm:items-center sm:justify-between border-b border-border/60 pb-6 mb-6',
   {
     variants: {
       variant: {
@@ -44,7 +44,12 @@ export function PageTabHeader({
       className={cn(pageTabHeaderVariants({ variant, className }))}
       {...props}
     >
-      <div className="flex items-start gap-3">
+      <div
+        className={cn(
+          'flex w-full items-start gap-3',
+          endContent && 'lg:w-1/2',
+        )}
+      >
         {Icon && (
           <div
             className={cn(
