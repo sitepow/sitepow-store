@@ -92,7 +92,7 @@ export default function MerchantOrganizationBranchesPage() {
         title="การจัดการสาขา"
         description="บริหารจัดการที่ตั้งสาขาและคลังหน้าร้าน เพื่อใช้ควบคุมสิทธิ์พนักงานและกระจายสต็อกสินค้าคงคลังให้แม่นยำ"
         endContent={
-          <div className="flex flex-wrap items-end gap-5">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
             <Field className="w-fit">
               <FieldLabel className="flex items-center gap-1.5">
                 <IconFilter size={14} />

@@ -61,8 +61,8 @@ export function AiUsageLogTable({ logs }: AiUsageLogTableProps) {
                     <TableCell>
                       <Badge variant="secondary">{log.feature}</Badge>
                     </TableCell>
-                    <TableCell className="max-w-75">
-                      <span className="text-muted-foreground text-sm">
+                    <TableCell className="max-w-72 min-w-72">
+                      <span className="text-muted-foreground text-sm wrap-break-word whitespace-pre-line">
                         {log.description}
                       </span>
                     </TableCell>

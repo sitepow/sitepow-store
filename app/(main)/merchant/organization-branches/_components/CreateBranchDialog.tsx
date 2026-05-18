@@ -75,11 +75,8 @@ export function CreateBranchDialog({
       onOpenChange={(open) => !isSubmitting && setIsOpen(open)}
     >
       <DialogTrigger asChild>
-        <Button
-          variant="default"
-          className="w-full gap-1.5 px-4 text-xs font-medium sm:w-auto"
-        >
-          <IconPlus size={16} />
+        <Button className="w-fit">
+          <IconPlus />
           เพิ่มสาขาใหม่
         </Button>
       </DialogTrigger>

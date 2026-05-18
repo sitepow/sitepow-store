@@ -69,8 +69,8 @@ export function MerchantInvoiceTable({ invoices }: MerchantInvoiceTableProps) {
                     <Badge variant="default">ชำระแล้ว</Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <IconDownload size={16} />
+                    <Button variant="outline" size="icon">
+                      <IconDownload />
                     </Button>
                   </TableCell>
                 </TableRow>

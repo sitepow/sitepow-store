@@ -44,7 +44,7 @@ export function ProfileAvartar({
       </CardContent>
       <CardFooter className="flex justify-between border-t text-xs">
         <span>เป็นสมาชิกตั้งแต่:</span>
-        <b>{formatDate(joinedDate)}</b>
+        <span>{formatDate(joinedDate)}</span>
       </CardFooter>
     </Card>
   )

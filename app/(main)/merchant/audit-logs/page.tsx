@@ -210,11 +210,11 @@ export default function MerchantAuditLogsPage() {
                   <TableCell>{log.ipAddress || '-'}</TableCell>
                   <TableCell>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
                       onClick={() => handleOpenDetails(log)}
                     >
-                      <IconEye size={14} />
+                      <IconEye />
                     </Button>
                   </TableCell>
                 </TableRow>

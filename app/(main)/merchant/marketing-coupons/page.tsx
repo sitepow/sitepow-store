@@ -118,8 +118,8 @@ export default function MerchantMarketingCouponsPage() {
         title="คูปองส่วนลดและการตลาด"
         description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
         endContent={
-          <div className="flex items-end gap-5">
-            <Field>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
+            <Field className="w-fit">
               <FieldLabel className="flex items-center gap-1.5">
                 <IconFilter size={14} />
                 กรองตามร้านค้า

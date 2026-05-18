@@ -1,12 +1,7 @@
 'use client'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import {
-  IconMapPin,
-  IconPackage,
-  IconPhone,
-  IconUsers,
-} from '@tabler/icons-react'
+import { IconPackage, IconUsers } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { Badge } from '@/components/ui/badge'
@@ -55,35 +50,23 @@ export function BranchListTable({ branches }: BranchListTableProps) {
             {branches?.length !== 0 &&
               branches.map((branch) => (
                 <TableRow key={branch.id}>
-                  <TableCell>
-                    <div className="flex flex-col">
+                  <TableCell className="max-w-60 min-w-60">
+                    <div className="flex flex-col wrap-break-word whitespace-pre-line">
                       <span className="font-medium">{branch.name}</span>
-                      <span className="text-xs opacity-60">
-                        เลขประจำตัวผู้เสียภาษี {branch.taxId || '-'}
+                      <span className="text-primary whitespace text-xs">
+                        Tax: {branch.taxId || '-'}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-75">
+                  <TableCell className="max-w-72 min-w-72">
                     <div className="flex flex-col space-y-2">
-                      <div className="flex items-start gap-2">
-                        <IconMapPin
-                          className="mt-0.5 shrink-0 opacity-60"
-                          size={18}
-                        />
-                        <span className="text-muted-foreground text-sm wrap-break-word whitespace-pre-line">
-                          {branch.address || '-'}
-                        </span>
-                      </div>
+                      <span className="text-muted-foreground text-sm wrap-break-word whitespace-pre-line">
+                        {branch.address || '-'}
+                      </span>
                       {branch.phone && (
-                        <div className="flex items-center gap-2">
-                          <IconPhone
-                            className="shrink-0 opacity-60"
-                            size={18}
-                          />
-                          <span className="text-muted-foreground text-sm">
-                            {branch.phone}
-                          </span>
-                        </div>
+                        <span className="text-muted-foreground text-sm">
+                          {branch.phone}
+                        </span>
                       )}
                     </div>
                   </TableCell>

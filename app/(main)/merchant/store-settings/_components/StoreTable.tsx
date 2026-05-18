@@ -53,7 +53,7 @@ export function StoreTable({ stores }: StoreTableProps) {
                     <span className="font-medium">{store.name}</span>
                   </TableCell>
                   <TableCell>
-                    <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                    <div className="text-muted-foreground flex items-center gap-1">
                       <span>myshop.com/{store.slug}</span>
                       <a
                         href={`https://myshop.com/${store.slug}`}
@@ -61,7 +61,7 @@ export function StoreTable({ stores }: StoreTableProps) {
                         rel="noopener noreferrer"
                         className="hover:text-primary transition-colors"
                       >
-                        <IconExternalLink size={12} />
+                        <IconExternalLink size={18} />
                       </a>
                     </div>
                   </TableCell>
@@ -83,7 +83,7 @@ export function StoreTable({ stores }: StoreTableProps) {
                       </Button>
                       <Button size="sm">
                         จัดการระบบ
-                        <IconArrowRight size={12} />
+                        <IconArrowRight size={18} />
                       </Button>
                     </div>
                   </TableCell>

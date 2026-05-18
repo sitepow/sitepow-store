@@ -34,7 +34,9 @@ export function CouponListTable({
           <TableHeader>
             <TableRow>
               <TableHead>รหัสคูปอง</TableHead>
-              <TableHead className="max-w-70">รายละเอียด / เงื่อนไข</TableHead>
+              <TableHead className="max-w-72 min-w-72">
+                รายละเอียด / เงื่อนไข
+              </TableHead>
               <TableHead>มูลค่าส่วนลด</TableHead>
               <TableHead>สาขาที่เข้าร่วม</TableHead>
               <TableHead className="w-48">สถิติการใช้งาน</TableHead>
@@ -64,7 +66,7 @@ export function CouponListTable({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-70">
+                    <TableCell className="max-w-72 min-w-72">
                       <div className="flex flex-col">
                         <span className="font-medium wrap-break-word whitespace-pre-line">
                           {coupon.description || '-'}

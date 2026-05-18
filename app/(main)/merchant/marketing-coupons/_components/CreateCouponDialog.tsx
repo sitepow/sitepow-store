@@ -100,11 +100,8 @@ export function CreateCouponDialog({
       onOpenChange={(open) => !isSubmitting && setIsDialogOpen(open)}
     >
       <DialogTrigger asChild>
-        <Button
-          variant="default"
-          className="w-full gap-1.5 px-4 text-xs font-medium sm:w-auto"
-        >
-          <IconPlus size={16} />
+        <Button className="w-fit">
+          <IconPlus />
           สร้างคูปองใหม่
         </Button>
       </DialogTrigger>
