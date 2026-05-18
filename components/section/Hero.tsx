@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
 import { useSession } from '@/hooks/use-session'
+import { ArrowRight } from 'lucide-react'
 
 import { HeroHeader } from '../HeroHeader'
 import { LogoBrand } from '../LogoBrand'
@@ -35,6 +36,15 @@ export function HeroSection() {
             </Button>
           </Link>
         </div>
+      )}
+
+      {isAuthenticated && (
+        <Link href="/merchant/dashboard">
+          <Button size="lg">
+            จัดการร้านค้าของคุณ
+            <ArrowRight />
+          </Button>
+        </Link>
       )}
 
       <div className="absolute -bottom-10 left-1/2">
