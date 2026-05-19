@@ -122,26 +122,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
         label: 'เพิ่มสินค้าใหม่',
         url: '/merchant/store-settings/products/create',
       },
-      {
-        value: 'categories',
-        label: 'หมวดหมู่สินค้า',
-        url: '/merchant/store-settings/categories',
-      },
-      {
-        value: 'stocks',
-        label: 'เช็คสต็อก/คลังสินค้า',
-        url: '/merchant/store-settings/stocks',
-      },
-      {
-        value: 'orders',
-        label: 'รายการคำสั่งซื้อ',
-        url: '/merchant/store-settings/orders',
-      },
-      {
-        value: 'blogs',
-        label: 'บทความ / Blog',
-        url: '/merchant/store-settings/blogs',
-      },
     ],
   },
   {

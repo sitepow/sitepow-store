@@ -4,6 +4,8 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
+  AlertCircleIcon,
+  ArrowRight,
   CreditCard,
   DollarSign,
   Eye,
@@ -11,11 +13,15 @@ import {
   Package,
   Search,
   TrendingUp,
+  User2,
   Users,
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -30,8 +36,58 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 export default function MerchantDashboardPage() {
+  const LOW_STOCK_PRODUCTS = [
+    {
+      id: 'PROD-003',
+      name: 'กระเป๋าผ้า Canvas Eco',
+      inventory: [
+        { branchName: 'สาขาสยาม', stock: 0 },
+        { branchName: 'ออนไลน์', stock: 2 },
+      ],
+    },
+    {
+      id: 'PROD-004',
+      name: 'หมวกแก๊ปสีดำ Basic',
+      inventory: [{ branchName: 'สาขาสยาม', stock: 3 }],
+    },
+  ]
+
+  const RECENT_SALES = [
+    {
+      id: 1,
+      name: 'สมชาย รักดี',
+      email: 'somchai.r@email.com',
+      amount: 1999,
+    },
+    {
+      id: 2,
+      name: 'วิภาดา สายชล',
+      email: 'wipada.s@email.com',
+      amount: 2500.5,
+    },
+    {
+      id: 3,
+      name: 'ธนกฤต มั่งมี',
+      email: 'tanakrit.m@email.com',
+      amount: 850,
+    },
+    {
+      id: 4,
+      name: 'ปิยะนุช สดใส',
+      email: 'piyanut.s@email.com',
+      amount: 4200,
+    },
+    {
+      id: 5,
+      name: 'อานนท์ บุญส่ง',
+      email: 'arnon.b@email.com',
+      amount: 1150.25,
+    },
+  ]
+
   const SALES_DATA = [
     { name: 'ม.ค.', total: 4500 },
     { name: 'ก.พ.', total: 5200 },
@@ -274,6 +330,91 @@ export default function MerchantDashboardPage() {
                 <span>AI Description</span>
               </div>
             </div>
+          </CardFooter>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>รายการขายล่าสุด</CardTitle>
+            <CardDescription>คุณมียอดขาย 265 รายการในเดือนนี้</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {RECENT_SALES.map((sale) => (
+                <div key={sale.id} className="flex items-center">
+                  <Avatar className="size-8 border">
+                    <AvatarFallback>
+                      <User2 size={16} />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4 space-y-1">
+                    <p className="text-sm leading-none font-medium">
+                      {sale.name}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {sale.email}
+                    </p>
+                  </div>
+                  <div className="text-primary ml-auto font-medium">
+                    +{formatCurrency(sale.amount)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="h-fit">
+          <CardHeader>
+            <div className="flex flex-wrap justify-between gap-2.5">
+              <CardTitle>สินค้าใกล้หมด</CardTitle>
+              <Badge variant="destructive">
+                <AlertCircleIcon />
+                {LOW_STOCK_PRODUCTS.length} รายการ
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableBody>
+                {LOW_STOCK_PRODUCTS.map((product) => (
+                  <TableRow key={product.id} className="hover:bg-transparent">
+                    <TableCell className="px-0 py-4">
+                      <div className="space-y-2">
+                        <p className="text-sm leading-none font-medium">
+                          {product.name}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {product.inventory.map((inv, idx) => (
+                            <Badge
+                              key={idx}
+                              variant="outline"
+                              className="px-1.5 py-0 text-[10px] font-normal"
+                            >
+                              <span className="text-muted-foreground mr-1.5 border-r pr-1.5">
+                                {inv.branchName}
+                              </span>
+                              <span
+                                className={
+                                  inv.stock === 0
+                                    ? 'text-destructive'
+                                    : 'text-foreground'
+                                }
+                              >
+                                {formatNumber(inv.stock)}
+                              </span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">
+              ดูคลังสินค้าทั้งหมด <ArrowRight />
+            </Button>
           </CardFooter>
         </Card>
       </div>

@@ -113,7 +113,7 @@ export function DashboardSidebar({
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-      <main className="w-full min-w-0 space-y-5 overflow-hidden p-5">
+      <main className="w-full min-w-0 space-y-5 p-5">
         <SidebarTrigger />
         {children}
       </main>
