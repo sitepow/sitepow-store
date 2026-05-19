@@ -77,9 +77,9 @@ export default function StoreUserRewardsPage() {
           <CardFooter className="bg-muted/5 border-t pt-3 pb-3">
             <Button
               variant="outline"
-              className="w-full border-amber-200 text-amber-700 hover:bg-amber-50"
+              className="w-full border-amber-200 text-amber-700"
             >
-              <IconGift size={14} className="mr-1" /> ดูสิทธิพิเศษ / แลกรางวัล
+              <IconGift /> ดูสิทธิพิเศษ / แลกรางวัล
             </Button>
           </CardFooter>
         </Card>

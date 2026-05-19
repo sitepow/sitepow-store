@@ -33,7 +33,7 @@ export function ChangePasswordForm() {
         />
       </CardHeader>
       <CardContent className="space-y-4 text-xs">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           <Field>
             <FieldLabel>รหัสผ่านปัจจุบัน</FieldLabel>
             <ButtonGroup>
