@@ -6,7 +6,7 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
 import { BASE_FAVICON } from '@/constants/favicon'
-import { BUYER_NAVIGATION } from '@/constants/navigation'
+import { NavigationItem } from '@/constants/navigation'
 import { useSession } from '@/hooks/use-session'
 import { IconLogout } from '@tabler/icons-react'
 
@@ -22,12 +22,17 @@ import {
 
 import { cn } from '@/lib/utils'
 
-type BuyerAvatarDropdownProps = ComponentProps<typeof Avatar>
+interface UserAvatarDropdownProps extends ComponentProps<typeof Avatar> {
+  items: NavigationItem[]
+  redirectPath: string
+}
 
-export function BuyerAvatarDropdown({
+export function UserAvatarDropdown({
   className,
+  items,
+  redirectPath,
   ...props
-}: BuyerAvatarDropdownProps) {
+}: UserAvatarDropdownProps) {
   const { user } = useSession()
 
   const handleLogout = async () => {
@@ -66,7 +71,7 @@ export function BuyerAvatarDropdown({
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {BUYER_NAVIGATION.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon
 
           return (
@@ -74,7 +79,7 @@ export function BuyerAvatarDropdown({
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/user/${item.value}`}
+                  href={`/${redirectPath}/${item.value}`}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />

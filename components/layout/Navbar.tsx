@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
+import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NAVBAR_ITEMS } from '@/constants/navbar'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useSession } from '@/hooks/use-session'
 import { LockIcon, Menu, X } from 'lucide-react'
 
@@ -25,7 +27,6 @@ import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
 import { Separator } from '../ui/separator'
 import { ListItem } from './_components/ListItem'
-import { MerchantAvatarDropdown } from './_components/MerchantAvatarDropdown'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -100,7 +101,11 @@ export function Navbar() {
 
           {isAuthenticated && (
             <div className="hidden items-center gap-4 lg:flex">
-              <MerchantAvatarDropdown className="hidden lg:block" />
+              <UserAvatarDropdown
+                redirectPath="merchant"
+                items={MERCHANT_NAVIGATION}
+                className="hidden lg:block"
+              />
               <Link href="/merchant/dashboard">
                 <Button variant="secondary" className="flex gap-2 font-bold">
                   <LockIcon size={18} />
@@ -111,7 +116,12 @@ export function Navbar() {
           )}
 
           <div className="flex items-center gap-2 lg:hidden">
-            {isAuthenticated && <MerchantAvatarDropdown />}
+            {isAuthenticated && (
+              <UserAvatarDropdown
+                redirectPath="merchant"
+                items={MERCHANT_NAVIGATION}
+              />
+            )}
 
             <Button
               variant="ghost"

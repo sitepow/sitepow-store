@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
 import { useSession } from '@/hooks/use-session'
 import {
@@ -33,8 +34,8 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 
+import { UserAvatarDropdown } from '../UserAvatarDropdown'
 import { CartDrawer } from '../cart/CartDrawer'
-import { BuyerAvatarDropdown } from './_components/BuyerAvatarDropdown'
 
 export function StoreNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -76,7 +77,12 @@ export function StoreNavbar() {
                 </Link>
               )}
 
-              {isAuthenticated && <BuyerAvatarDropdown />}
+              {isAuthenticated && (
+                <UserAvatarDropdown
+                  redirectPath="user"
+                  items={BUYER_NAVIGATION}
+                />
+              )}
 
               <CartDrawer />
 
