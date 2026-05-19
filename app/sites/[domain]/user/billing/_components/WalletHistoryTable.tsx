@@ -13,7 +13,7 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { StorePagination } from '../../_components/Pagination'
+import { StorePagination } from '../../../_components/Pagination'
 
 interface WalletTransaction {
   id: string

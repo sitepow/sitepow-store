@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-import { WalletHistoryTable } from './WalletHistoryTable'
+import { WalletHistoryTable } from './_components/WalletHistoryTable'
 
 const MOCK_WALLET_BALANCE = 1250.0
 const MOCK_WALLET_HISTORY = [
