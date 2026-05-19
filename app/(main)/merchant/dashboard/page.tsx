@@ -1,7 +1,7 @@
 'use client'
 
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   CreditCard,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import {
   Card,
   CardContent,
@@ -103,7 +104,7 @@ export default function MerchantDashboardPage() {
   ]
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS_DATA.map((stat, index) => (
           <StatsCard
@@ -276,6 +277,6 @@ export default function MerchantDashboardPage() {
           </CardFooter>
         </Card>
       </div>
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

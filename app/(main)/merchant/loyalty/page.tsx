@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconCoin, IconFilter } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -110,7 +111,7 @@ export default function MerchantLoyaltyPage() {
   )
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCoin}
         title="ระบบแต้มสะสม"
@@ -153,6 +154,6 @@ export default function MerchantLoyaltyPage() {
           className="xl:col-span-8"
         />
       </div>
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

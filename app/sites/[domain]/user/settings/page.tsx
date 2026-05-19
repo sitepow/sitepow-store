@@ -1,9 +1,10 @@
 'use client'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconSettings } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { ChangePasswordForm } from './_components/ChangePasswordForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
@@ -11,7 +12,7 @@ import { PdpaManagementForm } from './_components/PdpaManagementForm'
 
 export default function StoreUserSettingsPage() {
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
         title="ตั้งค่าบัญชีและความเป็นส่วนตัว"
@@ -20,6 +21,6 @@ export default function StoreUserSettingsPage() {
       <ChangePasswordForm />
       <NotificationSettingsForm />
       <PdpaManagementForm />
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

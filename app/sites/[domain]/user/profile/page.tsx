@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconUser } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { BuyerProfileAvatar } from './_components/BuyerProfileAvatar'
 import { BuyerProfileForm } from './_components/BuyerProfileForm'
@@ -26,7 +27,7 @@ export default function StoreUserProfilePage() {
   const [phone, setPhone] = useState(profile.phone)
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
         title="โปรไฟล์ส่วนตัว"
@@ -50,6 +51,6 @@ export default function StoreUserProfilePage() {
           className="col-span-1 xl:col-span-8"
         />
       </div>
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

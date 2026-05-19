@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconHeart, IconSearch } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Input } from '@/components/ui/input'
 
 import { WishlistTable } from './_components/WishlistTable'
@@ -58,7 +59,7 @@ export default function StoreUserWishlistPage() {
   )
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconHeart}
         title="สินค้าที่ถูกใจ"
@@ -79,6 +80,6 @@ export default function StoreUserWishlistPage() {
         }
       />
       <WishlistTable items={filteredItems} onRemove={handleRemove} />
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

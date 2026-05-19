@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconWallet } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -48,7 +49,7 @@ export default function StoreUserBillingPage() {
   const [history, setHistory] = useState(MOCK_WALLET_HISTORY)
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconWallet}
         title="กระเป๋าเงิน / ช่องทางชำระเงิน"
@@ -78,6 +79,6 @@ export default function StoreUserBillingPage() {
         </Card>
         <WalletHistoryTable history={history} className="xl:col-span-2" />
       </div>
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

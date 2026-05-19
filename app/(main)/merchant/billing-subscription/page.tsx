@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconFilter } from '@tabler/icons-react'
 import { Receipt } from 'lucide-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -100,7 +101,7 @@ export default function MerchantBillingSubscriptionPage() {
         )
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={Receipt}
         title="การจัดการสมาชิกและค่าบริการ"
@@ -131,6 +132,6 @@ export default function MerchantBillingSubscriptionPage() {
       />
       <MerchantSubscriptionTable stores={filteredStores} />
       <MerchantInvoiceTable invoices={filteredInvoices} />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

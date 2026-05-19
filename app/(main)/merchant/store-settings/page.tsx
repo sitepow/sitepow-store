@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconBuildingStore } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { CreateStoreDialog } from './_components/CreateStoreDialog'
 import { StoreTable } from './_components/StoreTable'
@@ -34,7 +35,7 @@ export default function MerchantStoreSettingsPage() {
   const [stores, setStores] = useState(MOCK_STORES)
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBuildingStore}
         title="ร้านค้าของคุณ"
@@ -46,6 +47,6 @@ export default function MerchantStoreSettingsPage() {
         }
       />
       <StoreTable stores={stores} />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

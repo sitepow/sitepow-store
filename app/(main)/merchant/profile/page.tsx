@@ -1,16 +1,17 @@
 'use client'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconUser } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { ProfileAvartar } from './_components/ProfileAvartar'
 import { ProfileForm } from './_components/ProfileForm'
 
 export default function MerchantProfilePage() {
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
         title="โปรไฟล์ส่วนตัว"
@@ -26,6 +27,6 @@ export default function MerchantProfilePage() {
         />
         <ProfileForm className="col-span-1 xl:col-span-8" />
       </div>
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

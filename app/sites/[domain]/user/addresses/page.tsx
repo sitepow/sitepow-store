@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconMapPin, IconPlus } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -121,7 +122,7 @@ export default function StoreUserAddressesPage() {
   }
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconMapPin}
         title="ที่อยู่จัดส่งของฉัน"
@@ -173,6 +174,6 @@ export default function StoreUserAddressesPage() {
         onSetDefault={handleSetDefault}
         onDelete={handleDeleteAddress}
       />
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

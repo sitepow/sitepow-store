@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconSearch, IconShoppingBag } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Input } from '@/components/ui/input'
 
 import { OrderTable } from './_components/OrderTable'
@@ -78,7 +79,7 @@ export default function StoreUserOrderPage() {
   )
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconShoppingBag}
         title="ประวัติการสั่งซื้อของคุณ"
@@ -99,6 +100,6 @@ export default function StoreUserOrderPage() {
         }
       />
       <OrderTable orders={filteredOrders} />
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

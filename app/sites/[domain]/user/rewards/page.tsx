@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconCoin, IconGift, IconShoppingBag } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -51,7 +52,7 @@ export default function StoreUserRewardsPage() {
   const [history, setHistory] = useState(MOCK_POINTS_HISTORY)
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconCoin}
         title="แต้มสะสมของฉัน"
@@ -123,6 +124,6 @@ export default function StoreUserRewardsPage() {
         </Card>
       </div>
       <RewardsHistoryTable history={history} />
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

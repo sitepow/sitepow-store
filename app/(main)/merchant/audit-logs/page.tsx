@@ -3,11 +3,12 @@
 import { useMemo, useState } from 'react'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconEye, IconFilter, IconHistory } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -140,7 +141,7 @@ export default function MerchantAuditLogsPage() {
   }
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHistory}
         title="ประวัติกิจกรรมระบบ"
@@ -235,6 +236,6 @@ export default function MerchantAuditLogsPage() {
         onOpenChange={setIsDialogOpen}
         logItem={activeLogItem}
       />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

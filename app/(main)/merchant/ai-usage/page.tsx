@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconFilter, IconSparkles } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -105,7 +106,7 @@ export default function MerchantAiUsagePage() {
       : MOCK_AI_LOGS.filter((log) => log.storeId === selectedStoreId)
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconSparkles}
         title="เครดิตและการใช้งาน AI"
@@ -136,6 +137,6 @@ export default function MerchantAiUsagePage() {
       />
       <StoreAiCreditTable stores={filteredStores} />
       <AiUsageLogTable logs={filteredLogs} />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

@@ -22,6 +22,11 @@ export interface NavigationItem {
   tab: string
   icon: TablerIcon
   hasSeparatorBefore?: boolean
+  items?: {
+    value: string
+    label: string
+    url: string
+  }[]
 }
 
 export const BUYER_NAVIGATION: NavigationItem[] = [
@@ -101,6 +106,43 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'ข้อมูลร้านค้า',
     tab: 'store',
     icon: IconBuildingStore,
+    items: [
+      {
+        value: 'store-info',
+        label: 'ข้อมูลทั่วไปของร้าน',
+        url: '/merchant/store-settings',
+      },
+      {
+        value: 'products',
+        label: 'รายการสินค้าทั้งหมด',
+        url: '/merchant/store-settings/products',
+      },
+      {
+        value: 'product-create',
+        label: 'เพิ่มสินค้าใหม่',
+        url: '/merchant/store-settings/products/create',
+      },
+      {
+        value: 'categories',
+        label: 'หมวดหมู่สินค้า',
+        url: '/merchant/store-settings/categories',
+      },
+      {
+        value: 'stocks',
+        label: 'เช็คสต็อก/คลังสินค้า',
+        url: '/merchant/store-settings/stocks',
+      },
+      {
+        value: 'orders',
+        label: 'รายการคำสั่งซื้อ',
+        url: '/merchant/store-settings/orders',
+      },
+      {
+        value: 'blogs',
+        label: 'บทความ / Blog',
+        url: '/merchant/store-settings/blogs',
+      },
+    ],
   },
   {
     value: 'billing-subscription',

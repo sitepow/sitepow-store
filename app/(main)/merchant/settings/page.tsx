@@ -1,6 +1,6 @@
 'use client'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import {
   IconBell,
   IconBuildingStore,
@@ -9,6 +9,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
@@ -17,7 +18,7 @@ import { StoreProfileForm } from './_components/StoreProfileForm'
 
 export default function MerchantSettingsPage() {
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
         title="การตั้งค่าระบบ"
@@ -49,6 +50,6 @@ export default function MerchantSettingsPage() {
           <NotificationSettingsForm />
         </TabsContent>
       </Tabs>
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

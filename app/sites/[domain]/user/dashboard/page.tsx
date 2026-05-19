@@ -1,6 +1,7 @@
 'use client'
 
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'
 import {
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import {
   Card,
   CardContent,
@@ -99,7 +100,7 @@ export default function StoreUserDashboardPage() {
   ]
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS_DATA.map((stat, index) => (
           <StatsCard
@@ -265,6 +266,6 @@ export default function StoreUserDashboardPage() {
           </CardFooter>
         </Card>
       </div>
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

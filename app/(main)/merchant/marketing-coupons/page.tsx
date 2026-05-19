@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconFilter, IconTicket } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -112,7 +113,7 @@ export default function MerchantMarketingCouponsPage() {
   }
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconTicket}
         title="คูปองส่วนลดและการตลาด"
@@ -156,6 +157,6 @@ export default function MerchantMarketingCouponsPage() {
         coupons={filteredCoupons}
         currentStoreBranches={currentStoreBranches}
       />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }

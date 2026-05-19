@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 
+import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconInfoCircle, IconTicket } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { BuyerLayout } from '@/components/layout/BuyerLayout'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -69,7 +70,7 @@ export default function StoreUserVouchersPage() {
   })
 
   return (
-    <BuyerLayout>
+    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconTicket}
         title="โค้ดส่วนลดของฉัน"
@@ -112,6 +113,6 @@ export default function StoreUserVouchersPage() {
           </AlertDescription>
         </Alert>
       </div>
-    </BuyerLayout>
+    </DashboardSidebar>
   )
 }

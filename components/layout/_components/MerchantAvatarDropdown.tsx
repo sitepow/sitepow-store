@@ -51,7 +51,6 @@ export function MerchantAvatarDropdown({
           <AvatarImage src={BASE_FAVICON} alt="@sitepowStore" />
         </Avatar>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
@@ -64,9 +63,7 @@ export function MerchantAvatarDropdown({
             </p>
           </div>
         </DropdownMenuLabel>
-
         <DropdownMenuSeparator />
-
         {MERCHANT_NAVIGATION.map((item) => {
           const Icon = item.icon
 
@@ -75,7 +72,7 @@ export function MerchantAvatarDropdown({
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/merchant/${item.tab}`}
+                  href={`/merchant/${item.value}`}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />
@@ -85,9 +82,7 @@ export function MerchantAvatarDropdown({
             </Fragment>
           )
         })}
-
         <DropdownMenuSeparator />
-
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer"

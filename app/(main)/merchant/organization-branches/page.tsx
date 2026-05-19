@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react'
 
-import { MerchantLayout } from '@/app/sites/[domain]/_components/layout/admin/MerchantLayout'
+import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconFilter, IconHierarchy } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -86,7 +87,7 @@ export default function MerchantOrganizationBranchesPage() {
   }
 
   return (
-    <MerchantLayout>
+    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHierarchy}
         title="การจัดการสาขา"
@@ -126,6 +127,6 @@ export default function MerchantOrganizationBranchesPage() {
         }
       />
       <BranchListTable branches={filteredBranches} />
-    </MerchantLayout>
+    </DashboardSidebar>
   )
 }
