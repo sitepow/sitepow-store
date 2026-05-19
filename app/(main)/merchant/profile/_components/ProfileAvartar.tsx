@@ -43,7 +43,7 @@ export function ProfileAvartar({
         <p className="text-muted-foreground text-xs">{email}</p>
       </CardContent>
       <CardFooter className="flex justify-between border-t text-xs">
-        <span>เป็นสมาชิกตั้งแต่:</span>
+        <span>เป็นสมาชิกตั้งแต่</span>
         <span>{formatDate(joinedDate)}</span>
       </CardFooter>
     </Card>
