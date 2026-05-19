@@ -1,7 +1,7 @@
 'use client'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { IconArrowRight, IconExternalLink } from '@tabler/icons-react'
+import { IconEdit, IconExternalLink } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -77,15 +77,9 @@ export function StoreTable({ stores }: StoreTableProps) {
                   </TableCell>
                   <TableCell>{store.createdAt}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="link" className="underline" size="sm">
-                        ดูหน้าร้าน
-                      </Button>
-                      <Button size="sm">
-                        จัดการระบบ
-                        <IconArrowRight size={18} />
-                      </Button>
-                    </div>
+                    <Button variant="outline" size="icon-lg">
+                      <IconEdit />
+                    </Button>
                   </TableCell>
                 </TableRow>
               )
