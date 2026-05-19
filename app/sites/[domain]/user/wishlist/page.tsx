@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState } from 'react'
@@ -14,6 +13,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
@@ -52,7 +52,7 @@ const MOCK_WISHLIST = [
   },
 ]
 
-export function WishlistContent() {
+export default function StoreUserWishlistPage() {
   const [items, setItems] = useState(MOCK_WISHLIST)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -67,7 +67,7 @@ export function WishlistContent() {
   )
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconHeart}
         title="สินค้าที่ถูกใจ (My Wishlist)"
@@ -88,7 +88,6 @@ export function WishlistContent() {
           </div>
         }
       />
-
       {filteredItems.length === 0 ? (
         <div className="text-muted-foreground rounded-2xl border border-dashed py-20 text-center text-xs">
           ไม่พบสินค้าในรายการโปรดของคุณ
@@ -123,17 +122,14 @@ export function WishlistContent() {
                   <IconTrash size={16} />
                 </button>
               </div>
-
               <CardContent className="space-y-2 p-4">
                 <div className="text-muted-foreground flex items-center gap-1 text-[10px] font-medium">
                   <IconBuildingStore size={12} />
                   <span className="truncate">{product.storeName}</span>
                 </div>
-
                 <h3 className="text-foreground line-clamp-2 min-h-8 text-xs font-bold">
                   {product.name}
                 </h3>
-
                 <div className="flex items-baseline gap-2">
                   <span className="text-primary text-sm font-black">
                     ฿{(product.discountPrice || product.price).toLocaleString()}
@@ -144,7 +140,6 @@ export function WishlistContent() {
                     </span>
                   )}
                 </div>
-
                 <div className="flex items-center gap-1.5 pt-1">
                   {product.inStock ? (
                     <span className="flex items-center gap-1 text-[10px] font-medium text-green-600">
@@ -157,7 +152,6 @@ export function WishlistContent() {
                   )}
                 </div>
               </CardContent>
-
               <CardFooter className="bg-muted/5 border-t p-3 pt-0">
                 <Button
                   className="h-8 w-full gap-1.5 text-[11px]"
@@ -172,6 +166,6 @@ export function WishlistContent() {
           ))}
         </div>
       )}
-    </div>
+    </BuyerLayout>
   )
 }

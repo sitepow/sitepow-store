@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import {
   Card,
   CardContent,
@@ -27,7 +28,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-export function DashboardContent() {
+export default function StoreUserDashboardPage() {
   const SPENDING_DATA = [
     { name: 'ม.ค.', total: 1200 },
     { name: 'ก.พ.', total: 850 },
@@ -98,7 +99,7 @@ export function DashboardContent() {
   ]
 
   return (
-    <div className="col-span-10 space-y-6">
+    <BuyerLayout>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS_DATA.map((stat, index) => (
           <StatsCard
@@ -118,7 +119,6 @@ export function DashboardContent() {
           />
         ))}
       </div>
-
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -181,7 +181,6 @@ export function DashboardContent() {
             </div>
           </CardFooter>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>ความเคลื่อนไหวของแต้มสะสม</CardTitle>
@@ -219,7 +218,6 @@ export function DashboardContent() {
                   cursor={false}
                   content={<ChartTooltipContent indicator="dot" />}
                 />
-
                 <Area
                   dataKey="earned"
                   type="monotone"
@@ -228,7 +226,6 @@ export function DashboardContent() {
                   stroke="var(--color-earned)"
                   strokeWidth={2}
                 />
-
                 <Area
                   dataKey="used"
                   type="monotone"
@@ -256,20 +253,18 @@ export function DashboardContent() {
                 <div className="shrink-0 rounded-md border border-green-200 bg-green-50 p-1 text-green-600">
                   <IconArrowDownLeft size={14} />
                 </div>
-
                 <span>แต้มที่ได้รับ (Earned)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="shrink-0 rounded-md border bg-red-50 p-1 text-red-500 not-first:border-red-200">
                   <IconArrowUpRight size={14} />
                 </div>
-
                 <span>แต้มที่ใช้ (Used)</span>
               </div>
             </div>
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

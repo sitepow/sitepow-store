@@ -14,6 +14,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -91,7 +92,7 @@ const MOCK_BUYER_ORDERS: BuyerOrder[] = [
   },
 ]
 
-export function OrdersContent() {
+export default function StoreUserOrderPage() {
   const [orders, setOrders] = useState(MOCK_BUYER_ORDERS)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedOrder, setSelectedOrder] = useState<BuyerOrder | null>(null)
@@ -132,13 +133,12 @@ export function OrdersContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconShoppingBag}
         title="ประวัติการสั่งซื้อของคุณ"
         description="ติดตามสถานะคำสั่งซื้อ ตรวจสอบเลขพัสดุ และดูประวัติการช้อปปิ้งย้อนหลัง"
       />
-
       <div className="relative max-w-md">
         <IconSearch
           className="text-muted-foreground absolute top-2.5 left-3"
@@ -246,7 +246,6 @@ export function OrdersContent() {
                                 </span>
                               </div>
                             </div>
-
                             <div className="space-y-1.5">
                               <span className="text-muted-foreground block text-[10px] font-bold tracking-wider uppercase">
                                 ข้อมูลการจัดส่ง
@@ -293,6 +292,6 @@ export function OrdersContent() {
           </TableBody>
         </Table>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

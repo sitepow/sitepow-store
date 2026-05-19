@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -58,19 +59,18 @@ const MOCK_POINTS_HISTORY = [
   },
 ]
 
-export function RewardsContent() {
+export default function StoreUserRewardsPage() {
   const [totalPoints, setTotalPoints] = useState(MOCK_TOTAL_POINTS)
   const [history, setHistory] = useState(MOCK_POINTS_HISTORY)
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconCoin}
         title="แต้มสะสมของฉัน (Loyalty Points)"
         description="ตรวจสอบคะแนนสะสมทั้งหมด แลกรับของรางวัลพิเศษ
           และดูประวัติแต้มจากการช้อปปิ้งออนไลน์และหน้าร้าน"
       />
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card className="to-background relative flex flex-col justify-between overflow-hidden border-amber-500/20 bg-linear-to-br from-amber-500/10 via-amber-500/2 md:col-span-1">
           <CardHeader className="pb-2">
@@ -98,7 +98,6 @@ export function RewardsContent() {
             </Button>
           </CardFooter>
         </Card>
-
         <Card className="text-xs md:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
@@ -120,7 +119,6 @@ export function RewardsContent() {
                 </span>
               </div>
             </div>
-
             <div className="flex items-start gap-3">
               <div className="shrink-0 rounded-md bg-amber-100 p-1.5 text-amber-700">
                 <IconCoin size={14} />
@@ -139,12 +137,10 @@ export function RewardsContent() {
           </CardContent>
         </Card>
       </div>
-
       <div className="space-y-3 pt-2">
         <h3 className="text-muted-foreground flex items-center gap-1 text-xs font-bold tracking-wider uppercase">
           <IconHistory size={16} /> ประวัติธุรกรรมคะแนนสะสม
         </h3>
-
         <div className="bg-background overflow-hidden rounded-xl border">
           <Table>
             <TableHeader className="bg-muted/40 text-xs">
@@ -197,6 +193,6 @@ export function RewardsContent() {
           </Table>
         </div>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

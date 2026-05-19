@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -55,12 +56,12 @@ const MOCK_WALLET_HISTORY = [
   },
 ]
 
-export function BillingContent() {
+export default function StoreUserBillingPage() {
   const [balance, setBalance] = useState(MOCK_WALLET_BALANCE)
   const [history, setHistory] = useState(MOCK_WALLET_HISTORY)
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconWallet}
         title="กระเป๋าเงิน / ช่องทางชำระเงิน"
@@ -68,7 +69,6 @@ export function BillingContent() {
           ผูกบัตรเครดิตเพื่อความสะดวกรวดเร็วในการเช็คเอาท์
           และตรวจสอบประวัติธุรกรรมของคุณ"
       />
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex flex-col justify-between overflow-hidden bg-linear-to-br md:col-span-1">
           <CardHeader className="pb-2">
@@ -93,7 +93,6 @@ export function BillingContent() {
             </Button>
           </CardFooter>
         </Card>
-
         <div className="space-y-3 md:col-span-2">
           <div className="flex items-center justify-between">
             <h3 className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
@@ -103,7 +102,6 @@ export function BillingContent() {
               <IconPlus size={14} /> ผูกบัตรใหม่
             </Button>
           </div>
-
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="text-muted-foreground col-span-2 rounded-xl border border-dashed py-8 text-center text-xs">
               ยังไม่มีการผูกบัตรเครดิตในระบบ
@@ -111,12 +109,10 @@ export function BillingContent() {
           </div>
         </div>
       </div>
-
       <div className="space-y-3 pt-2">
         <h3 className="text-muted-foreground flex items-center gap-1 text-xs font-bold tracking-wider uppercase">
           <IconHistory size={16} /> ประวัติธุรกรรมวอลเล็ต
         </h3>
-
         <div className="bg-background overflow-hidden rounded-xl border">
           <Table>
             <TableHeader className="bg-muted/40 text-xs">
@@ -171,6 +167,6 @@ export function BillingContent() {
           </Table>
         </div>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

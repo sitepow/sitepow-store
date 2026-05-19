@@ -77,7 +77,7 @@ export function BuyerAvatarDropdown({
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/user?tab=${item.tab}`}
+                  href={`/user/${item.tab}`}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />

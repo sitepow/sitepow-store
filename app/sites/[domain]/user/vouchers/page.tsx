@@ -11,6 +11,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -55,7 +56,7 @@ const MOCK_VOUCHERS = [
   },
 ]
 
-export function VouchersContent() {
+export default function StoreUserVouchersPage() {
   const [vouchers, setVouchers] = useState(MOCK_VOUCHERS)
   const [activeSubTab, setActiveSubTab] = useState('available')
   const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -74,14 +75,13 @@ export function VouchersContent() {
   })
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconTicket}
         title="โค้ดส่วนลดของฉัน (My Vouchers)"
         description="คลังรวมคูปองและโค้ดส่วนลดที่คุณเก็บไว้
             สามารถคลิกคัดลอกไปใช้ลดราคาได้ทันทีก่อนชำระเงิน"
       />
-
       <Tabs
         defaultValue="available"
         onValueChange={setActiveSubTab}
@@ -97,7 +97,6 @@ export function VouchersContent() {
           </TabsTrigger>
         </TabsList>
       </Tabs>
-
       {filteredVouchers.length === 0 ? (
         <div className="text-muted-foreground rounded-2xl border border-dashed py-16 text-center text-xs">
           ไม่พบโค้ดส่วนลดในหมวดหมู่นี้
@@ -125,7 +124,6 @@ export function VouchersContent() {
                 >
                   <div className="bg-background border-muted absolute -top-2 -right-2 h-4 w-4 rounded-full border" />
                   <div className="bg-background border-muted absolute -right-2 -bottom-2 h-4 w-4 rounded-full border" />
-
                   <IconTicket size={24} className="mb-1" />
                   <span className="text-lg leading-tight font-extrabold">
                     {voucher.discountType === 'FIXED'
@@ -136,7 +134,6 @@ export function VouchersContent() {
                     DISCOUNT
                   </span>
                 </div>
-
                 <div className="flex grow flex-col justify-between space-y-3 p-4 text-xs">
                   <div className="space-y-1">
                     <div className="flex items-start justify-between gap-2">
@@ -154,13 +151,11 @@ export function VouchersContent() {
                       {voucher.description}
                     </p>
                   </div>
-
                   <div className="border-muted/60 flex items-center justify-between border-t pt-2 text-[11px]">
                     <span className="text-muted-foreground flex items-center gap-1 font-mono text-[10px]">
                       <IconAlertCircle size={12} /> หมดอายุ:{' '}
                       {voucher.expiryDate}
                     </span>
-
                     {isAvailable ? (
                       <Button
                         size="sm"
@@ -198,7 +193,6 @@ export function VouchersContent() {
           })}
         </div>
       )}
-
       <div className="text-muted-foreground bg-muted/30 flex items-start gap-1.5 rounded-xl border p-3 text-[11px]">
         <IconInfoCircle size={14} className="text-primary mt-0.5 shrink-0" />
         <span>
@@ -208,6 +202,6 @@ export function VouchersContent() {
           หรือแจ้งกับพนักงานตอนชำระเงินที่หน้าร้านค้าเพื่อให้ระบบทำการคำนวณส่วนลดท้ายบิลครับ
         </span>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

@@ -13,6 +13,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -34,21 +35,20 @@ const MOCK_BUYER_PROFILE = {
   avatarUrl: null,
 }
 
-export function ProfileContent() {
+export default function StoreUserProfilePage() {
   const [profile, setProfile] = useState(MOCK_BUYER_PROFILE)
   const [firstName, setFirstName] = useState(profile.firstName)
   const [lastName, setLastName] = useState(profile.lastName)
   const [phone, setPhone] = useState(profile.phone)
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconUser}
         title="โปรไฟล์ส่วนตัว"
         description="จัดการข้อมูลบัญชีผู้ซื้อ ชื่อ-นามสกุล
           และเบอร์โทรศัพท์สำหรับติดต่อและรับสิทธิ์สมาชิก"
       />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-1">
           <Card className="overflow-hidden text-center">
@@ -73,7 +73,6 @@ export function ProfileContent() {
                 {profile.email}
               </p>
             </CardContent>
-
             <div className="bg-muted/10 text-muted-foreground flex items-center justify-between border-t px-4 py-2.5 text-left text-[11px]">
               <span className="flex items-center gap-1">
                 <IconCalendarTime size={14} /> วันที่เริ่มใช้งาน:
@@ -84,7 +83,6 @@ export function ProfileContent() {
             </div>
           </Card>
         </div>
-
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-sm font-bold">
@@ -120,7 +118,6 @@ export function ProfileContent() {
                 />
               </div>
             </div>
-
             <div className="max-w-md space-y-1.5">
               <Label
                 htmlFor="by-email"
@@ -135,7 +132,6 @@ export function ProfileContent() {
                 className="bg-muted text-muted-foreground font-mono text-xs"
               />
             </div>
-
             <div className="max-w-md space-y-1.5">
               <Label
                 htmlFor="by-phone"
@@ -170,6 +166,6 @@ export function ProfileContent() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }

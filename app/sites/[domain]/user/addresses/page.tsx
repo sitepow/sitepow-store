@@ -14,6 +14,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -69,7 +70,7 @@ const MOCK_ADDRESSES: UserAddress[] = [
   },
 ]
 
-export function AddressesContent() {
+export default function StoreUserAddressesPage() {
   const [addresses, setAddresses] = useState(MOCK_ADDRESSES)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null)
@@ -138,7 +139,7 @@ export function AddressesContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconMapPin}
         title="ที่อยู่จัดส่งของฉัน"
@@ -172,7 +173,6 @@ export function AddressesContent() {
                   และช่องทางติดต่อของผู้รับปลายทางให้ชัดเจนเพื่อป้องกันพัสดุตีกลับ
                 </DialogDescription>
               </DialogHeader>
-
               <form onSubmit={handleSubmit} className="space-y-4 pt-2 text-xs">
                 <div className="space-y-1.5">
                   <Label htmlFor="ad-title" className="font-semibold">
@@ -187,7 +187,6 @@ export function AddressesContent() {
                     className="text-xs"
                   />
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="ad-receiver" className="font-semibold">
@@ -216,7 +215,6 @@ export function AddressesContent() {
                     />
                   </div>
                 </div>
-
                 <div className="space-y-1.5">
                   <Label htmlFor="ad-details" className="font-semibold">
                     ที่อยู่โดยละเอียด
@@ -250,7 +248,6 @@ export function AddressesContent() {
           </Dialog>
         }
       />
-
       {addresses.length === 0 ? (
         <div className="text-muted-foreground rounded-2xl border border-dashed py-16 text-center text-xs">
           คุณยังไม่มีข้อมูลที่อยู่จัดส่งในระบบ
@@ -295,7 +292,6 @@ export function AddressesContent() {
                   )}
                 </div>
               </CardHeader>
-
               <CardContent className="text-muted-foreground grow space-y-3 pb-4 text-xs">
                 <p className="text-foreground line-clamp-3 min-h-12 leading-relaxed">
                   {addr.details}
@@ -318,7 +314,6 @@ export function AddressesContent() {
                   </div>
                 </div>
               </CardContent>
-
               <CardFooter className="bg-muted/20 flex items-center justify-between gap-2 border-t px-4 py-2">
                 <div>
                   {!addr.isDefault ? (
@@ -335,7 +330,6 @@ export function AddressesContent() {
                     </span>
                   )}
                 </div>
-
                 <div className="flex shrink-0 gap-0.5">
                   <Button
                     variant="ghost"
@@ -361,6 +355,6 @@ export function AddressesContent() {
           ))}
         </div>
       )}
-    </div>
+    </BuyerLayout>
   )
 }

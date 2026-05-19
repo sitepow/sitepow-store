@@ -15,6 +15,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { BuyerLayout } from '@/components/layout/BuyerLayout'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +40,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 
-export function SettingsContent() {
+export default function StoreUserSettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -54,14 +55,13 @@ export function SettingsContent() {
   const [marketingNotify, setMarketingNotify] = useState(false)
 
   return (
-    <div className="space-y-6">
+    <BuyerLayout>
       <PageTabHeader
         icon={IconSettings}
         title="ตั้งค่าบัญชีและความเป็นส่วนตัว"
         description="จัดการความปลอดภัยของรหัสผ่าน การรับข้อมูลแจ้งเตือน
           และรักษาสิทธิ์ของข้อมูลส่วนบุคคล (PDPA) ของคุณ"
       />
-
       <div className="grid grid-cols-1 gap-6">
         <Card className="shadow-sm">
           <CardHeader>
@@ -113,7 +113,6 @@ export function SettingsContent() {
                   </button>
                 </div>
               </div>
-
               <div className="space-y-1.5">
                 <Label
                   htmlFor="new-pass"
@@ -148,7 +147,6 @@ export function SettingsContent() {
                   </button>
                 </div>
               </div>
-
               <div className="space-y-1.5">
                 <Label
                   htmlFor="confirm-pass"
@@ -194,7 +192,6 @@ export function SettingsContent() {
             </Button>
           </CardFooter>
         </Card>
-
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center gap-1.5 text-sm font-bold">
@@ -222,7 +219,6 @@ export function SettingsContent() {
                 onCheckedChange={setOrderNotify}
               />
             </div>
-
             <div className="flex items-center justify-between pt-1">
               <div className="mr-4 space-y-1">
                 <Label
@@ -244,7 +240,6 @@ export function SettingsContent() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="border-red-200/60 bg-red-50/10 shadow-sm dark:border-red-950 dark:bg-red-950/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-1.5 text-sm font-bold text-red-600 dark:text-red-400">
@@ -277,7 +272,6 @@ export function SettingsContent() {
                 ร้องขอไฟล์ข้อมูล
               </Button>
             </div>
-
             <div className="bg-background flex flex-col justify-between gap-3 rounded-xl border border-red-200 p-4 shadow-sm sm:flex-row sm:items-center dark:border-red-900">
               <div className="space-y-0.5">
                 <span className="flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
@@ -289,7 +283,6 @@ export function SettingsContent() {
                   &quot;การถูกลืม&quot; (Right to Erasure)
                 </span>
               </div>
-
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -347,6 +340,6 @@ export function SettingsContent() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </BuyerLayout>
   )
 }
