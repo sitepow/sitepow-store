@@ -37,7 +37,6 @@ export default function StoreUserProfilePage() {
           firstName={firstName}
           lastName={lastName}
           email={profile.email}
-          joinedDate={profile.joinedDate}
           className="col-span-1 xl:col-span-4"
         />
         <BuyerProfileForm
