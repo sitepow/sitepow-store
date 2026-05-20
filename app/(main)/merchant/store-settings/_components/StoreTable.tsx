@@ -1,6 +1,7 @@
 'use client'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { Plan } from '@/generated/prisma/enums'
 import { IconEdit, IconExternalLink } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -14,13 +15,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { PLAN_DETAILS, PlanType } from './planDetails'
+import { PLAN_DETAILS } from './planDetails'
 
 interface Store {
   id: string
   name: string
   slug: string
-  plan: PlanType
+  plan: Plan
   status: string
   createdAt: string
 }
