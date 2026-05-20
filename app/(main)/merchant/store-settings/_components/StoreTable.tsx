@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { PLAN_DETAILS } from './planDetails'
+import { PLAN_DETAILS } from '../../../../../config/planDetails'
 
 interface Store {
   id: string
