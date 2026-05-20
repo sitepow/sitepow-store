@@ -7,7 +7,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { formatDate } from '@/utils/date'
-import { IconEdit, IconExternalLink } from '@tabler/icons-react'
+import { IconEdit, IconExternalLink, IconTrash } from '@tabler/icons-react'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -109,9 +109,12 @@ export function StoreTable() {
                     <TableCell className="text-muted-foreground text-sm">
                       {formattedDate}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="space-x-2 text-right">
                       <Button variant="outline" size="icon">
-                        <IconEdit size={16} />
+                        <IconEdit />
+                      </Button>
+                      <Button variant="outline" size="icon">
+                        <IconTrash />
                       </Button>
                     </TableCell>
                   </TableRow>
