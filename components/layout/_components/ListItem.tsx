@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ComponentType } from 'react'
 
 import Link from 'next/link'
 
@@ -8,15 +8,18 @@ export function ListItem({
   title,
   children,
   href,
-  icon,
+  icon: Icon,
   ...props
-}: React.ComponentPropsWithoutRef<'li'> & { href: string; icon?: ReactNode }) {
+}: React.ComponentPropsWithoutRef<'li'> & {
+  href: string
+  icon?: ComponentType<{ className?: string; size?: number }>
+}) {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
         <Link href={href}>
           <div className="flex flex-col gap-1 text-sm">
-            {icon && <div className="text-primary mb-2.5">{icon}</div>}
+            {Icon && <Icon className="text-primary mb-2" />}
             <div className="leading-none font-medium">{title}</div>
             {children && (
               <div className="text-muted-foreground line-clamp-2">

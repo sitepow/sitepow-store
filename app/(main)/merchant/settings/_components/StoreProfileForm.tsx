@@ -107,7 +107,6 @@ export function StoreProfileForm() {
           }
         />
       </CardHeader>
-
       <CardContent className="space-y-6">
         <Field>
           <FieldLabel className="text-sm font-medium tracking-tight text-neutral-900">
@@ -127,7 +126,6 @@ export function StoreProfileForm() {
             </div>
           </div>
         </Field>
-
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Field>
             <FieldLabel>ชื่อร้านค้า / ชื่อจดทะเบียนพาณิชย์</FieldLabel>
@@ -138,23 +136,21 @@ export function StoreProfileForm() {
               onChange={(e) => handleFieldChange('name', e.target.value)}
             />
           </Field>
-
           <Field>
             <FieldLabel>Store URL Slug (ลิงก์หลักระบบ Sale Page)</FieldLabel>
             <div className="flex items-center overflow-hidden rounded-md shadow-sm">
-              <span className="border-input bg-muted text-muted-foreground flex h-9 items-center border border-r-0 px-3 font-mono text-sm select-none">
+              <span className="border-input bg-muted text-muted-foreground flex h-9 items-center border border-r-0 px-3 text-sm select-none">
                 sitepow.store/
               </span>
               <Input
                 id="st-slug"
-                className="rounded-l-none font-mono"
+                className="rounded-l-none"
                 placeholder="my-shop-slug"
                 value={currentStoreConfig?.slug || ''}
                 onChange={(e) => handleFieldChange('slug', e.target.value)}
               />
             </div>
           </Field>
-
           <Field>
             <FieldLabel>
               อีเมลติดต่อและส่งใบแจ้งหนี้หลัก (Store Email)
@@ -167,7 +163,6 @@ export function StoreProfileForm() {
               onChange={(e) => handleFieldChange('email', e.target.value)}
             />
           </Field>
-
           <Field>
             <FieldLabel>เลขประจำตัวผู้เสียภาษี 13 หลัก (Tax ID)</FieldLabel>
             <Input
@@ -179,7 +174,6 @@ export function StoreProfileForm() {
               onChange={(e) => handleFieldChange('taxId', e.target.value)}
             />
           </Field>
-
           <Field>
             <FieldLabel>
               ข้อความสโลแกนหรือเงื่อนไขท้ายใบเสร็จ (Receipt Footer Note)
@@ -196,7 +190,6 @@ export function StoreProfileForm() {
           </Field>
         </div>
       </CardContent>
-
       <CardFooter className="flex justify-end border-t">
         <Button size="sm" onClick={handleSave} disabled={isSaving}>
           {isSaving ? (

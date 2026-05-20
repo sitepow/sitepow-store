@@ -4,6 +4,8 @@ import { type VariantProps, cva } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
+import { PageTabHeaderIcon } from './PageTabHeaderIcon'
+
 const pageTabHeaderVariants = cva(
   'flex flex-wrap gap-4 sm:items-center sm:justify-between border-b border-border/60 pb-6 mb-6',
   {
@@ -37,7 +39,6 @@ export function PageTabHeader({
   ...props
 }: PageTabHeaderProps) {
   const isSecondary = variant === 'secondary'
-  const iconSize = isSecondary ? 18 : 22
 
   return (
     <div
@@ -50,21 +51,7 @@ export function PageTabHeader({
           endContent && 'lg:w-1/2',
         )}
       >
-        {Icon && (
-          <div
-            className={cn(
-              'border-border/50 bg-muted/30 flex items-center justify-center rounded-lg border',
-              isSecondary ? 'p-1.5' : 'mt-0.5 p-2',
-            )}
-          >
-            <Icon
-              className={cn(
-                isSecondary ? 'text-muted-foreground' : 'text-foreground/80',
-              )}
-              size={iconSize}
-            />
-          </div>
-        )}
+        {Icon && <PageTabHeaderIcon icon={Icon} />}
 
         <div className="space-y-1">
           <h2

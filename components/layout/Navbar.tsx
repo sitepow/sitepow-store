@@ -59,7 +59,7 @@ export function Navbar() {
                           {item.title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <ul className="grid w-100 gap-3 p-4 md:w-125 md:grid-cols-2 lg:w-150">
+                          <ul className="grid w-100 gap-3 p-4 md:w-2xl md:grid-cols-3 lg:w-3xl">
                             {item.children.map(({ description, ...rest }) => (
                               <ListItem key={rest.title} {...rest}>
                                 {description}
