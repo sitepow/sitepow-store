@@ -1,9 +1,17 @@
 'use client'
 
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { Plan } from '@/generated/prisma/enums'
-import { IconEdit, IconExternalLink } from '@tabler/icons-react'
+import { useState } from 'react'
 
+import { getStores } from '@/actions/store'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { PLAN_DETAILS } from '@/config/planDetails'
+import { StoreStatus } from '@/generated/prisma/enums'
+import { formatDate } from '@/utils/date'
+import { IconEdit, IconExternalLink } from '@tabler/icons-react'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+
+import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,22 +23,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { PLAN_DETAILS } from '../../../../../config/planDetails'
+export function StoreTable() {
+  const [page, setPage] = useState(1)
 
-interface Store {
-  id: string
-  name: string
-  slug: string
-  plan: Plan
-  status: string
-  createdAt: string
-}
+  const { data: { data: stores = [], meta } = {}, isLoading } = useQuery(
+    queryOptions({
+      queryKey: ['stores', { page }],
+      queryFn: async () => await getStores({ page }),
+      placeholderData: (previousData) => previousData,
+    }),
+  )
 
-interface StoreTableProps {
-  stores: Store[]
-}
-
-export function StoreTable({ stores }: StoreTableProps) {
   return (
     <>
       <div className="overflow-hidden rounded-xl border">
@@ -46,49 +49,86 @@ export function StoreTable({ stores }: StoreTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {stores.map((store) => {
-              const isActive = store.status === 'ACTIVE'
-              return (
-                <TableRow key={store.id}>
-                  <TableCell>
-                    <span className="font-medium">{store.name}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-muted-foreground flex items-center gap-1">
-                      <span>myshop.com/{store.slug}</span>
-                      <a
-                        href={`https://myshop.com/${store.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-primary transition-colors"
+            {isLoading && stores.length === 0 && (
+              <TableLoadingRow colSpan={6} />
+            )}
+            {!isLoading && stores.length === 0 && (
+              <TableEmptyRow colSpan={6} title="ไม่พบข้อมูลร้านค้าของคุณ" />
+            )}
+            {stores.length !== 0 &&
+              stores.map((store) => {
+                const isActive = store.status === StoreStatus.ACTIVE
+                const isMaintenance = store.status === StoreStatus.MAINTENANCE
+
+                const formattedDate = store.createdAt
+                  ? formatDate(store.createdAt)
+                  : '-'
+
+                return (
+                  <TableRow key={store.id}>
+                    <TableCell>
+                      <span className="text-foreground font-medium">
+                        {store.name}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+                        <span>sitepow.store/{store.slug}</span>
+                        <a
+                          href={`https://${store.slug}.sitepow.store`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-primary text-muted-foreground/70 transition-colors"
+                        >
+                          <IconExternalLink size={16} />
+                        </a>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="font-normal">
+                        {PLAN_DETAILS[store.plan]?.name || store.plan}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          isActive
+                            ? 'default'
+                            : isMaintenance
+                              ? 'outline'
+                              : 'destructive'
+                        }
                       >
-                        <IconExternalLink size={18} />
-                      </a>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {PLAN_DETAILS[store.plan].name}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={isActive ? 'default' : 'secondary'}>
-                      {isActive ? 'เปิดใช้งานอยู่' : 'ปิดการใช้งาน'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{store.createdAt}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="icon-lg">
-                      <IconEdit />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+                        {isActive
+                          ? 'เปิดใช้งานอยู่'
+                          : isMaintenance
+                            ? 'ปิดปรับปรุงชั่วคราว'
+                            : 'ถูกระงับการใช้งาน'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {formattedDate}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="icon">
+                        <IconEdit size={16} />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {meta && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(targetPage) => setPage(targetPage)}
+        />
+      )}
     </>
   )
 }
