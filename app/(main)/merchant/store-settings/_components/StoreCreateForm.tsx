@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 
 import { Plan } from '@/generated/prisma/enums'
+import { formatNumber } from '@/utils/pricing'
 import { IconPlus } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -177,7 +178,7 @@ export function StoreCreateForm() {
                         </div>
                         <div className="shrink-0 text-right">
                           <b className="text-primary text-xl">
-                            {plan.price} -.
+                            {formatNumber(plan.price)} -.
                           </b>
                           <span className="text-muted-foreground block text-[10px]">
                             /เดือน
