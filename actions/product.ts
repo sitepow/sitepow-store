@@ -1,5 +1,6 @@
 'use server'
 
+import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
 
 import { prisma } from '@/lib/prisma'
@@ -13,6 +14,12 @@ const productSelect = {
     select: {
       id: true,
       title: true,
+    },
+  },
+  store: {
+    select: {
+      id: true,
+      name: true,
     },
   },
   images: {
@@ -37,7 +44,7 @@ export type GetProductsItem = Prisma.ProductGetPayload<{
 }>
 
 export interface GetProductsParams {
-  storeId: string
+  storeId?: string
   page?: number
   limit?: number
   search?: string
@@ -63,7 +70,10 @@ export async function getProducts({
   search,
   categoryId,
 }: GetProductsParams): Promise<GetProductsResponse> {
-  if (!storeId) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
     return {
       data: [],
       meta: {
@@ -82,8 +92,13 @@ export async function getProducts({
     const sanitizedLimit = Math.max(1, Math.min(50, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.ProductWhereInput = {
-      storeId: storeId,
+    const whereClause: Prisma.ProductWhereInput = {}
+
+    if (storeId && storeId !== 'all' && storeId !== '') {
+      whereClause.storeId = storeId
+      whereClause.store = { ownerId: userId }
+    } else {
+      whereClause.store = { ownerId: userId }
     }
 
     if (search) {

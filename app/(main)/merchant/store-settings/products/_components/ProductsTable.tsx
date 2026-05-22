@@ -49,6 +49,7 @@ export function ProductsTable({
             <TableRow>
               <TableHead>รหัส</TableHead>
               <TableHead>ชื่อสินค้า</TableHead>
+              <TableHead>ร้านค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>
               <TableHead>ราคาเริ่มต้น</TableHead>
               <TableHead>สถานะ</TableHead>
@@ -78,6 +79,11 @@ export function ProductsTable({
                           </span>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {product.store?.name ?? ''}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
