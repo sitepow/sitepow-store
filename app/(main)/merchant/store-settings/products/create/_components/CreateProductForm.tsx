@@ -7,7 +7,7 @@ import {
   useForm,
 } from 'react-hook-form'
 
-import { generateProductAiAction } from '@/actions/product'
+import { generateProductAiAction } from '@/actions/ai'
 import { DiscountType, MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
