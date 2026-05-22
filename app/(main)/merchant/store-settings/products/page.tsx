@@ -27,7 +27,7 @@ export default function MerchantStoreSettingsProductsPage() {
           />
         }
       />
-      <ProductsTable />
+      <ProductsTable storeId={selectedStoreId} />
     </DashboardSidebar>
   )
 }

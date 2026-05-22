@@ -1,7 +1,14 @@
+'use client'
+
+import { useState } from 'react'
+
+import { useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency } from '@/utils/pricing'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 
+import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,43 +20,27 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-const products = [
-  {
-    id: 'PROD-001',
-    name: 'เสื้อยืด Minimalist White',
-    category: 'เสื้อผ้า',
-    price: 350,
-    status: 'active',
-    inventory: [
-      { branchName: 'สาขาสยาม', stock: 50 },
-      { branchName: 'สาขาเซ็นทรัลลาดพร้าว', stock: 70 },
-    ],
-  },
-  {
-    id: 'PROD-002',
-    name: 'กางเกงยีนส์ Chino Slim Fit',
-    category: 'เสื้อผ้า',
-    price: 890,
-    status: 'active',
-    inventory: [
-      { branchName: 'สาขาสยาม', stock: 15 },
-      { branchName: 'สาขาออนไลน์', stock: 30 },
-    ],
-  },
-  {
-    id: 'PROD-003',
-    name: 'กระเป๋าผ้า Canvas Eco',
-    category: 'เครื่องประดับ',
-    price: 150,
-    status: 'out_of_stock',
-    inventory: [
-      { branchName: 'สาขาสยาม', stock: 0 },
-      { branchName: 'สาขาออนไลน์', stock: 0 },
-    ],
-  },
-]
+interface ProductsTableProps {
+  storeId: string
+  search?: string
+  categoryId?: string
+}
 
-export function ProductsTable() {
+export function ProductsTable({
+  storeId,
+  search,
+  categoryId,
+}: ProductsTableProps) {
+  const [page, setPage] = useState(1)
+
+  const { data: { data: products = [], meta } = {}, isLoading } = useProducts({
+    storeId,
+    page,
+    limit: 10,
+    search,
+    categoryId,
+  })
+
   return (
     <>
       <div className="rounded-md border">
@@ -59,59 +50,68 @@ export function ProductsTable() {
               <TableHead>รหัส</TableHead>
               <TableHead>ชื่อสินค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>
-              <TableHead>ราคา</TableHead>
-              <TableHead>สต็อก (แยกสาขา)</TableHead>
+              <TableHead>ราคาเริ่มต้น</TableHead>
               <TableHead>สถานะ</TableHead>
-              <TableHead>จัดการ</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => {
-              const totalStock = product.inventory.reduce(
-                (acc, curr) => acc + curr.stock,
-                0,
-              )
+            {isLoading && products.length === 0 ? (
+              <TableLoadingRow colSpan={6} />
+            ) : products.length === 0 ? (
+              <TableEmptyRow colSpan={6} title="ไม่พบรายการสินค้า" />
+            ) : (
+              products.map((product) => {
+                const basePrice = product.variants?.[0]?.price
+                  ? Number(product.variants[0].price)
+                  : 0
 
-              return (
-                <TableRow key={product.id}>
-                  <TableCell>{product.id}</TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{product.category}</Badge>
-                  </TableCell>
-                  <TableCell>{formatCurrency(product.price)}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {product.inventory.map((inv, idx) => (
-                        <Badge key={idx} variant="outline">
-                          <span>{inv.branchName}</span>
-                          <span> {formatNumber(inv.stock)}</span>
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {totalStock > 0 ? (
+                return (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.id}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col">
+                          <span>{product.title}</span>
+                          <span className="text-muted-foreground text-xs">
+                            {product.slug}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {product.category?.title ?? ''}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatCurrency(basePrice)}</TableCell>
+                    <TableCell>
                       <Badge>พร้อมขาย</Badge>
-                    ) : (
-                      <Badge variant="destructive">สินค้าหมด</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="space-x-2">
-                    <Button variant="outline" size="icon-lg">
-                      <IconEdit />
-                    </Button>
-                    <Button variant="outline" size="icon-lg">
-                      <IconTrash />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
+                    </TableCell>
+                    <TableCell className="space-x-2 text-right">
+                      <Button variant="outline" size="icon-lg">
+                        <IconEdit />
+                      </Button>
+                      <Button variant="outline" size="icon-lg">
+                        <IconTrash />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            )}
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
     </>
   )
 }
