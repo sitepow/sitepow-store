@@ -3,32 +3,22 @@
 import { useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconFilter } from '@tabler/icons-react'
+import { Plan, SubStatus } from '@/generated/prisma/enums'
 import { Receipt } from 'lucide-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import { MerchantInvoiceTable } from './_components/MerchantInvoiceTable'
 import { MerchantSubscriptionTable } from './_components/MerchantSubscriptionTable'
-
-type PlanType = 'STARTER' | 'PRO' | 'ULTIMATE'
-type SubStatusType = 'ACTIVE' | 'PAST_DUE' | 'CANCELED' | 'EXPIRED'
 
 const MOCK_USER_STORES = [
   {
     id: 'store-1',
     name: 'เสื้อผ้าแฟชั่นสไตล์เกาหลี มินิมอล',
-    plan: 'PRO' as PlanType,
-    status: 'ACTIVE' as SubStatusType,
+    plan: 'PRO' as Plan,
+    status: 'ACTIVE' as SubStatus,
     isTrial: true,
     daysRemaining: 8,
     totalDays: 14,
@@ -37,8 +27,8 @@ const MOCK_USER_STORES = [
   {
     id: 'store-2',
     name: 'ร้านกาแฟหอมกรุ่น Cafe & Bakery',
-    plan: 'STARTER' as PlanType,
-    status: 'ACTIVE' as SubStatusType,
+    plan: 'STARTER' as Plan,
+    status: 'ACTIVE' as SubStatus,
     isTrial: false,
     daysRemaining: 0,
     totalDays: 0,
@@ -47,8 +37,8 @@ const MOCK_USER_STORES = [
   {
     id: 'store-3',
     name: 'Gadget & IT Accessories',
-    plan: 'ULTIMATE' as PlanType,
-    status: 'PAST_DUE' as SubStatusType,
+    plan: 'ULTIMATE' as Plan,
+    status: 'PAST_DUE' as SubStatus,
     isTrial: false,
     daysRemaining: 3,
     totalDays: 7,
@@ -107,27 +97,10 @@ export default function MerchantBillingSubscriptionPage() {
         title="การจัดการสมาชิกและค่าบริการ"
         description="ตรวจสอบข้อมูลแพลนรายเดือนและประวัติใบเสร็จแยกตามรายร้านค้าของคุณ"
         endContent={
-          <Field>
-            <FieldLabel>
-              <IconFilter size={14} />
-              กรองตามร้านค้า
-            </FieldLabel>
-            <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
-              <SelectTrigger className="w-full sm:w-64">
-                <SelectValue placeholder="เลือกดูทุกร้านค้า" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  ทุกร้านค้า ({MOCK_USER_STORES.length})
-                </SelectItem>
-                {MOCK_USER_STORES.map((store) => (
-                  <SelectItem key={store.id} value={store.id}>
-                    {store.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <MerchantSubscriptionTable stores={filteredStores} />

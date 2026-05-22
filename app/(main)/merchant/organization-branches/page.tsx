@@ -3,21 +3,13 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconFilter, IconHierarchy } from '@tabler/icons-react'
+import { IconHierarchy } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import { BranchListTable } from './_components/BranchListTable'
-import { CreateBranchDialog } from './_components/CreateBranchDialog'
 
 export interface Branch {
   id: string
@@ -71,8 +63,8 @@ const MOCK_BRANCHES_DATA: Branch[] = [
 ]
 
 export default function MerchantOrganizationBranchesPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
-  const [branches, setBranches] = useState<Branch[]>(MOCK_BRANCHES_DATA)
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const [branches] = useState<Branch[]>(MOCK_BRANCHES_DATA)
 
   const filteredBranches = useMemo(() => {
     if (!branches) {
@@ -82,10 +74,6 @@ export default function MerchantOrganizationBranchesPage() {
     return branches.filter((branch) => branch.storeId === selectedStoreId)
   }, [branches, selectedStoreId])
 
-  const handleBranchCreated = (newBranch: Branch) => {
-    setBranches((prev) => [...prev, newBranch])
-  }
-
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -93,37 +81,10 @@ export default function MerchantOrganizationBranchesPage() {
         title="การจัดการสาขา"
         description="บริหารจัดการที่ตั้งสาขาและคลังหน้าร้าน เพื่อใช้ควบคุมสิทธิ์พนักงานและกระจายสต็อกสินค้าคงคลังให้แม่นยำ"
         endContent={
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-            <Field className="w-fit">
-              <FieldLabel className="flex items-center gap-1.5">
-                <IconFilter size={14} />
-                กรองตามร้านค้า
-              </FieldLabel>
-              <Select
-                value={selectedStoreId}
-                onValueChange={setSelectedStoreId}
-              >
-                <SelectTrigger className="w-full sm:w-60">
-                  <SelectValue placeholder="เลือกร้านค้าเพื่อดูสาขา" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="store-1">
-                    เสื้อผ้าแฟชั่นสไตล์เกาหลี มินิมอล
-                  </SelectItem>
-                  <SelectItem value="store-2">
-                    ร้านกาแฟหอมกรุ่น Cafe & Bakery
-                  </SelectItem>
-                  <SelectItem value="store-3">
-                    Gadget & IT Accessories
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <CreateBranchDialog
-              selectedStoreId={selectedStoreId}
-              onBranchCreated={handleBranchCreated}
-            />
-          </div>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <BranchListTable branches={filteredBranches} />

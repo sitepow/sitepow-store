@@ -3,21 +3,13 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconFilter, IconTicket } from '@tabler/icons-react'
+import { IconTicket } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import { CouponListTable } from './_components/CouponListTable'
-import { CreateCouponDialog } from './_components/CreateCouponDialog'
 
 export type DiscountType = 'FIXED_AMOUNT' | 'PERCENTAGE'
 
@@ -97,8 +89,8 @@ const MOCK_COUPONS: Coupon[] = [
 ]
 
 export default function MerchantMarketingCouponsPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
-  const [coupons, setCoupons] = useState<Coupon[]>(MOCK_COUPONS)
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const [coupons] = useState<Coupon[]>(MOCK_COUPONS)
 
   const filteredCoupons = useMemo(() => {
     return coupons.filter((coupon) => coupon.storeId === selectedStoreId)
@@ -108,10 +100,6 @@ export default function MerchantMarketingCouponsPage() {
     return MOCK_BRANCHES[selectedStoreId] || []
   }, [selectedStoreId])
 
-  const handleCouponCreated = (newCoupon: Coupon) => {
-    setCoupons((prev) => [...prev, newCoupon])
-  }
-
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -119,38 +107,10 @@ export default function MerchantMarketingCouponsPage() {
         title="คูปองส่วนลดและการตลาด"
         description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
         endContent={
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-            <Field className="w-fit">
-              <FieldLabel className="flex items-center gap-1.5">
-                <IconFilter size={14} />
-                กรองตามร้านค้า
-              </FieldLabel>
-              <Select
-                value={selectedStoreId}
-                onValueChange={setSelectedStoreId}
-              >
-                <SelectTrigger className="w-full sm:w-60">
-                  <SelectValue placeholder="เลือกแบรนด์ร้านค้า" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="store-1">
-                    เสื้อผ้าแฟชั่นสไตล์เกาหลี มินิมอล
-                  </SelectItem>
-                  <SelectItem value="store-2">
-                    ร้านกาแฟหอมกรุ่น Cafe &
-                  </SelectItem>
-                  <SelectItem value="store-3">
-                    Gadget & IT Accessories
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <CreateCouponDialog
-              selectedStoreId={selectedStoreId}
-              currentStoreBranches={currentStoreBranches}
-              onCouponCreated={handleCouponCreated}
-            />
-          </div>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <CouponListTable

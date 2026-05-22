@@ -13,6 +13,11 @@ interface GetStoresParams {
   plan?: Plan
 }
 
+const storeDropdownSelect = {
+  id: true,
+  name: true,
+} satisfies Prisma.StoreSelect
+
 const storeSelect = {
   id: true,
   name: true,
@@ -25,6 +30,10 @@ const storeSelect = {
 
 export type GetStoresItem = Prisma.StoreGetPayload<{
   select: typeof storeSelect
+}>
+
+export type GetStoreOptionsItem = Prisma.StoreGetPayload<{
+  select: typeof storeDropdownSelect
 }>
 
 export interface GetStoresResponse {
@@ -125,5 +134,32 @@ export async function getStores({
         hasPreviousPage: false,
       },
     }
+  }
+}
+
+export async function getStoreOptions(filters?: {
+  search?: string
+  status?: StoreStatus
+}): Promise<GetStoreOptionsItem[]> {
+  try {
+    const whereClause: Prisma.StoreWhereInput = {}
+
+    if (filters?.search) {
+      whereClause.name = { contains: filters.search, mode: 'insensitive' }
+    }
+
+    if (filters?.status) {
+      whereClause.status = filters.status
+    }
+
+    return await prisma.store.findMany({
+      where: whereClause,
+      select: storeDropdownSelect,
+      orderBy: {
+        name: 'asc',
+      },
+    })
+  } catch {
+    return []
   }
 }

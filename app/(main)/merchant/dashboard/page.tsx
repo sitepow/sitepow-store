@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -18,6 +20,7 @@ import {
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -39,6 +42,8 @@ import {
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 export default function MerchantDashboardPage() {
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+
   const LOW_STOCK_PRODUCTS = [
     {
       id: 'PROD-003',
@@ -161,6 +166,10 @@ export default function MerchantDashboardPage() {
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+      <StoreSelectField
+        value={selectedStoreId}
+        onValueChange={setSelectedStoreId}
+      />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS_DATA.map((stat, index) => (
           <StatsCard

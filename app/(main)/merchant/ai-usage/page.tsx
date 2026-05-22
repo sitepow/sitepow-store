@@ -3,18 +3,11 @@
 import { useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconFilter, IconSparkles } from '@tabler/icons-react'
+import { IconSparkles } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import { AiUsageLog, AiUsageLogTable } from './_components/AiUsageLogTable'
 import {
@@ -112,27 +105,10 @@ export default function MerchantAiUsagePage() {
         title="เครดิตและการใช้งาน AI"
         description="ตรวจสอบปริมาณการทำงานของระบบ AI Vision คัดกรองสลิป และ AI Search ค้นหาสินค้าจากคลังรูปภาพ"
         endContent={
-          <Field>
-            <FieldLabel>
-              <IconFilter size={14} />
-              กรองตามร้านค้า
-            </FieldLabel>
-            <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
-              <SelectTrigger className="w-full sm:w-64">
-                <SelectValue placeholder="เลือกดูทุกร้านค้า" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  ร้านค้าทั้งหมด ({MOCK_STORE_AI_CREDITS.length})
-                </SelectItem>
-                {MOCK_STORE_AI_CREDITS.map((store) => (
-                  <SelectItem key={store.id} value={store.id}>
-                    {store.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <StoreAiCreditTable stores={filteredStores} />

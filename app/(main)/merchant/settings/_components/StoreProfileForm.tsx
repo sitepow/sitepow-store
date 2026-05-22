@@ -5,23 +5,16 @@ import { useState } from 'react'
 import {
   IconBuildingStore,
   IconDeviceFloppy,
-  IconFilter,
   IconLoader2,
   IconPhoto,
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 
 const MOCK_STORES_SETTINGS = {
@@ -50,7 +43,7 @@ const MOCK_STORES_SETTINGS = {
 }
 
 export function StoreProfileForm() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
   const [storeConfigs, setStoreConfigs] = useState(MOCK_STORES_SETTINGS)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -83,27 +76,10 @@ export function StoreProfileForm() {
           title="ข้อมูลโปรไฟล์แบรนด์และร้านค้าหลัก"
           description="แก้ไขข้อมูลสาขาหลัก, URL Slug หน้าระบบ และข้อมูลข้อความหมายเหตุที่จะปรากฏในกระดาษใบเสร็จ POS"
           endContent={
-            <Field>
-              <FieldLabel>
-                <IconFilter size={14} />
-                กรองตามร้านค้า
-              </FieldLabel>
-              <Select
-                value={selectedStoreId}
-                onValueChange={setSelectedStoreId}
-              >
-                <SelectTrigger className="w-full sm:w-60">
-                  <SelectValue placeholder="เลือกแบรนด์ที่ต้องการตั้งค่า" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(storeConfigs).map(([id, store]) => (
-                    <SelectItem key={id} value={id}>
-                      {store.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+            <StoreSelectField
+              value={selectedStoreId}
+              onValueChange={setSelectedStoreId}
+            />
           }
         />
       </CardHeader>

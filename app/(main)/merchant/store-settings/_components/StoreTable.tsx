@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 
-import { getStores } from '@/actions/store'
+import { useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { formatDate } from '@/utils/date'
 import { IconEdit, IconExternalLink, IconTrash } from '@tabler/icons-react'
-import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
@@ -26,13 +25,9 @@ import {
 export function StoreTable() {
   const [page, setPage] = useState(1)
 
-  const { data: { data: stores = [], meta } = {}, isLoading } = useQuery(
-    queryOptions({
-      queryKey: ['stores', { page }],
-      queryFn: async () => await getStores({ page }),
-      placeholderData: (previousData) => previousData,
-    }),
-  )
+  const { data: { data: stores = [], meta } = {}, isLoading } = useStores({
+    page,
+  })
 
   return (
     <>

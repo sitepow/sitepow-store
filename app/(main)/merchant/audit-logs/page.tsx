@@ -4,21 +4,14 @@ import { useMemo, useState } from 'react'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconEye, IconFilter, IconHistory } from '@tabler/icons-react'
+import { IconEye, IconHistory } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -106,7 +99,7 @@ const MOCK_ACTIVITY_LOGS: ActivityLogItem[] = [
 ]
 
 export default function MerchantAuditLogsPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
   const [actionFilter, setActionFilter] = useState<string>('all')
   const [actorFilter, setActorFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -147,26 +140,10 @@ export default function MerchantAuditLogsPage() {
         title="ประวัติกิจกรรมระบบ"
         description="ตรวจสอบบันทึก Log การกระทำและเข้าถึงข้อมูลอย่างละเอียด เพื่อความโปร่งใสและการรักษาความปลอดภัยภายในองค์กร"
         endContent={
-          <Field className="w-fit">
-            <FieldLabel>
-              <IconFilter size={14} />
-              กรองตามร้านค้า
-            </FieldLabel>
-            <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
-              <SelectTrigger className="bg-background w-full lg:w-60">
-                <SelectValue placeholder="เลือกบัญชีร้านค้า" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="store-1">
-                  เสื้อผ้าแฟชั่นสไตล์เกาหลี มินิมอล
-                </SelectItem>
-                <SelectItem value="store-2">
-                  ร้านกาแฟหอมกรุ่น Cafe & Bakery
-                </SelectItem>
-                <SelectItem value="store-3">Gadget & IT Accessories</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <AuditLogFilters

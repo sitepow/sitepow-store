@@ -3,18 +3,11 @@
 import { useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconCoin, IconFilter } from '@tabler/icons-react'
+import { IconCoin } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Field, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 import { CustomerPointsTable } from './_components/CustomerPointsTable'
 import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
@@ -81,7 +74,7 @@ const MOCK_CUSTOMER_POINTS = {
 }
 
 export default function MerchantLoyaltyPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('store-1')
+  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [settings, setSettings] = useState(MOCK_LOYALTY_SETTINGS)
 
@@ -117,26 +110,10 @@ export default function MerchantLoyaltyPage() {
         title="ระบบแต้มสะสม"
         description="ตั้งค่าเงื่อนไขการแจกแต้ม และบริหารจัดการคะแนนสมาชิกของแต่ละร้านค้า"
         endContent={
-          <Field>
-            <FieldLabel className="flex items-center gap-1.5">
-              <IconFilter size={14} />
-              กรองตามร้านค้า
-            </FieldLabel>
-            <Select value={selectedStoreId} onValueChange={setSelectedStoreId}>
-              <SelectTrigger className="w-full md:w-70">
-                <SelectValue placeholder="เลือกร้านค้า" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="store-1">
-                  เสื้อผ้าแฟชั่นสไตล์เกาหลี มินิมอล
-                </SelectItem>
-                <SelectItem value="store-2">
-                  ร้านกาแฟหอมกรุ่น Cafe & Bakery
-                </SelectItem>
-                <SelectItem value="store-3">Gadget & IT Accessories</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+          <StoreSelectField
+            value={selectedStoreId}
+            onValueChange={setSelectedStoreId}
+          />
         }
       />
       <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
