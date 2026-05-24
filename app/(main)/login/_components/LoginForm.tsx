@@ -55,14 +55,11 @@ export function LoginForm() {
     <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
         <div className="hidden w-full rounded-l-3xl bg-gray-200 lg:block" />
-
         <div className="sm:shadow-airy flex w-full flex-col items-center gap-8 rounded-3xl bg-white p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl">
           <SectionHeader title="เข้าสู่ระบบหลังบ้านของคุณ" />
-
           <div className="w-full max-w-md space-y-8">
             <div className="space-y-6">
               <ContentDivider name="ด้วย E-mail" />
-
               <div className="flex flex-col gap-3">
                 <Field>
                   <FieldLabel>E-mail</FieldLabel>
@@ -75,7 +72,6 @@ export function LoginForm() {
                   />
                   <FieldError>{errors?.email?.message}</FieldError>
                 </Field>
-
                 <Field>
                   <FieldLabel>รหัสผ่าน</FieldLabel>
                   <Input
@@ -86,7 +82,6 @@ export function LoginForm() {
                   />
                   <FieldError>{errors?.password?.message}</FieldError>
                 </Field>
-
                 <Button
                   onClick={handleSubmit((data) => mutate(data))}
                   className="col-span-7"
@@ -98,10 +93,8 @@ export function LoginForm() {
                 </Button>
               </div>
             </div>
-
             <div className="space-y-6">
               <ContentDivider name="ด้วยบัญชี Social" />
-
               <div className="flex w-full flex-wrap justify-center gap-4">
                 {LOGIN_PROVIDERS.map((provider, idx) => (
                   <div key={idx} className="shrink-0">
@@ -114,7 +107,6 @@ export function LoginForm() {
               </div>
             </div>
           </div>
-
           <p className="text-center text-sm text-slate-500">
             ยังไม่มีบัญชีใช่มั้ย?{' '}
             <a
@@ -126,7 +118,6 @@ export function LoginForm() {
           </p>
         </div>
       </div>
-
       <SupportContact />
     </div>
   )

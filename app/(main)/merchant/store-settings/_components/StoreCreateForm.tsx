@@ -1,10 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
+import { useCreateStore } from '@/actions/hooks/store'
 import { Plan } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
 import { formatNumber } from '@/utils/pricing'
-import { IconPlus } from '@tabler/icons-react'
+import { formatSlug } from '@/utils/slug'
+import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { IconLoader2, IconPlus } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -23,48 +29,81 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 import { cn } from '@/lib/utils'
 
 import { PLAN_DETAILS } from '../../../../../config/planDetails'
 
-function formatSlug(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9-ก-๙]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-}
-
 export function StoreCreateForm() {
+  const { user } = useSession()
   const [open, setOpen] = useState(false)
-  const [storeName, setStoreName] = useState('')
-  const [description, setDescription] = useState('')
-  const [storeSlug, setStoreSlug] = useState('')
-  const [phone, setPhone] = useState('')
-  const [lineId, setLineId] = useState('')
-  const [taxId, setTaxId] = useState('')
-  const [selectedPlan, setSelectedPlan] = useState<Plan>(Plan.STARTER)
+  const createStoreMutation = useCreateStore()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!storeName || !storeSlug) {
-      return
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CreateStoreFormValues>({
+    resolver: zodResolver(createStoreSchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      description: '',
+      phone: '',
+      lineId: '',
+      taxId: '',
+      plan: Plan.STARTER,
+    },
+  })
+
+  const storeName = watch('name')
+  const storeSlug = watch('slug')
+  const selectedPlan = watch('plan')
+
+  useEffect(() => {
+    if (storeName && !storeSlug) {
+      setValue('slug', formatSlug(storeName))
     }
+  }, [storeName, setValue, storeSlug])
 
-    setStoreName('')
-    setStoreSlug('')
-    setPhone('')
-    setLineId('')
-    setTaxId('')
-    setSelectedPlan(Plan.STARTER)
+  const handleClose = () => {
+    reset()
     setOpen(false)
   }
 
+  const onSubmit = (values: CreateStoreFormValues) => {
+    createStoreMutation.mutate(
+      {
+        ...values,
+        slug: formatSlug(values.slug),
+        ownerId: user?.id ?? '',
+      },
+      {
+        onSuccess: () => {
+          handleClose()
+        },
+      },
+    )
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) handleClose()
+        else setOpen(v)
+      }}
+    >
       <DialogTrigger asChild>
         <Button className="gap-2">
           <IconPlus size={16} />
@@ -79,22 +118,22 @@ export function StoreCreateForm() {
             พร้อมเลือกแพลนเริ่มต้นใช้งานของคุณ
           </DialogDescription>
         </DialogHeader>
+
         <form
-          onSubmit={handleSubmit}
+          id="store-create-form"
+          onSubmit={handleSubmit(onSubmit)}
           className="grid gap-5 space-y-5 sm:grid-cols-2"
         >
           <Field>
             <FieldLabel>ชื่อร้านค้า</FieldLabel>
             <Input
               placeholder="เช่น เสื้อผ้าเด็กมินิมอล"
-              value={storeName}
-              onChange={(e) => {
-                setStoreName(e.target.value)
-                if (!storeSlug) setStoreSlug(e.target.value)
-              }}
-              required
+              {...register('name')}
+              disabled={createStoreMutation.isPending}
             />
+            <FieldError>{errors?.name?.message}</FieldError>
           </Field>
+
           <Field>
             <FieldLabel>URL หน้าร้าน (Slug)</FieldLabel>
             <div className="flex">
@@ -104,54 +143,70 @@ export function StoreCreateForm() {
               <Input
                 placeholder="minimal-kids"
                 className="rounded-l-none"
-                value={storeSlug}
-                onChange={(e) => setStoreSlug(e.target.value)}
-                required
+                {...register('slug')}
+                disabled={createStoreMutation.isPending}
               />
             </div>
-            {storeSlug && (
-              <FieldDescription>
-                ลิงก์ร้านค้าของคุณ{' '}
-                <span className="text-foreground font-medium">
-                  https://{formatSlug(storeSlug)}.sitepow.store
-                </span>
-              </FieldDescription>
+            {errors?.slug?.message ? (
+              <FieldError>{errors?.slug?.message}</FieldError>
+            ) : (
+              storeSlug && (
+                <FieldDescription>
+                  ลิงก์ร้านค้าของคุณ{' '}
+                  <span className="text-foreground font-medium">
+                    https://{formatSlug(storeSlug)}.sitepow.store
+                  </span>
+                </FieldDescription>
+              )
             )}
           </Field>
+
           <Field>
             <FieldLabel>เบอร์โทรศัพท์ร้านค้า</FieldLabel>
             <Input
               type="tel"
               placeholder="เช่น 0812345678"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              {...register('phone')}
+              disabled={createStoreMutation.isPending}
             />
+            <FieldError>{errors?.phone?.message}</FieldError>
           </Field>
+
           <Field>
             <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
             <Input
               placeholder="อธิบายสั้นๆ เกี่ยวกับร้านค้าของคุณ"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register('description')}
+              disabled={createStoreMutation.isPending}
             />
+            <FieldError>{errors?.description?.message}</FieldError>
           </Field>
+
           <Field>
             <FieldLabel>Line ID ร้านค้า</FieldLabel>
             <Input
               placeholder="เช่น @minimal_kids"
-              value={lineId}
-              onChange={(e) => setLineId(e.target.value)}
+              {...register('lineId')}
+              disabled={createStoreMutation.isPending}
             />
+            <FieldError>{errors?.lineId?.message}</FieldError>
           </Field>
+
           <Field>
             <FieldLabel>เลขผู้เสียภาษีร้านค้า (Tax ID)</FieldLabel>
             <Input
               placeholder="เลข 13 หลัก (ถ้ามี)"
               maxLength={13}
-              value={taxId}
-              onChange={(e) => setTaxId(e.target.value.replace(/[^0-9]/g, ''))}
+              {...register('taxId', {
+                onChange: (e) => {
+                  setValue('taxId', e.target.value.replace(/[^0-9]/g, ''))
+                },
+              })}
+              disabled={createStoreMutation.isPending}
             />
+            <FieldError>{errors?.taxId?.message}</FieldError>
           </Field>
+
           <Field className="space-y-3 sm:col-span-2">
             <FieldLabel>เลือกแพ็กเกจเริ่มต้นใช้งาน</FieldLabel>
             <div className="flex flex-col gap-3">
@@ -162,10 +217,15 @@ export function StoreCreateForm() {
                 return (
                   <Card
                     key={key}
-                    onClick={() => setSelectedPlan(key)}
+                    onClick={() =>
+                      !createStoreMutation.isPending &&
+                      setValue('plan', key, { shouldValidate: true })
+                    }
                     className={cn(
                       'hover:border-muted-foreground/50 cursor-pointer transition-all',
                       isSelected && 'border-primary ring-primary ring-1',
+                      createStoreMutation.isPending &&
+                        'cursor-not-allowed opacity-60',
                     )}
                   >
                     <CardHeader className="border-b p-4">
@@ -203,17 +263,32 @@ export function StoreCreateForm() {
                 )
               })}
             </div>
+            <FieldError>{errors?.plan?.message}</FieldError>
           </Field>
         </form>
         <DialogFooter className="flex gap-2">
           <Button
             type="button"
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
+            disabled={createStoreMutation.isPending}
           >
             ยกเลิก
           </Button>
-          <Button type="submit">สร้างร้านค้าของคุณ</Button>
+          <Button
+            type="submit"
+            form="store-create-form"
+            disabled={createStoreMutation.isPending}
+          >
+            {createStoreMutation.isPending ? (
+              <>
+                <IconLoader2 className="mr-2 size-4 animate-spin" />
+                <span>กำลังสร้างร้านค้า...</span>
+              </>
+            ) : (
+              'สร้างร้านค้าของคุณ'
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

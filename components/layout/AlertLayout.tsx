@@ -14,7 +14,7 @@ export function AlertLayout({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-2 text-center text-xl font-bold">
       {icon}
-      <h1>{title}</h1>
+      <h1 className="max-w-1/2">{title}</h1>
     </div>
   )
 }

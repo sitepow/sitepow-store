@@ -1,8 +1,21 @@
 import { Plan, StoreStatus } from '@/generated/prisma/enums'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
 import { storeKeys } from '../query-keys/store'
-import { getStoreOptions, getStores } from '../store'
+import {
+  CreateStoreInput,
+  UpdateStoreInput,
+  createStore,
+  deleteStore,
+  getStoreOptions,
+  getStores,
+  updateStore,
+} from '../store'
 
 interface UseStoreOptionsParams {
   search?: string
@@ -42,4 +55,43 @@ export function useStoreOptions(filters?: UseStoreOptionsParams) {
       queryFn: async () => await getStoreOptions(filters),
     }),
   )
+}
+
+export function useCreateStore() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: CreateStoreInput) => await createStore(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: storeKeys.all })
+    },
+  })
+}
+
+export function useUpdateStore() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: string
+      input: UpdateStoreInput
+    }) => await updateStore(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: storeKeys.all })
+    },
+  })
+}
+
+export function useDeleteStore() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => await deleteStore(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: storeKeys.all })
+    },
+  })
 }

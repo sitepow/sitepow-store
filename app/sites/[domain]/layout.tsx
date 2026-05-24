@@ -50,7 +50,11 @@ export default async function StoreLayout({ children, params }: Props) {
   const store = await getStore({ domain })
 
   if (!store) {
-    notFound()
+    return (
+      <AlertLayout
+        title={`คุณสามารถเปิดร้านค้าด้วยชื่อ domain นี้ได้ในระบบ ชื่อโดเมนนี้ยังไม่ได้เปิดใช้งานในระบบของเรา คุณเองก็สามารถเป็นเจ้าของร้านค้าออนไลน์ที่สวยงามแบบนี้ได้ง่ายๆ ภายใน 5 นาที!`}
+      />
+    )
   }
 
   if (store.status === StoreStatus.MAINTENANCE) {
@@ -64,7 +68,7 @@ export default async function StoreLayout({ children, params }: Props) {
       <AlertLayout
         title={
           <>
-            ร้านค้านี้หมดระยะเวลาบริการชั่วคราว <br /> หากคุณเป็นเจ้าของร้าน
+            ร้านค้านี้หมดระยะเวลาบริการชั่วคราว หากคุณเป็นเจ้าของร้าน
             โปรดติดต่อผู้ให้บริการเพื่อเปิดใช้งานอีกครั้ง
           </>
         }

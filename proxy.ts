@@ -30,5 +30,7 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  return NextResponse.rewrite(new URL(`/sites/${hostname}${path}`, req.url))
+  const slug = hostname.replace('.lvh.me', '').replace('.sitepow.store', '')
+
+  return NextResponse.rewrite(new URL(`/sites/${slug}${path}`, req.url))
 }

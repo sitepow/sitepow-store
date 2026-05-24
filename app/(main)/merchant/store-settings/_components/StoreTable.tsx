@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 
-import { useStores } from '@/actions/hooks/store'
+import { useDeleteStore, useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { formatDate } from '@/utils/date'
-import { IconEdit, IconExternalLink, IconTrash } from '@tabler/icons-react'
+import { IconEdit, IconExternalLink } from '@tabler/icons-react'
 
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -28,6 +29,7 @@ export function StoreTable() {
   const { data: { data: stores = [], meta } = {}, isLoading } = useStores({
     page,
   })
+  const deleteStoreMutation = useDeleteStore()
 
   return (
     <>
@@ -105,12 +107,13 @@ export function StoreTable() {
                       {formattedDate}
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button variant="outline" size="icon">
+                      <Button variant="outline" size="icon-lg">
                         <IconEdit />
                       </Button>
-                      <Button variant="outline" size="icon">
-                        <IconTrash />
-                      </Button>
+                      <DeleteButton
+                        isPending={false}
+                        onDelete={() => deleteStoreMutation.mutate(store.id)}
+                      />
                     </TableCell>
                   </TableRow>
                 )
