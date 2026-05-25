@@ -195,71 +195,65 @@ export async function getStoreOptions(filters?: {
 }
 
 export async function createStore(input: CreateStoreInput) {
-  try {
+  const { name, slug } = input
+
+  const existingStore = await prisma.store.findFirst({
+    where: {
+      OR: [{ slug }, { name }],
+    },
+  })
+
+  if (existingStore) {
+    if (existingStore.slug === slug) throw new Error('Slug นี้ถูกใช้งานไปแล้ว')
+    if (existingStore.name === name)
+      throw new Error('ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว')
+  }
+
+  const store = await prisma.store.create({
+    data: {
+      ...input,
+      usage: {
+        create: {},
+      },
+    },
+    select: storeSelect,
+  })
+
+  return { store }
+}
+
+export async function updateStore(id: string, input: UpdateStoreInput) {
+  if (!id) {
+    throw new Error('ไม่พบ Store ID')
+  }
+
+  if (input.slug) {
     const existingStore = await prisma.store.findUnique({
       where: { slug: input.slug },
     })
 
-    if (existingStore) {
+    if (existingStore && existingStore.id !== id) {
       throw new Error('Slug นี้ถูกใช้งานไปแล้ว')
     }
-
-    const store = await prisma.store.create({
-      data: {
-        ...input,
-        usage: {
-          create: {},
-        },
-      },
-      select: storeSelect,
-    })
-
-    return { store }
-  } catch {
-    throw new Error('เกิดข้อผิดพลาดในการสร้างร้านค้า')
   }
-}
 
-export async function updateStore(id: string, input: UpdateStoreInput) {
-  try {
-    if (!id) {
-      throw new Error('ไม่พบ Store ID')
-    }
+  const updatedStore = await prisma.store.update({
+    where: { id },
+    data: input,
+    select: storeSelect,
+  })
 
-    if (input.slug) {
-      const existingStore = await prisma.store.findUnique({
-        where: { slug: input.slug },
-      })
-
-      if (existingStore && existingStore.id !== id) {
-        throw new Error('Slug นี้ถูกใช้งานไปแล้ว')
-      }
-    }
-
-    const updatedStore = await prisma.store.update({
-      where: { id },
-      data: input,
-      select: storeSelect,
-    })
-
-    return { updatedStore }
-  } catch {
-    throw new Error('เกิดข้อผิดพลาดในการอัปเดตข้อมูลร้านค้า')
-  }
+  return { updatedStore }
 }
 
 export async function deleteStore(id: string) {
-  try {
-    if (!id) {
-      throw new Error('ไม่พบ Store ID')
-    }
-
-    await prisma.store.delete({
-      where: { id },
-    })
-
-    return { message: 'ลบร้านค้าสำเร็จ' }
-  } catch {
-    throw new Error('เกิดข้อผิดพลาดในการลบร้านค้า')
+  if (!id) {
+    throw new Error('ไม่พบ Store ID')
   }
+
+  await prisma.store.delete({
+    where: { id },
+  })
+
+  return { message: 'ลบร้านค้าสำเร็จ' }
 }

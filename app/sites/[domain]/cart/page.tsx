@@ -16,6 +16,7 @@ import { ChevronLeftIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Button } from '@/components/ui/button'
+import { RadioGroup } from '@/components/ui/radio-group'
 
 import { CircularProgress } from '../_components/CircularProgress'
 import { CartItemCard } from '../_components/cart/_components/CartItemCard'
@@ -34,9 +35,9 @@ export default function StoreCartPage() {
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
   const summary = getCartSummary()
 
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
-  const [selectedShipping, setSelectedShipping] = useState<string | null>(null)
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null)
+  const [selectedAddress, setSelectedAddress] = useState<string>('')
+  const [selectedShipping, setSelectedShipping] = useState<string>('')
+  const [selectedPayment, setSelectedPayment] = useState<string>('')
   const [activeSection, setActiveSection] = useState<CheckoutStep>('address')
 
   const stepIcons = {
@@ -193,17 +194,22 @@ export default function StoreCartPage() {
                   <CustomerAddressForm />
                 </div>
 
-                <div className="grid gap-2">
-                  {addresses.map((addr) => (
-                    <RadioCard
-                      key={addr.id}
-                      title={addr.title}
-                      description={addr.description}
-                      isSelected={selectedAddress === addr.id}
-                      onSelect={() => setSelectedAddress(addr.id)}
-                    />
-                  ))}
-                </div>
+                <RadioGroup
+                  value={selectedAddress}
+                  onValueChange={setSelectedAddress}
+                >
+                  <div className="grid gap-2">
+                    {addresses.map((addr) => (
+                      <RadioCard
+                        key={addr.id}
+                        id={`addr-${addr.id}`}
+                        value={addr.id}
+                        title={addr.title}
+                        description={addr.description}
+                      />
+                    ))}
+                  </div>
+                </RadioGroup>
 
                 <Button
                   className="w-full"
@@ -215,12 +221,14 @@ export default function StoreCartPage() {
               </div>
 
               {selectedAddressData && (
-                <RadioCard
-                  title={selectedAddressData.title}
-                  description={selectedAddressData.description}
-                  isSelected={true}
-                  onSelect={() => {}}
-                />
+                <RadioGroup value={selectedAddress}>
+                  <RadioCard
+                    id={`summary-addr-${selectedAddressData.id}`}
+                    value={selectedAddressData.id}
+                    title={selectedAddressData.title}
+                    description={selectedAddressData.description}
+                  />
+                </RadioGroup>
               )}
             </CheckoutSection>
 
@@ -231,18 +239,23 @@ export default function StoreCartPage() {
               onEdit={() => setActiveSection('shipping')}
             >
               <div className="space-y-4">
-                <div className="grid gap-2">
-                  {shippingMethods.map((method) => (
-                    <RadioCard
-                      key={method.id}
-                      title={method.title}
-                      description={method.description}
-                      price={method.price}
-                      isSelected={selectedShipping === method.id}
-                      onSelect={() => setSelectedShipping(method.id)}
-                    />
-                  ))}
-                </div>
+                <RadioGroup
+                  value={selectedShipping}
+                  onValueChange={setSelectedShipping}
+                >
+                  <div className="grid gap-2">
+                    {shippingMethods.map((method) => (
+                      <RadioCard
+                        key={method.id}
+                        id={`ship-${method.id}`}
+                        value={method.id}
+                        title={method.title}
+                        description={method.description}
+                      />
+                    ))}
+                  </div>
+                </RadioGroup>
+
                 <Button
                   className="w-full"
                   disabled={!selectedShippingData}
@@ -253,13 +266,14 @@ export default function StoreCartPage() {
               </div>
 
               {selectedShippingData && (
-                <RadioCard
-                  title={selectedShippingData.title}
-                  description={selectedShippingData.description}
-                  price={selectedShippingData.price}
-                  isSelected={true}
-                  onSelect={() => {}}
-                />
+                <RadioGroup value={selectedShipping}>
+                  <RadioCard
+                    id={`summary-ship-${selectedShippingData.id}`}
+                    value={selectedShippingData.id}
+                    title={selectedShippingData.title}
+                    description={selectedShippingData.description}
+                  />
+                </RadioGroup>
               )}
             </CheckoutSection>
 
@@ -270,17 +284,23 @@ export default function StoreCartPage() {
               onEdit={() => setActiveSection('payment')}
             >
               <div className="space-y-3">
-                <div className="grid gap-2">
-                  {paymentMethods.map((method) => (
-                    <RadioCard
-                      key={method.id}
-                      title={method.title}
-                      description={method.description}
-                      isSelected={selectedPayment === method.id}
-                      onSelect={() => setSelectedPayment(method.id)}
-                    />
-                  ))}
-                </div>
+                <RadioGroup
+                  value={selectedPayment}
+                  onValueChange={setSelectedPayment}
+                >
+                  <div className="grid gap-2">
+                    {paymentMethods.map((method) => (
+                      <RadioCard
+                        key={method.id}
+                        id={`pay-${method.id}`}
+                        value={method.id}
+                        title={method.title}
+                        description={method.description}
+                      />
+                    ))}
+                  </div>
+                </RadioGroup>
+
                 <Button
                   className="mt-2 h-11 w-full"
                   disabled={!selectedPayment}
@@ -291,12 +311,14 @@ export default function StoreCartPage() {
               </div>
 
               {selectedPaymentData && (
-                <RadioCard
-                  title={selectedPaymentData.title}
-                  description={selectedPaymentData.description}
-                  isSelected={true}
-                  onSelect={() => {}}
-                />
+                <RadioGroup value={selectedPayment}>
+                  <RadioCard
+                    id={`summary-pay-${selectedPaymentData.id}`}
+                    value={selectedPaymentData.id}
+                    title={selectedPaymentData.title}
+                    description={selectedPaymentData.description}
+                  />
+                </RadioGroup>
               )}
             </CheckoutSection>
 
