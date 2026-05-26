@@ -23,13 +23,13 @@ export function StoreSelectField({
   const { data: stores = [], isLoading } = useStoreOptions()
 
   return (
-    <Field>
+    <Field className="w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
         กรองตามร้านค้า
       </FieldLabel>
       <Select value={value} onValueChange={onValueChange} disabled={isLoading}>
-        <SelectTrigger className="bg-background w-full sm:w-64">
+        <SelectTrigger className="w-full sm:w-64">
           <SelectValue placeholder="เลือกดูทุกร้านค้า" />
         </SelectTrigger>
         <SelectContent>

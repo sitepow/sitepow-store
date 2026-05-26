@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconPackage } from '@tabler/icons-react'
+import { IconPackage, IconPlus } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Button } from '@/components/ui/button'
 
 import { ProductsTable } from './_components/ProductsTable'
 
@@ -21,10 +24,18 @@ export default function MerchantStoreSettingsProductsPage() {
         title="รายการสินค้าทั้งหมด"
         description="จัดการข้อมูลสินค้า ตรวจสอบสถานะ และอัปเดตสต็อกสินค้าของร้านค้าคุณ"
         endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
+          <div className="flex flex-wrap items-end gap-5">
+            <StoreSelectField
+              value={selectedStoreId}
+              onValueChange={setSelectedStoreId}
+            />
+            <Button asChild>
+              <Link href={'/merchant/store-settings/products/create'}>
+                เพิ่มสินค้าใหม่
+                <IconPlus />
+              </Link>
+            </Button>
+          </div>
         }
       />
       <ProductsTable storeId={selectedStoreId} />

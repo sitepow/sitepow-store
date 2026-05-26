@@ -58,9 +58,9 @@ export function ProductsTable({
           </TableHeader>
           <TableBody>
             {isLoading && products.length === 0 ? (
-              <TableLoadingRow colSpan={6} />
+              <TableLoadingRow colSpan={7} />
             ) : products.length === 0 ? (
-              <TableEmptyRow colSpan={6} title="ไม่พบรายการสินค้า" />
+              <TableEmptyRow colSpan={7} title="ไม่พบรายการสินค้า" />
             ) : (
               products.map((product) => {
                 const basePrice = product.variants?.[0]?.price

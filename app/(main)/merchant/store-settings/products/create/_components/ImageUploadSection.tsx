@@ -1,14 +1,36 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import React, { useState } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { ProductFormValues } from '@/zod/product'
-import { ImagePlus, Loader2, X } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { FieldLegend, FieldSet } from '@/components/ui/field'
 
-import { cn } from '@/lib/utils'
+import { ProductFormValues } from '@/zod/product';
+import { ImagePlus, Loader2, X } from 'lucide-react';
+
+
+
+import { Button } from '@/components/ui/button';
+import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field';
+
+
+
+import { cn } from '@/lib/utils';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export function ImageUploadSection() {
   const { control } = useFormContext<ProductFormValues>()
@@ -26,7 +48,6 @@ export function ImageUploadSection() {
     }
 
     setIsUploading(true)
-
     try {
       for (let i = 0; i < files.length; i++) {
         const fakeUrl = URL.createObjectURL(files[i])
@@ -38,50 +59,49 @@ export function ImageUploadSection() {
   }
 
   return (
-    <FieldSet className="bg-muted/30 rounded-xl border p-6">
-      <FieldLegend className="text-lg font-bold">
+    <FieldSet className="space-y-4">
+      <FieldLegend className="text-foreground text-sm font-medium">
         รูปภาพสินค้า ({fields.length})
       </FieldLegend>
-
-      <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <FieldDescription>
+        แสดงในหน้าหน้าร้านค้า แนะนำสัดส่วน 1:1
+      </FieldDescription>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field, index) => (
           <div
             key={field.id}
-            className="group bg-background relative aspect-square overflow-hidden rounded-lg border"
+            className="group bg-muted/10 relative aspect-square overflow-hidden rounded-md border"
           >
             <img
               src={field.url}
               alt="product"
               className="h-full w-full object-cover"
             />
+            <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity group-hover:opacity-100" />
             <Button
-              type="button"
-              variant="destructive"
+              variant="secondary"
               size="icon"
-              className="absolute top-1 right-1 opacity-100 transition-opacity group-hover:opacity-100 xl:opacity-0"
+              className="bg-background/90 absolute top-1.5 right-1.5 h-6 w-6 rounded-md border opacity-100 shadow-sm backdrop-blur-sm transition-opacity md:opacity-0 md:group-hover:opacity-100"
               onClick={() => remove(index)}
             >
-              <X className="size-4" />
+              <X className="text-muted-foreground" />
             </Button>
           </div>
         ))}
-
         <label
           className={cn(
-            'border-muted-foreground/25 hover:bg-muted/50 flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors',
+            'bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-colors',
             isUploading && 'pointer-events-none opacity-50',
           )}
         >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            {isUploading ? (
-              <Loader2 className="text-muted-foreground mb-3 size-8 animate-spin" />
-            ) : (
-              <ImagePlus className="text-muted-foreground mb-3 size-8" />
-            )}
-            <p className="text-muted-foreground text-xs">
-              {isUploading ? 'กำลังอัปโหลด...' : 'คลิกเพื่อเพิ่มรูป'}
-            </p>
-          </div>
+          {isUploading ? (
+            <Loader2 className="size-5 animate-spin" />
+          ) : (
+            <ImagePlus className="size-5" />
+          )}
+          <span className="mt-2 text-xs font-medium">
+            {isUploading ? 'กำลังอัปโหลด...' : 'เพิ่มรูปภาพ'}
+          </span>
           <input
             type="file"
             multiple

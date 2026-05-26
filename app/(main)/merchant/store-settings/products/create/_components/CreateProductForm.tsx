@@ -11,9 +11,13 @@ import { generateProductAiAction } from '@/actions/ai'
 import { DiscountType, MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconImageGeneration, IconLoader2 } from '@tabler/icons-react'
+import {
+  IconImageGeneration,
+  IconLoader2,
+  IconTrash,
+} from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { CirclePlus, PlusCircle, Trash2 } from 'lucide-react'
+import { CirclePlus, PlusCircle } from 'lucide-react'
 import z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -297,12 +301,11 @@ export function CreateProductForm() {
                     )}
                   />
                   <Button
-                    type="button"
                     variant="destructive"
-                    size="icon"
+                    size="icon-lg"
                     onClick={() => removeMetadata(index)}
                   >
-                    <Trash2 className="size-4" />
+                    <IconTrash />
                   </Button>
                 </div>
               ))}
@@ -377,12 +380,11 @@ export function CreateProductForm() {
                       />
                     </div>
                     <Button
-                      type="button"
                       variant="destructive"
-                      size="icon"
+                      size="icon-lg"
                       onClick={() => removeAddon(index)}
                     >
-                      <Trash2 className="size-4" />
+                      <IconTrash />
                     </Button>
                   </CardContent>
                 </Card>

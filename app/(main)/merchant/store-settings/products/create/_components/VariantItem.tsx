@@ -6,7 +6,8 @@ import {
 } from 'react-hook-form'
 
 import { ProductFormValues } from '@/zod/product'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { IconTrash } from '@tabler/icons-react'
+import { PlusCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -254,14 +255,13 @@ export function VariantItem({
                   )}
                 />
                 <Button
-                  type="button"
                   variant="destructive"
                   className="col-span-2"
                   size="icon"
                   onClick={() => removeStock(stockIndex)}
                   disabled={stockFields.length === 1}
                 >
-                  <Trash2 className="size-4" />
+                  <IconTrash />
                 </Button>
               </div>
             ))}
@@ -271,13 +271,12 @@ export function VariantItem({
 
       <div className="absolute top-2 right-2">
         <Button
-          type="button"
           variant="destructive"
-          size="icon"
+          size="icon-lg"
           onClick={() => removeVariant(index)}
           disabled={isOnlyOne}
         >
-          <Trash2 className="size-4" />
+          <IconTrash />
         </Button>
       </div>
     </Card>
