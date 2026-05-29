@@ -8,6 +8,7 @@ import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarD
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useSession } from '@/hooks/use-session'
+import { IconSettings } from '@tabler/icons-react'
 import { LockIcon, Menu, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -108,7 +109,7 @@ export function Navbar() {
               />
               <Link href="/merchant/dashboard">
                 <Button variant="secondary" className="flex gap-2 font-bold">
-                  <LockIcon size={18} />
+                  <IconSettings />
                   จัดการร้านค้าของคุณ
                 </Button>
               </Link>
