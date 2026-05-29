@@ -9,7 +9,7 @@ import { useSession } from '@/hooks/use-session'
 import { formatSlug } from '@/utils/slug'
 import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconLoader2, IconPlus } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -23,9 +23,13 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from './PlanSelector'
-import { SlugPreview } from './SlugPreview'
+import { PointsSettingsForm } from './PointsSettingsForm'
+import { StoreNameField } from './StoreNameField'
+import { StoreSlugField } from './StoreSlugField'
+import { VatSettingsForm } from './VatSettingsForm'
 
 export function StoreCreateForm() {
   const { user } = useSession()
@@ -40,7 +44,14 @@ export function StoreCreateForm() {
       description: '',
       phone: '',
       lineId: '',
+      facebookPage: '',
+      address: '',
       taxId: '',
+      isVatRegistered: false,
+      vatRate: 7.0,
+      isPointsEnabled: false,
+      pointEarningRate: 100,
+      pointRedeemRate: 1,
       plan: Plan.STARTER,
     },
   })
@@ -48,7 +59,6 @@ export function StoreCreateForm() {
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
     formState: { errors },
   } = methods
@@ -94,42 +104,40 @@ export function StoreCreateForm() {
         <DialogHeader className="space-y-2">
           <DialogTitle>เริ่มต้นสร้างร้านค้าใหม่</DialogTitle>
           <DialogDescription>
-            กรอกข้อมูลพื้นฐานเพื่อตั้งค่า URL หน้าร้านที่เป็นเอกลักษณ์
-            พร้อมเลือกแพลนเริ่มต้นใช้งานของคุณ
+            กรอกข้อมูลพื้นฐานและตั้งค่าระบบของร้านค้าเพื่อเริ่มต้นขายสินค้าออนไลน์
           </DialogDescription>
         </DialogHeader>
 
         <FormProvider {...methods}>
-          <div className="grid gap-5 space-y-5 sm:grid-cols-2">
-            <Field>
-              <FieldLabel>ชื่อร้านค้า</FieldLabel>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="text-muted-foreground border-b pb-1 text-sm font-semibold sm:col-span-2">
+              1. เลือกแพลนการใช้งานของคุณ
+            </div>
+
+            <div className="sm:col-span-2">
+              <PlanSelector isPending={createStoreMutation.isPending} />
+            </div>
+
+            <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
+              2. ข้อมูลทั่วไปของร้านค้า
+            </div>
+
+            <StoreNameField isPending={createStoreMutation.isPending} />
+            <StoreSlugField isPending={createStoreMutation.isPending} />
+
+            <Field className="sm:col-span-2">
+              <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
               <Input
-                placeholder="เช่น เสื้อผ้าเด็กมินิมอล"
-                {...register('name')}
+                placeholder="อธิบายสั้นๆ เกี่ยวกับร้านค้าของคุณ"
+                {...register('description')}
                 disabled={createStoreMutation.isPending}
               />
-              <FieldError>{errors?.name?.message}</FieldError>
+              <FieldError>{errors?.description?.message}</FieldError>
             </Field>
 
-            <Field>
-              <FieldLabel>URL หน้าร้าน (Slug)</FieldLabel>
-              <div className="flex">
-                <span className="bg-muted text-muted-foreground inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
-                  sitepow.store/
-                </span>
-                <Input
-                  placeholder="minimal-kids"
-                  className="rounded-l-none"
-                  {...register('slug')}
-                  disabled={createStoreMutation.isPending}
-                />
-              </div>
-              {errors?.slug?.message ? (
-                <FieldError>{errors?.slug?.message}</FieldError>
-              ) : (
-                <SlugPreview />
-              )}
-            </Field>
+            <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
+              3. ช่องทางการติดต่อ & ที่ตั้งร้าน
+            </div>
 
             <Field>
               <FieldLabel>เบอร์โทรศัพท์ร้านค้า</FieldLabel>
@@ -143,16 +151,6 @@ export function StoreCreateForm() {
             </Field>
 
             <Field>
-              <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
-              <Input
-                placeholder="อธิบายสั้นๆ เกี่ยวกับร้านค้าของคุณ"
-                {...register('description')}
-                disabled={createStoreMutation.isPending}
-              />
-              <FieldError>{errors?.description?.message}</FieldError>
-            </Field>
-
-            <Field>
               <FieldLabel>Line ID ร้านค้า</FieldLabel>
               <Input
                 placeholder="เช่น @minimal_kids"
@@ -163,25 +161,31 @@ export function StoreCreateForm() {
             </Field>
 
             <Field>
-              <FieldLabel>เลขผู้เสียภาษีร้านค้า (Tax ID)</FieldLabel>
+              <FieldLabel>Facebook Page</FieldLabel>
               <Input
-                placeholder="เลข 13 หลัก (ถ้ามี)"
-                maxLength={13}
-                {...register('taxId', {
-                  onChange: (e) => {
-                    setValue('taxId', e.target.value.replace(/[^0-9]/g, ''))
-                  },
-                })}
+                placeholder="เช่น facebook.com/yourstore"
+                {...register('facebookPage')}
                 disabled={createStoreMutation.isPending}
               />
-              <FieldError>{errors?.taxId?.message}</FieldError>
+              <FieldError>{errors?.facebookPage?.message}</FieldError>
             </Field>
 
-            <PlanSelector isPending={createStoreMutation.isPending} />
+            <Field className="sm:col-span-2">
+              <FieldLabel>ที่อยู่ร้านค้า / สำนักงาน</FieldLabel>
+              <Input
+                placeholder="บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด..."
+                {...register('address')}
+                disabled={createStoreMutation.isPending}
+              />
+              <FieldError>{errors?.address?.message}</FieldError>
+            </Field>
+
+            <VatSettingsForm isPending={createStoreMutation.isPending} />
+            <PointsSettingsForm isPending={createStoreMutation.isPending} />
           </div>
         </FormProvider>
 
-        <DialogFooter className="flex gap-2">
+        <DialogFooter className="mt-5 flex gap-2 border-t pt-4">
           <Button
             variant="outline"
             onClick={handleClose}
@@ -195,8 +199,7 @@ export function StoreCreateForm() {
           >
             {createStoreMutation.isPending ? (
               <>
-                <IconLoader2 className="mr-2 size-4 animate-spin" />
-                <span>กำลังสร้างร้านค้า...</span>
+                <Spinner /> กำลังสร้างร้านค้า...
               </>
             ) : (
               'สร้างร้านค้าของคุณ'

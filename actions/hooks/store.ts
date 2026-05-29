@@ -10,6 +10,7 @@ import { storeKeys } from '../query-keys/store'
 import {
   CreateStoreInput,
   UpdateStoreInput,
+  checkStoreAvailability,
   createStore,
   deleteStore,
   getStoreOptions,
@@ -44,6 +45,19 @@ export function useStores({
       queryKey: storeKeys.list(filters),
       queryFn: async () => await getStores(filters),
       placeholderData: (previousData) => previousData,
+    }),
+  )
+}
+
+export function useCheckStoreAvailability(
+  params: { name?: string; slug?: string; excludeId?: string },
+  options?: { enabled?: boolean },
+) {
+  return useQuery(
+    queryOptions({
+      queryKey: storeKeys.availability(params),
+      queryFn: () => checkStoreAvailability(params),
+      enabled: options?.enabled ?? (!!params.name || !!params.slug),
     }),
   )
 }

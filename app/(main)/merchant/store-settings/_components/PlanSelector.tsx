@@ -7,7 +7,7 @@ import { Plan } from '@/generated/prisma/enums'
 import { formatNumber } from '@/utils/pricing'
 import { CreateStoreFormValues } from '@/zod/store'
 
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError } from '@/components/ui/field'
 import { RadioGroup } from '@/components/ui/radio-group'
 
 import { PLAN_DETAILS } from '../../../../../config/planDetails'
@@ -30,7 +30,6 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
 
   return (
     <Field className="space-y-3 sm:col-span-2">
-      <FieldLabel>เลือกแพ็กเกจเริ่มต้นใช้งาน</FieldLabel>
       <RadioGroup
         value={selectedPlan}
         disabled={isPending}

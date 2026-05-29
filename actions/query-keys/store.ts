@@ -13,4 +13,9 @@ export const storeKeys = {
   options: (filters?: { search?: string; status?: StoreStatus }) =>
     [...storeKeys.all, 'options', filters] as const,
   detail: (domain: string) => [...storeKeys.all, 'detail', domain] as const,
+  availability: (params: {
+    name?: string
+    slug?: string
+    excludeId?: string
+  }) => [...storeKeys.all, 'availability', params] as const,
 }

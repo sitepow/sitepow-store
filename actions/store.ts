@@ -97,6 +97,38 @@ export async function getStore({ domain }: { domain: string }) {
   })
 }
 
+export async function checkStoreAvailability(input: {
+  name?: string
+  slug?: string
+  excludeId?: string
+}) {
+  const { name, slug, excludeId } = input
+
+  const results = { nameAvailable: true, slugAvailable: true }
+
+  if (slug) {
+    const existing = await prisma.store.findFirst({
+      where: { slug, ...(excludeId && { id: { not: excludeId } }) },
+      select: { id: true },
+    })
+    if (existing) {
+      results.slugAvailable = false
+    }
+  }
+
+  if (name) {
+    const existing = await prisma.store.findFirst({
+      where: { name, ...(excludeId && { id: { not: excludeId } }) },
+      select: { id: true },
+    })
+    if (existing) {
+      results.nameAvailable = false
+    }
+  }
+
+  return results
+}
+
 export async function getStores({
   page = 1,
   limit = 10,
