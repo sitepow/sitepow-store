@@ -1,6 +1,17 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
-import { GetProductsParams, getProducts } from '../product'
+import {
+  CreateProductInput,
+  GetProductsParams,
+  createProduct,
+  deleteProduct,
+  getProducts,
+} from '../product'
 import { productKeys } from '../query-keys/product'
 
 export function useProducts({
@@ -20,4 +31,26 @@ export function useProducts({
       enabled: !!storeId,
     }),
   )
+}
+
+export function useCreateProduct() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: CreateProductInput) => createProduct(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all })
+    },
+  })
+}
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all })
+    },
+  })
 }

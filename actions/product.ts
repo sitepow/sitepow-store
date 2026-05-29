@@ -5,6 +5,29 @@ import { Prisma } from '@/generated/prisma/client'
 
 import { prisma } from '@/lib/prisma'
 
+export interface CreateProductInput {
+  storeId: string
+  categoryId: string
+  title: string
+  slug: string
+  tags?: string
+  images?: string[]
+  weight?: number
+  width?: number
+  height?: number
+  length?: number
+  variants: {
+    title: string
+    price: number
+    sku?: string
+    stocks: { branchId: string; quantity: number; minStock: number }[]
+    discount: { active: boolean; type: 'PERCENTAGE' | 'FIXED'; amount: number }
+    rewardPoints: { isActive: boolean; amount: number }
+  }[]
+  addons?: { title: string; price: number; isAvailable: boolean }[]
+  metadata?: { key: string; value: string }[]
+}
+
 const productSelect = {
   id: true,
   title: true,
@@ -151,4 +174,91 @@ export async function getProducts({
       },
     }
   }
+}
+
+export async function createProduct(input: CreateProductInput) {
+  const {
+    variants,
+    addons,
+    metadata,
+    tags,
+    images,
+    storeId,
+    categoryId,
+    ...rest
+  } = input
+
+  const tagsArray = tags
+    ? tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : []
+
+  const details = metadata?.length
+    ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
+    : undefined
+
+  const product = await prisma.product.create({
+    data: {
+      ...rest,
+      storeId,
+      categoryId,
+      details,
+      tags: {
+        create: tagsArray.map((name) => ({ name })),
+      },
+      images: {
+        create: images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+      },
+      variants: {
+        create: variants.map((v) => ({
+          title: v.title,
+          price: v.price,
+          sku: v.sku ?? '',
+          discountActive: v.discount.active,
+          discountType: v.discount.active ? v.discount.type : null,
+          discountAmount: v.discount.active ? v.discount.amount : null,
+          pointsActive: v.rewardPoints.isActive,
+          pointsAmount: v.rewardPoints.amount,
+          stocks: {
+            create: v.stocks.map((s) => ({
+              branchId: s.branchId,
+              quantity: s.quantity,
+              minStock: s.minStock,
+            })),
+          },
+        })),
+      },
+      addons: {
+        create:
+          addons?.map((a) => ({
+            title: a.title,
+            price: a.price,
+            isAvailable: a.isAvailable,
+          })) ?? [],
+      },
+    },
+    select: productSelect,
+  })
+
+  return { product }
+}
+
+export async function deleteProduct(id: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  const product = await prisma.product.findFirst({
+    where: { id, store: { ownerId: userId } },
+    select: { id: true },
+  })
+
+  if (!product) {
+    throw new Error('ไม่พบสินค้า หรือคุณไม่มีสิทธิ์ลบ')
+  }
+
+  await prisma.product.delete({ where: { id } })
+
+  return { message: 'ลบสินค้าสำเร็จ' }
 }
