@@ -98,7 +98,7 @@ export function VariantItem({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 border-t pt-6 sm:col-span-12 lg:grid-cols-2 xl:col-span-12">
+          <div className="grid grid-cols-1 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
             <div className="space-y-4">
               <div className="flex items-center justify-between px-1">
                 <div className="space-y-0.5">
@@ -122,7 +122,7 @@ export function VariantItem({
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                      <FieldLabel className="text-muted-foreground text-[10px]">
                         ประเภท
                       </FieldLabel>
                       <Select
@@ -165,7 +165,7 @@ export function VariantItem({
               </div>
             </div>
 
-            <div className="space-y-4 border-l pl-6 max-lg:border-t max-lg:border-l-0 max-lg:pt-6 max-lg:pl-0">
+            <div className="space-y-4">
               <div className="flex items-center justify-between px-1">
                 <div className="space-y-0.5">
                   <span className="text-sm font-medium">สะสมคะแนน</span>

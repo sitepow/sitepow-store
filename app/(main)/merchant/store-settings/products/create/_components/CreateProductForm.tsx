@@ -206,7 +206,10 @@ export function CreateProductForm() {
             </div>
             <div className="space-y-3">
               {metadataFields.map((field, index) => (
-                <div key={field.id} className="flex items-start gap-2">
+                <div
+                  key={field.id}
+                  className="flex flex-wrap items-start gap-2"
+                >
                   <div className="w-1/3">
                     <Controller
                       control={form.control}
