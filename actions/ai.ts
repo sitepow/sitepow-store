@@ -26,6 +26,23 @@ export async function generateProductAiAction(title: string) {
                   price: { type: SchemaType.NUMBER },
                   stock: { type: SchemaType.NUMBER },
                   sku: { type: SchemaType.STRING },
+                  discount: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                      active: { type: SchemaType.BOOLEAN },
+                      type: { type: SchemaType.STRING },
+                      amount: { type: SchemaType.NUMBER },
+                    },
+                    required: ['active', 'type', 'amount'],
+                  },
+                  rewardPoints: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                      isActive: { type: SchemaType.BOOLEAN },
+                      amount: { type: SchemaType.NUMBER },
+                    },
+                    required: ['isActive', 'amount'],
+                  },
                 },
               },
             },
@@ -79,7 +96,9 @@ export async function generateProductAiAction(title: string) {
     - ส่วน "value" ให้เติมค่าที่เหมาะสมเป็นภาษาไทย เช่น ถ้าเลือก key "battery_life" ให้ใส่ value เป็น "ใช้งานได้สูงสุด 40 ชั่วโมง"
     - metadata.tags: keywords 3-5 คำ (ภาษาไทย)
     - ข้อมูลที่เป็นภาษาไทย: title, variants.title, addons.title, และค่า (value) ใน metadata
-    - ข้อมูลที่เป็นภาษาอังกฤษ: slug, variants.sku`
+    - ข้อมูลที่เป็นภาษาอังกฤษ: slug, variants.sku
+    - variants[].discount: active: false, type: "PERCENTAGE", amount: 0 เสมอ
+    - variants[].rewardPoints: isActive: false, amount: 0 เสมอ`
 
     const result = await model.generateContent(prompt)
     const responseText = result.response.text()

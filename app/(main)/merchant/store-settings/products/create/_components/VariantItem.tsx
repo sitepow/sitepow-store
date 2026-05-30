@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react'
 import {
   Controller,
   useFieldArray,
@@ -5,6 +6,8 @@ import {
   useWatch,
 } from 'react-hook-form'
 
+import { useBranches } from '@/actions/hooks/branch'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
 import { IconTrash } from '@tabler/icons-react'
 import { PlusCircle } from 'lucide-react'
@@ -27,6 +30,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 
+import { DiscountField } from './DiscountField'
+
 interface VariantItemProps {
   index: number
   removeVariant: (index: number) => void
@@ -38,7 +43,7 @@ export function VariantItem({
   removeVariant,
   isOnlyOne,
 }: VariantItemProps) {
-  const { control } = useFormContext<ProductFormValues>()
+  const { control, setValue } = useFormContext<ProductFormValues>()
 
   const {
     fields: stockFields,
@@ -49,14 +54,38 @@ export function VariantItem({
     name: `variants.${index}.stocks`,
   })
 
-  const discountActive = useWatch({
-    control,
-    name: `variants.${index}.discount.active`,
-  })
   const pointsActive = useWatch({
     control,
     name: `variants.${index}.rewardPoints.isActive`,
   })
+
+  const { selectedStoreId } = useStoreFilter()
+  const { data: branchesData } = useBranches({ storeId: selectedStoreId })
+  const branches = useMemo(() => branchesData?.data ?? [], [branchesData])
+
+  const usedBranchIds =
+    useWatch({
+      control,
+      name: `variants.${index}.stocks`,
+    })?.map((s) => s.branchId) ?? []
+
+  const stocks = useWatch({
+    control,
+    name: `variants.${index}.stocks`,
+  })
+
+  const availableBranches = branches.filter(
+    (b) => !usedBranchIds.includes(b.id),
+  )
+
+  useEffect(() => {
+    if (branches.length > 0 && stocks?.length === 1 && !stocks[0]?.branchId) {
+      const mainBranch = branches.find((b) => b.isMain)
+      if (mainBranch) {
+        setValue(`variants.${index}.stocks.0.branchId`, mainBranch.id)
+      }
+    }
+  }, [branches, stocks, index, setValue])
 
   return (
     <Card className="relative overflow-hidden">
@@ -99,71 +128,7 @@ export function VariantItem({
           </div>
 
           <div className="grid grid-cols-1 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-1">
-                <div className="space-y-0.5">
-                  <span className="text-sm font-medium">เปิดใช้งานส่วนลด</span>
-                </div>
-                <Controller
-                  name={`variants.${index}.discount.active`}
-                  control={control}
-                  render={({ field }) => (
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                <Controller
-                  name={`variants.${index}.discount.type`}
-                  control={control}
-                  render={({ field }) => (
-                    <Field>
-                      <FieldLabel className="text-muted-foreground text-[10px]">
-                        ประเภท
-                      </FieldLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={!discountActive}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Percentage">
-                            เปอร์เซ็นต์ (%)
-                          </SelectItem>
-                          <SelectItem value="Fixed">จำนวนเงิน (฿)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name={`variants.${index}.discount.amount`}
-                  control={control}
-                  render={({ field }) => (
-                    <Field>
-                      <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
-                        มูลค่าส่วนลด
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="0"
-                        className="h-9"
-                        disabled={!discountActive}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </Field>
-                  )}
-                />
-              </div>
-            </div>
+            <DiscountField index={index} />
 
             <div className="space-y-4">
               <div className="flex items-center justify-between px-1">
@@ -213,6 +178,7 @@ export function VariantItem({
               type="button"
               variant="outline"
               size="sm"
+              disabled={availableBranches.length === 0}
               onClick={() =>
                 appendStock({ branchId: '', quantity: 0, minStock: 0 })
               }
@@ -236,8 +202,17 @@ export function VariantItem({
                         <SelectValue placeholder="เลือกสาขา" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="branch-1">สาขาหลัก</SelectItem>
-                        <SelectItem value="branch-2">สาขาพารากอน</SelectItem>
+                        {branches
+                          .filter(
+                            (b) =>
+                              !usedBranchIds.includes(b.id) ||
+                              b.id === field.value,
+                          )
+                          .map((branch) => (
+                            <SelectItem key={branch.id} value={branch.id}>
+                              {branch.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   )}

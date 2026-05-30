@@ -1,10 +1,10 @@
 'use client'
 
-import { useFormContext, useWatch } from 'react-hook-form'
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
 
+import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
 
-import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -14,68 +14,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 
 export function DiscountField({ index }: { index: number }) {
-  const {
-    register,
-    setValue,
-    formState: { errors },
-  } = useFormContext<ProductFormValues>()
+  const { control } = useFormContext<ProductFormValues>()
 
-  const active = useWatch<ProductFormValues>({
+  const discountActive = useWatch({
+    control,
     name: `variants.${index}.discount.active`,
   })
 
   return (
-    <div className="space-y-3">
-      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-        <Checkbox
-          checked={!!active}
-          onCheckedChange={(v) =>
-            setValue(`variants.${index}.discount.active`, !!v)
-          }
-        />
-        <span>เปิดใช้งานส่วนลด</span>
-      </label>
-
-      {active && (
-        <div className="grid grid-cols-2 gap-3">
-          <Field>
-            <FieldLabel>ประเภทส่วนลด</FieldLabel>
-            <Select
-              defaultValue="PERCENTAGE"
-              onValueChange={(v) =>
-                setValue(
-                  `variants.${index}.discount.type`,
-                  v as 'PERCENTAGE' | 'FIXED',
-                )
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="PERCENTAGE">เปอร์เซ็นต์ (%)</SelectItem>
-                <SelectItem value="FIXED">จำนวนเงิน (บาท)</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
-
-          <Field>
-            <FieldLabel>จำนวนส่วนลด</FieldLabel>
-            <Input
-              type="number"
-              placeholder="0"
-              {...register(`variants.${index}.discount.amount`, {
-                valueAsNumber: true,
-              })}
-            />
-            <FieldError>
-              {errors?.variants?.[index]?.discount?.amount?.message}
-            </FieldError>
-          </Field>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <div className="space-y-0.5">
+          <span className="text-sm font-medium">เปิดใช้งานส่วนลด</span>
         </div>
-      )}
+        <Controller
+          name={`variants.${index}.discount.active`}
+          control={control}
+          render={({ field }) => (
+            <Switch checked={field.value} onCheckedChange={field.onChange} />
+          )}
+        />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+        <Controller
+          name={`variants.${index}.discount.type`}
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel className="text-muted-foreground text-[10px]">
+                ประเภท
+              </FieldLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={!discountActive}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={DiscountType.PERCENTAGE}>
+                    เปอร์เซ็นต์ (%)
+                  </SelectItem>
+                  <SelectItem value={DiscountType.FIXED}>
+                    จำนวนเงิน (฿)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+        />
+        <Controller
+          name={`variants.${index}.discount.amount`}
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                มูลค่าส่วนลด
+              </FieldLabel>
+              <Input
+                {...field}
+                type="number"
+                placeholder="0"
+                className="h-9"
+                disabled={!discountActive}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+              />
+              {fieldState.invalid && (
+                <FieldError>{fieldState.error?.message}</FieldError>
+              )}
+            </Field>
+          )}
+        />
+      </div>
     </div>
   )
 }

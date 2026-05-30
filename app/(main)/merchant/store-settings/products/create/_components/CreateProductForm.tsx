@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import {
@@ -6,9 +7,11 @@ import {
   useFieldArray,
   useForm,
 } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { generateProductAiAction } from '@/actions/ai'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+import { DiscountType } from '@/generated/prisma/enums'
 import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -61,7 +64,7 @@ export function CreateProductForm() {
           price: 0,
           sku: '',
           stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-          discount: { active: false, type: 'PERCENTAGE', amount: 0 },
+          discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
           rewardPoints: { isActive: false, amount: 0 },
         },
       ],
@@ -116,13 +119,17 @@ export function CreateProductForm() {
           value: String(item.value),
         })) || []
 
+      const { variants: _variants, metadata: _metadata, ...restData } = data
+
       reset({
         ...getValues(),
-        ...data,
+        ...restData,
         addons: data.addons || [],
         tags: data.metadata?.tags ? data.metadata.tags.join(', ') : '',
         metadata: metadataDynamicFields,
       })
+
+      toast.success('AI คิดเนื้อหาให้กับสินค้าของคุณสำเร็จแล้ว')
     },
     onError: (error) => {
       console.error('AI Gen Error:', error)
@@ -165,7 +172,7 @@ export function CreateProductForm() {
                     stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
                     discount: {
                       active: false,
-                      type: 'PERCENTAGE',
+                      type: DiscountType.PERCENTAGE,
                       amount: 0,
                     },
                     rewardPoints: { isActive: false, amount: 0 },
