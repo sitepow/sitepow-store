@@ -1,8 +1,9 @@
+import { DiscountType } from '@/generated/prisma/enums'
 import z from 'zod'
 
 const discountSchema = z.object({
   active: z.boolean().default(false),
-  type: z.enum(['PERCENTAGE', 'FIXED']).default('PERCENTAGE'),
+  type: z.enum(DiscountType).default(DiscountType.PERCENTAGE),
   amount: z.number().min(0).default(0),
 })
 

@@ -3,7 +3,7 @@
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 
 import { generateProductAiAction } from '@/actions/ai'
-import { DiscountType, MetadataDetail } from '@/types/sites/product'
+import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -46,7 +46,7 @@ export function CreateProductForm() {
           price: 0,
           sku: '',
           stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-          discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
+          discount: { active: false, type: 'PERCENTAGE', amount: 0 },
           rewardPoints: { isActive: false, amount: 0 },
         },
       ],
@@ -150,7 +150,7 @@ export function CreateProductForm() {
                     stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
                     discount: {
                       active: false,
-                      type: DiscountType.PERCENTAGE,
+                      type: 'PERCENTAGE',
                       amount: 0,
                     },
                     rewardPoints: { isActive: false, amount: 0 },
