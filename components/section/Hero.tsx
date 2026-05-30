@@ -28,23 +28,33 @@ export function HeroSection() {
       {!isAuthenticated && (
         <div className="flex gap-2.5">
           <Link href="/register">
-            <Button size="lg">สมัครเปิดร้าน</Button>
+            <Button size="lg">
+              สมัครเปิดร้านฟรี
+              <ArrowRight />
+            </Button>
           </Link>
           <Link href="/pricing">
             <Button variant="secondary" size="lg">
-              ดูราคา
+              ดูราคาและแพ็กเกจ
             </Button>
           </Link>
         </div>
       )}
 
       {isAuthenticated && (
-        <Link href="/merchant/dashboard">
-          <Button size="lg">
-            จัดการร้านค้าของคุณ
-            <ArrowRight />
-          </Button>
-        </Link>
+        <div className="flex gap-2.5">
+          <Link href="/merchant/dashboard">
+            <Button size="lg">
+              จัดการร้านค้าของคุณ
+              <ArrowRight />
+            </Button>
+          </Link>
+          <Link href="/pricing">
+            <Button variant="secondary" size="lg">
+              ดูราคาและแพ็กเกจ
+            </Button>
+          </Link>
+        </div>
       )}
 
       <div className="absolute -bottom-10 left-1/2">
