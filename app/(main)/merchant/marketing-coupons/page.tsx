@@ -3,9 +3,10 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconTicket } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -109,10 +110,13 @@ export default function MerchantMarketingCouponsPage() {
         description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
         endContent={<StoreSelectField />}
       />
-      <CouponListTable
-        coupons={filteredCoupons}
-        currentStoreBranches={currentStoreBranches}
-      />
+      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+      {selectedStoreId !== ALL_STORES && (
+        <CouponListTable
+          coupons={filteredCoupons}
+          currentStoreBranches={currentStoreBranches}
+        />
+      )}
     </DashboardSidebar>
   )
 }

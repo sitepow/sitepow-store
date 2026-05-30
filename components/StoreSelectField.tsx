@@ -20,7 +20,7 @@ export function StoreSelectField() {
     <Field className="w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
-        กรองตามร้านค้า
+        เลือกร้านค้าของคุณ
       </FieldLabel>
       <Select
         value={selectedStoreId}

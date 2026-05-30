@@ -3,9 +3,10 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconHierarchy } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -83,7 +84,10 @@ export default function MerchantOrganizationBranchesPage() {
         description="บริหารจัดการที่ตั้งสาขาและคลังหน้าร้าน เพื่อใช้ควบคุมสิทธิ์พนักงานและกระจายสต็อกสินค้าคงคลังให้แม่นยำ"
         endContent={<StoreSelectField />}
       />
-      <BranchListTable branches={filteredBranches} />
+      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+      {selectedStoreId !== ALL_STORES && (
+        <BranchListTable branches={filteredBranches} />
+      )}
     </DashboardSidebar>
   )
 }
