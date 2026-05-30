@@ -121,7 +121,7 @@ export function StoreProfileForm() {
                 <FieldLabel>
                   Store URL Slug (ลิงก์หลักระบบ Sale Page)
                 </FieldLabel>
-                <div className="flex items-center overflow-hidden rounded-md shadow-sm">
+                <div className="flex items-center overflow-hidden rounded-md">
                   <span className="border-input bg-muted text-muted-foreground flex h-9 items-center border border-r-0 px-3 text-sm select-none">
                     sitepow.store/
                   </span>
