@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-
 import Link from 'next/link'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconPlus } from '@tabler/icons-react'
 import { ArrowLeftIcon } from 'lucide-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { CreateProductForm } from './_components/CreateProductForm'
 
 export default function StoreAdminProductNew() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const { selectedStoreId } = useStoreFilter()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -31,14 +31,13 @@ export default function StoreAdminProductNew() {
                 <ArrowLeftIcon /> ย้อนกลับ
               </Link>
             </Button>
-            <StoreSelectField
-              value={selectedStoreId}
-              onValueChange={setSelectedStoreId}
-            />
+            <StoreSelectField />
           </div>
         }
       />
-      <CreateProductForm />
+
+      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+      {selectedStoreId !== ALL_STORES && <CreateProductForm />}
     </DashboardSidebar>
   )
 }

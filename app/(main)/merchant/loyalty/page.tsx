@@ -3,8 +3,10 @@
 import { useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCoin } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -74,7 +76,7 @@ const MOCK_CUSTOMER_POINTS = {
 }
 
 export default function MerchantLoyaltyPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const { selectedStoreId } = useStoreFilter()
   const [searchTerm, setSearchTerm] = useState('')
   const [settings, setSettings] = useState(MOCK_LOYALTY_SETTINGS)
 
@@ -109,28 +111,28 @@ export default function MerchantLoyaltyPage() {
         icon={IconCoin}
         title="ระบบแต้มสะสม"
         description="ตั้งค่าเงื่อนไขการแจกแต้ม และบริหารจัดการคะแนนสมาชิกของแต่ละร้านค้า"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
-      <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
-        <LoyaltySettingsCard
-          settings={currentStoreSettings}
-          onToggleLoyalty={handleToggleLoyalty}
-          onInputChange={handleInputChange}
-          className="xl:col-span-4"
-        />
-        <CustomerPointsTable
-          customers={filteredCustomers}
-          isEnabled={currentStoreSettings?.isEnabled}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          className="xl:col-span-8"
-        />
-      </div>
+
+      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+
+      {selectedStoreId !== ALL_STORES && (
+        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
+          <LoyaltySettingsCard
+            settings={currentStoreSettings}
+            onToggleLoyalty={handleToggleLoyalty}
+            onInputChange={handleInputChange}
+            className="xl:col-span-4"
+          />
+          <CustomerPointsTable
+            customers={filteredCustomers}
+            isEnabled={currentStoreSettings?.isEnabled}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            className="xl:col-span-8"
+          />
+        </div>
+      )}
     </DashboardSidebar>
   )
 }

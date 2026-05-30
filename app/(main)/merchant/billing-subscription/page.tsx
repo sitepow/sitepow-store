@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { Plan, SubStatus } from '@/generated/prisma/enums'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { Receipt } from 'lucide-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -74,8 +73,7 @@ const MOCK_INVOICES = [
 ]
 
 export default function MerchantBillingSubscriptionPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
-
+  const { selectedStoreId } = useStoreFilter()
   const filteredStores =
     selectedStoreId === 'all'
       ? MOCK_USER_STORES
@@ -96,12 +94,7 @@ export default function MerchantBillingSubscriptionPage() {
         icon={Receipt}
         title="การจัดการสมาชิกและค่าบริการ"
         description="ตรวจสอบข้อมูลแพลนรายเดือนและประวัติใบเสร็จแยกตามรายร้านค้าของคุณ"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
       <MerchantSubscriptionTable stores={filteredStores} />
       <MerchantInvoiceTable invoices={filteredInvoices} />

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconTicket } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -89,7 +90,7 @@ const MOCK_COUPONS: Coupon[] = [
 ]
 
 export default function MerchantMarketingCouponsPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const { selectedStoreId } = useStoreFilter()
   const [coupons] = useState<Coupon[]>(MOCK_COUPONS)
 
   const filteredCoupons = useMemo(() => {
@@ -106,12 +107,7 @@ export default function MerchantMarketingCouponsPage() {
         icon={IconTicket}
         title="คูปองส่วนลดและการตลาด"
         description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
       <CouponListTable
         coupons={filteredCoupons}

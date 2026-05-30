@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconHierarchy } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -63,7 +64,7 @@ const MOCK_BRANCHES_DATA: Branch[] = [
 ]
 
 export default function MerchantOrganizationBranchesPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const { selectedStoreId } = useStoreFilter()
   const [branches] = useState<Branch[]>(MOCK_BRANCHES_DATA)
 
   const filteredBranches = useMemo(() => {
@@ -80,12 +81,7 @@ export default function MerchantOrganizationBranchesPage() {
         icon={IconHierarchy}
         title="การจัดการสาขา"
         description="บริหารจัดการที่ตั้งสาขาและคลังหน้าร้าน เพื่อใช้ควบคุมสิทธิ์พนักงานและกระจายสต็อกสินค้าคงคลังให้แม่นยำ"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
       <BranchListTable branches={filteredBranches} />
     </DashboardSidebar>

@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -42,8 +40,6 @@ import {
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 export default function MerchantDashboardPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
-
   const LOW_STOCK_PRODUCTS = [
     {
       id: 'PROD-003',
@@ -166,10 +162,7 @@ export default function MerchantDashboardPage() {
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
-      <StoreSelectField
-        value={selectedStoreId}
-        onValueChange={setSelectedStoreId}
-      />
+      <StoreSelectField />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS_DATA.map((stat, index) => (
           <StatsCard

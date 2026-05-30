@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEye, IconHistory } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -99,7 +100,7 @@ const MOCK_ACTIVITY_LOGS: ActivityLogItem[] = [
 ]
 
 export default function MerchantAuditLogsPage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
+  const { selectedStoreId } = useStoreFilter()
   const [actionFilter, setActionFilter] = useState<string>('all')
   const [actorFilter, setActorFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -139,12 +140,7 @@ export default function MerchantAuditLogsPage() {
         icon={IconHistory}
         title="ประวัติกิจกรรมระบบ"
         description="ตรวจสอบบันทึก Log การกระทำและเข้าถึงข้อมูลอย่างละเอียด เพื่อความโปร่งใสและการรักษาความปลอดภัยภายในองค์กร"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
       <AuditLogFilters
         searchQuery={searchQuery}

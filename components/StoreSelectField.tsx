@@ -1,4 +1,5 @@
 import { useStoreOptions } from '@/actions/hooks/store'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
 import {
@@ -11,16 +12,9 @@ import {
 
 import { Field, FieldLabel } from './ui/field'
 
-interface StoreSelectFieldProps {
-  value: string
-  onValueChange: (value: string) => void
-}
-
-export function StoreSelectField({
-  value,
-  onValueChange,
-}: StoreSelectFieldProps) {
+export function StoreSelectField() {
   const { data: stores = [], isLoading } = useStoreOptions()
+  const { selectedStoreId, setSelectedStoreId } = useStoreFilter()
 
   return (
     <Field className="w-full sm:w-fit">
@@ -28,7 +22,11 @@ export function StoreSelectField({
         <IconFilter size={14} />
         กรองตามร้านค้า
       </FieldLabel>
-      <Select value={value} onValueChange={onValueChange} disabled={isLoading}>
+      <Select
+        value={selectedStoreId}
+        onValueChange={setSelectedStoreId}
+        disabled={isLoading}
+      >
         <SelectTrigger className="w-full sm:w-64">
           <SelectValue placeholder="เลือกดูทุกร้านค้า" />
         </SelectTrigger>

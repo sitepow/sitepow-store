@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconSparkles } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -86,8 +85,7 @@ const MOCK_AI_LOGS: AiUsageLog[] = [
 ]
 
 export default function MerchantAiUsagePage() {
-  const [selectedStoreId, setSelectedStoreId] = useState<string>('all')
-
+  const { selectedStoreId } = useStoreFilter()
   const filteredStores =
     selectedStoreId === 'all'
       ? MOCK_STORE_AI_CREDITS
@@ -104,12 +102,7 @@ export default function MerchantAiUsagePage() {
         icon={IconSparkles}
         title="เครดิตและการใช้งาน AI"
         description="ตรวจสอบปริมาณการทำงานของระบบ AI Vision คัดกรองสลิป และ AI Search ค้นหาสินค้าจากคลังรูปภาพ"
-        endContent={
-          <StoreSelectField
-            value={selectedStoreId}
-            onValueChange={setSelectedStoreId}
-          />
-        }
+        endContent={<StoreSelectField />}
       />
       <StoreAiCreditTable stores={filteredStores} />
       <AiUsageLogTable logs={filteredLogs} />
