@@ -34,6 +34,32 @@ export const PRICING_OPTIONS: PricingOption[] = [
 
 export const PRICING_PLANS: PricingPlanProps[] = [
   {
+    title: 'Free',
+    description: 'เปิดร้านออนไลน์วันนี้ ฟรีตลอดชีพ ไม่ต้องใส่บัตร ไม่มีหมดอายุ',
+    price: '0',
+    currency: 'THB',
+    seed: 'newcomer',
+    features: [
+      {
+        text: 'ลงสินค้าได้สูงสุด 5 ชิ้น',
+        icon: <IconLayersIntersect size={18} stroke={1.5} />,
+      },
+      {
+        text: 'หน้าร้านออนไลน์ส่วนตัว',
+        icon: <IconBuildingStore size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รับเงินโอนแบบ Manual',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+        icon: <IconBolt size={18} stroke={1.5} />,
+      },
+    ],
+    buttonText: 'เริ่มฟรีเลย ไม่ต้องใส่บัตร',
+  },
+  {
     title: 'Starter',
     description: 'เริ่มต้นขายออนไลน์แบบมืออาชีพ กำไรเต็ม 100% ไม่โดนหัก GP',
     price: '490',
@@ -97,7 +123,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconChartBar size={18} stroke={1.5} />,
       },
     ],
-    buttonText: 'อัปเกรดเป็น Pro เลย',
+    buttonText: 'ทดลองใช้ Pro ฟรี 14 วัน',
   },
   {
     title: 'Ultimate',
@@ -123,7 +149,6 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
         icon: <IconTrophy size={18} stroke={1.5} />,
       },
-
       {
         text: 'Support พิเศษดูแลส่วนตัวตลอด 24 ชม.',
         icon: <IconHeadset size={18} stroke={1.5} />,
@@ -134,18 +159,18 @@ export const PRICING_PLANS: PricingPlanProps[] = [
 ]
 
 export const PRICING_TABLES: PricingTables = {
-  tiers: ['Starter', 'Pro', 'Ultimate'],
+  tiers: ['Free', 'Starter', 'Pro', 'Ultimate'],
   categories: [
     {
       name: 'ฟีเจอร์ AI อัจฉริยะ',
       features: [
         {
           label: 'AI ช่วยตั้งชื่อสินค้าจากรูปภาพ',
-          access: [false, true, true],
+          access: [false, false, true, true],
         },
         {
           label: 'AI ช่วยเขียน Sales Copy ภาษาไทย',
-          access: [false, true, true],
+          access: [false, false, true, true],
         },
       ],
     },
@@ -154,36 +179,39 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         {
           label: 'รับเงินเข้าบัญชีร้านโดยตรง (0% GP)',
-          access: [true, true, true],
+          access: [true, true, true, true],
         },
         {
           label: 'ระบบเช็คสลิปอัตโนมัติ (Easy Slip)',
-          access: [false, true, true],
+          access: [false, false, true, true],
         },
-        { label: 'เชื่อมต่อ GB Prime Pay', access: [false, true, true] },
+        { label: 'เชื่อมต่อ GB Prime Pay', access: [false, false, true, true] },
       ],
     },
     {
       name: 'การจัดการร้านค้า',
       features: [
-        { label: 'ลงสินค้าไม่จำกัดจำนวน', access: [false, true, true] },
-        { label: 'ระบบจัดการสต็อกสินค้า', access: [true, true, true] },
-        { label: 'รายงานวิเคราะห์ยอดขายและกำไร', access: [false, true, true] },
+        { label: 'ลงสินค้าไม่จำกัดจำนวน', access: [false, false, true, true] },
+        { label: 'ระบบจัดการสต็อกสินค้า', access: [false, true, true, true] },
+        {
+          label: 'รายงานวิเคราะห์ยอดขายและกำไร',
+          access: [false, false, true, true],
+        },
         {
           label: 'นำเข้าสินค้าจาก Lazada/Shopee (CSV/JSON)',
-          access: [true, true, true],
+          access: [false, true, true, true],
         },
         {
           label: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-          access: [false, false, true],
+          access: [false, false, false, true],
         },
       ],
     },
     {
       name: 'การตลาดและลูกค้าสัมพันธ์',
       features: [
-        { label: 'ระบบคูปองส่วนลด', access: [true, true, true] },
-        { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, true] },
+        { label: 'ระบบคูปองส่วนลด', access: [false, true, true, true] },
+        { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, false, true] },
       ],
     },
     {
@@ -191,11 +219,11 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         {
           label: 'ระบบ POS ขายหน้าร้านพื้นฐาน',
-          access: [true, true, true],
+          access: [false, true, true, true],
         },
         {
           label: 'AI Visual Search (หาของจากรูปภาพสำหรับพนักงาน)',
-          access: [false, true, true],
+          access: [false, false, true, true],
         },
       ],
     },
@@ -204,15 +232,15 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         {
           label: 'ระบบจัดการสถานะออเดอร์',
-          access: [true, true, true],
+          access: [false, true, true, true],
         },
         {
           label: 'พิมพ์ใบปะหน้าพัสดุ (พร้อม Packing List)',
-          access: [true, true, true],
+          access: [false, true, true, true],
         },
         {
           label: 'ระบบบันทึกและแจ้งเลข Tracking ให้ลูกค้า',
-          access: [true, true, true],
+          access: [false, true, true, true],
         },
       ],
     },
