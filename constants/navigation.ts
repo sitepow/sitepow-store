@@ -526,6 +526,11 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
         url: '/merchant/settings',
       },
       {
+        value: 'settings-transfer',
+        label: 'โอนความเป็นเจ้าของร้าน',
+        url: '/merchant/settings/transfer',
+      },
+      {
         value: 'settings-tax',
         label: 'ภาษีและใบกำกับ (VAT)',
         url: '/merchant/settings/tax',

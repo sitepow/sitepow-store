@@ -222,23 +222,52 @@ model Store {
   pointEarningRate Decimal? @db.Decimal(10, 2) // เช่น ซื้อ 100 บาท ได้ 1 แต้ม
   pointRedeemRate  Decimal? @db.Decimal(10, 2) // เช่น 1 แต้ม มีค่า 1 บาท
 
-  blogs          Blog[]
-  categories     Category[]
-  products       Product[]
-  reviews        Review[]
-  orders         Order[]
-  customers      CustomerStore[]
-  transactions   Transaction[]
-  carts          Cart[]
-  aiLogs         AiLog[]
-  branches       Branch[]
-  staffs         Staff[]
-  activityLogs   ActivityLog[]
-  coupons        Coupon[]
-  contactTickets ContactTicket[]
+  blogs            Blog[]
+  categories       Category[]
+  products         Product[]
+  reviews          Review[]
+  orders           Order[]
+  customers        CustomerStore[]
+  transactions     Transaction[]
+  carts            Cart[]
+  aiLogs           AiLog[]
+  branches         Branch[]
+  staffs           Staff[]
+  activityLogs     ActivityLog[]
+  coupons          Coupon[]
+  contactTickets   ContactTicket[]
+  transferRequests StoreTransferRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum TransferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  CANCELLED
+}
+
+model StoreTransferRequest {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  fromOwnerId String
+  toEmail     String
+  toUserId    String?
+
+  token     String         @unique @default(cuid())
+  status    TransferStatus @default(PENDING)
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([token])
 }
 
 model Subscription {
@@ -717,6 +746,7 @@ enum LogAction {
   DELETE_PRODUCT // ลบสินค้า
   UPDATE_STORE_SETTING // แก้ไขข้อมูลร้าน (ชื่อ, ที่อยู่, เวลาเปิด-ปิด)
   MANAGE_STAFF // เพิ่ม/ลบ/แก้ไข สิทธิ์ของพนักงาน
+  TRANSFER_STORE // โอนความเป็นเจ้าของร้านให้ผู้อื่น
   LOGIN // เข้าสู่ระบบ
   LOGOUT // ออกจากระบบ
 }
