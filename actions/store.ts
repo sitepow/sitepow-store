@@ -247,6 +247,12 @@ export async function createStore(input: CreateStoreInput) {
       usage: {
         create: {},
       },
+      branches: {
+        create: {
+          name: 'สาขาหลัก',
+          isMain: true,
+        },
+      },
     },
     select: storeSelect,
   })
