@@ -1,8 +1,14 @@
 'use client'
 
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import {
+  Controller,
+  FormProvider,
+  useFieldArray,
+  useForm,
+} from 'react-hook-form'
 
 import { generateProductAiAction } from '@/actions/ai'
+import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,6 +30,15 @@ import {
   FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 import { CategoryField } from './CategoryField'
 import { ImageUploadSection } from './ImageUploadSection'
@@ -192,13 +207,36 @@ export function CreateProductForm() {
             <div className="space-y-3">
               {metadataFields.map((field, index) => (
                 <div key={field.id} className="flex items-start gap-2">
+                  <div className="w-1/3">
+                    <Controller
+                      control={form.control}
+                      name={`metadata.${index}.key`}
+                      render={({ field: selectField }) => (
+                        <Select
+                          onValueChange={selectField.onChange}
+                          value={selectField.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="เลือกคุณสมบัติ" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-75">
+                            {PRODUCT_METADATA_MASTER.map((group) => (
+                              <SelectGroup key={group.category}>
+                                <SelectLabel>{group.category}</SelectLabel>
+                                {group.fields.map((item) => (
+                                  <SelectItem key={item.key} value={item.key}>
+                                    {item.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
                   <Input
-                    placeholder="ชื่อฟิลด์ (เช่น material)"
-                    className="w-1/3"
-                    {...register(`metadata.${index}.key`)}
-                  />
-                  <Input
-                    placeholder="ค่าข้อมูล"
+                    placeholder="ค่าข้อมูล (เช่น Apple, 5000mAh, สีดำ)"
                     className="flex-1"
                     {...register(`metadata.${index}.value`)}
                   />

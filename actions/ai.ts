@@ -1,5 +1,6 @@
 'use server'
 
+import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
@@ -66,12 +67,19 @@ export async function generateProductAiAction(title: string) {
       },
     })
 
+    const availableKeys = PRODUCT_METADATA_MASTER.flatMap((group) =>
+      group.fields.map((field) => field.key),
+    )
+
     const prompt = `ช่วยคิดข้อมูลสินค้า: "${title}". 
     - categoryId: "019d8c50-5e3a-7df1-8de0-e260f4f4f8dd"
-    - ในส่วน "metadata.details": ให้เพิ่มคุณสมบัติเชิงลึก 3-5 อย่าง โดยใช้ key เป็นภาษาอังกฤษ (snake_case) และ value เป็นภาษาไทย เช่น {"key": "brand", "value": "ชื่อแบรนด์"}
-    - metadata.tags: keywords 3-5 คำ
+    - ในส่วน "metadata.details": ให้เลือกคุณสมบัติเชิงลึกที่เกี่ยวข้องกับตัวสินค้าที่สุดจำนวน 3-5 อย่าง
+    - ข้อบังคับสำคัญ: ฟิลด์ "key" จะต้องเลือกมาจากรายการที่กำหนดให้ต่อไปนี้เท่านั้น ห้ามคิดคีย์ใหม่เองเด็ดขาด!
+      รายการคีย์ที่เลือกใช้ได้: ${JSON.stringify(availableKeys)}
+    - ส่วน "value" ให้เติมค่าที่เหมาะสมเป็นภาษาไทย เช่น ถ้าเลือก key "battery_life" ให้ใส่ value เป็น "ใช้งานได้สูงสุด 40 ชั่วโมง"
+    - metadata.tags: keywords 3-5 คำ (ภาษาไทย)
     - ข้อมูลที่เป็นภาษาไทย: title, variants.title, addons.title, และค่า (value) ใน metadata
-    - ข้อมูลที่เป็นภาษาอังกฤษ: slug, variants.sku, และชื่อคีย์ (key) ใน metadata`
+    - ข้อมูลที่เป็นภาษาอังกฤษ: slug, variants.sku`
 
     const result = await model.generateContent(prompt)
     const responseText = result.response.text()
