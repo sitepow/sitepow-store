@@ -2,6 +2,7 @@
 
 import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
+import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { prisma } from '@/lib/prisma'
 
@@ -75,7 +76,7 @@ export interface GetProductsParams {
 }
 
 export interface GetProductsResponse {
-  data: GetProductsItem[]
+  data: DecimalToNumber<GetProductsItem>[]
   meta: {
     currentPage: number
     limit: number
@@ -151,7 +152,7 @@ export async function getProducts({
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: products,
+      data: serializeDecimal(products),
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,
@@ -199,50 +200,62 @@ export async function createProduct(input: CreateProductInput) {
     ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
     : undefined
 
-  const product = await prisma.product.create({
-    data: {
-      ...rest,
-      storeId,
-      categoryId,
-      details,
-      tags: {
-        create: tagsArray.map((name) => ({ name })),
+  try {
+    await prisma.product.create({
+      data: {
+        ...rest,
+        storeId,
+        categoryId,
+        details,
+        tags: {
+          create: tagsArray.map((name) => ({ name })),
+        },
+        images: {
+          create: images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+        },
+        variants: {
+          create: variants.map((v) => ({
+            title: v.title,
+            price: v.price,
+            sku: v.sku ?? '',
+            discountActive: v.discount.active,
+            discountType: v.discount.active ? v.discount.type : null,
+            discountAmount: v.discount.active ? v.discount.amount : null,
+            pointsActive: v.rewardPoints.isActive,
+            pointsAmount: v.rewardPoints.amount,
+            stocks: {
+              create: v.stocks.map((s) => ({
+                branchId: s.branchId,
+                quantity: s.quantity,
+                minStock: s.minStock,
+              })),
+            },
+          })),
+        },
+        addons: {
+          create:
+            addons?.map((a) => ({
+              title: a.title,
+              price: a.price,
+              isAvailable: a.isAvailable,
+            })) ?? [],
+        },
       },
-      images: {
-        create: images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
-      },
-      variants: {
-        create: variants.map((v) => ({
-          title: v.title,
-          price: v.price,
-          sku: v.sku ?? '',
-          discountActive: v.discount.active,
-          discountType: v.discount.active ? v.discount.type : null,
-          discountAmount: v.discount.active ? v.discount.amount : null,
-          pointsActive: v.rewardPoints.isActive,
-          pointsAmount: v.rewardPoints.amount,
-          stocks: {
-            create: v.stocks.map((s) => ({
-              branchId: s.branchId,
-              quantity: s.quantity,
-              minStock: s.minStock,
-            })),
-          },
-        })),
-      },
-      addons: {
-        create:
-          addons?.map((a) => ({
-            title: a.title,
-            price: a.price,
-            isAvailable: a.isAvailable,
-          })) ?? [],
-      },
-    },
-    select: productSelect,
-  })
+      select: productSelect,
+    })
 
-  return { product }
+    return { message: 'สร้างสินค้าสำเร็จแล้ว' }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        throw new Error('สินค้านี้มี slug ซ้ำกับสินค้าอื่นในระบบแล้ว')
+      }
+      if (error.code === 'P2003') {
+        throw new Error('ไม่พบข้อมูลที่เชื่อมโยง เช่น หมวดหมู่หรือสาขาที่ระบุ')
+      }
+    }
+    throw new Error('เกิดข้อผิดพลาดในการบันทึกสินค้า กรุณาลองใหม่อีกครั้ง')
+  }
 }
 
 export async function deleteProduct(id: string) {

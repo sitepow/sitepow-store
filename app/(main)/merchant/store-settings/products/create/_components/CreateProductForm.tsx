@@ -9,17 +9,17 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useRouter } from 'next/navigation'
+
 import { generateProductAiAction } from '@/actions/ai'
+import { createProduct } from '@/actions/product'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IconImageGeneration,
-  IconLoader2,
-  IconTrash,
-} from '@tabler/icons-react'
+import { IconImageGeneration, IconTrash } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
@@ -42,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 
 import { CategoryField } from './CategoryField'
 import { ImageUploadSection } from './ImageUploadSection'
@@ -51,6 +52,8 @@ import { ProductTitleField } from './ProductTitleField'
 import { VariantItem } from './VariantItem'
 
 export function CreateProductForm() {
+  const router = useRouter()
+  const { selectedStoreId } = useStoreFilter()
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
@@ -60,7 +63,7 @@ export function CreateProductForm() {
       images: [],
       variants: [
         {
-          title: 'Standard',
+          title: 'มาตรฐาน',
           price: 0,
           sku: '',
           stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
@@ -103,8 +106,51 @@ export function CreateProductForm() {
     name: 'metadata',
   })
 
+  const { mutate: handleCreateProduct, isPending: isPendingCreate } =
+    useMutation({
+      mutationFn: async (data: ProductFormValues) => {
+        if (!selectedStoreId || selectedStoreId === ALL_STORES) return
+        return await createProduct({
+          storeId: selectedStoreId,
+          categoryId: data.categoryId,
+          title: data.title,
+          slug: data.slug,
+          tags: data.tags,
+          images: data.images,
+          variants: data.variants.map((v) => ({
+            title: v.title,
+            price: v.price,
+            sku: v.sku,
+            stocks: v.stocks.map((s) => ({
+              branchId: s.branchId,
+              quantity: s.quantity ?? 0,
+              minStock: s.minStock ?? 0,
+            })),
+            discount: {
+              active: v.discount.active ?? false,
+              type: v.discount.type ?? DiscountType.PERCENTAGE,
+              amount: v.discount.amount ?? 0,
+            },
+            rewardPoints: {
+              isActive: v.rewardPoints.isActive ?? false,
+              amount: v.rewardPoints.amount ?? 0,
+            },
+          })),
+          addons: data.addons?.map((a) => ({
+            title: a.title,
+            price: a.price,
+            isAvailable: a.isAvailable ?? true,
+          })),
+          metadata: data.metadata,
+        })
+      },
+      onSuccess: () => {
+        router.push('/store-settings/products')
+      },
+    })
+
   const onSubmit = (data: ProductFormValues) => {
-    console.log('Submitted Data:', data)
+    handleCreateProduct(data)
   }
 
   const { mutate: handleAiGen, isPending: isPendingAiGen } = useMutation({
@@ -136,6 +182,8 @@ export function CreateProductForm() {
     },
   })
 
+  const isPending = isPendingAiGen || isPendingCreate
+
   return (
     <FormProvider {...form}>
       <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
@@ -153,7 +201,7 @@ export function CreateProductForm() {
           <ImageUploadSection />
 
           <FieldSet
-            disabled={isPendingAiGen}
+            disabled={isPending}
             className="bg-muted/30 rounded-xl border p-6"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
@@ -195,7 +243,7 @@ export function CreateProductForm() {
           </FieldSet>
 
           <FieldSet
-            disabled={isPendingAiGen}
+            disabled={isPending}
             className="bg-muted/30 rounded-lg border p-4"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
@@ -271,7 +319,7 @@ export function CreateProductForm() {
           </FieldSet>
 
           <FieldSet
-            disabled={isPendingAiGen}
+            disabled={isPending}
             className="bg-muted/30 rounded-xl border p-6"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
@@ -339,13 +387,16 @@ export function CreateProductForm() {
               onClick={() => handleAiGen()}
             >
               {isPendingAiGen ? (
-                <IconLoader2 className="mr-2 size-4 animate-spin" />
+                <Spinner />
               ) : (
                 <IconImageGeneration className="mr-2 size-4" />
               )}
-              {isPendingAiGen ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
+              {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
             </Button>
-            <Button type="submit">บันทึกสินค้าใหม่</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPendingCreate && <Spinner />}
+              บันทึกสินค้าใหม่
+            </Button>
           </div>
         </form>
 

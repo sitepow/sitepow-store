@@ -16,7 +16,6 @@ export async function generateProductAiAction(title: string) {
           properties: {
             title: { type: SchemaType.STRING },
             slug: { type: SchemaType.STRING },
-            categoryId: { type: SchemaType.STRING },
             variants: {
               type: SchemaType.ARRAY,
               items: {
@@ -89,7 +88,6 @@ export async function generateProductAiAction(title: string) {
     )
 
     const prompt = `ช่วยคิดข้อมูลสินค้า: "${title}". 
-    - categoryId: "019d8c50-5e3a-7df1-8de0-e260f4f4f8dd"
     - ในส่วน "metadata.details": ให้เลือกคุณสมบัติเชิงลึกที่เกี่ยวข้องกับตัวสินค้าที่สุดจำนวน 3-5 อย่าง
     - ข้อบังคับสำคัญ: ฟิลด์ "key" จะต้องเลือกมาจากรายการที่กำหนดให้ต่อไปนี้เท่านั้น ห้ามคิดคีย์ใหม่เองเด็ดขาด!
       รายการคีย์ที่เลือกใช้ได้: ${JSON.stringify(availableKeys)}
