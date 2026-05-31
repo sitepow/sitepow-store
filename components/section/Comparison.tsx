@@ -16,7 +16,7 @@ import {
 import { SectionContainer } from '../SectionContainer'
 import { SectionHeader } from '../SectionHeader'
 
-export function ProfitComparisonSection() {
+export function ComparisonSection() {
   return (
     <SectionContainer>
       <SectionHeader

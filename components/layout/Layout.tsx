@@ -2,6 +2,7 @@ import { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
+import { ProtectedByBrand } from '../ProtectedByBrand'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
@@ -17,6 +18,7 @@ export function MainLayout({
         {children}
       </main>
       <Footer />
+      <ProtectedByBrand />
     </div>
   )
 }

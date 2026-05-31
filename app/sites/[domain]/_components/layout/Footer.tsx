@@ -1,4 +1,5 @@
 import { LogoBrand } from '@/components/LogoBrand'
+import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { FacebookIcon } from '@/components/icon/Facebook'
 import { GithubIcon } from '@/components/icon/Github'
 import { InstagramIcon } from '@/components/icon/Instagram'
@@ -69,9 +70,7 @@ export function StoreFooter() {
         </div>
       </div>
 
-      <div className="mb-5 flex flex-wrap items-center justify-center gap-2.5 px-2.5">
-        protected & managed by <LogoBrand />
-      </div>
+      <ProtectedByBrand />
     </footer>
   )
 }

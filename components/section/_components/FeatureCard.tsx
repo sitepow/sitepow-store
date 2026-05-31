@@ -17,7 +17,7 @@ export function FeatureCard({
   icon,
 }: FeatureCardProps) {
   return (
-    <Card className="group text-start">
+    <Card className="group hover:border-primary border border-transparent text-start">
       <CardHeader>
         <div className="mb-4 flex items-center gap-3">
           {icon && (

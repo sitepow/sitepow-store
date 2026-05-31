@@ -19,7 +19,7 @@ export function LogisticsSection() {
         ประหยัดเวลาแพ็คและส่งของได้มากกว่า 50%"
       />
 
-      <div className="grid w-full gap-5 sm:grid-cols-2">
+      <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {LOGISTICS_FEATURES.map((feature, idx) => {
           return <FeatureCard key={idx} {...feature} />
         })}
