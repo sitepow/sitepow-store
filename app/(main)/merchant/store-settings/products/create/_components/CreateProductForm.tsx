@@ -13,13 +13,14 @@ import { useRouter } from 'next/navigation'
 
 import { generateProductAiAction } from '@/actions/ai'
 import { createProduct } from '@/actions/product'
+import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconImageGeneration, IconTrash } from '@tabler/icons-react'
+import { IconBulb, IconImageGeneration, IconTrash } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
@@ -78,6 +79,22 @@ export function CreateProductForm() {
   })
 
   const { register, handleSubmit, reset, getValues } = form
+
+  const handleApplyPreset = (type: string) => {
+    const preset = PRODUCT_PRESETS_MASTER.find((p) => p.type === type)
+    if (!preset) {
+      return
+    }
+
+    const currentValues = getValues()
+
+    reset({
+      ...currentValues,
+      ...preset.data,
+    } as ProductFormValues)
+
+    toast.success(`โหลดตัวอย่าง${preset.toastLabel} เรียบร้อยแล้ว`)
+  }
 
   const {
     fields: variantFields,
@@ -145,7 +162,7 @@ export function CreateProductForm() {
         })
       },
       onSuccess: () => {
-        router.push('/store-settings/products')
+        router.push('/merchant/store-settings/products')
       },
     })
 
@@ -186,6 +203,35 @@ export function CreateProductForm() {
 
   return (
     <FormProvider {...form}>
+      <Card>
+        <CardContent className="flex flex-wrap items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending}
+            onClick={() => handleAiGen()}
+          >
+            {isPendingAiGen ? (
+              <Spinner />
+            ) : (
+              <IconImageGeneration className="mr-2 size-4" />
+            )}
+            {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
+          </Button>
+          {PRODUCT_PRESETS_MASTER.map((preset) => (
+            <Button
+              key={preset.type}
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              onClick={() => handleApplyPreset(preset.type)}
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
           <FieldSet disabled={isPendingAiGen}>
@@ -378,20 +424,13 @@ export function CreateProductForm() {
           </FieldSet>
 
           <div className="flex flex-wrap justify-end gap-4 border-t pt-6">
-            <Button type="button" variant="ghost" onClick={() => reset()}>
-              ล้างฟอร์ม
-            </Button>
             <Button
               type="button"
+              disabled={isPending}
               variant="outline"
-              onClick={() => handleAiGen()}
+              onClick={() => reset()}
             >
-              {isPendingAiGen ? (
-                <Spinner />
-              ) : (
-                <IconImageGeneration className="mr-2 size-4" />
-              )}
-              {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
+              ล้างฟอร์ม
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPendingCreate && <Spinner />}

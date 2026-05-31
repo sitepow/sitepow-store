@@ -5,16 +5,35 @@ import { arrayToString, stringToArray } from '@/utils/format'
 export function ProductPreviewContent() {
   const { control } = useFormContext()
 
-  const [title, slug, tags] = useWatch({
+  const [title, slug, tags, variants] = useWatch({
     control,
-    name: ['title', 'slug', 'tags'],
+    name: ['title', 'slug', 'tags', 'variants'],
   })
 
   const displayTitle = title || 'ชื่อสินค้าจะแสดงตรงนี้'
   const displaySlug = slug || 'url-slug-example'
   const formattedTags = arrayToString(stringToArray(tags))
 
-  const description = `${formattedTags}สั่งซื้อ ${title} พร้อมโปรโมชั่นพิเศษและตัวเลือกเสริมมากมายได้ที่นี่...`
+  const getMinPrice = () => {
+    if (!variants || variants.length === 0) {
+      return null
+    }
+
+    const prices = variants
+      .map((v: { price: number }) => Number(v?.price))
+      .filter((p: number) => !isNaN(p) && p > 0)
+
+    if (prices.length === 0) {
+      return null
+    }
+    return Math.min(...prices)
+  }
+
+  const minPrice = getMinPrice()
+
+  const priceText =
+    minPrice !== null ? ` เริ่มต้นเพียง ฿${minPrice.toLocaleString()}! ` : ' '
+  const description = `${formattedTags ? `${formattedTags}` : ''}ช้อปเลย! ${title || 'สินค้าคุณภาพ'}${priceText}พร้อมโปรโมชั่นพิเศษและตัวเลือกเสริมมากมาย การันตีของแท้ สั่งซื้อได้ที่นี่...`
 
   return (
     <div className="space-y-6">

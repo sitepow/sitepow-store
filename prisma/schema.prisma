@@ -375,10 +375,18 @@ model Category {
   @@unique([storeId, slug])
 }
 
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+}
+
 model Product {
   id    String @id @default(cuid())
   title String
   slug  String
+
+  productType ProductType @default(PHYSICAL)
+  digitalUrl  String?
 
   tags    ProductTag[]
   details Json?
