@@ -12,11 +12,11 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-interface PointsSettingsFormProps {
+interface PointsSettingsFieldProps {
   isPending: boolean
 }
 
-export function PointsSettingsForm({ isPending }: PointsSettingsFormProps) {
+export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
   const {
     register,
     setValue,

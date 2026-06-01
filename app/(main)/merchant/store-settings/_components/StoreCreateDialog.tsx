@@ -26,10 +26,10 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from './PlanSelector'
-import { PointsSettingsForm } from './PointsSettingsForm'
+import { PointsSettingsField } from './PointsSettingsField'
 import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
-import { VatSettingsForm } from './VatSettingsForm'
+import { VatSettingsField } from './VatSettingsField'
 
 export function StoreCreateDialog() {
   const { user } = useSession()
@@ -180,8 +180,8 @@ export function StoreCreateDialog() {
               <FieldError>{errors?.address?.message}</FieldError>
             </Field>
 
-            <VatSettingsForm isPending={createStoreMutation.isPending} />
-            <PointsSettingsForm isPending={createStoreMutation.isPending} />
+            <VatSettingsField isPending={createStoreMutation.isPending} />
+            <PointsSettingsField isPending={createStoreMutation.isPending} />
           </div>
         </FormProvider>
 

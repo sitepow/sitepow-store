@@ -1,36 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import React, { useState } from 'react'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import { ProductFormValues } from '@/zod/product'
+import { ImagePlus, Loader2, X } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
+import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field'
 
-import { ProductFormValues } from '@/zod/product';
-import { ImagePlus, Loader2, X } from 'lucide-react';
-
-
-
-import { Button } from '@/components/ui/button';
-import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field';
-
-
-
-import { cn } from '@/lib/utils';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { cn } from '@/lib/utils'
 
 export function ImageUploadSection() {
   const { control } = useFormContext<ProductFormValues>()

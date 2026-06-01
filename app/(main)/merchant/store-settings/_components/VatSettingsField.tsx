@@ -8,11 +8,11 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-interface VatSettingsFormProps {
+interface VatSettingsFieldProps {
   isPending: boolean
 }
 
-export function VatSettingsForm({ isPending }: VatSettingsFormProps) {
+export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
   const {
     register,
     setValue,
