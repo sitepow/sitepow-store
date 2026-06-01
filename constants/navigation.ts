@@ -1,10 +1,29 @@
-import { IconBox, IconBuildingStore, IconChartBar, IconCoin, IconCreditCard, IconHeadset, IconHeart, IconHierarchy2, IconHistory, IconLayoutDashboard, IconMapPin, IconMessageCircle, IconNews, IconPackage, IconSettings, IconShoppingCart, IconSparkles, IconStar, IconTicket, IconTruck, IconUser, IconUsers, IconWallet, TablerIcon } from '@tabler/icons-react';
-
-
-
-
-
-
+import {
+  IconBox,
+  IconBuildingStore,
+  IconChartBar,
+  IconCoin,
+  IconCreditCard,
+  IconHeadset,
+  IconHeart,
+  IconHierarchy2,
+  IconHistory,
+  IconLayoutDashboard,
+  IconMapPin,
+  IconMessageCircle,
+  IconNews,
+  IconPackage,
+  IconSettings,
+  IconShoppingCart,
+  IconSparkles,
+  IconStar,
+  IconTicket,
+  IconTruck,
+  IconUser,
+  IconUsers,
+  IconWallet,
+  TablerIcon,
+} from '@tabler/icons-react'
 
 export interface NavigationItem {
   value: string
