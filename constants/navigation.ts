@@ -1,29 +1,10 @@
-import {
-  IconBox,
-  IconBuildingStore,
-  IconChartBar,
-  IconCoin,
-  IconCreditCard,
-  IconHeadset,
-  IconHeart,
-  IconHierarchy2,
-  IconHistory,
-  IconLayoutDashboard,
-  IconMapPin,
-  IconMessageCircle,
-  IconNews,
-  IconPackage,
-  IconSettings,
-  IconShoppingCart,
-  IconSparkles,
-  IconStar,
-  IconTicket,
-  IconTruck,
-  IconUser,
-  IconUsers,
-  IconWallet,
-  TablerIcon,
-} from '@tabler/icons-react'
+import { IconBox, IconBuildingStore, IconChartBar, IconCoin, IconCreditCard, IconHeadset, IconHeart, IconHierarchy2, IconHistory, IconLayoutDashboard, IconMapPin, IconMessageCircle, IconNews, IconPackage, IconSettings, IconShoppingCart, IconSparkles, IconStar, IconTicket, IconTruck, IconUser, IconUsers, IconWallet, TablerIcon } from '@tabler/icons-react';
+
+
+
+
+
+
 
 export interface NavigationItem {
   value: string
@@ -257,11 +238,11 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
         label: 'สินค้าใกล้หมด',
         url: '/merchant/inventory?filter=low_stock',
       },
-      {
-        value: 'inventory-transfer',
-        label: 'โอนย้ายสต็อก',
-        url: '/merchant/inventory/transfer',
-      },
+      // {
+      //   value: 'inventory-transfer',
+      //   label: 'โอนย้ายสต็อก',
+      //   url: '/merchant/inventory/transfer',
+      // },
     ],
   },
   {
@@ -316,59 +297,59 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'billing',
     icon: IconCreditCard,
     hasSeparatorBefore: true,
-    items: [
-      {
-        value: 'billing-plan',
-        label: 'แผนปัจจุบันและอัปเกรด',
-        url: '/merchant/billing',
-      },
-      {
-        value: 'billing-invoices',
-        label: 'ประวัติการชำระเงิน',
-        url: '/merchant/billing/invoices',
-      },
-    ],
+    // items: [
+    //   {
+    //     value: 'billing-plan',
+    //     label: 'แผนปัจจุบันและอัปเกรด',
+    //     url: '/merchant/billing',
+    //   },
+    //   {
+    //     value: 'billing-invoices',
+    //     label: 'ประวัติการชำระเงิน',
+    //     url: '/merchant/billing/invoices',
+    //   },
+    // ],
   },
   {
     value: 'ai-usage',
     label: 'เครดิต AI (Vision/Search)',
     tab: 'ai',
     icon: IconSparkles,
-    items: [
-      {
-        value: 'ai-overview',
-        label: 'ภาพรวมเครดิต',
-        url: '/merchant/ai-usage',
-      },
-      {
-        value: 'ai-logs',
-        label: 'ประวัติการใช้ AI',
-        url: '/merchant/ai-usage/logs',
-      },
-      {
-        value: 'ai-topup',
-        label: 'เติมเครดิต',
-        url: '/merchant/ai-usage/topup',
-      },
-    ],
+    // items: [
+    //   {
+    //     value: 'ai-overview',
+    //     label: 'ภาพรวมเครดิต',
+    //     url: '/merchant/ai-usage',
+    //   },
+    //   {
+    //     value: 'ai-logs',
+    //     label: 'ประวัติการใช้ AI',
+    //     url: '/merchant/ai-usage/logs',
+    //   },
+    //   {
+    //     value: 'ai-topup',
+    //     label: 'เติมเครดิต',
+    //     url: '/merchant/ai-usage/topup',
+    //   },
+    // ],
   },
   {
     value: 'loyalty',
     label: 'ระบบแต้มสะสม',
     tab: 'loyalty',
     icon: IconCoin,
-    items: [
-      {
-        value: 'loyalty-settings',
-        label: 'ตั้งค่าระบบแต้ม',
-        url: '/merchant/loyalty',
-      },
-      {
-        value: 'loyalty-history',
-        label: 'ประวัติแต้มลูกค้า',
-        url: '/merchant/loyalty/history',
-      },
-    ],
+    // items: [
+    //   {
+    //     value: 'loyalty-settings',
+    //     label: 'ตั้งค่าระบบแต้ม',
+    //     url: '/merchant/loyalty',
+    //   },
+    //   {
+    //     value: 'loyalty-history',
+    //     label: 'ประวัติแต้มลูกค้า',
+    //     url: '/merchant/loyalty/history',
+    //   },
+    // ],
   },
   {
     value: 'marketing-coupons',
@@ -468,18 +449,18 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'branches',
     icon: IconHierarchy2,
     hasSeparatorBefore: true,
-    items: [
-      {
-        value: 'branches-list',
-        label: 'สาขาทั้งหมด',
-        url: '/merchant/branches',
-      },
-      {
-        value: 'branches-create',
-        label: 'เพิ่มสาขาใหม่',
-        url: '/merchant/branches/create',
-      },
-    ],
+    // items: [
+    //   {
+    //     value: 'branches-list',
+    //     label: 'สาขาทั้งหมด',
+    //     url: '/merchant/branches',
+    //   },
+    //   {
+    //     value: 'branches-create',
+    //     label: 'เพิ่มสาขาใหม่',
+    //     url: '/merchant/branches/create',
+    //   },
+    // ],
   },
   {
     value: 'audit-logs',
@@ -532,7 +513,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       },
       {
         value: 'settings-shipping',
-        label: 'ระบบขนส่ง (Shippop)',
+        label: 'ระบบขนส่ง',
         url: '/merchant/settings/shipping',
       },
       {
