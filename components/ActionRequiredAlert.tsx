@@ -18,7 +18,7 @@ export function ActionRequiredAlert({
   return (
     <Alert>
       <AlertTitle className="flex flex-wrap items-center gap-2">
-        <IconAlertCircle size={26} className="text-muted-foreground/40" />
+        <IconAlertCircle />
         {title}
       </AlertTitle>
       <AlertDescription>{description}</AlertDescription>
