@@ -1,11 +1,14 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import { ComponentProps, useState } from 'react'
 
+import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -26,36 +29,29 @@ import {
 
 import { cn } from '@/lib/utils'
 
-interface Customer {
-  id: string
-  name: string
-  phone: string
-  currentPoints: number
-  totalEarned: number
-  lastActive: string
-}
-
-interface CustomerPointsTableProps extends ComponentProps<typeof Card> {
-  customers: Customer[]
-  isEnabled: boolean
-  searchTerm: string
-  onSearchChange: (value: string) => void
-}
-
 export function CustomerPointsTable({
-  customers,
-  isEnabled,
-  searchTerm,
-  onSearchChange,
   className,
   ...props
-}: CustomerPointsTableProps) {
+}: ComponentProps<typeof Card>) {
+  const { selectedStoreId } = useStoreFilter()
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+
+  const { data: settings } = useLoyaltySettings(selectedStoreId)
+  const { data: { data: customers = [], meta } = {}, isLoading } =
+    useCustomerPoints({
+      storeId: selectedStoreId,
+      page,
+      limit: 10,
+      search,
+    })
+
+  const isEnabled = settings?.isPointsEnabled ?? false
+
   return (
     <Card className={cn('h-fit', className)} {...props}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          ฐานข้อมูลสมาชิกและคะแนนคงเหลือ
-        </CardTitle>
+        <CardTitle>ฐานข้อมูลสมาชิกและคะแนนคงเหลือ</CardTitle>
         <CardDescription>
           รายชื่อลูกค้าที่เป็นสมาชิกของร้านค้านี้ และประวัติคะแนนสะสม
         </CardDescription>
@@ -68,8 +64,11 @@ export function CustomerPointsTable({
           />
           <Input
             placeholder="ค้นหาสมาชิกด้วยชื่อ หรือเบอร์โทรศัพท์..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
             className="pl-9 text-xs"
             disabled={!isEnabled}
           />
@@ -78,11 +77,10 @@ export function CustomerPointsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>รหัสสมาชิก</TableHead>
                 <TableHead>ชื่อลูกค้า</TableHead>
                 <TableHead>เบอร์โทรศัพท์</TableHead>
                 <TableHead className="text-right">แต้มปัจจุบัน</TableHead>
-                <TableHead className="text-right">แต้มสะสมทั้งหมด</TableHead>
+                <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
                 <TableHead className="text-right">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
@@ -90,30 +88,31 @@ export function CustomerPointsTable({
               {!isEnabled ? (
                 <TableEmptyRow
                   title="ระบบแต้มสะสมของร้านค้านี้ถูกปิดการใช้งานอยู่"
-                  colSpan={6}
+                  colSpan={5}
                 />
+              ) : isLoading && customers.length === 0 ? (
+                <TableLoadingRow colSpan={5} />
               ) : customers.length === 0 ? (
                 <TableEmptyRow
                   title="ไม่พบข้อมูลสมาชิกในระบบของแบรนด์นี้"
-                  colSpan={6}
+                  colSpan={5}
                 />
               ) : (
-                customers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell className="text-xs font-medium">
-                      {customer.id}
-                    </TableCell>
+                customers.map((item) => (
+                  <TableRow key={item.id}>
                     <TableCell className="font-medium">
-                      {customer.name}
+                      {[item.customer.firstName, item.customer.lastName]
+                        .filter(Boolean)
+                        .join(' ') || item.customer.email}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">
-                      {customer.phone}
+                      {item.customer.phone ?? '-'}
                     </TableCell>
                     <TableCell className="text-primary text-right font-semibold">
-                      {customer.currentPoints.toLocaleString()}
+                      {item.rewardPoints.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-right text-xs">
-                      {customer.totalEarned.toLocaleString()}
+                      ฿{Number(item.totalSpent).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -130,7 +129,15 @@ export function CustomerPointsTable({
             </TableBody>
           </Table>
         </div>
-        <StorePagination />
+        {meta && meta.totalPages > 1 && (
+          <StorePagination
+            currentPage={meta.currentPage}
+            totalPages={meta.totalPages}
+            hasNextPage={meta.hasNextPage}
+            hasPreviousPage={meta.hasPreviousPage}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        )}
       </CardContent>
     </Card>
   )

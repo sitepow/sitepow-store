@@ -1,7 +1,18 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import { ComponentProps, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 
+import {
+  useLoyaltySettings,
+  useUpdateLoyaltySettings,
+} from '@/actions/hooks/loyalty'
+import { useStoreFilter } from '@/stores/use-store-filter'
+import {
+  UpdateLoyaltySettingsFormValues,
+  updateLoyaltySettingsSchema,
+} from '@/zod/loyalty'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -15,38 +26,69 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 import { cn } from '@/lib/utils'
 
-interface LoyaltySettings {
-  isEnabled: boolean
-  earnRate: number
-  rewardValue: number
-  minRedeemPoints: number
-}
-
-interface LoyaltySettingsCardProps extends ComponentProps<typeof Card> {
-  settings: LoyaltySettings
-  onToggleLoyalty: (checked: boolean) => void
-  onInputChange: (field: string, value: number) => void
-}
-
 export function LoyaltySettingsCard({
-  settings,
-  onToggleLoyalty,
-  onInputChange,
   className,
   ...props
-}: LoyaltySettingsCardProps) {
+}: ComponentProps<typeof Card>) {
+  const { selectedStoreId } = useStoreFilter()
+  const { data: settings } = useLoyaltySettings(selectedStoreId)
+  const updateLoyaltyMutation = useUpdateLoyaltySettings()
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<UpdateLoyaltySettingsFormValues>({
+    resolver: zodResolver(updateLoyaltySettingsSchema),
+    defaultValues: {
+      isPointsEnabled: false,
+      pointEarningRate: null,
+      pointRedeemRate: null,
+    },
+  })
+
+  useEffect(() => {
+    if (settings) {
+      reset({
+        isPointsEnabled: settings.isPointsEnabled,
+        pointEarningRate: settings.pointEarningRate
+          ? Number(settings.pointEarningRate)
+          : null,
+        pointRedeemRate: settings.pointRedeemRate
+          ? Number(settings.pointRedeemRate)
+          : null,
+      })
+    }
+  }, [settings, reset])
+
+  const isPointsEnabled = watch('isPointsEnabled')
+
+  const onSubmit = (values: UpdateLoyaltySettingsFormValues) => {
+    updateLoyaltyMutation.mutate({
+      storeId: selectedStoreId,
+      input: values,
+    })
+  }
+
   return (
     <Card className={cn('h-fit', className)} {...props}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>เงื่อนไขการคำนวณแต้ม</CardTitle>
           <Switch
-            checked={settings?.isEnabled}
-            onCheckedChange={onToggleLoyalty}
+            checked={isPointsEnabled}
+            onCheckedChange={(v) =>
+              setValue('isPointsEnabled', v, { shouldValidate: true })
+            }
+            disabled={updateLoyaltyMutation.isPending}
           />
         </div>
         <CardDescription>
@@ -54,11 +96,10 @@ export function LoyaltySettingsCard({
         </CardDescription>
       </CardHeader>
       <CardContent
-        className={`space-y-5 transition-opacity duration-200 ${
-          !settings?.isEnabled
-            ? 'pointer-events-none opacity-40 select-none'
-            : ''
-        }`}
+        className={cn(
+          'space-y-5 transition-opacity duration-200',
+          !isPointsEnabled && 'pointer-events-none opacity-40 select-none',
+        )}
       >
         <div className="space-y-2">
           <Label className="text-xs font-semibold">
@@ -67,20 +108,22 @@ export function LoyaltySettingsCard({
           <div className="flex items-center">
             <Input
               type="number"
-              value={settings?.earnRate || ''}
-              onChange={(e) =>
-                onInputChange('earnRate', Number(e.target.value))
-              }
+              min={1}
               className="rounded-r-none"
+              {...register('pointEarningRate', { valueAsNumber: true })}
+              disabled={updateLoyaltyMutation.isPending}
             />
             <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
               บาท = 1 แต้ม
             </span>
           </div>
-          <p className="text-muted-foreground text-[10px]">
-            เช่น ซื้อครบ 100 บาท ระบบจะคำนวณให้ 1 คะแนนเข้าสู่บัญชีลูกค้า
-          </p>
+          {errors?.pointEarningRate && (
+            <p className="text-destructive text-xs">
+              {errors.pointEarningRate.message}
+            </p>
+          )}
         </div>
+
         <div className="space-y-2">
           <Label className="text-xs font-semibold">
             มูลค่าส่วนลดต่อ 1 แต้ม
@@ -88,43 +131,38 @@ export function LoyaltySettingsCard({
           <div className="flex items-center">
             <Input
               type="number"
-              value={settings?.rewardValue || ''}
-              onChange={(e) =>
-                onInputChange('rewardValue', Number(e.target.value))
-              }
+              min={1}
               className="rounded-r-none"
+              {...register('pointRedeemRate', { valueAsNumber: true })}
+              disabled={updateLoyaltyMutation.isPending}
             />
             <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
               แต้ม = ลด 1 บาท
             </span>
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label className="text-xs font-semibold">
-            จำนวนแต้มขั้นต่ำที่สามารถแลกได้
-          </Label>
-          <div className="flex items-center">
-            <Input
-              type="number"
-              value={settings?.minRedeemPoints || ''}
-              onChange={(e) =>
-                onInputChange('minRedeemPoints', Number(e.target.value))
-              }
-              className="rounded-r-none"
-            />
-            <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
-              แต้มขึ้นไป
-            </span>
-          </div>
+          {errors?.pointRedeemRate && (
+            <p className="text-destructive text-xs">
+              {errors.pointRedeemRate.message}
+            </p>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-end border-t pt-3">
         <Button
           size="sm"
           className="gap-1.5 text-xs"
-          disabled={!settings?.isEnabled}
+          disabled={updateLoyaltyMutation.isPending}
+          onClick={handleSubmit(onSubmit)}
         >
-          <IconDeviceFloppy size={14} /> บันทึกการตั้งค่า
+          {updateLoyaltyMutation.isPending ? (
+            <>
+              <Spinner /> กำลังบันทึก...
+            </>
+          ) : (
+            <>
+              <IconDeviceFloppy size={14} /> บันทึกการตั้งค่า
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>
