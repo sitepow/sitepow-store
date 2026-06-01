@@ -379,17 +379,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       {
         value: 'coupons-all',
         label: 'คูปองทั้งหมด',
-        url: '/merchant/coupons',
-      },
-      {
-        value: 'coupons-create',
-        label: 'สร้างคูปองใหม่',
-        url: '/merchant/coupons/create',
+        url: '/merchant/marketing-coupons',
       },
       {
         value: 'coupons-expired',
         label: 'คูปองหมดอายุ',
-        url: '/merchant/coupons?status=expired',
+        url: '/merchant/marketing-coupons?status=expired',
       },
     ],
   },

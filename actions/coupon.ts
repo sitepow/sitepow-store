@@ -1,0 +1,172 @@
+'use server'
+
+import { DiscountType, Prisma } from '@/generated/prisma/client'
+import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+
+import { prisma } from '@/lib/prisma'
+
+interface GetCouponsParams {
+  storeId: string
+  page?: number
+  limit?: number
+  search?: string
+}
+
+export interface CreateCouponInput {
+  storeId: string
+  branchId?: string | null
+  code: string
+  description?: string | null
+  discountType: DiscountType
+  discountAmount: number | string
+  minOrderAmount?: number | string
+  maxDiscount?: number | string | null
+  startDate: Date | string
+  endDate: Date | string
+  usageLimit?: number | null
+}
+
+export type UpdateCouponInput = Partial<Omit<CreateCouponInput, 'storeId'>>
+
+const couponSelect = {
+  id: true,
+  code: true,
+  description: true,
+  discountType: true,
+  discountAmount: true,
+  minOrderAmount: true,
+  maxDiscount: true,
+  startDate: true,
+  endDate: true,
+  usageLimit: true,
+  usedCount: true,
+  branchId: true,
+  branch: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  createdAt: true,
+} satisfies Prisma.CouponSelect
+
+export type GetCouponItem = Prisma.CouponGetPayload<{
+  select: typeof couponSelect
+}>
+
+export interface GetCouponsResponse {
+  data: DecimalToNumber<GetCouponItem[]>
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
+
+export async function getCoupons({
+  storeId,
+  page = 1,
+  limit = 10,
+  search,
+}: GetCouponsParams): Promise<GetCouponsResponse> {
+  try {
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(20, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
+
+    const whereClause: Prisma.CouponWhereInput = { storeId }
+
+    if (search) {
+      whereClause.OR = [
+        { code: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    const [totalItems, coupons] = await Promise.all([
+      prisma.coupon.count({ where: whereClause }),
+      prisma.coupon.findMany({
+        where: whereClause,
+        skip,
+        take: sanitizedLimit,
+        orderBy: { createdAt: 'desc' },
+        select: couponSelect,
+      }),
+    ])
+
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
+    return {
+      data: serializeDecimal(coupons),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
+    }
+  } catch {
+    return {
+      data: [],
+      meta: {
+        currentPage: page,
+        limit,
+        totalItems: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    }
+  }
+}
+
+export async function createCoupon(input: CreateCouponInput) {
+  const existing = await prisma.coupon.findUnique({
+    where: { code: input.code },
+    select: { id: true },
+  })
+
+  if (existing) {
+    throw new Error('รหัสคูปองนี้ถูกใช้งานไปแล้ว')
+  }
+
+  return serializeDecimal(
+    await prisma.coupon.create({
+      data: {
+        ...input,
+        startDate: new Date(input.startDate),
+        endDate: new Date(input.endDate),
+      },
+      select: couponSelect,
+    }),
+  )
+}
+
+export async function updateCoupon(id: string, input: UpdateCouponInput) {
+  if (!id) {
+    throw new Error('ไม่พบ Coupon ID')
+  }
+
+  return serializeDecimal(
+    await prisma.coupon.update({
+      where: { id },
+      data: input,
+      select: couponSelect,
+    }),
+  )
+}
+
+export async function deleteCoupon(id: string) {
+  if (!id) {
+    throw new Error('ไม่พบ Coupon ID')
+  }
+
+  await prisma.coupon.delete({ where: { id } })
+
+  return { message: 'ลบคูปองสำเร็จ' }
+}
