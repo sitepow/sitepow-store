@@ -160,7 +160,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     items: [
       {
         value: 'store-info',
-        label: 'ข้อมูลทั่วไปของร้าน',
+        label: 'ร้านค้าของคุณ',
         url: '/merchant/store-settings',
       },
       {
