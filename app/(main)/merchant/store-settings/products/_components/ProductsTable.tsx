@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 import { useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -85,8 +87,10 @@ export function ProductsTable() {
                       <Badge>พร้อมขาย</Badge>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button variant="outline" size="icon-lg">
-                        <IconEdit />
+                      <Button variant="outline" size="icon-lg" asChild>
+                        <Link href={'/merchant/inventory'}>
+                          <IconEdit />
+                        </Link>
                       </Button>
                       <Button variant="outline" size="icon-lg">
                         <IconTrash />

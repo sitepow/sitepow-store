@@ -97,10 +97,13 @@ model Branch {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  staffs  Staff[]
-  orders  Order[]
-  stocks  ProductStock[]
-  coupons Coupon[]
+  staffs           Staff[]
+  orders           Order[]
+  stocks           ProductStock[]
+  coupons          Coupon[]
+  transfersOut     StockTransfer[]   @relation("TransferFrom")
+  transfersIn      StockTransfer[]   @relation("TransferTo")
+  stockAdjustments StockAdjustment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -237,6 +240,8 @@ model Store {
   coupons          Coupon[]
   contactTickets   ContactTicket[]
   transferRequests StoreTransferRequest[]
+  stockTransfers   StockTransfer[]
+  stockAdjustments StockAdjustment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -454,8 +459,10 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  reviews Review[]
-  stocks  ProductStock[]
+  reviews          Review[]
+  stocks           ProductStock[]
+  stockTransfers   StockTransfer[]
+  stockAdjustments StockAdjustment[]
 }
 
 model ProductOption {
@@ -780,6 +787,62 @@ model ActivityLog {
 
   @@index([storeId])
   @@index([action])
+}
+
+model StockAdjustment {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  quantity Int
+  reason   StockAdjustmentReason
+  note     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
+  @@index([variantId])
+  @@index([branchId])
+}
+
+enum StockAdjustmentReason {
+  DAMAGED // สินค้าเสียหาย
+  LOST // สินค้าสูญหาย
+  EXPIRED // สินค้าหมดอายุ
+  CORRECTION // แก้ไขข้อมูลสต็อก
+  PROMOTION // ใช้เพื่อโปรโมชัน/ของแถม
+  OTHER // อื่นๆ
+}
+
+model StockTransfer {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  fromBranchId String
+  fromBranch   Branch @relation("TransferFrom", fields: [fromBranchId], references: [id])
+
+  toBranchId String
+  toBranch   Branch @relation("TransferTo", fields: [toBranchId], references: [id])
+
+  quantity Int
+  note     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
+  @@index([variantId])
+  @@index([fromBranchId])
+  @@index([toBranchId])
 }
 
 model ProductStock {
