@@ -3,7 +3,6 @@
 import Link from 'next/link'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconPackage, IconPlus } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -14,8 +13,6 @@ import { Button } from '@/components/ui/button'
 import { ProductsTable } from './_components/ProductsTable'
 
 export default function MerchantStoreSettingsProductsPage() {
-  const { selectedStoreId } = useStoreFilter()
-
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -34,7 +31,7 @@ export default function MerchantStoreSettingsProductsPage() {
           </div>
         }
       />
-      <ProductsTable storeId={selectedStoreId} />
+      <ProductsTable />
     </DashboardSidebar>
   )
 }

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 
@@ -20,25 +21,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface ProductsTableProps {
-  storeId: string
-  search?: string
-  categoryId?: string
-}
-
-export function ProductsTable({
-  storeId,
-  search,
-  categoryId,
-}: ProductsTableProps) {
+export function ProductsTable() {
+  const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
   const { data: { data: products = [], meta } = {}, isLoading } = useProducts({
-    storeId,
+    storeId: selectedStoreId,
     page,
     limit: 10,
-    search,
-    categoryId,
   })
 
   return (

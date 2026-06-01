@@ -6,7 +6,7 @@ import { IconBuildingStore } from '@tabler/icons-react'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
-import { StoreCreateForm } from './_components/StoreCreateForm'
+import { StoreCreateDialog } from './_components/StoreCreateDialog'
 import { StoreTable } from './_components/StoreTable'
 
 export default function MerchantStoreSettingsPage() {
@@ -16,7 +16,7 @@ export default function MerchantStoreSettingsPage() {
         icon={IconBuildingStore}
         title="ร้านค้าของคุณ"
         description="จัดการข้อมูลหน้าร้าน สลับเข้าสู่ระบบหลังบ้าน หรือเปิดร้านค้าใหม่เพื่อเริ่มธุรกิจเพิ่ม"
-        endContent={<StoreCreateForm />}
+        endContent={<StoreCreateDialog />}
       />
       <StoreTable />
     </DashboardSidebar>

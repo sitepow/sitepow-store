@@ -10,6 +10,7 @@ import {
   UpdateCategoryInput,
   createCategory,
   deleteCategory,
+  getCategories,
   getCategoryOptions,
   updateCategory,
 } from '../category'
@@ -18,6 +19,30 @@ import { categoryKeys } from '../query-keys/category'
 interface UseCategoryOptionsParams {
   storeId?: string
   search?: string
+}
+
+interface UseCategoriesParams {
+  page?: number
+  limit?: number
+  search?: string
+  storeId?: string
+}
+
+export function useCategories({
+  page = 1,
+  limit = 10,
+  search,
+  storeId,
+}: UseCategoriesParams = {}) {
+  const filters = { page, limit, search, storeId }
+
+  return useQuery(
+    queryOptions({
+      queryKey: categoryKeys.list(filters),
+      queryFn: async () => await getCategories(filters),
+      placeholderData: (previousData) => previousData,
+    }),
+  )
 }
 
 export function useCategoryOptions(filters?: UseCategoryOptionsParams) {

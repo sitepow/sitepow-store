@@ -31,7 +31,7 @@ import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 import { VatSettingsForm } from './VatSettingsForm'
 
-export function StoreCreateForm() {
+export function StoreCreateDialog() {
   const { user } = useSession()
   const [open, setOpen] = useState(false)
   const createStoreMutation = useCreateStore()
