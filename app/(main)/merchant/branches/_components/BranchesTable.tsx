@@ -1,0 +1,116 @@
+'use client'
+
+import { useState } from 'react'
+
+import {
+  useBranches,
+  useDeleteBranch,
+  useSetMainBranch,
+} from '@/actions/hooks/branch'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useStoreFilter } from '@/stores/use-store-filter'
+import { IconEdit, IconStar } from '@tabler/icons-react'
+
+import { DeleteButton } from '@/components/DeleteButton'
+import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+export function BranchesTable() {
+  const { selectedStoreId } = useStoreFilter()
+  const [page, setPage] = useState(1)
+
+  const { data: { data: branches = [], meta } = {}, isLoading } = useBranches({
+    storeId: selectedStoreId,
+    page,
+    limit: 10,
+  })
+
+  const deleteBranchMutation = useDeleteBranch()
+  const setMainBranchMutation = useSetMainBranch()
+
+  return (
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>รหัส</TableHead>
+              <TableHead>ชื่อสาขา</TableHead>
+              <TableHead>ประเภท</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading && branches.length === 0 ? (
+              <TableLoadingRow colSpan={4} />
+            ) : branches.length === 0 ? (
+              <TableEmptyRow colSpan={4} title="ไม่พบรายการสาขา" />
+            ) : (
+              branches.map((branch) => (
+                <TableRow key={branch.id}>
+                  <TableCell>{branch.id}</TableCell>
+                  <TableCell>{branch.name}</TableCell>
+                  <TableCell>
+                    {branch.isMain ? (
+                      <Badge>สาขาหลัก</Badge>
+                    ) : (
+                      <Badge variant="outline">สาขาย่อย</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="space-x-2 text-right">
+                    {!branch.isMain && (
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        disabled={setMainBranchMutation.isPending}
+                        onClick={() =>
+                          setMainBranchMutation.mutate({
+                            id: branch.id,
+                            storeId: selectedStoreId,
+                          })
+                        }
+                      >
+                        <IconStar />
+                      </Button>
+                    )}
+                    <Button variant="outline" size="icon-lg">
+                      <IconEdit />
+                    </Button>
+                    <DeleteButton
+                      isPending={deleteBranchMutation.isPending}
+                      onDelete={() =>
+                        deleteBranchMutation.mutate({
+                          id: branch.id,
+                          storeId: selectedStoreId,
+                        })
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
+    </>
+  )
+}
