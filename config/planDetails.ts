@@ -9,6 +9,18 @@ export interface PlanDetails {
 }
 
 export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
+  FREE: {
+    name: 'Free',
+    price: 0,
+    description: 'เปิดร้านออนไลน์วันนี้ ฟรีตลอดชีพ ไม่ต้องใส่บัตร ไม่มีหมดอายุ',
+    features: [
+      'ลงสินค้าได้สูงสุด 5 ชิ้น',
+      'หน้าร้านออนไลน์ส่วนตัว',
+      'รับเงินโอนแบบ Manual',
+      '0% ค่าคอมมิชชั่นทุกออเดอร์',
+    ],
+    isAiSupported: false,
+  },
   STARTER: {
     name: 'Starter',
     price: 490,

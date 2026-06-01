@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from './PlanSelector'
-import { PointsSettingsField } from './PointsSettingsField'
+// import { PointsSettingsField } from './PointsSettingsField'
 import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 import { VatSettingsField } from './VatSettingsField'
@@ -181,7 +181,7 @@ export function StoreCreateDialog() {
             </Field>
 
             <VatSettingsField isPending={createStoreMutation.isPending} />
-            <PointsSettingsField isPending={createStoreMutation.isPending} />
+            {/* <PointsSettingsField isPending={createStoreMutation.isPending} /> */}
           </div>
         </FormProvider>
 

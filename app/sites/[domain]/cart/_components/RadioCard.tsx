@@ -33,7 +33,7 @@ export function RadioCard({
           'has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 has-data-[state=checked]:ring-primary has-data-[state=checked]:ring-1',
         )}
       >
-        <div className="flex flex-col">
+        <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <div className="[[data-state=checked]~&]:text-primary has-data-[state=checked]:text-primary text-sm font-bold text-gray-700">

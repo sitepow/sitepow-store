@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { useStores } from '@/actions/hooks/store'
+import { useDeleteStore, useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
@@ -12,7 +12,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
 import { IconEdit, IconExternalLink } from '@tabler/icons-react'
 
-// import { DeleteButton } from '@/components/DeleteButton'
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -34,7 +34,7 @@ export function StoreTable() {
   const { data: { data: stores = [], meta } = {}, isLoading } = useStores({
     page,
   })
-  // const deleteStoreMutation = useDeleteStore()
+  const deleteStoreMutation = useDeleteStore()
 
   const handleClickRedirectStoreSetting = (storeId: string) => {
     setSelectedStoreId(storeId)
@@ -126,10 +126,10 @@ export function StoreTable() {
                       >
                         <IconEdit />
                       </Button>
-                      {/* <DeleteButton
+                      <DeleteButton
                         isPending={false}
                         onDelete={() => deleteStoreMutation.mutate(store.id)}
-                      /> */}
+                      />
                     </TableCell>
                   </TableRow>
                 )

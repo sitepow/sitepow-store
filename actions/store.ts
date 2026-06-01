@@ -1,7 +1,8 @@
 'use server'
 
+import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
-import { Plan, StoreStatus } from '@/generated/prisma/enums'
+import { Plan, StoreStatus, SubStatus } from '@/generated/prisma/enums'
 
 import { prisma } from '@/lib/prisma'
 
@@ -251,6 +252,16 @@ export async function createStore(input: CreateStoreInput) {
         create: {
           name: 'สาขาหลัก',
           isMain: true,
+        },
+      },
+      subscription: {
+        create: {
+          plan: input.plan ?? Plan.STARTER,
+          status: SubStatus.ACTIVE,
+          startDate: new Date(),
+          endDate: new Date(
+            Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
+          ),
         },
       },
     },

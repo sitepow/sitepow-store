@@ -1,3 +1,5 @@
+import { Plan } from '@/generated/prisma/enums'
+
 export const PLAN_LIMITS = {
   STARTER: {
     maxProducts: 50,
@@ -20,4 +22,11 @@ export const PLAN_LIMITS = {
     hasEasySlip: true,
     hasCrm: true,
   },
+}
+
+export const PLAN_RANK: Record<Plan, number> = {
+  [Plan.FREE]: 0,
+  [Plan.STARTER]: 1,
+  [Plan.PRO]: 2,
+  [Plan.ULTIMATE]: 3,
 }

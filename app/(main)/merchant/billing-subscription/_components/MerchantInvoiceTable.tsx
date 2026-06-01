@@ -1,9 +1,16 @@
 'use client'
 
+import { useState } from 'react'
+
+import { useTransactions } from '@/actions/hooks/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { PLAN_DETAILS } from '@/config/planDetails'
+import { useSession } from '@/hooks/use-session'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconDownload } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,58 +22,72 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export interface MerchantInvoice {
-  id: string
-  date: string
-  amount: number
-  storeName: string
-  plan: string
-  status: string
-}
+export function MerchantInvoiceTable() {
+  const { user } = useSession()
+  const { selectedStoreId } = useStoreFilter()
+  const [page, setPage] = useState(1)
 
-interface MerchantInvoiceTableProps {
-  invoices: MerchantInvoice[]
-}
+  const { data: { data: transactions = [], meta } = {}, isLoading } =
+    useTransactions({
+      ownerId: user?.id ?? '',
+      storeId: selectedStoreId === ALL_STORES ? undefined : selectedStoreId,
+      page,
+      limit: 10,
+    })
 
-export function MerchantInvoiceTable({ invoices }: MerchantInvoiceTableProps) {
   return (
     <>
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>เลขที่ใบเสร็จ</TableHead>
+              <TableHead>รหัสธุรกรรม</TableHead>
               <TableHead>สำหรับร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
-              <TableHead>วันที่ชำระ</TableHead>
-              <TableHead>ยอดชำระ</TableHead>
-              <TableHead>สถานะ</TableHead>
+              <TableHead>วันที่</TableHead>
+              <TableHead>ยอด</TableHead>
+              <TableHead>ประเภท</TableHead>
               <TableHead className="text-right"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices?.length !== 0 &&
-              invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
+            {isLoading && transactions.length === 0 ? (
+              <TableLoadingRow colSpan={7} />
+            ) : transactions.length === 0 ? (
+              <TableEmptyRow
+                colSpan={7}
+                title="ไม่พบประวัติการชำระเงินของร้านค้าที่คุณเลือก"
+              />
+            ) : (
+              transactions.map((tx) => (
+                <TableRow key={tx.id}>
                   <TableCell>
-                    <span className="font-medium">{invoice.id}</span>
+                    <span className="text-xs font-medium">{tx.id}</span>
                   </TableCell>
                   <TableCell>
-                    <span>{invoice.storeName}</span>
+                    <span>{tx.store.name}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm opacity-60">{invoice.plan}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm opacity-60">{invoice.date}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-medium">
-                      ฿{invoice.amount.toLocaleString()}
+                    <span className="text-muted-foreground text-sm">
+                      {PLAN_DETAILS[tx.store.plan].name}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="default">ชำระแล้ว</Badge>
+                    <span className="text-muted-foreground text-sm">
+                      {new Date(tx.createdAt).toLocaleDateString('th-TH', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-medium">
+                      ฿{Number(tx.amount).toLocaleString()}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="default">{tx.description ?? tx.type}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="icon">
@@ -74,17 +95,20 @@ export function MerchantInvoiceTable({ invoices }: MerchantInvoiceTableProps) {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
-            {invoices?.length === 0 && (
-              <TableEmptyRow
-                colSpan={7}
-                title="ไม่พบประวัติการชำระเงินของร้านค้าที่คุณเลือก"
-              />
+              ))
             )}
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
     </>
   )
 }

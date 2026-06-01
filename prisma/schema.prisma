@@ -280,10 +280,12 @@ model Subscription {
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  plan      Plan
-  status    SubStatus @default(ACTIVE)
-  startDate DateTime  @default(now())
-  endDate   DateTime
+  plan          Plan
+  status        SubStatus @default(ACTIVE)
+  startDate     DateTime  @default(now())
+  endDate       DateTime
+  pendingPlan   Plan? // แพลนที่รอเปลี่ยนเมื่อหมดรอบ
+  pendingPlanAt DateTime? // วันที่จะมีผล
 
   externalId String?
   createdAt  DateTime @default(now())
@@ -312,21 +314,18 @@ enum SubStatus {
   EXPIRED // หมดอายุสมาชิกแล้ว (ระบบควรตัดฟีเจอร์เหลือแค่ FREE)
 }
 
-/**
- * ระดับสมาชิกของร้านค้า (SaaS Subscription)
- * ใช้กำหนดความสามารถ (Limits) ของแต่ละร้าน
- */
 enum Plan {
-  STARTER // แผนเริ่มต้น: ลงสินค้าได้จำกัด, ไม่มีระบบ AI
-  PRO // แผนมาตรฐาน: เพิ่มจำนวนสินค้า, มีระบบ Easy Slip, AI Vision พื้นฐาน
-  ULTIMATE // แผนสูงสุด: ทุกอย่าง Unlimited, ระบบ AI ครบวงจร, ระบบ CRM
+  FREE
+  STARTER
+  PRO
+  ULTIMATE
 }
 
 enum TicketStatus {
-  OPEN // รอร้านค้าอ่าน/ตอบ
-  IN_PROGRESS // กำลังดำเนินการ
-  RESOLVED // แก้ไขปัญหาแล้ว
-  CLOSED // ปิดการติดต่อ
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
 
 model ContactTicket {
