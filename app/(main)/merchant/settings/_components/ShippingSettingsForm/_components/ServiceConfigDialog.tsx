@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import { WeightRate, ZoneRate } from '@/types/shipping'
+import { ShippingSettingsFormValues } from '@/zod/shipping-settings'
 import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -19,67 +20,37 @@ import { Input } from '@/components/ui/input'
 
 interface ServiceConfigDialogProps {
   serviceName: string
-  onSave: (config: { weightRates: WeightRate[]; zoneRates: ZoneRate[] }) => void
+  serviceIndex: number
 }
 
 export function ServiceConfigDialog({
   serviceName,
-  onSave,
+  serviceIndex,
 }: ServiceConfigDialogProps) {
   const [open, setOpen] = useState(false)
 
-  const [weightRates, setWeightRates] = useState<WeightRate[]>([
-    { minWeight: 0, maxWeight: 1, fee: 40 },
-  ])
+  const { control, register, watch } =
+    useFormContext<ShippingSettingsFormValues>()
 
-  const [zoneRates, setZoneRates] = useState<ZoneRate[]>([
-    { zoneType: 'REMOTE_AREA', additionalFee: 50 },
-    { zoneType: 'BORDER_PROVINCES', additionalFee: 40 },
-  ])
+  const { fields: weightFields, append: appendWeight } = useFieldArray({
+    control,
+    name: `services.${serviceIndex}.weightRates`,
+  })
+
+  const zoneRates = watch(`services.${serviceIndex}.zoneRates`)
 
   const addWeightRow = () => {
-    const lastRate = weightRates[weightRates.length - 1]
-    const nextMin = lastRate ? lastRate.maxWeight + 0.001 : 0
-    setWeightRates([
-      ...weightRates,
-      { minWeight: nextMin, maxWeight: nextMin + 1, fee: 50 },
-    ])
-  }
+    const currentRates = watch(`services.${serviceIndex}.weightRates`) || []
+    const lastRate = currentRates[currentRates.length - 1]
+    const nextMin = lastRate ? lastRate.maxWeight + 1 : 0
 
-  const removeWeightRow = (index: number) => {
-    setWeightRates(weightRates.filter((_, i) => i !== index))
-  }
-
-  const handleWeightChange = (
-    index: number,
-    field: keyof WeightRate,
-    value: number,
-  ) => {
-    const updated = [...weightRates]
-    updated[index] = { ...updated[index], [field]: value }
-    setWeightRates(updated)
-  }
-
-  const handleZoneChange = (
-    zoneType: 'REMOTE_AREA' | 'BORDER_PROVINCES',
-    value: number,
-  ) => {
-    setZoneRates(
-      zoneRates.map((z) =>
-        z.zoneType === zoneType ? { ...z, additionalFee: value } : z,
-      ),
-    )
-  }
-
-  const handleSaveConfig = () => {
-    onSave({ weightRates, zoneRates })
-    setOpen(false)
+    appendWeight({ minWeight: nextMin, maxWeight: nextMin + 1000, fee: 45 })
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1">
+        <Button type="button" variant="outline" size="sm" className="h-8 gap-1">
           <IconSettings size={14} /> ตั้งค่าเรทราคา
         </Button>
       </DialogTrigger>
@@ -100,30 +71,25 @@ export function ServiceConfigDialog({
               <Button
                 type="button"
                 variant="outline"
-                size="xs"
+                size="sm"
                 onClick={addWeightRow}
-                className="h-7 gap-1"
+                className="h-7 gap-1 px-2 text-xs"
               >
                 <IconPlus size={14} /> เพิ่มช่วงน้ำหนัก
               </Button>
             </div>
 
             <div className="space-y-2">
-              {weightRates.map((rate, index) => (
-                <div key={index} className="flex items-center gap-2">
+              {weightFields.map((field, index) => (
+                <div key={field.id} className="flex items-center gap-2">
                   <div className="flex flex-1 items-center gap-1.5">
                     <Input
                       type="number"
-                      step="0.001"
-                      placeholder="0.00"
-                      value={rate.minWeight}
-                      onChange={(e) =>
-                        handleWeightChange(
-                          index,
-                          'minWeight',
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
+                      placeholder="0"
+                      {...register(
+                        `services.${serviceIndex}.weightRates.${index}.minWeight` as const,
+                        { valueAsNumber: true },
+                      )}
                       className="h-8 text-right"
                     />
                     <span className="text-muted-foreground text-xs select-none">
@@ -131,20 +97,15 @@ export function ServiceConfigDialog({
                     </span>
                     <Input
                       type="number"
-                      step="0.001"
-                      placeholder="1.00"
-                      value={rate.maxWeight}
-                      onChange={(e) =>
-                        handleWeightChange(
-                          index,
-                          'maxWeight',
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
+                      placeholder="1000"
+                      {...register(
+                        `services.${serviceIndex}.weightRates.${index}.maxWeight` as const,
+                        { valueAsNumber: true },
+                      )}
                       className="h-8 text-right"
                     />
                     <span className="text-muted-foreground text-xs select-none">
-                      กก.
+                      กรัม (g)
                     </span>
                   </div>
 
@@ -152,14 +113,10 @@ export function ServiceConfigDialog({
                     <Input
                       type="number"
                       placeholder="ราคา"
-                      value={rate.fee}
-                      onChange={(e) =>
-                        handleWeightChange(
-                          index,
-                          'fee',
-                          parseFloat(e.target.value) || 0,
-                        )
-                      }
+                      {...register(
+                        `services.${serviceIndex}.weightRates.${index}.fee` as const,
+                        { valueAsNumber: true },
+                      )}
                       className="h-8 rounded-r-none text-right font-medium"
                     />
                     <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
@@ -171,9 +128,8 @@ export function ServiceConfigDialog({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeWeightRow(index)}
-                    disabled={weightRates.length <= 1}
-                    className="text-destructive h-8 w-8"
+                    disabled={weightFields.length <= 1}
+                    className="text-destructive hover:bg-destructive/10 h-8 w-8"
                   >
                     <IconTrash size={14} />
                   </Button>
@@ -187,78 +143,48 @@ export function ServiceConfigDialog({
               ค่าบริการเพิ่มเติมสำหรับพื้นที่พิเศษ
             </span>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="bg-muted/20 flex flex-col gap-2 rounded-lg border p-3">
-                <div>
-                  <span className="block text-xs font-medium">
-                    พื้นที่ห่างไกล
-                  </span>
-                  <span className="text-muted-foreground block text-[10px]">
-                    ดอย, เกาะต่างๆ เช่น แม่ฮ่องสอน, เกาะสมุย
-                  </span>
+              {zoneRates?.map((zone, zIndex) => (
+                <div
+                  key={zone.zoneType}
+                  className="bg-muted/20 flex flex-col gap-2 rounded-lg border p-3"
+                >
+                  <div>
+                    <span className="block text-xs font-medium">
+                      {zone.zoneType === 'REMOTE_AREA'
+                        ? 'พื้นที่ห่างไกล'
+                        : '3 จังหวัดชายแดนภาคใต้'}
+                    </span>
+                    <span className="text-muted-foreground block text-[10px]">
+                      {zone.zoneType === 'REMOTE_AREA'
+                        ? 'ดอย, เกาะต่างๆ เช่น แม่ฮ่องสอน, เกาะสมุย'
+                        : 'จังหวัดยะลา, ปัตตานี, นราธิวาส'}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center">
+                    <span className="text-muted-foreground mr-1.5 shrink-0 text-xs select-none">
+                      + เพิ่ม
+                    </span>
+                    <Input
+                      type="number"
+                      {...register(
+                        `services.${serviceIndex}.zoneRates.${zIndex}.additionalFee` as const,
+                        { valueAsNumber: true },
+                      )}
+                      className="h-8 rounded-r-none text-right"
+                    />
+                    <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2.5 text-xs select-none">
+                      บาท
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-center">
-                  <span className="text-muted-foreground mr-1.5 shrink-0 text-xs select-none">
-                    + เพิ่ม
-                  </span>
-                  <Input
-                    type="number"
-                    value={
-                      zoneRates.find((z) => z.zoneType === 'REMOTE_AREA')
-                        ?.additionalFee || 0
-                    }
-                    onChange={(e) =>
-                      handleZoneChange(
-                        'REMOTE_AREA',
-                        parseFloat(e.target.value) || 0,
-                      )
-                    }
-                    className="h-8 rounded-r-none text-right"
-                  />
-                  <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2.5 text-xs select-none">
-                    บาท
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-muted/20 flex flex-col gap-2 rounded-lg border p-3">
-                <div>
-                  <span className="block text-xs font-medium">
-                    3 จังหวัดชายแดนภาคใต้
-                  </span>
-                  <span className="text-muted-foreground block text-[10px]">
-                    จังหวัดยะลา, ปัตตานี, นราธิวาส
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center">
-                  <span className="text-muted-foreground mr-1.5 shrink-0 text-xs select-none">
-                    + เพิ่ม
-                  </span>
-                  <Input
-                    type="number"
-                    value={
-                      zoneRates.find((z) => z.zoneType === 'BORDER_PROVINCES')
-                        ?.additionalFee || 0
-                    }
-                    onChange={(e) =>
-                      handleZoneChange(
-                        'BORDER_PROVINCES',
-                        parseFloat(e.target.value) || 0,
-                      )
-                    }
-                    className="h-8 rounded-r-none text-right"
-                  />
-                  <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2.5 text-xs select-none">
-                    บาท
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button type="button" onClick={handleSaveConfig} size="sm">
-            ยืนยันการตั้งค่าบริการ
+          <Button type="button" onClick={() => setOpen(false)} size="sm">
+            เสร็จสิ้น
           </Button>
         </DialogFooter>
       </DialogContent>
