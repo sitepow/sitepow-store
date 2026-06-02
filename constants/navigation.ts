@@ -514,37 +514,37 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'ตั้งค่าระบบ',
     tab: 'settings',
     icon: IconSettings,
-    items: [
-      {
-        value: 'settings-store',
-        label: 'ข้อมูลร้านและการติดต่อ',
-        url: '/merchant/settings',
-      },
-      {
-        value: 'settings-transfer',
-        label: 'โอนความเป็นเจ้าของร้าน',
-        url: '/merchant/settings/transfer',
-      },
-      {
-        value: 'settings-tax',
-        label: 'ภาษีและใบกำกับ (VAT)',
-        url: '/merchant/settings/tax',
-      },
-      {
-        value: 'settings-shipping',
-        label: 'ระบบขนส่ง',
-        url: '/merchant/settings/shipping',
-      },
-      {
-        value: 'settings-payment',
-        label: 'ช่องทางรับชำระเงิน',
-        url: '/merchant/settings/payment',
-      },
-      {
-        value: 'settings-notifications',
-        label: 'การแจ้งเตือน',
-        url: '/merchant/settings/notifications',
-      },
-    ],
+    // items: [
+    //   {
+    //     value: 'settings-store',
+    //     label: 'ข้อมูลร้านและการติดต่อ',
+    //     url: '/merchant/settings',
+    //   },
+    //   {
+    //     value: 'settings-transfer',
+    //     label: 'โอนความเป็นเจ้าของร้าน',
+    //     url: '/merchant/settings/transfer',
+    //   },
+    //   {
+    //     value: 'settings-tax',
+    //     label: 'ภาษีและใบกำกับ (VAT)',
+    //     url: '/merchant/settings/tax',
+    //   },
+    //   {
+    //     value: 'settings-shipping',
+    //     label: 'ระบบขนส่ง',
+    //     url: '/merchant/settings/shipping',
+    //   },
+    //   {
+    //     value: 'settings-payment',
+    //     label: 'ช่องทางรับชำระเงิน',
+    //     url: '/merchant/settings/payment',
+    //   },
+    //   {
+    //     value: 'settings-notifications',
+    //     label: 'การแจ้งเตือน',
+    //     url: '/merchant/settings/notifications',
+    //   },
+    // ],
   },
 ]
