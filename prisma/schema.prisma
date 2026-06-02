@@ -217,6 +217,13 @@ model CourierService {
   @@index([code])
 }
 
+enum ShippingZoneType {
+  SAME_PROVINCE
+  SAME_REGION
+  CROSS_REGION
+  REMOTE_AREA
+}
+
 model ShippingSetting {
   id      String @id @default(cuid())
   storeId String @unique
@@ -254,9 +261,11 @@ model StoreServiceWeightRate {
   storeCourierServiceId String
   storeCourierService   StoreCourierService @relation(fields: [storeCourierServiceId], references: [id], onDelete: Cascade)
 
-  minWeight Decimal @default(0.00) @db.Decimal(10, 3) // น้ำหนักเริ่ม (กก.) เช่น 0.000
-  maxWeight Decimal @db.Decimal(10, 3) // น้ำหนักสิ้นสุด (กก.) เช่น 1.000
-  fee       Decimal @db.Decimal(10, 2) // ค่าส่งช่วงน้ำหนักนี้ เช่น EMS คิด 50 บาท, ลงทะเบียนคิด 30 บาท
+  zoneType ShippingZoneType @default(SAME_PROVINCE)
+
+  minWeight Decimal @default(0.00) @db.Decimal(10, 3)
+  maxWeight Decimal @db.Decimal(10, 3)
+  fee       Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -277,12 +286,6 @@ model StoreServiceZoneRate {
 
   @@unique([storeCourierServiceId, zoneType])
   @@index([storeCourierServiceId])
-}
-
-enum ShippingZoneType {
-  NORMAL
-  REMOTE_AREA
-  BORDER_PROVINCES
 }
 
 model Store {
@@ -888,6 +891,15 @@ enum StockAdjustmentReason {
   CORRECTION
   PROMOTION
   OTHER
+}
+
+model GlobalShippingRateMatrix {
+  id           String @id @default(cuid())
+  fromProvince String @unique
+
+  ratesMatrix Json
+
+  updatedAt DateTime @updatedAt
 }
 
 model StockTransfer {

@@ -9,6 +9,7 @@ import {
 import axios from 'axios'
 
 export interface CheckPriceWeightRate {
+  zoneType: ShippingZoneType
   minWeight: number
   maxWeight: number
   fee: number
@@ -57,7 +58,7 @@ interface ShippopServiceResponse {
   timeMax?: number | string
 }
 
-export async function checkPrice(
+export async function getShippingPrice(
   payload: CheckPriceInput,
 ): Promise<CheckPriceCourierResult[]> {
   try {
@@ -101,7 +102,6 @@ export async function checkPrice(
     )
 
     const shippopServices = (response.data || []) as ShippopServiceResponse[]
-
     const shippopPriceMap = new Map<string, ShippopServiceResponse>()
 
     if (Array.isArray(shippopServices)) {
@@ -141,7 +141,12 @@ export async function checkPrice(
                     : service.estimatedDays),
                 currentFee: price,
                 weightRates: [
-                  { minWeight: 0, maxWeight: payload.weight, fee: price },
+                  {
+                    zoneType: 'SAME_PROVINCE' as ShippingZoneType,
+                    minWeight: 0,
+                    maxWeight: payload.weight,
+                    fee: price,
+                  },
                 ],
                 zoneRates: [],
               }

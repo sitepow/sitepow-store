@@ -3,8 +3,13 @@
 import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 
-import { checkPrice } from '@/actions/check-price'
-import { COURIERS_LIST, SHIPPING_WEIGHT_TIERS } from '@/constants/shipping'
+import { getShippingPrice } from '@/actions/shippop'
+import {
+  COURIERS_LIST,
+  PROVINCES_POOL,
+  SHIPPING_WEIGHT_TIERS,
+} from '@/constants/shipping'
+import { ShippingZoneType } from '@/generated/prisma/client'
 import {
   ShippingSettingsFormValues,
   shippingSettingsFormSchema,
@@ -26,8 +31,38 @@ import { Switch } from '@/components/ui/switch'
 
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 
+const REPRESENTATIVE_DESTINATIONS = [
+  {
+    zoneType: 'SAME_PROVINCE' as ShippingZoneType,
+    province: 'สมุทรปราการ',
+    district: 'เมืองสมุทรปราการ',
+    postcode: 10270,
+  },
+  {
+    zoneType: 'SAME_REGION' as ShippingZoneType,
+    province: 'นนทบุรี',
+    district: 'เมืองนนทบุรี',
+    postcode: 11000,
+  },
+  {
+    zoneType: 'CROSS_REGION' as ShippingZoneType,
+    province: 'เชียงใหม่',
+    district: 'เมืองเชียงใหม่',
+    postcode: 50000,
+  },
+  {
+    zoneType: 'REMOTE_AREA' as ShippingZoneType,
+    province: 'แม่ฮ่องสอน',
+    district: 'ปาย',
+    postcode: 58130,
+  },
+]
+
 const defaultPresetValues: ShippingSettingsFormValues = {
-  freeShipMin: 999,
+  freeShipMin: 299,
+  storeProvince: 'สมุทรปราการ',
+  storeDistrict: 'เมืองสมุทรปราการ',
+  storePostcode: 10270,
   services: COURIERS_LIST.flatMap((c) =>
     c.services.map((s) => ({
       courierServiceId: s.id,
@@ -59,75 +94,113 @@ export function ShippingSettingsForm({
 
   const watchedServices = watch('services')
 
-  const handleFetchAutoRates = async () => {
-    try {
-      const priceCheckPromises = SHIPPING_WEIGHT_TIERS.map((tier) =>
-        checkPrice({
-          weight: tier.maxWeight,
-          fromPostcode: 10540,
-          toPostcode: 50000,
-          fromDistrict: 'บางพลี',
-          fromProvince: 'สมุทรปราการ',
-          toDistrict: 'เมืองเชียงใหม่',
-          toProvince: 'เชียงใหม่',
-          width: tier.width,
-          length: tier.length,
-          height: tier.height,
-        }),
-      )
+  const currentStoreProvince = watch('storeProvince') || 'สมุทรปราการ'
 
-      const allTierResults = await Promise.all(priceCheckPromises)
+  const fetchRatesForProvince = async (
+    provinceName: string,
+    districtName: string,
+    postcodeNum: number,
+  ) => {
+    const priceCheckPromises: Promise<any>[] = []
+    const requestMetadata: Array<{
+      minWeight: number
+      maxWeight: number
+      zoneType: ShippingZoneType
+    }> = []
 
-      const serviceRatesAccumulator = new Map<
-        string,
-        Array<{ minWeight: number; maxWeight: number; fee: number }>
-      >()
+    SHIPPING_WEIGHT_TIERS.forEach((tier) => {
+      REPRESENTATIVE_DESTINATIONS.forEach((dest) => {
+        requestMetadata.push({
+          minWeight: tier.minWeight,
+          maxWeight: tier.maxWeight,
+          zoneType: dest.zoneType,
+        })
 
-      allTierResults.forEach((shippopData, tierIndex) => {
-        const tierConfig = SHIPPING_WEIGHT_TIERS[tierIndex]
+        priceCheckPromises.push(
+          getShippingPrice({
+            weight: tier.maxWeight,
+            fromPostcode: postcodeNum,
+            fromDistrict: districtName,
+            fromProvince: provinceName,
+            toPostcode: dest.postcode,
+            toDistrict: dest.district,
+            toProvince: dest.province,
+            width: tier.width,
+            length: tier.length,
+            height: tier.height,
+          }),
+        )
+      })
+    })
 
-        shippopData.forEach((courierData) => {
-          courierData.services.forEach((activeService) => {
-            if (
-              activeService.currentFee !== null &&
-              activeService.currentFee !== undefined
-            ) {
-              if (!serviceRatesAccumulator.has(activeService.id)) {
-                serviceRatesAccumulator.set(activeService.id, [])
-              }
+    const allResults = await Promise.all(priceCheckPromises)
+    const serviceRatesAccumulator = new Map<string, any[]>()
 
-              serviceRatesAccumulator.get(activeService.id)?.push({
-                minWeight: tierConfig.minWeight,
-                maxWeight: tierConfig.maxWeight,
-                fee: activeService.currentFee,
-              })
+    allResults.forEach((shippopData, index) => {
+      const meta = requestMetadata[index]
+      shippopData.forEach((courierData: any) => {
+        courierData.services.forEach((activeService: any) => {
+          if (
+            activeService.currentFee !== null &&
+            activeService.currentFee !== undefined
+          ) {
+            if (!serviceRatesAccumulator.has(activeService.id)) {
+              serviceRatesAccumulator.set(activeService.id, [])
             }
-          })
+            serviceRatesAccumulator.get(activeService.id)?.push({
+              zoneType: meta.zoneType,
+              minWeight: meta.minWeight,
+              maxWeight: meta.maxWeight,
+              fee: activeService.currentFee,
+            })
+          }
         })
       })
+    })
 
-      watchedServices.forEach((serviceFormItem, index) => {
-        const accumulatedRates = serviceRatesAccumulator.get(
-          serviceFormItem.courierServiceId,
+    const ratesMatrixJson: Record<string, any> = {}
+    serviceRatesAccumulator.forEach((rates, courierServiceId) => {
+      ratesMatrixJson[courierServiceId] = rates
+    })
+
+    return {
+      fromProvince: provinceName,
+      ratesMatrix: ratesMatrixJson,
+    }
+  }
+
+  const handleFetchAutoRates = async () => {
+    const globalShippingRateMatrixPayload: any[] = []
+
+    for (const store of PROVINCES_POOL) {
+      try {
+        const provinceData = await fetchRatesForProvince(
+          store.name,
+          store.district,
+          store.postcode,
         )
+        globalShippingRateMatrixPayload.push(provinceData)
 
-        if (accumulatedRates && accumulatedRates.length > 0) {
-          setValue(`services.${index}.weightRates`, accumulatedRates, {
-            shouldDirty: true,
-            shouldValidate: true,
-          })
-        } else {
-          setValue(`services.${index}.weightRates`, [], {
-            shouldDirty: true,
-            shouldValidate: true,
+        if (store.name === currentStoreProvince) {
+          watchedServices.forEach((serviceFormItem, index) => {
+            const accumulatedRates =
+              provinceData.ratesMatrix[serviceFormItem.courierServiceId]
+            setValue(`services.${index}.weightRates`, accumulatedRates || [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
           })
         }
-      })
-    } catch (err) {
-      console.error(
-        'เกิดข้อผิดพลาดในการดึงและจัดกลุ่มบันไดราคาจัดส่งสินค้า:',
-        err,
-      )
+      } catch (singleProvinceErr) {
+        console.error(
+          `⚠️ ข้ามจังหวัด ${store.name} เนื่องจากเกิดข้อผิดพลาด:`,
+          singleProvinceErr,
+        )
+      }
+
+      console.log(JSON.stringify(globalShippingRateMatrixPayload, null, 2))
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
     }
   }
 
