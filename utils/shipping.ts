@@ -3,15 +3,9 @@
 import { REGION_MAP, REMOTE_AREAS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 
-import addressData from '@/lib/address/database/db.json'
+import { ThaiAddressFinder } from '@/lib/address/logic'
 
-type SubDistrictData = [string | number, number]
-type DistrictData = [string | number, SubDistrictData[]]
-type ProvinceData = [string, DistrictData[]]
-
-interface AddressJsonStructure {
-  data: ProvinceData[]
-}
+const addressFinder = new ThaiAddressFinder({ maxSearchResult: 200 })
 
 function getRegionByProvinceName(provinceName: string): string {
   const cleanName = provinceName.trim().replace(/ /g, '')
@@ -21,38 +15,32 @@ function getRegionByProvinceName(provinceName: string): string {
   return 'OTHER'
 }
 
-export function getRealProvinceDetails(provinceName: string): {
-  postcode: string
-  district: string
-  state: string
-} {
-  const cleanName = provinceName.trim().replace(/ /g, '')
-  const typedAddressData = addressData as unknown as AddressJsonStructure
-  const provincesList =
-    typedAddressData.data || (typedAddressData as unknown as ProvinceData[])
+export function getProvinceDetails(
+  provinceName: string,
+  amphoeName?: string,
+): { postcode: string; district: string; state: string } {
+  const cleanProvince = provinceName.trim()
 
-  const targetProvince = provincesList.find((p) => p[0] === cleanName)
+  const results = addressFinder.SearchAddressByProvince(cleanProvince)
 
-  if (targetProvince && targetProvince[1] && targetProvince[1][0]) {
-    const firstDistrictGroup = targetProvince[1][0]
-    const districtName = firstDistrictGroup[0]
+  const targetAmphoe = amphoeName
+    ? amphoeName.trim()
+    : cleanProvince === 'กรุงเทพมหานคร'
+      ? 'พระนคร'
+      : `เมือง${cleanProvince}`
 
-    const subDistricts = firstDistrictGroup[1]
-    if (subDistricts && subDistricts[0]) {
-      const subDistrictName = subDistricts[0][0]
-      const zipCode = subDistricts[0][1]
+  const match =
+    results.find(
+      (item) =>
+        item.amphoe.includes(targetAmphoe) ||
+        targetAmphoe.includes(item.amphoe),
+    ) || results[0]
 
-      return {
-        postcode: String(zipCode),
-        district: String(
-          subDistrictName === 0 ? districtName : subDistrictName,
-        ),
-        state: String(districtName),
-      }
-    }
+  return {
+    postcode: String(match.zipcode),
+    district: String(match.district),
+    state: String(match.amphoe),
   }
-
-  return { postcode: '10300', district: 'ดุสิต', state: 'ดุสิต' }
 }
 
 export function getRepresentativeDestinations(fromProvince: string) {
@@ -70,7 +58,7 @@ export function getRepresentativeDestinations(fromProvince: string) {
   destinations.push({
     zoneType: ShippingZoneType.SAME_PROVINCE,
     province: from,
-    ...getRealProvinceDetails(from),
+    ...getProvinceDetails(from),
   })
 
   const validRemoteArea =
@@ -90,13 +78,13 @@ export function getRepresentativeDestinations(fromProvince: string) {
     destinations.push({
       zoneType: ShippingZoneType.SAME_REGION,
       province: sameRegionProvince,
-      ...getRealProvinceDetails(sameRegionProvince),
+      ...getProvinceDetails(sameRegionProvince),
     })
   } else {
     destinations.push({
       zoneType: ShippingZoneType.SAME_REGION,
       province: from,
-      ...getRealProvinceDetails(from),
+      ...getProvinceDetails(from),
     })
   }
 
@@ -110,7 +98,7 @@ export function getRepresentativeDestinations(fromProvince: string) {
   destinations.push({
     zoneType: ShippingZoneType.CROSS_REGION,
     province: crossRegionProvince,
-    ...getRealProvinceDetails(crossRegionProvince),
+    ...getProvinceDetails(crossRegionProvince),
   })
 
   return destinations

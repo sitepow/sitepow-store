@@ -12,7 +12,7 @@ import {
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import {
-  getRealProvinceDetails,
+  getProvinceDetails,
   getRepresentativeDestinations,
 } from '@/utils/shipping'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
@@ -74,13 +74,11 @@ export function ShippingSettingsForm({
 
   const watchedServices = watch('services')
 
-  // const currentStoreProvince = watch('storeProvince')
-
   const fetchRatesForProvince = async (
     provinceName: string,
     districtName: string,
     stateName: string,
-    postcodeNum: number,
+    postcode: string,
   ) => {
     const serviceRatesAccumulator = new Map<string, AccumulatedRate[]>()
     const representativeDestinations =
@@ -93,7 +91,7 @@ export function ShippingSettingsForm({
             zoneType: dest.zoneType,
             minWeight: tier.minWeight,
             weight: tier.maxWeight,
-            fromPostcode: postcodeNum,
+            fromPostcode: postcode,
             fromDistrict: districtName,
             fromState: stateName,
             fromProvince: provinceName,
@@ -154,41 +152,45 @@ export function ShippingSettingsForm({
       ratesMatrix: Record<string, AccumulatedRate[]>
     }> = []
 
-    for (const province of PROVINCES_POOL) {
-      try {
-        const provinceName = province.name
+    const BATCH_SIZE = 5
 
-        const sourceDetails = getRealProvinceDetails(provinceName)
+    for (let i = 0; i < PROVINCES_POOL.length; i += BATCH_SIZE) {
+      const batch = PROVINCES_POOL.slice(i, i + BATCH_SIZE)
 
-        const provinceData = await fetchRatesForProvince(
-          provinceName,
-          sourceDetails.district,
-          sourceDetails.state,
-          province.postcode,
-        )
+      const batchPromises = batch.map(async (provinceName) => {
+        try {
+          const sourceDetails = getProvinceDetails(provinceName)
 
-        globalShippingRateMatrixPayload.push(provinceData)
+          const provinceData = await fetchRatesForProvince(
+            provinceName,
+            sourceDetails.district,
+            sourceDetails.state,
+            sourceDetails.postcode,
+          )
 
-        // if (provinceName === currentStoreProvince) {
-        //   watchedServices.forEach((serviceFormItem, index) => {
-        //     const accumulatedRates =
-        //       provinceData.ratesMatrix[serviceFormItem.courierServiceId]
-        //     setValue(`services.${index}.weightRates`, accumulatedRates || [], {
-        //       shouldDirty: true,
-        //       shouldValidate: true,
-        //     })
-        //   })
-        // }
-      } catch (singleProvinceErr) {
-        console.error(
-          `⚠️ ข้ามจังหวัด ${province.name} เนื่องจากเกิดข้อผิดพลาด:`,
-          singleProvinceErr,
-        )
-      }
+          watchedServices.forEach((serviceFormItem, index) => {
+            const accumulatedRates =
+              provinceData.ratesMatrix[serviceFormItem.courierServiceId]
+            setValue(`services.${index}.weightRates`, accumulatedRates || [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          })
 
-      console.log(JSON.stringify(globalShippingRateMatrixPayload, null, 2))
-      await new Promise((resolve) => setTimeout(resolve, 500))
+          globalShippingRateMatrixPayload.push(provinceData)
+        } catch (singleProvinceErr) {
+          console.error(
+            `⚠️ ข้อผิดพลาดที่จังหวัด ${provinceName}:`,
+            singleProvinceErr,
+          )
+        }
+      })
+
+      await Promise.all(batchPromises)
+      await new Promise((resolve) => setTimeout(resolve, 300))
     }
+
+    console.log(JSON.stringify(globalShippingRateMatrixPayload, null, 2))
   }
 
   const onFormSubmit = (data: ShippingFormValues) => {
