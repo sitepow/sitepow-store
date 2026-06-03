@@ -1,4 +1,5 @@
-import { ShippingZoneType } from '@/generated/prisma/client'
+import { REGION_MAP, REMOTE_PROVINCES } from '@/constants/shipping'
+import { ShippingZoneType } from '@/generated/prisma/enums'
 
 import addressData from '@/lib/address/database/db.json'
 
@@ -9,102 +10,6 @@ type ProvinceData = [string, DistrictData[]]
 interface AddressJsonStructure {
   data: ProvinceData[]
 }
-
-const REGION_MAP: Record<string, string[]> = {
-  BKK: [
-    'กรุงเทพมหานคร',
-    'นนทบุรี',
-    'ปทุมธานี',
-    'สมุทรปราการ',
-    'นครปฐม',
-    'สมุทรสาคร',
-  ],
-  NORTH: [
-    'เชียงใหม่',
-    'เชียงราย',
-    'ลำพูน',
-    'ลำปาง',
-    'แพร่',
-    'น่าน',
-    'พะเยา',
-    'แม่ฮ่องสอน',
-    'อุตรดิตถ์',
-  ],
-  NE: [
-    'ขอนแก่น',
-    'นครราชสีมา',
-    'อุดรธานี',
-    'อุบลราชธานี',
-    'บุรีรัมย์',
-    'ศรีสะเกษ',
-    'สุรินทร์',
-    'ร้อยเอ็ด',
-    'ชัยภูมิ',
-    'สกลนคร',
-    'กาฬสินธุ์',
-    'มหาสารคาม',
-    'นครพนม',
-    'เลย',
-    'ยโสธร',
-    'หนองคาย',
-    'หนองบัวลำภู',
-    'บึงกาฬ',
-    'อำนาจเจริญ',
-    'มุกดาหาร',
-  ],
-  CENTRAL: [
-    'พิษณุโลก',
-    'นครสวรรค์',
-    'สุพรรณบุรี',
-    'พระนครศรีอยุธยา',
-    'ลพบุรี',
-    'กำแพงเพชร',
-    'สุโขทัย',
-    'พิจิตร',
-    'เพชรบูรณ์',
-    'อุทัยธานี',
-    'สระบุรี',
-    'อ่างทอง',
-    'สิงห์บุรี',
-    'ชัยนาท',
-  ],
-  EAST: [
-    'ชลบุรี',
-    'ระยอง',
-    'ฉะเชิงเทรา',
-    'จันทบุรี',
-    'ปราจีนบุรี',
-    'สระแก้ว',
-    'ตราด',
-    'นครนายก',
-  ],
-  WEST: [
-    'ตาก',
-    'ราชบุรี',
-    'กาญจนบุรี',
-    'เพชรบุรี',
-    'ประจวบคีรีขันธ์',
-    'สมุทรสงคราม',
-  ],
-  SOUTH: [
-    'ภูเก็ต',
-    'สงขลา',
-    'สุราษฎร์ธานี',
-    'นครศรีธรรมราช',
-    'กระบี่',
-    'พังงา',
-    'ตรัง',
-    'พัทลุง',
-    'ชุมพร',
-    'ระนอง',
-    'สตูล',
-    'ยะลา',
-    'ปัตตานี',
-    'นราธิวาส',
-  ],
-}
-
-export const REMOTE_PROVINCES = ['แม่ฮ่องสอน', 'ยะลา', 'ปัตตานี', 'นราธิวาส']
 
 function getRegionByProvinceName(provinceName: string): string {
   const cleanName = provinceName.trim().replace(/ /g, '')
@@ -122,20 +27,20 @@ export function determineShippingZone(
   const to = toProvince.trim().replace(/ /g, '')
 
   if (REMOTE_PROVINCES.includes(to)) {
-    return 'REMOTE_AREA'
+    return ShippingZoneType.REMOTE_AREA
   }
   if (from === to) {
-    return 'SAME_PROVINCE'
+    return ShippingZoneType.SAME_PROVINCE
   }
 
   const fromRegion = getRegionByProvinceName(from)
   const toRegion = getRegionByProvinceName(to)
 
   if (fromRegion === toRegion) {
-    return 'SAME_REGION'
+    return ShippingZoneType.SAME_REGION
   }
 
-  return 'CROSS_REGION'
+  return ShippingZoneType.CROSS_REGION
 }
 
 export function getRealProvinceDetails(provinceName: string): {
@@ -175,50 +80,106 @@ export function getRepresentativeDestinations(fromProvince: string) {
   const sameProvinceDetails = getRealProvinceDetails(from)
   const remoteDetails = getRealProvinceDetails('แม่ฮ่องสอน')
 
-  const destinations = [
+  const destinations: Array<{
+    zoneType: ShippingZoneType
+    province: string
+    postcode: number
+    district: string
+  }> = [
     {
-      zoneType: 'SAME_PROVINCE' as ShippingZoneType,
+      zoneType: ShippingZoneType.SAME_PROVINCE,
       province: from,
       ...sameProvinceDetails,
     },
     {
-      zoneType: 'REMOTE_AREA' as ShippingZoneType,
+      zoneType: ShippingZoneType.REMOTE_AREA,
       province: 'แม่ฮ่องสอน',
       ...remoteDetails,
     },
   ]
 
   if (fromRegion === 'BKK') {
+    const sameRegionTarget = from === 'นนทบุรี' ? 'ปทุมธานี' : 'นนทบุรี'
     destinations.push({
-      zoneType: 'SAME_REGION' as ShippingZoneType,
-      province: 'นนทบุรี',
-      ...getRealProvinceDetails('นนทบุรี'),
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
     })
     destinations.push({
-      zoneType: 'CROSS_REGION' as ShippingZoneType,
+      zoneType: ShippingZoneType.CROSS_REGION,
       province: 'เชียงใหม่',
       ...getRealProvinceDetails('เชียงใหม่'),
     })
   } else if (fromRegion === 'NORTH') {
+    const sameRegionTarget = from === 'เชียงราย' ? 'ลำปาง' : 'เชียงราย'
     destinations.push({
-      zoneType: 'SAME_REGION' as ShippingZoneType,
-      province: 'เชียงราย',
-      ...getRealProvinceDetails('เชียงราย'),
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
     })
     destinations.push({
-      zoneType: 'CROSS_REGION' as ShippingZoneType,
+      zoneType: ShippingZoneType.CROSS_REGION,
+      province: 'กรุงเทพมหานคร',
+      ...getRealProvinceDetails('กรุงเทพมหานคร'),
+    })
+  } else if (fromRegion === 'NE') {
+    const sameRegionTarget = from === 'ขอนแก่น' ? 'นครราชสีมา' : 'ขอนแก่น'
+    destinations.push({
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
+    })
+    destinations.push({
+      zoneType: ShippingZoneType.CROSS_REGION,
+      province: 'กรุงเทพมหานคร',
+      ...getRealProvinceDetails('กรุงเทพมหานคร'),
+    })
+  } else if (fromRegion === 'CENTRAL') {
+    const sameRegionTarget = from === 'พิษณุโลก' ? 'นครสวรรค์' : 'พิษณุโลก'
+    destinations.push({
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
+    })
+    destinations.push({
+      zoneType: ShippingZoneType.CROSS_REGION,
+      province: 'กรุงเทพมหานคร',
+      ...getRealProvinceDetails('กรุงเทพมหานคร'),
+    })
+  } else if (fromRegion === 'WEST') {
+    const sameRegionTarget = from === 'ราชบุรี' ? 'กาญจนบุรี' : 'ราชบุรี'
+    destinations.push({
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
+    })
+    destinations.push({
+      zoneType: ShippingZoneType.CROSS_REGION,
+      province: 'กรุงเทพมหานคร',
+      ...getRealProvinceDetails('กรุงเทพมหานคร'),
+    })
+  } else if (fromRegion === 'SOUTH') {
+    const sameRegionTarget =
+      from === 'สุราษฎร์ธานี' ? 'นครศรีธรรมราช' : 'สุราษฎร์ธานี'
+    destinations.push({
+      zoneType: ShippingZoneType.SAME_REGION,
+      province: sameRegionTarget,
+      ...getRealProvinceDetails(sameRegionTarget),
+    })
+    destinations.push({
+      zoneType: ShippingZoneType.CROSS_REGION,
       province: 'กรุงเทพมหานคร',
       ...getRealProvinceDetails('กรุงเทพมหานคร'),
     })
   } else {
     const sameRegionTarget = from === 'ชลบุรี' ? 'ระยอง' : 'ชลบุรี'
     destinations.push({
-      zoneType: 'SAME_REGION' as ShippingZoneType,
+      zoneType: ShippingZoneType.SAME_REGION,
       province: sameRegionTarget,
       ...getRealProvinceDetails(sameRegionTarget),
     })
     destinations.push({
-      zoneType: 'CROSS_REGION' as ShippingZoneType,
+      zoneType: ShippingZoneType.CROSS_REGION,
       province: 'กรุงเทพมหานคร',
       ...getRealProvinceDetails('กรุงเทพมหานคร'),
     })

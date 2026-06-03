@@ -1,6 +1,6 @@
 'use server'
 
-import { COURIERS_LIST } from '@/constants/shipping'
+import { COURIERS_LIST, COURIER_MAPPING } from '@/constants/shipping'
 import {
   Courier,
   CourierService,
@@ -8,35 +8,37 @@ import {
 } from '@/generated/prisma/client'
 import axios from 'axios'
 
-export interface CheckPriceWeightRate {
+export interface GetPriceWeightRate {
   zoneType: ShippingZoneType
   minWeight: number
   maxWeight: number
   fee: number
 }
 
-export interface CheckPriceZoneRate {
+export interface GetPriceZoneRate {
   zoneType: ShippingZoneType
   additionalFee: number
 }
 
-export interface CheckPriceServiceResult extends Omit<
+export interface GetPriceServiceResult extends Omit<
   CourierService,
   'createdAt' | 'updatedAt'
 > {
-  weightRates: CheckPriceWeightRate[]
-  zoneRates: CheckPriceZoneRate[]
+  weightRates: GetPriceWeightRate[]
+  zoneRates: GetPriceZoneRate[]
   currentFee: number | null
 }
 
-export interface CheckPriceCourierResult extends Omit<
+export interface GetPriceCourierResult extends Omit<
   Courier,
   'createdAt' | 'updatedAt'
 > {
-  services: CheckPriceServiceResult[]
+  services: GetPriceServiceResult[]
 }
 
-export interface CheckPriceInput {
+export interface GetPriceInput {
+  zoneType: ShippingZoneType
+  minWeight: number
   weight: number
   fromPostcode: number
   toPostcode: number
@@ -59,8 +61,8 @@ interface ShippopServiceResponse {
 }
 
 export async function getShippingPrice(
-  payload: CheckPriceInput,
-): Promise<CheckPriceCourierResult[]> {
+  payload: GetPriceInput,
+): Promise<GetPriceCourierResult[]> {
   try {
     const requestBody = {
       data: [
@@ -107,22 +109,17 @@ export async function getShippingPrice(
     if (Array.isArray(shippopServices)) {
       shippopServices.forEach((service) => {
         const rawCourierCode = service.courierCode?.toUpperCase() || ''
-        let uniqueKey = rawCourierCode
 
-        if (rawCourierCode === 'EMST') uniqueKey = 'THAIPOST_EMS'
-        else if (rawCourierCode === 'FLE') uniqueKey = 'FLASH_STANDARD'
-        else if (rawCourierCode === 'KRYD') uniqueKey = 'KERRY_STANDARD'
-        else if (rawCourierCode === 'SPX') uniqueKey = 'SPX_STANDARD'
-        else if (rawCourierCode === 'BEST') uniqueKey = 'BEST_STANDARD'
-        else if (rawCourierCode === 'DHL') uniqueKey = 'DHL_STANDARD'
-
-        shippopPriceMap.set(uniqueKey, service)
+        shippopPriceMap.set(
+          COURIER_MAPPING[rawCourierCode] || rawCourierCode,
+          service,
+        )
       })
     }
 
-    const formattedResult: CheckPriceCourierResult[] = COURIERS_LIST.map(
+    const formattedResult: GetPriceCourierResult[] = COURIERS_LIST.map(
       (courier) => {
-        const updatedServices: CheckPriceServiceResult[] = courier.services.map(
+        const updatedServices: GetPriceServiceResult[] = courier.services.map(
           (service) => {
             const shippopData = shippopPriceMap.get(service.code.toUpperCase())
 
@@ -142,8 +139,8 @@ export async function getShippingPrice(
                 currentFee: price,
                 weightRates: [
                   {
-                    zoneType: 'SAME_PROVINCE' as ShippingZoneType,
-                    minWeight: 0,
+                    zoneType: payload.zoneType,
+                    minWeight: payload.minWeight,
                     maxWeight: payload.weight,
                     fee: price,
                   },
@@ -169,6 +166,6 @@ export async function getShippingPrice(
       courier.services.some((s) => s.currentFee !== null),
     )
   } catch {
-    throw new Error('ไม่สามารถดึงข้อมูลราคาจากระบบหลังบ้าน Shippop ได้')
+    throw new Error('ไม่สามารถดึงข้อมูลราคาค่าจัดส่งจากระบบ Shippop ได้')
   }
 }

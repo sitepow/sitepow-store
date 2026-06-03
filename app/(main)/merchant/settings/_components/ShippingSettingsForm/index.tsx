@@ -3,17 +3,16 @@
 import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 
-import { getShippingPrice } from '@/actions/shippop'
+import { useGetShippingPrice } from '@/actions/hooks/shippop'
 import {
   COURIERS_LIST,
+  DEFAULT_PRESET_VALUES,
   PROVINCES_POOL,
   SHIPPING_WEIGHT_TIERS,
 } from '@/constants/shipping'
-import { ShippingZoneType } from '@/generated/prisma/client'
-import {
-  ShippingSettingsFormValues,
-  shippingSettingsFormSchema,
-} from '@/zod/shipping-settings'
+import { ShippingZoneType } from '@/generated/prisma/enums'
+import { getRepresentativeDestinations } from '@/utils/shipping'
+import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconCloudDownload,
@@ -27,62 +26,40 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 
-const REPRESENTATIVE_DESTINATIONS = [
-  {
-    zoneType: 'SAME_PROVINCE' as ShippingZoneType,
-    province: 'สมุทรปราการ',
-    district: 'เมืองสมุทรปราการ',
-    postcode: 10270,
-  },
-  {
-    zoneType: 'SAME_REGION' as ShippingZoneType,
-    province: 'นนทบุรี',
-    district: 'เมืองนนทบุรี',
-    postcode: 11000,
-  },
-  {
-    zoneType: 'CROSS_REGION' as ShippingZoneType,
-    province: 'เชียงใหม่',
-    district: 'เมืองเชียงใหม่',
-    postcode: 50000,
-  },
-  {
-    zoneType: 'REMOTE_AREA' as ShippingZoneType,
-    province: 'แม่ฮ่องสอน',
-    district: 'ปาย',
-    postcode: 58130,
-  },
-]
+interface ShippopService {
+  id: string
+  currentFee: number | null | undefined
+}
 
-const defaultPresetValues: ShippingSettingsFormValues = {
-  freeShipMin: 299,
-  storeProvince: 'สมุทรปราการ',
-  storeDistrict: 'เมืองสมุทรปราการ',
-  storePostcode: 10270,
-  services: COURIERS_LIST.flatMap((c) =>
-    c.services.map((s) => ({
-      courierServiceId: s.id,
-      isEnabled: true,
-      weightRates: [],
-      zoneRates: [],
-    })),
-  ),
+interface ShippopCourier {
+  services: ShippopService[]
+}
+
+interface AccumulatedRate {
+  zoneType: ShippingZoneType
+  minWeight: number
+  maxWeight: number
+  fee: number
 }
 
 export function ShippingSettingsForm({
   initialData,
 }: {
-  initialData?: ShippingSettingsFormValues
+  initialData?: ShippingFormValues
 }) {
   const [isSaving, setIsSaving] = useState(false)
 
-  const methods = useForm<ShippingSettingsFormValues>({
-    resolver: zodResolver(shippingSettingsFormSchema),
-    defaultValues: initialData || defaultPresetValues,
+  const { mutateAsync: fetchPriceMutation, isPending: isFetchingRates } =
+    useGetShippingPrice()
+
+  const methods = useForm<ShippingFormValues>({
+    resolver: zodResolver(shippingFormSchema),
+    defaultValues: initialData || DEFAULT_PRESET_VALUES,
   })
 
   const { control, handleSubmit, register, setValue, watch } = methods
@@ -101,15 +78,18 @@ export function ShippingSettingsForm({
     districtName: string,
     postcodeNum: number,
   ) => {
-    const priceCheckPromises: Promise<any>[] = []
+    const priceCheckPromises: Promise<ShippopCourier[]>[] = ([] = [])
     const requestMetadata: Array<{
       minWeight: number
       maxWeight: number
       zoneType: ShippingZoneType
     }> = []
 
+    const representativeDestinations =
+      getRepresentativeDestinations(provinceName)
+
     SHIPPING_WEIGHT_TIERS.forEach((tier) => {
-      REPRESENTATIVE_DESTINATIONS.forEach((dest) => {
+      representativeDestinations.forEach((dest) => {
         requestMetadata.push({
           minWeight: tier.minWeight,
           maxWeight: tier.maxWeight,
@@ -117,7 +97,9 @@ export function ShippingSettingsForm({
         })
 
         priceCheckPromises.push(
-          getShippingPrice({
+          fetchPriceMutation({
+            zoneType: dest.zoneType,
+            minWeight: tier.minWeight,
             weight: tier.maxWeight,
             fromPostcode: postcodeNum,
             fromDistrict: districtName,
@@ -134,12 +116,12 @@ export function ShippingSettingsForm({
     })
 
     const allResults = await Promise.all(priceCheckPromises)
-    const serviceRatesAccumulator = new Map<string, any[]>()
+    const serviceRatesAccumulator = new Map<string, AccumulatedRate[]>()
 
     allResults.forEach((shippopData, index) => {
       const meta = requestMetadata[index]
-      shippopData.forEach((courierData: any) => {
-        courierData.services.forEach((activeService: any) => {
+      shippopData.forEach((courierData: ShippopCourier) => {
+        courierData.services.forEach((activeService: ShippopService) => {
           if (
             activeService.currentFee !== null &&
             activeService.currentFee !== undefined
@@ -158,7 +140,7 @@ export function ShippingSettingsForm({
       })
     })
 
-    const ratesMatrixJson: Record<string, any> = {}
+    const ratesMatrixJson: Record<string, AccumulatedRate[]> = {}
     serviceRatesAccumulator.forEach((rates, courierServiceId) => {
       ratesMatrixJson[courierServiceId] = rates
     })
@@ -170,7 +152,10 @@ export function ShippingSettingsForm({
   }
 
   const handleFetchAutoRates = async () => {
-    const globalShippingRateMatrixPayload: any[] = []
+    const globalShippingRateMatrixPayload: Array<{
+      fromProvince: string
+      ratesMatrix: Record<string, AccumulatedRate[]>
+    }> = []
 
     for (const store of PROVINCES_POOL) {
       try {
@@ -204,7 +189,7 @@ export function ShippingSettingsForm({
     }
   }
 
-  const onFormSubmit = (data: ShippingSettingsFormValues) => {
+  const onFormSubmit = (data: ShippingFormValues) => {
     setIsSaving(true)
     console.log('Sending structured payload to Prisma backend:', data)
 
@@ -227,10 +212,22 @@ export function ShippingSettingsForm({
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={isFetchingRates}
                   onClick={handleFetchAutoRates}
                 >
-                  <IconCloudDownload size={16} />
-                  ดึงเรทค่าจัดส่งอัตโนมัติ
+                  {isFetchingRates && (
+                    <>
+                      <Spinner />
+                      กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
+                    </>
+                  )}
+
+                  {!isFetchingRates && (
+                    <>
+                      <IconCloudDownload size={16} />
+                      ดึงเรทค่าจัดส่งอัตโนมัติ
+                    </>
+                  )}
                 </Button>
               }
             />

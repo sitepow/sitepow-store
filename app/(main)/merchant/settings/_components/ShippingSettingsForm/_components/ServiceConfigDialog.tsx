@@ -3,8 +3,14 @@
 import { useState } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import { ShippingZoneType } from '@/generated/prisma/client'
-import { ShippingSettingsFormValues } from '@/zod/shipping-settings'
+import {
+  DEFAULT_SHIPPING_FEE,
+  DEFAULT_WEIGHT_STEP,
+  INITIAL_MIN_WEIGHT,
+  ZONE_LABELS,
+} from '@/constants/shipping'
+import { ShippingZoneType } from '@/generated/prisma/enums'
+import { ShippingFormValues } from '@/zod/shipping'
 import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -25,31 +31,16 @@ interface ServiceConfigDialogProps {
   serviceIndex: number
 }
 
-const ZONE_LABELS: Record<ShippingZoneType, { title: string; desc: string }> = {
-  SAME_PROVINCE: { title: 'จังหวัดเดียวกัน', desc: 'ส่งภายในจังหวัดต้นทาง' },
-  SAME_REGION: {
-    title: 'ภูมิภาคเดียวกัน',
-    desc: 'ส่งไปจังหวัดอื่นภายในภาคเดียวกัน',
-  },
-  CROSS_REGION: {
-    title: 'ข้ามภูมิภาค',
-    desc: 'ส่งต่างภาค หรือพื้นที่ระยะไกลปกติ',
-  },
-  REMOTE_AREA: {
-    title: 'พื้นที่ห่างไกลพิเศษ',
-    desc: 'เกาะ ดอย สูง หรือ 3 จังหวัดชายแดนใต้',
-  },
-}
-
 export function ServiceConfigDialog({
   serviceName,
   serviceIndex,
 }: ServiceConfigDialogProps) {
   const [open, setOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<string>('SAME_PROVINCE')
+  const [activeTab, setActiveTab] = useState<string>(
+    ShippingZoneType.SAME_PROVINCE,
+  )
 
-  const { control, register, watch } =
-    useFormContext<ShippingSettingsFormValues>()
+  const { control, register, watch } = useFormContext<ShippingFormValues>()
 
   const {
     fields: allWeightRates,
@@ -65,13 +56,13 @@ export function ServiceConfigDialog({
     const filteredRates = currentRates.filter((r) => r.zoneType === zone)
 
     const lastRate = filteredRates[filteredRates.length - 1]
-    const nextMin = lastRate ? lastRate.maxWeight + 1 : 0
+    const nextMin = lastRate ? lastRate.maxWeight + 1 : INITIAL_MIN_WEIGHT
 
     append({
       zoneType: zone,
       minWeight: nextMin,
-      maxWeight: nextMin + 1000,
-      fee: 45,
+      maxWeight: nextMin + DEFAULT_WEIGHT_STEP,
+      fee: DEFAULT_SHIPPING_FEE,
     })
   }
 
@@ -82,7 +73,7 @@ export function ServiceConfigDialog({
           <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="min-w-lg">
         <DialogHeader>
           <DialogTitle>ตั้งค่าอัตราค่าบริการ: {serviceName}</DialogTitle>
           <DialogDescription>
@@ -119,7 +110,7 @@ export function ServiceConfigDialog({
                       {zoneMeta.title}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {zoneMeta.desc}
+                      {zoneMeta.description}
                     </span>
                   </div>
                   <Button
@@ -190,10 +181,9 @@ export function ServiceConfigDialog({
 
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
                           onClick={() => remove(globalIndex)}
-                          className="text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0"
                         >
                           <IconTrash size={14} />
                         </Button>
