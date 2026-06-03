@@ -74,7 +74,7 @@ export function ShippingSettingsForm({
 
   const watchedServices = watch('services')
 
-  const currentStoreProvince = watch('storeProvince') || 'สมุทรปราการ'
+  // const currentStoreProvince = watch('storeProvince')
 
   const fetchRatesForProvince = async (
     provinceName: string,
@@ -82,26 +82,14 @@ export function ShippingSettingsForm({
     stateName: string,
     postcodeNum: number,
   ) => {
-    const priceCheckPromises: Promise<ShippopCourier[]>[] = []
-    const requestMetadata: Array<{
-      minWeight: number
-      maxWeight: number
-      zoneType: ShippingZoneType
-    }> = []
-
+    const serviceRatesAccumulator = new Map<string, AccumulatedRate[]>()
     const representativeDestinations =
       getRepresentativeDestinations(provinceName)
 
-    SHIPPING_WEIGHT_TIERS.forEach((tier) => {
-      representativeDestinations.forEach((dest) => {
-        requestMetadata.push({
-          minWeight: tier.minWeight,
-          maxWeight: tier.maxWeight,
-          zoneType: dest.zoneType,
-        })
-
-        priceCheckPromises.push(
-          fetchPriceMutation({
+    for (const tier of SHIPPING_WEIGHT_TIERS) {
+      for (const dest of representativeDestinations) {
+        try {
+          const shippopData = await fetchPriceMutation({
             zoneType: dest.zoneType,
             minWeight: tier.minWeight,
             weight: tier.maxWeight,
@@ -116,35 +104,38 @@ export function ShippingSettingsForm({
             width: tier.width,
             length: tier.length,
             height: tier.height,
-          }),
-        )
-      })
-    })
+          })
 
-    const allResults = await Promise.all(priceCheckPromises)
-    const serviceRatesAccumulator = new Map<string, AccumulatedRate[]>()
-
-    allResults.forEach((shippopData, index) => {
-      const meta = requestMetadata[index]
-      shippopData.forEach((courierData: ShippopCourier) => {
-        courierData.services.forEach((activeService: ShippopService) => {
-          if (
-            activeService.currentFee !== null &&
-            activeService.currentFee !== undefined
-          ) {
-            if (!serviceRatesAccumulator.has(activeService.id)) {
-              serviceRatesAccumulator.set(activeService.id, [])
-            }
-            serviceRatesAccumulator.get(activeService.id)?.push({
-              zoneType: meta.zoneType,
-              minWeight: meta.minWeight,
-              maxWeight: meta.maxWeight,
-              fee: activeService.currentFee,
+          if (shippopData && Array.isArray(shippopData)) {
+            shippopData.forEach((courierData: ShippopCourier) => {
+              courierData.services.forEach((activeService: ShippopService) => {
+                if (
+                  activeService.currentFee !== null &&
+                  activeService.currentFee !== undefined
+                ) {
+                  if (!serviceRatesAccumulator.has(activeService.id)) {
+                    serviceRatesAccumulator.set(activeService.id, [])
+                  }
+                  serviceRatesAccumulator.get(activeService.id)?.push({
+                    zoneType: dest.zoneType,
+                    minWeight: tier.minWeight,
+                    maxWeight: tier.maxWeight,
+                    fee: activeService.currentFee,
+                  })
+                }
+              })
             })
           }
-        })
-      })
-    })
+
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        } catch (apiErr) {
+          console.warn(
+            `⚠️ ข้ามคู่ขนส่ง ${provinceName} -> ${dest.province} (${tier.minWeight}-${tier.maxWeight}kg):`,
+            apiErr,
+          )
+        }
+      }
+    }
 
     const ratesMatrixJson: Record<string, AccumulatedRate[]> = {}
     serviceRatesAccumulator.forEach((rates, courierServiceId) => {
@@ -178,16 +169,16 @@ export function ShippingSettingsForm({
 
         globalShippingRateMatrixPayload.push(provinceData)
 
-        if (provinceName === currentStoreProvince) {
-          watchedServices.forEach((serviceFormItem, index) => {
-            const accumulatedRates =
-              provinceData.ratesMatrix[serviceFormItem.courierServiceId]
-            setValue(`services.${index}.weightRates`, accumulatedRates || [], {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          })
-        }
+        // if (provinceName === currentStoreProvince) {
+        //   watchedServices.forEach((serviceFormItem, index) => {
+        //     const accumulatedRates =
+        //       provinceData.ratesMatrix[serviceFormItem.courierServiceId]
+        //     setValue(`services.${index}.weightRates`, accumulatedRates || [], {
+        //       shouldDirty: true,
+        //       shouldValidate: true,
+        //     })
+        //   })
+        // }
       } catch (singleProvinceErr) {
         console.error(
           `⚠️ ข้ามจังหวัด ${province.name} เนื่องจากเกิดข้อผิดพลาด:`,
