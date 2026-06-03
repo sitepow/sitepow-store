@@ -1,4 +1,6 @@
-import { REGION_MAP } from '@/constants/shipping'
+'use client'
+
+import { REGION_MAP, REMOTE_AREAS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 
 import addressData from '@/lib/address/database/db.json'
@@ -71,11 +73,15 @@ export function getRepresentativeDestinations(fromProvince: string) {
     ...getRealProvinceDetails(from),
   })
 
-  const remoteTarget = from === 'แม่ฮ่องสอน' ? 'ยะลา' : 'แม่ฮ่องสอน'
+  const validRemoteArea =
+    REMOTE_AREAS.find((area) => area.province !== from) || REMOTE_AREAS[0]
+
   destinations.push({
     zoneType: ShippingZoneType.REMOTE_AREA,
-    province: remoteTarget,
-    ...getRealProvinceDetails(remoteTarget),
+    province: validRemoteArea.province,
+    postcode: validRemoteArea.postcode,
+    state: validRemoteArea.state,
+    district: validRemoteArea.district,
   })
 
   const siblingProvinces = REGION_MAP[fromRegion] || []

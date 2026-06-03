@@ -222,7 +222,32 @@ export const REGION_MAP: Record<string, string[]> = {
   ],
 }
 
-export const REMOTE_PROVINCES = ['แม่ฮ่องสอน', 'ยะลา', 'ปัตตานี', 'นราธิวาส']
+export const REMOTE_AREAS = [
+  {
+    province: 'ยะลา',
+    postcode: '95110',
+    state: 'เบตง',
+    district: 'เบตง',
+  },
+  {
+    province: 'แม่ฮ่องสอน',
+    postcode: '58130',
+    state: 'ปาย',
+    district: 'เวียงใต้',
+  },
+  {
+    province: 'พังงา',
+    postcode: '82160',
+    state: 'เกาะยาว',
+    district: 'เกาะยาวน้อย',
+  },
+  {
+    province: 'ตราด',
+    postcode: '23170',
+    state: 'เกาะช้าง',
+    district: 'เกาะช้างใต้',
+  },
+]
 
 export const ZONE_LABELS: Record<
   ShippingZoneType,
