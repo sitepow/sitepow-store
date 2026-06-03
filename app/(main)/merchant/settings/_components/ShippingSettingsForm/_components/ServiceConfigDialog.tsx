@@ -73,7 +73,7 @@ export function ServiceConfigDialog({
           <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
         </Button>
       </DialogTrigger>
-      <DialogContent className="min-w-lg">
+      <DialogContent className="min-w-lg" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>ตั้งค่าอัตราค่าบริการ: {serviceName}</DialogTitle>
           <DialogDescription>

@@ -3,7 +3,6 @@ import {
   CourierService,
   ShippingZoneType,
 } from '@/generated/prisma/client'
-import { ShippingFormValues } from '@/zod/shipping'
 
 export interface CourierWithServices extends Omit<
   Courier,
@@ -356,18 +355,3 @@ export const SHIPPING_WEIGHT_TIERS = [
   { minWeight: 10001, maxWeight: 15000, width: 35, length: 50, height: 25 },
   { minWeight: 15001, maxWeight: 20000, width: 40, length: 50, height: 30 },
 ]
-
-export const DEFAULT_PRESET_VALUES: ShippingFormValues = {
-  freeShipMin: 299,
-  storeProvince: 'สมุทรปราการ',
-  storeDistrict: 'เมืองสมุทรปราการ',
-  storePostcode: 10270,
-  services: COURIERS_LIST.flatMap((c) =>
-    c.services.map((s) => ({
-      courierServiceId: s.id,
-      isEnabled: true,
-      weightRates: [],
-      zoneRates: [],
-    })),
-  ),
-}

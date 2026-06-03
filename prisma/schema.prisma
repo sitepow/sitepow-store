@@ -229,7 +229,8 @@ model ShippingSetting {
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  freeShipMin Decimal @default(999.00) @db.Decimal(10, 2)
+  freeShipMin       Decimal @default(999.00) @db.Decimal(10, 2)
+  isFreeShipEnabled Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -305,7 +306,12 @@ model Store {
   shippingSetting      ShippingSetting?
   storeCourierServices StoreCourierService[]
 
-  address         String? @db.Text
+  province    String?
+  district    String?
+  subDistrict String?
+  postcode    String?
+  address     String? @db.Text
+
   taxId           String?
   isVatRegistered Boolean @default(false)
   vatRate         Decimal @default(7.0) @db.Decimal(10, 2)

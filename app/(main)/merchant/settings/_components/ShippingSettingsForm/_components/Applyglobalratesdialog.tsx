@@ -3,10 +3,14 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { applyGlobalRatesToStore } from '@/actions/global-shipping-rate-matrix'
+import {
+  useApplyGlobalRates,
+  useGlobalShippingMetadata,
+} from '@/actions/hooks/global-shipping-rate-matrix'
 import { PROVINCES_POOL } from '@/constants/shipping'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconCloudDownload, IconLoader2 } from '@tabler/icons-react'
+import { formatDate } from '@/utils/date'
+import { IconCloudDownload } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import {
   Select,
   SelectContent,
@@ -26,40 +30,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
 
 export function ApplyGlobalRatesDialog() {
   const [open, setOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string>('')
-  const [isApplying, setIsApplying] = useState(false)
 
   const { selectedStoreId } = useStoreFilter()
 
-  const handleApply = async () => {
+  const { mutate: applyRates, isPending: isApplying } = useApplyGlobalRates()
+  const { data: matrixMeta } = useGlobalShippingMetadata(selectedProvince)
+
+  const handleApply = () => {
     if (!selectedProvince || !selectedStoreId) {
       return
     }
 
-    setIsApplying(true)
-    try {
-      await applyGlobalRatesToStore(selectedStoreId, selectedProvince)
-      toast.success(
-        `อัพเดตเรทจัดส่งจากจังหวัด ${selectedProvince} เรียบร้อยแล้ว`,
-      )
-      setOpen(false)
-      setSelectedProvince('')
-    } catch (err) {
-      toast.error('เกิดข้อผิดพลาดในการอัพเดตเรทจัดส่ง')
-      console.error(err)
-    } finally {
-      setIsApplying(false)
-    }
+    applyRates(
+      { storeId: selectedStoreId, fromProvince: selectedProvince },
+      {
+        onSuccess: () => {
+          toast.success(
+            `อัพเดตเรทจัดส่งจากจังหวัด ${selectedProvince} เรียบร้อยแล้ว`,
+          )
+          setOpen(false)
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      },
+    )
   }
 
   return (
     <Dialog
       open={open}
       onOpenChange={(v) => {
-        if (!v) setSelectedProvince('')
+        if (!v) {
+          setSelectedProvince('')
+        }
         setOpen(v)
       }}
     >
@@ -75,7 +84,8 @@ export function ApplyGlobalRatesDialog() {
           <DialogTitle>เลือกจังหวัดต้นทางของร้านค้า</DialogTitle>
           <DialogDescription>
             ระบบจะดึงเรทค่าจัดส่งจาก Master Data
-            และนำมาตั้งค่าให้กับร้านค้านี้โดยอัตโนมัติ
+            พร้อมทั้งปรับปรุงที่อยู่ต้นทางของร้านค้า (จังหวัด/อำเภอ/ไปรษณีย์)
+            ให้ตรงกับข้อมูลเรทที่เลือกโดยอัตโนมัติ
           </DialogDescription>
         </DialogHeader>
 
@@ -93,6 +103,12 @@ export function ApplyGlobalRatesDialog() {
               ))}
             </SelectContent>
           </Select>
+          {selectedProvince && (
+            <FieldDescription>
+              อัพเดตฐานข้อมูลวันที่:{' '}
+              {matrixMeta?.updatedAt ? formatDate(matrixMeta?.updatedAt) : '-'}
+            </FieldDescription>
+          )}
         </Field>
 
         <DialogFooter>
@@ -103,7 +119,7 @@ export function ApplyGlobalRatesDialog() {
           >
             {isApplying ? (
               <>
-                <IconLoader2 size={14} className="animate-spin" />
+                <Spinner />
                 กำลังอัพเดต...
               </>
             ) : (

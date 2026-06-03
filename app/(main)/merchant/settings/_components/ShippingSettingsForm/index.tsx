@@ -1,15 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import {
+  Controller,
+  FormProvider,
+  useFieldArray,
+  useForm,
+} from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { upsertGlobalShippingRateMatrix } from '@/actions/global-shipping-rate-matrix'
-import { useStoreShippingSettings } from '@/actions/hooks/shipping'
+import {
+  useStoreShippingSettings,
+  useUpdateShippingSettings,
+} from '@/actions/hooks/shipping'
 import { useGetShippingPrice } from '@/actions/hooks/shippop'
 import {
   COURIERS_LIST,
-  DEFAULT_PRESET_VALUES,
   PROVINCES_POOL,
   SHIPPING_WEIGHT_TIERS,
 } from '@/constants/shipping'
@@ -25,7 +32,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconCloudDownload,
   IconDeviceFloppy,
-  IconLoader2,
   IconTruck,
 } from '@tabler/icons-react'
 
@@ -51,20 +57,16 @@ interface ShippopCourier {
   services: ShippopService[]
 }
 
-export function ShippingSettingsForm({
-  initialData,
-}: {
-  initialData?: ShippingFormValues
-}) {
-  const [isSaving, setIsSaving] = useState(false)
+export function ShippingSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
 
   const { mutateAsync: fetchPriceMutation, isPending: isFetchingRates } =
     useGetShippingPrice()
+  const { mutate: updateShipping, isPending: isUpdating } =
+    useUpdateShippingSettings()
 
   const methods = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
-    defaultValues: initialData || DEFAULT_PRESET_VALUES,
   })
 
   const { control, handleSubmit, register, setValue, watch, reset } = methods
@@ -75,6 +77,7 @@ export function ShippingSettingsForm({
   })
 
   const watchedServices = watch('services')
+  const watchedFreeShipEnabled = watch('isFreeShipEnabled')
 
   const fetchRatesForProvince = async (
     provinceName: string,
@@ -189,30 +192,30 @@ export function ShippingSettingsForm({
   const { data: shippingSettings } = useStoreShippingSettings(selectedStoreId)
 
   useEffect(() => {
-    if (!selectedStoreId) {
+    if (!selectedStoreId || !shippingSettings) {
       return
     }
 
-    const loadData = async () => {
-      if (shippingSettings) {
-        reset({
-          ...DEFAULT_PRESET_VALUES,
-          ...shippingSettings,
-          services: shippingSettings.services || [],
-        })
-      }
-    }
-
-    loadData()
+    reset({
+      ...shippingSettings,
+      services: shippingSettings.services || [],
+    })
   }, [selectedStoreId, reset, shippingSettings])
 
   const onFormSubmit = (data: ShippingFormValues) => {
-    setIsSaving(true)
-    console.log('Sending structured payload to Prisma backend:', data)
+    if (!selectedStoreId) {
+      toast.error('ไม่พบข้อมูลร้านค้า')
+      return
+    }
 
-    setTimeout(() => {
-      setIsSaving(false)
-    }, 1200)
+    updateShipping(
+      { storeId: selectedStoreId, data },
+      {
+        onSuccess: () => {
+          toast.success('บันทึกการตั้งค่าการจัดส่งเรียบร้อยแล้ว')
+        },
+      },
+    )
   }
 
   return (
@@ -308,7 +311,7 @@ export function ShippingSettingsForm({
                                 {service.name}
                               </span>
                               <span className="text-muted-foreground block text-xs">
-                                ระยะเวลาโดยประมาณ: {service.estimatedDays}
+                                ระยะเวลาโดยประมาณ {service.estimatedDays}
                               </span>
                             </div>
 
@@ -340,33 +343,47 @@ export function ShippingSettingsForm({
             </div>
 
             <div className="space-y-4 py-5">
-              <span className="block text-sm font-semibold text-neutral-900">
-                เงื่อนไขโปรโมชันส่งฟรีของร้าน
-              </span>
-              <div className="grid grid-cols-2">
-                <Field>
-                  <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
-                  <div className="mt-1 flex items-center">
-                    <Input
-                      type="number"
-                      placeholder="1000"
-                      {...register('freeShipMin', { valueAsNumber: true })}
-                      className="rounded-r-none"
+              <div className="flex flex-wrap gap-2">
+                <Controller
+                  control={control}
+                  name="isFreeShipEnabled"
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
                     />
-                    <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                      บาท
-                    </span>
-                  </div>
-                </Field>
+                  )}
+                />
+                <span className="block text-sm font-semibold text-neutral-900">
+                  เงื่อนไขโปรโมชันส่งฟรีของร้าน
+                </span>
               </div>
+              {watchedFreeShipEnabled && (
+                <div className="grid grid-cols-2">
+                  <Field>
+                    <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
+                    <div className="mt-1 flex items-center">
+                      <Input
+                        type="number"
+                        placeholder="1000"
+                        {...register('freeShipMin', { valueAsNumber: true })}
+                        className="rounded-r-none"
+                      />
+                      <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
+                        บาท
+                      </span>
+                    </div>
+                  </Field>
+                </div>
+              )}
             </div>
           </CardContent>
 
           <CardFooter className="flex justify-end border-t">
-            <Button type="submit" size="sm" disabled={isSaving}>
-              {isSaving ? (
+            <Button type="submit" disabled={isUpdating}>
+              {isUpdating ? (
                 <>
-                  <IconLoader2 size={14} className="animate-spin" />{' '}
+                  <Spinner />
                   กำลังบันทึกเกณฑ์ขนส่งระบบ...
                 </>
               ) : (

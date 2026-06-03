@@ -2,13 +2,24 @@
 
 import { COURIERS_LIST } from '@/constants/shipping'
 import { Prisma } from '@/generated/prisma/client'
-import { AggregatedRate } from '@/utils/shipping'
+import { AggregatedRate, getProvinceDetails } from '@/utils/shipping'
 
 import { prisma } from '@/lib/prisma'
 
 export interface GlobalShippingRateMatrixPayload {
   fromProvince: string
   ratesMatrix: Record<string, AggregatedRate[]>
+}
+
+export async function getGlobalShippingRateMatrixMetadata(
+  fromProvince: string,
+) {
+  const matrix = await prisma.globalShippingRateMatrix.findUnique({
+    where: { fromProvince },
+    select: { updatedAt: true },
+  })
+
+  return matrix
 }
 
 export async function upsertGlobalShippingRateMatrix(
@@ -34,6 +45,11 @@ export async function applyGlobalRatesToStore(
   storeId: string,
   fromProvince: string,
 ): Promise<void> {
+  if (!fromProvince) {
+    throw new Error('กรุณาระบุจังหวัดต้นทางของร้านค้าก่อนดำเนินการ')
+  }
+
+  const provinceDetails = getProvinceDetails(fromProvince)
   const matrixRow = await prisma.globalShippingRateMatrix.findUnique({
     where: { fromProvince },
   })
@@ -48,6 +64,16 @@ export async function applyGlobalRatesToStore(
   >
 
   await prisma.$transaction(async (tx) => {
+    await tx.store.update({
+      where: { id: storeId },
+      data: {
+        province: fromProvince,
+        district: provinceDetails.state,
+        subDistrict: provinceDetails.district,
+        postcode: provinceDetails.postcode,
+      },
+    })
+
     for (const courier of COURIERS_LIST) {
       await tx.courier.upsert({
         where: { id: courier.id },
@@ -81,7 +107,9 @@ export async function applyGlobalRatesToStore(
       })
 
       const rates = ratesMatrix[courierServiceId]
-      if (!rates || rates.length === 0) continue
+      if (!rates || rates.length === 0) {
+        continue
+      }
 
       await tx.storeServiceWeightRate.deleteMany({
         where: { storeCourierServiceId: storeCourierService.id },

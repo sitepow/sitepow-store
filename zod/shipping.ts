@@ -31,6 +31,7 @@ export const courierServiceFormSchema = z.object({
 })
 
 export const shippingFormSchema = z.object({
+  isFreeShipEnabled: z.boolean().default(false),
   freeShipMin: z.number({ message: 'กรุณาระบุยอดส่งฟรีขั้นต่ำ' }),
 
   storeProvince: z
@@ -44,4 +45,4 @@ export const shippingFormSchema = z.object({
   services: z.array(courierServiceFormSchema),
 })
 
-export type ShippingFormValues = z.infer<typeof shippingFormSchema>
+export type ShippingFormValues = z.input<typeof shippingFormSchema>

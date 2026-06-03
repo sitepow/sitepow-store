@@ -1,5 +1,3 @@
-'use client'
-
 import { REGION_MAP, REMOTE_AREAS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 
