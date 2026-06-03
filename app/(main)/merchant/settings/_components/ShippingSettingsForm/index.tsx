@@ -7,7 +7,6 @@ import toast from 'react-hot-toast'
 import { upsertGlobalShippingRateMatrix } from '@/actions/global-shipping-rate-matrix'
 import { useStoreShippingSettings } from '@/actions/hooks/shipping'
 import { useGetShippingPrice } from '@/actions/hooks/shippop'
-import { getStoreShippingSettings } from '@/actions/shipping'
 import {
   COURIERS_LIST,
   DEFAULT_PRESET_VALUES,
@@ -41,6 +40,7 @@ import { Switch } from '@/components/ui/switch'
 
 import { ApplyGlobalRatesDialog } from './_components/Applyglobalratesdialog'
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
+import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
 interface ShippopService {
   id: string
@@ -256,6 +256,8 @@ export function ShippingSettingsForm({
           </CardHeader>
 
           <CardContent className="divide-border divide-y">
+            <ShippingZoneTable originProvince={watch('storeProvince')} />
+
             <div className="space-y-5 py-5">
               <div>
                 <span className="block text-sm font-semibold text-neutral-900">
