@@ -38,7 +38,7 @@ export const COURIERS_LIST: CourierWithServices[] = [
         courierId: 'c-thaipost',
         code: 'THAIPOST_EMS',
         name: 'EMS (ส่งด่วนพิเศษ)',
-        estimatedDays: '1-2 วัน',
+        estimatedDays: '1-5 วัน',
       },
     ],
   },
@@ -47,14 +47,13 @@ export const COURIERS_LIST: CourierWithServices[] = [
     code: 'FLASH',
     name: 'Flash Express',
     description: 'บริการเข้ารับและจัดส่งพัสดุด่วนครอบคลุม 77 จังหวัดทั่วประเทศ',
-
     services: [
       {
         id: 'cs-flash-std',
         courierId: 'c-flash',
         code: 'FLASH_STANDARD',
         name: 'Flash Speed (ส่งด่วนปกติ)',
-        estimatedDays: '1-3 วัน',
+        estimatedDays: '1-5 วัน',
       },
     ],
   },
@@ -64,7 +63,6 @@ export const COURIERS_LIST: CourierWithServices[] = [
     name: 'Kerry Express (KEX)',
     description:
       'บริการจัดส่งพัสดุด่วนชั้นนำ รวดเร็ว ปลอดภัย ได้รับความนิยมสูง',
-
     services: [
       {
         id: 'cs-kerry-std',
@@ -81,14 +79,13 @@ export const COURIERS_LIST: CourierWithServices[] = [
     name: 'SPX Express',
     description:
       'บริการขนส่งพัสดุด่วนที่เติบโตอย่างรวดเร็ว เน้นตอบโจทย์ e-Commerce',
-
     services: [
       {
         id: 'cs-spx-std',
         courierId: 'c-spx',
         code: 'SPX_STANDARD',
         name: 'SPX Standard Delivery',
-        estimatedDays: '1-3 วัน',
+        estimatedDays: '1-4 วัน',
       },
     ],
   },
@@ -98,14 +95,13 @@ export const COURIERS_LIST: CourierWithServices[] = [
     name: 'Best Express',
     description:
       'บริการรับ-ส่งพัสดุถึงที่ทั่วไทย มีเครือข่ายแฟรนไชส์ที่แข็งแกร่ง',
-
     services: [
       {
         id: 'cs-best-std',
         courierId: 'c-best',
         code: 'BEST_STANDARD',
         name: 'Best Express Delivery',
-        estimatedDays: '1-3 วัน',
+        estimatedDays: '1-5 วัน',
       },
     ],
   },
@@ -115,14 +111,13 @@ export const COURIERS_LIST: CourierWithServices[] = [
     name: 'DHL Express (Domestic)',
     description:
       'บริการขนส่งพัสดุมาตรฐานระดับโลก มั่นใจเรื่องความปลอดภัยและเป็นระบบ',
-
     services: [
       {
         id: 'cs-dhl-std',
         courierId: 'c-dhl',
         code: 'DHL_STANDARD',
         name: 'DHL eCommerce Premium',
-        estimatedDays: '1-2 วัน',
+        estimatedDays: '1-5 วัน',
       },
     ],
   },
