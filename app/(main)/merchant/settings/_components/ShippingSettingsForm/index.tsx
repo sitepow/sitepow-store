@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
+import { upsertGlobalShippingRateMatrix } from '@/actions/global-shipping-rate-matrix'
 import { useGetShippingPrice } from '@/actions/hooks/shippop'
 import {
   COURIERS_LIST,
@@ -13,7 +15,6 @@ import {
 import {
   AggregatedRate,
   aggregateRatesByMaxFee,
-  getAllProvinceAmphoePairs,
   getProvinceDetails,
   getRepresentativeDestinations,
 } from '@/utils/shipping'
@@ -143,17 +144,8 @@ export function ShippingSettingsForm({
   }
 
   const handleFetchAutoRates = async () => {
-    const globalShippingRateMatrixPayload: Array<{
-      fromProvince: string
-      ratesMatrix: Record<string, AggregatedRate[]>
-    }> = []
-
-    const BATCH_SIZE = 5
-
-    for (let i = 0; i < PROVINCES_POOL.length; i += BATCH_SIZE) {
-      const batch = PROVINCES_POOL.slice(i, i + BATCH_SIZE)
-
-      const batchPromises = batch.map(async (provinceName) => {
+    await Promise.all(
+      PROVINCES_POOL.map(async (provinceName) => {
         try {
           const sourceDetails = getProvinceDetails(provinceName)
 
@@ -164,31 +156,28 @@ export function ShippingSettingsForm({
             sourceDetails.postcode,
           )
 
-          watchedServices.forEach((serviceFormItem, index) => {
-            const aggregatedRates =
-              provinceData.ratesMatrix[serviceFormItem.courierServiceId]
-            if (aggregatedRates) {
-              setValue(`services.${index}.weightRates`, aggregatedRates, {
-                shouldDirty: true,
-                shouldValidate: true,
-              })
-            }
-          })
+          // watchedServices.forEach((serviceFormItem, index) => {
+          //   const aggregatedRates =
+          //     provinceData.ratesMatrix[serviceFormItem.courierServiceId]
+          //   if (aggregatedRates) {
+          //     setValue(`services.${index}.weightRates`, aggregatedRates, {
+          //       shouldDirty: true,
+          //       shouldValidate: true,
+          //     })
+          //   }
+          // })
 
-          globalShippingRateMatrixPayload.push(provinceData)
-        } catch (singleProvinceErr) {
-          console.error(
-            `⚠️ ข้อผิดพลาดที่จังหวัด ${provinceName}:`,
-            singleProvinceErr,
+          await upsertGlobalShippingRateMatrix([provinceData])
+          toast.success(
+            `บันทึกเรทจัดส่งสำหรับจังหวัด ${provinceName} เรียบร้อยแล้ว`,
           )
+        } catch (singleProvinceErr) {
+          const errorMessage = `⚠️ ข้อผิดพลาดที่จังหวัด ${provinceName}`
+          toast.error(errorMessage)
+          console.error(errorMessage, singleProvinceErr)
         }
-      })
-
-      await Promise.all(batchPromises)
-      await new Promise((resolve) => setTimeout(resolve, 300))
-    }
-
-    console.log(JSON.stringify(globalShippingRateMatrixPayload, null, 2))
+      }),
+    )
   }
 
   const onFormSubmit = (data: ShippingFormValues) => {
@@ -211,37 +200,26 @@ export function ShippingSettingsForm({
               title="ช่องทางและตัวเลือกการจัดส่งพัสดุ"
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
-                <div className="flex flex-wrap gap-2.5">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isFetchingRates}
-                    onClick={handleFetchAutoRates}
-                  >
-                    {isFetchingRates && (
-                      <>
-                        <Spinner />
-                        กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
-                      </>
-                    )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isFetchingRates}
+                  onClick={handleFetchAutoRates}
+                >
+                  {isFetchingRates && (
+                    <>
+                      <Spinner />
+                      กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
+                    </>
+                  )}
 
-                    {!isFetchingRates && (
-                      <>
-                        <IconCloudDownload size={16} />
-                        ดึงเรทค่าจัดส่งอัตโนมัติ
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      console.log(getAllProvinceAmphoePairs())
-                    }}
-                  >
-                    ดึงจังหวัดและตำบลทั้งหมด
-                  </Button>
-                </div>
+                  {!isFetchingRates && (
+                    <>
+                      <IconCloudDownload size={16} />
+                      ดึงเรทค่าจัดส่งอัตโนมัติ
+                    </>
+                  )}
+                </Button>
               }
             />
           </CardHeader>
