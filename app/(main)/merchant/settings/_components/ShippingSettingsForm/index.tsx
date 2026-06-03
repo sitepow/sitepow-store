@@ -11,7 +11,10 @@ import {
   SHIPPING_WEIGHT_TIERS,
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
-import { getRepresentativeDestinations } from '@/utils/shipping'
+import {
+  getRealProvinceDetails,
+  getRepresentativeDestinations,
+} from '@/utils/shipping'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -76,9 +79,10 @@ export function ShippingSettingsForm({
   const fetchRatesForProvince = async (
     provinceName: string,
     districtName: string,
+    stateName: string,
     postcodeNum: number,
   ) => {
-    const priceCheckPromises: Promise<ShippopCourier[]>[] = ([] = [])
+    const priceCheckPromises: Promise<ShippopCourier[]>[] = []
     const requestMetadata: Array<{
       minWeight: number
       maxWeight: number
@@ -103,9 +107,11 @@ export function ShippingSettingsForm({
             weight: tier.maxWeight,
             fromPostcode: postcodeNum,
             fromDistrict: districtName,
+            fromState: stateName,
             fromProvince: provinceName,
             toPostcode: dest.postcode,
             toDistrict: dest.district,
+            toState: dest.state,
             toProvince: dest.province,
             width: tier.width,
             length: tier.length,
@@ -157,16 +163,22 @@ export function ShippingSettingsForm({
       ratesMatrix: Record<string, AccumulatedRate[]>
     }> = []
 
-    for (const store of PROVINCES_POOL) {
+    for (const province of PROVINCES_POOL) {
       try {
+        const provinceName = province.name
+
+        const sourceDetails = getRealProvinceDetails(provinceName)
+
         const provinceData = await fetchRatesForProvince(
-          store.name,
-          store.district,
-          store.postcode,
+          provinceName,
+          sourceDetails.district,
+          sourceDetails.state,
+          province.postcode,
         )
+
         globalShippingRateMatrixPayload.push(provinceData)
 
-        if (store.name === currentStoreProvince) {
+        if (provinceName === currentStoreProvince) {
           watchedServices.forEach((serviceFormItem, index) => {
             const accumulatedRates =
               provinceData.ratesMatrix[serviceFormItem.courierServiceId]
@@ -178,13 +190,12 @@ export function ShippingSettingsForm({
         }
       } catch (singleProvinceErr) {
         console.error(
-          `⚠️ ข้ามจังหวัด ${store.name} เนื่องจากเกิดข้อผิดพลาด:`,
+          `⚠️ ข้ามจังหวัด ${province.name} เนื่องจากเกิดข้อผิดพลาด:`,
           singleProvinceErr,
         )
       }
 
       console.log(JSON.stringify(globalShippingRateMatrixPayload, null, 2))
-
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
   }

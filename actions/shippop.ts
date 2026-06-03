@@ -40,12 +40,14 @@ export interface GetPriceInput {
   zoneType: ShippingZoneType
   minWeight: number
   weight: number
-  fromPostcode: number
-  toPostcode: number
-  fromProvince?: string
-  fromDistrict?: string
-  toProvince?: string
-  toDistrict?: string
+  fromPostcode: string | number
+  toPostcode: string | number
+  fromProvince: string
+  fromDistrict: string
+  fromState: string
+  toProvince: string
+  toDistrict: string
+  toState: string
   width?: number
   length?: number
   height?: number
@@ -71,18 +73,18 @@ export async function getShippingPrice(
             name: '-',
             address: '-',
             district: payload.fromDistrict,
-            state: payload.fromDistrict,
+            state: payload.fromState,
             province: payload.fromProvince,
-            postcode: payload.fromPostcode,
+            postcode: String(payload.fromPostcode),
             tel: '-',
           },
           to: {
             name: '-',
             address: '-',
             district: payload.toDistrict,
-            state: payload.toDistrict,
+            state: payload.toState,
             province: payload.toProvince,
-            postcode: payload.toPostcode,
+            postcode: String(payload.toPostcode),
             tel: '-',
           },
           parcel: {
