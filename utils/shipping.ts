@@ -7,6 +7,15 @@ import { ThaiAddressFinder } from '@/lib/address/logic'
 
 const addressFinder = new ThaiAddressFinder({ maxSearchResult: 200 })
 
+export interface ProvinceAmphoePair {
+  province: string
+  amphoe: string
+}
+
+export function getAllProvinceAmphoePairs() {
+  return addressFinder.GetAllProvinceAmphoePairs()
+}
+
 function getRegionByProvinceName(provinceName: string): string {
   const cleanName = provinceName.trim().replace(/ /g, '')
   for (const [region, provinces] of Object.entries(REGION_MAP)) {

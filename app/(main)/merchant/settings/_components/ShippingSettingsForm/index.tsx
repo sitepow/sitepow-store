@@ -12,6 +12,7 @@ import {
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import {
+  getAllProvinceAmphoePairs,
   getProvinceDetails,
   getRepresentativeDestinations,
 } from '@/utils/shipping'
@@ -213,26 +214,37 @@ export function ShippingSettingsForm({
               title="ช่องทางและตัวเลือกการจัดส่งพัสดุ"
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isFetchingRates}
-                  onClick={handleFetchAutoRates}
-                >
-                  {isFetchingRates && (
-                    <>
-                      <Spinner />
-                      กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
-                    </>
-                  )}
+                <div className="flex flex-wrap gap-2.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isFetchingRates}
+                    onClick={handleFetchAutoRates}
+                  >
+                    {isFetchingRates && (
+                      <>
+                        <Spinner />
+                        กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
+                      </>
+                    )}
 
-                  {!isFetchingRates && (
-                    <>
-                      <IconCloudDownload size={16} />
-                      ดึงเรทค่าจัดส่งอัตโนมัติ
-                    </>
-                  )}
-                </Button>
+                    {!isFetchingRates && (
+                      <>
+                        <IconCloudDownload size={16} />
+                        ดึงเรทค่าจัดส่งอัตโนมัติ
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      console.log(getAllProvinceAmphoePairs())
+                    }}
+                  >
+                    ดึงจังหวัดและตำบลทั้งหมด
+                  </Button>
+                </div>
               }
             />
           </CardHeader>
