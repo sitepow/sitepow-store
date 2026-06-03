@@ -12,6 +12,23 @@ export interface ProvinceAmphoePair {
   amphoe: string
 }
 
+export interface RepresentativeDestination {
+  zoneType: ShippingZoneType
+  province: string
+  postcode: string
+  district: string
+  state: string
+}
+
+type RateGroupKey = `${ShippingZoneType}-${number}-${number}`
+
+export interface AggregatedRate {
+  zoneType: ShippingZoneType
+  minWeight: number
+  maxWeight: number
+  fee: number
+}
+
 export function getAllProvinceAmphoePairs() {
   return addressFinder.GetAllProvinceAmphoePairs()
 }
@@ -29,7 +46,6 @@ export function getProvinceDetails(
   amphoeName?: string,
 ): { postcode: string; district: string; state: string } {
   const cleanProvince = provinceName.trim()
-
   const results = addressFinder.SearchAddressByProvince(cleanProvince)
 
   const targetAmphoe = amphoeName
@@ -52,17 +68,12 @@ export function getProvinceDetails(
   }
 }
 
-export function getRepresentativeDestinations(fromProvince: string) {
+export function getRepresentativeDestinations(
+  fromProvince: string,
+): RepresentativeDestination[] {
   const from = fromProvince.trim().replace(/ /g, '')
   const fromRegion = getRegionByProvinceName(from)
-
-  const destinations: Array<{
-    zoneType: ShippingZoneType
-    province: string
-    postcode: string
-    district: string
-    state: string
-  }> = []
+  const destinations: RepresentativeDestination[] = []
 
   destinations.push({
     zoneType: ShippingZoneType.SAME_PROVINCE,
@@ -70,26 +81,16 @@ export function getRepresentativeDestinations(fromProvince: string) {
     ...getProvinceDetails(from),
   })
 
-  const validRemoteArea =
-    REMOTE_AREAS.find((area) => area.province !== from) || REMOTE_AREAS[0]
-
-  destinations.push({
-    zoneType: ShippingZoneType.REMOTE_AREA,
-    province: validRemoteArea.province,
-    postcode: validRemoteArea.postcode,
-    state: validRemoteArea.state,
-    district: validRemoteArea.district,
-  })
-
-  const siblingProvinces = REGION_MAP[fromRegion] || []
-  const sameRegionProvince = siblingProvinces.find((p) => p !== from)
-  if (sameRegionProvince) {
+  const siblings = (REGION_MAP[fromRegion] || []).filter((p) => p !== from)
+  siblings.slice(0, 2).forEach((p) => {
     destinations.push({
       zoneType: ShippingZoneType.SAME_REGION,
-      province: sameRegionProvince,
-      ...getProvinceDetails(sameRegionProvince),
+      province: p,
+      ...getProvinceDetails(p),
     })
-  } else {
+  })
+
+  if (siblings.length === 0) {
     destinations.push({
       zoneType: ShippingZoneType.SAME_REGION,
       province: from,
@@ -97,18 +98,63 @@ export function getRepresentativeDestinations(fromProvince: string) {
     })
   }
 
-  let crossRegionProvince = 'กรุงเทพมหานคร'
-  if (fromRegion === 'BKK' || fromRegion === 'CENTRAL') {
-    crossRegionProvince = 'อุบลราชธานี'
-  } else {
-    crossRegionProvince = 'สมุทรปราการ'
-  }
+  const crossCandidates: string[] =
+    fromRegion === 'BKK' || fromRegion === 'CENTRAL'
+      ? ['อุบลราชธานี', 'เชียงราย']
+      : fromRegion === 'NORTH' || fromRegion === 'NE'
+        ? ['สมุทรปราการ', 'สงขลา']
+        : ['กรุงเทพมหานคร', 'อุดรธานี']
 
-  destinations.push({
-    zoneType: ShippingZoneType.CROSS_REGION,
-    province: crossRegionProvince,
-    ...getProvinceDetails(crossRegionProvince),
+  crossCandidates
+    .filter((p) => p !== from)
+    .forEach((p) => {
+      destinations.push({
+        zoneType: ShippingZoneType.CROSS_REGION,
+        province: p,
+        ...getProvinceDetails(p),
+      })
+    })
+
+  const remoteTargets = REMOTE_AREAS.filter((area) => area.province !== from)
+  const remoteList =
+    remoteTargets.length > 0 ? remoteTargets : REMOTE_AREAS.slice(0, 1)
+
+  remoteList.forEach((area) => {
+    destinations.push({
+      zoneType: ShippingZoneType.REMOTE_AREA,
+      province: area.province,
+      postcode: area.postcode,
+      state: area.state,
+      district: area.district,
+    })
   })
 
   return destinations
+}
+
+export function aggregateRatesByMaxFee(
+  rawRates: AggregatedRate[],
+): AggregatedRate[] {
+  const maxMap = new Map<RateGroupKey, AggregatedRate>()
+
+  for (const rate of rawRates) {
+    const key: RateGroupKey = `${rate.zoneType}-${rate.minWeight}-${rate.maxWeight}`
+    const existing = maxMap.get(key)
+    if (!existing || rate.fee > existing.fee) {
+      maxMap.set(key, rate)
+    }
+  }
+
+  const zoneOrder: ShippingZoneType[] = [
+    ShippingZoneType.SAME_PROVINCE,
+    ShippingZoneType.SAME_REGION,
+    ShippingZoneType.CROSS_REGION,
+    ShippingZoneType.REMOTE_AREA,
+  ]
+
+  return Array.from(maxMap.values()).sort((a, b) => {
+    const zoneDiff =
+      zoneOrder.indexOf(a.zoneType) - zoneOrder.indexOf(b.zoneType)
+    return zoneDiff !== 0 ? zoneDiff : a.minWeight - b.minWeight
+  })
 }

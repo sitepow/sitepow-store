@@ -10,8 +10,9 @@ import {
   PROVINCES_POOL,
   SHIPPING_WEIGHT_TIERS,
 } from '@/constants/shipping'
-import { ShippingZoneType } from '@/generated/prisma/enums'
 import {
+  AggregatedRate,
+  aggregateRatesByMaxFee,
   getAllProvinceAmphoePairs,
   getProvinceDetails,
   getRepresentativeDestinations,
@@ -44,13 +45,6 @@ interface ShippopCourier {
   services: ShippopService[]
 }
 
-interface AccumulatedRate {
-  zoneType: ShippingZoneType
-  minWeight: number
-  maxWeight: number
-  fee: number
-}
-
 export function ShippingSettingsForm({
   initialData,
 }: {
@@ -80,8 +74,12 @@ export function ShippingSettingsForm({
     districtName: string,
     stateName: string,
     postcode: string,
-  ) => {
-    const serviceRatesAccumulator = new Map<string, AccumulatedRate[]>()
+  ): Promise<{
+    fromProvince: string
+    ratesMatrix: Record<string, AggregatedRate[]>
+  }> => {
+    const rawAccumulator = new Map<string, AggregatedRate[]>()
+
     const representativeDestinations =
       getRepresentativeDestinations(provinceName)
 
@@ -112,10 +110,10 @@ export function ShippingSettingsForm({
                   activeService.currentFee !== null &&
                   activeService.currentFee !== undefined
                 ) {
-                  if (!serviceRatesAccumulator.has(activeService.id)) {
-                    serviceRatesAccumulator.set(activeService.id, [])
+                  if (!rawAccumulator.has(activeService.id)) {
+                    rawAccumulator.set(activeService.id, [])
                   }
-                  serviceRatesAccumulator.get(activeService.id)?.push({
+                  rawAccumulator.get(activeService.id)!.push({
                     zoneType: dest.zoneType,
                     minWeight: tier.minWeight,
                     maxWeight: tier.maxWeight,
@@ -129,28 +127,25 @@ export function ShippingSettingsForm({
           await new Promise((resolve) => setTimeout(resolve, 50))
         } catch (apiErr) {
           console.warn(
-            `⚠️ ข้ามคู่ขนส่ง ${provinceName} -> ${dest.province} (${tier.minWeight}-${tier.maxWeight}kg):`,
+            `⚠️ ข้ามคู่ขนส่ง ${provinceName} → ${dest.province} [${dest.zoneType}] (${tier.minWeight}-${tier.maxWeight}g):`,
             apiErr,
           )
         }
       }
     }
 
-    const ratesMatrixJson: Record<string, AccumulatedRate[]> = {}
-    serviceRatesAccumulator.forEach((rates, courierServiceId) => {
-      ratesMatrixJson[courierServiceId] = rates
+    const ratesMatrix: Record<string, AggregatedRate[]> = {}
+    rawAccumulator.forEach((rawRates, serviceId) => {
+      ratesMatrix[serviceId] = aggregateRatesByMaxFee(rawRates)
     })
 
-    return {
-      fromProvince: provinceName,
-      ratesMatrix: ratesMatrixJson,
-    }
+    return { fromProvince: provinceName, ratesMatrix }
   }
 
   const handleFetchAutoRates = async () => {
     const globalShippingRateMatrixPayload: Array<{
       fromProvince: string
-      ratesMatrix: Record<string, AccumulatedRate[]>
+      ratesMatrix: Record<string, AggregatedRate[]>
     }> = []
 
     const BATCH_SIZE = 5
@@ -170,12 +165,14 @@ export function ShippingSettingsForm({
           )
 
           watchedServices.forEach((serviceFormItem, index) => {
-            const accumulatedRates =
+            const aggregatedRates =
               provinceData.ratesMatrix[serviceFormItem.courierServiceId]
-            setValue(`services.${index}.weightRates`, accumulatedRates || [], {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
+            if (aggregatedRates) {
+              setValue(`services.${index}.weightRates`, aggregatedRates, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
           })
 
           globalShippingRateMatrixPayload.push(provinceData)
