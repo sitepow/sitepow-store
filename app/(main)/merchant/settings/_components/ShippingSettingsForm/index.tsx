@@ -1,17 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { upsertGlobalShippingRateMatrix } from '@/actions/global-shipping-rate-matrix'
+import { useStoreShippingSettings } from '@/actions/hooks/shipping'
 import { useGetShippingPrice } from '@/actions/hooks/shippop'
+import { getStoreShippingSettings } from '@/actions/shipping'
 import {
   COURIERS_LIST,
   DEFAULT_PRESET_VALUES,
   PROVINCES_POOL,
   SHIPPING_WEIGHT_TIERS,
 } from '@/constants/shipping'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   AggregatedRate,
   aggregateRatesByMaxFee,
@@ -28,6 +31,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -35,6 +39,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
+import { ApplyGlobalRatesDialog } from './_components/Applyglobalratesdialog'
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 
 interface ShippopService {
@@ -52,6 +57,7 @@ export function ShippingSettingsForm({
   initialData?: ShippingFormValues
 }) {
   const [isSaving, setIsSaving] = useState(false)
+  const { selectedStoreId } = useStoreFilter()
 
   const { mutateAsync: fetchPriceMutation, isPending: isFetchingRates } =
     useGetShippingPrice()
@@ -61,7 +67,7 @@ export function ShippingSettingsForm({
     defaultValues: initialData || DEFAULT_PRESET_VALUES,
   })
 
-  const { control, handleSubmit, register, setValue, watch } = methods
+  const { control, handleSubmit, register, setValue, watch, reset } = methods
 
   const { fields } = useFieldArray({
     control,
@@ -180,6 +186,26 @@ export function ShippingSettingsForm({
     )
   }
 
+  const { data: shippingSettings } = useStoreShippingSettings(selectedStoreId)
+
+  useEffect(() => {
+    if (!selectedStoreId) {
+      return
+    }
+
+    const loadData = async () => {
+      if (shippingSettings) {
+        reset({
+          ...DEFAULT_PRESET_VALUES,
+          ...shippingSettings,
+          services: shippingSettings.services || [],
+        })
+      }
+    }
+
+    loadData()
+  }, [selectedStoreId, reset, shippingSettings])
+
   const onFormSubmit = (data: ShippingFormValues) => {
     setIsSaving(true)
     console.log('Sending structured payload to Prisma backend:', data)
@@ -200,26 +226,31 @@ export function ShippingSettingsForm({
               title="ช่องทางและตัวเลือกการจัดส่งพัสดุ"
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isFetchingRates}
-                  onClick={handleFetchAutoRates}
-                >
-                  {isFetchingRates && (
-                    <>
-                      <Spinner />
-                      กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
-                    </>
-                  )}
+                <div className="flex flex-wrap items-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled
+                    // disabled={isFetchingRates}
+                    onClick={handleFetchAutoRates}
+                  >
+                    {isFetchingRates && (
+                      <>
+                        <Spinner />
+                        กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
+                      </>
+                    )}
 
-                  {!isFetchingRates && (
-                    <>
-                      <IconCloudDownload size={16} />
-                      ดึงเรทค่าจัดส่งอัตโนมัติ
-                    </>
-                  )}
-                </Button>
+                    {!isFetchingRates && (
+                      <>
+                        <IconCloudDownload size={16} />
+                        ดึงเรทค่าจัดส่งจาก Shippop อัตโนมัติ
+                      </>
+                    )}
+                  </Button>
+                  <ApplyGlobalRatesDialog />
+                  <StoreSelectField />
+                </div>
               }
             />
           </CardHeader>
@@ -310,20 +341,22 @@ export function ShippingSettingsForm({
               <span className="block text-sm font-semibold text-neutral-900">
                 เงื่อนไขโปรโมชันส่งฟรีของร้าน
               </span>
-              <Field>
-                <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
-                <div className="mt-1 flex items-center">
-                  <Input
-                    type="number"
-                    placeholder="1000"
-                    {...register('freeShipMin', { valueAsNumber: true })}
-                    className="rounded-r-none"
-                  />
-                  <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                    บาท
-                  </span>
-                </div>
-              </Field>
+              <div className="grid grid-cols-2">
+                <Field>
+                  <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
+                  <div className="mt-1 flex items-center">
+                    <Input
+                      type="number"
+                      placeholder="1000"
+                      {...register('freeShipMin', { valueAsNumber: true })}
+                      className="rounded-r-none"
+                    />
+                    <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
+                      บาท
+                    </span>
+                  </div>
+                </Field>
+              </div>
             </div>
           </CardContent>
 
