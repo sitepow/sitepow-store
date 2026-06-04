@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import {
   Controller,
   FormProvider,
@@ -43,7 +43,9 @@ export function ShippingSettingsForm() {
     resolver: zodResolver(shippingFormSchema),
   })
 
-  const { control, handleSubmit, register, setValue, watch, reset } = methods
+  const { control, handleSubmit, register, setValue, watch, reset, formState } =
+    methods
+  const { isDirty } = formState
 
   const { fields } = useFieldArray({
     control,
@@ -55,16 +57,22 @@ export function ShippingSettingsForm() {
 
   const { data: shippingSettings } = useStoreShippingSettings(selectedStoreId)
 
+  const resetFormToDefaultDatabase = useCallback(() => {
+    if (shippingSettings) {
+      reset({
+        ...shippingSettings,
+        services: shippingSettings.services || [],
+      })
+    }
+  }, [shippingSettings, reset])
+
   useEffect(() => {
     if (!selectedStoreId || !shippingSettings) {
       return
     }
 
-    reset({
-      ...shippingSettings,
-      services: shippingSettings.services || [],
-    })
-  }, [selectedStoreId, reset, shippingSettings])
+    resetFormToDefaultDatabase()
+  }, [selectedStoreId, reset, shippingSettings, resetFormToDefaultDatabase])
 
   const onFormSubmit = (data: ShippingFormValues) => {
     if (!selectedStoreId) {
@@ -227,7 +235,17 @@ export function ShippingSettingsForm() {
                 </div>
               </CardContent>
 
-              <CardFooter className="flex justify-end border-t">
+              <CardFooter className="flex flex-wrap justify-end gap-2 border-t">
+                {isDirty && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => resetFormToDefaultDatabase()}
+                  >
+                    ล้างค่าการตั้งค่า
+                  </Button>
+                )}
+
                 <Button type="submit" disabled={isUpdating}>
                   {isUpdating ? (
                     <>
