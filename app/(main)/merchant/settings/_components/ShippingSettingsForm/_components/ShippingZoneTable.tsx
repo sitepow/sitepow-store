@@ -45,7 +45,7 @@ export function ShippingZoneTable({
         return PROVINCES_POOL.filter((p) => !sameRegionProvinces.includes(p))
 
       case ShippingZoneType.REMOTE_AREA:
-        return REMOTE_AREAS.map((a) => a.province)
+        return Array.from(new Set(REMOTE_AREAS.map((a) => a.province)))
 
       default:
         return []

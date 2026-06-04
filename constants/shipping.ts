@@ -218,17 +218,30 @@ export const REGION_MAP: Record<string, string[]> = {
 
 export const REMOTE_AREAS = [
   {
-    province: 'ยะลา',
-    postcode: '95110',
-    state: 'เบตง',
-    district: 'เบตง',
-  },
-  {
     province: 'แม่ฮ่องสอน',
     postcode: '58130',
     state: 'ปาย',
     district: 'เวียงใต้',
   },
+  {
+    province: 'แม่ฮ่องสอน',
+    postcode: '58000',
+    state: 'เมืองแม่ฮ่องสอน',
+    district: 'จองคำ',
+  },
+  {
+    province: 'เชียงใหม่',
+    postcode: '50310',
+    state: 'อมก๋อย',
+    district: 'อมก๋อย',
+  },
+  {
+    province: 'เชียงราย',
+    postcode: '57110',
+    state: 'แม่ฟ้าหลวง',
+    district: 'แม่สลองนอก',
+  },
+  { province: 'ยะลา', postcode: '95110', state: 'เบตง', district: 'เบตง' },
   {
     province: 'พังงา',
     postcode: '82160',
@@ -236,10 +249,89 @@ export const REMOTE_AREAS = [
     district: 'เกาะยาวน้อย',
   },
   {
+    province: 'สุราษฎร์ธานี',
+    postcode: '84280',
+    state: 'เกาะสมุย',
+    district: 'อ่างทอง',
+  },
+  {
+    province: 'สุราษฎร์ธานี',
+    postcode: '84360',
+    state: 'เกาะพะงัน',
+    district: 'เกาะพะงัน',
+  },
+  {
+    province: 'กระบี่',
+    postcode: '81150',
+    state: 'เกาะลันตา',
+    district: 'เกาะลันตาใหญ่',
+  },
+  {
+    province: 'สตูล',
+    postcode: '91000',
+    state: 'เมืองสตูล',
+    district: 'เกาะหลีเป๊ะ',
+  },
+  {
     province: 'ตราด',
     postcode: '23170',
     state: 'เกาะช้าง',
     district: 'เกาะช้างใต้',
+  },
+  {
+    province: 'เชียงใหม่',
+    postcode: '50240',
+    state: 'เวียงแหง',
+    district: 'เปียงหลวง',
+  },
+  {
+    province: 'เชียงใหม่',
+    postcode: '50280',
+    state: 'แม่อาย',
+    district: 'แม่อาย',
+  },
+  {
+    province: 'น่าน',
+    postcode: '55220',
+    state: 'บ่อเกลือ',
+    district: 'บ่อเกลือใต้',
+  },
+  {
+    province: 'น่าน',
+    postcode: '55130',
+    state: 'เฉลิมพระเกียรติ',
+    district: 'ห้วยโก๋น',
+  },
+  {
+    province: 'แม่ฮ่องสอน',
+    postcode: '58120',
+    state: 'ปางมะผ้า',
+    district: 'ปางมะผ้า',
+  },
+  {
+    province: 'ภูเก็ต',
+    postcode: '83110',
+    state: 'ถลาง',
+    district: 'เกาะยาว (บางพื้นที่ที่ข้ามไป)',
+  },
+  { province: 'ระนอง', postcode: '85120', state: 'สุขสำราญ', district: 'นาคา' },
+  {
+    province: 'สุราษฎร์ธานี',
+    postcode: '84310',
+    state: 'เกาะเต่า',
+    district: 'เกาะเต่า',
+  },
+  {
+    province: 'ปัตตานี',
+    postcode: '94150',
+    state: 'ไม้แก่น',
+    district: 'ไม้แก่น',
+  },
+  {
+    province: 'นราธิวาส',
+    postcode: '96160',
+    state: 'สุคิริน',
+    district: 'สุคิริน',
   },
 ]
 
