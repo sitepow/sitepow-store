@@ -1,12 +1,8 @@
 'use client'
 
-import {
-  PROVINCES_POOL,
-  REGION_MAP,
-  REMOTE_AREAS,
-  ZONE_LABELS,
-} from '@/constants/shipping'
+import { REGION_MAP, REMOTE_AREAS, ZONE_LABELS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
+import { getAllProvinces } from '@/utils/shipping'
 
 import {
   Table,
@@ -42,7 +38,7 @@ export function ShippingZoneTable({
 
       case ShippingZoneType.CROSS_REGION:
         const sameRegionProvinces = REGION_MAP[originRegion]
-        return PROVINCES_POOL.filter((p) => !sameRegionProvinces.includes(p))
+        return getAllProvinces().filter((p) => !sameRegionProvinces.includes(p))
 
       case ShippingZoneType.REMOTE_AREA:
         return Array.from(new Set(REMOTE_AREAS.map((a) => a.province)))

@@ -126,7 +126,9 @@ export function ServiceConfigDialog({
 
                 <div className="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
                   {allWeightRates.map((field, globalIndex) => {
-                    if (field.zoneType !== targetZone) return null
+                    if (field.zoneType !== targetZone) {
+                      return null
+                    }
 
                     return (
                       <div key={field.id} className="flex items-center gap-2">

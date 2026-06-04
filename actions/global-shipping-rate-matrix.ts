@@ -6,20 +6,38 @@ import { AggregatedRate, getProvinceDetails } from '@/utils/shipping'
 
 import { prisma } from '@/lib/prisma'
 
+const MatrixSelect = {
+  fromProvince: true,
+  updatedAt: true,
+} satisfies Prisma.GlobalShippingRateMatrixSelect
+
 export interface GlobalShippingRateMatrixPayload {
   fromProvince: string
   ratesMatrix: Record<string, AggregatedRate[]>
 }
 
+export type GetMatrixItem = Prisma.GlobalShippingRateMatrixGetPayload<{
+  select: typeof MatrixSelect
+}> | null
+
+export async function getGlobalShippingRateMatrixProvinces() {
+  return await prisma.globalShippingRateMatrix.findMany({
+    select: {
+      fromProvince: true,
+    },
+    orderBy: {
+      fromProvince: 'asc',
+    },
+  })
+}
+
 export async function getGlobalShippingRateMatrixMetadata(
   fromProvince: string,
-) {
-  const matrix = await prisma.globalShippingRateMatrix.findUnique({
+): Promise<GetMatrixItem> {
+  return await prisma.globalShippingRateMatrix.findUnique({
     where: { fromProvince },
-    select: { updatedAt: true },
+    select: MatrixSelect,
   })
-
-  return matrix
 }
 
 export async function upsertGlobalShippingRateMatrix(

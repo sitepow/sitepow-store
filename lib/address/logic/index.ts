@@ -42,23 +42,10 @@ export class ThaiAddressFinder {
     this.#records = this.preProcess()
   }
 
-  public GetAllProvinceAmphoePairs = (): {
-    province: string
-    amphoe: string
-  }[] => {
-    const uniquePairs = new Map<string, { province: string; amphoe: string }>()
+  public GetAllProvinces = (): string[] => {
+    const provinces = new Set(this.#records.map((record) => record.province))
 
-    this.#records.forEach((record) => {
-      const key = `${record.province}|${record.amphoe}`
-      if (!uniquePairs.has(key)) {
-        uniquePairs.set(key, {
-          province: record.province,
-          amphoe: record.amphoe,
-        })
-      }
-    })
-
-    return Array.from(uniquePairs.values())
+    return Array.from(provinces)
   }
 
   // preProcess: modified with simple typescript from original: https://github.com/earthchie/jquery.Thailand.js/blob/aaa03d6030350e8253dd42dc003ccc2cbf17ad86/jquery.Thailand.js/src/jquery.Thailand.js#L19-L76

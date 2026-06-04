@@ -8,8 +8,19 @@ import {
 import {
   applyGlobalRatesToStore,
   getGlobalShippingRateMatrixMetadata,
+  getGlobalShippingRateMatrixProvinces,
 } from '../global-shipping-rate-matrix'
+import { globalShippingRateMatrixKeys } from '../query-keys/global-shipping-rate-matrix'
 import { shippingKeys } from '../query-keys/shipping'
+
+export function useGlobalShippingRateMatrixProvinces() {
+  return useQuery(
+    queryOptions({
+      queryKey: globalShippingRateMatrixKeys.lists(),
+      queryFn: () => getGlobalShippingRateMatrixProvinces(),
+    }),
+  )
+}
 
 export function useGlobalShippingMetadata(province: string) {
   return useQuery(

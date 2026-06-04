@@ -9,31 +9,15 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { upsertGlobalShippingRateMatrix } from '@/actions/global-shipping-rate-matrix'
 import {
   useStoreShippingSettings,
   useUpdateShippingSettings,
 } from '@/actions/hooks/shipping'
-import { useGetShippingPrice } from '@/actions/hooks/shippop'
-import {
-  COURIERS_LIST,
-  PROVINCES_POOL,
-  SHIPPING_WEIGHT_TIERS,
-} from '@/constants/shipping'
+import { COURIERS_LIST } from '@/constants/shipping'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import {
-  AggregatedRate,
-  aggregateRatesByMaxFee,
-  getProvinceDetails,
-  getRepresentativeDestinations,
-} from '@/utils/shipping'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IconCloudDownload,
-  IconDeviceFloppy,
-  IconTruck,
-} from '@tabler/icons-react'
+import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
@@ -48,20 +32,9 @@ import { ApplyGlobalRatesDialog } from './_components/Applyglobalratesdialog'
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
-interface ShippopService {
-  id: string
-  currentFee: number | null | undefined
-}
-
-interface ShippopCourier {
-  services: ShippopService[]
-}
-
 export function ShippingSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
 
-  const { mutateAsync: fetchPriceMutation, isPending: isFetchingRates } =
-    useGetShippingPrice()
   const { mutate: updateShipping, isPending: isUpdating } =
     useUpdateShippingSettings()
 
@@ -78,116 +51,6 @@ export function ShippingSettingsForm() {
 
   const watchedServices = watch('services')
   const watchedFreeShipEnabled = watch('isFreeShipEnabled')
-
-  const fetchRatesForProvince = async (
-    provinceName: string,
-    districtName: string,
-    stateName: string,
-    postcode: string,
-  ): Promise<{
-    fromProvince: string
-    ratesMatrix: Record<string, AggregatedRate[]>
-  }> => {
-    const rawAccumulator = new Map<string, AggregatedRate[]>()
-
-    const representativeDestinations =
-      getRepresentativeDestinations(provinceName)
-
-    for (const tier of SHIPPING_WEIGHT_TIERS) {
-      for (const dest of representativeDestinations) {
-        try {
-          const shippopData = await fetchPriceMutation({
-            zoneType: dest.zoneType,
-            minWeight: tier.minWeight,
-            weight: tier.maxWeight,
-            fromPostcode: postcode,
-            fromDistrict: districtName,
-            fromState: stateName,
-            fromProvince: provinceName,
-            toPostcode: dest.postcode,
-            toDistrict: dest.district,
-            toState: dest.state,
-            toProvince: dest.province,
-            width: tier.width,
-            length: tier.length,
-            height: tier.height,
-          })
-
-          if (shippopData && Array.isArray(shippopData)) {
-            shippopData.forEach((courierData: ShippopCourier) => {
-              courierData.services.forEach((activeService: ShippopService) => {
-                if (
-                  activeService.currentFee !== null &&
-                  activeService.currentFee !== undefined
-                ) {
-                  if (!rawAccumulator.has(activeService.id)) {
-                    rawAccumulator.set(activeService.id, [])
-                  }
-                  rawAccumulator.get(activeService.id)!.push({
-                    zoneType: dest.zoneType,
-                    minWeight: tier.minWeight,
-                    maxWeight: tier.maxWeight,
-                    fee: activeService.currentFee,
-                  })
-                }
-              })
-            })
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        } catch (apiErr) {
-          console.warn(
-            `⚠️ ข้ามคู่ขนส่ง ${provinceName} → ${dest.province} [${dest.zoneType}] (${tier.minWeight}-${tier.maxWeight}g):`,
-            apiErr,
-          )
-        }
-      }
-    }
-
-    const ratesMatrix: Record<string, AggregatedRate[]> = {}
-    rawAccumulator.forEach((rawRates, serviceId) => {
-      ratesMatrix[serviceId] = aggregateRatesByMaxFee(rawRates)
-    })
-
-    return { fromProvince: provinceName, ratesMatrix }
-  }
-
-  const handleFetchAutoRates = async () => {
-    await Promise.all(
-      PROVINCES_POOL.map(async (provinceName) => {
-        try {
-          const sourceDetails = getProvinceDetails(provinceName)
-
-          const provinceData = await fetchRatesForProvince(
-            provinceName,
-            sourceDetails.district,
-            sourceDetails.state,
-            sourceDetails.postcode,
-          )
-
-          // watchedServices.forEach((serviceFormItem, index) => {
-          //   const aggregatedRates =
-          //     provinceData.ratesMatrix[serviceFormItem.courierServiceId]
-          //   if (aggregatedRates) {
-          //     setValue(`services.${index}.weightRates`, aggregatedRates, {
-          //       shouldDirty: true,
-          //       shouldValidate: true,
-          //     })
-          //   }
-          // })
-
-          await upsertGlobalShippingRateMatrix([provinceData])
-          toast.success(
-            `บันทึกเรทจัดส่งสำหรับจังหวัด ${provinceName} เรียบร้อยแล้ว`,
-          )
-        } catch (singleProvinceErr) {
-          const errorMessage = `⚠️ ข้อผิดพลาดที่จังหวัด ${provinceName}`
-          toast.error(errorMessage)
-          console.error(errorMessage, singleProvinceErr)
-        }
-      }),
-    )
-  }
 
   const { data: shippingSettings } = useStoreShippingSettings(selectedStoreId)
 
@@ -230,27 +93,6 @@ export function ShippingSettingsForm() {
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
                 <div className="flex flex-wrap items-end gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled
-                    // disabled={isFetchingRates}
-                    onClick={handleFetchAutoRates}
-                  >
-                    {isFetchingRates && (
-                      <>
-                        <Spinner />
-                        กำลังดึงเรทค่าจัดส่งอัตโนมัติ...
-                      </>
-                    )}
-
-                    {!isFetchingRates && (
-                      <>
-                        <IconCloudDownload size={16} />
-                        ดึงเรทค่าจัดส่งจาก Shippop อัตโนมัติ
-                      </>
-                    )}
-                  </Button>
                   <ApplyGlobalRatesDialog />
                   <StoreSelectField />
                 </div>

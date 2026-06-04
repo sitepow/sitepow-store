@@ -6,8 +6,8 @@ import toast from 'react-hot-toast'
 import {
   useApplyGlobalRates,
   useGlobalShippingMetadata,
+  useGlobalShippingRateMatrixProvinces,
 } from '@/actions/hooks/global-shipping-rate-matrix'
-import { PROVINCES_POOL } from '@/constants/shipping'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
 import { IconCloudDownload } from '@tabler/icons-react'
@@ -39,6 +39,7 @@ export function ApplyGlobalRatesDialog() {
   const { selectedStoreId } = useStoreFilter()
 
   const { mutate: applyRates, isPending: isApplying } = useApplyGlobalRates()
+  const { data: provinces } = useGlobalShippingRateMatrixProvinces()
   const { data: matrixMeta } = useGlobalShippingMetadata(selectedProvince)
 
   const handleApply = () => {
@@ -96,9 +97,12 @@ export function ApplyGlobalRatesDialog() {
               <SelectValue placeholder="เลือกจังหวัด..." />
             </SelectTrigger>
             <SelectContent>
-              {PROVINCES_POOL.map((province) => (
-                <SelectItem key={province} value={province}>
-                  {province}
+              {provinces?.map((matrix) => (
+                <SelectItem
+                  key={matrix?.fromProvince}
+                  value={matrix?.fromProvince}
+                >
+                  {matrix?.fromProvince}
                 </SelectItem>
               ))}
             </SelectContent>
