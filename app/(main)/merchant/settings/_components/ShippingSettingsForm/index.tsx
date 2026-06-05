@@ -170,7 +170,7 @@ export function ShippingSettingsForm() {
                               return (
                                 <div
                                   key={service.id}
-                                  className={`flex items-center justify-between rounded-lg border bg-white p-3 transition-colors ${
+                                  className={`flex flex-wrap items-center justify-between gap-5 rounded-lg border bg-white p-3 transition-colors ${
                                     isEnabled
                                       ? 'border-brand/20 bg-brand/5'
                                       : ''
@@ -229,7 +229,7 @@ export function ShippingSettingsForm() {
                       </span>
                     </div>
                     {watchedFreeShipEnabled && (
-                      <div className="grid grid-cols-2">
+                      <div className="grid lg:grid-cols-2">
                         <Field>
                           <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
                           <div className="mt-1 flex items-center">
