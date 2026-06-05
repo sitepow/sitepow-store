@@ -295,6 +295,40 @@ model StoreServiceZoneRate {
   @@index([storeCourierServiceId])
 }
 
+model PaymentSetting {
+  id      String @id @default(cuid())
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  isBankTransferEnabled Boolean @default(true)
+  isStripeEnabled       Boolean @default(false)
+
+  stripeSecretKey String?
+  stripePublicKey String?
+
+  bankAccounts BankAccount[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BankAccount {
+  id               String         @id @default(cuid())
+  paymentSettingId String
+  paymentSetting   PaymentSetting @relation(fields: [paymentSettingId], references: [id], onDelete: Cascade)
+
+  bankName      String
+  accountNumber String
+  accountName   String
+  qrImage       String?
+  isDefault     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentSettingId])
+}
+
 model Store {
   id      String @id @default(cuid())
   name    String
@@ -347,6 +381,7 @@ model Store {
   transferRequests StoreTransferRequest[]
   stockTransfers   StockTransfer[]
   stockAdjustments StockAdjustment[]
+  PaymentSetting   PaymentSetting[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

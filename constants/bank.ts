@@ -1,0 +1,16 @@
+export const THAI_BANKS = [
+  { code: 'KBANK', name: 'ธนาคารกสิกรไทย' },
+  { code: 'SCB', name: 'ธนาคารไทยพาณิชย์' },
+  { code: 'KTB', name: 'ธนาคารกรุงไทย' },
+  { code: 'BBL', name: 'ธนาคารกรุงเทพ' },
+  { code: 'BAY', name: 'ธนาคารกรุงศรีอยุธยา' },
+  { code: 'TTB', name: 'ธนาคารทีทีบี' },
+  { code: 'TISCO', name: 'ธนาคารทิสโก้' },
+  { code: 'KK', name: 'ธนาคารเกียรตินาคินภัทร' },
+  { code: 'CIMB', name: 'ธนาคารซีไอเอ็มบีไทย' },
+  { code: 'UOB', name: 'ธนาคารยูโอบี' },
+  { code: 'GSB', name: 'ธนาคารออมสิน' },
+  { code: 'BAAC', name: 'ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร' },
+  { code: 'GHB', name: 'ธนาคารอาคารสงเคราะห์' },
+  { code: 'ISBT', name: 'ธนาคารอิสลามแห่งประเทศไทย' },
+] as const
