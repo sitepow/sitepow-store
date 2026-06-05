@@ -1,8 +1,8 @@
 'use client'
 
-import { REGION_MAP, REMOTE_AREAS, ZONE_LABELS } from '@/constants/shipping'
+import { ZONE_LABELS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
-import { getAllProvinces } from '@/utils/shipping'
+import { getProvincesForZone, getRegionKey } from '@/utils/shipping'
 
 import {
   Table,
@@ -18,35 +18,7 @@ export function ShippingZoneTable({
 }: {
   originProvince: string
 }) {
-  const getRegionKey = (province: string) => {
-    return (
-      Object.entries(REGION_MAP).find(([_, provinces]) =>
-        provinces.includes(province),
-      )?.[0] || 'BKK'
-    )
-  }
-
   const originRegion = getRegionKey(originProvince)
-
-  const getProvincesForZone = (key: string) => {
-    switch (key) {
-      case ShippingZoneType.SAME_PROVINCE:
-        return [originProvince]
-
-      case ShippingZoneType.SAME_REGION:
-        return REGION_MAP[originRegion].filter((p) => p !== originProvince)
-
-      case ShippingZoneType.CROSS_REGION:
-        const sameRegionProvinces = REGION_MAP[originRegion]
-        return getAllProvinces().filter((p) => !sameRegionProvinces.includes(p))
-
-      case ShippingZoneType.REMOTE_AREA:
-        return Array.from(new Set(REMOTE_AREAS.map((a) => a.province)))
-
-      default:
-        return []
-    }
-  }
 
   return (
     <div className="rounded-md border">
@@ -68,7 +40,11 @@ export function ShippingZoneTable({
               </TableCell>
               <TableCell className="max-w-md min-w-md">
                 <div className="text-sm leading-relaxed wrap-break-word whitespace-normal text-neutral-700">
-                  {getProvincesForZone(key).join(', ')}
+                  {getProvincesForZone({
+                    zoneType: key as ShippingZoneType,
+                    originProvince,
+                    originRegion,
+                  }).join(', ')}
                 </div>
               </TableCell>
             </TableRow>
