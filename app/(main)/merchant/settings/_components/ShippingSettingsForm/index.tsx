@@ -111,12 +111,12 @@ export function ShippingSettingsForm() {
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
                 <div className="flex flex-wrap items-end gap-2">
+                  <StoreSelectField />
+                  <BranchSelectField />
                   {selectedStoreId !== ALL_STORES &&
                     selectedBranchId !== ALL_BRANCHES && (
                       <ApplyGlobalRatesDialog />
                     )}
-                  <StoreSelectField />
-                  <BranchSelectField />
                 </div>
               }
             />
