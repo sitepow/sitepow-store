@@ -88,9 +88,9 @@ export const mapStoreToShippingForm = (
   store: DecimalToNumber<StoreShippingPayload>,
 ): Partial<ShippingFormValues> | null => {
   return {
-    storeProvince: store.province || '',
-    storeDistrict: store.district || '',
-    storePostcode: store.postcode ? Number(store.postcode) : 0,
+    storeProvince: store.branch?.province || '',
+    storeDistrict: store.branch?.district || '',
+    storePostcode: store.branch?.postcode ? Number(store.branch.postcode) : 0,
 
     isFreeShipEnabled: store.shippingSetting?.isFreeShipEnabled ?? false,
     freeShipMin: store.shippingSetting?.freeShipMin

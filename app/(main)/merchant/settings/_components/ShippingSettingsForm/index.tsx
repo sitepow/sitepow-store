@@ -14,12 +14,14 @@ import {
   useUpdateShippingSettings,
 } from '@/actions/hooks/shipping'
 import { COURIERS_LIST } from '@/constants/shipping'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
@@ -35,6 +37,7 @@ import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
 export function ShippingSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
+  const { selectedBranchId } = useBranchFilter()
 
   const { mutate: updateShipping, isPending: isUpdating } =
     useUpdateShippingSettings()
@@ -55,7 +58,10 @@ export function ShippingSettingsForm() {
   const watchedServices = watch('services')
   const watchedFreeShipEnabled = watch('isFreeShipEnabled')
 
-  const { data: shippingSettings } = useStoreShippingSettings(selectedStoreId)
+  const { data: shippingSettings } = useStoreShippingSettings(
+    selectedStoreId,
+    selectedBranchId,
+  )
 
   const resetFormToDefaultDatabase = useCallback(() => {
     if (shippingSettings) {
@@ -67,12 +73,15 @@ export function ShippingSettingsForm() {
   }, [shippingSettings, reset])
 
   useEffect(() => {
-    if (!selectedStoreId || !shippingSettings) {
+    if (!selectedStoreId || selectedStoreId === ALL_STORES) {
+      return
+    }
+    if (!selectedBranchId || selectedBranchId === ALL_BRANCHES) {
       return
     }
 
     resetFormToDefaultDatabase()
-  }, [selectedStoreId, reset, shippingSettings, resetFormToDefaultDatabase])
+  }, [selectedStoreId, selectedBranchId, resetFormToDefaultDatabase])
 
   const onFormSubmit = (data: ShippingFormValues) => {
     if (!selectedStoreId) {
@@ -81,7 +90,7 @@ export function ShippingSettingsForm() {
     }
 
     updateShipping(
-      { storeId: selectedStoreId, data },
+      { storeId: selectedStoreId, branchId: selectedBranchId, data },
       {
         onSuccess: () => {
           toast.success('บันทึกการตั้งค่าการจัดส่งเรียบร้อยแล้ว')
@@ -102,171 +111,179 @@ export function ShippingSettingsForm() {
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
                 <div className="flex flex-wrap items-end gap-2">
-                  {selectedStoreId !== ALL_STORES && <ApplyGlobalRatesDialog />}
+                  {selectedStoreId !== ALL_STORES &&
+                    selectedBranchId !== ALL_BRANCHES && (
+                      <ApplyGlobalRatesDialog />
+                    )}
                   <StoreSelectField />
+                  <BranchSelectField />
                 </div>
               }
             />
           </CardHeader>
 
-          {selectedStoreId !== ALL_STORES && (
-            <>
-              <CardContent className="divide-border divide-y">
-                <ShippingZoneTable originProvince={watch('storeProvince')} />
+          {selectedStoreId !== ALL_STORES &&
+            selectedBranchId !== ALL_BRANCHES && (
+              <>
+                <CardContent className="divide-border divide-y">
+                  <ShippingZoneTable originProvince={watch('storeProvince')} />
 
-                <div className="space-y-5 py-5">
-                  <div>
-                    <span className="block text-sm font-semibold text-neutral-900">
-                      ตัวเลือกผู้ให้บริการจัดส่งและบริการย่อย (Courier &
-                      Services)
-                    </span>
-                    <span className="text-muted-foreground mt-0.5 block text-xs leading-relaxed">
-                      เปิด-ปิด และระบุอัตราค่าบริการของแต่ละบริการย่อย
-                    </span>
-                  </div>
-
-                  <div className="space-y-6 pt-2">
-                    {COURIERS_LIST.map((courier) => (
-                      <div
-                        key={courier.id}
-                        className="space-y-3 rounded-xl border bg-neutral-50/40 p-4"
-                      >
-                        <div>
-                          <h4 className="text-sm font-bold text-neutral-900">
-                            {courier.name}
-                          </h4>
-                          <p className="text-muted-foreground text-xs">
-                            {courier.description}
-                          </p>
-                        </div>
-
-                        <div className="border-muted flex flex-col gap-2.5">
-                          {courier.services.map((service) => {
-                            const formFieldIndex = fields.findIndex(
-                              (f) => f.courierServiceId === service.id,
-                            )
-
-                            if (formFieldIndex === -1) {
-                              return null
-                            }
-
-                            const isEnabled =
-                              watchedServices[formFieldIndex]?.isEnabled
-
-                            return (
-                              <div
-                                key={service.id}
-                                className={`flex items-center justify-between rounded-lg border bg-white p-3 transition-colors ${
-                                  isEnabled ? 'border-brand/20 bg-brand/5' : ''
-                                }`}
-                              >
-                                <div>
-                                  <span className="block text-sm font-medium">
-                                    {service.name}
-                                  </span>
-                                  <span className="text-muted-foreground block text-xs">
-                                    ระยะเวลาโดยประมาณ {service.estimatedDays}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                  {isEnabled && (
-                                    <ServiceConfigDialog
-                                      serviceName={`${courier.name} - ${service.name}`}
-                                      serviceIndex={formFieldIndex}
-                                    />
-                                  )}
-                                  <Switch
-                                    checked={!!isEnabled}
-                                    onCheckedChange={(checked) =>
-                                      setValue(
-                                        `services.${formFieldIndex}.isEnabled`,
-                                        checked,
-                                        { shouldDirty: true },
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4 py-5">
-                  <div className="flex flex-wrap gap-2">
-                    <Controller
-                      control={control}
-                      name="isFreeShipEnabled"
-                      render={({ field }) => (
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      )}
-                    />
-                    <span className="block text-sm font-semibold text-neutral-900">
-                      เงื่อนไขโปรโมชันส่งฟรีของร้าน
-                    </span>
-                  </div>
-                  {watchedFreeShipEnabled && (
-                    <div className="grid grid-cols-2">
-                      <Field>
-                        <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
-                        <div className="mt-1 flex items-center">
-                          <Input
-                            type="number"
-                            placeholder="1000"
-                            {...register('freeShipMin', {
-                              valueAsNumber: true,
-                            })}
-                            className="rounded-r-none"
-                          />
-                          <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                            บาท
-                          </span>
-                        </div>
-                      </Field>
+                  <div className="space-y-5 py-5">
+                    <div>
+                      <span className="block text-sm font-semibold text-neutral-900">
+                        ตัวเลือกผู้ให้บริการจัดส่งและบริการย่อย (Courier &
+                        Services)
+                      </span>
+                      <span className="text-muted-foreground mt-0.5 block text-xs leading-relaxed">
+                        เปิด-ปิด และระบุอัตราค่าบริการของแต่ละบริการย่อย
+                      </span>
                     </div>
-                  )}
-                </div>
-              </CardContent>
 
-              <CardFooter className="flex flex-wrap justify-end gap-2 border-t">
-                {isDirty && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => resetFormToDefaultDatabase()}
-                  >
-                    ล้างค่าการตั้งค่า
+                    <div className="space-y-6 pt-2">
+                      {COURIERS_LIST.map((courier) => (
+                        <div
+                          key={courier.id}
+                          className="space-y-3 rounded-xl border bg-neutral-50/40 p-4"
+                        >
+                          <div>
+                            <h4 className="text-sm font-bold text-neutral-900">
+                              {courier.name}
+                            </h4>
+                            <p className="text-muted-foreground text-xs">
+                              {courier.description}
+                            </p>
+                          </div>
+
+                          <div className="border-muted flex flex-col gap-2.5">
+                            {courier.services.map((service) => {
+                              const formFieldIndex = fields.findIndex(
+                                (f) => f.courierServiceId === service.id,
+                              )
+
+                              if (formFieldIndex === -1) {
+                                return null
+                              }
+
+                              const isEnabled =
+                                watchedServices[formFieldIndex]?.isEnabled
+
+                              return (
+                                <div
+                                  key={service.id}
+                                  className={`flex items-center justify-between rounded-lg border bg-white p-3 transition-colors ${
+                                    isEnabled
+                                      ? 'border-brand/20 bg-brand/5'
+                                      : ''
+                                  }`}
+                                >
+                                  <div>
+                                    <span className="block text-sm font-medium">
+                                      {service.name}
+                                    </span>
+                                    <span className="text-muted-foreground block text-xs">
+                                      ระยะเวลาโดยประมาณ {service.estimatedDays}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-3">
+                                    {isEnabled && (
+                                      <ServiceConfigDialog
+                                        serviceName={`${courier.name} - ${service.name}`}
+                                        serviceIndex={formFieldIndex}
+                                      />
+                                    )}
+                                    <Switch
+                                      checked={!!isEnabled}
+                                      onCheckedChange={(checked) =>
+                                        setValue(
+                                          `services.${formFieldIndex}.isEnabled`,
+                                          checked,
+                                          { shouldDirty: true },
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 py-5">
+                    <div className="flex flex-wrap gap-2">
+                      <Controller
+                        control={control}
+                        name="isFreeShipEnabled"
+                        render={({ field }) => (
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        )}
+                      />
+                      <span className="block text-sm font-semibold text-neutral-900">
+                        เงื่อนไขโปรโมชันส่งฟรีของร้าน
+                      </span>
+                    </div>
+                    {watchedFreeShipEnabled && (
+                      <div className="grid grid-cols-2">
+                        <Field>
+                          <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
+                          <div className="mt-1 flex items-center">
+                            <Input
+                              type="number"
+                              placeholder="1000"
+                              {...register('freeShipMin', {
+                                valueAsNumber: true,
+                              })}
+                              className="rounded-r-none"
+                            />
+                            <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
+                              บาท
+                            </span>
+                          </div>
+                        </Field>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-wrap justify-end gap-2 border-t">
+                  {isDirty && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => resetFormToDefaultDatabase()}
+                    >
+                      ล้างค่าการตั้งค่า
+                    </Button>
+                  )}
+
+                  <Button type="submit" disabled={isUpdating}>
+                    {isUpdating ? (
+                      <>
+                        <Spinner />
+                        กำลังบันทึกเกณฑ์ขนส่งระบบ...
+                      </>
+                    ) : (
+                      <>
+                        <IconDeviceFloppy size={14} /> บันทึกเกณฑ์การส่งสินค้า
+                      </>
+                    )}
                   </Button>
-                )}
+                </CardFooter>
+              </>
+            )}
 
-                <Button type="submit" disabled={isUpdating}>
-                  {isUpdating ? (
-                    <>
-                      <Spinner />
-                      กำลังบันทึกเกณฑ์ขนส่งระบบ...
-                    </>
-                  ) : (
-                    <>
-                      <IconDeviceFloppy size={14} /> บันทึกเกณฑ์การส่งสินค้า
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </>
-          )}
-
-          {selectedStoreId === ALL_STORES && (
-            <CardContent>
-              <ActionRequiredAlert />
-            </CardContent>
-          )}
+          {selectedStoreId === ALL_STORES ||
+            (selectedBranchId === ALL_BRANCHES && (
+              <CardContent>
+                <ActionRequiredAlert />
+              </CardContent>
+            ))}
         </Card>
       </form>
     </FormProvider>

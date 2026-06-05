@@ -38,14 +38,16 @@ export function useApplyGlobalRates() {
   return useMutation({
     mutationFn: async ({
       storeId,
+      branchId,
       fromProvince,
     }: {
       storeId: string
+      branchId: string
       fromProvince: string
-    }) => await applyGlobalRatesToStore(storeId, fromProvince),
+    }) => await applyGlobalRatesToStore(storeId, branchId, fromProvince),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: shippingKeys.settings(variables.storeId),
+        queryKey: shippingKeys.settings(variables.storeId, variables.branchId),
       })
     },
   })

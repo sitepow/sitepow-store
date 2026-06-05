@@ -11,6 +11,7 @@ import {
   createBranch,
   deleteBranch,
   getBranch,
+  getBranchOptions,
   getBranches,
   setMainBranch,
   updateBranch,
@@ -110,4 +111,14 @@ export function useDeleteBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() })
     },
   })
+}
+
+export function useBranchOptions(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: branchKeys.options(storeId),
+      queryFn: async () => await getBranchOptions(storeId),
+      enabled: !!storeId,
+    }),
+  )
 }

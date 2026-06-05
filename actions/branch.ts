@@ -46,6 +46,30 @@ export interface GetBranchesResponse {
   }
 }
 
+const branchOptionSelect = {
+  id: true,
+  name: true,
+  isMain: true,
+} satisfies Prisma.BranchSelect
+
+export type BranchOption = Prisma.BranchGetPayload<{
+  select: typeof branchOptionSelect
+}>
+
+export async function getBranchOptions(
+  storeId: string,
+): Promise<BranchOption[]> {
+  if (!storeId) {
+    return []
+  }
+
+  return await prisma.branch.findMany({
+    where: { storeId },
+    orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],
+    select: branchOptionSelect,
+  })
+}
+
 export async function getBranches({
   storeId,
   page = 1,

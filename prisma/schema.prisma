@@ -93,6 +93,12 @@ model Branch {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
+  province    String?
+  district    String?
+  subDistrict String?
+  postcode    String?
+  address     String? @db.Text
+
   staffs           Staff[]
   orders           Order[]
   stocks           ProductStock[]
@@ -305,12 +311,6 @@ model Store {
 
   shippingSetting      ShippingSetting?
   storeCourierServices StoreCourierService[]
-
-  province    String?
-  district    String?
-  subDistrict String?
-  postcode    String?
-  address     String? @db.Text
 
   taxId           String?
   isVatRegistered Boolean @default(false)

@@ -11,50 +11,62 @@ import { ShippingFormValues } from '@/zod/shipping'
 
 import { prisma } from '@/lib/prisma'
 
-const storeShippingQuery = {
-  select: {
-    province: true,
-    district: true,
-    postcode: true,
-    shippingSetting: {
-      select: { isFreeShipEnabled: true, freeShipMin: true },
-    },
-    storeCourierServices: {
-      include: { weightRates: true },
-    },
-  },
-  where: {} as { id: string },
-} satisfies Prisma.StoreFindUniqueArgs
+const branchShippingSelect = {
+  province: true,
+  district: true,
+  postcode: true,
+} satisfies Prisma.BranchSelect
 
-export type StoreShippingPayload = Prisma.StoreGetPayload<
-  typeof storeShippingQuery
->
+const storeShippingSelect = {
+  shippingSetting: {
+    select: { isFreeShipEnabled: true, freeShipMin: true },
+  },
+  storeCourierServices: {
+    include: { weightRates: true },
+  },
+} satisfies Prisma.StoreSelect
+
+export type StoreShippingPayload = Prisma.StoreGetPayload<{
+  select: typeof storeShippingSelect
+}> & {
+  branch: Prisma.BranchGetPayload<{
+    select: typeof branchShippingSelect
+  }> | null
+}
 
 export async function getStoreShippingSettings(
   storeId: string,
+  branchId: string,
 ): Promise<Partial<ShippingFormValues> | null> {
-  const store = serializeDecimal(
-    await prisma.store.findUnique({
-      ...storeShippingQuery,
+  const [store, branch] = await Promise.all([
+    prisma.store.findUnique({
       where: { id: storeId },
+      select: storeShippingSelect,
     }),
-  )
+    prisma.branch.findUnique({
+      where: { id: branchId },
+      select: branchShippingSelect,
+    }),
+  ])
 
   if (!store) {
     return null
   }
 
-  return mapStoreToShippingForm(store)
+  const serialized = serializeDecimal({ ...store, branch })
+
+  return mapStoreToShippingForm(serialized)
 }
 
 export async function updateStoreShippingSettings(
   storeId: string,
+  branchId: string,
   data: ShippingFormValues,
 ) {
   try {
     return await prisma.$transaction(async (tx) => {
-      await tx.store.update({
-        where: { id: storeId },
+      await tx.branch.update({
+        where: { id: branchId },
         data: {
           province: data.storeProvince,
           district: data.storeDistrict,

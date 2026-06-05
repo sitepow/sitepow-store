@@ -8,6 +8,7 @@ import {
   useGlobalShippingMetadata,
   useGlobalShippingRateMatrixProvinces,
 } from '@/actions/hooks/global-shipping-rate-matrix'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
 import { IconCloudDownload } from '@tabler/icons-react'
@@ -37,6 +38,7 @@ export function ApplyGlobalRatesDialog() {
   const [selectedProvince, setSelectedProvince] = useState<string>('')
 
   const { selectedStoreId } = useStoreFilter()
+  const { selectedBranchId } = useBranchFilter()
 
   const { mutate: applyRates, isPending: isApplying } = useApplyGlobalRates()
   const { data: provinces } = useGlobalShippingRateMatrixProvinces()
@@ -48,7 +50,11 @@ export function ApplyGlobalRatesDialog() {
     }
 
     applyRates(
-      { storeId: selectedStoreId, fromProvince: selectedProvince },
+      {
+        storeId: selectedStoreId,
+        branchId: selectedBranchId,
+        fromProvince: selectedProvince,
+      },
       {
         onSuccess: () => {
           toast.success(

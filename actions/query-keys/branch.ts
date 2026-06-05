@@ -8,4 +8,6 @@ export const branchKeys = {
     search?: string
   }) => [...branchKeys.lists(), filters] as const,
   detail: (id: string) => [...branchKeys.all, 'detail', id] as const,
+  options: (storeId: string) =>
+    [...branchKeys.all, 'options', storeId] as const,
 }

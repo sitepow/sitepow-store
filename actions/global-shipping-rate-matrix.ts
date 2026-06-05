@@ -65,6 +65,7 @@ export async function upsertGlobalShippingRateMatrix(
 
 export async function applyGlobalRatesToStore(
   storeId: string,
+  branchId: string,
   fromProvince: string,
 ): Promise<void> {
   if (!fromProvince) {
@@ -85,9 +86,30 @@ export async function applyGlobalRatesToStore(
     AggregatedRate[]
   >
 
+  for (const courier of COURIERS_LIST) {
+    await prisma.courier.upsert({
+      where: { id: courier.id },
+      update: {},
+      create: { id: courier.id, code: courier.code, name: courier.name },
+    })
+
+    for (const service of courier.services) {
+      await prisma.courierService.upsert({
+        where: { id: service.id },
+        update: {},
+        create: {
+          id: service.id,
+          courierId: courier.id,
+          code: service.code,
+          name: service.name,
+        },
+      })
+    }
+  }
+
   await prisma.$transaction(async (tx) => {
-    await tx.store.update({
-      where: { id: storeId },
+    await tx.branch.update({
+      where: { id: branchId },
       data: {
         province: fromProvince,
         district: provinceDetails.state,
@@ -95,27 +117,6 @@ export async function applyGlobalRatesToStore(
         postcode: provinceDetails.postcode,
       },
     })
-
-    for (const courier of COURIERS_LIST) {
-      await tx.courier.upsert({
-        where: { id: courier.id },
-        update: {},
-        create: { id: courier.id, code: courier.code, name: courier.name },
-      })
-
-      for (const service of courier.services) {
-        await tx.courierService.upsert({
-          where: { id: service.id },
-          update: {},
-          create: {
-            id: service.id,
-            courierId: courier.id,
-            code: service.code,
-            name: service.name,
-          },
-        })
-      }
-    }
 
     const allServiceIds = COURIERS_LIST.flatMap((c) =>
       c.services.map((s) => s.id),

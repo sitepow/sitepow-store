@@ -1,3 +1,5 @@
+import { ALL_BRANCHES } from '@/stores/use-branch-filter'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { ShippingFormValues } from '@/zod/shipping'
 import {
   queryOptions,
@@ -12,12 +14,16 @@ import {
   updateStoreShippingSettings,
 } from '../shipping'
 
-export function useStoreShippingSettings(storeId: string) {
+export function useStoreShippingSettings(storeId: string, branchId: string) {
   return useQuery(
     queryOptions({
-      queryKey: shippingKeys.settings(storeId),
-      queryFn: async () => await getStoreShippingSettings(storeId),
-      enabled: !!storeId,
+      queryKey: shippingKeys.settings(storeId, branchId),
+      queryFn: async () => await getStoreShippingSettings(storeId, branchId),
+      enabled:
+        !!storeId &&
+        storeId !== ALL_STORES &&
+        !!branchId &&
+        branchId !== ALL_BRANCHES,
     }),
   )
 }
@@ -28,14 +34,16 @@ export function useUpdateShippingSettings() {
   return useMutation({
     mutationFn: async ({
       storeId,
+      branchId,
       data,
     }: {
       storeId: string
+      branchId: string
       data: ShippingFormValues
-    }) => await updateStoreShippingSettings(storeId, data),
+    }) => await updateStoreShippingSettings(storeId, branchId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: shippingKeys.settings(variables.storeId),
+        queryKey: shippingKeys.settings(variables.storeId, variables.branchId),
       })
     },
   })
