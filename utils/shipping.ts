@@ -1,7 +1,12 @@
+import { StoreShippingPayload } from '@/actions/shipping'
 import { REGION_MAP, REMOTE_AREAS } from '@/constants/shipping'
+import { Prisma } from '@/generated/prisma/client'
 import { ShippingZoneType } from '@/generated/prisma/enums'
+import { ShippingFormValues } from '@/zod/shipping'
 
 import { ThaiAddressFinder } from '@/lib/address/logic'
+
+import { DecimalToNumber } from './decimal'
 
 const addressFinder = new ThaiAddressFinder({ maxSearchResult: 200 })
 
@@ -76,5 +81,52 @@ export const getProvincesForZone = ({
 
     default:
       return []
+  }
+}
+
+export const mapStoreToShippingForm = (
+  store: DecimalToNumber<StoreShippingPayload>,
+): Partial<ShippingFormValues> | null => {
+  return {
+    storeProvince: store.province || '',
+    storeDistrict: store.district || '',
+    storePostcode: store.postcode ? Number(store.postcode) : 0,
+
+    isFreeShipEnabled: store.shippingSetting?.isFreeShipEnabled ?? false,
+    freeShipMin: store.shippingSetting?.freeShipMin
+      ? Number(store.shippingSetting.freeShipMin)
+      : 0,
+
+    services: store.storeCourierServices.map((scs) => ({
+      ...scs,
+      zoneRates: [],
+    })),
+  }
+}
+
+export async function syncStoreServiceWeightRates(
+  tx: Prisma.TransactionClient,
+  storeCourierServiceId: string,
+  rates: {
+    zoneType: ShippingZoneType
+    minWeight: number
+    maxWeight: number
+    fee: number
+  }[],
+) {
+  await tx.storeServiceWeightRate.deleteMany({
+    where: { storeCourierServiceId },
+  })
+
+  if (rates.length > 0) {
+    await tx.storeServiceWeightRate.createMany({
+      data: rates.map((rate) => ({
+        storeCourierServiceId,
+        zoneType: rate.zoneType,
+        minWeight: rate.minWeight,
+        maxWeight: rate.maxWeight,
+        fee: rate.fee,
+      })),
+    })
   }
 }

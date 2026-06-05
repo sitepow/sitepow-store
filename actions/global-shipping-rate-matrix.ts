@@ -2,7 +2,11 @@
 
 import { COURIERS_LIST } from '@/constants/shipping'
 import { Prisma } from '@/generated/prisma/client'
-import { AggregatedRate, getProvinceDetails } from '@/utils/shipping'
+import {
+  AggregatedRate,
+  getProvinceDetails,
+  syncStoreServiceWeightRates,
+} from '@/utils/shipping'
 
 import { prisma } from '@/lib/prisma'
 
@@ -129,19 +133,7 @@ export async function applyGlobalRatesToStore(
         continue
       }
 
-      await tx.storeServiceWeightRate.deleteMany({
-        where: { storeCourierServiceId: storeCourierService.id },
-      })
-
-      await tx.storeServiceWeightRate.createMany({
-        data: rates.map((rate) => ({
-          storeCourierServiceId: storeCourierService.id,
-          zoneType: rate.zoneType,
-          minWeight: rate.minWeight,
-          maxWeight: rate.maxWeight,
-          fee: rate.fee,
-        })),
-      })
+      await syncStoreServiceWeightRates(tx, storeCourierService.id, rates)
     }
   })
 }

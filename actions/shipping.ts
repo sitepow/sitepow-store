@@ -1,58 +1,50 @@
 'use server'
 
+import { Prisma } from '@/generated/prisma/client'
 import { ShippingZoneType } from '@/generated/prisma/enums'
+import { serializeDecimal } from '@/utils/decimal'
+import {
+  mapStoreToShippingForm,
+  syncStoreServiceWeightRates,
+} from '@/utils/shipping'
 import { ShippingFormValues } from '@/zod/shipping'
 
 import { prisma } from '@/lib/prisma'
 
+const storeShippingQuery = {
+  select: {
+    province: true,
+    district: true,
+    postcode: true,
+    shippingSetting: {
+      select: { isFreeShipEnabled: true, freeShipMin: true },
+    },
+    storeCourierServices: {
+      include: { weightRates: true },
+    },
+  },
+  where: {} as { id: string },
+} satisfies Prisma.StoreFindUniqueArgs
+
+export type StoreShippingPayload = Prisma.StoreGetPayload<
+  typeof storeShippingQuery
+>
+
 export async function getStoreShippingSettings(
   storeId: string,
 ): Promise<Partial<ShippingFormValues> | null> {
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    select: {
-      province: true,
-      district: true,
-      postcode: true,
-      shippingSetting: {
-        select: {
-          isFreeShipEnabled: true,
-          freeShipMin: true,
-        },
-      },
-      storeCourierServices: {
-        include: { weightRates: true },
-      },
-    },
-  })
+  const store = serializeDecimal(
+    await prisma.store.findUnique({
+      ...storeShippingQuery,
+      where: { id: storeId },
+    }),
+  )
 
   if (!store) {
     return null
   }
 
-  const services = store.storeCourierServices.map((scs) => ({
-    courierServiceId: scs.courierServiceId,
-    isEnabled: scs.isEnabled,
-    weightRates: scs.weightRates.map((wr) => ({
-      id: wr.id,
-      zoneType: wr.zoneType,
-      minWeight: Number(wr.minWeight),
-      maxWeight: Number(wr.maxWeight),
-      fee: Number(wr.fee),
-    })),
-    zoneRates: [],
-  }))
-
-  return {
-    storeProvince: store.province || '',
-    storeDistrict: store.district || '',
-    storePostcode: store.postcode ? Number(store.postcode) : 0,
-    isFreeShipEnabled: store.shippingSetting?.isFreeShipEnabled ?? false,
-    freeShipMin: store.shippingSetting?.freeShipMin
-      ? Number(store.shippingSetting.freeShipMin)
-      : 0,
-    services,
-  }
+  return mapStoreToShippingForm(store)
 }
 
 export async function updateStoreShippingSettings(
@@ -101,23 +93,14 @@ export async function updateStoreShippingSettings(
           },
         })
 
-        await tx.storeServiceWeightRate.deleteMany({
-          where: {
-            storeCourierServiceId: courierServiceRecord.id,
-          },
-        })
-
-        if (service.weightRates.length > 0) {
-          await tx.storeServiceWeightRate.createMany({
-            data: service.weightRates.map((wr) => ({
-              storeCourierServiceId: courierServiceRecord.id,
-              zoneType: wr.zoneType as ShippingZoneType,
-              minWeight: wr.minWeight,
-              maxWeight: wr.maxWeight,
-              fee: wr.fee,
-            })),
-          })
-        }
+        await syncStoreServiceWeightRates(
+          tx,
+          courierServiceRecord.id,
+          service.weightRates.map((wr) => ({
+            ...wr,
+            zoneType: wr.zoneType as ShippingZoneType,
+          })),
+        )
       }
     })
   } catch {
