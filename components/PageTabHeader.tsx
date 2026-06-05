@@ -71,7 +71,7 @@ export function PageTabHeader({
       </div>
 
       {endContent && (
-        <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
+        <div className="flex items-center gap-2 self-start sm:self-center">
           {endContent}
         </div>
       )}
