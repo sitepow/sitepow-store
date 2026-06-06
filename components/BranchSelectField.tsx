@@ -22,7 +22,7 @@ export function BranchSelectField() {
     <Field className="w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
-        เลือกสาขา
+        เลือกสาขาของร้านค้า
       </FieldLabel>
       <Select
         value={selectedBranchId}

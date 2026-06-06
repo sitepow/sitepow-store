@@ -47,7 +47,7 @@ export const ACTOR_TYPE_TH: Record<ActorType, string> = {
 export const STAFF_ROLE_TH: Record<StaffRole, string> = {
   [StaffRole.ADMIN]: 'ผู้ดูแลระบบร้าน',
   [StaffRole.MANAGER]: 'ผู้จัดการ',
-  [StaffRole.CASHIER]: 'พนักงานขาย (POS)',
+  [StaffRole.CASHIER]: 'พนักงานขายหน้าร้าน',
 }
 
 export const DELIVERY_STATUS_TH: Record<DeliveryStatus, string> = {
@@ -67,6 +67,7 @@ export const ADDRESS_TYPE_TH: Record<AddressType, string> = {
 }
 
 export const PLAN_TH: Record<Plan, string> = {
+  [Plan.FREE]: 'Free',
   [Plan.STARTER]: 'Starter',
   [Plan.PRO]: 'Pro',
   [Plan.ULTIMATE]: 'Ultimate',

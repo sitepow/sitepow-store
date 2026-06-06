@@ -99,7 +99,7 @@ model Branch {
   postcode    String?
   address     String? @db.Text
 
-  staffs           Staff[]
+  staffs           StaffBranch[]
   orders           Order[]
   stocks           ProductStock[]
   coupons          Coupon[]
@@ -161,6 +161,16 @@ model User {
   sessions Session[]
 }
 
+model StaffBranch {
+  id       String @id @default(cuid())
+  staffId  String
+  staff    Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([staffId, branchId])
+}
+
 model Staff {
   id    String    @id @default(cuid())
   name  String
@@ -173,9 +183,7 @@ model Staff {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  branchId String?
-  branch   Branch? @relation(fields: [branchId], references: [id])
-
+  branches     StaffBranch[]
   activityLogs ActivityLog[]
 }
 
