@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { useTaxSetting, useUpdateTaxSetting } from '@/actions/hooks/tax'
@@ -33,13 +33,25 @@ export function TaxSettingsForm() {
     defaultValues: {
       isVatRegistered: true,
       vatRate: '7.0',
+      taxId: '',
     },
   })
+
+  const resetFormToDefaultDatabase = useCallback(() => {
+    if (taxSetting) {
+      form.reset({
+        ...taxSetting,
+        taxId: taxSetting.taxId?.toString(),
+        vatRate: taxSetting.vatRate.toString(),
+      })
+    }
+  }, [taxSetting, form])
 
   useEffect(() => {
     if (taxSetting) {
       form.reset({
-        isVatRegistered: taxSetting.isVatRegistered,
+        ...taxSetting,
+        taxId: taxSetting.taxId?.toString(),
         vatRate: taxSetting.vatRate.toString(),
       })
     }
@@ -109,10 +121,29 @@ export function TaxSettingsForm() {
                   </>
                 )}
               </Field>
+
+              <Field>
+                <FieldLabel>เลขประจำตัวผู้เสียภาษี (13 หลัก)</FieldLabel>
+                <Input
+                  placeholder="เลขประจำตัวของคุณ"
+                  {...form.register('taxId')}
+                  maxLength={13}
+                />
+              </Field>
             </div>
           </CardContent>
 
           <CardFooter className="flex justify-end border-t">
+            {form.formState.isDirty && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => resetFormToDefaultDatabase()}
+              >
+                ล้างค่าการตั้งค่า
+              </Button>
+            )}
+
             <Button
               size="sm"
               onClick={form.handleSubmit(onSubmit)}

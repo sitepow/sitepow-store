@@ -9,7 +9,7 @@ export async function getTaxSetting(storeId: string) {
   return serializeDecimal(
     await prisma.store.findUnique({
       where: { id: storeId },
-      select: { isVatRegistered: true, vatRate: true },
+      select: { isVatRegistered: true, taxId: true, vatRate: true },
     }),
   )
 }
@@ -22,7 +22,7 @@ export async function updateTaxSetting(
     const result = await prisma.store.update({
       where: { id: storeId },
       data: {
-        isVatRegistered: data.isVatRegistered,
+        ...data,
         vatRate: parseFloat(data.vatRate),
       },
     })

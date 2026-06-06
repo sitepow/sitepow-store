@@ -9,6 +9,12 @@ export const taxSettingSchema = z.object({
     },
     { message: 'อัตราภาษีต้องอยู่ระหว่าง 0-100' },
   ),
+  taxId: z
+    .string()
+    .min(13, 'เลขผู้เสียภาษีต้องมี 13 หลัก')
+    .max(13, 'เลขผู้เสียภาษีต้องมี 13 หลัก')
+    .optional()
+    .or(z.literal('')),
 })
 
 export type TaxSettingFormValues = z.infer<typeof taxSettingSchema>
