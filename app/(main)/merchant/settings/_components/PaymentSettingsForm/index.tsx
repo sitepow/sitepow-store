@@ -89,7 +89,7 @@ export function PaymentSettingsForm() {
           <>
             <CardContent className="divide-border divide-y">
               <div className="space-y-4 pb-5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
                       โอนเงินผ่านบัญชีธนาคาร (Bank Transfer)

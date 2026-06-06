@@ -278,12 +278,12 @@ export function ShippingSettingsForm() {
               </>
             )}
 
-          {selectedStoreId === ALL_STORES ||
-            (selectedBranchId === ALL_BRANCHES && (
-              <CardContent>
-                <ActionRequiredAlert />
-              </CardContent>
-            ))}
+          {(selectedStoreId === ALL_STORES ||
+            selectedBranchId === ALL_BRANCHES) && (
+            <CardContent>
+              <ActionRequiredAlert />
+            </CardContent>
+          )}
         </Card>
       </form>
     </FormProvider>
