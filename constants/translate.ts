@@ -11,6 +11,7 @@ import {
   StaffRole,
   SubStatus,
   TransactionType,
+  TransferStatus,
 } from '@/generated/prisma/enums'
 
 export const ORDER_STATUS_TH: Record<OrderStatus, string> = {
@@ -106,6 +107,14 @@ export const SUB_STATUS_TH: Record<SubStatus, string> = {
   [SubStatus.EXPIRED]: 'หมดอายุ',
 }
 
+export const TRANSFER_STATUS_TH: Record<TransferStatus, string> = {
+  [TransferStatus.PENDING]: 'รอการยืนยัน',
+  [TransferStatus.ACCEPTED]: 'ยอมรับแล้ว',
+  [TransferStatus.DECLINED]: 'ปฏิเสธแล้ว',
+  [TransferStatus.EXPIRED]: 'หมดอายุ',
+  [TransferStatus.CANCELLED]: 'ยกเลิกแล้ว',
+}
+
 export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
@@ -119,4 +128,5 @@ export const getLabel = {
   logAction: (v: LogAction) => LOG_ACTION_TH[v] || v,
   transactionType: (v: TransactionType) => TRANSACTION_TYPE_TH[v] || v,
   subStatus: (v: SubStatus) => SUB_STATUS_TH[v] || v,
+  transferStatus: (v: TransferStatus) => TRANSFER_STATUS_TH[v] || v,
 }
