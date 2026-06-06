@@ -1,6 +1,6 @@
 'use client'
 
-import { PRODUCTS } from '@/constants/sites/product'
+// import { PRODUCTS } from '@/constants/sites/product'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
 import { Category } from '@/types/sites/category'
@@ -8,19 +8,20 @@ import { Category } from '@/types/sites/category'
 import { SectionContainer } from '@/components/SectionContainer'
 
 import { SeeMoreButton } from '../SeeMoreButton'
-import { ProductCard } from '../product/ProductCard'
+
+// import { ProductCard } from '../product/ProductCard'
 
 export function CategorySection({ categoryId, title, image }: Category) {
   const fallbackGradient = useRandomGradient()
   const { emblaRef } = useCarousel()
 
-  const filteredProducts = PRODUCTS.filter(
-    (product) => product.categoryId === categoryId,
-  )
+  // const filteredProducts = PRODUCTS.filter(
+  //   (product) => product.categoryId === categoryId,
+  // )
 
-  if (filteredProducts.length === 0) {
-    return null
-  }
+  // if (filteredProducts.length === 0) {
+  //   return null
+  // }
 
   return (
     <SectionContainer>
@@ -40,14 +41,14 @@ export function CategorySection({ categoryId, title, image }: Category) {
 
         <div className="relative w-full overflow-hidden" ref={emblaRef}>
           <div className="flex h-87.5 items-center gap-5">
-            {filteredProducts.map((product) => (
+            {/* {filteredProducts.map((product) => (
               <div
                 key={product.productId}
                 className="h-full min-w-0 flex-[0_0_288px]"
               >
                 <ProductCard variant="shadow" {...product} />
               </div>
-            ))}
+            ))} */}
 
             <SeeMoreButton href="/products" />
           </div>

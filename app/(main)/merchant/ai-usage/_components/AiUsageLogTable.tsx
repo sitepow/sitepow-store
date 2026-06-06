@@ -86,7 +86,7 @@ export function AiUsageLogTable({ logs }: AiUsageLogTableProps) {
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </>
   )
 }

@@ -107,7 +107,7 @@ export function AddressTable({
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </>
   )
 }

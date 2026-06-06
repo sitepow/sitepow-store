@@ -84,7 +84,7 @@ export function RewardsHistoryTable({
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </div>
   )
 }

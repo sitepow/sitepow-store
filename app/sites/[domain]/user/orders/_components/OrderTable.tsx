@@ -83,7 +83,7 @@ export function OrderTable({ orders }: OrderTableProps) {
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
       <Dialog
         open={selectedOrder !== null}
         onOpenChange={(open) => !open && setSelectedOrder(null)}

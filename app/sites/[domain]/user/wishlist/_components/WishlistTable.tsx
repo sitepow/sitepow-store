@@ -117,7 +117,7 @@ export function WishlistTable({ items, onRemove }: WishlistTableProps) {
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </>
   )
 }

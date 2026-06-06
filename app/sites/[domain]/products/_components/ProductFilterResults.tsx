@@ -1,5 +1,4 @@
-import { PRODUCTS } from '@/constants/sites/product'
-
+// import { PRODUCTS } from '@/constants/sites/product'
 import {
   Select,
   SelectContent,
@@ -9,16 +8,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { StorePagination } from '../../_components/Pagination'
-import { ProductCard } from '../../_components/product/ProductCard'
+// import { StorePagination } from '../../_components/Pagination'
+// import { ProductCard } from '../../_components/product/ProductCard'
 
 export function ProductFilterResults() {
   return (
     <div className="flex flex-1 flex-col gap-5 xl:sticky xl:top-40 xl:col-span-9">
       <div className="mb-6 flex flex-wrap items-center justify-center gap-2.5 sm:justify-between">
-        <p className="text-muted-foreground">
+        {/* <p className="text-muted-foreground">
           แสดงทั้งหมด <span>{PRODUCTS.length}</span> รายการ
-        </p>
+        </p> */}
 
         <Select value="a">
           <SelectTrigger className="w-45">
@@ -34,19 +33,19 @@ export function ProductFilterResults() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+      {/* <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {PRODUCTS.map((product) => (
           <ProductCard key={product.productId} variant="outline" {...product} />
         ))}
-      </div>
+      </div> */}
 
-      {PRODUCTS.length === 0 && (
+      {/* {PRODUCTS.length === 0 && (
         <div className="flex h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed">
           <p className="text-muted-foreground">ไม่พบสินค้าที่คุณกำลังมองหา</p>
         </div>
-      )}
+      )} */}
 
-      <StorePagination />
+      {/* <StorePagination /> */}
     </div>
   )
 }

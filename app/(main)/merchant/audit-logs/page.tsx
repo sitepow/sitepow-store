@@ -203,7 +203,7 @@ export default function MerchantAuditLogsPage() {
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
       <AuditLogDetailDialog
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}

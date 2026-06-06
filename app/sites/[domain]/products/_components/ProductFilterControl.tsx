@@ -1,8 +1,9 @@
 'use client'
 
 import { CATEGORIES } from '@/constants/sites/category'
-import { PRODUCTS } from '@/constants/sites/product'
-import { formatCurrency } from '@/utils/pricing'
+
+// import { PRODUCTS } from '@/constants/sites/product'
+// import { formatCurrency } from '@/utils/pricing'
 
 import {
   Accordion,
@@ -14,24 +15,25 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Slider } from '@/components/ui/slider'
+
+// import { Slider } from '@/components/ui/slider'
 
 export function ProductFilterControl() {
-  const products = PRODUCTS
+  // const products = PRODUCTS
   const categories = CATEGORIES
 
-  const availableBrands = Array.from(
-    new Set(products.map((product) => product.metadata.brand).filter(Boolean)),
-  )
+  // const availableBrands = Array.from(
+  //   new Set(products.map((product) => product.metadata.brand).filter(Boolean)),
+  // )
 
-  const allPrices = products.flatMap((product) =>
-    product.variants.map((variant) => variant.price),
-  )
+  // const allPrices = products.flatMap((product) =>
+  //   product.variants.map((variant) => variant.price),
+  // )
 
-  const minRaw = allPrices.length > 0 ? Math.min(...allPrices) : 0
-  const maxRaw = allPrices.length > 0 ? Math.max(...allPrices) : 0
+  // const minRaw = allPrices.length > 0 ? Math.min(...allPrices) : 0
+  // const maxRaw = allPrices.length > 0 ? Math.max(...allPrices) : 0
 
-  const currentMaxPrice = Math.ceil(maxRaw / 100) * 100
+  // const currentMaxPrice = Math.ceil(maxRaw / 100) * 100
 
   return (
     <aside className="w-full shrink-0 space-y-8 xl:sticky xl:top-40 xl:col-span-3">
@@ -64,14 +66,14 @@ export function ProductFilterControl() {
             ช่วงราคา
           </AccordionTrigger>
           <AccordionContent className="space-y-6 px-2 pt-6">
-            <Slider
+            {/* <Slider
               defaultValue={[0, currentMaxPrice]}
               max={currentMaxPrice}
               step={100}
-            />
+            /> */}
             <div className="flex items-center justify-between text-sm font-medium">
-              <span>{formatCurrency(minRaw)}</span>
-              <span>{formatCurrency(currentMaxPrice)}</span>
+              {/* <span>{formatCurrency(minRaw)}</span>
+              <span>{formatCurrency(currentMaxPrice)}</span> */}
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -81,7 +83,7 @@ export function ProductFilterControl() {
             แบรนด์
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-4">
-            {availableBrands.map((brand) => (
+            {/* {availableBrands.map((brand) => (
               <div key={brand} className="flex items-center space-x-3">
                 <Checkbox id={`brand-${brand}`} />
                 <Label
@@ -91,10 +93,10 @@ export function ProductFilterControl() {
                   {brand}
                 </Label>
               </div>
-            ))}
-            {availableBrands.length === 0 && (
+            ))} */}
+            {/* {availableBrands.length === 0 && (
               <p className="text-muted-foreground text-xs">ไม่มีแบรนด์</p>
-            )}
+            )} */}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -127,7 +127,7 @@ export function VouchersTable({
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </div>
   )
 }

@@ -49,7 +49,11 @@ export const productFormSchema = z.object({
       message: 'Slug ใช้ได้เฉพาะตัวอักษร ตัวเลข และขีดกลาง',
     }),
   categoryId: z.string().min(1, { message: 'กรุณาเลือกหมวดหมู่' }),
-  images: z.array(z.string()).default([]),
+  images: z.array(
+    z.object({
+      url: z.string(),
+    }),
+  ),
   variants: z
     .array(variantSchema)
     .min(1, { message: 'ต้องมีอย่างน้อย 1 ตัวเลือก' }),

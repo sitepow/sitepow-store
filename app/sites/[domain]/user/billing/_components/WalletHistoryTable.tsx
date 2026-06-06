@@ -83,7 +83,7 @@ export function WalletHistoryTable({
           </TableBody>
         </Table>
       </div>
-      <StorePagination />
+      {/* <StorePagination /> */}
     </div>
   )
 }

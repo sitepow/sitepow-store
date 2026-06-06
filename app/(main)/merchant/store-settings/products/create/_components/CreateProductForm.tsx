@@ -133,7 +133,7 @@ export function CreateProductForm() {
           title: data.title,
           slug: data.slug,
           tags: data.tags,
-          images: data.images,
+          // images: data.images,
           variants: data.variants.map((v) => ({
             title: v.title,
             price: v.price,
