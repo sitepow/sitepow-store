@@ -372,6 +372,10 @@ model Store {
   pointEarningRate Decimal? @db.Decimal(10, 2)
   pointRedeemRate  Decimal? @db.Decimal(10, 2)
 
+  notifyLowStock     Boolean @default(true)
+  notifyDailySummary Boolean @default(true)
+  notifyBillingAlert Boolean @default(true)
+
   blogs            Blog[]
   categories       Category[]
   products         Product[]

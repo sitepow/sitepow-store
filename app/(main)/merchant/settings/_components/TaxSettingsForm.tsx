@@ -133,7 +133,7 @@ export function TaxSettingsForm() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-end border-t">
+          <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
             {form.formState.isDirty && (
               <Button
                 type="button"

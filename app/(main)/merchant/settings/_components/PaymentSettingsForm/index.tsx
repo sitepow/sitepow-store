@@ -172,7 +172,7 @@ export function PaymentSettingsForm() {
               )}
             </CardContent>
 
-            <CardFooter className="flex justify-end gap-2 border-t">
+            <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
               {isDirty && (
                 <Button type="button" variant="outline" onClick={resetForm}>
                   ล้างค่า
