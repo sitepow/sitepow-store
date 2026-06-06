@@ -344,6 +344,7 @@ model Store {
   slug    String @unique
   ownerId String
 
+  email       String?
   logo        String?
   coverImage  String?
   description String? @db.Text

@@ -7,6 +7,8 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDate } from '@/utils/date'
+import { formatCurrency } from '@/utils/pricing'
 import { IconDownload } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -74,16 +76,12 @@ export function MerchantInvoiceTable() {
                   </TableCell>
                   <TableCell>
                     <span className="text-muted-foreground text-sm">
-                      {new Date(tx.createdAt).toLocaleDateString('th-TH', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
+                      {formatDate(tx.createdAt)}
                     </span>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
-                      ฿{Number(tx.amount).toLocaleString()}
+                      {formatCurrency(tx.amount)}
                     </span>
                   </TableCell>
                   <TableCell>

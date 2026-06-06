@@ -67,10 +67,6 @@ export function NotificationSettingsForm() {
     })
   }
 
-  if (selectedStoreId === ALL_STORES) {
-    return <ActionRequiredAlert />
-  }
-
   return (
     <Card>
       <CardHeader>

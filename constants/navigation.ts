@@ -153,7 +153,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
   },
   {
     value: 'store-settings',
-    label: 'ข้อมูลร้านค้า',
+    label: 'จัดการร้านค้า',
     tab: 'store',
     icon: IconBuildingStore,
     items: [

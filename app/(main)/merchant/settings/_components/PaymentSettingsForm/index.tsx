@@ -51,8 +51,7 @@ export function PaymentSettingsForm() {
   const resetForm = useCallback(() => {
     if (paymentSetting) {
       reset({
-        isBankTransferEnabled: paymentSetting.isBankTransferEnabled,
-        isStripeEnabled: paymentSetting.isStripeEnabled,
+        ...paymentSetting,
         stripeSecretKey: paymentSetting.stripeSecretKey ?? '',
         stripePublicKey: paymentSetting.stripePublicKey ?? '',
       })
@@ -89,7 +88,7 @@ export function PaymentSettingsForm() {
           <>
             <CardContent className="divide-border divide-y">
               <div className="space-y-4 pb-5">
-                <div className="flex items-center justify-between gap-5">
+                <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
                       โอนเงินผ่านบัญชีธนาคาร (Bank Transfer)
@@ -124,7 +123,7 @@ export function PaymentSettingsForm() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-5 py-5">
+              <div className="flex flex-wrap items-center justify-between gap-5 py-5">
                 <div>
                   <span className="block text-sm font-semibold">
                     Stripe Payment Gateway

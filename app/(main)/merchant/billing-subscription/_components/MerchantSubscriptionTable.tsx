@@ -7,6 +7,8 @@ import {
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { Plan, SubStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
+import { formatDate } from '@/utils/date'
+import { formatCurrency } from '@/utils/pricing'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { differenceInDays } from 'date-fns'
 
@@ -92,13 +94,11 @@ export function MerchantSubscriptionTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{plan.name}</Badge>
+                    <Badge>{plan.name}</Badge>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
-                      {plan.price > 0
-                        ? `฿${plan.price.toLocaleString()}`
-                        : 'ฟรี'}
+                      {formatCurrency(plan.price)}
                     </span>
                   </TableCell>
                   <TableCell className="max-w-75">
@@ -123,25 +123,13 @@ export function MerchantSubscriptionTable() {
                         <span className="text-muted-foreground text-sm">
                           มีผลวันที่{' '}
                           <span className="text-foreground font-medium">
-                            {new Date(sub.pendingPlanAt).toLocaleDateString(
-                              'th-TH',
-                              {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                              },
-                            )}
+                            {formatDate(sub.pendingPlanAt)}
                           </span>
                         </span>
                       </div>
                     ) : isCanceled ? (
                       <span className="text-muted-foreground text-sm">
-                        ใช้งานได้ถึง{' '}
-                        {new Date(sub.endDate).toLocaleDateString('th-TH', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        ใช้งานได้ถึง {formatDate(sub.endDate)}
                       </span>
                     ) : (
                       <span className="text-sm opacity-60">ปกติ</span>
@@ -153,13 +141,7 @@ export function MerchantSubscriptionTable() {
                         isPastDue ? 'text-destructive font-medium' : 'text-sm'
                       }
                     >
-                      {isCanceled
-                        ? '-'
-                        : new Date(sub.endDate).toLocaleDateString('th-TH', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
+                      {isCanceled ? '-' : formatDate(sub.endDate)}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
