@@ -14,12 +14,16 @@ services:
   db:
     image: postgres:16-alpine
     restart: always
+    ports:
+      - '5432:5432'
     environment:
       - POSTGRES_USER=sitepow
       - POSTGRES_PASSWORD=sitepow
       - POSTGRES_DB=sitepow
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      - webnet
 
 volumes:
   pg_data:
