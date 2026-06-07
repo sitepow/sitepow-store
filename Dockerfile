@@ -3,15 +3,12 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile --ignore-scripts
-
+RUN pnpm install --frozen-lockfile
 COPY . .
-
-RUN pnpm rebuild @prisma/engines prisma sharp
-
 RUN pnpm build
 
 FROM node:current-alpine AS runner
+RUN npm install -g pnpm
 WORKDIR /app
 
 ENV NODE_ENV=production
