@@ -2,10 +2,11 @@ FROM node:current-alpine AS builder
 RUN npm install -g pnpm
 WORKDIR /app
 
-RUN pnpm config set enable-pre-post-scripts true
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --unsafe-perm
 
 COPY . .
 RUN pnpm build
