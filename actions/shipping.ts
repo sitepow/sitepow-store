@@ -64,7 +64,7 @@ export async function updateStoreShippingSettings(
   data: ShippingFormValues,
 ) {
   try {
-    return await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       await tx.branch.update({
         where: { id: branchId },
         data: {
@@ -115,7 +115,10 @@ export async function updateStoreShippingSettings(
         )
       }
     })
-  } catch {
-    throw new Error('ไม่สามารถบันทึกข้อมูลการจัดส่งได้')
+
+    return { success: true, message: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }

@@ -36,14 +36,19 @@ export async function updateNotificationSettings(
   storeId: string,
   input: NotificationSettingsFormValues,
 ) {
-  if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    await prisma.store.update({
+      where: { id: storeId },
+      data: input,
+    })
+
+    return { success: true, message: 'บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.store.update({
-    where: { id: storeId },
-    data: input,
-  })
-
-  return { message: 'บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ' }
 }

@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react'
 import toast from 'react-hot-toast'
 
 import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/query'
+import { SERVER_ERROR_MESSAGE } from '@/constants/system'
 import {
   MutationCache,
   QueryCache,
@@ -18,22 +19,36 @@ const QueryProviders = ({ children }: PropsWithChildren) => {
     () =>
       new QueryClient({
         queryCache: new QueryCache({
-          onError: (error) => {
-            if (error?.message) {
-              toast.error(error?.message)
-            }
+          onError: () => {
+            toast.error(SERVER_ERROR_MESSAGE)
           },
         }),
         mutationCache: new MutationCache({
-          onError: (error) => {
-            if (error?.message) {
-              toast.error(error?.message)
-            }
+          onError: () => {
+            toast.error(SERVER_ERROR_MESSAGE)
           },
           onSuccess: (result: unknown) => {
-            if (result && typeof result === 'object' && 'message' in result) {
-              const response = result as { message: string }
-              toast.success(response.message)
+            const isResponse = (
+              res: unknown,
+            ): res is { success: boolean; message: string } => {
+              return (
+                typeof res === 'object' &&
+                res !== null &&
+                'success' in res &&
+                'message' in res
+              )
+            }
+
+            if (isResponse(result)) {
+              if (result.success) {
+                toast.success(result.message)
+              } else {
+                if (!result.message) {
+                  toast.error(SERVER_ERROR_MESSAGE)
+                } else {
+                  toast.error(result.message)
+                }
+              }
             }
           },
         }),

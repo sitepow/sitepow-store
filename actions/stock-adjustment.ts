@@ -140,46 +140,54 @@ export async function getStockAdjustments({
 }
 
 export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
-  const { storeId, variantId, branchId, quantity, reason, note } = input
+  try {
+    const { storeId, variantId, branchId, quantity, reason, note } = input
 
-  if (quantity === 0) {
-    throw new Error('จำนวนต้องไม่เป็น 0')
+    if (quantity === 0) {
+      return { success: false, message: 'จำนวนต้องไม่เป็น 0' }
+    }
+
+    const FREE_REASONS: StockAdjustmentReason[] = [
+      StockAdjustmentReason.CORRECTION,
+      StockAdjustmentReason.OTHER,
+    ]
+
+    if (!FREE_REASONS.includes(reason) && quantity > 0) {
+      return { success: false, message: 'ไม่สามารถเพิ่มสต็อกด้วยเหตุผลนี้ได้' }
+    }
+
+    const stock = await prisma.productStock.findUnique({
+      where: { branchId_variantId: { branchId, variantId } },
+      select: { id: true, quantity: true },
+    })
+
+    if (!stock) {
+      return { success: false, message: 'ไม่พบข้อมูลสต็อกสาขานี้' }
+    }
+
+    const newQuantity = stock.quantity + quantity
+
+    if (newQuantity < 0) {
+      return {
+        success: false,
+        message: `สต็อกไม่เพียงพอ (มีอยู่ ${stock.quantity} ชิ้น)`,
+      }
+    }
+
+    const [, adjustment] = await prisma.$transaction([
+      prisma.productStock.update({
+        where: { id: stock.id },
+        data: { quantity: newQuantity },
+      }),
+      prisma.stockAdjustment.create({
+        data: { storeId, variantId, branchId, quantity, reason, note },
+        select: stockAdjustmentSelect,
+      }),
+    ])
+
+    return { success: true, message: 'ปรับสต็อกสำเร็จแล้ว', data: adjustment }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const FREE_REASONS: StockAdjustmentReason[] = [
-    StockAdjustmentReason.CORRECTION,
-    StockAdjustmentReason.OTHER,
-  ]
-
-  if (!FREE_REASONS.includes(reason) && quantity > 0) {
-    throw new Error('ไม่สามารถเพิ่มสต็อกด้วยเหตุผลนี้ได้')
-  }
-
-  const stock = await prisma.productStock.findUnique({
-    where: { branchId_variantId: { branchId, variantId } },
-    select: { id: true, quantity: true },
-  })
-
-  if (!stock) {
-    throw new Error('ไม่พบข้อมูลสต็อกสาขานี้')
-  }
-
-  const newQuantity = stock.quantity + quantity
-
-  if (newQuantity < 0) {
-    throw new Error(`สต็อกไม่เพียงพอ (มีอยู่ ${stock.quantity} ชิ้น)`)
-  }
-
-  const [, adjustment] = await prisma.$transaction([
-    prisma.productStock.update({
-      where: { id: stock.id },
-      data: { quantity: newQuantity },
-    }),
-    prisma.stockAdjustment.create({
-      data: { storeId, variantId, branchId, quantity, reason, note },
-      select: stockAdjustmentSelect,
-    }),
-  ])
-
-  return { adjustment, message: 'ปรับสต็อกสำเร็จแล้ว' }
 }

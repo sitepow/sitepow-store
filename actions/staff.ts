@@ -124,70 +124,85 @@ export async function getStaffs({
 }
 
 export async function createStaff(input: CreateStaffInput) {
-  const existing = await prisma.staff.findUnique({
-    where: { email: input.email },
-    select: { id: true },
-  })
+  try {
+    const existing = await prisma.staff.findUnique({
+      where: { email: input.email },
+      select: { id: true },
+    })
 
-  if (existing) {
-    throw new Error('อีเมลนี้ถูกใช้งานไปแล้ว')
-  }
+    if (existing) {
+      return { success: false, message: 'อีเมลนี้ถูกใช้งานไปแล้ว' }
+    }
 
-  const user = await prisma.user.create({
-    data: {
-      email: input.email,
-      name: input.name,
-      role: UserRole.MERCHANT,
-    },
-    select: { id: true },
-  })
-
-  const staff = await prisma.staff.create({
-    data: {
-      name: input.name,
-      email: input.email,
-      role: input.role,
-      storeId: input.storeId,
-      userId: user.id,
-      branches: {
-        create: input.branchIds.map((branchId) => ({ branchId })),
+    const user = await prisma.user.create({
+      data: {
+        email: input.email,
+        name: input.name,
+        role: UserRole.MERCHANT,
       },
-    },
-    select: staffSelect,
-  })
+      select: { id: true },
+    })
 
-  return { data: staff, message: 'บันทึกข้อมูลสำเร็จแล้ว' }
+    const staff = await prisma.staff.create({
+      data: {
+        name: input.name,
+        email: input.email,
+        role: input.role,
+        storeId: input.storeId,
+        userId: user.id,
+        branches: {
+          create: input.branchIds.map((branchId) => ({ branchId })),
+        },
+      },
+      select: staffSelect,
+    })
+
+    return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: staff }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }
 
 export async function updateStaff(id: string, input: UpdateStaffInput) {
-  if (!id) {
-    throw new Error('ไม่พบ Staff ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Staff ID' }
+    }
+
+    const updated = await prisma.staff.update({
+      where: { id },
+      data: {
+        name: input.name,
+        role: input.role,
+        ...(input.branchIds && {
+          branches: {
+            deleteMany: {},
+            create: input.branchIds.map((branchId) => ({ branchId })),
+          },
+        }),
+      },
+      select: staffSelect,
+    })
+
+    return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const updated = await prisma.staff.update({
-    where: { id },
-    data: {
-      name: input.name,
-      role: input.role,
-      ...(input.branchIds && {
-        branches: {
-          deleteMany: {},
-          create: input.branchIds.map((branchId) => ({ branchId })),
-        },
-      }),
-    },
-    select: staffSelect,
-  })
-
-  return { staff: updated }
 }
 
 export async function deleteStaff(id: string) {
-  if (!id) {
-    throw new Error('ไม่พบ Staff ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Staff ID' }
+    }
+
+    await prisma.staff.delete({ where: { id } })
+
+    return { success: true, message: 'ลบพนักงานสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.staff.delete({ where: { id } })
-
-  return { message: 'ลบพนักงานสำเร็จ' }
 }

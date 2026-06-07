@@ -91,7 +91,8 @@ export async function getCustomers({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
+  } catch (error) {
+    console.error(error)
     return {
       data: [],
       meta: {

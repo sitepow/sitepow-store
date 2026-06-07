@@ -228,81 +228,103 @@ export async function getStoreOptions(filters?: {
 }
 
 export async function createStore(input: CreateStoreInput) {
-  const { name, slug } = input
+  try {
+    const { name, slug } = input
 
-  const existingStore = await prisma.store.findFirst({
-    where: {
-      OR: [{ slug }, { name }],
-    },
-  })
+    const existingStore = await prisma.store.findFirst({
+      where: {
+        OR: [{ slug }, { name }],
+      },
+    })
 
-  if (existingStore) {
-    if (existingStore.slug === slug) throw new Error('Slug นี้ถูกใช้งานไปแล้ว')
-    if (existingStore.name === name)
-      throw new Error('ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว')
+    if (existingStore) {
+      if (existingStore.slug === slug) {
+        return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้ว' }
+      }
+      if (existingStore.name === name) {
+        return { success: false, message: 'ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว' }
+      }
+    }
+
+    const store = await prisma.store.create({
+      data: {
+        ...input,
+        usage: {
+          create: {},
+        },
+        branches: {
+          create: {
+            name: 'สาขาหลัก',
+            isMain: true,
+          },
+        },
+        subscription: {
+          create: {
+            plan: input.plan ?? Plan.STARTER,
+            status: SubStatus.ACTIVE,
+            startDate: new Date(),
+            endDate: new Date(
+              Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
+            ),
+          },
+        },
+      },
+      select: storeSelect,
+    })
+
+    return { success: true, message: 'สร้างร้านค้าสำเร็จแล้ว', data: store }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const store = await prisma.store.create({
-    data: {
-      ...input,
-      usage: {
-        create: {},
-      },
-      branches: {
-        create: {
-          name: 'สาขาหลัก',
-          isMain: true,
-        },
-      },
-      subscription: {
-        create: {
-          plan: input.plan ?? Plan.STARTER,
-          status: SubStatus.ACTIVE,
-          startDate: new Date(),
-          endDate: new Date(
-            Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
-          ),
-        },
-      },
-    },
-    select: storeSelect,
-  })
-
-  return { store }
 }
 
 export async function updateStore(id: string, input: UpdateStoreInput) {
-  if (!id) {
-    throw new Error('ไม่พบ Store ID')
-  }
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
 
-  if (input.slug) {
-    const existingStore = await prisma.store.findUnique({
-      where: { slug: input.slug },
+    if (input.slug) {
+      const existingStore = await prisma.store.findUnique({
+        where: { slug: input.slug },
+      })
+
+      if (existingStore && existingStore.id !== id) {
+        return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้ว' }
+      }
+    }
+
+    const updatedStore = await prisma.store.update({
+      where: { id },
+      data: input,
+      select: storeSelect,
     })
 
-    if (existingStore && existingStore.id !== id) {
-      throw new Error('Slug นี้ถูกใช้งานไปแล้ว')
+    return {
+      success: true,
+      message: 'อัปเดตข้อมูลร้านค้าสำเร็จแล้ว',
+      data: updatedStore,
     }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const updatedStore = await prisma.store.update({
-    where: { id },
-    data: input,
-    select: storeSelect,
-  })
-
-  return { updatedStore }
 }
 
 export async function deleteStore(id: string) {
-  if (!id) {
-    throw new Error('ไม่พบ Store ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    await prisma.store.delete({
+      where: { id },
+    })
+
+    return { success: true, message: 'ลบร้านค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.store.delete({
-    where: { id },
-  })
-
-  return { message: 'ลบร้านค้าสำเร็จ' }
 }

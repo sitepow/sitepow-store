@@ -70,19 +70,25 @@ export async function updateLoyaltySettings(
   storeId: string,
   input: UpdateLoyaltySettingsInput,
 ) {
-  if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
-  }
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
 
-  return {
-    data: serializeDecimal(
-      await prisma.store.update({
-        where: { id: storeId },
-        data: input,
-        select: loyaltySettingsSelect,
-      }),
-    ),
-    message: 'ตั้งค่าสำเร็จแล้ว',
+    const data = await prisma.store.update({
+      where: { id: storeId },
+      data: input,
+      select: loyaltySettingsSelect,
+    })
+
+    return {
+      success: true,
+      message: 'ตั้งค่าสำเร็จแล้ว',
+      data: serializeDecimal(data),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
 

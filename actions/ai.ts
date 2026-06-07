@@ -101,9 +101,9 @@ export async function generateProductAiAction(title: string) {
     const result = await model.generateContent(prompt)
     const responseText = result.response.text()
 
-    return JSON.parse(responseText)
+    return { success: true, data: JSON.parse(responseText) }
   } catch (error) {
-    console.error('Gemini Error:', error)
-    throw new Error('Failed to generate product content')
+    console.error(error)
+    return { success: false }
   }
 }

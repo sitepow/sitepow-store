@@ -39,28 +39,33 @@ export async function updateStoreProfile(
   storeId: string,
   input: StoreProfileFormValues,
 ) {
-  if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
-  }
-
-  if (input.slug) {
-    const existing = await prisma.store.findFirst({
-      where: { slug: input.slug, id: { not: storeId } },
-      select: { id: true },
-    })
-    if (existing) {
-      throw new Error('URL Slug นี้ถูกใช้งานไปแล้ว')
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
+
+    if (input.slug) {
+      const existing = await prisma.store.findFirst({
+        where: { slug: input.slug, id: { not: storeId } },
+        select: { id: true },
+      })
+      if (existing) {
+        return { success: false, message: 'URL Slug นี้ถูกใช้งานไปแล้ว' }
+      }
+    }
+
+    await prisma.store.update({
+      where: { id: storeId },
+      data: {
+        ...input,
+        email: input.email || null,
+        taxId: input.taxId || null,
+      },
+    })
+
+    return { success: true, message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.store.update({
-    where: { id: storeId },
-    data: {
-      ...input,
-      email: input.email || null,
-      taxId: input.taxId || null,
-    },
-  })
-
-  return { message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }
 }

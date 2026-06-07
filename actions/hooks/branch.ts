@@ -77,10 +77,14 @@ export function useUpdateBranch() {
       id: string
       input: UpdateBranchInput
     }) => await updateBranch(id, input),
-    onSuccess: (data) => {
+    onSuccess: (result) => {
+      if (!result.success || !result.data) {
+        return
+      }
+
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() })
       queryClient.invalidateQueries({
-        queryKey: branchKeys.detail(data.updatedBranch.id),
+        queryKey: branchKeys.detail(result.data.id),
       })
     },
   })

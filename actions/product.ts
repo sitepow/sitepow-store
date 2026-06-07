@@ -178,29 +178,29 @@ export async function getProducts({
 }
 
 export async function createProduct(input: CreateProductInput) {
-  const {
-    variants,
-    addons,
-    metadata,
-    tags,
-    images,
-    storeId,
-    categoryId,
-    ...rest
-  } = input
-
-  const tagsArray = tags
-    ? tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : []
-
-  const details = metadata?.length
-    ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
-    : undefined
-
   try {
+    const {
+      variants,
+      addons,
+      metadata,
+      tags,
+      images,
+      storeId,
+      categoryId,
+      ...rest
+    } = input
+
+    const tagsArray = tags
+      ? tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : []
+
+    const details = metadata?.length
+      ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
+      : undefined
+
     await prisma.product.create({
       data: {
         ...rest,
@@ -244,34 +244,46 @@ export async function createProduct(input: CreateProductInput) {
       select: productSelect,
     })
 
-    return { message: 'สร้างสินค้าสำเร็จแล้ว' }
+    return { success: true, message: 'สร้างสินค้าสำเร็จแล้ว' }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        throw new Error('สินค้านี้มี slug ซ้ำกับสินค้าอื่นในระบบแล้ว')
+        return {
+          success: false,
+          message: 'สินค้านี้มี slug ซ้ำกับสินค้าอื่นในระบบแล้ว',
+        }
       }
       if (error.code === 'P2003') {
-        throw new Error('ไม่พบข้อมูลที่เชื่อมโยง เช่น หมวดหมู่หรือสาขาที่ระบุ')
+        return {
+          success: false,
+          message: 'ไม่พบข้อมูลที่เชื่อมโยง เช่น หมวดหมู่หรือสาขาที่ระบุ',
+        }
       }
     }
-    throw new Error('เกิดข้อผิดพลาดในการบันทึกสินค้า กรุณาลองใหม่อีกครั้ง')
+    console.error(error)
+    return { success: false }
   }
 }
 
 export async function deleteProduct(id: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
 
-  const product = await prisma.product.findFirst({
-    where: { id, store: { ownerId: userId } },
-    select: { id: true },
-  })
+    const product = await prisma.product.findFirst({
+      where: { id, store: { ownerId: userId } },
+      select: { id: true },
+    })
 
-  if (!product) {
-    throw new Error('ไม่พบสินค้า หรือคุณไม่มีสิทธิ์ลบ')
+    if (!product) {
+      return { success: false, message: 'ไม่พบสินค้า หรือคุณไม่มีสิทธิ์ลบ' }
+    }
+
+    await prisma.product.delete({ where: { id } })
+
+    return { success: true, message: 'ลบสินค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.product.delete({ where: { id } })
-
-  return { message: 'ลบสินค้าสำเร็จ' }
 }

@@ -36,48 +36,58 @@ export async function updateSecuritySettings(
   userId: string,
   input: ChangePasswordFormValues,
 ) {
-  if (!userId) {
-    throw new Error('ไม่พบ User ID')
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { password: true },
-  })
-
-  if (!user) {
-    throw new Error('ไม่พบบัญชีผู้ใช้')
-  }
-
-  if (user.password) {
-    const isMatch = await bcrypt.compare(input.currentPassword, user.password)
-    if (!isMatch) {
-      throw new Error('รหัสผ่านปัจจุบันไม่ถูกต้อง')
+  try {
+    if (!userId) {
+      return { success: false, message: 'ไม่พบ User ID' }
     }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    })
+
+    if (!user) {
+      return { success: false, message: 'ไม่พบบัญชีผู้ใช้' }
+    }
+
+    if (user.password) {
+      const isMatch = await bcrypt.compare(input.currentPassword, user.password)
+      if (!isMatch) {
+        return { success: false, message: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' }
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(input.newPassword, 10)
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    })
+
+    return { success: true, message: 'อัปเดตรหัสผ่านสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const hashedPassword = await bcrypt.hash(input.newPassword, 10)
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword },
-  })
-
-  return { message: 'อัปเดตรหัสผ่านสำเร็จ' }
 }
 
 export async function updateTwoFactor(
   userId: string,
   isTwoFactorEnabled: boolean,
 ) {
-  if (!userId) {
-    throw new Error('ไม่พบ User ID')
+  try {
+    if (!userId) {
+      return { success: false, message: 'ไม่พบ User ID' }
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isTwoFactorEnabled },
+    })
+
+    return { success: true, message: 'อัปเดตการตั้งค่า 2FA สำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { isTwoFactorEnabled },
-  })
-
-  return { message: 'อัปเดตการตั้งค่า 2FA สำเร็จ' }
 }

@@ -98,7 +98,7 @@ export async function getStoreSubscription(
 
 export async function cancelSubscription(storeId: string) {
   if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
+    return { success: false, message: 'ไม่พบ Store ID' }
   }
 
   const subscription = await prisma.subscription.findUnique({
@@ -107,91 +107,97 @@ export async function cancelSubscription(storeId: string) {
   })
 
   if (!subscription) {
-    throw new Error('ไม่พบข้อมูล Subscription')
+    return { success: false, message: 'ไม่พบข้อมูล Subscription' }
   }
 
   if (subscription.plan === Plan.FREE) {
-    throw new Error('ไม่สามารถยกเลิกแพลนฟรีได้')
+    return { success: false, message: 'ไม่สามารถยกเลิกแพลนฟรีได้' }
   }
 
   if (subscription.status === SubStatus.CANCELED) {
-    throw new Error('Subscription ถูกยกเลิกไปแล้ว')
+    return { success: false, message: 'Subscription ถูกยกเลิกไปแล้ว' }
   }
 
-  return serializeDecimal(
-    await prisma.$transaction([
-      prisma.store.update({
-        where: { id: storeId },
-        data: { plan: Plan.FREE },
-      }),
-      prisma.subscription.update({
-        where: { storeId },
-        data: {
-          status: SubStatus.CANCELED,
-          pendingPlan: Plan.FREE,
-          pendingPlanAt: subscription.endDate ?? new Date(),
-        },
-      }),
-    ]),
-  )
+  await prisma.$transaction([
+    prisma.store.update({
+      where: { id: storeId },
+      data: { plan: Plan.FREE },
+    }),
+    prisma.subscription.update({
+      where: { storeId },
+      data: {
+        status: SubStatus.CANCELED,
+        pendingPlan: Plan.FREE,
+        pendingPlanAt: subscription.endDate ?? new Date(),
+      },
+    }),
+  ])
+
+  return { success: true, message: 'ยกเลิก Subscription สำเร็จแล้ว' }
 }
 
 export async function changePlan(storeId: string, newPlan: Plan) {
-  if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
-  }
-
-  const subscription = await prisma.subscription.findUnique({
-    where: { storeId },
-    select: { id: true, plan: true, endDate: true, status: true },
-  })
-
-  if (!subscription) {
-    throw new Error('ไม่พบข้อมูล Subscription')
-  }
-
-  const isUpgrade = PLAN_RANK[newPlan] > PLAN_RANK[subscription.plan]
-  const isSamePlan = newPlan === subscription.plan
-  const isCanceled = subscription.status === SubStatus.CANCELED
-
-  if (isSamePlan && !isCanceled) {
-    throw new Error('คุณใช้แพลนนี้อยู่แล้ว')
-  }
-
-  if (isUpgrade || isCanceled) {
-    await prisma.$transaction([
-      prisma.store.update({
-        where: { id: storeId },
-        data: { plan: newPlan },
-      }),
-      prisma.subscription.update({
-        where: { storeId },
-        data: {
-          plan: newPlan,
-          status: SubStatus.ACTIVE,
-          pendingPlan: null,
-          pendingPlanAt: null,
-        },
-      }),
-    ])
-
-    return {
-      effective: 'immediate',
-      message: `เปลี่ยนแพลนเป็น ${newPlan} เรียบร้อยแล้ว`,
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
-  } else {
-    await prisma.subscription.update({
+
+    const subscription = await prisma.subscription.findUnique({
       where: { storeId },
-      data: {
-        pendingPlan: newPlan,
-        pendingPlanAt: subscription.endDate,
-      },
+      select: { id: true, plan: true, endDate: true, status: true },
     })
 
+    if (!subscription) {
+      return { success: false, message: 'ไม่พบข้อมูล Subscription' }
+    }
+
+    const isUpgrade = PLAN_RANK[newPlan] > PLAN_RANK[subscription.plan]
+    const isSamePlan = newPlan === subscription.plan
+    const isCanceled = subscription.status === SubStatus.CANCELED
+
+    if (isSamePlan && !isCanceled) {
+      return { success: false, message: 'คุณใช้แพลนนี้อยู่แล้ว' }
+    }
+
+    if (isUpgrade || isCanceled) {
+      await prisma.$transaction([
+        prisma.store.update({
+          where: { id: storeId },
+          data: { plan: newPlan },
+        }),
+        prisma.subscription.update({
+          where: { storeId },
+          data: {
+            plan: newPlan,
+            status: SubStatus.ACTIVE,
+            pendingPlan: null,
+            pendingPlanAt: null,
+          },
+        }),
+      ])
+
+      return {
+        success: true,
+        message: `เปลี่ยนแพลนเป็น ${newPlan} เรียบร้อยแล้ว`,
+      }
+    } else {
+      await prisma.subscription.update({
+        where: { storeId },
+        data: {
+          pendingPlan: newPlan,
+          pendingPlanAt: subscription.endDate,
+        },
+      })
+
+      return {
+        success: true,
+        message: `ตั้งค่าลดแพลนเป็น ${newPlan} เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
+      }
+    }
+  } catch (error) {
+    console.error(error)
     return {
-      effective: 'end_of_cycle',
-      effectiveDate: subscription.endDate,
-      message: `จะลดแพลนเป็น ${newPlan} เมื่อรอบปัจจุบันสิ้นสุด`,
+      success: false,
     }
   }
 }

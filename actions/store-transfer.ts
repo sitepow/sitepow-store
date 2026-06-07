@@ -37,153 +37,176 @@ export async function createTransferRequest(
   fromOwnerId: string,
   toEmail: string,
 ) {
-  if (!storeId) {
-    throw new Error('ไม่พบ Store ID')
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+    if (!toEmail) {
+      return { success: false, message: 'กรุณาระบุอีเมลผู้รับ' }
+    }
+
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบร้านค้า' }
+    }
+    if (store.ownerId !== fromOwnerId) {
+      return { success: false, message: 'คุณไม่ใช่เจ้าของร้านค้านี้' }
+    }
+
+    const toUser = await prisma.user.findUnique({
+      where: { email: toEmail },
+      select: { id: true },
+    })
+
+    if (!toUser) {
+      return { success: false, message: 'ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้ในระบบ' }
+    }
+
+    const pending = await prisma.storeTransferRequest.findFirst({
+      where: { storeId, status: TransferStatus.PENDING },
+      select: { id: true },
+    })
+
+    if (pending) {
+      return {
+        success: false,
+        message: 'มีคำขอโอนที่รอการยืนยันอยู่แล้ว กรุณายกเลิกก่อน',
+      }
+    }
+
+    await prisma.storeTransferRequest.create({
+      data: {
+        storeId,
+        fromOwnerId,
+        toEmail,
+        toUserId: toUser.id,
+        expiresAt: new Date(
+          Date.now() + TRANSFER_EXPIRY_DAYS * MILLISECONDS_PER_DAY,
+        ),
+      },
+    })
+
+    return { success: true, message: 'ส่งคำขอโอนร้านค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-  if (!toEmail) {
-    throw new Error('กรุณาระบุอีเมลผู้รับ')
-  }
-
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    select: { ownerId: true },
-  })
-
-  if (!store) {
-    throw new Error('ไม่พบร้านค้า')
-  }
-  if (store.ownerId !== fromOwnerId) {
-    throw new Error('คุณไม่ใช่เจ้าของร้านค้านี้')
-  }
-
-  const toUser = await prisma.user.findUnique({
-    where: { email: toEmail },
-    select: { id: true },
-  })
-
-  if (!toUser) {
-    throw new Error('ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้ในระบบ')
-  }
-
-  const pending = await prisma.storeTransferRequest.findFirst({
-    where: { storeId, status: TransferStatus.PENDING },
-    select: { id: true },
-  })
-
-  if (pending) {
-    throw new Error('มีคำขอโอนที่รอการยืนยันอยู่แล้ว กรุณายกเลิกก่อน')
-  }
-
-  await prisma.storeTransferRequest.create({
-    data: {
-      storeId,
-      fromOwnerId,
-      toEmail,
-      toUserId: toUser.id,
-      expiresAt: new Date(
-        Date.now() + TRANSFER_EXPIRY_DAYS * MILLISECONDS_PER_DAY,
-      ),
-    },
-  })
-
-  return { message: 'ส่งคำขอโอนร้านค้าสำเร็จ' }
 }
 
 export async function cancelTransferRequest(
   requestId: string,
   ownerId: string,
 ) {
-  if (!requestId) {
-    throw new Error('ไม่พบ Request ID')
+  try {
+    if (!requestId) {
+      return { success: false, message: 'ไม่พบ Request ID' }
+    }
+
+    const request = await prisma.storeTransferRequest.findUnique({
+      where: { id: requestId },
+      select: { fromOwnerId: true, status: true },
+    })
+
+    if (!request) {
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
+    }
+    if (request.fromOwnerId !== ownerId) {
+      return { success: false, message: 'คุณไม่มีสิทธิ์ยกเลิกคำขอนี้' }
+    }
+
+    if (request.status !== TransferStatus.PENDING) {
+      return { success: false, message: 'ไม่สามารถยกเลิกคำขอที่ดำเนินการแล้ว' }
+    }
+
+    await prisma.storeTransferRequest.update({
+      where: { id: requestId },
+      data: { status: TransferStatus.CANCELLED },
+    })
+
+    return { success: true, message: 'ยกเลิกคำขอโอนสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const request = await prisma.storeTransferRequest.findUnique({
-    where: { id: requestId },
-    select: { fromOwnerId: true, status: true },
-  })
-
-  if (!request) {
-    throw new Error('ไม่พบคำขอโอนนี้')
-  }
-  if (request.fromOwnerId !== ownerId) {
-    throw new Error('คุณไม่มีสิทธิ์ยกเลิกคำขอนี้')
-  }
-
-  if (request.status !== TransferStatus.PENDING) {
-    throw new Error('ไม่สามารถยกเลิกคำขอที่ดำเนินการแล้ว')
-  }
-
-  await prisma.storeTransferRequest.update({
-    where: { id: requestId },
-    data: { status: TransferStatus.CANCELLED },
-  })
-
-  return { message: 'ยกเลิกคำขอโอนสำเร็จ' }
 }
 
 export async function acceptTransferRequest(token: string, userId: string) {
-  const request = await prisma.storeTransferRequest.findUnique({
-    where: { token },
-    select: {
-      id: true,
-      storeId: true,
-      toUserId: true,
-      status: true,
-      expiresAt: true,
-    },
-  })
-
-  if (!request) {
-    throw new Error('ไม่พบคำขอโอนนี้')
-  }
-  if (request.toUserId !== userId) {
-    throw new Error('คุณไม่ใช่ผู้รับโอนที่ระบุไว้')
-  }
-  if (request.status !== TransferStatus.PENDING) {
-    throw new Error('คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน')
-  }
-  if (new Date() > request.expiresAt) {
-    await prisma.storeTransferRequest.update({
-      where: { id: request.id },
-      data: { status: TransferStatus.EXPIRED },
+  try {
+    const request = await prisma.storeTransferRequest.findUnique({
+      where: { token },
+      select: {
+        id: true,
+        storeId: true,
+        toUserId: true,
+        status: true,
+        expiresAt: true,
+      },
     })
-    throw new Error('คำขอโอนนี้หมดอายุแล้ว')
+
+    if (!request) {
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
+    }
+    if (request.toUserId !== userId) {
+      return { success: false, message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้' }
+    }
+    if (request.status !== TransferStatus.PENDING) {
+      return { success: false, message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน' }
+    }
+    if (new Date() > request.expiresAt) {
+      await prisma.storeTransferRequest.update({
+        where: { id: request.id },
+        data: { status: TransferStatus.EXPIRED },
+      })
+      return { success: false, message: 'คำขอโอนนี้หมดอายุแล้ว' }
+    }
+
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: request.storeId },
+        data: { ownerId: userId },
+      }),
+      prisma.storeTransferRequest.update({
+        where: { id: request.id },
+        data: { status: TransferStatus.ACCEPTED },
+      }),
+    ])
+
+    return { success: true, message: 'รับโอนร้านค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.$transaction([
-    prisma.store.update({
-      where: { id: request.storeId },
-      data: { ownerId: userId },
-    }),
-    prisma.storeTransferRequest.update({
-      where: { id: request.id },
-      data: { status: TransferStatus.ACCEPTED },
-    }),
-  ])
-
-  return { message: 'รับโอนร้านค้าสำเร็จ' }
 }
 
 export async function declineTransferRequest(token: string, userId: string) {
-  const request = await prisma.storeTransferRequest.findUnique({
-    where: { token },
-    select: { id: true, toUserId: true, status: true },
-  })
+  try {
+    const request = await prisma.storeTransferRequest.findUnique({
+      where: { token },
+      select: { id: true, toUserId: true, status: true },
+    })
 
-  if (!request) {
-    throw new Error('ไม่พบคำขอโอนนี้')
-  }
-  if (request.toUserId !== userId) {
-    throw new Error('คุณไม่ใช่ผู้รับโอนที่ระบุไว้')
-  }
-  if (request.status !== TransferStatus.PENDING) {
-    throw new Error('คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน')
-  }
+    if (!request) {
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
+    }
+    if (request.toUserId !== userId) {
+      return { success: false, message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้' }
+    }
+    if (request.status !== TransferStatus.PENDING) {
+      return { success: false, message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน' }
+    }
 
-  await prisma.storeTransferRequest.update({
-    where: { id: request.id },
-    data: { status: TransferStatus.DECLINED },
-  })
+    await prisma.storeTransferRequest.update({
+      where: { id: request.id },
+      data: { status: TransferStatus.DECLINED },
+    })
 
-  return { message: 'ปฏิเสธคำขอโอนสำเร็จ' }
+    return { success: true, message: 'ปฏิเสธคำขอโอนสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }

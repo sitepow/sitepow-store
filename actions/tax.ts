@@ -28,10 +28,14 @@ export async function updateTaxSetting(
     })
 
     return {
-      data: serializeDecimal(result),
+      success: true,
       message: 'บันทึกการตั้งค่าสำเร็จแล้ว',
+      data: serializeDecimal(result),
     }
-  } catch {
-    throw new Error('ไม่สามารถบันทึกการตั้งค่าภาษีได้')
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+    }
   }
 }

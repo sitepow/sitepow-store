@@ -110,7 +110,8 @@ export async function getCoupons({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
+  } catch (error) {
+    console.error(error)
     return {
       data: [],
       meta: {
@@ -126,47 +127,74 @@ export async function getCoupons({
 }
 
 export async function createCoupon(input: CreateCouponInput) {
-  const existing = await prisma.coupon.findUnique({
-    where: { code: input.code },
-    select: { id: true },
-  })
+  try {
+    const existing = await prisma.coupon.findUnique({
+      where: { code: input.code },
+      select: { id: true },
+    })
 
-  if (existing) {
-    throw new Error('รหัสคูปองนี้ถูกใช้งานไปแล้ว')
-  }
+    if (existing) {
+      return { success: false, message: 'รหัสคูปองนี้ถูกใช้งานไปแล้ว' }
+    }
 
-  return serializeDecimal(
-    await prisma.coupon.create({
+    const coupon = await prisma.coupon.create({
       data: {
         ...input,
         startDate: new Date(input.startDate),
         endDate: new Date(input.endDate),
       },
       select: couponSelect,
-    }),
-  )
+    })
+
+    return {
+      success: true,
+      message: 'สร้างคูปองสำเร็จ',
+      data: serializeDecimal(coupon),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }
 
 export async function updateCoupon(id: string, input: UpdateCouponInput) {
-  if (!id) {
-    throw new Error('ไม่พบ Coupon ID')
-  }
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Coupon ID' }
+    }
 
-  return serializeDecimal(
-    await prisma.coupon.update({
+    const updated = await prisma.coupon.update({
       where: { id },
-      data: input,
+      data: {
+        ...input,
+        ...(input.startDate && { startDate: new Date(input.startDate) }),
+        ...(input.endDate && { endDate: new Date(input.endDate) }),
+      },
       select: couponSelect,
-    }),
-  )
+    })
+
+    return {
+      success: true,
+      message: 'อัปเดตคูปองสำเร็จ',
+      data: serializeDecimal(updated),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }
 
 export async function deleteCoupon(id: string) {
-  if (!id) {
-    throw new Error('ไม่พบ Coupon ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Coupon ID' }
+    }
+
+    await prisma.coupon.delete({ where: { id } })
+
+    return { success: true, message: 'ลบคูปองสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  await prisma.coupon.delete({ where: { id } })
-
-  return { message: 'ลบคูปองสำเร็จ' }
 }

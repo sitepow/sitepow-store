@@ -147,46 +147,56 @@ export async function getStockTransfers({
 }
 
 export async function createStockTransfer(input: CreateStockTransferInput) {
-  const { storeId, variantId, fromBranchId, toBranchId, quantity, note } = input
+  try {
+    const { storeId, variantId, fromBranchId, toBranchId, quantity, note } =
+      input
 
-  if (fromBranchId === toBranchId) {
-    throw new Error('สาขาต้นทางและปลายทางต้องไม่เป็นสาขาเดียวกัน')
+    if (fromBranchId === toBranchId) {
+      return {
+        success: false,
+        message: 'สาขาต้นทางและปลายทางต้องไม่เป็นสาขาเดียวกัน',
+      }
+    }
+
+    if (quantity <= 0) {
+      return { success: false, message: 'จำนวนต้องมากกว่า 0' }
+    }
+
+    const fromStock = await prisma.productStock.findUnique({
+      where: { branchId_variantId: { branchId: fromBranchId, variantId } },
+      select: { id: true, quantity: true },
+    })
+
+    if (!fromStock) {
+      return { success: false, message: 'ไม่พบข้อมูลสต็อกสาขาต้นทาง' }
+    }
+
+    if (fromStock.quantity < quantity) {
+      return {
+        success: false,
+        message: `สต็อกสาขาต้นทางไม่เพียงพอ (มีอยู่ ${fromStock.quantity} ชิ้น)`,
+      }
+    }
+
+    const [, , transfer] = await prisma.$transaction([
+      prisma.productStock.update({
+        where: { id: fromStock.id },
+        data: { quantity: { decrement: quantity } },
+      }),
+      prisma.productStock.upsert({
+        where: { branchId_variantId: { branchId: toBranchId, variantId } },
+        update: { quantity: { increment: quantity } },
+        create: { branchId: toBranchId, variantId, quantity },
+      }),
+      prisma.stockTransfer.create({
+        data: { storeId, variantId, fromBranchId, toBranchId, quantity, note },
+        select: stockTransferSelect,
+      }),
+    ])
+
+    return { success: true, message: 'โอนย้ายสต็อกสำเร็จแล้ว', data: transfer }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  if (quantity <= 0) {
-    throw new Error('จำนวนต้องมากกว่า 0')
-  }
-
-  const fromStock = await prisma.productStock.findUnique({
-    where: { branchId_variantId: { branchId: fromBranchId, variantId } },
-    select: { id: true, quantity: true },
-  })
-
-  if (!fromStock) {
-    throw new Error('ไม่พบข้อมูลสต็อกสาขาต้นทาง')
-  }
-
-  if (fromStock.quantity < quantity) {
-    throw new Error(
-      `สต็อกสาขาต้นทางไม่เพียงพอ (มีอยู่ ${fromStock.quantity} ชิ้น)`,
-    )
-  }
-
-  const [, , transfer] = await prisma.$transaction([
-    prisma.productStock.update({
-      where: { id: fromStock.id },
-      data: { quantity: { decrement: quantity } },
-    }),
-    prisma.productStock.upsert({
-      where: { branchId_variantId: { branchId: toBranchId, variantId } },
-      update: { quantity: { increment: quantity } },
-      create: { branchId: toBranchId, variantId, quantity },
-    }),
-    prisma.stockTransfer.create({
-      data: { storeId, variantId, fromBranchId, toBranchId, quantity, note },
-      select: stockTransferSelect,
-    }),
-  ])
-
-  return { transfer }
 }

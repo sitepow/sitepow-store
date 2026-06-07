@@ -175,27 +175,35 @@ export function CreateProductForm() {
       const title = getValues('title')
       return await generateProductAiAction(title)
     },
-    onSuccess: (data) => {
+    onSuccess: (result) => {
+      if (!result.success || !result.data) {
+        return
+      }
+
+      const productData = result.data
+
       const metadataDynamicFields =
-        (data.metadata?.details as MetadataDetail[])?.map((item) => ({
+        (productData.metadata?.details as MetadataDetail[])?.map((item) => ({
           key: String(item.key),
           value: String(item.value),
         })) || []
 
-      const { variants: _variants, metadata: _metadata, ...restData } = data
+      const {
+        variants: _variants,
+        metadata: _metadata,
+        addons: _addons,
+        ...restData
+      } = productData
 
       reset({
         ...getValues(),
         ...restData,
-        addons: data.addons || [],
-        tags: data.metadata?.tags ? data.metadata.tags.join(', ') : '',
+        addons: productData.addons || [],
+        tags: productData.metadata?.tags
+          ? productData.metadata.tags.join(', ')
+          : '',
         metadata: metadataDynamicFields,
       })
-
-      toast.success('AI คิดเนื้อหาให้กับสินค้าของคุณสำเร็จแล้ว')
-    },
-    onError: (error) => {
-      console.error('AI Gen Error:', error)
     },
   })
 

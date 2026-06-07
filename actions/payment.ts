@@ -45,14 +45,20 @@ export async function upsertPaymentSetting(
   data: PaymentSettingFormValues,
 ) {
   try {
-    return await prisma.paymentSetting.upsert({
+    const setting = await prisma.paymentSetting.upsert({
       where: { storeId },
       create: { storeId, ...data },
       update: data,
       select: paymentSettingSelect,
     })
-  } catch {
-    throw new Error('ไม่สามารถบันทึกการตั้งค่าการชำระเงินได้')
+    return {
+      success: true,
+      message: 'บันทึกการตั้งค่าการชำระเงินสำเร็จแล้ว',
+      data: setting,
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
 
@@ -75,11 +81,13 @@ export async function createBankAccount(
       })
     }
 
-    return await prisma.bankAccount.create({
+    const account = await prisma.bankAccount.create({
       data: { ...data, paymentSettingId: setting.id },
     })
-  } catch {
-    throw new Error('ไม่สามารถเพิ่มบัญชีธนาคารได้')
+    return { success: true, message: 'เพิ่มบัญชีธนาคารสำเร็จ', data: account }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
 
@@ -87,10 +95,11 @@ export async function updateBankAccount(
   id: string,
   data: BankAccountFormValues,
 ) {
-  if (!id) {
-    throw new Error('ไม่พบบัญชีธนาคาร')
-  }
   try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+    }
+
     if (data.isDefault) {
       const account = await prisma.bankAccount.findUnique({
         where: { id },
@@ -104,24 +113,31 @@ export async function updateBankAccount(
       }
     }
 
-    return await prisma.bankAccount.update({
+    const updatedAccount = await prisma.bankAccount.update({
       where: { id },
       data,
     })
-  } catch {
-    throw new Error('ไม่สามารถแก้ไขบัญชีธนาคารได้')
+    return {
+      success: true,
+      message: 'แก้ไขบัญชีธนาคารสำเร็จ',
+      data: updatedAccount,
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
 
 export async function deleteBankAccount(id: string) {
-  if (!id) {
-    throw new Error('ไม่พบบัญชีธนาคาร')
-  }
-
   try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+    }
+
     await prisma.bankAccount.delete({ where: { id } })
-    return { message: 'ลบบัญชีธนาคารสำเร็จ' }
-  } catch {
-    throw new Error('ไม่สามารถลบบัญชีธนาคารได้')
+    return { success: true, message: 'ลบบัญชีธนาคารสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }

@@ -59,15 +59,19 @@ export type BranchOption = Prisma.BranchGetPayload<{
 export async function getBranchOptions(
   storeId: string,
 ): Promise<BranchOption[]> {
-  if (!storeId) {
+  try {
+    if (!storeId) {
+      return []
+    }
+    return await prisma.branch.findMany({
+      where: { storeId },
+      orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],
+      select: branchOptionSelect,
+    })
+  } catch (error) {
+    console.error(error)
     return []
   }
-
-  return await prisma.branch.findMany({
-    where: { storeId },
-    orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],
-    select: branchOptionSelect,
-  })
 }
 
 export async function getBranches({
@@ -111,7 +115,8 @@ export async function getBranches({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
+  } catch (error) {
+    console.error(error)
     return {
       data: [],
       meta: {
@@ -127,87 +132,111 @@ export async function getBranches({
 }
 
 export async function getBranch(id: string) {
-  if (!id) {
+  try {
+    if (!id) {
+      return null
+    }
+    return await prisma.branch.findUnique({
+      where: { id },
+      select: branchSelect,
+    })
+  } catch (error) {
+    console.error(error)
     return null
   }
-
-  return await prisma.branch.findUnique({
-    where: { id },
-    select: branchSelect,
-  })
 }
 
 export async function createBranch(input: CreateBranchInput) {
-  const { storeId, isMain = false } = input
+  try {
+    const { storeId, isMain = false } = input
 
-  if (isMain) {
+    if (isMain) {
+      await prisma.branch.updateMany({
+        where: { storeId, isMain: true },
+        data: { isMain: false },
+      })
+    }
+
+    const branch = await prisma.branch.create({
+      data: input,
+      select: branchSelect,
+    })
+
+    return { success: true, data: branch }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export async function updateBranch(id: string, input: UpdateBranchInput) {
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Branch ID' }
+    }
+
+    const updatedBranch = await prisma.branch.update({
+      where: { id },
+      data: input,
+      select: branchSelect,
+    })
+
+    return { success: true, data: updatedBranch }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export async function setMainBranch(id: string, storeId: string) {
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Branch ID' }
+    }
+
     await prisma.branch.updateMany({
       where: { storeId, isMain: true },
       data: { isMain: false },
     })
+
+    const updatedBranch = await prisma.branch.update({
+      where: { id },
+      data: { isMain: true },
+      select: branchSelect,
+    })
+
+    return { success: true, data: updatedBranch }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const branch = await prisma.branch.create({
-    data: input,
-    select: branchSelect,
-  })
-
-  return { branch }
-}
-
-export async function updateBranch(id: string, input: UpdateBranchInput) {
-  if (!id) {
-    throw new Error('ไม่พบ Branch ID')
-  }
-
-  const updatedBranch = await prisma.branch.update({
-    where: { id },
-    data: input,
-    select: branchSelect,
-  })
-
-  return { updatedBranch }
-}
-
-export async function setMainBranch(id: string, storeId: string) {
-  if (!id) {
-    throw new Error('ไม่พบ Branch ID')
-  }
-
-  await prisma.branch.updateMany({
-    where: { storeId, isMain: true },
-    data: { isMain: false },
-  })
-
-  const updatedBranch = await prisma.branch.update({
-    where: { id },
-    data: { isMain: true },
-    select: branchSelect,
-  })
-
-  return { updatedBranch }
 }
 
 export async function deleteBranch(id: string, storeId: string) {
-  if (!id) {
-    throw new Error('ไม่พบ Branch ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Branch ID' }
+    }
+
+    const branch = await prisma.branch.findUnique({
+      where: { id },
+      select: { isMain: true },
+    })
+
+    if (branch?.isMain) {
+      return { success: false, message: 'ไม่สามารถลบสาขาหลักได้' }
+    }
+
+    const branchCount = await prisma.branch.count({ where: { storeId } })
+    if (branchCount <= 1) {
+      return { success: false, message: 'ต้องมีสาขาอย่างน้อย 1 สาขา' }
+    }
+
+    await prisma.branch.delete({ where: { id } })
+
+    return { success: true, message: 'ลบสาขาสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const branch = await prisma.branch.findUnique({
-    where: { id },
-    select: { isMain: true },
-  })
-
-  if (branch?.isMain) {
-    throw new Error('ไม่สามารถลบสาขาหลักได้')
-  }
-
-  const branchCount = await prisma.branch.count({ where: { storeId } })
-  if (branchCount <= 1) {
-    throw new Error('ต้องมีสาขาอย่างน้อย 1 สาขา')
-  }
-
-  await prisma.branch.delete({ where: { id } })
-
-  return { message: 'ลบสาขาสำเร็จ' }
 }

@@ -58,7 +58,6 @@ export interface GetInventoryResponse {
 }
 
 export interface UpdateStockInput {
-  // quantity: number
   minStock: number
 }
 
@@ -141,28 +140,46 @@ export async function getInventory({
 }
 
 export async function updateStock(id: string, input: UpdateStockInput) {
-  if (!id) {
-    throw new Error('ไม่พบ Stock ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Stock ID' }
+    }
+
+    const updatedStock = await prisma.productStock.update({
+      where: { id },
+      data: input,
+      select: inventorySelect,
+    })
+
+    return {
+      success: true,
+      message: 'อัปเดตสต็อกสำเร็จ',
+      data: serializeDecimal(updatedStock),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const updatedStock = await prisma.productStock.update({
-    where: { id },
-    data: input,
-    select: inventorySelect,
-  })
-
-  return { updatedStock: serializeDecimal(updatedStock) }
 }
 
 export async function upsertStock(input: UpsertStockInput) {
-  const { variantId, branchId, quantity, minStock = 0 } = input
+  try {
+    const { variantId, branchId, quantity, minStock = 0 } = input
 
-  const stock = await prisma.productStock.upsert({
-    where: { branchId_variantId: { branchId, variantId } },
-    update: { quantity, minStock },
-    create: { variantId, branchId, quantity, minStock },
-    select: inventorySelect,
-  })
+    const stock = await prisma.productStock.upsert({
+      where: { branchId_variantId: { branchId, variantId } },
+      update: { quantity, minStock },
+      create: { variantId, branchId, quantity, minStock },
+      select: inventorySelect,
+    })
 
-  return { stock: serializeDecimal(stock) }
+    return {
+      success: true,
+      message: 'บันทึกสต็อกสำเร็จ',
+      data: serializeDecimal(stock),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }

@@ -5,3 +5,5 @@ export const MILLISECONDS_PER_MINUTE = 60000
 export const MILLISECONDS_PER_DAY = 24 * 60 * MILLISECONDS_PER_MINUTE
 export const SUBSCRIPTION_DAYS = 30
 export const TRANSFER_EXPIRY_DAYS = 1
+export const SERVER_ERROR_MESSAGE =
+  'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
