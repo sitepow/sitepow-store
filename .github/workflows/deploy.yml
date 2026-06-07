@@ -34,4 +34,6 @@ jobs:
             cd /var/www/sitepow-store
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sitepow-store:latest
-            docker compose up -d --force-recreate
+            docker compose stop app
+            docker compose rm -f app
+            docker compose up -d
