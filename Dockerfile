@@ -3,7 +3,8 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
-RUN pnpm install --config.unsafe-perm=true
+RUN pnpm install --ignore-scripts
+RUN pnpm exec prisma generate
 COPY . .
 RUN pnpm build
 
