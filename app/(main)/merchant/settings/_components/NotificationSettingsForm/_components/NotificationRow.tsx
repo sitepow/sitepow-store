@@ -21,8 +21,8 @@ export function NotificationRow({
     useFormContext<NotificationSettingsFormValues>()
 
   return (
-    <div className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-      <div className="pr-4">
+    <div className="flex flex-wrap items-center justify-between gap-5 py-5">
+      <div>
         <span className="block text-sm font-medium">{title}</span>
         <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">
           {description}

@@ -83,23 +83,21 @@ export function NotificationSettingsForm() {
         <>
           <CardContent className="divide-border divide-y">
             <FormProvider {...methods}>
-              <CardContent className="divide-border divide-y">
-                <NotificationRow
-                  name="notifyLowStock"
-                  title="ระบบแจ้งเตือนเมื่อสินค้าใกล้หมดคลังวิกฤต"
-                  description="ส่งอีเมลรายงานด่วนและแจ้งเตือนพนักงานคลังสินค้าทันทีเมื่อจำนวนสินค้าคงเหลือในสาขาใดๆ มีค่าต่ำกว่า Min Stock ที่ตั้งไว้"
-                />
-                <NotificationRow
-                  name="notifyDailySummary"
-                  title="รายงานสรุปยอดขายรายวันอัตโนมัติ"
-                  description="ประมวลผลยอดจำหน่ายรวมของทุกร้านค้า แล้วสรุปส่งเป็นรายงานสถิติเข้าอีเมลหลักของผู้ดูแลระบบทุกคืนเวลา 23:59 น."
-                />
-                <NotificationRow
-                  name="notifyBillingAlert"
-                  title="แจ้งเตือนรอบบิลและค่าบริการ"
-                  description="รับแจ้งเตือนล่วงหน้าเมื่อใกล้ถึงวันชำระค่าบริการรายเดือน หรือเมื่อโควตา AI Vision และ AI Search ใกล้หมด"
-                />
-              </CardContent>
+              <NotificationRow
+                name="notifyLowStock"
+                title="ระบบแจ้งเตือนเมื่อสินค้าใกล้หมดคลังวิกฤต"
+                description="ส่งอีเมลรายงานด่วนและแจ้งเตือนพนักงานคลังสินค้าทันทีเมื่อจำนวนสินค้าคงเหลือในสาขาใดๆ มีค่าต่ำกว่า Min Stock ที่ตั้งไว้"
+              />
+              <NotificationRow
+                name="notifyDailySummary"
+                title="รายงานสรุปยอดขายรายวันอัตโนมัติ"
+                description="ประมวลผลยอดจำหน่ายรวมของทุกร้านค้า แล้วสรุปส่งเป็นรายงานสถิติเข้าอีเมลหลักของผู้ดูแลระบบทุกคืนเวลา 23:59 น."
+              />
+              <NotificationRow
+                name="notifyBillingAlert"
+                title="แจ้งเตือนรอบบิลและค่าบริการ"
+                description="รับแจ้งเตือนล่วงหน้าเมื่อใกล้ถึงวันชำระค่าบริการรายเดือน หรือเมื่อโควตา AI Vision และ AI Search ใกล้หมด"
+              />
             </FormProvider>
           </CardContent>
 
