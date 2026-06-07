@@ -2,6 +2,8 @@ FROM node:current-alpine AS builder
 RUN npm install -g pnpm
 WORKDIR /app
 
+RUN pnpm config set pnpm-build-policies "[{\"type\": \"allow\", \"names\": [\"@prisma/engines\", \"esbuild\", \"msw\", \"prisma\", \"sharp\"]}]"
+
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 COPY . .
