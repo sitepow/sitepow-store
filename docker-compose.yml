@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - webnet
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=sitepow
+      - POSTGRES_PASSWORD=sitepow
+      - POSTGRES_DB=sitepow
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+networks:
+  webnet:
+    external: true
