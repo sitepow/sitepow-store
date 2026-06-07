@@ -2,17 +2,16 @@ FROM node:current-alpine AS builder
 RUN npm install -g pnpm
 WORKDIR /app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile --unsafe-perm
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
+
+RUN pnpm rebuild @prisma/engines prisma sharp
+
 RUN pnpm build
 
 FROM node:current-alpine AS runner
-RUN npm install -g pnpm
 WORKDIR /app
 
 ENV NODE_ENV=production
