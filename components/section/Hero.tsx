@@ -26,32 +26,32 @@ export function HeroSection() {
       />
 
       {!isAuthenticated && (
-        <div className="flex gap-2.5">
+        <div className="flex flex-wrap justify-center gap-2.5 px-10">
+          <Link href="/pricing">
+            <Button variant="outline" size="lg">
+              ดูราคาและแพ็กเกจ
+            </Button>
+          </Link>
           <Link href="/register">
             <Button size="lg">
               สมัครเปิดร้านฟรี
               <ArrowRight />
             </Button>
           </Link>
-          <Link href="/pricing">
-            <Button variant="secondary" size="lg">
-              ดูราคาและแพ็กเกจ
-            </Button>
-          </Link>
         </div>
       )}
 
       {isAuthenticated && (
-        <div className="flex gap-2.5">
+        <div className="flex flex-wrap justify-center gap-2.5 px-5">
+          <Link href="/pricing">
+            <Button variant="outline" size="lg">
+              ดูราคาและแพ็กเกจ
+            </Button>
+          </Link>
           <Link href="/merchant/dashboard">
             <Button size="lg">
               จัดการร้านค้าของคุณ
               <ArrowRight />
-            </Button>
-          </Link>
-          <Link href="/pricing">
-            <Button variant="secondary" size="lg">
-              ดูราคาและแพ็กเกจ
             </Button>
           </Link>
         </div>
