@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 import {
   useCreateBankAccount,
@@ -74,10 +73,8 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
         { id: defaultValues.id, storeId: selectedStoreId, data },
         {
           onSuccess: () => {
-            toast.success('แก้ไขบัญชีธนาคารเรียบร้อยแล้ว')
             handleClose()
           },
-          onError: (err) => toast.error(err.message),
         },
       )
     } else {
@@ -85,10 +82,8 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
         { storeId: selectedStoreId, data },
         {
           onSuccess: () => {
-            toast.success('เพิ่มบัญชีธนาคารเรียบร้อยแล้ว')
             handleClose()
           },
-          onError: (err) => toast.error(err.message),
         },
       )
     }

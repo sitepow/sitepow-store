@@ -57,9 +57,6 @@ export function ApplyGlobalRatesDialog() {
       },
       {
         onSuccess: () => {
-          toast.success(
-            `อัพเดตเรทจัดส่งจากจังหวัด ${selectedProvince} เรียบร้อยแล้ว`,
-          )
           setOpen(false)
         },
         onError: (err) => {
