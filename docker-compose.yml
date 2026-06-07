@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: 'kteeraphatt/sitepow-store:latest'
     restart: always
     env_file:
       - .env
