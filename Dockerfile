@@ -2,8 +2,8 @@ FROM node:current-alpine AS builder
 RUN npm install -g pnpm
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
+RUN pnpm install --config.unsafe-perm=true
 COPY . .
 RUN pnpm build
 
