@@ -1,6 +1,7 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { signIn } from 'next-auth/react'
 
@@ -37,16 +38,18 @@ export function LoginForm() {
         redirect: false,
       })
 
-      if (result?.error) {
-        if (result.error === 'CredentialsSignin') {
-          throw new Error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
-        }
-        throw new Error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ')
-      }
-
       return result
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data?.error) {
+        if (data.error === 'CredentialsSignin') {
+          toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
+        } else {
+          toast.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ')
+        }
+        return
+      }
+
       window.location.href = '/'
     },
   })
