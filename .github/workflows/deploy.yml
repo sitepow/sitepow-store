@@ -32,9 +32,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/sitepow-store
-            docker compose down
-            docker network rm sitepow-store_webnet || true
+            docker network ls | grep -q "webnet" || docker network create webnet
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker compose down
             docker compose pull
             docker compose up -d --force-recreate
             docker image prune -f
