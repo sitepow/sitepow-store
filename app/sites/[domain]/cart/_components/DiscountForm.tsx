@@ -39,7 +39,7 @@ export function DiscountForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[95vh] w-[95vw] max-w-xl overflow-y-auto rounded-xl p-4 sm:p-6">
+      <DialogContent className="max-h-[80vh] w-[95vw] max-w-xl overflow-y-auto rounded-xl p-4 sm:p-6">
         <DialogHeader className="gap-4">
           <DialogTitle className="flex items-center gap-2.5 text-lg sm:text-xl">
             <IconTicket className="text-primary" />

@@ -44,7 +44,7 @@ export function StoreTransferConfirmDialog({
         if (!v && !createMutation.isPending) onClose()
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <IconAlertTriangle size={18} className="text-destructive" />

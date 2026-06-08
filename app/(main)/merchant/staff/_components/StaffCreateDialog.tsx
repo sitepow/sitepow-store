@@ -90,7 +90,7 @@ export function StaffCreateDialog() {
           <span>เพิ่มพนักงาน</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>เพิ่มพนักงานใหม่</DialogTitle>
         </DialogHeader>

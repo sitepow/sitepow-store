@@ -1,28 +1,44 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { useUpdateStock } from '@/actions/hooks/inventory'
-import { GetInventoryItem } from '@/actions/inventory'
-import { DecimalToNumber } from '@/utils/decimal'
-import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { IconSettings } from '@tabler/icons-react'
 
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Spinner } from '@/components/ui/spinner'
+
+import { useUpdateStock } from '@/actions/hooks/inventory';
+import { GetInventoryItem } from '@/actions/inventory';
+import { DecimalToNumber } from '@/utils/decimal';
+import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { IconSettings } from '@tabler/icons-react';
+
+
+
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 interface StockEditDialogProps {
   stock: DecimalToNumber<GetInventoryItem>
@@ -84,7 +100,7 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>แก้ไขสต็อกสินค้า</DialogTitle>
           <DialogDescription>

@@ -105,7 +105,7 @@ export function StockTransferDialog({
           <IconPackageExport />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>โอนย้ายสต็อก</DialogTitle>
           <DialogDescription>{variantLabel}</DialogDescription>

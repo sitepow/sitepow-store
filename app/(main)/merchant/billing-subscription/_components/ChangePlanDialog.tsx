@@ -85,7 +85,7 @@ export function ChangePlanDialog({
           <IconAdjustments />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>เปลี่ยนแพลนการใช้งาน</DialogTitle>
           <DialogDescription>

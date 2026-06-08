@@ -37,7 +37,7 @@ export function AuditLogDetailDialog({
 }: AuditLogDetailDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-6">
+      <DialogContent className="max-h-[80vh] max-w-md overflow-y-auto p-6">
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
             <IconTerminal size={18} className="text-muted-foreground" />

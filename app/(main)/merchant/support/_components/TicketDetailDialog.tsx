@@ -57,7 +57,7 @@ export function TicketDetailDialog({ ticket }: TicketDetailDialogProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="pr-6">{ticket.subject}</DialogTitle>
         </DialogHeader>

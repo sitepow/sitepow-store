@@ -83,7 +83,7 @@ export function ApplyGlobalRatesDialog() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>เลือกจังหวัดต้นทางของร้านค้า</DialogTitle>
           <DialogDescription>

@@ -41,12 +41,12 @@ export function CustomerAddressForm() {
     branchCode: '00000',
   })
 
-const handleChange = <K extends keyof typeof formData>(
-  key: K,
-  value: (typeof formData)[K]
-) => {
-  setFormData((prev) => ({ ...prev, [key]: value }))
-}
+  const handleChange = <K extends keyof typeof formData>(
+    key: K,
+    value: (typeof formData)[K],
+  ) => {
+    setFormData((prev) => ({ ...prev, [key]: value }))
+  }
 
   const handleAddressAutoSelect = (selectedAddr: Address) => {
     setFormData((prev) => ({
@@ -72,7 +72,7 @@ const handleChange = <K extends keyof typeof formData>(
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-xl">
         <form
           onSubmit={(e) => {
             e.preventDefault()

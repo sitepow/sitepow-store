@@ -100,7 +100,7 @@ export function StoreCreateDialog() {
           <span>สร้างร้านค้าใหม่</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader className="space-y-2">
           <DialogTitle>เริ่มต้นสร้างร้านค้าใหม่</DialogTitle>
           <DialogDescription>
