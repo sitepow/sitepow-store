@@ -5,8 +5,12 @@ export function PricingSection() {
   return (
     <SectionContainer>
       <HeroHeader
-        title="ร้านค้าออนไลน์ที่จะเติบโตไปพร้อมกับคุณ เลือก Package
-        ที่เหมาะสมกับขนาดร้านค้า และธุรกิจของคุณ"
+        title={
+          <>
+            เลือก Package ที่เหมาะกับ{' '}
+            <span className="text-primary">ขนาดร้านค้าและธุรกิจของคุณ</span>
+          </>
+        }
       />
     </SectionContainer>
   )
