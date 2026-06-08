@@ -11,7 +11,7 @@ import {
   createStockTransferSchema,
 } from '@/zod/stock-transfer'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconArrowsTransferUp } from '@tabler/icons-react'
+import { IconPackageExport } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -102,7 +102,7 @@ export function StockTransferDialog({
     >
       <DialogTrigger asChild>
         <Button variant="outline" size="icon-lg">
-          <IconArrowsTransferUp />
+          <IconPackageExport />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

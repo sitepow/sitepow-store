@@ -59,7 +59,9 @@ export function BranchesTable() {
               branches.map((branch) => (
                 <TableRow key={branch.id}>
                   <TableCell>{branch.id}</TableCell>
-                  <TableCell>{branch.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{branch.name}</Badge>
+                  </TableCell>
                   <TableCell>
                     {branch.isMain ? (
                       <Badge>สาขาหลัก</Badge>

@@ -6,6 +6,7 @@ import { useInventory } from '@/actions/hooks/inventory'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
@@ -62,12 +63,10 @@ export function InventoryTable() {
 
                 return (
                   <TableRow key={stock.id}>
-                    <TableCell>
-                      <span className="font-medium">
-                        {stock.variant.product.title}
-                      </span>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                      {stock.variant.product.title}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
                         <span>{stock.variant.title}</span>
                         <span className="text-muted-foreground text-xs">
@@ -77,7 +76,7 @@ export function InventoryTable() {
                     </TableCell>
                     <TableCell>
                       <span className="text-muted-foreground text-sm">
-                        {stock.variant.sku}
+                        {stock.variant.sku || '-'}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -88,29 +87,23 @@ export function InventoryTable() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-end">
-                      <span
-                        className={
-                          isOut
-                            ? 'text-destructive font-semibold'
-                            : isLow
-                              ? 'font-semibold text-yellow-600'
-                              : ''
-                        }
-                      >
+                      <Badge variant="outline">
                         {formatNumber(stock.quantity)}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-end">
-                      <span className="text-muted-foreground text-sm">
+                      <Badge variant="outline">
                         {formatNumber(stock.minStock)}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       {isOut ? (
-                        <Badge variant="destructive">หมด</Badge>
+                        <Badge variant="destructive">
+                          <IconAlertCircle /> หมด
+                        </Badge>
                       ) : isLow ? (
                         <Badge className="bg-yellow-500 hover:bg-yellow-500">
-                          ใกล้หมด
+                          <IconAlertTriangle /> ใกล้หมด
                         </Badge>
                       ) : (
                         <Badge variant="outline">ปกติ</Badge>

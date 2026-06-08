@@ -12,7 +12,7 @@ import {
   createStockAdjustmentSchema,
 } from '@/zod/stock-adjustment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconAdjustments } from '@tabler/icons-react'
+import { IconPackageImport } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -103,7 +103,7 @@ export function StockAdjustmentDialog({
     >
       <DialogTrigger asChild>
         <Button variant="outline" size="icon-lg">
-          <IconAdjustments />
+          <IconPackageImport />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

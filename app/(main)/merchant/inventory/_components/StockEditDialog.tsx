@@ -8,7 +8,7 @@ import { GetInventoryItem } from '@/actions/inventory'
 import { DecimalToNumber } from '@/utils/decimal'
 import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconEdit } from '@tabler/icons-react'
+import { IconSettings } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -40,7 +40,6 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
   } = useForm<UpdateStockFormValues>({
     resolver: zodResolver(updateStockSchema),
     defaultValues: {
-      // quantity: stock.quantity,
       minStock: stock.minStock,
     },
   })
@@ -48,7 +47,6 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
   useEffect(() => {
     if (open) {
       reset({
-        // quantity: stock.quantity,
         minStock: stock.minStock,
       })
     }
@@ -83,7 +81,7 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
     >
       <DialogTrigger asChild>
         <Button variant="outline" size="icon-lg">
-          <IconEdit />
+          <IconSettings />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -96,17 +94,6 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
         </DialogHeader>
 
         <div className="grid gap-4">
-          {/* <Field>
-            <FieldLabel>จำนวนในสต็อก</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              {...register('quantity', { valueAsNumber: true })}
-              disabled={updateStockMutation.isPending}
-            />
-            <FieldError>{errors?.quantity?.message}</FieldError>
-          </Field> */}
-
           <Field>
             <FieldLabel>จำนวนขั้นต่ำ (แจ้งเตือนเมื่อสต็อกต่ำกว่า)</FieldLabel>
             <Input

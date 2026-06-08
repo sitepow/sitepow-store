@@ -191,30 +191,39 @@ model User {
   Authenticator Authenticator[]
 }
 
-model StaffBranch {
-  id       String @id @default(cuid())
-  staffId  String
-  staff    Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  @@unique([staffId, branchId])
-}
-
 model Staff {
-  id    String    @id @default(cuid())
+  id    String @id @default(cuid())
   name  String
-  email String    @unique
-  role  StaffRole @default(CASHIER)
+  email String @unique
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  branches     StaffBranch[]
+  stores       StaffStore[]
   activityLogs ActivityLog[]
+}
+
+model StaffBranch {
+  id           String     @id @default(cuid())
+  staffStoreId String
+  staffStore   StaffStore @relation(fields: [staffStoreId], references: [id], onDelete: Cascade)
+  branchId     String
+  branch       Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([staffStoreId, branchId])
+}
+
+model StaffStore {
+  id      String    @id @default(cuid())
+  role    StaffRole @default(CASHIER)
+  staffId String
+  staff   Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  storeId String
+  store   Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  branches StaffBranch[]
+
+  @@unique([staffId, storeId])
 }
 
 enum StaffRole {
@@ -417,7 +426,6 @@ model Store {
   carts            Cart[]
   aiLogs           AiLog[]
   branches         Branch[]
-  staffs           Staff[]
   activityLogs     ActivityLog[]
   coupons          Coupon[]
   contactTickets   ContactTicket[]
@@ -425,6 +433,7 @@ model Store {
   stockTransfers   StockTransfer[]
   stockAdjustments StockAdjustment[]
   PaymentSetting   PaymentSetting[]
+  StaffStore       StaffStore[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

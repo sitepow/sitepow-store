@@ -58,9 +58,11 @@ export function StaffTable() {
             ) : (
               staffs.map((staff) => (
                 <TableRow key={staff.id}>
-                  <TableCell className="font-medium">{staff.name}</TableCell>
-                  <TableCell>{staff.email}</TableCell>
-                  <TableCell>{STAFF_ROLE_TH[staff.role]}</TableCell>
+                  <TableCell>{staff.staff.name}</TableCell>
+                  <TableCell>{staff.staff.email}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{STAFF_ROLE_TH[staff.role]}</Badge>
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {staff.branches.length === 0 ? (
