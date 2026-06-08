@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 
 import {
   IconCalculator,
+  IconChartBar,
   IconPackage,
   IconPrinter,
   IconSearch,
@@ -16,6 +17,12 @@ export interface LogisticsFeature {
 }
 
 export const LOGISTICS_FEATURES: LogisticsFeature[] = [
+  {
+    title: 'คำนวณค่าส่งอัจฉริยะด้วย Big Data',
+    description:
+      'ใช้ Matrix เรทค่าส่งมาตรฐานที่ผ่านการคำนวณจาก Big Data ตามโซนพื้นที่จริง ช่วยให้คุณตั้งราคาได้สมดุล ไม่ขาดทุนและไม่ผลักภาระให้ลูกค้าเกินไป',
+    icon: IconChartBar,
+  },
   {
     title: 'ตั้งค่าค่าจัดส่งได้อย่างอิสระ',
     description:
