@@ -4,12 +4,13 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
-import { useProducts } from '@/actions/hooks/product'
+import { useDeleteProduct, useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
-import { IconEdit, IconTrash } from '@tabler/icons-react'
+import { IconEdit } from '@tabler/icons-react'
 
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +28,7 @@ export function ProductsTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct()
   const { data: { data: products = [], meta } = {}, isLoading } = useProducts({
     storeId: selectedStoreId,
     page,
@@ -92,9 +94,10 @@ export function ProductsTable() {
                           <IconEdit />
                         </Link>
                       </Button>
-                      <Button variant="outline" size="icon-lg">
-                        <IconTrash />
-                      </Button>
+                      <DeleteButton
+                        isPending={isDeleting}
+                        onDelete={() => deleteProduct(product.id)}
+                      />
                     </TableCell>
                   </TableRow>
                 )
