@@ -17,7 +17,13 @@ export function HeroSection() {
   return (
     <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden pt-20 pb-96 text-center">
       <HeroHeader
-        title="เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย ของการขายสินค้าออนไลน์"
+        title={
+          <>
+            เปลี่ยนเรื่องยุ่ง ๆ ให้เป็น
+            <span className="text-primary">เรื่องง่าย</span>{' '}
+            ของการขายสินค้าออนไลน์
+          </>
+        }
         subtitle={
           <>
             ด้วยระบบจัดการร้านค้าออนไลน์ จาก <LogoBrand />

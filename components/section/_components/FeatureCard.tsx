@@ -31,7 +31,7 @@ export function FeatureCard({
           {title}
         </h3>
       </CardHeader>
-      <CardContent>
+      <CardContent className="-mt-5">
         <p className="text-lg leading-relaxed text-gray-500 opacity-80">
           {description}
         </p>
