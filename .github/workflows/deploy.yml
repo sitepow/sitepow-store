@@ -33,5 +33,7 @@ jobs:
           script: |
             cd /var/www/sitepow-store
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker compose down --rmi local
+            docker system prune -f
             docker compose pull
             docker compose up -d --force-recreate
