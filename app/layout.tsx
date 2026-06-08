@@ -41,6 +41,15 @@ export const metadata: Metadata = {
     'โปรแกรมสต็อกสินค้า',
     'E-commerce Platform Thailand',
   ],
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
   icons: {
     icon: BASE_FAVICON,
     shortcut: BASE_FAVICON,

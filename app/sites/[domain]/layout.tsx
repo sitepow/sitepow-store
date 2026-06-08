@@ -38,9 +38,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
     },
+    // robots: {
+    //   index: store.status === StoreStatus.ACTIVE,
+    //   follow: store.status === StoreStatus.ACTIVE,
+    // },
     robots: {
-      index: store.status === StoreStatus.ACTIVE,
-      follow: store.status === StoreStatus.ACTIVE,
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
     },
   }
 }
