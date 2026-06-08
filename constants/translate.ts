@@ -10,6 +10,7 @@ import {
   Plan,
   StaffRole,
   SubStatus,
+  TicketStatus,
   TransactionType,
   TransferStatus,
 } from '@/generated/prisma/enums'
@@ -43,6 +44,13 @@ export const ACTOR_TYPE_TH: Record<ActorType, string> = {
   [ActorType.SYSTEM]: 'ระบบอัตโนมัติ',
   [ActorType.SUPER_ADMIN]: 'ผู้ดูแลระบบแพลตฟอร์ม',
   [ActorType.MERCHANT]: 'ร้านค้า/พนักงาน',
+}
+
+export const TICKET_STATUS_TH: Record<TicketStatus, string> = {
+  [TicketStatus.OPEN]: 'เปิด',
+  [TicketStatus.IN_PROGRESS]: 'กำลังดำเนินการ',
+  [TicketStatus.RESOLVED]: 'แก้ไขแล้ว',
+  [TicketStatus.CLOSED]: 'ปิดแล้ว',
 }
 
 export const STAFF_ROLE_TH: Record<StaffRole, string> = {
