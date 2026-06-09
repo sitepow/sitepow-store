@@ -64,7 +64,7 @@ export function ProductsTable() {
                 return (
                   <TableRow key={product.id}>
                     <TableCell>{product.id}</TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex items-center gap-3">
                         <div className="flex flex-col">
                           <span>{product.title}</span>

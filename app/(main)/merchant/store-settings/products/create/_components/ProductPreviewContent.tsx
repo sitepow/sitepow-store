@@ -37,7 +37,7 @@ export function ProductPreviewContent() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-white p-4 shadow-sm">
+      <div className="rounded-lg border bg-white p-4">
         <p className="mb-2 text-xs font-semibold text-slate-400 uppercase">
           Google Search (ตัวอย่าง)
         </p>
@@ -52,14 +52,14 @@ export function ProductPreviewContent() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+      <div className="overflow-hidden rounded-lg border bg-white">
         <p className="border-b p-3 text-xs font-semibold text-slate-400 uppercase">
           Social Share (ตัวอย่าง)
         </p>
         <div className="flex aspect-video items-center justify-center bg-slate-100 text-slate-400">
           รูปภาพตัวอย่าง
         </div>
-        <div className="bg-[#f2f3f5] p-3">
+        <div className="p-3">
           <p className="text-[12px] text-slate-500 uppercase">YOURSTORE.COM</p>
           <p className="font-bold text-slate-800">{displayTitle}</p>
           <p className="line-clamp-1 text-sm text-slate-600">{description}</p>

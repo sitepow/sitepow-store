@@ -292,10 +292,7 @@ export function CreateProductForm() {
             ))}
           </FieldGroup>
 
-          <FieldSet
-            disabled={isPending}
-            className="bg-muted/30 rounded-lg border p-4"
-          >
+          <FieldSet disabled={isPending} className="rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
@@ -368,10 +365,7 @@ export function CreateProductForm() {
             </Field>
           </FieldSet>
 
-          <FieldSet
-            disabled={isPending}
-            className="bg-muted/30 rounded-xl border p-6"
-          >
+          <FieldSet disabled={isPending} className="rounded-lg border p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
                 บริการเสริม (Addons)

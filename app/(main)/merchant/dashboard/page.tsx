@@ -301,7 +301,7 @@ export default function MerchantDashboardPage() {
                           className="hover:bg-transparent"
                         >
                           <TableCell className="px-0 py-4">
-                            <div className="space-y-2">
+                            <div className="flex items-center gap-2.5">
                               <p className="text-sm leading-none font-medium">
                                 {product.name}
                               </p>
