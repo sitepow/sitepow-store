@@ -7,7 +7,6 @@ import {
   Inter,
 } from 'next/font/google'
 
-import { BASE_FAVICON } from '@/constants/favicon'
 import { QueryProviders } from '@/providers/QueryProviders'
 import { SessionProviders } from '@/providers/SessionProviders'
 
@@ -41,20 +40,6 @@ export const metadata: Metadata = {
     'โปรแกรมสต็อกสินค้า',
     'E-commerce Platform Thailand',
   ],
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: {
-      index: false,
-      follow: false,
-    },
-  },
-  icons: {
-    icon: BASE_FAVICON,
-    shortcut: BASE_FAVICON,
-    apple: BASE_FAVICON,
-  },
 }
 
 export default function RootLayout({
