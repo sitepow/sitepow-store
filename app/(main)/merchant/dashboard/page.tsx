@@ -7,8 +7,8 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { IconAlertCircle } from '@tabler/icons-react'
 import {
-  AlertCircleIcon,
   ArrowRight,
   CreditCard,
   DollarSign,
@@ -24,6 +24,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,8 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+
+import { DashboardSkeleton } from './_components/DashboardSkeleton'
 
 function pctChange(current: number, previous: number): string {
   if (previous === 0 && current === 0) return '0% จากเดือนที่แล้ว'
@@ -104,6 +107,9 @@ export default function MerchantDashboardPage() {
       <StoreSelectField />
 
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+
+      {selectedStoreId !== ALL_STORES && isLoading && <DashboardSkeleton />}
+
       {selectedStoreId !== ALL_STORES && !isLoading && data && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -242,9 +248,11 @@ export default function MerchantDashboardPage() {
               </CardHeader>
               <CardContent>
                 {(data?.recentSales ?? []).length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    ยังไม่มียอดขายล่าสุด
-                  </p>
+                  <Alert>
+                    <AlertDescription className="flex items-center gap-2">
+                      <IconAlertCircle /> ยังไม่มียอดขายล่าสุด
+                    </AlertDescription>
+                  </Alert>
                 ) : (
                   <div className="space-y-8">
                     {(data?.recentSales ?? []).map((sale) => (
@@ -274,21 +282,16 @@ export default function MerchantDashboardPage() {
 
             <Card className="h-fit">
               <CardHeader>
-                <div className="flex flex-wrap justify-between gap-2.5">
-                  <CardTitle>สินค้าใกล้หมด</CardTitle>
-                  {(data?.lowStock.length ?? 0) > 0 && (
-                    <Badge variant="destructive">
-                      <AlertCircleIcon />
-                      {data?.lowStock.length} รายการ
-                    </Badge>
-                  )}
-                </div>
+                <CardTitle>สินค้าใกล้หมด</CardTitle>
               </CardHeader>
               <CardContent>
                 {(data?.lowStock ?? []).length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    ไม่มีสินค้าใกล้หมด
-                  </p>
+                  <Alert>
+                    <AlertDescription className="flex items-center gap-2">
+                      <IconAlertCircle />
+                      ไม่มีสินค้าใกล้หมด
+                    </AlertDescription>
+                  </Alert>
                 ) : (
                   <Table>
                     <TableBody>
@@ -304,11 +307,7 @@ export default function MerchantDashboardPage() {
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {product.inventory.map((inv, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    variant="outline"
-                                    className="px-1.5 py-0 text-[10px] font-normal"
-                                  >
+                                  <Badge key={idx} variant="outline">
                                     <span className="text-muted-foreground mr-1.5 border-r pr-1.5">
                                       {inv.branchName}
                                     </span>
