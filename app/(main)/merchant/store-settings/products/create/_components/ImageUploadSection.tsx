@@ -55,11 +55,11 @@ export function ImageUploadSection() {
               alt="product"
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100" />
             <Button
               variant="secondary"
               size="icon"
-              className="bg-background/90 absolute top-1.5 right-1.5 h-6 w-6 rounded-md border opacity-100 shadow-sm backdrop-blur-sm transition-opacity md:opacity-0 md:group-hover:opacity-100"
+              className="bg-background/90 absolute top-1.5 right-1.5 h-6 w-6 rounded-md border opacity-100 shadow-sm md:opacity-0 md:group-hover:opacity-100"
               onClick={() => remove(index)}
             >
               <X className="text-muted-foreground" />
