@@ -20,7 +20,7 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBulb, IconImageGeneration, IconTrash } from '@tabler/icons-react'
+import { IconImageGeneration, IconTrash } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
@@ -254,47 +254,43 @@ export function CreateProductForm() {
 
           <ImageUploadSection />
 
-          <FieldSet
-            disabled={isPending}
-            className="bg-muted/30 rounded-xl border p-6"
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-              <FieldLegend variant="label" className="text-lg font-bold">
-                ตัวเลือกสินค้า (Variants)
-              </FieldLegend>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  appendVariant({
-                    title: '',
-                    price: 0,
-                    sku: '',
-                    stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-                    discount: {
-                      active: false,
-                      type: DiscountType.PERCENTAGE,
-                      amount: 0,
-                    },
-                    rewardPoints: { isActive: false, amount: 0 },
-                  })
-                }
-              >
-                <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
-              </Button>
-            </div>
-            <FieldGroup className="space-y-4">
-              {variantFields.map((item, index) => (
-                <VariantItem
-                  key={item.id}
-                  index={index}
-                  removeVariant={removeVariant}
-                  isOnlyOne={variantFields.length === 1}
-                />
-              ))}
-            </FieldGroup>
-          </FieldSet>
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            <FieldLegend variant="label" className="text-lg font-bold">
+              ตัวเลือกสินค้า
+            </FieldLegend>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                appendVariant({
+                  title: '',
+                  price: 0,
+                  sku: '',
+                  stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
+                  discount: {
+                    active: false,
+                    type: DiscountType.PERCENTAGE,
+                    amount: 0,
+                  },
+                  rewardPoints: { isActive: false, amount: 0 },
+                })
+              }
+            >
+              <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
+            </Button>
+          </div>
+
+          <FieldGroup className="space-y-4">
+            {variantFields.map((item, index) => (
+              <VariantItem
+                key={item.id}
+                index={index}
+                removeVariant={removeVariant}
+                isOnlyOne={variantFields.length === 1}
+              />
+            ))}
+          </FieldGroup>
 
           <FieldSet
             disabled={isPending}

@@ -174,7 +174,7 @@ export function PaymentSettingsForm() {
             <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
               {isDirty && (
                 <Button type="button" variant="outline" onClick={resetForm}>
-                  ล้างค่า
+                  ล้างค่าการตั้งค่า
                 </Button>
               )}
               <Button type="submit" disabled={isSaving}>

@@ -88,7 +88,7 @@ export function VariantItem({
   }, [branches, stocks, index, setValue])
 
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden rounded-lg">
       <CardContent className="grid gap-6 pt-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
           <div className="md:col-span-6">

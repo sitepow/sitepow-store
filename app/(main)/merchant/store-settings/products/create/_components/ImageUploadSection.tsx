@@ -38,7 +38,7 @@ export function ImageUploadSection() {
 
   return (
     <FieldSet className="space-y-4">
-      <FieldLegend className="text-foreground text-sm font-medium">
+      <FieldLegend variant="label" className="text-lg font-bold">
         รูปภาพสินค้า ({fields.length})
       </FieldLegend>
       <FieldDescription>
