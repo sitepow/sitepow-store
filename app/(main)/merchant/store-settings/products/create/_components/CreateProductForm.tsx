@@ -17,7 +17,7 @@ import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { MetadataDetail } from '@/types/sites/product'
+// import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconImageGeneration, IconTrash } from '@tabler/icons-react'
@@ -182,11 +182,11 @@ export function CreateProductForm() {
 
       const productData = result.data
 
-      const metadataDynamicFields =
-        (productData.metadata?.details as MetadataDetail[])?.map((item) => ({
-          key: String(item.key),
-          value: String(item.value),
-        })) || []
+      // const metadataDynamicFields =
+      //   (productData.metadata?.details as MetadataDetail[])?.map((item) => ({
+      //     key: String(item.key),
+      //     value: String(item.value),
+      //   })) || []
 
       const {
         variants: _variants,
@@ -202,7 +202,7 @@ export function CreateProductForm() {
         tags: productData.metadata?.tags
           ? productData.metadata.tags.join(', ')
           : '',
-        metadata: metadataDynamicFields,
+        // metadata: metadataDynamicFields,
       })
     },
   })
