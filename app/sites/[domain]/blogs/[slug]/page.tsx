@@ -2,8 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { BLOGS } from '@/constants/sites/blog'
-import { StorePageProps } from '@/types/sites/page'
+import { getStorefrontBlogDetail } from '@/actions/storefront/blog'
 import { formatDate } from '@/utils/date'
 import {
   CalendarIcon,
@@ -24,24 +23,26 @@ import { Separator } from '@/components/ui/separator'
 
 import { StoreLayout } from '../../_components/layout/Layout'
 
-export default async function StoreBlogDescriptionPage({
-  params,
-}: StorePageProps) {
-  const { slug } = await params
-  const blog = BLOGS.find((blog) => blog.slug === slug)
+type Props = {
+  params: Promise<{ domain: string; slug: string }>
+}
+
+export default async function StoreBlogDescriptionPage({ params }: Props) {
+  const { domain, slug } = await params
+  const blog = await getStorefrontBlogDetail(domain, slug)
 
   if (!blog) {
     notFound()
   }
 
-  const readingTime = Math.ceil(blog?.content.length / 500) || 5
+  const readingTime = Math.ceil(blog.content.length / 500) || 5
 
   return (
     <StoreLayout>
       <SectionContainer>
         <div className="flex w-full flex-col gap-8">
           <div className="flex items-center justify-between">
-            <Link href={'/blogs'}>
+            <Link href="/blogs">
               <Button
                 variant="ghost"
                 className="text-muted-foreground hover:text-primary -ml-4"
@@ -79,7 +80,7 @@ export default async function StoreBlogDescriptionPage({
               <Separator orientation="vertical" className="h-4" />
               <div className="flex items-center gap-1.5">
                 <CalendarIcon size={16} />
-                <span>{formatDate(new Date())}</span>
+                <span>{formatDate(blog.createdAt)}</span>
               </div>
               <Separator orientation="vertical" className="h-4" />
               <div className="flex items-center gap-1.5">

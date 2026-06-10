@@ -1,24 +1,20 @@
-import { BLOGS } from '@/constants/sites/blog'
-
 import { SectionContainer } from '@/components/SectionContainer'
 
-import { StorePagination } from '../_components/Pagination'
-import { BlogCard } from '../_components/blog/BlogCard'
 import { StoreLayout } from '../_components/layout/Layout'
+import { BlogsList } from './_components/BlogsList'
 
-export default function StoreBlogsPage() {
+type Props = {
+  params: Promise<{ domain: string }>
+}
+
+export default async function StoreBlogsPage({ params }: Props) {
+  const { domain } = await params
+
   return (
     <StoreLayout>
       <SectionContainer>
         <h1 className="text-4xl leading-tight font-bold">บทความทั้งหมด</h1>
-
-        <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {BLOGS.map((blog) => {
-            return <BlogCard key={blog.blogId} {...blog} />
-          })}
-        </div>
-
-        {/* <StorePagination /> */}
+        <BlogsList storeSlug={domain} />
       </SectionContainer>
     </StoreLayout>
   )

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Blog } from '@/types/sites/blog'
+import { StorefrontBlogListItem } from '@/actions/storefront/blog'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { ArrowRightIcon } from 'lucide-react'
 
@@ -23,8 +23,8 @@ const blogCardVariants = cva(
   },
 )
 
-interface BlogCardProps
-  extends Partial<Blog>, VariantProps<typeof blogCardVariants> {
+interface BlogCardProps extends VariantProps<typeof blogCardVariants> {
+  blog: StorefrontBlogListItem
   className?: string
   isFeatured?: boolean
 }
@@ -32,12 +32,11 @@ interface BlogCardProps
 export function BlogCard({
   variant,
   className,
-  title,
-  slug,
+  blog,
   isFeatured,
 }: BlogCardProps) {
   return (
-    <Link href={`/blogs/${slug}`} className="block h-full">
+    <Link href={`/blogs/${blog.slug}`} className="block h-full">
       <div className={cn(blogCardVariants({ variant }), className)}>
         <div
           className={cn(
@@ -60,7 +59,7 @@ export function BlogCard({
               isFeatured && 'lg:mx-auto lg:w-sm lg:text-center',
             )}
           >
-            {title!}
+            {blog.title}
           </h3>
 
           <div

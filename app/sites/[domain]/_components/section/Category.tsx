@@ -42,7 +42,7 @@ export function CategorySection({
     <SectionContainer>
       <div className="flex w-full flex-col gap-6 md:flex-row">
         <div
-          className="relative h-96 w-full shrink-0 rounded-xl bg-gray-200 bg-cover bg-center text-start md:w-72"
+          className="animate-gradient relative h-48 w-full shrink-0 rounded-xl bg-gray-200 bg-cover bg-center text-start md:h-88.75 md:w-72"
           style={{
             backgroundImage: image ? `url('${image}')` : fallbackGradient,
           }}
@@ -50,14 +50,14 @@ export function CategorySection({
         >
           <div className="absolute inset-0 rounded-xl bg-black/20" />
           <div className="p-5">
-            <h2 className="relative z-10 line-clamp-2 text-4xl font-bold break-all whitespace-normal text-white drop-shadow-md">
+            <h2 className="relative z-10 line-clamp-2 text-2xl font-bold break-all whitespace-normal text-white drop-shadow-md md:text-4xl">
               {title}
             </h2>
           </div>
         </div>
 
         <div className="relative w-full overflow-hidden" ref={emblaRef}>
-          <div className="flex h-87.5 items-center gap-5">
+          <div className="flex h-87.5 items-center gap-5 p-2.5">
             {products.map((product) => (
               <div key={product.id} className="h-full min-w-0 flex-[0_0_288px]">
                 <ProductCard
