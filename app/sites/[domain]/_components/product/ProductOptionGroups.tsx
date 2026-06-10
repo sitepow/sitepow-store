@@ -26,7 +26,7 @@ export function ProductOptionGroups() {
 
           <RadioGroup
             value={selectedOptions[option.title]?.[0]}
-            onValueChange={(val) => toggleOption(option.title, val, 1)} // maxSelect เป็น 1 สำหรับ Radio
+            onValueChange={(val) => toggleOption(option.title, val, 1)}
           >
             <div className="grid grid-cols-1 gap-2">
               {option.choices.map((choice) => (

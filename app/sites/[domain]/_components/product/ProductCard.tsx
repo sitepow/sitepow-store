@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Product } from '@/types/sites/product'
+import { StorefrontProductListItem } from '@/actions/storefront/product'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
 import { type VariantProps, cva } from 'class-variance-authority'
@@ -21,16 +21,12 @@ const productCardVariants = cva(
   },
 )
 
-interface ProductCardProps
-  extends Product, VariantProps<typeof productCardVariants> {
+interface ProductCardProps extends VariantProps<typeof productCardVariants> {
+  product: StorefrontProductListItem
   className?: string
 }
 
-export function ProductCard({
-  variant,
-  className,
-  ...product
-}: ProductCardProps) {
+export function ProductCard({ variant, className, product }: ProductCardProps) {
   const { hasDiscount, net, maxDiscountPercent } = calculateProduct(product)
 
   return (
@@ -47,7 +43,7 @@ export function ProductCard({
           )}
         </div>
 
-        <h3 className="group-hover:text-primary line-clamp-2">
+        <h3 className="group-hover:text-primary line-clamp-2 px-2.5">
           {product.title}
         </h3>
 

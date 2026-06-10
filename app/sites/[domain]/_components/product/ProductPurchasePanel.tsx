@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { Product } from '@/types/sites/product'
+import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 
 import { useProductPurchaseStore } from '../../products/store'
 import { ProductAddToCart } from './ProductAddToCart'
@@ -11,12 +11,22 @@ import { ProductOptionGroups } from './ProductOptionGroups'
 import { ProductPriceHeader } from './ProductPriceHeader'
 import { ProductVariantSelector } from './ProductVariantSelector'
 
-export function ProductPurchasePanel({ product }: { product: Product }) {
+interface Props {
+  storeSlug: string
+  productSlug: string
+}
+
+export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
+  const { data: product } = useStorefrontProductDetail(storeSlug, productSlug)
   const { setProduct } = useProductPurchaseStore()
 
   useEffect(() => {
-    setProduct(product)
+    if (product) setProduct(product)
   }, [product, setProduct])
+
+  if (!product) {
+    return null
+  }
 
   return (
     <>

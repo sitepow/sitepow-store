@@ -18,17 +18,17 @@ export function ProductAddonSelector() {
           <div className="space-y-2">
             {product?.addons?.map((addon) => (
               <div
-                key={addon.addonId}
+                key={addon.id}
                 className="flex items-center space-x-3 rounded-lg border p-3"
               >
                 <Checkbox
-                  id={addon.addonId}
+                  id={addon.id}
                   disabled={!addon.isAvailable}
-                  checked={selectedAddons.includes(addon.addonId)}
-                  onCheckedChange={() => toggleAddon(addon.addonId)}
+                  checked={selectedAddons.includes(addon.id)}
+                  onCheckedChange={() => toggleAddon(addon.id)}
                 />
                 <Label
-                  htmlFor={addon.addonId}
+                  htmlFor={addon.id}
                   className="flex-1 cursor-pointer text-sm font-medium"
                 >
                   {addon.title}

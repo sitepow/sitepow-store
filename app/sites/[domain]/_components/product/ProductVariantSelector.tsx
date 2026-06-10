@@ -17,48 +17,46 @@ export function ProductVariantSelector() {
     <>
       <div className="space-y-4">
         <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
-        <RadioGroup
-          value={selectedVariant?.variantId}
-          onValueChange={selectVariant}
-        >
+        <RadioGroup value={selectedVariant?.id} onValueChange={selectVariant}>
           {product?.variants?.map((variant) => {
             const netPrice = calculateNetPrice({
               price: variant.price,
-              discount: variant.discount,
+              discount: variant.discountActive
+                ? {
+                    active: variant.discountActive,
+                    type: variant.discountType ?? '',
+                    amount: variant.discountAmount ?? 0,
+                  }
+                : undefined,
             })
 
             const hasDiscount =
-              variant.discount?.active && netPrice < variant.price
-            const hasPoint =
-              variant?.rewardPoints && variant?.rewardPoints?.isActive
+              variant.discountActive && netPrice < variant.price
+            const hasPoint = variant.pointsActive
 
             return (
               <div
-                key={variant.variantId}
+                key={variant.id}
                 className="hover:bg-accent flex items-center space-y-0 space-x-3 rounded-lg border p-3 transition-colors"
               >
-                <RadioGroupItem
-                  value={variant.variantId}
-                  id={variant.variantId}
-                />
+                <RadioGroupItem value={variant.id} id={variant.id} />
 
                 <div className="flex flex-1 flex-col gap-0.5">
                   <Label
-                    htmlFor={variant.variantId}
+                    htmlFor={variant.id}
                     className="cursor-pointer font-medium"
                   >
                     {variant.title}
                   </Label>
                   <div className="flex gap-2.5">
-                    {hasDiscount && variant.discount?.type === 'Percentage' && (
+                    {hasDiscount && variant.discountType === 'PERCENTAGE' && (
                       <span className="text-primary text-xs font-semibold">
-                        ลด {variant.discount.amount}%
+                        ลด {variant.discountAmount}%
                       </span>
                     )}
-
                     {hasPoint && (
                       <span className="text-primary text-xs font-semibold">
-                        + {variant?.rewardPoints?.amount} แต้มสะต้ม
+                        + {variant.pointsAmount} แต้มสะสม
                       </span>
                     )}
                   </div>

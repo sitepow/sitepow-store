@@ -1,4 +1,7 @@
-import { ProductAddon, ProductVariant } from './product'
+import { StorefrontProductDetail } from '@/actions/storefront/product'
+
+export type CartVariant = StorefrontProductDetail['variants'][number]
+export type CartAddon = NonNullable<StorefrontProductDetail['addons']>[number]
 
 export interface SelectedOption {
   optionTitle: string
@@ -11,9 +14,9 @@ export interface CartItem {
   productId: string
   productTitle: string
   image: string
-  variant: ProductVariant
+  variant: CartVariant
   selectedOptions: SelectedOption[]
-  selectedAddons: ProductAddon[]
+  selectedAddons: CartAddon[]
   quantity: number
   unitPrice: number
   totalPrice: number

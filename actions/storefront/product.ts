@@ -1,0 +1,224 @@
+'use server'
+
+import { Prisma, StoreStatus } from '@/generated/prisma/client'
+import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+
+import { prisma } from '@/lib/prisma'
+
+const storefrontProductListSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  productType: true,
+  category: {
+    select: { id: true, title: true, slug: true },
+  },
+  images: {
+    where: { isPrimary: true },
+    select: { url: true },
+    take: 1,
+  },
+  variants: {
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      discountActive: true,
+      discountType: true,
+      discountAmount: true,
+      pointsActive: true,
+      pointsAmount: true,
+      stocks: {
+        select: { quantity: true },
+      },
+    },
+  },
+  reviews: {
+    select: { rating: true },
+  },
+} satisfies Prisma.ProductSelect
+
+const storefrontProductDetailSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  productType: true,
+  digitalUrl: true,
+  details: true,
+  tags: { select: { name: true } },
+  weight: true,
+  width: true,
+  height: true,
+  length: true,
+  category: {
+    select: { id: true, title: true, slug: true },
+  },
+  images: {
+    select: { id: true, url: true, isPrimary: true },
+  },
+  variants: {
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      discountActive: true,
+      discountType: true,
+      discountAmount: true,
+      pointsActive: true,
+      pointsAmount: true,
+      image: { select: { url: true } },
+      stocks: {
+        select: { quantity: true },
+      },
+    },
+  },
+  options: {
+    select: {
+      id: true,
+      title: true,
+      maxSelect: true,
+      require: true,
+      choices: {
+        select: { id: true, name: true, extraPrice: true },
+      },
+    },
+  },
+  addons: {
+    where: { isAvailable: true },
+    select: { id: true, title: true, price: true, isAvailable: true },
+  },
+  reviews: {
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      images: true,
+      date: true,
+      customer: {
+        select: { firstName: true, lastName: true, avatar: true },
+      },
+    },
+    orderBy: { date: 'desc' },
+    take: 10,
+  },
+} satisfies Prisma.ProductSelect
+
+export type StorefrontProductListItem = DecimalToNumber<
+  Prisma.ProductGetPayload<{ select: typeof storefrontProductListSelect }>
+>
+
+export type StorefrontProductDetail = DecimalToNumber<
+  Prisma.ProductGetPayload<{ select: typeof storefrontProductDetailSelect }>
+>
+
+export interface GetStorefrontProductsParams {
+  storeSlug: string
+  page?: number
+  limit?: number
+  search?: string
+  categorySlug?: string
+}
+
+export interface GetStorefrontProductsResponse {
+  data: StorefrontProductListItem[]
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
+
+export async function getStorefrontProducts({
+  storeSlug,
+  page = 1,
+  limit = 12,
+  search,
+  categorySlug,
+}: GetStorefrontProductsParams): Promise<GetStorefrontProductsResponse> {
+  const empty: GetStorefrontProductsResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  try {
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(50, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
+
+    const whereClause: Prisma.ProductWhereInput = {
+      store: { slug: storeSlug, status: StoreStatus.ACTIVE },
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { slug: { contains: search, mode: 'insensitive' } },
+        { tags: { some: { name: { contains: search, mode: 'insensitive' } } } },
+      ]
+    }
+
+    if (categorySlug) {
+      whereClause.category = { slug: categorySlug }
+    }
+
+    const [totalItems, products] = await Promise.all([
+      prisma.product.count({ where: whereClause }),
+      prisma.product.findMany({
+        where: whereClause,
+        skip,
+        take: sanitizedLimit,
+        orderBy: { createdAt: 'desc' },
+        select: storefrontProductListSelect,
+      }),
+    ])
+
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
+    return {
+      data: serializeDecimal(products),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
+    }
+  } catch {
+    return empty
+  }
+}
+
+export async function getStorefrontProductDetail(
+  storeSlug: string,
+  productSlug: string,
+): Promise<StorefrontProductDetail | null> {
+  try {
+    const product = await prisma.product.findFirst({
+      where: {
+        slug: productSlug,
+        store: { slug: storeSlug, status: StoreStatus.ACTIVE },
+      },
+      select: storefrontProductDetailSelect,
+    })
+
+    if (!product) {
+      return null
+    }
+
+    return serializeDecimal(product)
+  } catch {
+    return null
+  }
+}

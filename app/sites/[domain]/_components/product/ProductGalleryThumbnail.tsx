@@ -23,7 +23,7 @@ export function ProductGalleryThumbnail() {
       <div className="flex gap-2 px-1">
         {images.map((image, index) => (
           <div
-            key={image.imageId || index}
+            key={image.id || index}
             className="size-14 flex-none rounded-sm bg-gray-100 md:size-20 md:rounded-xl"
           />
         ))}

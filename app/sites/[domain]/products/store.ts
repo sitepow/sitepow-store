@@ -1,24 +1,19 @@
-import {
-  CalculatedProduct,
-  Product,
-  ProductVariant,
-} from '@/types/sites/product'
-import {
-  calculateProduct,
-  calculateRewardPoints,
-  getVariantNetPrice,
-} from '@/utils/product'
+import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { CalculatedProduct } from '@/utils/product'
+import { calculateProduct, getVariantNetPrice } from '@/utils/product'
 import { create } from 'zustand'
 
+type StorefrontVariant = StorefrontProductDetail['variants'][number]
+
 interface ProductStore {
-  product: Product | null
+  product: StorefrontProductDetail | null
   price: CalculatedProduct | null
-  selectedVariant: ProductVariant | null
+  selectedVariant: StorefrontVariant | null
   selectedOptions: Record<string, string[]>
   selectedAddons: string[]
   quantity: number
 
-  setProduct: (product: Product) => void
+  setProduct: (product: StorefrontProductDetail) => void
   selectVariant: (variantId: string) => void
   toggleOption: (
     optionTitle: string,
@@ -28,7 +23,7 @@ interface ProductStore {
   toggleAddon: (addonId: string) => void
   setQuantity: (qty: number) => void
 
-  getVariantPrice: (variant: ProductVariant) => number
+  getVariantPrice: (variant: StorefrontVariant) => number
   getTotalPrice: () => number
   getCurrentPoints: () => number
 }
@@ -42,12 +37,10 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   quantity: 1,
 
   setProduct: (product) => {
-    const calculatedPrice = calculateProduct(product)
-
     set({
       product,
-      price: calculatedPrice,
-      selectedVariant: product.variants[0] || null,
+      price: calculateProduct(product),
+      selectedVariant: product.variants[0] ?? null,
       selectedOptions: {},
       selectedAddons: [],
       quantity: 1,
@@ -56,39 +49,33 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
 
   selectVariant: (variantId) => {
     const { product, quantity } = get()
-    const variant = product?.variants.find(
-      (variant) => variant.variantId === variantId,
-    )
+    const variant = product?.variants.find((v) => v.id === variantId) ?? null
 
     if (variant) {
-      const newStock = variant.stock ?? 0
-
+      const stock = variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
       set({
         selectedVariant: variant,
-        quantity: Math.max(1, Math.min(quantity, newStock)),
+        quantity: Math.max(1, Math.min(quantity, stock)),
       })
     }
   },
 
   toggleOption: (optionTitle, choiceName, maxSelect) => {
     set((state) => {
-      const currentChoices = state.selectedOptions[optionTitle] || []
-      let newChoices: string[]
+      const current = state.selectedOptions[optionTitle] ?? []
+      let next: string[]
 
-      if (currentChoices.includes(choiceName)) {
-        newChoices = currentChoices.filter((name) => name !== choiceName)
+      if (current.includes(choiceName)) {
+        next = current.filter((n) => n !== choiceName)
       } else {
-        newChoices =
+        next =
           maxSelect === 1
             ? [choiceName]
-            : [...currentChoices, choiceName].slice(-maxSelect)
+            : [...current, choiceName].slice(-maxSelect)
       }
 
       return {
-        selectedOptions: {
-          ...state.selectedOptions,
-          [optionTitle]: newChoices,
-        },
+        selectedOptions: { ...state.selectedOptions, [optionTitle]: next },
       }
     })
   },
@@ -102,32 +89,36 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   },
 
   setQuantity: (qty) => {
-    const stock = get().selectedVariant?.stock ?? 0
+    const stock =
+      get().selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0
     set({ quantity: Math.max(1, Math.min(qty, stock)) })
   },
 
   getVariantPrice: (variant) => getVariantNetPrice(variant),
 
   getTotalPrice: () => {
-    const state = get()
-
-    if (!state.selectedVariant) {
+    const { selectedVariant, selectedAddons, product, quantity } = get()
+    if (!selectedVariant) {
       return 0
     }
 
-    let unitPrice = getVariantNetPrice(state.selectedVariant)
+    let unitPrice = getVariantNetPrice(selectedVariant)
 
-    state.selectedAddons.forEach((id) => {
-      const addon = state.product?.addons.find((addon) => addon.addonId === id)
-      if (addon && addon.isAvailable) {
+    selectedAddons.forEach((id) => {
+      const addon = product?.addons.find((a) => a.id === id)
+      if (addon?.isAvailable) {
         unitPrice += addon.price
       }
     })
 
-    return unitPrice * state.quantity
+    return unitPrice * quantity
   },
 
   getCurrentPoints: () => {
-    return calculateRewardPoints(get().selectedVariant, get().quantity)
+    const { selectedVariant, quantity } = get()
+    if (!selectedVariant?.pointsActive) {
+      return 0
+    }
+    return selectedVariant.pointsAmount * quantity
   },
 }))

@@ -12,9 +12,9 @@ export function AlertLayout({
   title,
 }: AlertLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-2 text-center text-xl font-bold">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-1 text-center text-xl font-bold">
       {icon}
-      <h1 className="max-w-1/2">{title}</h1>
+      <h1 className="p-5 sm:max-w-1/2">{title}</h1>
     </div>
   )
 }

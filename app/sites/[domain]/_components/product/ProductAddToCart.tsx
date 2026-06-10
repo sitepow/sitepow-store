@@ -1,11 +1,7 @@
 import toast from 'react-hot-toast'
 
-import { calculateUnitPrice, mapSelectedOptions } from '@/utils/cart'
 import { formatNumber } from '@/utils/pricing'
-import {
-  calculateRewardPoints,
-  validateProductRequirements,
-} from '@/utils/product'
+import { calculateNetPrice } from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -33,29 +29,57 @@ export function ProductAddToCart() {
       return
     }
 
-    const { isValid, missingOptions } = validateProductRequirements(
-      product,
-      selectedOptions,
-    )
+    const missingOptions: string[] = []
+    product.options?.forEach((option) => {
+      if (
+        option.require &&
+        (selectedOptions[option.title] ?? []).length === 0
+      ) {
+        missingOptions.push(option.title)
+      }
+    })
 
-    if (!isValid) {
+    if (missingOptions.length > 0) {
       toast.error(`กรุณาเลือก ${missingOptions.join(', ')}`)
       return
     }
 
-    const mappedOptions = mapSelectedOptions(product, selectedOptions)
-    const selectedAddonsData = product.addons.filter((addon) =>
-      selectedAddons.includes(addon.addonId),
+    const mappedOptions = Object.entries(selectedOptions).flatMap(
+      ([title, choices]) => {
+        const optionGroup = product.options?.find((o) => o.title === title)
+        return choices.map((choiceName) => {
+          const choice = optionGroup?.choices.find((c) => c.name === choiceName)
+          return {
+            optionTitle: title,
+            choiceName,
+            extraPrice: choice?.extraPrice ?? 0,
+          }
+        })
+      },
     )
 
-    const unitPrice = calculateUnitPrice(
-      selectedVariant,
-      mappedOptions,
-      selectedAddonsData,
-    )
+    const selectedAddonsData =
+      product.addons?.filter((addon) => selectedAddons.includes(addon.id)) ?? []
+
+    let unitPrice = calculateNetPrice({
+      price: selectedVariant.price,
+      discount: selectedVariant.discountActive
+        ? {
+            active: true,
+            type: selectedVariant.discountType ?? '',
+            amount: selectedVariant.discountAmount ?? 0,
+          }
+        : undefined,
+    })
+    mappedOptions.forEach((o) => {
+      unitPrice += o.extraPrice
+    })
+    selectedAddonsData.forEach((a) => {
+      if (a.isAvailable) unitPrice += a.price
+    })
 
     addItem({
-      productId: product.productId,
+      productId: product.id,
       productTitle: product.title,
       image:
         product.images.find((img) => img.isPrimary)?.url ||
@@ -64,11 +88,16 @@ export function ProductAddToCart() {
       variant: selectedVariant,
       selectedOptions: mappedOptions,
       selectedAddons: selectedAddonsData,
-      quantity: quantity,
-      unitPrice: unitPrice,
-      rewardPoints: calculateRewardPoints(selectedVariant, quantity), // ใช้ Utils คำนวณตรงๆ
+      quantity,
+      unitPrice,
+      rewardPoints: selectedVariant.pointsActive
+        ? selectedVariant.pointsAmount * quantity
+        : 0,
     })
   }
+
+  const stock =
+    selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0
 
   return (
     <>
@@ -79,11 +108,10 @@ export function ProductAddToCart() {
             value={quantity}
             onChange={(val) => setQuantity(val)}
           />
-
           {selectedVariant && (
             <div className="flex gap-2.5">
               <PackageIcon className="text-primary" />
-              <span>{formatNumber(selectedVariant?.stock || 0)} ชิ้น</span>
+              <span>{formatNumber(stock)} ชิ้น</span>
             </div>
           )}
         </div>

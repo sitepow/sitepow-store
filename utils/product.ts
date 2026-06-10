@@ -1,19 +1,91 @@
-import {
-  CalculatedProduct,
-  Discount,
-  DiscountType,
-  Product,
-  ProductVariant,
-} from '@/types/sites/product'
+import { StorefrontProductListItem } from '@/actions/storefront/product'
+import { DiscountType } from '@/generated/prisma/enums'
+
+type StorefrontVariant = StorefrontProductListItem['variants'][number]
+
+export interface CalculatedProduct {
+  original: PriceStats
+  net: PriceStats
+  hasDiscount: boolean
+  maxDiscountPercent: number
+}
+
+export interface PriceStats {
+  min: number
+  max: number
+  avg: number
+}
+
+const calculateNetPriceFromVariant = (variant: StorefrontVariant): number => {
+  if (
+    !variant.discountActive ||
+    !variant.discountType ||
+    !variant.discountAmount
+  ) {
+    return variant.price
+  }
+
+  switch (variant.discountType) {
+    case 'PERCENTAGE':
+      return variant.price - (variant.price * variant.discountAmount) / 100
+    case 'FIXED':
+      return Math.max(0, variant.price - variant.discountAmount)
+    default:
+      return variant.price
+  }
+}
+
+const getStats = (prices: number[]): PriceStats => {
+  const min = Math.min(...prices)
+  const max = Math.max(...prices)
+  const avg = prices.reduce((a, b) => a + b, 0) / prices.length
+  return { min, max, avg }
+}
+
+export const calculateProduct = (
+  product: StorefrontProductListItem,
+): CalculatedProduct => {
+  const variants = product.variants ?? []
+
+  if (variants.length === 0) {
+    return {
+      original: { min: 0, max: 0, avg: 0 },
+      net: { min: 0, max: 0, avg: 0 },
+      hasDiscount: false,
+      maxDiscountPercent: 0,
+    }
+  }
+
+  const originalPrices = variants.map((v) => v.price)
+  const netPrices = variants.map((v) => calculateNetPriceFromVariant(v))
+
+  const hasDiscount = netPrices.some((net, i) => net < originalPrices[i])
+
+  const discountPercentages = variants.map((v, i) => {
+    if (originalPrices[i] === 0) {
+      return 0
+    }
+    return ((originalPrices[i] - netPrices[i]) / originalPrices[i]) * 100
+  })
+
+  return {
+    original: getStats(originalPrices),
+    net: getStats(netPrices),
+    hasDiscount,
+    maxDiscountPercent: hasDiscount
+      ? Math.round(Math.max(...discountPercentages))
+      : 0,
+  }
+}
 
 export const calculateNetPrice = ({
   price,
   discount,
 }: {
   price: number
-  discount?: Discount
+  discount?: { active: boolean; type: string; amount: number }
 }): number => {
-  if (!discount || !discount.active) {
+  if (!discount?.active) {
     return price
   }
 
@@ -27,66 +99,8 @@ export const calculateNetPrice = ({
   }
 }
 
-export const calculateProduct = (product: Product): CalculatedProduct => {
-  const variants = product?.variants || []
-
-  if (variants.length === 0) {
-    return {
-      original: { min: 0, max: 0, avg: 0 },
-      net: { min: 0, max: 0, avg: 0 },
-      hasDiscount: false,
-      maxDiscountPercent: 0,
-    }
-  }
-
-  const originalPrices = variants.map((variant) => variant.price)
-  const netPrices = variants.map((variant) =>
-    calculateNetPrice({ price: variant.price, discount: variant.discount }),
-  )
-
-  const getStats = (prices: number[]) => {
-    const min = Math.min(...prices)
-    const max = Math.max(...prices)
-    const avg = prices.reduce((a, b) => a + b, 0) / prices.length
-    return { min, max, avg }
-  }
-
-  const originalStats = getStats(originalPrices)
-  const netStats = getStats(netPrices)
-
-  const hasDiscount = netPrices.some(
-    (netPrice, index) => netPrice < originalPrices[index],
-  )
-
-  const discountPercentages = variants.map((variant) => {
-    if (variant.price === 0) {
-      return 0
-    }
-
-    const net = calculateNetPrice({
-      price: variant.price,
-      discount: variant.discount,
-    })
-
-    return ((variant.price - net) / variant.price) * 100
-  })
-
-  return {
-    original: originalStats,
-    net: netStats,
-    hasDiscount,
-    maxDiscountPercent: hasDiscount
-      ? Math.round(Math.max(...discountPercentages))
-      : 0,
-  }
-}
-
-export const getVariantNetPrice = (variant: ProductVariant): number => {
-  return calculateNetPrice({ price: variant.price, discount: variant.discount })
-}
-
 export const calculateRewardPoints = (
-  variant: ProductVariant | null,
+  variant: { rewardPoints?: { isActive: boolean; amount: number } } | null,
   quantity: number,
 ): number => {
   if (variant?.rewardPoints?.isActive) {
@@ -95,24 +109,9 @@ export const calculateRewardPoints = (
   return 0
 }
 
-export const validateProductRequirements = (
-  product: Product,
-  selectedOptions: Record<string, string[]>,
-) => {
-  const missingOptions: string[] = []
-
-  product.options.forEach((option) => {
-    if (option.require) {
-      const selections = selectedOptions[option.title] || []
-
-      if (selections.length === 0) {
-        missingOptions.push(option.title)
-      }
-    }
-  })
-
-  return {
-    isValid: missingOptions.length === 0,
-    missingOptions,
-  }
+export const getVariantNetPrice = (variant: {
+  price: number
+  discount?: { active: boolean; type: string; amount: number }
+}): number => {
+  return calculateNetPrice({ price: variant.price, discount: variant.discount })
 }

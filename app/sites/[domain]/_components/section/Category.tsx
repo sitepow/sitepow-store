@@ -1,27 +1,42 @@
 'use client'
 
-// import { PRODUCTS } from '@/constants/sites/product'
+import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
-import { Category } from '@/types/sites/category'
 
 import { SectionContainer } from '@/components/SectionContainer'
 
 import { SeeMoreButton } from '../SeeMoreButton'
+import { ProductCard } from '../product/ProductCard'
 
-// import { ProductCard } from '../product/ProductCard'
+interface CategorySectionProps {
+  storeSlug: string
+  categoryId: string
+  categorySlug: string
+  title: string
+  image?: string | null
+}
 
-export function CategorySection({ categoryId, title, image }: Category) {
+export function CategorySection({
+  storeSlug,
+  categorySlug,
+  title,
+  image,
+}: CategorySectionProps) {
   const fallbackGradient = useRandomGradient()
   const { emblaRef } = useCarousel()
 
-  // const filteredProducts = PRODUCTS.filter(
-  //   (product) => product.categoryId === categoryId,
-  // )
+  const { data, isLoading } = useStorefrontProducts({
+    storeSlug,
+    categorySlug,
+    limit: 10,
+  })
 
-  // if (filteredProducts.length === 0) {
-  //   return null
-  // }
+  const products = data?.data ?? []
+
+  if (!isLoading && products.length === 0) {
+    return null
+  }
 
   return (
     <SectionContainer>
@@ -34,25 +49,26 @@ export function CategorySection({ categoryId, title, image }: Category) {
           suppressHydrationWarning
         >
           <div className="absolute inset-0 rounded-xl bg-black/20" />
-          <h2 className="relative z-10 p-5 text-4xl font-bold text-white drop-shadow-md">
-            {title}
-          </h2>
+          <div className="p-5">
+            <h2 className="relative z-10 line-clamp-2 text-4xl font-bold break-all whitespace-normal text-white drop-shadow-md">
+              {title}
+            </h2>
+          </div>
         </div>
 
         <div className="relative w-full overflow-hidden" ref={emblaRef}>
           <div className="flex h-87.5 items-center gap-5">
-            {/* {filteredProducts.map((product) => (
-              <div
-                key={product.productId}
-                className="h-full min-w-0 flex-[0_0_288px]"
-              >
-                <ProductCard variant="shadow" {...product} />
+            {products.map((product) => (
+              <div key={product.id} className="h-full min-w-0 flex-[0_0_288px]">
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  variant="shadow"
+                />
               </div>
-            ))} */}
-
-            <SeeMoreButton href="/products" />
+            ))}
+            <SeeMoreButton href={`/products?category=${categorySlug}`} />
           </div>
-
           <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-10 bg-linear-to-l from-white to-transparent" />
         </div>
       </div>
