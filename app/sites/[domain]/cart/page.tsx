@@ -145,22 +145,28 @@ export default function StoreCartPage() {
               </div>
 
               <div className="space-y-8 p-5 text-start">
-                {items.map((item) => (
-                  <CartItemCard
-                    key={item.cartItemId}
-                    item={item}
-                    onRemove={removeItem}
-                    onUpdateQuantity={updateQuantity}
-                    isMaxStock={
-                      item.quantity >=
-                      getRemainingStock(items, {
-                        variantId: item.variant.variantId,
-                        stock: item.variant.stock ?? 0,
-                        excludeCartItemId: item.cartItemId,
-                      })
-                    }
-                  />
-                ))}
+                {items.map((item) => {
+                  const stock = item.variant.stocks.reduce(
+                    (sum, s) => sum + s.quantity,
+                    0,
+                  )
+                  return (
+                    <CartItemCard
+                      key={item.cartItemId}
+                      item={item}
+                      onRemove={removeItem}
+                      onUpdateQuantity={updateQuantity}
+                      isMaxStock={
+                        item.quantity >=
+                        getRemainingStock(items, {
+                          variantId: item.variant.id,
+                          stock,
+                          excludeCartItemId: item.cartItemId,
+                        })
+                      }
+                    />
+                  )
+                })}
               </div>
             </div>
           </div>

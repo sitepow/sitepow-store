@@ -1,11 +1,18 @@
-import { REVIEWS } from '@/constants/sites/review'
+'use client'
 
 import { Separator } from '@/components/ui/separator'
 
+import { useProductPurchaseStore } from '../../products/store'
 import { ProductReviewRating } from './ProductReviewRating'
 import { ReviewCard } from './ReviewCard'
 
 export function ProductReviewLists() {
+  const reviews = useProductPurchaseStore((s) => s.product?.reviews)
+
+  if (!reviews || reviews.length === 0) {
+    return null
+  }
+
   return (
     <div className="mt-20 space-y-8">
       <div className="flex items-center gap-2">
@@ -13,11 +20,11 @@ export function ProductReviewLists() {
         <Separator className="flex-1" />
       </div>
 
-      <ProductReviewRating />
+      <ProductReviewRating reviews={reviews} />
 
       <div className="space-y-10 pt-4">
-        {REVIEWS.map((review) => (
-          <ReviewCard key={review.reviewId} review={review} />
+        {reviews.map((review) => (
+          <ReviewCard key={review.id} review={review} />
         ))}
       </div>
     </div>

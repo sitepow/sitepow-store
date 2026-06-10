@@ -2,7 +2,6 @@ import toast from 'react-hot-toast'
 
 import { CartItem, CartSummary } from '@/types/sites/cart'
 import { getRemainingStock, isSameCartItem } from '@/utils/cart'
-import { calculateRewardPoints } from '@/utils/product'
 import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -18,6 +17,12 @@ interface CartStore {
   getCartSummary: () => CartSummary
 }
 
+const getStock = (variant: CartItem['variant']) =>
+  variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
+
+const getRewardPoints = (variant: CartItem['variant'], quantity: number) =>
+  variant.pointsActive ? variant.pointsAmount * quantity : 0
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
@@ -27,8 +32,8 @@ export const useCartStore = create<CartStore>()(
         const { items } = get()
 
         const remaining = getRemainingStock(items, {
-          variantId: newItem.variant.variantId,
-          stock: newItem.variant.stock ?? 0,
+          variantId: newItem.variant.id,
+          stock: getStock(newItem.variant),
         })
 
         if (remaining <= 0) {
@@ -47,7 +52,7 @@ export const useCartStore = create<CartStore>()(
           updatedItems[existingIndex].totalPrice =
             updatedItems[existingIndex].unitPrice *
             updatedItems[existingIndex].quantity
-          updatedItems[existingIndex].rewardPoints = calculateRewardPoints(
+          updatedItems[existingIndex].rewardPoints = getRewardPoints(
             newItem.variant,
             updatedItems[existingIndex].quantity,
           )
@@ -58,7 +63,7 @@ export const useCartStore = create<CartStore>()(
             cartItemId: uuidv7(),
             quantity: finalQty,
             totalPrice: newItem.unitPrice * finalQty,
-            rewardPoints: calculateRewardPoints(newItem.variant, finalQty),
+            rewardPoints: getRewardPoints(newItem.variant, finalQty),
           }
           set({ items: [...items, cartItem] })
         }
@@ -80,8 +85,8 @@ export const useCartStore = create<CartStore>()(
         }
 
         const remaining = getRemainingStock(items, {
-          variantId: target.variant.variantId,
-          stock: target.variant.stock ?? 0,
+          variantId: target.variant.id,
+          stock: getStock(target.variant),
           excludeCartItemId: cartItemId,
         })
 
@@ -94,10 +99,7 @@ export const useCartStore = create<CartStore>()(
                   ...item,
                   quantity: validatedQty,
                   totalPrice: item.unitPrice * validatedQty,
-                  rewardPoints: calculateRewardPoints(
-                    item.variant,
-                    validatedQty,
-                  ),
+                  rewardPoints: getRewardPoints(item.variant, validatedQty),
                 }
               : item,
           ),

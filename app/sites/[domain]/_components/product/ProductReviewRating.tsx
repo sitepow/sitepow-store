@@ -1,21 +1,25 @@
-import { REVIEWS } from '@/constants/sites/review'
+'use client'
+
+import { StorefrontProductDetail } from '@/actions/storefront/product'
 
 import { Progress } from '@/components/ui/progress'
 
 import { StarRating } from './StarRating'
 
-export function ProductReviewRating() {
-  const totalReviews = REVIEWS.length
+type ReviewItem = StorefrontProductDetail['reviews'][number]
+
+export function ProductReviewRating({ reviews }: { reviews: ReviewItem[] }) {
+  const totalReviews = reviews.length
 
   const averageRating =
     totalReviews > 0
       ? (
-          REVIEWS.reduce((acc, curr) => acc + curr.rating, 0) / totalReviews
+          reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalReviews
         ).toFixed(1)
       : '0.0'
 
   const starCounts = [5, 4, 3, 2, 1].map((star) => {
-    const count = REVIEWS.filter((r) => Math.round(r.rating) === star).length
+    const count = reviews.filter((r) => Math.round(r.rating) === star).length
     const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
     return { star, percentage }
   })

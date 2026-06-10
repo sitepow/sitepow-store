@@ -93,7 +93,15 @@ const storefrontProductDetailSelect = {
       rating: true,
       comment: true,
       images: true,
+      video: true,
       date: true,
+      selectedOptions: true,
+      categories: {
+        select: { id: true, label: true, rating: true },
+      },
+      variant: {
+        select: { title: true, sku: true },
+      },
       customer: {
         select: { firstName: true, lastName: true, avatar: true },
       },

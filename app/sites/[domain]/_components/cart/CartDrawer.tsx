@@ -50,22 +50,28 @@ export function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-4 py-4">
-              {items.map((item) => (
-                <CartItemCard
-                  key={item.cartItemId}
-                  item={item}
-                  onRemove={removeItem}
-                  onUpdateQuantity={updateQuantity}
-                  isMaxStock={
-                    item.quantity >=
-                    getRemainingStock(items, {
-                      variantId: item.variant.variantId,
-                      stock: item.variant.stock ?? 0,
-                      excludeCartItemId: item.cartItemId,
-                    })
-                  }
-                />
-              ))}
+              {items.map((item) => {
+                const stock = item.variant.stocks.reduce(
+                  (sum, s) => sum + s.quantity,
+                  0,
+                )
+                return (
+                  <CartItemCard
+                    key={item.cartItemId}
+                    item={item}
+                    onRemove={removeItem}
+                    onUpdateQuantity={updateQuantity}
+                    isMaxStock={
+                      item.quantity >=
+                      getRemainingStock(items, {
+                        variantId: item.variant.id,
+                        stock,
+                        excludeCartItemId: item.cartItemId,
+                      })
+                    }
+                  />
+                )
+              })}
             </div>
           )}
         </ScrollArea>
@@ -73,7 +79,7 @@ export function CartDrawer() {
         {items.length > 0 && (
           <DrawerFooter className="border-t bg-slate-50/50">
             <CartSummary summary={summary} />
-            <Link href={'/cart'}>
+            <Link href="/cart">
               <Button size="lg" className="h-12 w-full shadow-md sm:text-lg">
                 สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
               </Button>

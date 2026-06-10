@@ -1,9 +1,8 @@
 'use client'
 
-import { CATEGORIES } from '@/constants/sites/category'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-// import { PRODUCTS } from '@/constants/sites/product'
-// import { formatCurrency } from '@/utils/pricing'
+import { useStorefrontCategoryOptions } from '@/actions/hooks/storefront/category'
 
 import {
   Accordion,
@@ -16,24 +15,26 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 
-// import { Slider } from '@/components/ui/slider'
+export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-export function ProductFilterControl() {
-  // const products = PRODUCTS
-  const categories = CATEGORIES
+  const { data: categories } = useStorefrontCategoryOptions(storeSlug)
 
-  // const availableBrands = Array.from(
-  //   new Set(products.map((product) => product.metadata.brand).filter(Boolean)),
-  // )
+  const selectedCategory = searchParams.get('category') ?? ''
 
-  // const allPrices = products.flatMap((product) =>
-  //   product.variants.map((variant) => variant.price),
-  // )
+  const updateParam = (key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set(key, value)
+    } else {
+      params.delete(key)
+    }
+    params.delete('page')
+    router.push(`?${params.toString()}`)
+  }
 
-  // const minRaw = allPrices.length > 0 ? Math.min(...allPrices) : 0
-  // const maxRaw = allPrices.length > 0 ? Math.max(...allPrices) : 0
-
-  // const currentMaxPrice = Math.ceil(maxRaw / 100) * 100
+  const clearAll = () => router.push('?')
 
   return (
     <aside className="w-full shrink-0 space-y-8 xl:sticky xl:top-40 xl:col-span-3">
@@ -46,10 +47,16 @@ export function ProductFilterControl() {
           <AccordionTrigger className="py-2 text-base font-semibold hover:no-underline">
             หมวดหมู่
           </AccordionTrigger>
-          <AccordionContent className="space-y-4 pt-4">
-            {categories.map((cat) => (
+          <AccordionContent className="space-y-4 py-10 pt-4">
+            {categories?.map((cat) => (
               <div key={cat.slug} className="flex items-center space-x-3">
-                <Checkbox id={`cat-${cat.slug}`} />
+                <Checkbox
+                  id={`cat-${cat.slug}`}
+                  checked={selectedCategory === cat.slug}
+                  onCheckedChange={(checked) =>
+                    updateParam('category', checked ? cat.slug : null)
+                  }
+                />
                 <Label
                   htmlFor={`cat-${cat.slug}`}
                   className="cursor-pointer text-sm font-medium"
@@ -60,49 +67,12 @@ export function ProductFilterControl() {
             ))}
           </AccordionContent>
         </AccordionItem>
-
-        <AccordionItem value="price" className="border-none">
-          <AccordionTrigger className="py-2 text-base font-semibold hover:no-underline">
-            ช่วงราคา
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 px-2 pt-6">
-            {/* <Slider
-              defaultValue={[0, currentMaxPrice]}
-              max={currentMaxPrice}
-              step={100}
-            /> */}
-            <div className="flex items-center justify-between text-sm font-medium">
-              {/* <span>{formatCurrency(minRaw)}</span>
-              <span>{formatCurrency(currentMaxPrice)}</span> */}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="brands" className="border-none">
-          <AccordionTrigger className="py-2 text-base font-semibold hover:no-underline">
-            แบรนด์
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pt-4">
-            {/* {availableBrands.map((brand) => (
-              <div key={brand} className="flex items-center space-x-3">
-                <Checkbox id={`brand-${brand}`} />
-                <Label
-                  htmlFor={`brand-${brand}`}
-                  className="cursor-pointer text-sm font-medium"
-                >
-                  {brand}
-                </Label>
-              </div>
-            ))} */}
-            {/* {availableBrands.length === 0 && (
-              <p className="text-muted-foreground text-xs">ไม่มีแบรนด์</p>
-            )} */}
-          </AccordionContent>
-        </AccordionItem>
       </Accordion>
 
       <Separator />
-      <Button variant="link">ล้างตัวกรองทั้งหมด</Button>
+      <Button variant="link" onClick={clearAll}>
+        ล้างตัวกรองทั้งหมด
+      </Button>
     </aside>
   )
 }
