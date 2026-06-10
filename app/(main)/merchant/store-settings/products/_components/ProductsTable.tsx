@@ -8,7 +8,7 @@ import { useDeleteProduct, useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
-import { IconEdit } from '@tabler/icons-react'
+import { IconPackage } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -91,7 +91,7 @@ export function ProductsTable() {
                     <TableCell className="space-x-2 text-right">
                       <Button variant="outline" size="icon-lg" asChild>
                         <Link href={'/merchant/inventory'}>
-                          <IconEdit />
+                          <IconPackage />
                         </Link>
                       </Button>
                       <DeleteButton

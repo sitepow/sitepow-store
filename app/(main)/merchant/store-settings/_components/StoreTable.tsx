@@ -10,7 +10,11 @@ import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
-import { IconEdit, IconExternalLink } from '@tabler/icons-react'
+import {
+  IconExternalLink,
+  IconPackage,
+  IconSettings,
+} from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -36,19 +40,14 @@ export function StoreTable() {
   })
   const deleteStoreMutation = useDeleteStore()
 
-  const handleClickRedirectStoreSetting = (storeId: string) => {
-    setSelectedStoreId(storeId)
-    router.push('/merchant/settings')
-  }
-
   return (
     <>
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัส</TableHead>
               <TableHead>ร้านค้า</TableHead>
-              <TableHead>URL</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>สถานะ</TableHead>
               <TableHead>วันที่เปิดใช้งาน</TableHead>
@@ -73,26 +72,27 @@ export function StoreTable() {
 
                 return (
                   <TableRow key={store.id}>
+                    <TableCell>{store.id}</TableCell>
                     <TableCell>
-                      <span className="text-foreground font-medium">
-                        {store.name}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
-                        <span>sitepow.store/{store.slug}</span>
-                        <a
-                          href={`https://${store.slug}.sitepow.store`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-primary text-muted-foreground/70 transition-colors"
-                        >
-                          <IconExternalLink size={16} />
-                        </a>
+                      <div className="flex flex-col">
+                        <span className="text-foreground font-medium">
+                          {store.name}
+                        </span>
+                        <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+                          <span>sitepow.store/{store.slug}</span>
+                          <a
+                            href={`https://${store.slug}.sitepow.store`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-primary text-muted-foreground/70 transition-colors"
+                          >
+                            <IconExternalLink size={16} />
+                          </a>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="font-normal">
+                      <Badge>
                         {PLAN_DETAILS[store.plan]?.name || store.plan}
                       </Badge>
                     </TableCell>
@@ -120,11 +120,21 @@ export function StoreTable() {
                       <Button
                         variant="outline"
                         size="icon-lg"
+                        onClick={() => {
+                          setSelectedStoreId(store.id)
+                          router.push('/merchant/settings')
+                        }}
+                      >
+                        <IconSettings />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
                         onClick={() =>
-                          handleClickRedirectStoreSetting(store.id)
+                          router.push('/merchant/store-settings/products')
                         }
                       >
-                        <IconEdit />
+                        <IconPackage />
                       </Button>
                       <DeleteButton
                         isPending={false}

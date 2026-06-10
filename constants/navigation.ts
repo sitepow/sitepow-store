@@ -169,13 +169,8 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       },
       {
         value: 'products',
-        label: 'รายการสินค้าทั้งหมด',
+        label: 'สินค้าทั้งหมด',
         url: '/merchant/store-settings/products',
-      },
-      {
-        value: 'product-create',
-        label: 'เพิ่มสินค้าใหม่',
-        url: '/merchant/store-settings/products/create',
       },
     ],
   },
@@ -242,7 +237,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
   },
   {
     value: 'blog',
-    label: 'บทความ / Blog',
+    label: 'บทความ',
     tab: 'blog',
     icon: IconNews,
   },

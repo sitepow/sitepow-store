@@ -14,7 +14,8 @@ import { Field, FieldLabel } from './ui/field'
 
 export function StoreSelectField() {
   const { data: stores = [], isLoading } = useStoreOptions()
-  const { selectedStoreId, setSelectedStoreId } = useStoreFilter()
+  const { selectedStoreId, setSelectedStoreId, setSelectedStoreSlug } =
+    useStoreFilter()
 
   return (
     <Field className="w-full sm:w-fit">
@@ -24,7 +25,18 @@ export function StoreSelectField() {
       </FieldLabel>
       <Select
         value={selectedStoreId}
-        onValueChange={setSelectedStoreId}
+        onValueChange={(value) => {
+          setSelectedStoreId(value)
+
+          if (value === 'all') {
+            setSelectedStoreSlug('')
+          } else {
+            const selectedStore = stores.find((s) => s.id === value)
+            if (selectedStore) {
+              setSelectedStoreSlug(selectedStore.slug)
+            }
+          }
+        }}
         disabled={isLoading}
       >
         <SelectTrigger className="w-full sm:w-64">

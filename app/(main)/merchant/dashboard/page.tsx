@@ -7,7 +7,7 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconAlertCircle } from '@tabler/icons-react'
+import { IconAlertCircle, IconExternalLink } from '@tabler/icons-react'
 import {
   ArrowRight,
   CreditCard,
@@ -63,7 +63,7 @@ const aiChartConfig = {
 } satisfies ChartConfig
 
 export default function MerchantDashboardPage() {
-  const { selectedStoreId } = useStoreFilter()
+  const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
   const { data, isLoading } = useDashboard(selectedStoreId as string)
 
   const stats = data?.stats
@@ -104,7 +104,19 @@ export default function MerchantDashboardPage() {
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
-      <StoreSelectField />
+      <div className="flex flex-wrap items-end justify-between">
+        <StoreSelectField />
+        {selectedStoreId !== ALL_STORES && (
+          <Button variant="outline" asChild>
+            <Link
+              href={`https://${selectedStoreSlug}.sitepow.store`}
+              target="_blank"
+            >
+              ดูหน้าร้านค้าของคุณ <IconExternalLink />
+            </Link>
+          </Button>
+        )}
+      </div>
 
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
 

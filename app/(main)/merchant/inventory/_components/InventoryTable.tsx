@@ -40,6 +40,7 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัส</TableHead>
               <TableHead>สินค้า</TableHead>
               <TableHead>ตัวเลือก</TableHead>
               <TableHead>SKU</TableHead>
@@ -63,6 +64,7 @@ export function InventoryTable() {
 
                 return (
                   <TableRow key={stock.id}>
+                    <TableCell>{stock.id}</TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       {stock.variant.product.title}
                     </TableCell>

@@ -47,6 +47,7 @@ interface GetStoresParams {
 const storeDropdownSelect = {
   id: true,
   name: true,
+  slug: true,
 } satisfies Prisma.StoreSelect
 
 const storeSelect = {
