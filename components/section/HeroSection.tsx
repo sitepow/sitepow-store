@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
 import { useSession } from '@/hooks/use-session'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 
 import { HeroHeader } from '../HeroHeader'
 import { LogoBrand } from '../LogoBrand'
@@ -54,12 +54,12 @@ export function HeroSection() {
               ดูราคาและแพ็กเกจ
             </Button>
           </Link>
-          <Link href="/merchant/dashboard">
-            <Button size="lg">
+          <Button size="lg" asChild>
+            <Link href="/merchant/dashboard" target="_blank">
               จัดการร้านค้าของคุณ
-              <ArrowRight />
-            </Button>
-          </Link>
+              <ArrowUpRight />
+            </Link>
+          </Button>
         </div>
       )}
 

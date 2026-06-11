@@ -107,12 +107,16 @@ export function Navbar() {
                 items={MERCHANT_NAVIGATION}
                 className="hidden lg:block"
               />
-              <Link href="/merchant/dashboard">
-                <Button variant="secondary" className="flex gap-2 font-bold">
+              <Button
+                variant="secondary"
+                className="flex gap-2 font-bold"
+                asChild
+              >
+                <Link href="/merchant/dashboard" target="_blank">
                   <IconLock />
                   จัดการร้านค้าของคุณ
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           )}
 

@@ -86,7 +86,6 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     label: 'สินค้าที่ถูกใจ',
     tab: 'wishlist',
     icon: IconHeart,
-    hasSeparatorBefore: true,
   },
   {
     value: 'reviews',
@@ -179,6 +178,34 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'จัดการออเดอร์',
     tab: 'orders',
     icon: IconShoppingCart,
+    items: [
+      { value: 'orders-all', label: 'ทั้งหมด', url: '/merchant/orders' },
+      {
+        value: 'orders-pending',
+        label: 'รอชำระ',
+        url: '/merchant/orders?status=PENDING',
+      },
+      {
+        value: 'orders-paid',
+        label: 'ชำระแล้ว',
+        url: '/merchant/orders?status=PAID',
+      },
+      {
+        value: 'orders-shipped',
+        label: 'จัดส่งแล้ว',
+        url: '/merchant/orders?status=SHIPPED',
+      },
+      {
+        value: 'orders-completed',
+        label: 'สำเร็จ',
+        url: '/merchant/orders?status=COMPLETED',
+      },
+      {
+        value: 'orders-cancelled',
+        label: 'ยกเลิก',
+        url: '/merchant/orders?status=CANCELLED',
+      },
+    ],
   },
   {
     value: 'inventory',
@@ -222,24 +249,103 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'คูปองส่วนลด',
     tab: 'coupons',
     icon: IconTicket,
+    items: [
+      {
+        value: 'coupons-all',
+        label: 'ทั้งหมด',
+        url: '/merchant/marketing-coupons',
+      },
+      {
+        value: 'coupons-active',
+        label: 'ใช้งานได้',
+        url: '/merchant/marketing-coupons?status=active',
+      },
+      {
+        value: 'coupons-expired',
+        label: 'หมดอายุ',
+        url: '/merchant/marketing-coupons?status=expired',
+      },
+    ],
   },
   {
     value: 'transactions',
     label: 'รายการเงิน',
     tab: 'transactions',
     icon: IconWallet,
+    items: [
+      {
+        value: 'transactions-all',
+        label: 'ทั้งหมด',
+        url: '/merchant/transactions',
+      },
+      {
+        value: 'transactions-deposit',
+        label: 'เติมเงิน',
+        url: '/merchant/transactions?type=DEPOSIT',
+      },
+      {
+        value: 'transactions-withdraw',
+        label: 'ถอนเงิน',
+        url: '/merchant/transactions?type=WITHDRAW',
+      },
+      {
+        value: 'transactions-shipping',
+        label: 'ค่าส่ง',
+        url: '/merchant/transactions?type=SHIPPING_FEE',
+      },
+      {
+        value: 'transactions-refund',
+        label: 'คืนเงิน',
+        url: '/merchant/transactions?type=REFUND',
+      },
+    ],
   },
   {
     value: 'support',
     label: 'ติดต่อลูกค้า',
     tab: 'support',
     icon: IconHeadset,
+    items: [
+      { value: 'support-all', label: 'ทั้งหมด', url: '/merchant/support' },
+      {
+        value: 'support-open',
+        label: 'เปิด',
+        url: '/merchant/support?status=OPEN',
+      },
+      {
+        value: 'support-in-progress',
+        label: 'กำลังดำเนินการ',
+        url: '/merchant/support?status=IN_PROGRESS',
+      },
+      {
+        value: 'support-resolved',
+        label: 'แก้ไขแล้ว',
+        url: '/merchant/support?status=RESOLVED',
+      },
+      {
+        value: 'support-closed',
+        label: 'ปิดแล้ว',
+        url: '/merchant/support?status=CLOSED',
+      },
+    ],
   },
   {
     value: 'blog',
     label: 'บทความ',
     tab: 'blog',
     icon: IconNews,
+    items: [
+      {
+        value: 'blog',
+        label: 'บทความทั้งหมด',
+        url: '/merchant/blog',
+      },
+      {
+        value: 'blog-categories',
+        label: 'หมวดหมู่บทความ',
+        url: '/merchant/blog/category',
+      },
+    ],
   },
   {
     value: 'organization-branches',
