@@ -1,28 +1,29 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
+'use client'
+
 import { ComponentProps } from 'react'
 
+import { useProfile } from '@/actions/hooks/profile'
+import { BASE_FAVICON } from '@/constants/favicon'
 import { formatDate } from '@/utils/date'
-import { IconCamera, IconUser } from '@tabler/icons-react'
+import { IconCamera } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { cn } from '@/lib/utils'
 
-interface ProfileAvartarProps extends ComponentProps<typeof Card> {
-  firstName: string
-  lastName: string
-  email: string
-  joinedDate: Date
-}
-
 export function ProfileAvartar({
-  firstName,
-  lastName,
-  email,
-  joinedDate,
   className,
   ...props
-}: ProfileAvartarProps) {
+}: ComponentProps<typeof Card>) {
+  const { data: profile, isLoading } = useProfile()
+
+  const [firstName, ...rest] = (profile?.name ?? '').split(' ')
+  const lastName = rest.join(' ')
+
   return (
     <Card
       className={cn('h-fit overflow-hidden text-center', className)}
@@ -30,21 +31,37 @@ export function ProfileAvartar({
     >
       <CardContent className="relative flex flex-col items-center">
         <div className="group relative">
-          <div className="border-background bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full">
-            <IconUser />
-          </div>
+          <img
+            src={BASE_FAVICON}
+            className="border-background bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full"
+          />
           <Button size="icon-lg" className="absolute right-0 bottom-0">
             <IconCamera size={14} />
           </Button>
         </div>
-        <h2 className="mt-2 text-base font-bold">
-          {firstName} {lastName}
-        </h2>
-        <p className="text-muted-foreground text-xs">{email}</p>
+        {isLoading ? (
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-40" />
+          </div>
+        ) : (
+          <>
+            <h2 className="mt-2 text-base font-bold">
+              {firstName} {lastName}
+            </h2>
+            <p className="text-muted-foreground text-xs">{profile?.email}</p>
+          </>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between border-t text-xs">
         <span>เป็นสมาชิกตั้งแต่</span>
-        <span>{formatDate(joinedDate)}</span>
+        {isLoading ? (
+          <Skeleton className="h-3 w-20" />
+        ) : (
+          <span>
+            {profile?.createdAt ? formatDate(new Date(profile.createdAt)) : '-'}
+          </span>
+        )}
       </CardFooter>
     </Card>
   )

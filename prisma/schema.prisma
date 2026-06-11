@@ -182,6 +182,8 @@ model User {
   isEmailVerified    Boolean?  @default(false)
   emailVerified      DateTime?
   role               UserRole  @default(CUSTOMER)
+  phone              String?
+  createdAt          DateTime  @default(now())
 
   staffProfile    Staff?
   customerProfile Customer?
