@@ -1,9 +1,10 @@
 import { MainLayout } from '@/components/layout/Layout'
-import { ComparisonSection } from '@/components/section/Comparison'
-import { FeatureSection } from '@/components/section/Feature'
-import { HeroSection } from '@/components/section/Hero'
-import { LogisticsSection } from '@/components/section/Logistics'
-import { PaymentSection } from '@/components/section/Payment'
+import { ComparisonSection } from '@/components/section/ComparisonSection'
+import { FeatureSection } from '@/components/section/FeatureSection'
+import { HeroSection } from '@/components/section/HeroSection'
+import { InfrastructureSection } from '@/components/section/InfrastructureSection'
+import { LogisticsSection } from '@/components/section/LogisticsSection'
+import { PaymentSection } from '@/components/section/PaymentSection'
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
       <ComparisonSection />
       <PaymentSection />
       <LogisticsSection />
+      <InfrastructureSection />
     </MainLayout>
   )
 }

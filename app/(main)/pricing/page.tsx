@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/Layout'
-import { PricingSection } from '@/components/section/Pricing'
+import { PricingSection } from '@/components/section/PricingSection'
 
 import { PricingPackages } from './_components/PricingPackages'
 import { PricingTables } from './_components/PricingTables'
