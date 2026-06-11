@@ -73,7 +73,7 @@ export function ServiceConfigDialog({
           <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
         </Button>
       </DialogTrigger>
-      <DialogContent className="min-w-lg" showCloseButton={false}>
+      <DialogContent className="lg:min-w-lg" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>ตั้งค่าอัตราค่าบริการ: {serviceName}</DialogTitle>
           <DialogDescription>
@@ -85,9 +85,10 @@ export function ServiceConfigDialog({
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full pt-2"
+          orientation="vertical"
+          className="flex flex-col gap-6"
         >
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1">
             {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => (
               <TabsTrigger key={zoneKey} value={zoneKey} className="text-xs">
                 {zoneMeta.title}
@@ -104,7 +105,7 @@ export function ServiceConfigDialog({
                 value={targetZone}
                 className="space-y-4 pt-4"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
                       {zoneMeta.title}
@@ -124,82 +125,70 @@ export function ServiceConfigDialog({
                   </Button>
                 </div>
 
-                <div className="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
-                  {allWeightRates.map((field, globalIndex) => {
-                    if (field.zoneType !== targetZone) {
-                      return null
-                    }
+                <div className="w-0 min-w-full overflow-x-auto">
+                  <div className="min-w-125 space-y-2">
+                    {allWeightRates.map((field, globalIndex) => {
+                      if (field.zoneType !== targetZone) {
+                        return null
+                      }
 
-                    return (
-                      <div key={field.id} className="flex items-center gap-2">
-                        <div className="flex flex-1 items-center gap-1.5">
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            {...register(
-                              `services.${serviceIndex}.weightRates.${globalIndex}.minWeight` as const,
-                              { valueAsNumber: true },
-                            )}
-                            className="h-8 text-right text-sm"
-                          />
-                          <span className="text-muted-foreground text-xs select-none">
-                            ถึง
-                          </span>
-                          <Input
-                            type="number"
-                            placeholder="1000"
-                            {...register(
-                              `services.${serviceIndex}.weightRates.${globalIndex}.maxWeight` as const,
-                              { valueAsNumber: true },
-                            )}
-                            className="h-8 text-right text-sm"
-                          />
-                          <span className="text-muted-foreground w-12 shrink-0 text-xs select-none">
-                            กรัม (g)
-                          </span>
+                      return (
+                        <div key={field.id} className="flex items-center gap-2">
+                          <div className="flex shrink-0 items-center gap-1.5">
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              {...register(
+                                `services.${serviceIndex}.weightRates.${globalIndex}.minWeight` as const,
+                                { valueAsNumber: true },
+                              )}
+                              className="h-8 w-24 text-right text-sm"
+                            />
+                            <span className="text-muted-foreground text-xs select-none">
+                              ถึง
+                            </span>
+                            <Input
+                              type="number"
+                              placeholder="1000"
+                              {...register(
+                                `services.${serviceIndex}.weightRates.${globalIndex}.maxWeight` as const,
+                                { valueAsNumber: true },
+                              )}
+                              className="h-8 w-24 text-right text-sm"
+                            />
+                            <span className="text-muted-foreground w-12 shrink-0 text-xs select-none">
+                              กรัม (g)
+                            </span>
+                          </div>
+
+                          <div className="flex shrink-0 items-center">
+                            <Input
+                              type="number"
+                              placeholder="ราคา"
+                              {...register(
+                                `services.${serviceIndex}.weightRates.${globalIndex}.fee` as const,
+                                { valueAsNumber: true },
+                              )}
+                              className="h-8 w-32 rounded-r-none text-right text-sm font-medium"
+                            />
+                            <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
+                              บาท
+                            </span>
+                          </div>
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="size-8 shrink-0"
+                            onClick={() => remove(globalIndex)}
+                          >
+                            <IconTrash size={14} />
+                          </Button>
                         </div>
-
-                        <div className="flex w-1/4 items-center">
-                          <Input
-                            type="number"
-                            placeholder="ราคา"
-                            {...register(
-                              `services.${serviceIndex}.weightRates.${globalIndex}.fee` as const,
-                              { valueAsNumber: true },
-                            )}
-                            className="h-8 rounded-r-none text-right text-sm font-medium"
-                          />
-                          <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
-                            บาท
-                          </span>
-                        </div>
-
-                        <input
-                          type="hidden"
-                          {...register(
-                            `services.${serviceIndex}.weightRates.${globalIndex}.zoneType` as const,
-                          )}
-                        />
-
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => remove(globalIndex)}
-                        >
-                          <IconTrash size={14} />
-                        </Button>
-                      </div>
-                    )
-                  })}
-
-                  {allWeightRates.filter((f) => f.zoneType === targetZone)
-                    .length === 0 && (
-                    <div className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-xs">
-                      ยังไม่มีข้อมูลเกณฑ์ราคาสำหรับพื้นที่นี้
-                      กดปุ่มดึงเรทอัตโนมัติหรือเพิ่มแถวพิกัดใหม่ด้านบน
-                    </div>
-                  )}
+                      )
+                    })}
+                  </div>
                 </div>
               </TabsContent>
             )

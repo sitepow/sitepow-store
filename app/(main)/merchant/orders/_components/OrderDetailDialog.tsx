@@ -55,7 +55,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ออเดอร์ #{order.orderNumber}</DialogTitle>
         </DialogHeader>

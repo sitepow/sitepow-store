@@ -10,7 +10,7 @@ import { Plan } from '@/generated/prisma/enums'
 import { formatNumber } from '@/utils/pricing'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconAdjustments } from '@tabler/icons-react'
+import { IconSettings } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -82,10 +82,10 @@ export function ChangePlanDialog({
     >
       <DialogTrigger asChild>
         <Button variant="outline" size="icon-lg">
-          <IconAdjustments />
+          <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>เปลี่ยนแพลนการใช้งาน</DialogTitle>
           <DialogDescription>

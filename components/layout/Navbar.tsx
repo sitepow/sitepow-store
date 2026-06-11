@@ -176,27 +176,29 @@ export function Navbar() {
               </div>
             ))}
 
-            <div className="pt-4">
-              <Separator />
-            </div>
-
             {!isAuthenticated && (
-              <div className="flex flex-col gap-3 pt-4 pb-10">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-center gap-2 py-7 text-lg font-bold"
-                  >
-                    <LockIcon size={20} />
-                    เข้าสู่ระบบ
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full justify-center py-7 text-lg font-bold">
-                    สมัครเปิดร้าน
-                  </Button>
-                </Link>
-              </div>
+              <>
+                <div className="pt-4">
+                  <Separator />
+                </div>
+
+                <div className="flex flex-col gap-3 pt-4 pb-10">
+                  <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button
+                      variant="secondary"
+                      className="w-full justify-center gap-2 py-7 text-lg font-bold"
+                    >
+                      <LockIcon size={20} />
+                      เข้าสู่ระบบ
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full justify-center py-7 text-lg font-bold">
+                      สมัครเปิดร้าน
+                    </Button>
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -1,52 +1,38 @@
 'use client'
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
+import { useBranches } from '@/actions/hooks/branch'
+import { useCreateCoupon } from '@/actions/hooks/coupon'
+import { DiscountType } from '@/generated/prisma/enums'
+import { useStoreFilter } from '@/stores/use-store-filter'
+import { CreateCouponFormValues, createCouponSchema } from '@/zod/coupon'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { IconPlus } from '@tabler/icons-react'
 
-
-import { useBranches } from '@/actions/hooks/branch';
-import { useCreateCoupon } from '@/actions/hooks/coupon';
-import { DiscountType } from '@/generated/prisma/enums';
-import { useStoreFilter } from '@/stores/use-store-filter';
-import { CreateCouponFormValues, createCouponSchema } from '@/zod/coupon';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { IconPlus } from '@tabler/icons-react';
-
-
-
-import { Button } from '@/components/ui/button';
-import { DatePicker } from '@/components/ui/date-picker';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Spinner } from '@/components/ui/spinner'
+import { Textarea } from '@/components/ui/textarea'
 
 export function CouponCreateDialog() {
   const { selectedStoreId } = useStoreFilter()
@@ -115,7 +101,7 @@ export function CouponCreateDialog() {
           <IconPlus />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>สร้างคูปองส่วนลดใหม่</DialogTitle>
           <DialogDescription>

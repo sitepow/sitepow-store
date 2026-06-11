@@ -106,7 +106,7 @@ export function StockAdjustmentDialog({
           <IconPackageImport />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>ปรับสต็อกสินค้า</DialogTitle>
           <DialogDescription>

@@ -72,7 +72,7 @@ export function CustomerAddressForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl">
         <form
           onSubmit={(e) => {
             e.preventDefault()

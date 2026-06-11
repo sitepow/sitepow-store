@@ -83,7 +83,7 @@ export function EmailVerified() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="max-h-[80vh] gap-6 overflow-y-auto sm:max-w-md">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader className="space-y-2">
               <DialogTitle className="text-center text-xl font-bold tracking-tight sm:text-left">
                 ยืนยันรหัส OTP

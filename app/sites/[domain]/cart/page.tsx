@@ -172,7 +172,7 @@ export default function StoreCartPage() {
           </div>
 
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="shadow-airy flex items-center gap-5 rounded-xl px-5 py-2.5 text-start">
+            <div className="flex items-center gap-5 rounded-xl border border-gray-100 px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -328,7 +328,7 @@ export default function StoreCartPage() {
               )}
             </CheckoutSection>
 
-            <div className="shadow-airy rounded-xl border border-gray-100 bg-white p-5">
+            <div className="rounded-xl border border-gray-100 bg-white p-5">
               <SummaryRow label="ส่วนลด" value={<DiscountForm />} />
               <CartSummary summary={summary} />
               <Button

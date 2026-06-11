@@ -104,7 +104,7 @@ export default function MerchantDashboardPage() {
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
-      <div className="flex flex-wrap items-end justify-between">
+      <div className="flex flex-wrap items-end justify-between gap-5">
         <StoreSelectField />
         {selectedStoreId !== ALL_STORES && (
           <Button variant="outline" asChild>

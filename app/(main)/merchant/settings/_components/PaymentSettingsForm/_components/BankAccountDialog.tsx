@@ -106,7 +106,7 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[80vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}

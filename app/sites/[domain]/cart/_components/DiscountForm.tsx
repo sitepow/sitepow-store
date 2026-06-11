@@ -39,7 +39,7 @@ export function DiscountForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[80vh] w-[95vw] max-w-xl overflow-y-auto rounded-xl p-4 sm:p-6">
+      <DialogContent className="max-w-xl">
         <DialogHeader className="gap-4">
           <DialogTitle className="flex items-center gap-2.5 text-lg sm:text-xl">
             <IconTicket className="text-primary" />
@@ -116,7 +116,7 @@ export function DiscountForm() {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-2 rounded-xl border bg-white p-4 shadow-sm sm:p-5">
+          <div className="flex flex-col space-y-2 rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
             <SummaryRow
               label="ส่วนลดจากแต้มสะสม"
               value={

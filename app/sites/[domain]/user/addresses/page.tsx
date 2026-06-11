@@ -140,7 +140,7 @@ export default function StoreUserAddressesPage() {
                 <IconPlus size={16} /> เพิ่มที่อยู่ใหม่
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>
                   {editingAddress
