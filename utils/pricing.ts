@@ -7,11 +7,9 @@ export const calculatePlanPrice = (
   const currentOption = PRICING_OPTIONS.find(
     (opt) => opt.value === selectedValue,
   )
-
   const months = parseInt(selectedValue) || 1
-  const discountPercent = currentOption?.discount
-    ? parseInt(currentOption.discount)
-    : 0
+
+  const discountPercent = currentOption?.discountPercent || 0
   const basePrice = parseFloat(basePriceStr.replace(/,/g, ''))
 
   const totalPriceBeforeDiscount = basePrice * months

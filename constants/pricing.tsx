@@ -22,13 +22,13 @@ export const PRICING_VALUE = {
 } as const
 
 export const PRICING_OPTIONS: PricingOption[] = [
-  { value: PRICING_VALUE.ONE_MONTH, label: '1 เดือน' },
-  { value: PRICING_VALUE.THREE_MONTHS, label: '3 เดือน', discount: '10% OFF' },
-  { value: PRICING_VALUE.SIX_MONTHS, label: '6 เดือน', discount: '15% OFF' },
+  { value: PRICING_VALUE.ONE_MONTH, label: '1 เดือน', discountPercent: 0 },
+  { value: PRICING_VALUE.THREE_MONTHS, label: '3 เดือน', discountPercent: 10 },
+  { value: PRICING_VALUE.SIX_MONTHS, label: '6 เดือน', discountPercent: 15 },
   {
     value: PRICING_VALUE.TWELVE_MONTHS,
     label: '12 เดือน',
-    discount: '25% OFF',
+    discountPercent: 25,
   },
 ]
 

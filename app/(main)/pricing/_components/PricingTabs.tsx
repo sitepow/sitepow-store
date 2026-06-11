@@ -21,7 +21,9 @@ export function PricingTabs() {
           return (
             <TabsTrigger className="px-5" key={plan.value} value={plan.value}>
               {plan.label}
-              {plan.discount && <Badge>{plan.discount}</Badge>}
+              {plan?.discountPercent !== 0 && (
+                <Badge>ลด {plan.discountPercent}%</Badge>
+              )}
             </TabsTrigger>
           )
         })}

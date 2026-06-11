@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 export interface PricingOption {
   value: string
   label: string
-  discount?: string
+  discountPercent?: number
 }
 
 export interface FeatureItem {
