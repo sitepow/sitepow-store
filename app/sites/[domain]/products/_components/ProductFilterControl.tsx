@@ -14,12 +14,14 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const { data: categories } = useStorefrontCategoryOptions(storeSlug)
+  const { data: categories, isLoading } =
+    useStorefrontCategoryOptions(storeSlug)
 
   const selectedCategory = searchParams.get('category') ?? ''
 
@@ -48,23 +50,30 @@ export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
             หมวดหมู่
           </AccordionTrigger>
           <AccordionContent className="space-y-4 py-10 pt-4">
-            {categories?.map((cat) => (
-              <div key={cat.slug} className="flex items-center space-x-3">
-                <Checkbox
-                  id={`cat-${cat.slug}`}
-                  checked={selectedCategory === cat.slug}
-                  onCheckedChange={(checked) =>
-                    updateParam('category', checked ? cat.slug : null)
-                  }
-                />
-                <Label
-                  htmlFor={`cat-${cat.slug}`}
-                  className="cursor-pointer text-sm font-medium"
-                >
-                  {cat.title}
-                </Label>
-              </div>
-            ))}
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center space-x-3">
+                    <Skeleton className="size-4 rounded" />
+                    <Skeleton className="h-4 w-24 rounded" />
+                  </div>
+                ))
+              : categories?.map((cat) => (
+                  <div key={cat.slug} className="flex items-center space-x-3">
+                    <Checkbox
+                      id={`cat-${cat.slug}`}
+                      checked={selectedCategory === cat.slug}
+                      onCheckedChange={(checked) =>
+                        updateParam('category', checked ? cat.slug : null)
+                      }
+                    />
+                    <Label
+                      htmlFor={`cat-${cat.slug}`}
+                      className="cursor-pointer text-sm font-medium"
+                    >
+                      {cat.title}
+                    </Label>
+                  </div>
+                ))}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -6,6 +6,7 @@ import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { useCartStore } from '../../cart/store'
 import { useProductPurchaseStore } from '../../products/store'
@@ -19,6 +20,7 @@ export function ProductAddToCart() {
     selectedVariant,
     selectedOptions,
     selectedAddons,
+    isLoading,
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
@@ -98,6 +100,18 @@ export function ProductAddToCart() {
 
   const stock =
     selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="flex flex-col gap-2.5">
+          <Skeleton className="h-6 w-16 rounded-lg" />
+          <Skeleton className="h-10 w-36 rounded-lg" />
+        </div>
+        <Skeleton className="mt-4 h-14 w-full rounded-lg" />
+      </>
+    )
+  }
 
   return (
     <>

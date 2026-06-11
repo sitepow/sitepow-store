@@ -185,7 +185,7 @@ export function ShippingSettingsForm() {
                                     </span>
                                   </div>
 
-                                  <div className="flex items-center gap-3">
+                                  <div className="flex w-full flex-wrap items-center justify-between gap-3">
                                     {isEnabled && (
                                       <ServiceConfigDialog
                                         serviceName={`${courier.name} - ${service.name}`}

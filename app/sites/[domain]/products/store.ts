@@ -6,13 +6,14 @@ import { create } from 'zustand'
 type StorefrontVariant = StorefrontProductDetail['variants'][number]
 
 interface ProductStore {
+  isLoading: boolean
   product: StorefrontProductDetail | null
   price: CalculatedProduct | null
   selectedVariant: StorefrontVariant | null
   selectedOptions: Record<string, string[]>
   selectedAddons: string[]
   quantity: number
-
+  setIsLoading: (isLoading: boolean) => void
   setProduct: (product: StorefrontProductDetail) => void
   selectVariant: (variantId: string) => void
   toggleOption: (
@@ -29,12 +30,14 @@ interface ProductStore {
 }
 
 export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
+  isLoading: true,
   product: null,
   price: null,
   selectedVariant: null,
   selectedOptions: {},
   selectedAddons: [],
   quantity: 1,
+  setIsLoading: (isLoading) => set({ isLoading }),
 
   setProduct: (product) => {
     set({

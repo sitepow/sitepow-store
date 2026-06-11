@@ -5,6 +5,7 @@ import { TagIcon } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../products/store'
 
@@ -20,6 +21,26 @@ const metadataLabelMap = PRODUCT_METADATA_MASTER.reduce<Record<string, string>>(
 
 export function ProductSpecification() {
   const product = useProductPurchaseStore((s) => s.product)
+  const isLoading = useProductPurchaseStore((s) => s.isLoading)
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-7 w-28 rounded-lg" />
+          <Skeleton className="h-px flex-1" />
+        </div>
+        <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1 border-b pb-2">
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="h-5 w-36 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!product) {
     return null

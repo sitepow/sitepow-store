@@ -196,6 +196,14 @@ export function ServiceConfigDialog({
         </Tabs>
 
         <DialogFooter className="mt-2 border-t pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
+            size="sm"
+          >
+            ปิดหน้าต่าง
+          </Button>
           <Button type="button" onClick={() => setOpen(false)} size="sm">
             เสร็จสิ้นการตั้งค่าโซน
           </Button>

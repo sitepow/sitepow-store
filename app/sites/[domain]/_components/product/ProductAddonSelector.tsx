@@ -3,12 +3,30 @@ import { formatCurrency } from '@/utils/pricing'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../products/store'
 
 export function ProductAddonSelector() {
-  const { product, selectedAddons, toggleAddon } = useProductPurchaseStore()
+  const { product, selectedAddons, toggleAddon, isLoading } =
+    useProductPurchaseStore()
   const hasAddons = product?.addons?.length !== 0
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-24 rounded-lg" />
+          <div className="space-y-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))}
+          </div>
+        </div>
+        <Separator />
+      </>
+    )
+  }
 
   return (
     <>

@@ -17,16 +17,19 @@ interface Props {
 }
 
 export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
-  const { data: product } = useStorefrontProductDetail(storeSlug, productSlug)
-  const { setProduct } = useProductPurchaseStore()
+  const { data: product, isLoading } = useStorefrontProductDetail(
+    storeSlug,
+    productSlug,
+  )
+  const { setProduct, setIsLoading } = useProductPurchaseStore()
+
+  useEffect(() => {
+    setIsLoading(isLoading)
+  }, [isLoading, setIsLoading])
 
   useEffect(() => {
     if (product) setProduct(product)
   }, [product, setProduct])
-
-  if (!product) {
-    return null
-  }
 
   return (
     <>

@@ -91,7 +91,7 @@ export function PaymentSettingsForm() {
                 <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
-                      โอนเงินผ่านบัญชีธนาคาร (Bank Transfer)
+                      โอนเงินผ่านบัญชีธนาคาร
                     </span>
                     <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
                       ลูกค้าโอนเงินแล้วแนบสลิปหลักฐานในระบบ

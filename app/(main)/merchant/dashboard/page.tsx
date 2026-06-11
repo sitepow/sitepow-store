@@ -42,9 +42,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-
-import { DashboardSkeleton } from './_components/DashboardSkeleton'
 
 function pctChange(current: number, previous: number): string {
   if (previous === 0 && current === 0) return '0% จากเดือนที่แล้ว'
@@ -120,7 +119,22 @@ export default function MerchantDashboardPage() {
 
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
 
-      {selectedStoreId !== ALL_STORES && isLoading && <DashboardSkeleton />}
+      {selectedStoreId !== ALL_STORES && isLoading && (
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-28" />
+            ))}
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+          </div>
+        </div>
+      )}
 
       {selectedStoreId !== ALL_STORES && !isLoading && data && (
         <>
