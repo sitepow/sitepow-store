@@ -9,4 +9,6 @@ export const transactionKeys = {
     limit?: number
     type?: TransactionType
   }) => [...transactionKeys.lists(), filters] as const,
+  balance: (storeId: string) =>
+    [...transactionKeys.all, 'balance', storeId] as const,
 }

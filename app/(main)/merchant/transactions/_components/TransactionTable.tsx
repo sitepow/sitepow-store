@@ -1,17 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useTransactions } from '@/actions/hooks/transaction'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { TRANSACTION_TYPE_TH } from '@/constants/translate'
+import { TransactionType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDate } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
+import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -21,15 +22,22 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+const POSITIVE_TYPES = ['DEPOSIT', 'REFUND']
+
 export function TransactionTable() {
   const { selectedStoreId } = useStoreFilter()
-  const [page, setPage] = useState(1)
+  const router = useRouter()
+
+  const searchParams = useSearchParams()
+  const typeParam = searchParams.get('type') as TransactionType | null
+  const pageParam = Number(searchParams.get('page') ?? 1)
 
   const { data: { data: transactions = [], meta } = {}, isLoading } =
     useTransactions({
       storeId: selectedStoreId,
-      page,
+      page: pageParam,
       limit: 10,
+      type: typeParam ?? undefined,
     })
 
   if (selectedStoreId === ALL_STORES) {
@@ -42,9 +50,9 @@ export function TransactionTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ประเภท</TableHead>
-              <TableHead>รายละเอียด</TableHead>
-              <TableHead>เลขออเดอร์</TableHead>
+              <TableHead>รหัส</TableHead>
+              <TableHead>รายละเอียดรายการ</TableHead>
+              <TableHead>วัน-เวลา ทำรายการ</TableHead>
               <TableHead className="text-right">จำนวนเงิน</TableHead>
             </TableRow>
           </TableHeader>
@@ -54,35 +62,61 @@ export function TransactionTable() {
             ) : transactions.length === 0 ? (
               <TableEmptyRow colSpan={4} title="ยังไม่มีรายการเงิน" />
             ) : (
-              transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {TRANSACTION_TYPE_TH[transaction.type]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {transaction.description ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-sm">
-                    {transaction.orderId ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatCurrency(Number(transaction.amount))}
-                  </TableCell>
-                </TableRow>
-              ))
+              transactions.map((transaction) => {
+                const isPositive = POSITIVE_TYPES.includes(transaction.type)
+
+                return (
+                  <TableRow key={transaction.id}>
+                    <TableCell>{transaction.id}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 font-medium">
+                        <div
+                          className={`shrink-0 rounded-md border p-1 ${
+                            isPositive
+                              ? 'border-green-200 bg-green-50 text-green-600'
+                              : 'bg-muted border-muted-foreground/10 text-muted-foreground'
+                          }`}
+                        >
+                          {isPositive ? (
+                            <IconArrowDownLeft size={14} />
+                          ) : (
+                            <IconArrowUpRight size={14} />
+                          )}
+                        </div>
+                        <span>{transaction.description ?? '-'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {formatDate(new Date(transaction.createdAt))}
+                    </TableCell>
+                    <TableCell
+                      className={`text-right font-bold ${
+                        isPositive ? 'text-green-600' : 'text-foreground'
+                      }`}
+                    >
+                      {isPositive
+                        ? `+${formatCurrency(Number(transaction.amount))}`
+                        : `-${formatCurrency(Number(transaction.amount))}`}
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>
       </div>
+
       {meta && meta.totalPages > 1 && (
         <StorePagination
           currentPage={meta.currentPage}
           totalPages={meta.totalPages}
           hasNextPage={meta.hasNextPage}
           hasPreviousPage={meta.hasPreviousPage}
-          onPageChange={(newPage) => setPage(newPage)}
+          onPageChange={(p) => {
+            const params = new URLSearchParams(searchParams.toString())
+            params.set('page', String(p))
+            router.push(`?${params.toString()}`)
+          }}
         />
       )}
     </>

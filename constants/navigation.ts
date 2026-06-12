@@ -334,18 +334,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'บทความ',
     tab: 'blog',
     icon: IconNews,
-    items: [
-      {
-        value: 'blog',
-        label: 'บทความทั้งหมด',
-        url: '/merchant/blog',
-      },
-      {
-        value: 'blog-categories',
-        label: 'หมวดหมู่บทความ',
-        url: '/merchant/blog/category',
-      },
-    ],
   },
   {
     value: 'organization-branches',
