@@ -1,8 +1,15 @@
 'use client'
 
+import { useState } from 'react'
+
+import { useAiLogs } from '@/actions/hooks/ai-usage'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useSession } from '@/hooks/use-session'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDate } from '@/utils/date'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -13,22 +20,18 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export interface AiUsageLog {
-  id: string
-  storeId: string
-  storeName: string
-  feature: string
-  description: string
-  status: string
-  creditsUsed: number
-  timestamp: string
-}
+export function AiUsageLogTable() {
+  const { userId: ownerId } = useSession()
 
-interface AiUsageLogTableProps {
-  logs: AiUsageLog[]
-}
+  const { selectedStoreId } = useStoreFilter()
+  const storeId = selectedStoreId === ALL_STORES ? undefined : selectedStoreId
 
-export function AiUsageLogTable({ logs }: AiUsageLogTableProps) {
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading } = useAiLogs({ ownerId: ownerId!, storeId, page })
+  const logs = data?.data ?? []
+  const meta = data?.meta
+
   return (
     <>
       <div className="overflow-hidden rounded-xl border">
@@ -39,54 +42,56 @@ export function AiUsageLogTable({ logs }: AiUsageLogTableProps) {
               <TableHead>สำหรับร้านค้า</TableHead>
               <TableHead>ฟีเจอร์ AI</TableHead>
               <TableHead className="max-w-75">รายละเอียดคำสั่งงาน</TableHead>
-              <TableHead>ผลลัพธ์</TableHead>
               <TableHead className="text-right">เครดิตที่ใช้</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {logs?.length !== 0 &&
-              logs.map((log) => {
-                const isSuccess = log.status === 'SUCCESS'
+            {isLoading && <TableLoadingRow colSpan={5} />}
 
-                return (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <span className="text-sm opacity-60">
-                        {log.timestamp}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-medium">{log.storeName}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{log.feature}</Badge>
-                    </TableCell>
-                    <TableCell className="max-w-72 min-w-72">
-                      <span className="text-muted-foreground text-sm wrap-break-word whitespace-pre-line">
-                        {log.description}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={isSuccess ? 'default' : 'secondary'}>
-                        {isSuccess ? 'สำเร็จ' : 'ล้มเหลว'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {log.creditsUsed > 0 ? `-${log.creditsUsed}` : '0'}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            {logs?.length === 0 && (
+            {!isLoading && logs.length === 0 && (
               <TableEmptyRow
-                colSpan={6}
+                colSpan={5}
                 title="ไม่พบบันทึกข้อมูลประวัติกิจกรรม AI ของร้านค้าที่คุณเลือก"
               />
             )}
+
+            {!isLoading &&
+              logs.map((log) => (
+                <TableRow key={log.id}>
+                  <TableCell>
+                    <span className="text-sm opacity-60">
+                      {formatDate(new Date(log.createdAt))}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-medium">{log.store.name}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{log.action}</Badge>
+                  </TableCell>
+                  <TableCell className="max-w-72 min-w-72">
+                    <span className="text-muted-foreground text-sm wrap-break-word whitespace-pre-line">
+                      {log.prompt}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {log.cost > 0 ? `-${log.cost}` : '0'}
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>
-      {/* <StorePagination /> */}
+
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={setPage}
+        />
+      )}
     </>
   )
 }

@@ -6,6 +6,7 @@ export function useSession() {
   return {
     session,
     user: session?.user ?? null,
+    userId: session?.user?.id ?? null,
     status,
     isAuthenticated: status === 'authenticated',
     isLoading: status === 'loading',

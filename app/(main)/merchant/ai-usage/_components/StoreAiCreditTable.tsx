@@ -1,8 +1,14 @@
 'use client'
 
+import { useStoreAiCredits } from '@/actions/hooks/ai-usage'
+import { Plan } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDate } from '@/utils/date'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -13,20 +19,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export interface StoreAiCredit {
-  id: string
-  name: string
-  plan: string
-  visionCredits: { used: number; total: number }
-  searchCredits: { used: number; total: number }
-  resetDate: string
-}
+export function StoreAiCreditTable() {
+  const { userId } = useSession()
 
-interface StoreAiCreditTableProps {
-  stores: StoreAiCredit[]
-}
+  const { selectedStoreId } = useStoreFilter()
+  const storeId = selectedStoreId === ALL_STORES ? undefined : selectedStoreId
 
-export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
+  const { data: stores = [], isLoading } = useStoreAiCredits(userId!, storeId)
+
   return (
     <div className="overflow-hidden rounded-xl border">
       <Table>
@@ -40,21 +40,32 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stores?.length !== 0 &&
+          {isLoading && <TableLoadingRow colSpan={5} />}
+
+          {!isLoading && stores.length === 0 && (
+            <TableEmptyRow colSpan={5} title="ไม่พบข้อมูลเครดิตร้านค้า" />
+          )}
+
+          {!isLoading &&
             stores.map((store) => {
-              const isStarter = store.plan === 'Starter Plan'
+              const isStarter = store.plan === Plan.STARTER
+
+              const visionUsed = store.usage?.aiVisionUsed ?? 0
+              const visionTotal = store.aiVisionCredits
+              const searchUsed = store.usage?.aiSearchUsed ?? 0
+              const searchTotal = store.aiSearchCredits
 
               const visionPercent =
-                store.visionCredits.total > 0
-                  ? (store.visionCredits.used / store.visionCredits.total) * 100
-                  : 0
+                visionTotal > 0 ? (visionUsed / visionTotal) * 100 : 0
               const searchPercent =
-                store.searchCredits.total > 0
-                  ? (store.searchCredits.used / store.searchCredits.total) * 100
-                  : 0
+                searchTotal > 0 ? (searchUsed / searchTotal) * 100 : 0
 
               const isVisionCritical = visionPercent > 85
               const isSearchCritical = searchPercent > 85
+
+              const resetDate = store.usage?.lastResetDate
+                ? formatDate(new Date(store.usage.lastResetDate))
+                : '-'
 
               return (
                 <TableRow key={store.id}>
@@ -62,7 +73,7 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                     <span className="font-medium">{store.name}</span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{store.plan}</Badge>
+                    <Badge>{store.plan}</Badge>
                   </TableCell>
                   <TableCell>
                     {isStarter ? (
@@ -77,10 +88,10 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                                 : 'font-medium'
                             }
                           >
-                            {store.visionCredits.used.toLocaleString()}
+                            {visionUsed.toLocaleString()}
                           </span>
                           <span className="text-muted-foreground">
-                            /{store.visionCredits.total.toLocaleString()}
+                            /{visionTotal.toLocaleString()}
                           </span>
                           {isVisionCritical && (
                             <IconAlertTriangle
@@ -90,10 +101,7 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                           )}
                         </div>
                         <span className="text-xs opacity-60">
-                          เหลือ{' '}
-                          {(
-                            store.visionCredits.total - store.visionCredits.used
-                          ).toLocaleString()}{' '}
+                          เหลือ {(visionTotal - visionUsed).toLocaleString()}{' '}
                           ครั้ง
                         </span>
                       </div>
@@ -112,10 +120,10 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                                 : 'font-medium'
                             }
                           >
-                            {store.searchCredits.used.toLocaleString()}
+                            {searchUsed.toLocaleString()}
                           </span>
                           <span className="text-muted-foreground">
-                            /{store.searchCredits.total.toLocaleString()}
+                            /{searchTotal.toLocaleString()}
                           </span>
                           {isSearchCritical && (
                             <IconAlertTriangle
@@ -125,10 +133,7 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                           )}
                         </div>
                         <span className="text-xs opacity-60">
-                          เหลือ{' '}
-                          {(
-                            store.searchCredits.total - store.searchCredits.used
-                          ).toLocaleString()}{' '}
+                          เหลือ {(searchTotal - searchUsed).toLocaleString()}{' '}
                           ครั้ง
                         </span>
                       </div>
@@ -136,15 +141,12 @@ export function StoreAiCreditTable({ stores }: StoreAiCreditTableProps) {
                   </TableCell>
                   <TableCell>
                     <span className={isStarter ? 'opacity-60' : ''}>
-                      {store.resetDate}
+                      {resetDate}
                     </span>
                   </TableCell>
                 </TableRow>
               )
             })}
-          {stores?.length === 0 && (
-            <TableEmptyRow colSpan={5} title="ไม่พบข้อมูลเครดิตร้านค้า" />
-          )}
         </TableBody>
       </Table>
     </div>
