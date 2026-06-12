@@ -117,6 +117,7 @@ export async function applyGlobalRatesToStore(
             courierId: courier.id,
             code: service.code,
             name: service.name,
+            estimatedDays: service.estimatedDays,
           },
         })
       }

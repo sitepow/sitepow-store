@@ -3,10 +3,15 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 
+import { useAddressOptions } from '@/actions/hooks/storefront/address'
+import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
+import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
+  IconAlertCircle,
   IconCreditCard,
   IconMapPin,
   IconShoppingCartCheck,
@@ -15,6 +20,7 @@ import {
 import { ChevronLeftIcon } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { RadioGroup } from '@/components/ui/radio-group'
 
@@ -24,7 +30,7 @@ import { CartSummary } from '../_components/cart/_components/CartSummary'
 import { SummaryRow } from '../_components/cart/_components/SummaryRow'
 import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout'
 import { CheckoutSection } from './_components/CheckoutSection'
-import { CustomerAddressForm } from './_components/CustomerAddressForm'
+import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog'
 import { DiscountForm } from './_components/DiscountForm'
 import { RadioCard } from './_components/RadioCard'
 import { useCartStore } from './store'
@@ -32,6 +38,9 @@ import { useCartStore } from './store'
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const params = useParams()
+  const storeSlug = params.domain as string
+
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
   const summary = getCartSummary()
 
@@ -40,6 +49,10 @@ export default function StoreCartPage() {
   const [selectedPayment, setSelectedPayment] = useState<string>('')
   const [activeSection, setActiveSection] = useState<CheckoutStep>('address')
 
+  const { data: addressOptions = [] } = useAddressOptions()
+  const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
+  const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
+
   const stepIcons = {
     address: IconMapPin,
     shipping: IconTruckDelivery,
@@ -47,55 +60,30 @@ export default function StoreCartPage() {
     review: IconShoppingCartCheck,
   }
 
-  const addresses = [
-    {
-      id: 'addr_1',
-      title: 'คุณสมชาย สายเสมอ',
-      description: '123/45 หมู่บ้านตัวอย่าง ถ.สุขุมวิท เขตวัฒนา กรุงเทพฯ 10110',
-    },
-    {
-      id: 'addr_2',
-      title: 'คุณสมหญิง จริงใจ (ที่ทำงาน)',
-      description: 'อาคารออฟฟิศชั้น 20 ถ.รัชดาภิเษก เขตห้วยขวาง กรุงเทพฯ 10310',
-    },
-  ]
-
-  const shippingMethods = [
-    {
-      id: 'standard',
-      title: 'Standard Delivery',
-      description: 'จัดส่งด่วนภายใน 2-3 วันทำการ',
-      price: 40,
-    },
-    {
-      id: 'express',
-      title: 'Express Delivery',
-      description: 'จัดส่งด่วนพิเศษภายใน 1 วัน',
-      price: 80,
-    },
-  ]
-
   const paymentMethods = [
-    {
-      id: 'qr',
-      title: 'Thai QR Payment',
-      description: 'สแกนผ่าน Mobile Banking ทุกธนาคาร',
-    },
-    {
-      id: 'credit',
-      title: 'บัตรเครดิต / บัตรเดบิต',
-      description: 'ชำระผ่านบัตร Visa, Mastercard',
-    },
-    {
-      id: 'transfer',
-      title: 'โอนเงินผ่านบัญชีธนาคาร',
-      description: 'แจ้งโอนเงินผ่านระบบหลังชำระ',
-    },
+    ...(paymentOptions?.isBankTransferEnabled
+      ? paymentOptions.bankAccounts.map((acc) => ({
+          id: acc.id,
+          title: `โอนเงิน - ${acc.bankName}`,
+          description: `${acc.accountNumber} · ${acc.accountName}`,
+        }))
+      : []),
+    ...(paymentOptions?.isStripeEnabled
+      ? [
+          {
+            id: 'stripe',
+            title: 'บัตรเครดิต / บัตรเดบิต',
+            description: 'ชำระผ่านบัตร Visa, Mastercard ด้วย Stripe',
+          },
+        ]
+      : []),
   ]
 
-  const selectedAddressData = addresses.find((a) => a.id === selectedAddress)
-  const selectedShippingData = shippingMethods.find(
-    (m) => m.id === selectedShipping,
+  const selectedAddressData = addressOptions.find(
+    (a) => a.id === selectedAddress,
+  )
+  const selectedShippingData = shippingOptions.find(
+    (s) => s.id === selectedShipping,
   )
   const selectedPaymentData = paymentMethods.find(
     (p) => p.id === selectedPayment,
@@ -107,7 +95,6 @@ export default function StoreCartPage() {
     'payment',
     'review',
   ]
-
   const progressValue = ((stepsOrder.indexOf(activeSection) + 1) / 4) * 100
 
   const goToNextIncompleteStep = () => {
@@ -197,25 +184,36 @@ export default function StoreCartPage() {
                   <span className="text-muted-foreground text-sm">
                     เลือกที่อยู่ที่ต้องการให้จัดส่ง
                   </span>
-                  <CustomerAddressForm />
+                  <CustomerAddressCreateDialog />
                 </div>
 
-                <RadioGroup
-                  value={selectedAddress}
-                  onValueChange={setSelectedAddress}
-                >
-                  <div className="grid gap-2">
-                    {addresses.map((addr) => (
-                      <RadioCard
-                        key={addr.id}
-                        id={`addr-${addr.id}`}
-                        value={addr.id}
-                        title={addr.title}
-                        description={addr.description}
-                      />
-                    ))}
-                  </div>
-                </RadioGroup>
+                {addressOptions?.length === 0 && (
+                  <Alert>
+                    <AlertDescription className="flex flex-wrap items-center gap-2">
+                      <IconAlertCircle />
+                      ไม่มีที่อยู่สำหรับการจัดส่งสินค้า
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {addressOptions?.length !== 0 && (
+                  <RadioGroup
+                    value={selectedAddress}
+                    onValueChange={setSelectedAddress}
+                  >
+                    <div className="grid gap-2">
+                      {addressOptions.map((addr) => (
+                        <RadioCard
+                          key={addr.id}
+                          id={`addr-${addr.id}`}
+                          value={addr.id}
+                          title={`${addr.receiverName} (${addr.name})`}
+                          description={`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province}`}
+                        />
+                      ))}
+                    </div>
+                  </RadioGroup>
+                )}
 
                 <Button
                   className="w-full"
@@ -231,8 +229,8 @@ export default function StoreCartPage() {
                   <RadioCard
                     id={`summary-addr-${selectedAddressData.id}`}
                     value={selectedAddressData.id}
-                    title={selectedAddressData.title}
-                    description={selectedAddressData.description}
+                    title={`${selectedAddressData.receiverName} (${selectedAddressData.name})`}
+                    description={`${selectedAddressData.addressLine} ${selectedAddressData.subDistrict} ${selectedAddressData.district} ${selectedAddressData.province}`}
                   />
                 </RadioGroup>
               )}
@@ -245,22 +243,38 @@ export default function StoreCartPage() {
               onEdit={() => setActiveSection('shipping')}
             >
               <div className="space-y-4">
-                <RadioGroup
-                  value={selectedShipping}
-                  onValueChange={setSelectedShipping}
-                >
-                  <div className="grid gap-2">
-                    {shippingMethods.map((method) => (
-                      <RadioCard
-                        key={method.id}
-                        id={`ship-${method.id}`}
-                        value={method.id}
-                        title={method.title}
-                        description={method.description}
-                      />
-                    ))}
-                  </div>
-                </RadioGroup>
+                {shippingOptions.length === 0 && (
+                  <Alert>
+                    <AlertDescription className="flex flex-wrap items-center gap-2">
+                      <IconAlertCircle />
+                      ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง
+                      กรุณาติดต่อร้านค้าโดยตรง
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {shippingOptions.length !== 0 && (
+                  <RadioGroup
+                    value={selectedShipping}
+                    onValueChange={setSelectedShipping}
+                  >
+                    <div className="grid gap-2">
+                      {shippingOptions.map((method) => (
+                        <RadioCard
+                          key={method.id}
+                          id={`ship-${method.id}`}
+                          value={method.id}
+                          title={method.courierService.name}
+                          description={
+                            method.courierService.estimatedDays
+                              ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
+                              : method.courierService.courier.name
+                          }
+                        />
+                      ))}
+                    </div>
+                  </RadioGroup>
+                )}
 
                 <Button
                   className="w-full"
@@ -276,8 +290,12 @@ export default function StoreCartPage() {
                   <RadioCard
                     id={`summary-ship-${selectedShippingData.id}`}
                     value={selectedShippingData.id}
-                    title={selectedShippingData.title}
-                    description={selectedShippingData.description}
+                    title={selectedShippingData.courierService.name}
+                    description={
+                      selectedShippingData.courierService.estimatedDays
+                        ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
+                        : selectedShippingData.courierService.courier.name
+                    }
                   />
                 </RadioGroup>
               )}
@@ -290,26 +308,38 @@ export default function StoreCartPage() {
               onEdit={() => setActiveSection('payment')}
             >
               <div className="space-y-3">
-                <RadioGroup
-                  value={selectedPayment}
-                  onValueChange={setSelectedPayment}
-                >
-                  <div className="grid gap-2">
-                    {paymentMethods.map((method) => (
-                      <RadioCard
-                        key={method.id}
-                        id={`pay-${method.id}`}
-                        value={method.id}
-                        title={method.title}
-                        description={method.description}
-                      />
-                    ))}
-                  </div>
-                </RadioGroup>
+                {paymentMethods.length === 0 && (
+                  <Alert>
+                    <AlertDescription className="flex flex-wrap items-center gap-2">
+                      <IconAlertCircle />
+                      ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางชำระเงิน
+                      กรุณาติดต่อร้านค้าโดยตรง
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {paymentMethods.length !== 0 && (
+                  <RadioGroup
+                    value={selectedPayment}
+                    onValueChange={setSelectedPayment}
+                  >
+                    <div className="grid gap-2">
+                      {paymentMethods.map((method) => (
+                        <RadioCard
+                          key={method.id}
+                          id={`pay-${method.id}`}
+                          value={method.id}
+                          title={method.title}
+                          description={method.description}
+                        />
+                      ))}
+                    </div>
+                  </RadioGroup>
+                )}
 
                 <Button
                   className="mt-2 h-11 w-full"
-                  disabled={!selectedPayment}
+                  disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ

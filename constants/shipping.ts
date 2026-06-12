@@ -30,14 +30,14 @@ export const COURIERS_LIST: CourierWithServices[] = [
     code: 'THAIPOST',
     name: 'ไปรษณีย์ไทย (Thailand Post)',
     description:
-      'บริการจัดส่งพัสดุผ่านรัฐวิสาหกิจไทย มีเครือข่ายครอบคลุมทั่วประเทศ',
+      'ไปรษณีย์ไทย บริการที่คุ้นเคย มีสาขาครอบคลุมทั่วประเทศถึงหน้าบ้าน',
     services: [
       {
         id: 'cs-ems',
         courierId: 'c-thaipost',
         code: 'THAIPOST_EMS',
-        name: 'EMS (ส่งด่วนพิเศษ)',
-        estimatedDays: '1-5 วัน',
+        name: 'EMS ไปรษณีย์ด่วนพิเศษ',
+        estimatedDays: '1-3 วัน',
       },
     ],
   },
@@ -45,14 +45,14 @@ export const COURIERS_LIST: CourierWithServices[] = [
     id: 'c-flash',
     code: 'FLASH',
     name: 'Flash Express',
-    description: 'บริการเข้ารับและจัดส่งพัสดุด่วนครอบคลุม 77 จังหวัดทั่วประเทศ',
+    description: 'ขนส่งที่เข้ารับพัสดุถึงที่ เน้นความเร็วและครอบคลุมทั่วไทย',
     services: [
       {
         id: 'cs-flash-std',
         courierId: 'c-flash',
         code: 'FLASH_STANDARD',
-        name: 'Flash Speed (ส่งด่วนปกติ)',
-        estimatedDays: '1-5 วัน',
+        name: 'Flash ส่งด่วนปกติ',
+        estimatedDays: '1-3 วัน',
       },
     ],
   },
@@ -60,14 +60,13 @@ export const COURIERS_LIST: CourierWithServices[] = [
     id: 'c-kerry',
     code: 'KERRY',
     name: 'Kerry Express (KEX)',
-    description:
-      'บริการจัดส่งพัสดุด่วนชั้นนำ รวดเร็ว ปลอดภัย ได้รับความนิยมสูง',
+    description: 'แบรนด์ขนส่งยอดนิยม การันตีความรวดเร็วและปลอดภัย',
     services: [
       {
         id: 'cs-kerry-std',
         courierId: 'c-kerry',
         code: 'KERRY_STANDARD',
-        name: 'Kerry Parcel Delivery',
+        name: 'Kerry ส่งด่วนทั่วไป',
         estimatedDays: '1-2 วัน',
       },
     ],
@@ -76,15 +75,14 @@ export const COURIERS_LIST: CourierWithServices[] = [
     id: 'c-spx',
     code: 'SPX',
     name: 'SPX Express',
-    description:
-      'บริการขนส่งพัสดุด่วนที่เติบโตอย่างรวดเร็ว เน้นตอบโจทย์ e-Commerce',
+    description: 'ขนส่งหลักของ Shopee เน้นจัดส่งรวดเร็วสำหรับขาช้อปออนไลน์',
     services: [
       {
         id: 'cs-spx-std',
         courierId: 'c-spx',
         code: 'SPX_STANDARD',
         name: 'SPX Standard Delivery',
-        estimatedDays: '1-4 วัน',
+        estimatedDays: '1-3 วัน',
       },
     ],
   },
@@ -92,15 +90,14 @@ export const COURIERS_LIST: CourierWithServices[] = [
     id: 'c-best',
     code: 'BEST',
     name: 'Best Express',
-    description:
-      'บริการรับ-ส่งพัสดุถึงที่ทั่วไทย มีเครือข่ายแฟรนไชส์ที่แข็งแกร่ง',
+    description: 'ขนส่งราคาประหยัดที่มีเครือข่ายจุดรับ-ส่งสินค้าทั่วประเทศ',
     services: [
       {
         id: 'cs-best-std',
         courierId: 'c-best',
         code: 'BEST_STANDARD',
-        name: 'Best Express Delivery',
-        estimatedDays: '1-5 วัน',
+        name: 'Best Express ปกติ',
+        estimatedDays: '1-4 วัน',
       },
     ],
   },
@@ -108,15 +105,14 @@ export const COURIERS_LIST: CourierWithServices[] = [
     id: 'c-dhl',
     code: 'DHL',
     name: 'DHL Express (Domestic)',
-    description:
-      'บริการขนส่งพัสดุมาตรฐานระดับโลก มั่นใจเรื่องความปลอดภัยและเป็นระบบ',
+    description: 'ผู้นำด้านโลจิสติกส์ระดับโลก มั่นใจในมาตรฐานความปลอดภัย',
     services: [
       {
         id: 'cs-dhl-std',
         courierId: 'c-dhl',
         code: 'DHL_STANDARD',
-        name: 'DHL eCommerce Premium',
-        estimatedDays: '1-5 วัน',
+        name: 'DHL Domestic Express',
+        estimatedDays: '1-2 วัน',
       },
     ],
   },

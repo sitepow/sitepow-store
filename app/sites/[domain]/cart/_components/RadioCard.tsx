@@ -33,6 +33,8 @@ export function RadioCard({
           'has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 has-data-[state=checked]:ring-primary has-data-[state=checked]:ring-1',
         )}
       >
+        <RadioGroupItem value={value} id={id} className="size-5 shrink-0" />
+
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
@@ -55,7 +57,6 @@ export function RadioCard({
             <div className="mt-4 w-full border-t pt-4">{children}</div>
           )}
         </div>
-        <RadioGroupItem value={value} id={id} className="size-5 shrink-0" />
       </Label>
     </div>
   )

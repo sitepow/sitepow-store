@@ -771,9 +771,10 @@ model Address {
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  name    String
-  taxName String?
-  phone   String
+  name         String
+  taxName      String?
+  phone        String
+  receiverName String?
 
   addressLine String
   subDistrict String
