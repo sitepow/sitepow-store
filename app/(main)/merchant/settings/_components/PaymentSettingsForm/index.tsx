@@ -148,23 +148,19 @@ export function PaymentSettingsForm() {
               {isStripeEnabled && (
                 <div className="grid gap-4 pt-5 lg:grid-cols-2">
                   <div className="grid gap-2">
-                    <Label htmlFor="stripePublicKey">กุญแจสาธารณะ</Label>
+                    <Label htmlFor="stripePublicKey">คีย์ที่เผยแพร่ได้</Label>
                     <Controller
                       control={control}
                       name="stripePublicKey"
-                      render={({ field }) => (
-                        <Input {...field} placeholder="pk_live_..." />
-                      )}
+                      render={({ field }) => <Input {...field} />}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="stripeSecretKey">กุญแจลับ</Label>
+                    <Label htmlFor="stripeSecretKey">คีย์ลับ</Label>
                     <Controller
                       control={control}
                       name="stripeSecretKey"
-                      render={({ field }) => (
-                        <Input {...field} placeholder="sk_live_..." />
-                      )}
+                      render={({ field }) => <Input {...field} />}
                     />
                   </div>
                 </div>

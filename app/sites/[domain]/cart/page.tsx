@@ -71,9 +71,14 @@ export default function StoreCartPage() {
     ...(paymentOptions?.isStripeEnabled
       ? [
           {
+            id: 'promptpay',
+            title: 'QR พร้อมเพย์',
+            description: 'รองรับแอปธนาคารทุกแห่ง',
+          },
+          {
             id: 'stripe',
-            title: 'บัตรเครดิต / บัตรเดบิต',
-            description: 'ชำระผ่านบัตร Visa, Mastercard ด้วย Stripe',
+            title: 'บัตรเครดิต / เดบิต',
+            description: 'ชำระผ่าน Visa หรือ Mastercard',
           },
         ]
       : []),
@@ -127,7 +132,7 @@ export default function StoreCartPage() {
             </div>
 
             <div className="flex flex-col rounded-xl border border-gray-100">
-              <div className="rounded-xl bg-gray-100 px-5 py-2.5 text-start font-bold">
+              <div className="rounded-xl bg-gray-50/50 px-5 py-2.5 text-start font-bold">
                 <h2>ตะกร้าสินค้า</h2>
               </div>
 
@@ -159,7 +164,7 @@ export default function StoreCartPage() {
           </div>
 
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="flex items-center gap-5 rounded-xl border border-gray-100 px-5 py-2.5 text-start">
+            <div className="flex items-center gap-5 rounded-xl border border-gray-100 bg-gray-50/50 px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}

@@ -29,8 +29,8 @@ export function RadioCard({
       <Label
         htmlFor={id}
         className={cn(
-          'flex cursor-pointer justify-between gap-5 rounded-xl border border-gray-200 bg-white p-4 text-start font-normal transition-all select-none hover:border-gray-300',
-          'has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 has-data-[state=checked]:ring-primary has-data-[state=checked]:ring-1',
+          'flex cursor-pointer justify-between gap-5 rounded-xl border border-gray-100 bg-white p-4 text-start font-normal transition-all select-none',
+          'has-data-[state=checked]:border-gray-100',
         )}
       >
         <RadioGroupItem value={value} id={id} className="size-5 shrink-0" />

@@ -1,4 +1,4 @@
-import { CheckCircle2Icon, PencilIcon } from 'lucide-react'
+import { PencilIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -33,9 +33,6 @@ export function CheckoutSection({
         )}
       >
         <div className="flex items-center gap-2">
-          {isCompleted && !isActive && (
-            <CheckCircle2Icon className="text-primary size-4" />
-          )}
           <span
             className={cn(
               'text-sm font-bold',

@@ -80,6 +80,32 @@ export interface GetStoresResponse {
   }
 }
 
+const storeLandingSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  logo: true,
+  coverImage: true,
+  description: true,
+} satisfies Prisma.StoreSelect
+
+export type StoreLandingItem = Prisma.StoreGetPayload<{
+  select: typeof storeLandingSelect
+}>
+
+export async function getLandingStores(limit = 6): Promise<StoreLandingItem[]> {
+  try {
+    return await prisma.store.findMany({
+      where: { status: StoreStatus.ACTIVE },
+      select: storeLandingSelect,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    })
+  } catch {
+    return []
+  }
+}
+
 export async function getStore({ domain }: { domain: string }) {
   if (!domain) {
     return null

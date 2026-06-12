@@ -13,6 +13,7 @@ import {
   checkStoreAvailability,
   createStore,
   deleteStore,
+  getLandingStores,
   getStoreOptions,
   getStores,
   updateStore,
@@ -108,4 +109,13 @@ export function useDeleteStore() {
       queryClient.invalidateQueries({ queryKey: storeKeys.all })
     },
   })
+}
+
+export function useLandingStores(limit: number = 6) {
+  return useQuery(
+    queryOptions({
+      queryKey: storeKeys.landing(limit),
+      queryFn: async () => await getLandingStores(limit),
+    }),
+  )
 }
