@@ -30,10 +30,10 @@ export function RadioCard({
         htmlFor={id}
         className={cn(
           'flex cursor-pointer justify-between gap-5 rounded-xl border border-gray-100 bg-white p-4 text-start font-normal transition-all select-none',
-          'has-data-[state=checked]:border-gray-100',
+          'has-data-[state=checked]:border-primary',
         )}
       >
-        <RadioGroupItem value={value} id={id} className="size-5 shrink-0" />
+        <RadioGroupItem value={value} id={id} className="shrink-0" />
 
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">

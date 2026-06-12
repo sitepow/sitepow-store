@@ -85,7 +85,7 @@ export function ChangePlanDialog({
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>เปลี่ยนแพลนการใช้งาน</DialogTitle>
           <DialogDescription>
@@ -101,7 +101,7 @@ export function ChangePlanDialog({
               setValue('plan', v as Plan, { shouldValidate: true })
             }
           >
-            <div className="flex flex-col gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               {(Object.keys(PLAN_DETAILS) as Plan[]).map((key) => {
                 const plan = PLAN_DETAILS[key]
 
@@ -128,17 +128,9 @@ export function ChangePlanDialog({
                       </div>
                     }
                   >
-                    <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                      {plan.features.map((feat, i) => (
-                        <li
-                          key={i}
-                          className="text-muted-foreground flex items-center gap-1.5 text-sm"
-                        >
-                          <span className="text-primary shrink-0">-</span>
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="text-muted-foreground text-xs">
+                      {plan.features.join(', ')}
+                    </div>
                   </RadioCard>
                 )
               })}

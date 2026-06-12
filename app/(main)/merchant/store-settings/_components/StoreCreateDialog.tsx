@@ -26,7 +26,6 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from './PlanSelector'
-// import { PointsSettingsField } from './PointsSettingsField'
 import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 import { VatSettingsField } from './VatSettingsField'
@@ -45,7 +44,7 @@ export function StoreCreateDialog() {
       phone: '',
       lineId: '',
       facebookPage: '',
-      address: '',
+      // address: '',
       taxId: '',
       isVatRegistered: false,
       vatRate: 7.0,
@@ -170,7 +169,7 @@ export function StoreCreateDialog() {
               <FieldError>{errors?.facebookPage?.message}</FieldError>
             </Field>
 
-            <Field className="sm:col-span-2">
+            {/* <Field className="sm:col-span-2">
               <FieldLabel>ที่อยู่ร้านค้า / สำนักงาน</FieldLabel>
               <Input
                 placeholder="บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด..."
@@ -178,10 +177,9 @@ export function StoreCreateDialog() {
                 disabled={createStoreMutation.isPending}
               />
               <FieldError>{errors?.address?.message}</FieldError>
-            </Field>
+            </Field> */}
 
             <VatSettingsField isPending={createStoreMutation.isPending} />
-            {/* <PointsSettingsField isPending={createStoreMutation.isPending} /> */}
           </div>
         </FormProvider>
 

@@ -64,7 +64,7 @@ export function CategoriesTable() {
                   </TableCell>
                   <TableCell>
                     <span className="text-muted-foreground text-sm">
-                      {category.description ?? '-'}
+                      {category.description || '-'}
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
