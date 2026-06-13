@@ -14,6 +14,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function StoresSection() {
   const { data: stores = [], isLoading } = useLandingStores(6)
 
+  if (stores?.length === 0) {
+    return null
+  }
+
   return (
     <SectionContainer>
       <SectionHeader

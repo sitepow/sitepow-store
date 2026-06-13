@@ -96,9 +96,9 @@ export function CouponCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>
-          สร้างคูปองใหม่
+        <Button variant="outline">
           <IconPlus />
+          สร้างคูปองใหม่
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">

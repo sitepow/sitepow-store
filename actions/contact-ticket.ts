@@ -1,8 +1,9 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { TicketStatus } from '@/generated/prisma/enums'
+import { ActorType, LogAction, TicketStatus } from '@/generated/prisma/enums'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetContactTicketsParams {
@@ -106,9 +107,23 @@ export async function updateTicketStatus(id: string, status: TicketStatus) {
     throw new Error('ไม่พบ Ticket ID')
   }
 
+  const ticket = await prisma.contactTicket.findUnique({
+    where: { id },
+    select: { storeId: true, status: true },
+  })
+
   await prisma.contactTicket.update({
     where: { id },
     data: { status },
+  })
+
+  await createLog({
+    action: LogAction.UPDATE_ORDER_STATUS,
+    actorType: ActorType.MERCHANT,
+    storeId: ticket?.storeId,
+    entity: 'ContactTicket',
+    entityId: id,
+    details: { from: ticket?.status, to: status },
   })
 
   return { message: 'อัปเดตสถานะ Ticket สำเร็จ' }

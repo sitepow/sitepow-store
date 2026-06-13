@@ -1,8 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { NotificationSettingsFormValues } from '@/zod/notification-settings'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const notificationSettingsSelect = {
@@ -44,6 +45,15 @@ export async function updateNotificationSettings(
     await prisma.store.update({
       where: { id: storeId },
       data: input,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Store',
+      entityId: storeId,
+      details: { setting: 'notification', updatedFields: Object.keys(input) },
     })
 
     return { success: true, message: 'บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ' }

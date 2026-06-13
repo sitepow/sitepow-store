@@ -1,13 +1,14 @@
 'use server'
 
 import { COURIERS_LIST } from '@/constants/shipping'
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import {
   AggregatedRate,
   getProvinceDetails,
   syncStoreServiceWeightRates,
 } from '@/utils/shipping'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const MatrixSelect = {
@@ -64,6 +65,14 @@ export async function upsertGlobalShippingRateMatrix(
         }),
       ),
     )
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.SUPER_ADMIN,
+      entity: 'GlobalShippingRateMatrix',
+      details: { provinces: payloads.map((p) => p.fromProvince) },
+    })
+
     return { success: true, message: 'บันทึกข้อมูลเรทจัดส่งกลางสำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
@@ -152,6 +161,15 @@ export async function applyGlobalRatesToStore(
 
         await syncStoreServiceWeightRates(tx, storeCourierService.id, rates)
       }
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'ShippingSetting',
+      entityId: storeId,
+      details: { fromProvince, branchId, type: 'applied_global_rates' },
     })
 
     return { success: true, message: 'ปรับใช้เรทจัดส่งกลางเรียบร้อยแล้ว' }

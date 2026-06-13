@@ -77,9 +77,9 @@ export function CategoryCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>
-          เพิ่มหมวดหมู่ใหม่
+        <Button variant="outline">
           <IconPlus />
+          เพิ่มหมวดหมู่ใหม่
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

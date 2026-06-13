@@ -1,8 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetInventoryParams {
@@ -148,7 +149,21 @@ export async function updateStock(id: string, input: UpdateStockInput) {
     const updatedStock = await prisma.productStock.update({
       where: { id },
       data: input,
-      select: inventorySelect,
+      select: {
+        ...inventorySelect,
+        branch: {
+          select: { storeId: true, id: true, name: true, isMain: true },
+        },
+      },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STOCK,
+      actorType: ActorType.MERCHANT,
+      storeId: updatedStock.branch.storeId,
+      entity: 'ProductStock',
+      entityId: id,
+      details: { minStock: input.minStock, type: 'updated' },
     })
 
     return {
@@ -171,6 +186,20 @@ export async function upsertStock(input: UpsertStockInput) {
       update: { quantity, minStock },
       create: { variantId, branchId, quantity, minStock },
       select: inventorySelect,
+    })
+
+    const branch = await prisma.branch.findUnique({
+      where: { id: branchId },
+      select: { storeId: true },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STOCK,
+      actorType: ActorType.MERCHANT,
+      storeId: branch?.storeId,
+      entity: 'ProductStock',
+      entityId: stock.id,
+      details: { variantId, branchId, quantity, minStock, type: 'upserted' },
     })
 
     return {

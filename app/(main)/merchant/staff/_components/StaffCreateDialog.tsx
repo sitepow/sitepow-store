@@ -85,9 +85,9 @@ export function StaffCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="gap-2">
-          <IconPlus size={16} />
-          <span>เพิ่มพนักงาน</span>
+        <Button variant="outline">
+          <IconPlus />
+          เพิ่มพนักงาน
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

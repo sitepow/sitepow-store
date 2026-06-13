@@ -13,6 +13,8 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Button } from '@/components/ui/button'
 
+import { BranchCreateDialog } from '../../../organization-branches/_components/BranchCreateDialog'
+import { CategoryCreateDialog } from '../../categories/_components/CategoryCreateDialog'
 import { CreateProductForm } from './_components/CreateProductForm'
 
 export default function StoreAdminProductNew() {
@@ -31,6 +33,12 @@ export default function StoreAdminProductNew() {
                 <ArrowLeftIcon /> ย้อนกลับ
               </Link>
             </Button>
+            {selectedStoreId !== ALL_STORES && (
+              <>
+                <CategoryCreateDialog />
+                <BranchCreateDialog />
+              </>
+            )}
             <StoreSelectField />
           </div>
         }

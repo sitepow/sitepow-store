@@ -63,11 +63,9 @@ export function BranchesTable() {
                     <Badge variant="outline">{branch.name}</Badge>
                   </TableCell>
                   <TableCell>
-                    {branch.isMain ? (
-                      <Badge>สาขาหลัก</Badge>
-                    ) : (
-                      <Badge variant="outline">สาขาย่อย</Badge>
-                    )}
+                    <Badge variant="outline">
+                      {branch.isMain ? 'สาขาหลัก' : 'สาขาย่อย'}
+                    </Badge>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
                     {!branch.isMain && (

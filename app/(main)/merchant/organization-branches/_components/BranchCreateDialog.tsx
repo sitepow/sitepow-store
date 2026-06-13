@@ -71,9 +71,9 @@ export function BranchCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>
-          เพิ่มสาขาใหม่
+        <Button variant="outline">
           <IconPlus />
+          เพิ่มสาขาใหม่
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">

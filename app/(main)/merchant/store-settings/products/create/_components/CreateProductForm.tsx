@@ -80,8 +80,8 @@ export function CreateProductForm() {
 
   const { register, handleSubmit, reset, getValues } = form
 
-  const handleApplyPreset = (type: string) => {
-    const preset = PRODUCT_PRESETS_MASTER.find((p) => p.type === type)
+  const handleApplyPreset = (id: string) => {
+    const preset = PRODUCT_PRESETS_MASTER.find((p) => p.id === id)
     if (!preset) {
       return
     }
@@ -93,7 +93,7 @@ export function CreateProductForm() {
       ...preset.data,
     } as ProductFormValues)
 
-    toast.success(`โหลดตัวอย่าง${preset.toastLabel} เรียบร้อยแล้ว`)
+    toast.success(`โหลดตัวอย่าง ${preset.toastLabel} เรียบร้อยแล้ว`)
   }
 
   const {
@@ -215,7 +215,6 @@ export function CreateProductForm() {
         <CardContent className="flex flex-wrap items-center gap-2.5">
           <Button
             type="button"
-            variant="outline"
             disabled={isPending}
             onClick={() => handleAiGen()}
           >
@@ -228,13 +227,13 @@ export function CreateProductForm() {
           </Button>
           {PRODUCT_PRESETS_MASTER.map((preset) => (
             <Button
-              key={preset.type}
+              key={preset.id}
               type="button"
               variant="outline"
               disabled={isPending}
-              onClick={() => handleApplyPreset(preset.type)}
+              onClick={() => handleApplyPreset(preset.id)}
             >
-              {preset.label}
+              [ตัวอย่าง] {preset.label}
             </Button>
           ))}
         </CardContent>

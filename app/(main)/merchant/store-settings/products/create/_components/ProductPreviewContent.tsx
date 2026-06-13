@@ -1,9 +1,11 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
 export function ProductPreviewContent() {
   const { control } = useFormContext()
+  const { selectedStoreSlug } = useStoreFilter()
 
   const [title, slug, tags, variants] = useWatch({
     control,
@@ -43,7 +45,7 @@ export function ProductPreviewContent() {
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
-            https://yourstore.com › products › {displaySlug}
+            https://{selectedStoreSlug}.sitepow.store › products › {displaySlug}
           </p>
           <p className="cursor-pointer text-xl text-blue-700 hover:underline">
             {displayTitle}
@@ -60,7 +62,9 @@ export function ProductPreviewContent() {
           รูปภาพตัวอย่าง
         </div>
         <div className="p-3">
-          <p className="text-[12px] text-slate-500 uppercase">YOURSTORE.COM</p>
+          <p className="text-[12px] text-slate-500 uppercase">
+            https://{selectedStoreSlug}.sitepow.store
+          </p>
           <p className="font-bold text-slate-800">{displayTitle}</p>
           <p className="line-clamp-1 text-sm text-slate-600">{description}</p>
         </div>

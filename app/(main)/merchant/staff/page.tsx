@@ -19,8 +19,8 @@ export default function StaffPage() {
         description="จัดการพนักงานและบทบาทการเข้าถึงระบบของร้านค้า"
         endContent={
           <div className="flex items-end gap-2.5">
-            <StaffCreateDialog />
             <StoreSelectField />
+            <StaffCreateDialog />
           </div>
         }
       />

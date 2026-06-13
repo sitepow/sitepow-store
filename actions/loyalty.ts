@@ -1,8 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const loyaltySettingsSelect = {
@@ -79,6 +80,15 @@ export async function updateLoyaltySettings(
       where: { id: storeId },
       data: input,
       select: loyaltySettingsSelect,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Store',
+      entityId: storeId,
+      details: { setting: 'loyalty', updatedFields: Object.keys(input) },
     })
 
     return {

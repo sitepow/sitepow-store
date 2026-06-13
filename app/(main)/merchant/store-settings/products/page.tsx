@@ -22,10 +22,10 @@ export default function MerchantStoreSettingsProductsPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <Button asChild>
+            <Button asChild variant="outline">
               <Link href={'/merchant/store-settings/products/create'}>
-                เพิ่มสินค้าใหม่
                 <IconPlus />
+                เพิ่มสินค้าใหม่
               </Link>
             </Button>
           </div>

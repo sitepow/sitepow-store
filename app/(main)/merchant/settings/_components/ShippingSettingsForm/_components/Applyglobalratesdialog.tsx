@@ -77,8 +77,8 @@ export function ApplyGlobalRatesDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button type="button">
-          <IconCloudDownload size={16} />
+        <Button type="button" variant="outline">
+          <IconCloudDownload />
           นำเรทจัดส่งมาใช้กับร้านนี้
         </Button>
       </DialogTrigger>

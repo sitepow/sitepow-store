@@ -1,9 +1,10 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetOrdersParams {
@@ -142,9 +143,27 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     throw new Error('ไม่พบ Order ID')
   }
 
+  const order = await prisma.order.findUnique({
+    where: { id },
+    select: { storeId: true, orderNumber: true, status: true },
+  })
+
   await prisma.order.update({
     where: { id },
     data: { status },
+  })
+
+  await createLog({
+    action: LogAction.UPDATE_ORDER_STATUS,
+    actorType: ActorType.MERCHANT,
+    storeId: order?.storeId,
+    entity: 'Order',
+    entityId: id,
+    details: {
+      orderNumber: order?.orderNumber,
+      from: order?.status,
+      to: status,
+    },
   })
 
   return { message: 'อัปเดตสถานะออเดอร์สำเร็จ' }

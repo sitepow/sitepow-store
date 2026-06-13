@@ -94,9 +94,9 @@ export function StoreCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="gap-2">
-          <IconPlus size={16} />
-          <span>สร้างร้านค้าใหม่</span>
+        <Button variant="outline">
+          <IconPlus />
+          สร้างร้านค้าใหม่
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
