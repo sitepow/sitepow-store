@@ -1,7 +1,8 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetStockTransfersParams {
@@ -193,6 +194,21 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
         select: stockTransferSelect,
       }),
     ])
+
+    await createLog({
+      action: LogAction.STOCK_TRANSFER,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'StockTransfer',
+      entityId: transfer.id,
+      details: {
+        variantId,
+        fromBranchId,
+        toBranchId,
+        quantity,
+        note,
+      },
+    })
 
     return { success: true, message: 'โอนย้ายสต็อกสำเร็จแล้ว', data: transfer }
   } catch (error) {

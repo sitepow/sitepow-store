@@ -1,9 +1,10 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ChangePasswordFormValues } from '@/zod/security-settings'
 import bcrypt from 'bcryptjs'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const securitySettingsSelect = {
@@ -64,6 +65,14 @@ export async function updateSecuritySettings(
       data: { password: hashedPassword },
     })
 
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      entity: 'User',
+      entityId: userId,
+      details: { setting: 'password_changed' },
+    })
+
     return { success: true, message: 'อัปเดตรหัสผ่านสำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -83,6 +92,14 @@ export async function updateTwoFactor(
     await prisma.user.update({
       where: { id: userId },
       data: { isTwoFactorEnabled },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      entity: 'User',
+      entityId: userId,
+      details: { setting: '2fa', isTwoFactorEnabled },
     })
 
     return { success: true, message: 'อัปเดตการตั้งค่า 2FA สำเร็จ' }

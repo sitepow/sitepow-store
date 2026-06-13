@@ -4,12 +4,15 @@ import { PLAN_DETAILS } from '@/config/planDetails'
 import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import {
+  ActorType,
   InvoiceStatus,
+  LogAction,
   Plan,
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateStoreInput {
@@ -318,6 +321,15 @@ export async function createStore(input: CreateStoreInput) {
       select: storeSelect,
     })
 
+    await createLog({
+      action: LogAction.CREATE_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId: store.id,
+      entity: 'Store',
+      entityId: store.id,
+      details: { name: store.name, slug: store.slug, plan: store.plan },
+    })
+
     return { success: true, message: 'สร้างร้านค้าสำเร็จแล้ว', data: store }
   } catch (error) {
     console.error(error)
@@ -347,6 +359,15 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
       select: storeSelect,
     })
 
+    await createLog({
+      action: LogAction.UPDATE_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId: id,
+      entity: 'Store',
+      entityId: id,
+      details: { updatedFields: Object.keys(input) },
+    })
+
     return {
       success: true,
       message: 'อัปเดตข้อมูลร้านค้าสำเร็จแล้ว',
@@ -366,6 +387,14 @@ export async function deleteStore(id: string) {
 
     await prisma.store.delete({
       where: { id },
+    })
+
+    await createLog({
+      action: LogAction.DELETE_STORE,
+      actorType: ActorType.SUPER_ADMIN,
+      storeId: id,
+      entity: 'Store',
+      entityId: id,
     })
 
     return { success: true, message: 'ลบร้านค้าสำเร็จ' }

@@ -1,9 +1,16 @@
 'use server'
 
 import { PLAN_RANK } from '@/config/plans'
-import { Plan, Prisma, SubStatus } from '@/generated/prisma/client'
+import {
+  ActorType,
+  LogAction,
+  Plan,
+  Prisma,
+  SubStatus,
+} from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const subscriptionSelect = {
@@ -138,6 +145,15 @@ export async function cancelSubscription(storeId: string) {
     }),
   ])
 
+  await createLog({
+    action: LogAction.CHANGE_PLAN,
+    actorType: ActorType.MERCHANT,
+    storeId,
+    entity: 'Subscription',
+    entityId: storeId,
+    details: { from: subscription.plan, to: Plan.FREE, reason: 'canceled' },
+  })
+
   return { success: true, message: 'ยกเลิก Subscription สำเร็จแล้ว' }
 }
 
@@ -181,6 +197,15 @@ export async function changePlan(storeId: string, newPlan: Plan) {
         }),
       ])
 
+      await createLog({
+        action: LogAction.CHANGE_PLAN,
+        actorType: ActorType.MERCHANT,
+        storeId,
+        entity: 'Subscription',
+        entityId: storeId,
+        details: { from: subscription.plan, to: newPlan, type: 'upgrade' },
+      })
+
       return {
         success: true,
         message: `เปลี่ยนแพลนเป็น ${newPlan} เรียบร้อยแล้ว`,
@@ -191,6 +216,19 @@ export async function changePlan(storeId: string, newPlan: Plan) {
         data: {
           pendingPlan: newPlan,
           pendingPlanAt: subscription.endDate,
+        },
+      })
+
+      await createLog({
+        action: LogAction.CHANGE_PLAN,
+        actorType: ActorType.MERCHANT,
+        storeId,
+        entity: 'Subscription',
+        entityId: storeId,
+        details: {
+          from: subscription.plan,
+          to: newPlan,
+          type: 'downgrade_pending',
         },
       })
 

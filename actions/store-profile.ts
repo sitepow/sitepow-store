@@ -1,8 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { StoreProfileFormValues } from '@/zod/store-profile'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const storeProfileSelect = {
@@ -61,6 +62,15 @@ export async function updateStoreProfile(
         email: input.email || null,
         taxId: input.taxId || null,
       },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Store',
+      entityId: storeId,
+      details: { setting: 'profile', updatedFields: Object.keys(input) },
     })
 
     return { success: true, message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }

@@ -1,5 +1,7 @@
 'use client'
 
+import { ACTOR_TYPE_TH, LOG_ACTION_TH } from '@/constants/translate'
+import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconFilter, IconSearch } from '@tabler/icons-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -55,15 +57,11 @@ export function AuditLogFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">ทั้งหมดทุกประเภท</SelectItem>
-              <SelectItem value="MERCHANT">
-                Merchant (เจ้าของร้าน / พนักงาน)
-              </SelectItem>
-              <SelectItem value="SYSTEM">
-                System (ระบบอัตโนมัติ / AI)
-              </SelectItem>
-              <SelectItem value="SUPER_ADMIN">
-                Super Admin (ทีมผู้ดูแลระบบกลาง)
-              </SelectItem>
+              {(Object.keys(ACTOR_TYPE_TH) as ActorType[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {ACTOR_TYPE_TH[key]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Field>
@@ -78,18 +76,11 @@ export function AuditLogFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">ทุกเหตุการณ์</SelectItem>
-              <SelectItem value="UPDATE_STOCK">
-                การจัดการคลังสต็อก (UPDATE_STOCK)
-              </SelectItem>
-              <SelectItem value="MANAGE_STAFF">
-                การตั้งค่าสิทธิ์พนักงาน (MANAGE_STAFF)
-              </SelectItem>
-              <SelectItem value="CREATE_ORDER">
-                การออกออเดอร์ใหม่ (CREATE_ORDER)
-              </SelectItem>
-              <SelectItem value="DELETE_PRODUCT">
-                การลบข้อมูลสินค้าออกจากระบบ (DELETE_PRODUCT)
-              </SelectItem>
+              {(Object.keys(LOG_ACTION_TH) as LogAction[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {LOG_ACTION_TH[key]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Field>

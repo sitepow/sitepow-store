@@ -83,6 +83,9 @@ export const PLAN_TH: Record<Plan, string> = {
 }
 
 export const LOG_ACTION_TH: Record<LogAction, string> = {
+  [LogAction.CREATE_STORE]: 'สร้างร้านค้าใหม่',
+  [LogAction.UPDATE_STORE]: 'แก้ไขข้อมูลร้านค้า',
+  [LogAction.DELETE_STORE]: 'ลบร้านค้า',
   [LogAction.CHANGE_PLAN]: 'เปลี่ยนแผนการใช้งาน',
   [LogAction.ADJUST_CREDITS]: 'ปรับปรุงเครดิต AI',
   [LogAction.SUSPEND_STORE]: 'ระงับการใช้งานร้านค้า',

@@ -1,8 +1,10 @@
 'use server'
 
+import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import { TaxSettingFormValues } from '@/zod/tax'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 export async function getTaxSetting(storeId: string) {
@@ -25,6 +27,15 @@ export async function updateTaxSetting(
         ...data,
         vatRate: parseFloat(data.vatRate),
       },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Store',
+      entityId: storeId,
+      details: { setting: 'tax', updatedFields: Object.keys(data) },
     })
 
     return {

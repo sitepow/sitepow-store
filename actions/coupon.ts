@@ -1,8 +1,14 @@
 'use server'
 
-import { DiscountType, Prisma } from '@/generated/prisma/client'
+import {
+  ActorType,
+  DiscountType,
+  LogAction,
+  Prisma,
+} from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetCouponsParams {
@@ -146,6 +152,19 @@ export async function createCoupon(input: CreateCouponInput) {
       select: couponSelect,
     })
 
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: input.storeId,
+      entity: 'Coupon',
+      entityId: coupon.id,
+      details: {
+        code: input.code,
+        discountType: input.discountType,
+        type: 'created',
+      },
+    })
+
     return {
       success: true,
       message: 'สร้างคูปองสำเร็จ',
@@ -170,7 +189,16 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
         ...(input.startDate && { startDate: new Date(input.startDate) }),
         ...(input.endDate && { endDate: new Date(input.endDate) }),
       },
-      select: couponSelect,
+      select: { ...couponSelect, storeId: true },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: updated.storeId,
+      entity: 'Coupon',
+      entityId: id,
+      details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
     return {
@@ -190,7 +218,21 @@ export async function deleteCoupon(id: string) {
       return { success: false, message: 'ไม่พบ Coupon ID' }
     }
 
+    const coupon = await prisma.coupon.findUnique({
+      where: { id },
+      select: { storeId: true, code: true },
+    })
+
     await prisma.coupon.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: coupon?.storeId,
+      entity: 'Coupon',
+      entityId: id,
+      details: { code: coupon?.code, type: 'deleted' },
+    })
 
     return { success: true, message: 'ลบคูปองสำเร็จ' }
   } catch (error) {

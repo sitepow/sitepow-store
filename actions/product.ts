@@ -1,9 +1,10 @@
 'use server'
 
 import { auth } from '@/auth'
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateProductInput {
@@ -201,7 +202,7 @@ export async function createProduct(input: CreateProductInput) {
       ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
       : undefined
 
-    await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         ...rest,
         storeId,
@@ -244,6 +245,15 @@ export async function createProduct(input: CreateProductInput) {
       select: productSelect,
     })
 
+    await createLog({
+      action: LogAction.CREATE_PRODUCT,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Product',
+      entityId: product.id,
+      details: { title: rest.title, slug: rest.slug, categoryId },
+    })
+
     return { success: true, message: 'สร้างสินค้าสำเร็จแล้ว' }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -272,7 +282,7 @@ export async function deleteProduct(id: string) {
 
     const product = await prisma.product.findFirst({
       where: { id, store: { ownerId: userId } },
-      select: { id: true },
+      select: { id: true, title: true, storeId: true },
     })
 
     if (!product) {
@@ -280,6 +290,15 @@ export async function deleteProduct(id: string) {
     }
 
     await prisma.product.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.DELETE_PRODUCT,
+      actorType: ActorType.MERCHANT,
+      storeId: product.storeId,
+      entity: 'Product',
+      entityId: id,
+      details: { title: product.title },
+    })
 
     return { success: true, message: 'ลบสินค้าสำเร็จ' }
   } catch (error) {

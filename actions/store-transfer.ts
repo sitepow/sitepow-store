@@ -2,8 +2,9 @@
 
 import { MILLISECONDS_PER_DAY, TRANSFER_EXPIRY_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
-import { TransferStatus } from '@/generated/prisma/enums'
+import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const transferRequestSelect = {
@@ -90,6 +91,14 @@ export async function createTransferRequest(
       },
     })
 
+    await createLog({
+      action: LogAction.TRANSFER_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'StoreTransferRequest',
+      details: { toEmail, status: 'created' },
+    })
+
     return { success: true, message: 'ส่งคำขอโอนร้านค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -108,7 +117,7 @@ export async function cancelTransferRequest(
 
     const request = await prisma.storeTransferRequest.findUnique({
       where: { id: requestId },
-      select: { fromOwnerId: true, status: true },
+      select: { storeId: true, fromOwnerId: true, status: true },
     })
 
     if (!request) {
@@ -125,6 +134,15 @@ export async function cancelTransferRequest(
     await prisma.storeTransferRequest.update({
       where: { id: requestId },
       data: { status: TransferStatus.CANCELLED },
+    })
+
+    await createLog({
+      action: LogAction.TRANSFER_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId: request.storeId,
+      entity: 'StoreTransferRequest',
+      entityId: requestId,
+      details: { status: 'cancelled' },
     })
 
     return { success: true, message: 'ยกเลิกคำขอโอนสำเร็จ' }
@@ -175,6 +193,15 @@ export async function acceptTransferRequest(token: string, userId: string) {
       }),
     ])
 
+    await createLog({
+      action: LogAction.TRANSFER_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId: request.storeId,
+      entity: 'StoreTransferRequest',
+      entityId: request.id,
+      details: { status: 'accepted' },
+    })
+
     return { success: true, message: 'รับโอนร้านค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -186,7 +213,7 @@ export async function declineTransferRequest(token: string, userId: string) {
   try {
     const request = await prisma.storeTransferRequest.findUnique({
       where: { token },
-      select: { id: true, toUserId: true, status: true },
+      select: { id: true, storeId: true, toUserId: true, status: true },
     })
 
     if (!request) {
@@ -202,6 +229,15 @@ export async function declineTransferRequest(token: string, userId: string) {
     await prisma.storeTransferRequest.update({
       where: { id: request.id },
       data: { status: TransferStatus.DECLINED },
+    })
+
+    await createLog({
+      action: LogAction.TRANSFER_STORE,
+      actorType: ActorType.MERCHANT,
+      storeId: request.storeId,
+      entity: 'StoreTransferRequest',
+      entityId: request.id,
+      details: { status: 'declined' },
     })
 
     return { success: true, message: 'ปฏิเสธคำขอโอนสำเร็จ' }

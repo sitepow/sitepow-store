@@ -1,7 +1,8 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateBranchInput {
@@ -162,6 +163,19 @@ export async function createBranch(input: CreateBranchInput) {
       select: branchSelect,
     })
 
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Branch',
+      entityId: branch.id,
+      details: {
+        name: input.name,
+        isMain: input.isMain ?? false,
+        type: 'created',
+      },
+    })
+
     return { success: true, data: branch }
   } catch (error) {
     console.error(error)
@@ -179,6 +193,15 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       where: { id },
       data: input,
       select: branchSelect,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: updatedBranch.storeId,
+      entity: 'Branch',
+      entityId: id,
+      details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
     return { success: true, data: updatedBranch }
@@ -203,6 +226,15 @@ export async function setMainBranch(id: string, storeId: string) {
       where: { id },
       data: { isMain: true },
       select: branchSelect,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Branch',
+      entityId: id,
+      details: { type: 'set_main' },
     })
 
     return { success: true, data: updatedBranch }
@@ -233,6 +265,15 @@ export async function deleteBranch(id: string, storeId: string) {
     }
 
     await prisma.branch.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Branch',
+      entityId: id,
+      details: { type: 'deleted' },
+    })
 
     return { success: true, message: 'ลบสาขาสำเร็จ' }
   } catch (error) {

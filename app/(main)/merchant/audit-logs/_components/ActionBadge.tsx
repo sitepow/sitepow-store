@@ -12,38 +12,8 @@ interface ActionBadgeProps {
 export function ActionBadge({ action }: ActionBadgeProps) {
   const label = LOG_ACTION_TH[action] || action
 
-  const getVariant = (
-    act: LogAction,
-  ): 'default' | 'destructive' | 'outline' | 'secondary' => {
-    switch (act) {
-      case LogAction.SUSPEND_STORE:
-      case LogAction.DELETE_PRODUCT:
-      case LogAction.CANCEL_ORDER:
-        return 'destructive'
-
-      case LogAction.CHANGE_PLAN:
-      case LogAction.ADJUST_CREDITS:
-      case LogAction.MANAGE_STAFF:
-      case LogAction.CREATE_ORDER:
-        return 'default'
-
-      case LogAction.UPDATE_STOCK:
-      case LogAction.RESTOCK_ITEMS:
-      case LogAction.STOCK_TRANSFER:
-      case LogAction.CREATE_PRODUCT:
-      case LogAction.UPDATE_ORDER_STATUS:
-        return 'outline'
-
-      case LogAction.LOGIN:
-      case LogAction.LOGOUT:
-      case LogAction.UPDATE_STORE_SETTING:
-      default:
-        return 'secondary'
-    }
-  }
-
   return (
-    <Badge variant={getVariant(action)} className="whitespace-nowrap">
+    <Badge variant={'outline'} className="whitespace-nowrap">
       {label}
     </Badge>
   )

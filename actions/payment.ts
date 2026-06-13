@@ -1,8 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { BankAccountFormValues, PaymentSettingFormValues } from '@/zod/payment'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const paymentSettingSelect = {
@@ -51,6 +52,16 @@ export async function upsertPaymentSetting(
       update: data,
       select: paymentSettingSelect,
     })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'PaymentSetting',
+      entityId: storeId,
+      details: { setting: 'payment', updatedFields: Object.keys(data) },
+    })
+
     return {
       success: true,
       message: 'บันทึกการตั้งค่าการชำระเงินสำเร็จแล้ว',
@@ -84,6 +95,20 @@ export async function createBankAccount(
     const account = await prisma.bankAccount.create({
       data: { ...data, paymentSettingId: setting.id },
     })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'BankAccount',
+      entityId: account.id,
+      details: {
+        setting: 'bank_account',
+        bankName: data.bankName,
+        type: 'created',
+      },
+    })
+
     return { success: true, message: 'เพิ่มบัญชีธนาคารสำเร็จ', data: account }
   } catch (error) {
     console.error(error)
@@ -100,23 +125,35 @@ export async function updateBankAccount(
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
-    if (data.isDefault) {
-      const account = await prisma.bankAccount.findUnique({
-        where: { id },
-        select: { paymentSettingId: true },
+    const account = await prisma.bankAccount.findUnique({
+      where: { id },
+      select: {
+        paymentSettingId: true,
+        paymentSetting: { select: { storeId: true } },
+      },
+    })
+
+    if (data.isDefault && account) {
+      await prisma.bankAccount.updateMany({
+        where: { paymentSettingId: account.paymentSettingId },
+        data: { isDefault: false },
       })
-      if (account) {
-        await prisma.bankAccount.updateMany({
-          where: { paymentSettingId: account.paymentSettingId },
-          data: { isDefault: false },
-        })
-      }
     }
 
     const updatedAccount = await prisma.bankAccount.update({
       where: { id },
       data,
     })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: account?.paymentSetting.storeId,
+      entity: 'BankAccount',
+      entityId: id,
+      details: { setting: 'bank_account', type: 'updated' },
+    })
+
     return {
       success: true,
       message: 'แก้ไขบัญชีธนาคารสำเร็จ',
@@ -134,7 +171,22 @@ export async function deleteBankAccount(id: string) {
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
+    const account = await prisma.bankAccount.findUnique({
+      where: { id },
+      select: { paymentSetting: { select: { storeId: true } } },
+    })
+
     await prisma.bankAccount.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: account?.paymentSetting.storeId,
+      entity: 'BankAccount',
+      entityId: id,
+      details: { setting: 'bank_account', type: 'deleted' },
+    })
+
     return { success: true, message: 'ลบบัญชีธนาคารสำเร็จ' }
   } catch (error) {
     console.error(error)

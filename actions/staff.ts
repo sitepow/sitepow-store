@@ -1,8 +1,14 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { StaffRole, UserRole } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  LogAction,
+  StaffRole,
+  UserRole,
+} from '@/generated/prisma/enums'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateStaffInput {
@@ -47,6 +53,7 @@ const staffStoreSelect = {
       },
     },
   },
+  store: { select: { id: true } },
 } satisfies Prisma.StaffStoreSelect
 
 export type GetStaffsItem = Prisma.StaffStoreGetPayload<{
@@ -180,6 +187,20 @@ export async function createStaff(input: CreateStaffInput) {
       select: staffStoreSelect,
     })
 
+    await createLog({
+      action: LogAction.MANAGE_STAFF,
+      actorType: ActorType.MERCHANT,
+      storeId: input.storeId,
+      entity: 'Staff',
+      entityId: staffStore.staff.id,
+      details: {
+        name: input.name,
+        email: input.email,
+        role: input.role,
+        type: 'created',
+      },
+    })
+
     return {
       success: true,
       message: 'บันทึกข้อมูลสำเร็จแล้ว',
@@ -214,6 +235,15 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
       select: staffStoreSelect,
     })
 
+    await createLog({
+      action: LogAction.MANAGE_STAFF,
+      actorType: ActorType.MERCHANT,
+      storeId: updated.store?.id,
+      entity: 'Staff',
+      entityId: updated.staff.id,
+      details: { updatedFields: Object.keys(input), type: 'updated' },
+    })
+
     return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
   } catch (error) {
     console.error(error)
@@ -227,7 +257,21 @@ export async function deleteStaff(id: string) {
       return { success: false, message: 'ไม่พบ Staff ID' }
     }
 
+    const staffStore = await prisma.staffStore.findUnique({
+      where: { id },
+      select: { storeId: true, staffId: true },
+    })
+
     await prisma.staffStore.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.MANAGE_STAFF,
+      actorType: ActorType.MERCHANT,
+      storeId: staffStore?.storeId,
+      entity: 'Staff',
+      entityId: staffStore?.staffId,
+      details: { type: 'deleted' },
+    })
 
     return { success: true, message: 'ลบพนักงานออกจากร้านสำเร็จ' }
   } catch (error) {

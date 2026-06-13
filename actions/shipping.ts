@@ -1,7 +1,11 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { ShippingZoneType } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  LogAction,
+  ShippingZoneType,
+} from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import {
   mapStoreToShippingForm,
@@ -9,6 +13,7 @@ import {
 } from '@/utils/shipping'
 import { ShippingFormValues } from '@/zod/shipping'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const branchShippingSelect = {
@@ -114,6 +119,15 @@ export async function updateStoreShippingSettings(
           })),
         )
       }
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'ShippingSetting',
+      entityId: storeId,
+      details: { branchId, setting: 'shipping' },
     })
 
     return { success: true, message: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว' }

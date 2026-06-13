@@ -191,6 +191,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Authenticator Authenticator[]
+  activityLogs  ActivityLog[]
 }
 
 model Staff {
@@ -942,6 +943,9 @@ model AiLog {
 }
 
 enum LogAction {
+  CREATE_STORE
+  UPDATE_STORE
+  DELETE_STORE
   CHANGE_PLAN
   ADJUST_CREDITS
   SUSPEND_STORE
@@ -965,8 +969,11 @@ model ActivityLog {
   action LogAction
 
   actorType ActorType
-  staffId   String?
-  staff     Staff?    @relation(fields: [staffId], references: [id])
+
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id])
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id])
 
   storeId String?
   store   Store?  @relation(fields: [storeId], references: [id], onDelete: Cascade)

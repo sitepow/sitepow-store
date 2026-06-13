@@ -1,7 +1,13 @@
 'use server'
 
-import { Prisma, StockAdjustmentReason } from '@/generated/prisma/client'
+import {
+  ActorType,
+  LogAction,
+  Prisma,
+  StockAdjustmentReason,
+} from '@/generated/prisma/client'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 interface GetStockAdjustmentsParams {
@@ -184,6 +190,21 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
         select: stockAdjustmentSelect,
       }),
     ])
+
+    await createLog({
+      action: LogAction.UPDATE_STOCK,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'StockAdjustment',
+      entityId: adjustment.id,
+      details: {
+        variantId,
+        branchId,
+        quantity,
+        reason,
+        note,
+      },
+    })
 
     return { success: true, message: 'ปรับสต็อกสำเร็จแล้ว', data: adjustment }
   } catch (error) {

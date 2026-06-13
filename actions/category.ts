@@ -1,7 +1,8 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const categorySelect = {
@@ -141,14 +142,24 @@ export async function getCategoryOptions(filters?: {
 export async function createCategory(input: CreateCategoryInput) {
   const existing = await prisma.category.findUnique({
     where: { storeId_slug: { storeId: input.storeId, slug: input.slug } },
-    select: { id: true },
   })
 
   if (existing) {
     return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้' }
   }
 
-  return await prisma.category.create({ data: input })
+  const category = await prisma.category.create({ data: input })
+
+  await createLog({
+    action: LogAction.UPDATE_STORE_SETTING,
+    actorType: ActorType.MERCHANT,
+    storeId: input.storeId,
+    entity: 'Category',
+    entityId: category.id,
+    details: { title: input.title, slug: input.slug, type: 'created' },
+  })
+
+  return { success: true, data: category }
 }
 
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
@@ -158,6 +169,16 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     }
 
     const updated = await prisma.category.update({ where: { id }, data: input })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: updated.storeId,
+      entity: 'Category',
+      entityId: id,
+      details: { updatedFields: Object.keys(input), type: 'updated' },
+    })
+
     return { success: true, data: updated }
   } catch (error) {
     console.error(error)
@@ -171,7 +192,22 @@ export async function deleteCategory(id: string) {
       return { success: false, message: 'ไม่พบ Category ID' }
     }
 
+    const category = await prisma.category.findUnique({
+      where: { id },
+      select: { storeId: true, title: true },
+    })
+
     await prisma.category.delete({ where: { id } })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: category?.storeId,
+      entity: 'Category',
+      entityId: id,
+      details: { title: category?.title, type: 'deleted' },
+    })
+
     return { success: true, message: 'ลบหมวดหมู่สำเร็จ' }
   } catch (error) {
     console.error(error)

@@ -1,5 +1,6 @@
 'use client'
 
+import { GetActivityLogItem } from '@/actions/activity-log'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconTerminal } from '@tabler/icons-react'
 
@@ -25,7 +26,7 @@ export interface ActivityLogItem {
 }
 
 interface AuditLogDetailDialogProps {
-  logItem: ActivityLogItem | null
+  logItem: GetActivityLogItem | null
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }

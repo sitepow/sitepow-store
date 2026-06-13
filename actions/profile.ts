@@ -1,9 +1,10 @@
 'use server'
 
 import { auth } from '@/auth'
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const profileSelect = {
@@ -59,6 +60,14 @@ export async function updateProfile(input: UpdateProfileInput) {
       ...(input.image !== undefined && { image: input.image }),
     },
     select: profileSelect,
+  })
+
+  await createLog({
+    action: LogAction.UPDATE_STORE_SETTING,
+    actorType: ActorType.MERCHANT,
+    entity: 'User',
+    entityId: session.user.id,
+    details: { setting: 'profile', updatedFields: Object.keys(input) },
   })
 
   return {

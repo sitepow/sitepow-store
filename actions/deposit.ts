@@ -1,9 +1,15 @@
 'use server'
 
 import { auth } from '@/auth'
-import { Prisma, TransactionType } from '@/generated/prisma/client'
+import {
+  ActorType,
+  LogAction,
+  Prisma,
+  TransactionType,
+} from '@/generated/prisma/client'
 import { serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
 const transactionSelect = {
@@ -52,6 +58,15 @@ export async function depositBalance({
       data: { balance: { increment: amount } },
     }),
   ])
+
+  await createLog({
+    action: LogAction.UPDATE_STORE_SETTING,
+    actorType: ActorType.MERCHANT,
+    storeId,
+    entity: 'Transaction',
+    entityId: transaction.id,
+    details: { type: 'deposit', amount, description },
+  })
 
   return serializeDecimal(transaction)
 }
