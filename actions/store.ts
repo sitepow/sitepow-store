@@ -1,8 +1,14 @@
 'use server'
 
+import { PLAN_DETAILS } from '@/config/planDetails'
 import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
-import { Plan, StoreStatus, SubStatus } from '@/generated/prisma/enums'
+import {
+  InvoiceStatus,
+  Plan,
+  StoreStatus,
+  SubStatus,
+} from '@/generated/prisma/enums'
 
 import { prisma } from '@/lib/prisma'
 
@@ -293,6 +299,19 @@ export async function createStore(input: CreateStoreInput) {
             endDate: new Date(
               Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
             ),
+          },
+        },
+        subscriptionInvoices: {
+          create: {
+            plan: input.plan ?? Plan.STARTER,
+            amount: PLAN_DETAILS[input.plan ?? Plan.STARTER].price,
+            status: InvoiceStatus.PAID,
+            paidAt: new Date(),
+            periodStart: new Date(),
+            periodEnd: new Date(
+              Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
+            ),
+            description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} เดือนแรก`,
           },
         },
       },

@@ -418,24 +418,25 @@ model Store {
   notifyDailySummary Boolean @default(true)
   notifyBillingAlert Boolean @default(true)
 
-  blogs            Blog[]
-  categories       Category[]
-  products         Product[]
-  reviews          Review[]
-  orders           Order[]
-  customers        CustomerStore[]
-  transactions     Transaction[]
-  carts            Cart[]
-  aiLogs           AiLog[]
-  branches         Branch[]
-  activityLogs     ActivityLog[]
-  coupons          Coupon[]
-  contactTickets   ContactTicket[]
-  transferRequests StoreTransferRequest[]
-  stockTransfers   StockTransfer[]
-  stockAdjustments StockAdjustment[]
-  PaymentSetting   PaymentSetting[]
-  StaffStore       StaffStore[]
+  blogs                Blog[]
+  categories           Category[]
+  products             Product[]
+  reviews              Review[]
+  orders               Order[]
+  customers            CustomerStore[]
+  transactions         Transaction[]
+  carts                Cart[]
+  aiLogs               AiLog[]
+  branches             Branch[]
+  activityLogs         ActivityLog[]
+  coupons              Coupon[]
+  contactTickets       ContactTicket[]
+  transferRequests     StoreTransferRequest[]
+  stockTransfers       StockTransfer[]
+  stockAdjustments     StockAdjustment[]
+  PaymentSetting       PaymentSetting[]
+  StaffStore           StaffStore[]
+  subscriptionInvoices SubscriptionInvoice[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -467,6 +468,30 @@ model StoreTransferRequest {
 
   @@index([storeId])
   @@index([token])
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  FAILED
+}
+
+model SubscriptionInvoice {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  plan        Plan
+  amount      Decimal       @db.Decimal(10, 2)
+  status      InvoiceStatus @default(UNPAID)
+  paidAt      DateTime?
+  periodStart DateTime
+  periodEnd   DateTime
+  description String?
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
 }
 
 model Subscription {

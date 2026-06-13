@@ -11,6 +11,7 @@ import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
 import {
+  IconCreditCard,
   IconExternalLink,
   IconPackage,
   IconSettings,
@@ -46,7 +47,7 @@ export function StoreTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสร้านค้า</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>สถานะ</TableHead>
@@ -126,6 +127,16 @@ export function StoreTable() {
                         }}
                       >
                         <IconSettings />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        onClick={() => {
+                          setSelectedStoreId(store.id)
+                          router.push('/merchant/billing-subscription')
+                        }}
+                      >
+                        <IconCreditCard />
                       </Button>
                       <Button
                         variant="outline"

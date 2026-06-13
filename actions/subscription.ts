@@ -30,11 +30,15 @@ export type GetSubscriptionItem = Prisma.SubscriptionGetPayload<{
 
 export type GetSubscriptionItemSerialized = DecimalToNumber<GetSubscriptionItem>
 
-const transactionSelect = {
+const subscriptionInvoiceSelect = {
   id: true,
   amount: true,
-  type: true,
+  status: true,
+  plan: true,
   description: true,
+  paidAt: true,
+  periodStart: true,
+  periodEnd: true,
   createdAt: true,
   store: {
     select: {
@@ -43,16 +47,17 @@ const transactionSelect = {
       plan: true,
     },
   },
-} satisfies Prisma.TransactionSelect
+} satisfies Prisma.SubscriptionInvoiceSelect
 
-export type GetTransactionItem = Prisma.TransactionGetPayload<{
-  select: typeof transactionSelect
+export type GetSubscriptionInvoiceItem = Prisma.SubscriptionInvoiceGetPayload<{
+  select: typeof subscriptionInvoiceSelect
 }>
 
-export type GetTransactionItemSerialized = DecimalToNumber<GetTransactionItem>
+export type GetSubscriptionInvoiceItemSerialized =
+  DecimalToNumber<GetSubscriptionInvoiceItem>
 
-export interface GetTransactionsResponse {
-  data: GetTransactionItemSerialized[]
+export interface GetSubscriptionInvoicesResponse {
+  data: GetSubscriptionInvoiceItemSerialized[]
   meta: {
     currentPage: number
     limit: number
@@ -202,7 +207,7 @@ export async function changePlan(storeId: string, newPlan: Plan) {
   }
 }
 
-export async function getTransactions({
+export async function getSubscriptionInvoices({
   ownerId,
   storeId,
   page = 1,
@@ -212,35 +217,32 @@ export async function getTransactions({
   storeId?: string
   page?: number
   limit?: number
-}): Promise<GetTransactionsResponse> {
+}): Promise<GetSubscriptionInvoicesResponse> {
   try {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.TransactionWhereInput = {
+    const whereClause: Prisma.SubscriptionInvoiceWhereInput = {
       store: { ownerId },
+      ...(storeId ? { storeId } : {}),
     }
 
-    if (storeId) {
-      whereClause.storeId = storeId
-    }
-
-    const [totalItems, transactions] = await Promise.all([
-      prisma.transaction.count({ where: whereClause }),
-      prisma.transaction.findMany({
+    const [totalItems, invoices] = await Promise.all([
+      prisma.subscriptionInvoice.count({ where: whereClause }),
+      prisma.subscriptionInvoice.findMany({
         where: whereClause,
         skip,
         take: sanitizedLimit,
         orderBy: { createdAt: 'desc' },
-        select: transactionSelect,
+        select: subscriptionInvoiceSelect,
       }),
     ])
 
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: serializeDecimal(transactions),
+      data: serializeDecimal(invoices),
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,

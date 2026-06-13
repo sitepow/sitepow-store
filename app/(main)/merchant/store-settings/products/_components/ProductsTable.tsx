@@ -41,7 +41,7 @@ export function ProductsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสสินค้า</TableHead>
               <TableHead>ชื่อสินค้า</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>

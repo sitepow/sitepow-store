@@ -40,7 +40,7 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสสินค้า</TableHead>
               <TableHead>สินค้า</TableHead>
               <TableHead>ตัวเลือก</TableHead>
               <TableHead>SKU</TableHead>

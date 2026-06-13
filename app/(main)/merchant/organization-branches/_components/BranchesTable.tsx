@@ -44,7 +44,7 @@ export function BranchesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสสาขา</TableHead>
               <TableHead>ชื่อสาขา</TableHead>
               <TableHead>ประเภท</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>

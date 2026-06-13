@@ -2,6 +2,7 @@ import { useStoreBalance } from '@/actions/hooks/deposit'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
 
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -37,8 +38,9 @@ export function StoreBalanceCard() {
         ใช้ชำระค่าขนส่งอัตโนมัติเมื่อมีออเดอร์ใหม่ และค่าบริการอื่นๆ บนแพลตฟอร์ม
         Sitepow
       </CardContent>
-      <CardFooter className="bg-muted/5 border-t pt-3 pb-3">
+      <CardFooter className="bg-muted/5 flex flex-wrap gap-2.5 border-t pt-3 pb-3">
         <DepositDialog />
+        <Button variant="outline">ถอนเงิน</Button>
       </CardFooter>
     </Card>
   )

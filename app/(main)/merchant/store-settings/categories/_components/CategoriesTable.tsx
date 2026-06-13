@@ -39,7 +39,7 @@ export function CategoriesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสหมวดหมู่</TableHead>
               <TableHead>ชื่อหมวดหมู่</TableHead>
               <TableHead>คำอธิบาย</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>

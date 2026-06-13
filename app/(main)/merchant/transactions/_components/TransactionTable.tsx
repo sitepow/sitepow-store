@@ -50,7 +50,7 @@ export function TransactionTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัส</TableHead>
+              <TableHead>รหัสธุรกรรม</TableHead>
               <TableHead>รายละเอียดรายการ</TableHead>
               <TableHead>วัน-เวลา ทำรายการ</TableHead>
               <TableHead className="text-right">จำนวนเงิน</TableHead>

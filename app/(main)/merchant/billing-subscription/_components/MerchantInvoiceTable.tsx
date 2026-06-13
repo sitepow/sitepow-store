@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 
-import { useTransactions } from '@/actions/hooks/subscription'
+import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
+import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDate } from '@/utils/date'
@@ -29,8 +30,8 @@ export function MerchantInvoiceTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { data: { data: transactions = [], meta } = {}, isLoading } =
-    useTransactions({
+  const { data: { data: invoices = [], meta } = {}, isLoading } =
+    useSubscriptionInvoices({
       ownerId: user?.id ?? '',
       storeId: selectedStoreId === ALL_STORES ? undefined : selectedStoreId,
       page,
@@ -43,49 +44,60 @@ export function MerchantInvoiceTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสธุรกรรม</TableHead>
+              <TableHead>รหัสใบแจ้งหนี้</TableHead>
               <TableHead>สำหรับร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
-              <TableHead>วันที่</TableHead>
+              <TableHead>รอบบริการ</TableHead>
               <TableHead>ยอด</TableHead>
-              <TableHead>ประเภท</TableHead>
+              <TableHead>สถานะ</TableHead>
               <TableHead className="text-right"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && transactions.length === 0 ? (
+            {isLoading && invoices.length === 0 ? (
               <TableLoadingRow colSpan={7} />
-            ) : transactions.length === 0 ? (
+            ) : invoices.length === 0 ? (
               <TableEmptyRow
                 colSpan={7}
-                title="ไม่พบประวัติการชำระเงินของร้านค้าที่คุณเลือก"
+                title="ไม่พบประวัติใบแจ้งหนี้ของร้านค้าที่คุณเลือก"
               />
             ) : (
-              transactions.map((tx) => (
-                <TableRow key={tx.id}>
+              invoices.map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableCell>{inv.id}</TableCell>
+                  <TableCell>{inv.store.name}</TableCell>
                   <TableCell>
-                    <span className="text-xs font-medium">{tx.id}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span>{tx.store.name}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-muted-foreground text-sm">
-                      {PLAN_DETAILS[tx.store.plan].name}
-                    </span>
+                    <Badge variant="outline">
+                      {PLAN_DETAILS[inv.plan].name}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <span className="text-muted-foreground text-sm">
-                      {formatDate(tx.createdAt)}
+                      {formatDate(inv.periodStart)} –{' '}
+                      {formatDate(inv.periodEnd)}
                     </span>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
-                      {formatCurrency(tx.amount)}
+                      {formatCurrency(inv.amount)}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="default">{tx.description ?? tx.type}</Badge>
+                    <Badge
+                      variant={
+                        inv.status === InvoiceStatus.PAID
+                          ? 'default'
+                          : inv.status === InvoiceStatus.FAILED
+                            ? 'destructive'
+                            : 'secondary'
+                      }
+                    >
+                      {inv.status === InvoiceStatus.PAID
+                        ? 'ชำระแล้ว'
+                        : inv.status === InvoiceStatus.FAILED
+                          ? 'ล้มเหลว'
+                          : 'รอชำระ'}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="icon">

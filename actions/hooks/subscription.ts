@@ -11,7 +11,7 @@ import {
   cancelSubscription,
   changePlan,
   getStoreSubscriptions,
-  getTransactions,
+  getSubscriptionInvoices,
 } from '../subscription'
 
 export function useStoreSubscriptions(ownerId: string) {
@@ -47,7 +47,7 @@ export function useChangePlan() {
   })
 }
 
-export function useTransactions({
+export function useSubscriptionInvoices({
   ownerId,
   storeId,
   page = 1,
@@ -62,8 +62,8 @@ export function useTransactions({
 
   return useQuery(
     queryOptions({
-      queryKey: subscriptionKeys.transactions(filters),
-      queryFn: async () => await getTransactions(filters),
+      queryKey: subscriptionKeys.invoices(filters),
+      queryFn: async () => await getSubscriptionInvoices(filters),
       enabled: !!ownerId,
       placeholderData: (previousData) => previousData,
     }),
