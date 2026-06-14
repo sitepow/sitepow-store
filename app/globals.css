@@ -49,6 +49,8 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-airy: 0 1.50943px 9.0566px rgba(96, 108, 171, 0.15);
+  --tracking-tighter: -0.05em;
+  --letter-spacing-tighter: var(--tracking-tighter);
 }
 
 :root {
@@ -123,6 +125,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    @apply tracking-tighter;
   }
   body {
     @apply bg-background text-foreground;
