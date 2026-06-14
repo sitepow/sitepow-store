@@ -152,7 +152,7 @@ export function Navbar() {
               <div key={idx} className="flex flex-col">
                 {item.children ? (
                   <div className="space-y-4">
-                    <p className="text-sm font-bold text-slate-400 uppercase">
+                    <p className="text-sm font-bold text-slate-400">
                       {item.title}
                     </p>
                     <div className="ml-2 flex flex-col space-y-4 border-l-2 border-slate-100 pl-4">
