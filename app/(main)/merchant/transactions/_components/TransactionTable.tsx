@@ -6,7 +6,7 @@ import { useTransactions } from '@/actions/hooks/transaction'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { TransactionType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'
 
@@ -87,7 +87,7 @@ export function TransactionTable() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {formatDate(new Date(transaction.createdAt))}
+                      {formatDateTime(new Date(transaction.createdAt))}
                     </TableCell>
                     <TableCell
                       className={`text-right font-bold ${

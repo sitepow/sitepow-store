@@ -6,7 +6,7 @@ import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -44,11 +44,12 @@ export function OrderTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>เลขออเดอร์</TableHead>
+              <TableHead>รหัสออเดอร์</TableHead>
               <TableHead>ลูกค้า</TableHead>
+              <TableHead>รายการสินค้า</TableHead>
+              <TableHead>ยอดรวม</TableHead>
               <TableHead>สถานะ</TableHead>
               <TableHead>จัดส่ง</TableHead>
-              <TableHead className="text-right">ยอดรวม</TableHead>
               <TableHead>วันที่</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
@@ -68,9 +69,7 @@ export function OrderTable() {
 
                 return (
                   <TableRow key={order.id}>
-                    <TableCell className="font-mono text-sm font-medium">
-                      #{order.orderNumber}
-                    </TableCell>
+                    <TableCell>{order.orderNumber}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="text-sm">{customerName}</span>
@@ -78,6 +77,14 @@ export function OrderTable() {
                           {order.customer?.email ?? order.guestEmail ?? '-'}
                         </span>
                       </div>
+                    </TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                      {order.items
+                        .map((item) => `${item.title} x${item.quantity}`)
+                        .join(', ')}
+                    </TableCell>
+                    <TableCell>
+                      {formatCurrency(Number(order.totalAmount))}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
@@ -89,12 +96,7 @@ export function OrderTable() {
                         {DELIVERY_STATUS_TH[order.deliveryStatus]}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {formatCurrency(Number(order.totalAmount))}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {formatDate(order.createdAt)}
-                    </TableCell>
+                    <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="text-right">
                       <OrderDetailDialog order={order} />
                     </TableCell>

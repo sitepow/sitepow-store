@@ -2,9 +2,15 @@
 
 import { useState } from 'react'
 
+import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
+import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
+import { ORDER_STATUS_TH } from '@/constants/translate'
+import { formatDateTime } from '@/utils/date'
+import { formatCurrency } from '@/utils/pricing'
 import { IconEye } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -18,28 +24,22 @@ import {
 } from '@/components/ui/table'
 
 import { StorePagination } from '../../../_components/Pagination'
-import { type BuyerOrder } from '../page'
 import { OrderDetailView } from './OrderDetailView'
 
 interface OrderTableProps {
-  orders: BuyerOrder[]
+  search?: string
 }
 
-export function OrderTable({ orders }: OrderTableProps) {
-  const [selectedOrder, setSelectedOrder] = useState<BuyerOrder | null>(null)
+export function OrderTable({ search }: OrderTableProps) {
+  const [page, setPage] = useState(1)
+  const [selectedOrder, setSelectedOrder] =
+    useState<GetStorefrontOrderItemSerialized | null>(null)
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'PENDING_VERIFY':
-        return <Badge variant="secondary">รอตรวจสอบสลิป</Badge>
-      case 'PROCESSING':
-        return <Badge variant="secondary">กำลังจัดเตรียม/จัดส่ง</Badge>
-      case 'COMPLETED':
-        return <Badge>สำเร็จแล้ว</Badge>
-      default:
-        return <Badge variant="destructive">ยกเลิก</Badge>
-    }
-  }
+  const { data: { data: orders = [], meta } = {}, isLoading } =
+    useStorefrontOrders({ page, limit: 10, search })
+
+  const getItemsSummary = (items: GetStorefrontOrderItemSerialized['items']) =>
+    items.map((item) => `${item.title} x ${item.quantity}`).join(', ')
 
   return (
     <>
@@ -57,18 +57,27 @@ export function OrderTable({ orders }: OrderTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.length === 0 && (
+            {isLoading && orders.length === 0 ? (
+              <TableLoadingRow colSpan={7} />
+            ) : orders.length === 0 ? (
               <TableEmptyRow colSpan={7} title="ไม่พบประวัติคำสั่งซื้อของคุณ" />
-            )}
-            {orders?.length !== 0 &&
+            ) : (
               orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-mono">{order.id}</TableCell>
-                  <TableCell>{order.storeName}</TableCell>
-                  <TableCell>{order.itemsSummary}</TableCell>
-                  <TableCell>฿{order.totalAmount.toLocaleString()}</TableCell>
-                  <TableCell>{getStatusBadge(order.status)}</TableCell>
-                  <TableCell>{order.createdAt}</TableCell>
+                  <TableCell>{order.orderNumber}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{order.store.name}</Badge>
+                  </TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    {getItemsSummary(order.items)}
+                  </TableCell>
+                  <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {ORDER_STATUS_TH[order.status]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="outline"
@@ -79,11 +88,20 @@ export function OrderTable({ orders }: OrderTableProps) {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
-      {/* <StorePagination /> */}
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
       <Dialog
         open={selectedOrder !== null}
         onOpenChange={(open) => !open && setSelectedOrder(null)}

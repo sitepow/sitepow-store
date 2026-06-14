@@ -43,6 +43,7 @@ export function CustomerTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัสลูกค้า</TableHead>
               <TableHead>ชื่อลูกค้า</TableHead>
               <TableHead>อีเมล</TableHead>
               <TableHead>เบอร์โทร</TableHead>
@@ -58,7 +59,8 @@ export function CustomerTable() {
             ) : (
               customers.map((item) => (
                 <TableRow key={item.customer.id}>
-                  <TableCell className="font-medium">
+                  <TableCell>{item.customer.id}</TableCell>
+                  <TableCell>
                     {[item.customer.firstName, item.customer.lastName]
                       .filter(Boolean)
                       .join(' ') || '-'}

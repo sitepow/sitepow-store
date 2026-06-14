@@ -6,7 +6,7 @@ import { ComponentProps } from 'react'
 
 import { useProfile } from '@/actions/hooks/profile'
 import { BASE_FAVICON } from '@/constants/favicon'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { IconCamera } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -59,7 +59,9 @@ export function ProfileAvartar({
           <Skeleton className="h-3 w-20" />
         ) : (
           <span>
-            {profile?.createdAt ? formatDate(new Date(profile.createdAt)) : '-'}
+            {profile?.createdAt
+              ? formatDateTime(new Date(profile.createdAt))
+              : '-'}
           </span>
         )}
       </CardFooter>

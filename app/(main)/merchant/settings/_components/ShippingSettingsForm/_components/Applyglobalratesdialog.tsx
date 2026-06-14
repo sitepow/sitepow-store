@@ -10,7 +10,7 @@ import {
 } from '@/actions/hooks/global-shipping-rate-matrix'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { IconCloudDownload } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -113,7 +113,9 @@ export function ApplyGlobalRatesDialog() {
           {selectedProvince && (
             <FieldDescription>
               อัพเดตฐานข้อมูลวันที่:{' '}
-              {matrixMeta?.updatedAt ? formatDate(matrixMeta?.updatedAt) : '-'}
+              {matrixMeta?.updatedAt
+                ? formatDateTime(matrixMeta?.updatedAt)
+                : '-'}
             </FieldDescription>
           )}
         </Field>

@@ -1,6 +1,6 @@
 import { ComponentProps } from 'react'
 
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { IconCalendarTime, IconCamera, IconUser } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -41,7 +41,7 @@ export function BuyerProfileAvatar({
         <span className="text-muted-foreground flex items-center gap-1">
           <IconCalendarTime size={14} /> วันที่เริ่มใช้งาน
         </span>
-        <span>{formatDate(new Date())}</span>
+        <span>{formatDateTime(new Date())}</span>
       </CardFooter>
     </Card>
   )

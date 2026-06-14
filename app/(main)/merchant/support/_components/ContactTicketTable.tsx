@@ -7,7 +7,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { TICKET_STATUS_TH } from '@/constants/translate'
 import { TicketStatus } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -91,7 +91,7 @@ export function ContactTicketTable() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {formatDate(ticket.createdAt)}
+                    {formatDateTime(ticket.createdAt)}
                   </TableCell>
                   <TableCell className="text-right">
                     <TicketDetailDialog ticket={ticket} />

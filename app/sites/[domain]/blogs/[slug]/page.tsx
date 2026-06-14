@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getStorefrontBlogDetail } from '@/actions/storefront/blog'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import {
   CalendarIcon,
   ChevronLeft,
@@ -80,7 +80,7 @@ export default async function StoreBlogDescriptionPage({ params }: Props) {
               <Separator orientation="vertical" className="h-4" />
               <div className="flex items-center gap-1.5">
                 <CalendarIcon size={16} />
-                <span>{formatDate(blog.createdAt)}</span>
+                <span>{formatDateTime(blog.createdAt)}</span>
               </div>
               <Separator orientation="vertical" className="h-4" />
               <div className="flex items-center gap-1.5">

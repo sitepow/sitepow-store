@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import { useAddressOptions } from '@/actions/hooks/storefront/address'
+import { useCreateOrder } from '@/actions/hooks/storefront/order'
 import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
 import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping'
+import { PaymentMethod } from '@/generated/prisma/enums'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
@@ -38,10 +41,12 @@ import { useCartStore } from './store'
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const router = useRouter()
   const params = useParams()
   const storeSlug = params.domain as string
 
-  const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
+  const { items, updateQuantity, removeItem, getCartSummary, clearCart } =
+    useCartStore()
   const summary = getCartSummary()
 
   const [selectedAddress, setSelectedAddress] = useState<string>('')
@@ -52,6 +57,8 @@ export default function StoreCartPage() {
   const { data: addressOptions = [] } = useAddressOptions()
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
   const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
+
+  const createOrderMutation = useCreateOrder()
 
   const stepIcons = {
     address: IconMapPin,
@@ -114,6 +121,57 @@ export default function StoreCartPage() {
     }
   }
 
+  const getPaymentMethod = (paymentId: string): PaymentMethod => {
+    if (paymentId === 'promptpay') {
+      return PaymentMethod.QR_PROMPTPAY
+    }
+    if (paymentId === 'stripe') {
+      return PaymentMethod.CREDIT_CARD
+    }
+    return PaymentMethod.TRANSFER
+  }
+
+  const handleCreateOrder = () => {
+    if (!selectedAddressData || !selectedShippingData || !selectedPaymentData) {
+      return
+    }
+
+    createOrderMutation.mutate(
+      {
+        storeSlug,
+        addressId: selectedAddressData.id,
+        shippingMethod: selectedShippingData.courierService.name,
+        storeCourierServiceId: selectedShippingData.id,
+        shippingFee: 0, // TODO: คำนวณค่าส่งจริงจาก Shippop rate
+        paymentMethod: getPaymentMethod(selectedPaymentData.id),
+        earnedPoints: summary.totalPoints,
+        // TODO: couponId / couponDiscount จาก DiscountForm, usedPoints / pointsDiscount ถ้ามี
+        items: items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variant.id,
+          title: item.productTitle,
+          variantTitle: item.variant.title,
+          quantity: item.quantity,
+          price: item.unitPrice,
+        })),
+      },
+      {
+        onSuccess: (res) => {
+          if (res.success && res.data) {
+            toast.success(res.message)
+            clearCart()
+            router.push('/user/orders')
+          } else {
+            toast.error(res.message ?? 'เกิดข้อผิดพลาดในการสั่งซื้อสินค้า')
+          }
+        },
+        onError: () => {
+          toast.error('เกิดข้อผิดพลาดในการสั่งซื้อสินค้า')
+        },
+      },
+    )
+  }
+
   return (
     <StoreLayoutCheckout>
       <SectionContainer>
@@ -136,30 +194,42 @@ export default function StoreCartPage() {
                 <h2>ตะกร้าสินค้า</h2>
               </div>
 
-              <div className="space-y-8 p-5 text-start">
-                {items.map((item) => {
-                  const stock = item.variant.stocks.reduce(
-                    (sum, s) => sum + s.quantity,
-                    0,
-                  )
-                  return (
-                    <CartItemCard
-                      key={item.cartItemId}
-                      item={item}
-                      onRemove={removeItem}
-                      onUpdateQuantity={updateQuantity}
-                      isMaxStock={
-                        item.quantity >=
-                        getRemainingStock(items, {
-                          variantId: item.variant.id,
-                          stock,
-                          excludeCartItemId: item.cartItemId,
-                        })
-                      }
-                    />
-                  )
-                })}
-              </div>
+              {items?.length === 0 && (
+                <div className="p-5">
+                  <Alert>
+                    <AlertDescription className="flex items-center gap-2">
+                      <IconAlertCircle /> ยังไม่มีสินค้าในตระกร้า
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
+
+              {items?.length !== 0 && (
+                <div className="space-y-8 p-5 text-start">
+                  {items.map((item) => {
+                    const stock = item.variant.stocks.reduce(
+                      (sum, s) => sum + s.quantity,
+                      0,
+                    )
+                    return (
+                      <CartItemCard
+                        key={item.cartItemId}
+                        item={item}
+                        onRemove={removeItem}
+                        onUpdateQuantity={updateQuantity}
+                        isMaxStock={
+                          item.quantity >=
+                          getRemainingStock(items, {
+                            variantId: item.variant.id,
+                            stock,
+                            excludeCartItemId: item.cartItemId,
+                          })
+                        }
+                      />
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
@@ -369,9 +439,16 @@ export default function StoreCartPage() {
               <Button
                 className="mt-6 h-12 w-full text-lg"
                 size="lg"
-                disabled={activeSection !== 'review'}
+                disabled={
+                  activeSection !== 'review' ||
+                  createOrderMutation.isPending ||
+                  items?.length === 0
+                }
+                onClick={handleCreateOrder}
               >
-                สั่งสินค้า
+                {createOrderMutation.isPending
+                  ? 'กำลังสั่งซื้อ...'
+                  : 'สั่งสินค้า'}
               </Button>
             </div>
           </div>

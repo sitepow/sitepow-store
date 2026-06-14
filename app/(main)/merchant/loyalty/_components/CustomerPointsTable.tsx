@@ -111,16 +111,12 @@ export function CustomerPointsTable({
                     <TableCell className="text-primary text-right font-semibold">
                       {item.rewardPoints.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-right text-xs">
+                    <TableCell className="text-muted-foreground text-right">
                       ฿{Number(item.totalSpent).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground hover:text-foreground h-7 gap-1 text-[11px]"
-                      >
-                        <IconHistory size={12} /> ประวัติการใช้
+                      <Button variant="outline" size="icon-lg">
+                        <IconHistory />
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -6,7 +6,7 @@ import { GetContactTicketsItem } from '@/actions/contact-ticket'
 import { useUpdateTicketStatus } from '@/actions/hooks/contact-ticket'
 import { TICKET_STATUS_TH } from '@/constants/translate'
 import { TicketStatus } from '@/generated/prisma/enums'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { IconEye } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -88,7 +88,7 @@ export function TicketDetailDialog({ ticket }: TicketDetailDialogProps) {
           </div>
 
           <p className="text-muted-foreground text-xs">
-            {formatDate(ticket.createdAt)}
+            {formatDateTime(ticket.createdAt)}
           </p>
 
           <div className="flex items-center gap-3 border-t pt-3">

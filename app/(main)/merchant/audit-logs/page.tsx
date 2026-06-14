@@ -8,7 +8,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import { IconEye, IconHistory } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -114,11 +114,7 @@ export default function MerchantAuditLogsPage() {
                 ) : (
                   logs.map((log) => (
                     <TableRow key={log.id}>
-                      <TableCell>
-                        <span className="text-muted-foreground text-sm">
-                          {formatDate(log.createdAt)}
-                        </span>
-                      </TableCell>
+                      <TableCell>{formatDateTime(log.createdAt)}</TableCell>
                       <TableCell>
                         <ActionBadge action={log.action} />
                       </TableCell>

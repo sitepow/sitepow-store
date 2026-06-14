@@ -10,7 +10,6 @@ import {
   PAYMENT_METHOD_TH,
 } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
-import { formatDate } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEye } from '@tabler/icons-react'
 
@@ -115,11 +114,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
             </span>
           </div>
 
-          <p className="text-muted-foreground text-xs">
-            {formatDate(order.createdAt)}
-          </p>
-
-          <div className="flex items-center gap-3 border-t pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
             <span className="text-sm font-medium">อัปเดตสถานะ</span>
             <Select
               value={order.status}

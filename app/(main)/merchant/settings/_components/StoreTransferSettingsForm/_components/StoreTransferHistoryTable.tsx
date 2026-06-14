@@ -6,7 +6,7 @@ import { TRANSFER_STATUS_TH } from '@/constants/translate'
 import { TransferStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -57,10 +57,10 @@ export function StoreTransferHistoryTable() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {formatDate(req.expiresAt)}
+                  {formatDateTime(req.expiresAt)}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {formatDate(req.createdAt)}
+                  {formatDateTime(req.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">
                   {req.status === TransferStatus.PENDING && (

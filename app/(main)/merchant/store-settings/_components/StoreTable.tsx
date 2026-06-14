@@ -9,7 +9,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatDate } from '@/utils/date'
+import { formatDateTime } from '@/utils/date'
 import {
   IconCreditCard,
   IconExternalLink,
@@ -68,7 +68,7 @@ export function StoreTable() {
                 const isMaintenance = store.status === StoreStatus.MAINTENANCE
 
                 const formattedDate = store.createdAt
-                  ? formatDate(store.createdAt)
+                  ? formatDateTime(store.createdAt)
                   : '-'
 
                 return (
