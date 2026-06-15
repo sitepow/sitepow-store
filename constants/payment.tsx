@@ -35,7 +35,7 @@ export const PAYMENTS_FEATURES = [
     icon: IconDeviceMobile,
   },
   {
-    title: 'อัปเกรดรับบัตรเครดิตได้ (Optional)',
+    title: 'อัปเกรดรับบัตรเครดิตได้',
     description:
       'หากธุรกิจขยายตัว สามารถเชื่อมต่อ Stripe เพื่อรับบัตรเครดิตและระบบผ่อนชำระได้ (มีขั้นตอนการตรวจสอบเอกสารจากผู้ให้บริการ)',
     icon: IconCreditCard,
