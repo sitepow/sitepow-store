@@ -1,4 +1,9 @@
 import {
+  OrderStatus,
+  TicketStatus,
+  TransactionType,
+} from '@/generated/prisma/enums'
+import {
   IconBox,
   IconBuildingStore,
   IconChartBar,
@@ -63,13 +68,6 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     icon: IconMapPin,
   },
   {
-    value: 'billing',
-    label: 'กระเป๋าเงิน / ช่องทางชำระเงิน',
-    tab: 'billing',
-    icon: IconWallet,
-    hasSeparatorBefore: true,
-  },
-  {
     value: 'rewards',
     label: 'แต้มสะสมของฉัน',
     tab: 'rewards',
@@ -93,18 +91,6 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     tab: 'reviews',
     icon: IconStar,
     hasSeparatorBefore: true,
-    items: [
-      {
-        value: 'reviews-all',
-        label: 'รีวิวทั้งหมด',
-        url: '/account/reviews',
-      },
-      {
-        value: 'reviews-pending',
-        label: 'รอรีวิว',
-        url: '/account/reviews?status=pending',
-      },
-    ],
   },
   {
     value: 'support',
@@ -120,12 +106,12 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
       {
         value: 'support-open',
         label: 'รอการตอบกลับ',
-        url: '/account/support?status=open',
+        url: `/account/support?status=${TicketStatus.OPEN}`,
       },
       {
         value: 'support-resolved',
         label: 'แก้ไขแล้ว',
-        url: '/account/support?status=resolved',
+        url: `/account/support?status=${TicketStatus.RESOLVED}`,
       },
     ],
   },
@@ -183,27 +169,27 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       {
         value: 'orders-pending',
         label: 'รอชำระ',
-        url: '/merchant/orders?status=PENDING',
+        url: `/merchant/orders?status=${OrderStatus.PENDING}`,
       },
       {
         value: 'orders-paid',
         label: 'ชำระแล้ว',
-        url: '/merchant/orders?status=PAID',
+        url: `/merchant/orders?status=${OrderStatus.PAID}`,
       },
       {
         value: 'orders-shipped',
         label: 'จัดส่งแล้ว',
-        url: '/merchant/orders?status=SHIPPED',
+        url: `/merchant/orders?status=${OrderStatus.SHIPPED}`,
       },
       {
         value: 'orders-completed',
         label: 'สำเร็จ',
-        url: '/merchant/orders?status=COMPLETED',
+        url: `/merchant/orders?status=${OrderStatus.COMPLETED}`,
       },
       {
         value: 'orders-cancelled',
         label: 'ยกเลิก',
-        url: '/merchant/orders?status=CANCELLED',
+        url: `/merchant/orders?status=${OrderStatus.CANCELLED}`,
       },
     ],
   },
@@ -249,54 +235,32 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'คูปองส่วนลด',
     tab: 'coupons',
     icon: IconTicket,
-    items: [
-      {
-        value: 'coupons-all',
-        label: 'ทั้งหมด',
-        url: '/merchant/marketing-coupons',
-      },
-      {
-        value: 'coupons-active',
-        label: 'ใช้งานได้',
-        url: '/merchant/marketing-coupons?status=active',
-      },
-      {
-        value: 'coupons-expired',
-        label: 'หมดอายุ',
-        url: '/merchant/marketing-coupons?status=expired',
-      },
-    ],
   },
   {
-    value: 'transactions',
-    label: 'รายการเงิน',
-    tab: 'transactions',
+    value: 'credits',
+    label: 'การจัดการเครดิต',
+    tab: 'credits',
     icon: IconWallet,
     items: [
       {
-        value: 'transactions-all',
-        label: 'ทั้งหมด',
-        url: '/merchant/transactions',
+        value: 'credits-all',
+        label: 'ประวัติทั้งหมด',
+        url: '/merchant/credits',
       },
       {
-        value: 'transactions-deposit',
-        label: 'เติมเงิน',
-        url: '/merchant/transactions?type=DEPOSIT',
+        value: 'credits-purchase',
+        label: 'ประวัติการซื้อเครดิต',
+        url: `/merchant/credits?type=${TransactionType.CREDIT_PURCHASE}`,
       },
       {
-        value: 'transactions-withdraw',
-        label: 'ถอนเงิน',
-        url: '/merchant/transactions?type=WITHDRAW',
+        value: 'credits-usage',
+        label: 'ประวัติการใช้งาน AI',
+        url: `/merchant/credits?type=${TransactionType.AI_USAGE}`,
       },
       {
-        value: 'transactions-shipping',
-        label: 'ค่าส่ง',
-        url: '/merchant/transactions?type=SHIPPING_FEE',
-      },
-      {
-        value: 'transactions-refund',
-        label: 'คืนเงิน',
-        url: '/merchant/transactions?type=REFUND',
+        value: 'credits-refund',
+        label: 'รายการคืนเครดิต',
+        url: `/merchant/credits?type=${TransactionType.REFUND}`,
       },
     ],
   },
@@ -310,22 +274,22 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       {
         value: 'support-open',
         label: 'เปิด',
-        url: '/merchant/support?status=OPEN',
+        url: `/merchant/support?status=${TicketStatus.OPEN}`,
       },
       {
         value: 'support-in-progress',
         label: 'กำลังดำเนินการ',
-        url: '/merchant/support?status=IN_PROGRESS',
+        url: `/merchant/support?status=${TicketStatus.IN_PROGRESS}`,
       },
       {
         value: 'support-resolved',
         label: 'แก้ไขแล้ว',
-        url: '/merchant/support?status=RESOLVED',
+        url: `/merchant/support?status=${TicketStatus.RESOLVED}`,
       },
       {
         value: 'support-closed',
         label: 'ปิดแล้ว',
-        url: '/merchant/support?status=CLOSED',
+        url: `/merchant/support?status=${TicketStatus.CLOSED}`,
       },
     ],
   },

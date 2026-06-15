@@ -105,10 +105,10 @@ export const LOG_ACTION_TH: Record<LogAction, string> = {
 }
 
 export const TRANSACTION_TYPE_TH: Record<TransactionType, string> = {
-  [TransactionType.DEPOSIT]: 'เติมเงิน',
-  [TransactionType.WITHDRAW]: 'ถอนเงิน',
-  [TransactionType.SHIPPING_FEE]: 'ค่าจัดส่ง',
-  [TransactionType.REFUND]: 'คืนเงิน',
+  [TransactionType.CREDIT_PURCHASE]: 'ซื้อเครดิต',
+  [TransactionType.AI_USAGE]: 'ค่าใช้งาน AI',
+  [TransactionType.SLIP_VERIFY]: 'ค่าบริการตรวจสลิป',
+  [TransactionType.REFUND]: 'คืนเครดิต',
 }
 
 export const SUB_STATUS_TH: Record<SubStatus, string> = {

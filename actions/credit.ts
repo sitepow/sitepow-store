@@ -1,6 +1,7 @@
 'use server'
 
 import { auth } from '@/auth'
+import { EXCHANGE_RATE } from '@/constants/credit'
 import {
   ActorType,
   LogAction,
@@ -20,7 +21,7 @@ const transactionSelect = {
   createdAt: true,
 } satisfies Prisma.TransactionSelect
 
-export async function depositBalance({
+export async function purchaseCredit({
   storeId,
   amount,
   description,
@@ -30,9 +31,7 @@ export async function depositBalance({
   description?: string
 }) {
   const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
-  }
+  if (!session?.user?.id) throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
 
   const store = await prisma.store.findUnique({
     where: { id: storeId, ownerId: session.user.id },
@@ -43,35 +42,41 @@ export async function depositBalance({
     throw new Error('ไม่พบข้อมูลร้านค้า')
   }
 
+  const creditAmount = Math.floor(amount * EXCHANGE_RATE)
+
   const [transaction] = await prisma.$transaction([
     prisma.transaction.create({
       data: {
         storeId,
-        amount,
-        type: TransactionType.DEPOSIT,
-        description: description || 'เติมเงิน Wallet',
+        amount: creditAmount,
+        type: TransactionType.CREDIT_PURCHASE,
+        description: description || `ซื้อเครดิต ${creditAmount} Credits`,
       },
       select: transactionSelect,
     }),
     prisma.store.update({
       where: { id: storeId },
-      data: { balance: { increment: amount } },
+      data: { balance: { increment: creditAmount } },
     }),
   ])
 
   await createLog({
-    action: LogAction.UPDATE_STORE_SETTING,
+    action: LogAction.ADJUST_CREDITS,
     actorType: ActorType.MERCHANT,
     storeId,
     entity: 'Transaction',
     entityId: transaction.id,
-    details: { type: 'deposit', amount, description },
+    details: {
+      paidAmount: amount,
+      creditedAmount: creditAmount,
+      description,
+    },
   })
 
   return serializeDecimal(transaction)
 }
 
-export async function getStoreBalance(storeId: string) {
+export async function getStoreCredit(storeId: string) {
   const session = await auth()
   if (!session?.user?.id) {
     throw new Error('ไม่พบข้อมูลผู้ใช้งาน')

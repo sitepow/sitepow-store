@@ -182,7 +182,7 @@ export const PRICING_TABLES: PricingTables = {
           access: [true, true, true, true],
         },
         {
-          label: 'ระบบเช็คสลิปอัตโนมัติ (Easy Slip)',
+          label: 'ระบบเช็คสลิปอัตโนมัติ',
           access: [false, false, true, true],
         },
         { label: 'เชื่อมต่อ GB Prime Pay', access: [false, false, true, true] },

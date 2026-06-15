@@ -767,9 +767,9 @@ enum DeliveryStatus {
 }
 
 enum TransactionType {
-  DEPOSIT
-  WITHDRAW
-  SHIPPING_FEE
+  CREDIT_PURCHASE
+  AI_USAGE
+  SLIP_VERIFY
   REFUND
 }
 

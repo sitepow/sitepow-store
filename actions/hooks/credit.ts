@@ -8,9 +8,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { depositBalance, getStoreBalance } from '../deposit'
+import { getStoreCredit, purchaseCredit } from '../credit'
 
-export function useDepositBalance() {
+export function usePurchaseCredit() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -18,18 +18,18 @@ export function useDepositBalance() {
       storeId: string
       amount: number
       description?: string
-    }) => depositBalance(params),
+    }) => purchaseCredit(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.all })
     },
   })
 }
 
-export function useStoreBalance(storeId: string) {
+export function useStoreCredit(storeId: string) {
   return useQuery(
     queryOptions({
       queryKey: transactionKeys.list({ storeId, page: 0 }),
-      queryFn: () => getStoreBalance(storeId),
+      queryFn: () => getStoreCredit(storeId),
       enabled: !!storeId,
     }),
   )
