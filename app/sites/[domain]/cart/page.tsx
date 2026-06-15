@@ -1,21 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import toast from 'react-hot-toast'
 
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
 import { useAddressOptions } from '@/actions/hooks/storefront/address'
+import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { useCreateOrder } from '@/actions/hooks/storefront/order'
 import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
 import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping'
 import { PaymentMethod } from '@/generated/prisma/enums'
-import { getRemainingStock } from '@/utils/cart'
+import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useSession } from '@/hooks/use-session'
+import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
   IconAlertCircle,
   IconCreditCard,
+  IconLock,
   IconMapPin,
   IconShoppingCartCheck,
   IconTruckDelivery,
@@ -31,6 +34,7 @@ import { CircularProgress } from '../_components/CircularProgress'
 import { CartItemCard } from '../_components/cart/_components/CartItemCard'
 import { CartSummary } from '../_components/cart/_components/CartSummary'
 import { SummaryRow } from '../_components/cart/_components/SummaryRow'
+import { SummaryTotal } from '../_components/cart/_components/SummaryTotal'
 import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout'
 import { CheckoutSection } from './_components/CheckoutSection'
 import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog'
@@ -41,13 +45,34 @@ import { useCartStore } from './store'
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const isMounted = useIsMounted()
+
   const router = useRouter()
   const params = useParams()
   const storeSlug = params.domain as string
 
-  const { items, updateQuantity, removeItem, getCartSummary, clearCart } =
-    useCartStore()
+  const { isAuthenticated } = useSession()
+
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    getCartSummary,
+    clearCart,
+    appliedCoupon,
+    usedPoints,
+  } = useCartStore()
   const summary = getCartSummary()
+
+  const { data: loyalty } = useStorefrontLoyalty(storeSlug)
+  const pointsDiscount = usedPoints * (loyalty?.pointRedeemRate ?? 0)
+  const couponDiscount = appliedCoupon?.discountAmount ?? 0
+
+  const grandTotal = calculateGrandTotal({
+    subtotal: summary.finalPrice,
+    pointsDiscount,
+    couponDiscount,
+  })
 
   const [selectedAddress, setSelectedAddress] = useState<string>('')
   const [selectedShipping, setSelectedShipping] = useState<string>('')
@@ -142,10 +167,11 @@ export default function StoreCartPage() {
         addressId: selectedAddressData.id,
         shippingMethod: selectedShippingData.courierService.name,
         storeCourierServiceId: selectedShippingData.id,
-        shippingFee: 0, // TODO: คำนวณค่าส่งจริงจาก Shippop rate
+        shippingFee: 0,
         paymentMethod: getPaymentMethod(selectedPaymentData.id),
+        couponId: appliedCoupon?.id,
+        usedPoints,
         earnedPoints: summary.totalPoints,
-        // TODO: couponId / couponDiscount จาก DiscountForm, usedPoints / pointsDiscount ถ้ามี
         items: items.map((item) => ({
           productId: item.productId,
           variantId: item.variant.id,
@@ -158,18 +184,16 @@ export default function StoreCartPage() {
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            toast.success(res.message)
             clearCart()
             router.push('/user/orders')
-          } else {
-            toast.error(res.message ?? 'เกิดข้อผิดพลาดในการสั่งซื้อสินค้า')
           }
-        },
-        onError: () => {
-          toast.error('เกิดข้อผิดพลาดในการสั่งซื้อสินค้า')
         },
       },
     )
+  }
+
+  if (!isMounted) {
+    return null
   }
 
   return (
@@ -242,7 +266,7 @@ export default function StoreCartPage() {
               />
               <div className="space-y-0.5">
                 <h3 className="font-bold" suppressHydrationWarning>
-                  ยอดที่ต้องชำระ: {formatCurrency(summary.finalPrice)}
+                  ยอดที่ต้องชำระ: {formatCurrency(grandTotal)}
                 </h3>
                 <p className="text-xs opacity-50">เลือกที่อยู่การจัดส่ง</p>
               </div>
@@ -253,6 +277,7 @@ export default function StoreCartPage() {
               isActive={activeSection === 'address'}
               isCompleted={!!selectedAddressData}
               onEdit={() => setActiveSection('address')}
+              isDisabled={!isAuthenticated}
             >
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -316,6 +341,7 @@ export default function StoreCartPage() {
               isActive={activeSection === 'shipping'}
               isCompleted={!!selectedShipping}
               onEdit={() => setActiveSection('shipping')}
+              isDisabled={!isAuthenticated}
             >
               <div className="space-y-4">
                 {shippingOptions.length === 0 && (
@@ -381,6 +407,7 @@ export default function StoreCartPage() {
               isActive={activeSection === 'payment'}
               isCompleted={!!selectedPayment}
               onEdit={() => setActiveSection('payment')}
+              isDisabled={!isAuthenticated}
             >
               <div className="space-y-3">
                 {paymentMethods.length === 0 && (
@@ -434,22 +461,61 @@ export default function StoreCartPage() {
             </CheckoutSection>
 
             <div className="rounded-xl border border-gray-100 bg-white p-5">
-              <SummaryRow label="ส่วนลด" value={<DiscountForm />} />
+              <SummaryRow
+                label="ส่วนลด"
+                value={<DiscountForm subtotal={summary.finalPrice} />}
+              />
               <CartSummary summary={summary} />
-              <Button
-                className="mt-6 h-12 w-full text-lg"
-                size="lg"
-                disabled={
-                  activeSection !== 'review' ||
-                  createOrderMutation.isPending ||
-                  items?.length === 0
-                }
-                onClick={handleCreateOrder}
-              >
-                {createOrderMutation.isPending
-                  ? 'กำลังสั่งซื้อ...'
-                  : 'สั่งสินค้า'}
-              </Button>
+
+              {(pointsDiscount > 0 || couponDiscount > 0) && (
+                <div className="mt-2 space-y-1 border-t pt-2">
+                  {pointsDiscount > 0 && (
+                    <SummaryRow
+                      label="ส่วนลดจากแต้มสะสม"
+                      value={`-${formatCurrency(pointsDiscount)}`}
+                    />
+                  )}
+                  {couponDiscount > 0 && (
+                    <SummaryRow
+                      label={`ส่วนลดจากรหัส (${appliedCoupon?.code})`}
+                      value={`-${formatCurrency(couponDiscount)}`}
+                    />
+                  )}
+                  <SummaryTotal
+                    label="ยอดที่ต้องชำระ"
+                    value={formatCurrency(grandTotal)}
+                  />
+                </div>
+              )}
+
+              {isAuthenticated && (
+                <Button
+                  className="mt-6 h-12 w-full text-lg"
+                  size="lg"
+                  disabled={
+                    activeSection !== 'review' ||
+                    createOrderMutation.isPending ||
+                    items?.length === 0
+                  }
+                  onClick={handleCreateOrder}
+                >
+                  {createOrderMutation.isPending
+                    ? 'กำลังสั่งซื้อ...'
+                    : 'สั่งสินค้า'}
+                </Button>
+              )}
+
+              {!isAuthenticated && (
+                <Button
+                  className="mt-6 h-12 w-full text-lg"
+                  onClick={() => {
+                    router.push('/login')
+                  }}
+                >
+                  <IconLock />
+                  เข้าสู่ระบบเพื่อสั่งสินค้า
+                </Button>
+              )}
             </div>
           </div>
         </div>

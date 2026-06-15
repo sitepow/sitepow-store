@@ -1,6 +1,7 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
+import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { prisma } from '@/lib/prisma'
 
@@ -32,7 +33,7 @@ export type GetCustomersItem = Prisma.CustomerStoreGetPayload<{
 }>
 
 export interface GetCustomersResponse {
-  data: GetCustomersItem[]
+  data: DecimalToNumber<GetCustomersItem[]>
   meta: {
     currentPage: number
     limit: number
@@ -81,7 +82,7 @@ export async function getCustomers({
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: customerStores,
+      data: serializeDecimal(customerStores),
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,

@@ -6,13 +6,24 @@ import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+export interface AppliedCoupon {
+  id: string
+  code: string
+  discountAmount: number
+}
+
 interface CartStore {
   items: CartItem[]
+  appliedCoupon: AppliedCoupon | null
+  usedPoints: number
 
   addItem: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, qty: number) => void
   clearCart: () => void
+
+  setAppliedCoupon: (coupon: AppliedCoupon | null) => void
+  setUsedPoints: (points: number) => void
 
   getCartSummary: () => CartSummary
 }
@@ -27,6 +38,8 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      appliedCoupon: null,
+      usedPoints: 0,
 
       addItem: (newItem) => {
         const { items } = get()
@@ -106,7 +119,11 @@ export const useCartStore = create<CartStore>()(
         })
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedCoupon: null, usedPoints: 0 }),
+
+      setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
+
+      setUsedPoints: (points) => set({ usedPoints: Math.max(0, points) }),
 
       getCartSummary: () => {
         const { items } = get()

@@ -9,6 +9,7 @@ import {
   OrderStatus,
   PaymentMethod,
 } from '@/generated/prisma/enums'
+import { calculateDiscounts } from '@/utils/cart'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import crypto from 'crypto'
 
@@ -225,7 +226,14 @@ export async function createOrder(input: CreateOrderInput) {
 
     const store = await prisma.store.findUnique({
       where: { slug: input.storeSlug },
-      select: { id: true, name: true, slug: true, logo: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        logo: true,
+        isPointsEnabled: true,
+        pointRedeemRate: true,
+      },
     })
 
     if (!store) {
@@ -245,7 +253,6 @@ export async function createOrder(input: CreateOrderInput) {
     }
 
     let subtotal = 0
-
     for (const item of input.items) {
       if (item.quantity <= 0) {
         return { success: false, message: 'จำนวนสินค้าต้องมากกว่า 0' }
@@ -271,15 +278,54 @@ export async function createOrder(input: CreateOrderInput) {
       subtotal += item.price * item.quantity
     }
 
-    const shippingFee = input.shippingFee ?? 0
-    const couponDiscount = input.couponDiscount ?? 0
-    const pointsDiscount = input.pointsDiscount ?? 0
+    let couponData = undefined
+    if (input.couponId) {
+      const coupon = await prisma.coupon.findUnique({
+        where: { id: input.couponId },
+      })
 
+      if (!coupon || coupon.storeId !== store.id) {
+        return { success: false, message: 'ไม่พบรหัสส่วนลดนี้' }
+      }
+
+      const now = new Date()
+      if (now < coupon.startDate || now > coupon.endDate) {
+        return {
+          success: false,
+          message: 'รหัสส่วนลดนี้หมดอายุหรือยังไม่เริ่มใช้งาน',
+        }
+      }
+
+      if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
+        return { success: false, message: 'รหัสส่วนลดนี้ถูกใช้งานครบจำนวนแล้ว' }
+      }
+
+      if (subtotal < Number(coupon.minOrderAmount ?? 0)) {
+        return {
+          success: false,
+          message: `ยอดสั่งซื้อขั้นต่ำ ${Number(coupon.minOrderAmount ?? 0).toLocaleString()} บาท สำหรับรหัสนี้`,
+        }
+      }
+
+      couponData = {
+        discountType: coupon.discountType,
+        discountAmount: Number(coupon.discountAmount),
+        maxDiscount: coupon.maxDiscount ? Number(coupon.maxDiscount) : null,
+      }
+    }
+
+    const { couponDiscount, pointsDiscount } = calculateDiscounts({
+      subtotal,
+      coupon: couponData,
+      usedPoints: input.usedPoints ?? 0,
+      pointRedeemRate: Number(store.pointRedeemRate ?? 0),
+    })
+
+    const shippingFee = input.shippingFee ?? 0
     const totalAmount = Math.max(
       0,
       subtotal + shippingFee - couponDiscount - pointsDiscount,
     )
-
     const orderNumber = generateOrderNumber()
 
     const order = await prisma.$transaction(async (tx) => {
@@ -304,10 +350,7 @@ export async function createOrder(input: CreateOrderInput) {
 
       await tx.customerStore.upsert({
         where: {
-          customerId_storeId: {
-            customerId: customer.id,
-            storeId: store.id,
-          },
+          customerId_storeId: { customerId: customer.id, storeId: store.id },
         },
         create: {
           customerId: customer.id,
@@ -342,6 +385,7 @@ export async function createOrder(input: CreateOrderInput) {
           usedPoints: input.usedPoints ?? 0,
           pointsDiscount,
           earnedPoints: input.earnedPoints ?? 0,
+          pointRedeemRateSnapshot: store.pointRedeemRate,
           shippingAddrSnapshot: address as unknown as Prisma.InputJsonValue,
           storeSnapshot: store as unknown as Prisma.InputJsonValue,
           items: {
@@ -368,6 +412,8 @@ export async function createOrder(input: CreateOrderInput) {
       details: {
         orderNumber: order.orderNumber,
         totalAmount,
+        couponDiscount,
+        pointsDiscount,
         paymentMethod: input.paymentMethod,
         itemCount: input.items.length,
       },

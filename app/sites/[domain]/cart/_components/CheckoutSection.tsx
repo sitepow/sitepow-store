@@ -8,6 +8,7 @@ interface CheckoutSectionProps {
   isCompleted: boolean
   onEdit: () => void
   children: [React.ReactNode, React.ReactNode]
+  isDisabled?: boolean
 }
 
 export function CheckoutSection({
@@ -16,6 +17,7 @@ export function CheckoutSection({
   isCompleted,
   onEdit,
   children,
+  isDisabled = false,
 }: CheckoutSectionProps) {
   const [editView, summaryView] = children
 
@@ -23,26 +25,30 @@ export function CheckoutSection({
     <div
       className={cn(
         'overflow-hidden rounded-xl border transition-all duration-300',
-        isActive ? 'border-primary shadow-md' : 'border-gray-100 bg-gray-50/50',
+        isDisabled
+          ? 'border-gray-100 bg-gray-50 opacity-60'
+          : isActive
+            ? 'border-primary shadow-md'
+            : 'border-gray-100 bg-gray-50/50',
       )}
     >
       <div
         className={cn(
           'flex items-center justify-between px-5 py-3 transition-colors',
-          isActive ? 'bg-primary text-white' : 'bg-transparent',
+          isActive && !isDisabled ? 'bg-primary text-white' : 'bg-transparent',
         )}
       >
         <div className="flex items-center gap-2">
           <span
             className={cn(
               'text-sm font-bold',
-              !isActive && !isCompleted && 'opacity-40',
+              !isActive && !isCompleted && !isDisabled && 'opacity-40',
             )}
           >
             {title}
           </span>
         </div>
-        {!isActive && isCompleted && (
+        {!isActive && isCompleted && !isDisabled && (
           <button
             onClick={onEdit}
             className="flex items-center gap-1 text-xs font-medium hover:underline"
@@ -52,19 +58,25 @@ export function CheckoutSection({
         )}
       </div>
 
-      <div
-        className={cn(
-          'transition-all duration-300',
-          isActive ? 'px-5 py-3 opacity-100' : 'h-0 overflow-hidden opacity-0',
-        )}
-      >
-        {isActive && editView}
-      </div>
+      {!isDisabled && (
+        <>
+          <div
+            className={cn(
+              'transition-all duration-300',
+              isActive
+                ? 'px-5 py-3 opacity-100'
+                : 'h-0 overflow-hidden opacity-0',
+            )}
+          >
+            {isActive && editView}
+          </div>
 
-      {!isActive && isCompleted && (
-        <div className="border-t border-gray-50 bg-white px-5 py-3">
-          {summaryView}
-        </div>
+          {!isActive && isCompleted && (
+            <div className="border-t border-gray-50 bg-white px-5 py-3">
+              {summaryView}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

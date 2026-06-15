@@ -1,8 +1,22 @@
-import { useState } from 'react'
+'use client'
 
-import { MAX_POINTS, POINT_RATE } from '@/constants/sites/point'
+import { useEffect, useState } from 'react'
+
+import { useParams } from 'next/navigation'
+
+import {
+  useStorefrontLoyalty,
+  useValidateCoupon,
+} from '@/actions/hooks/storefront/discount'
+import { useSession } from '@/hooks/use-session'
+import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconDiscount2, IconTicket, IconWallet } from '@tabler/icons-react'
+import {
+  IconDiscount2,
+  IconTicket,
+  IconWallet,
+  IconX,
+} from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,22 +33,87 @@ import { Slider } from '@/components/ui/slider'
 
 import { SummaryRow } from '../../_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '../../_components/cart/_components/SummaryTotal'
+import { useCartStore } from '../store'
 
-export function DiscountForm() {
-  const [points, setPoints] = useState([0])
-  const useDiscountTHB = points[0] * POINT_RATE
+interface DiscountFormProps {
+  subtotal: number
+}
+
+export function DiscountForm({ subtotal }: DiscountFormProps) {
+  const params = useParams()
+  const storeSlug = params.domain as string
+
+  const { isAuthenticated } = useSession()
+  const { data: loyalty } = useStorefrontLoyalty(storeSlug)
+  const validateCouponMutation = useValidateCoupon()
+
+  const { appliedCoupon, usedPoints, setAppliedCoupon, setUsedPoints } =
+    useCartStore()
+
+  const [couponCode, setCouponCode] = useState('')
+  const [couponError, setCouponError] = useState('')
+
+  const pointRedeemRate = loyalty?.pointRedeemRate ?? 0
+  const customerPoints = loyalty?.customerPoints ?? 0
+
+  const pointsDiscount = usedPoints * pointRedeemRate
+  const couponDiscount = appliedCoupon?.discountAmount ?? 0
+  const totalDiscount = pointsDiscount + couponDiscount
+
+  const maxUsablePoints = calculateMaxUsablePoints(
+    subtotal,
+    couponDiscount,
+    pointRedeemRate,
+    customerPoints,
+  )
+
+  useEffect(() => {
+    if (usedPoints > maxUsablePoints) {
+      setUsedPoints(maxUsablePoints)
+    }
+  }, [maxUsablePoints, usedPoints, setUsedPoints])
+
+  const handlePointsChange = (value: number[]) => {
+    setUsedPoints(Math.max(0, Math.min(value[0], maxUsablePoints)))
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Math.max(0, Math.min(Number(e.target.value), MAX_POINTS))
-    setPoints([val])
+    const val = Math.max(0, Math.min(Number(e.target.value), maxUsablePoints))
+    setUsedPoints(val)
+  }
+
+  const handleApplyCoupon = () => {
+    setCouponError('')
+    validateCouponMutation.mutate(
+      { storeSlug, code: couponCode.trim(), subtotal },
+      {
+        onSuccess: (res) => {
+          if (res.success && res.data) {
+            setAppliedCoupon(res.data)
+            setCouponCode('')
+          } else {
+            setCouponError(res.message ?? 'รหัสส่วนลดไม่ถูกต้อง')
+          }
+        },
+      },
+    )
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponError('')
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="gap-2">
-          <IconTicket className="size-4" />
-          <span>เพิ่มส่วนลด</span>
+        <Button
+          variant="secondary"
+          className="gap-2"
+          disabled={!isAuthenticated}
+        >
+          <IconTicket />
+          เพิ่มส่วนลด
         </Button>
       </DialogTrigger>
 
@@ -47,71 +126,122 @@ export function DiscountForm() {
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <IconWallet className="text-muted-foreground size-4" />
-                ใช้แต้มสะสม
-              </Label>
-              <span className="text-primary text-sm font-semibold">
-                {formatNumber(points[0])} / {formatNumber(MAX_POINTS)} แต้ม
-              </span>
-            </div>
+          {loyalty?.isPointsEnabled && (
+            <>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2">
+                    <IconWallet className="text-muted-foreground size-4" />
+                    ใช้แต้มสะสม
+                  </Label>
+                  <span className="text-primary text-sm font-semibold">
+                    {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
+                    แต้ม
+                  </span>
+                </div>
 
-            <Slider
-              max={MAX_POINTS}
-              step={10}
-              value={points}
-              onValueChange={setPoints}
-              className="cursor-pointer"
-            />
+                <Slider
+                  max={maxUsablePoints}
+                  step={10}
+                  value={[usedPoints]}
+                  onValueChange={handlePointsChange}
+                  disabled={maxUsablePoints === 0}
+                  className="cursor-pointer"
+                />
 
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={points[0]}
-                onChange={handleInputChange}
-                className="w-24 text-center font-bold"
-              />
-              <span className="text-muted-foreground text-sm">
-                แลกเป็นส่วนลดได้{' '}
-                <strong className="text-foreground">
-                  {formatCurrency(useDiscountTHB)}
-                </strong>
-              </span>
-            </div>
-          </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={usedPoints}
+                    onChange={handleInputChange}
+                    disabled={maxUsablePoints === 0}
+                    className="w-24 text-center font-bold"
+                  />
+                  <span className="text-muted-foreground text-sm">
+                    แลกเป็นส่วนลดได้{' '}
+                    <strong className="text-foreground">
+                      {formatCurrency(pointsDiscount)}
+                    </strong>
+                  </span>
+                </div>
 
-          <Separator />
+                <p className="text-muted-foreground text-xs">
+                  คุณมีแต้มสะสม {formatNumber(customerPoints)} แต้ม (1 แต้ม ={' '}
+                  {formatCurrency(pointRedeemRate)})
+                </p>
+              </div>
+
+              <Separator />
+            </>
+          )}
 
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <IconDiscount2 className="text-muted-foreground size-4" />
               รหัสส่วนลด
             </Label>
-            <div className="flex gap-2">
-              <Input placeholder="กรอกรหัสส่วนลด" />
-              <Button variant="outline">ใช้งาน</Button>
-            </div>
+
+            {appliedCoupon ? (
+              <div className="bg-primary/5 border-primary/20 flex items-center justify-between rounded-md border px-3 py-2">
+                <span className="text-sm font-medium">
+                  {appliedCoupon.code}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary text-sm font-semibold">
+                    -{formatCurrency(appliedCoupon.discountAmount)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleRemoveCoupon}
+                  >
+                    <IconX />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="กรอกรหัสส่วนลด"
+                  value={couponCode}
+                  className="uppercase"
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleApplyCoupon}
+                  disabled={
+                    !couponCode.trim() || validateCouponMutation.isPending
+                  }
+                >
+                  {validateCouponMutation.isPending
+                    ? 'กำลังตรวจสอบ...'
+                    : 'ใช้งาน'}
+                </Button>
+              </div>
+            )}
+
+            {couponError && (
+              <p className="text-destructive text-xs">{couponError}</p>
+            )}
           </div>
 
           <div className="bg-muted/20 space-y-3 rounded-xl border p-4">
             <SummaryRow
               label="ส่วนลดจากแต้มสะสม"
-              value={`-${formatCurrency(useDiscountTHB)}`}
+              value={`-${formatCurrency(pointsDiscount)}`}
             />
-            <SummaryRow label="ส่วนลดจากรหัส" value={`-${formatCurrency(0)}`} />
+            <SummaryRow
+              label="ส่วนลดจากรหัส"
+              value={`-${formatCurrency(couponDiscount)}`}
+            />
             <Separator />
             <SummaryTotal
               label="รวมส่วนลดทั้งหมด"
-              value={formatCurrency(useDiscountTHB)}
+              value={formatCurrency(totalDiscount)}
             />
           </div>
         </div>
-
-        <Button size="lg" className="w-full font-bold">
-          ยืนยันการใช้ส่วนลด
-        </Button>
       </DialogContent>
     </Dialog>
   )
