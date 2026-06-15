@@ -63,7 +63,7 @@ export function ShippingSettingsForm() {
     selectedBranchId,
   )
 
-  const resetFormToDefaultDatabase = useCallback(() => {
+  const resetForm = useCallback(() => {
     if (shippingSettings) {
       reset({
         ...shippingSettings,
@@ -80,8 +80,8 @@ export function ShippingSettingsForm() {
       return
     }
 
-    resetFormToDefaultDatabase()
-  }, [selectedStoreId, selectedBranchId, resetFormToDefaultDatabase])
+    resetForm()
+  }, [selectedStoreId, selectedBranchId, resetForm])
 
   const onFormSubmit = (data: ShippingFormValues) => {
     if (!selectedStoreId) {
@@ -256,7 +256,7 @@ export function ShippingSettingsForm() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => resetFormToDefaultDatabase()}
+                      onClick={() => resetForm()}
                     >
                       ล้างค่าการตั้งค่า
                     </Button>

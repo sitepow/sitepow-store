@@ -1,5 +1,11 @@
-import { ComponentProps } from 'react'
+'use client'
 
+import { ComponentProps, useCallback, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+
+import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
+import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -11,29 +17,54 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-interface BuyerProfileFormProps extends ComponentProps<typeof Card> {
-  firstName: string
-  lastName: string
-  phone: string
-  email: string
-  onFirstNameChange: (value: string) => void
-  onLastNameChange: (value: string) => void
-  onPhoneChange: (value: string) => void
-}
+export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
+  const { data: profile } = useProfile()
+  const { mutate: updateProfile, isPending } = useUpdateProfile()
 
-export function BuyerProfileForm({
-  firstName,
-  lastName,
-  phone,
-  email,
-  onFirstNameChange,
-  onLastNameChange,
-  onPhoneChange,
-  ...props
-}: BuyerProfileFormProps) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isDirty, errors },
+  } = useForm<UpdateProfileSchema>({
+    resolver: zodResolver(updateProfileSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+    },
+  })
+
+  const resetForm = useCallback(() => {
+    if (!profile?.name) {
+      return
+    }
+
+    const [firstName, ...rest] = profile.name.split(' ')
+    const values = {
+      firstName,
+      lastName: rest.join(' '),
+      phone: profile.phone ?? undefined,
+    }
+    reset(values, { keepDefaultValues: false })
+  }, [profile, reset])
+
+  useEffect(() => {
+    resetForm()
+  }, [profile, reset, resetForm])
+
+  function onSubmit(values: UpdateProfileSchema) {
+    updateProfile(values)
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -46,39 +77,38 @@ export function BuyerProfileForm({
       <CardContent className="grid gap-5 sm:grid-cols-2">
         <Field>
           <FieldLabel>ชื่อจริง</FieldLabel>
-          <Input
-            value={firstName}
-            onChange={(e) => onFirstNameChange(e.target.value)}
-          />
+          <Input {...register('firstName')} />
+          <FieldError>{errors.firstName?.message}</FieldError>
         </Field>
         <Field>
           <FieldLabel>นามสกุล</FieldLabel>
-          <Input
-            value={lastName}
-            onChange={(e) => onLastNameChange(e.target.value)}
-          />
+          <Input {...register('lastName')} />
+          <FieldError>{errors.lastName?.message}</FieldError>
         </Field>
         <Field className="sm:col-span-2">
           <FieldLabel>อีเมลลงทะเบียน (ใช้เข้าสู่ระบบ)</FieldLabel>
-          <Input value={email} disabled />
+          <Input value={profile?.email ?? ''} disabled />
         </Field>
         <Field className="sm:col-span-2">
           <FieldLabel>เบอร์โทรศัพท์ติดต่อหลัก</FieldLabel>
-          <Input
-            value={phone}
-            onChange={(e) => onPhoneChange(e.target.value)}
-            placeholder="เช่น 0812345678"
-          />
+          <Input {...register('phone')} placeholder="เช่น 0812345678" />
+          <FieldError>{errors.phone?.message}</FieldError>
           <FieldDescription>
             เบอร์โทรศัพท์นี้ระบบจะใช้เชื่อมโยงกับฐานข้อมูลสมาชิกร้านค้า (Loyalty
-            Points) ทั้งฝั่งออนไลน์ Sale Page และออฟไลน์หน้าร้าน POS
-            เพื่อสะสมแต้มให้คุณโดยอัตโนมัติ
+            Points) เพื่อสะสมแต้มให้คุณโดยอัตโนมัติ
           </FieldDescription>
         </Field>
       </CardContent>
-      <CardFooter className="flex justify-end border-t">
-        <Button>
-          <IconDeviceFloppy size={14} /> บันทึกข้อมูลโปรไฟล์
+      <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
+        {isDirty && (
+          <Button type="button" variant="outline" onClick={resetForm}>
+            ล้างค่าการตั้งค่า
+          </Button>
+        )}
+
+        <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
+          <IconDeviceFloppy size={14} />
+          {isPending ? 'กำลังบันทึก...' : 'บันทึกข้อมูลโปรไฟล์'}
         </Button>
       </CardFooter>
     </Card>

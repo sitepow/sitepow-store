@@ -43,7 +43,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     },
   })
 
-  const resetFormToDefaultDatabase = useCallback(() => {
+  const resetForm = useCallback(() => {
     if (!profile?.name) {
       return
     }
@@ -58,8 +58,8 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
   }, [profile, reset])
 
   useEffect(() => {
-    resetFormToDefaultDatabase()
-  }, [profile, reset, resetFormToDefaultDatabase])
+    resetForm()
+  }, [profile, reset, resetForm])
 
   function onSubmit(values: UpdateProfileSchema) {
     updateProfile({
@@ -101,11 +101,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
       </CardContent>
       <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
         {isDirty && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={resetFormToDefaultDatabase}
-          >
+          <Button type="button" variant="outline" onClick={resetForm}>
             ล้างค่าการตั้งค่า
           </Button>
         )}

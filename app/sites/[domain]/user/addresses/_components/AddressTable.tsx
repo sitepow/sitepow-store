@@ -1,11 +1,15 @@
-import {
-  IconBriefcase,
-  IconEdit,
-  IconHome,
-  IconTrash,
-} from '@tabler/icons-react'
+'use client'
 
+import {
+  useAddresses,
+  useDeleteAddress,
+  useSetDefaultAddress,
+} from '@/actions/hooks/storefront/address'
+import { IconArrowForward, IconBriefcase, IconHome } from '@tabler/icons-react'
+
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,53 +21,40 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { StorePagination } from '../../../_components/Pagination'
-import { type UserAddress } from '../page'
+export function AddressTable() {
+  const { data: addresses = [], isLoading } = useAddresses()
+  const { mutate: deleteAddress, isPending: isDeletePending } =
+    useDeleteAddress()
+  const { mutate: setDefault } = useSetDefaultAddress()
 
-interface AddressTableProps {
-  addresses: UserAddress[]
-  onEdit: (address: UserAddress) => void
-  onSetDefault: (id: string) => void
-  onDelete: (id: string) => void
-}
-
-export function AddressTable({
-  addresses,
-  onEdit,
-  onSetDefault,
-  onDelete,
-}: AddressTableProps) {
   return (
-    <>
-      <div className="rounded-xl border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ที่อยู่</TableHead>
-              <TableHead>ผู้รับสินค้า</TableHead>
-              <TableHead>เบอร์ติดต่อ</TableHead>
-              <TableHead>รายละเอียดสถานที่</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {addresses.length === 0 && (
-              <TableEmptyRow
-                colSpan={5}
-                title="คุณยังไม่มีข้อมูลที่อยู่จัดส่งในระบบ สามารถกดเพิ่มที่อยู่ใหม่ได้จากปุ่มด้านบนครับ"
-              />
-            )}
-            {addresses.map((addr) => (
+    <div className="rounded-xl border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ที่อยู่</TableHead>
+            <TableHead>ผู้รับสินค้า</TableHead>
+            <TableHead>เบอร์ติดต่อ</TableHead>
+            <TableHead>รายละเอียด</TableHead>
+            <TableHead className="text-right">จัดการ</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading && addresses.length === 0 ? (
+            <TableLoadingRow colSpan={5} />
+          ) : addresses.length === 0 ? (
+            <TableEmptyRow colSpan={5} title="คุณยังไม่มีที่อยู่ในระบบ" />
+          ) : (
+            addresses.map((addr) => (
               <TableRow key={addr.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {addr.title.includes('ออฟฟิศ') ||
-                    addr.title.includes('ทำงาน') ? (
+                    {addr.name?.includes('ออฟฟิศ') ? (
                       <IconBriefcase size={16} />
                     ) : (
                       <IconHome size={16} />
                     )}
-                    <span>{addr.title}</span>
+                    <span>{addr.name}</span>
                     {addr.isDefault && (
                       <Badge variant="secondary">ที่อยู่หลัก</Badge>
                     )}
@@ -72,42 +63,31 @@ export function AddressTable({
                 <TableCell>{addr.receiverName}</TableCell>
                 <TableCell>{addr.phone}</TableCell>
                 <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                  {addr.details}
+                  {`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province} ${addr.postalCode}`}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     {!addr.isDefault && (
                       <Button
                         variant="outline"
-                        onClick={() => onSetDefault(addr.id)}
+                        onClick={() => setDefault(addr.id)}
                       >
+                        <IconArrowForward />
                         ตั้งเป็นที่อยู่หลัก
                       </Button>
                     )}
-                    <Button
-                      variant="outline"
-                      size="icon-lg"
-                      onClick={() => onEdit(addr)}
-                    >
-                      <IconEdit />
-                    </Button>
-                    {!addr.isDefault && (
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => onDelete(addr.id)}
-                      >
-                        <IconTrash />
-                      </Button>
-                    )}
+
+                    <DeleteButton
+                      isPending={isDeletePending}
+                      onDelete={() => deleteAddress(addr.id)}
+                    />
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      {/* <StorePagination /> */}
-    </>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   )
 }

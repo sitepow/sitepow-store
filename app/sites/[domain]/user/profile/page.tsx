@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconUser } from '@tabler/icons-react'
 
@@ -11,21 +9,7 @@ import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { BuyerProfileAvatar } from './_components/BuyerProfileAvatar'
 import { BuyerProfileForm } from './_components/BuyerProfileForm'
 
-const MOCK_BUYER_PROFILE = {
-  firstName: 'สมชาย',
-  lastName: 'ใจดี',
-  email: 'somchai.jd@gmail.com',
-  phone: '081-234-5678',
-  joinedDate: '2026-02-20',
-  avatarUrl: null,
-}
-
 export default function StoreUserProfilePage() {
-  const [profile, setProfile] = useState(MOCK_BUYER_PROFILE)
-  const [firstName, setFirstName] = useState(profile.firstName)
-  const [lastName, setLastName] = useState(profile.lastName)
-  const [phone, setPhone] = useState(profile.phone)
-
   return (
     <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
@@ -34,22 +18,8 @@ export default function StoreUserProfilePage() {
         description="จัดการข้อมูลบัญชีผู้ซื้อ ชื่อ-นามสกุล และเบอร์โทรศัพท์สำหรับติดต่อและรับสิทธิ์สมาชิก"
       />
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-        <BuyerProfileAvatar
-          firstName={firstName}
-          lastName={lastName}
-          email={profile.email}
-          className="col-span-1 xl:col-span-4"
-        />
-        <BuyerProfileForm
-          firstName={firstName}
-          lastName={lastName}
-          phone={phone}
-          email={profile.email}
-          onFirstNameChange={setFirstName}
-          onLastNameChange={setLastName}
-          onPhoneChange={setPhone}
-          className="col-span-1 xl:col-span-8"
-        />
+        <BuyerProfileAvatar className="col-span-1 xl:col-span-4" />
+        <BuyerProfileForm className="col-span-1 xl:col-span-8" />
       </div>
     </DashboardSidebar>
   )

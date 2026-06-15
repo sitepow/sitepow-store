@@ -37,7 +37,7 @@ export function TaxSettingsForm() {
     },
   })
 
-  const resetFormToDefaultDatabase = useCallback(() => {
+  const resetForm = useCallback(() => {
     if (taxSetting) {
       form.reset({
         ...taxSetting,
@@ -138,7 +138,7 @@ export function TaxSettingsForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => resetFormToDefaultDatabase()}
+                onClick={() => resetForm()}
               >
                 ล้างค่าการตั้งค่า
               </Button>

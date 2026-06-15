@@ -46,7 +46,7 @@ export function NotificationSettingsForm() {
     formState: { isDirty },
   } = methods
 
-  const resetFormToDefaultDatabase = useCallback(() => {
+  const resetForm = useCallback(() => {
     if (notificationSettings) {
       reset({
         ...notificationSettings,
@@ -56,9 +56,9 @@ export function NotificationSettingsForm() {
 
   useEffect(() => {
     if (notificationSettings) {
-      resetFormToDefaultDatabase()
+      resetForm()
     }
-  }, [notificationSettings, reset, resetFormToDefaultDatabase])
+  }, [notificationSettings, reset, resetForm])
 
   const onSubmit = (values: NotificationSettingsFormValues) => {
     updateMutation.mutate({
@@ -106,7 +106,7 @@ export function NotificationSettingsForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => resetFormToDefaultDatabase()}
+                onClick={() => resetForm()}
               >
                 ล้างค่าการตั้งค่า
               </Button>

@@ -46,7 +46,7 @@ export function StoreProfileForm() {
     },
   })
 
-  const resetFormToDefaultDatabase = useCallback(() => {
+  const resetForm = useCallback(() => {
     if (storeProfile) {
       reset({
         name: storeProfile.name,
@@ -58,8 +58,8 @@ export function StoreProfileForm() {
   }, [storeProfile, reset])
 
   useEffect(() => {
-    resetFormToDefaultDatabase()
-  }, [resetFormToDefaultDatabase])
+    resetForm()
+  }, [resetForm])
 
   const onSubmit = (values: StoreProfileFormValues) => {
     profileMutation.mutate(
@@ -159,7 +159,7 @@ export function StoreProfileForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={resetFormToDefaultDatabase}
+                onClick={resetForm}
                 disabled={profileMutation.isPending}
               >
                 ล้างค่าการตั้งค่า
