@@ -22,9 +22,8 @@ export function ComparisonSection() {
       <SectionHeader
         title={
           <>
-            เก็บกำไรไว้กับตัว... อย่าให้{' '}
-            <span className="text-primary">ค่าธรรมเนียมแพลตฟอร์ม</span>{' '}
-            มาหักยอดขายคุณ
+            <span className="text-primary">ตารางเปรียบเทียบ</span>{' '}
+            การขายสินค้าในแพลตฟอร์มออนไลน์
           </>
         }
         description="ลองเช็คดูว่าคุณเหลือเงินกี่บาทจากการขาย? เปลี่ยนมาใช้ระบบที่ให้คุณเป็นเจ้าของกำไร 100% กันเถอะ"

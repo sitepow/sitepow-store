@@ -5,6 +5,7 @@ import { HeroSection } from '@/components/section/HeroSection'
 import { InfrastructureSection } from '@/components/section/InfrastructureSection'
 import { LogisticsSection } from '@/components/section/LogisticsSection'
 import { PaymentSection } from '@/components/section/PaymentSection'
+import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
 import { StoresSection } from '@/components/section/StoresSection'
 
 export default function HomePage() {
@@ -13,6 +14,7 @@ export default function HomePage() {
       <HeroSection />
       <FeatureSection />
       <ComparisonSection />
+      <PricingPhilosophySection />
       <PaymentSection />
       <LogisticsSection />
       <InfrastructureSection />
