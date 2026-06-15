@@ -107,11 +107,11 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'เช็คสลิปอัตโนมัติด้วย Easy Slip',
+        text: 'เช็คสลิปอัตโนมัติ',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
-        text: 'เชื่อมต่อ GB Prime Pay (บัตร/PromptPay)',
+        text: 'เชื่อมต่อ Stripe (บัตร/PromptPay)',
         icon: <IconCreditCard size={18} stroke={1.5} />,
       },
       {
@@ -185,7 +185,7 @@ export const PRICING_TABLES: PricingTables = {
           label: 'ระบบเช็คสลิปอัตโนมัติ',
           access: [false, false, true, true],
         },
-        { label: 'เชื่อมต่อ GB Prime Pay', access: [false, false, true, true] },
+        { label: 'เชื่อมต่อ Stripe', access: [false, false, true, true] },
       ],
     },
     {

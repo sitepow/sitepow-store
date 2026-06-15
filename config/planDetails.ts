@@ -42,8 +42,8 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
     features: [
       'AI Vision ช่วยลงของ (100 ครั้ง/เดือน)',
       'AI Visual Search ช่วยพนักงานหาของ (100 ครั้ง/เดือน)',
-      'เช็คสลิปอัตโนมัติด้วย Easy Slip',
-      'เชื่อมต่อ GB Prime Pay (บัตร/PromptPay)',
+      'เช็คสลิปอัตโนมัติ',
+      'เชื่อมต่อ Stripe (บัตร/PromptPay)',
       'ลงสินค้าได้ไม่จำกัดจำนวน',
       'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
     ],
