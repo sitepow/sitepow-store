@@ -159,6 +159,6 @@ export async function validateCoupon(
     }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการตรวจสอบรหัสส่วนลด' }
+    return { success: false }
   }
 }

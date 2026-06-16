@@ -64,7 +64,7 @@ export function OrderTable({ search }: OrderTableProps) {
             ) : (
               orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell>{order.orderNumber}</TableCell>
+                  <TableCell>#{order.orderNumber}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{order.store.name}</Badge>
                   </TableCell>
@@ -106,7 +106,7 @@ export function OrderTable({ search }: OrderTableProps) {
         open={selectedOrder !== null}
         onOpenChange={(open) => !open && setSelectedOrder(null)}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           {selectedOrder && <OrderDetailView order={selectedOrder} />}
         </DialogContent>
       </Dialog>

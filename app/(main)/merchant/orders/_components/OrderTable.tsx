@@ -69,7 +69,7 @@ export function OrderTable() {
 
                 return (
                   <TableRow key={order.id}>
-                    <TableCell>{order.orderNumber}</TableCell>
+                    <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="text-sm">{customerName}</span>

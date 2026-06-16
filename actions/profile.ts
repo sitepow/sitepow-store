@@ -20,21 +20,26 @@ const profileSelect = {
 export type ProfileData = NonNullable<Awaited<ReturnType<typeof getProfile>>>
 
 export async function getProfile() {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return null
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: profileSelect,
+    })
+
+    if (!user) {
+      return null
+    }
+
+    return serializeDecimal(user)
+  } catch (error) {
+    console.error(error)
+    return null
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: profileSelect,
-  })
-
-  if (!user) {
-    throw new Error('ไม่พบข้อมูลโปรไฟล์')
-  }
-
-  return serializeDecimal(user)
 }
 
 export interface UpdateProfileInput {
@@ -45,34 +50,39 @@ export interface UpdateProfileInput {
 }
 
 export async function updateProfile(input: UpdateProfileInput) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
-  }
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
 
-  const fullName = `${input.firstName.trim()} ${input.lastName.trim()}`.trim()
+    const fullName = `${input.firstName.trim()} ${input.lastName.trim()}`.trim()
 
-  const updated = await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      name: fullName,
-      phone: input.phone ?? null,
-      ...(input.image !== undefined && { image: input.image }),
-    },
-    select: profileSelect,
-  })
+    const updated = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        name: fullName,
+        phone: input.phone ?? null,
+        ...(input.image !== undefined && { image: input.image }),
+      },
+      select: profileSelect,
+    })
 
-  await createLog({
-    action: LogAction.UPDATE_STORE_SETTING,
-    actorType: ActorType.MERCHANT,
-    entity: 'User',
-    entityId: session.user.id,
-    details: { setting: 'profile', updatedFields: Object.keys(input) },
-  })
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      entity: 'User',
+      entityId: session.user.id,
+      details: { setting: 'profile', updatedFields: Object.keys(input) },
+    })
 
-  return {
-    success: true,
-    message: 'บันทึกข้อมูลสำเร็จแล้ว',
-    data: serializeDecimal(updated),
+    return {
+      success: true,
+      message: 'บันทึกข้อมูลสำเร็จแล้ว',
+      data: serializeDecimal(updated),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }

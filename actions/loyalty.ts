@@ -55,16 +55,21 @@ export interface UpdateLoyaltySettingsInput {
 }
 
 export async function getLoyaltySettings(storeId: string) {
-  if (!storeId) {
-    return null
-  }
+  try {
+    if (!storeId) {
+      return null
+    }
 
-  return serializeDecimal(
-    await prisma.store.findUnique({
+    const data = await prisma.store.findUnique({
       where: { id: storeId },
       select: loyaltySettingsSelect,
-    }),
-  )
+    })
+
+    return serializeDecimal(data)
+  } catch (error) {
+    console.error(error)
+    return null
+  }
 }
 
 export async function updateLoyaltySettings(
@@ -112,7 +117,19 @@ export async function getCustomerPoints({
   page?: number
   limit?: number
   search?: string
-}): Promise<GetCustomerPointsResponse> {
+}) {
+  const empty = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   try {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
@@ -155,17 +172,8 @@ export async function getCustomerPoints({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+  } catch (error) {
+    console.error(error)
+    return empty
   }
 }

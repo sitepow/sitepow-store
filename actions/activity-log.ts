@@ -57,9 +57,21 @@ export async function getActivityLogs({
   page?: number
   limit?: number
 }): Promise<GetActivityLogsResponse> {
+  const emptyResponse: GetActivityLogsResponse = {
+    data: [],
+    meta: {
+      currentPage: page || 1,
+      limit: limit || 10,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   try {
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(20, limit))
+    const sanitizedPage = Math.max(1, page || 1)
+    const sanitizedLimit = Math.max(1, Math.min(20, limit || 10))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
     const whereClause: Prisma.ActivityLogWhereInput = {
@@ -102,17 +114,8 @@ export async function getActivityLogs({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+  } catch (error) {
+    console.error('Error fetching activity logs:', error)
+    return emptyResponse
   }
 }

@@ -70,6 +70,7 @@ export function LoyaltySettingsCard({
   }, [settings, reset])
 
   const isPointsEnabled = watch('isPointsEnabled')
+  const point = watch('pointRedeemRate')
 
   const onSubmit = (values: UpdateLoyaltySettingsFormValues) => {
     updateLoyaltyMutation.mutate({
@@ -131,13 +132,13 @@ export function LoyaltySettingsCard({
           <div className="flex items-center">
             <Input
               type="number"
-              min={1}
+              min={0.1}
               className="rounded-r-none"
               {...register('pointRedeemRate', { valueAsNumber: true })}
               disabled={updateLoyaltyMutation.isPending}
             />
             <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
-              แต้ม = ลด 1 บาท
+              แต้ม = ลด {point} บาท
             </span>
           </div>
           {errors?.pointRedeemRate && (

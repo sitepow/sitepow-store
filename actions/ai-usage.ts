@@ -28,7 +28,7 @@ export type StoreAiCreditItem = Prisma.StoreGetPayload<{
 export async function getStoreAiCredits(ownerId: string, storeId?: string) {
   const session = await auth()
   if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+    return []
   }
 
   try {
@@ -42,7 +42,8 @@ export async function getStoreAiCredits(ownerId: string, storeId?: string) {
         orderBy: { createdAt: 'desc' },
       }),
     )
-  } catch {
+  } catch (error) {
+    console.error(error)
     return []
   }
 }
@@ -87,8 +88,21 @@ export async function getAiLogs({
   limit = 10,
 }: GetAiLogsParams): Promise<GetAiLogsResponse> {
   const session = await auth()
+
+  const emptyResponse: GetAiLogsResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+    return emptyResponse
   }
 
   try {
@@ -125,17 +139,8 @@ export async function getAiLogs({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+  } catch (error) {
+    console.error(error)
+    return emptyResponse
   }
 }

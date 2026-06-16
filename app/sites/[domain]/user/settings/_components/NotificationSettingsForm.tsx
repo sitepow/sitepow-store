@@ -59,6 +59,7 @@ export function NotificationSettingsForm() {
           <PageTabHeader
             variant="secondary"
             title="ตั้งค่าการแจ้งเตือน"
+            description="เลือกรูปแบบการรับการแจ้งเตือนที่สำคัญ เพื่อให้คุณไม่พลาดทุกสถานะคำสั่งซื้อและการดำเนินงานภายในร้านค้า"
             icon={IconBell}
           />
         </CardHeader>

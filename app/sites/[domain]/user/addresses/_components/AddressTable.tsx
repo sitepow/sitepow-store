@@ -55,9 +55,7 @@ export function AddressTable() {
                       <IconHome size={16} />
                     )}
                     <span>{addr.name}</span>
-                    {addr.isDefault && (
-                      <Badge variant="secondary">ที่อยู่หลัก</Badge>
-                    )}
+                    {addr.isDefault && <Badge>ที่อยู่หลัก</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>{addr.receiverName}</TableCell>

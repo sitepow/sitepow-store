@@ -49,7 +49,7 @@ async function getCustomerId(userId: string) {
   })
 
   if (!user) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+    return null
   }
 
   const [firstName, ...rest] = (user.name ?? '').split(' ')
@@ -70,33 +70,46 @@ async function getCustomerId(userId: string) {
 }
 
 export async function getAddressOptions() {
-  const session = await auth()
-  if (!session?.user?.id) return []
-
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return []
+    }
+
     const customerId = await getCustomerId(session.user.id)
-    return prisma.address.findMany({
+    if (!customerId) {
+      return []
+    }
+
+    return await prisma.address.findMany({
       where: { customerId },
       select: addressOptionSelect,
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     })
-  } catch {
+  } catch (error) {
+    console.error(error)
     return []
   }
 }
 
 export async function getAddresses() {
-  const session = await auth()
-  if (!session?.user?.id) return []
-
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return []
+    }
     const customerId = await getCustomerId(session.user.id)
-    return prisma.address.findMany({
+    if (!customerId) {
+      return []
+    }
+
+    return await prisma.address.findMany({
       where: { customerId },
       select: addressDetailSelect,
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     })
-  } catch {
+  } catch (error) {
+    console.error(error)
     return []
   }
 }
@@ -104,102 +117,129 @@ export async function getAddresses() {
 export async function createAddress(
   data: Omit<AddressDetail, 'id' | 'isDefault'>,
 ) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
+
+    const customerId = await getCustomerId(session.user.id)
+    if (!customerId) {
+      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+    }
+
+    const count = await prisma.address.count({ where: { customerId } })
+    const address = await prisma.address.create({
+      data: { ...data, customerId, isDefault: count === 0 },
+      select: addressDetailSelect,
+    })
+
+    return { success: true, message: 'บันทึกที่อยู่สำเร็จแล้ว', data: address }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const customerId = await getCustomerId(session.user.id)
-
-  const count = await prisma.address.count({ where: { customerId } })
-
-  return prisma.address.create({
-    data: {
-      ...data,
-      customerId,
-      isDefault: count === 0,
-    },
-    select: addressDetailSelect,
-  })
 }
 
 export async function updateAddress(
   id: string,
   data: Partial<Omit<AddressDetail, 'id' | 'isDefault'>>,
 ) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
+
+    const customerId = await getCustomerId(session.user.id)
+    const address = await prisma.address.findUnique({
+      where: { id },
+      select: { customerId: true },
+    })
+
+    if (!address || address.customerId !== customerId) {
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
+    }
+
+    const updated = await prisma.address.update({
+      where: { id },
+      data,
+      select: addressDetailSelect,
+    })
+
+    return { success: true, message: 'อัปเดตที่อยู่สำเร็จแล้ว', data: updated }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const customerId = await getCustomerId(session.user.id)
-
-  const address = await prisma.address.findUnique({
-    where: { id },
-    select: { customerId: true },
-  })
-
-  if (!address || address.customerId !== customerId) {
-    throw new Error('ไม่พบข้อมูลที่อยู่')
-  }
-
-  return prisma.address.update({
-    where: { id },
-    data,
-    select: addressDetailSelect,
-  })
 }
 
 export async function deleteAddress(id: string) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
-  }
-
-  const customerId = await getCustomerId(session.user.id)
-
-  const address = await prisma.address.findUnique({
-    where: { id },
-    select: { customerId: true, isDefault: true },
-  })
-
-  if (!address || address.customerId !== customerId) {
-    throw new Error('ไม่พบข้อมูลที่อยู่')
-  }
-
-  await prisma.address.delete({ where: { id } })
-
-  if (address.isDefault) {
-    const next = await prisma.address.findFirst({
-      where: { customerId },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true },
-    })
-    if (next) {
-      await prisma.address.update({
-        where: { id: next.id },
-        data: { isDefault: true },
-      })
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
+
+    const customerId = await getCustomerId(session.user.id)
+    const address = await prisma.address.findUnique({
+      where: { id },
+      select: { customerId: true, isDefault: true },
+    })
+
+    if (!address || address.customerId !== customerId) {
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
+    }
+
+    await prisma.address.delete({ where: { id } })
+
+    if (address.isDefault) {
+      const next = await prisma.address.findFirst({
+        where: { customerId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      })
+      if (next) {
+        await prisma.address.update({
+          where: { id: next.id },
+          data: { isDefault: true },
+        })
+      }
+    }
+
+    return { success: true, message: 'ลบที่อยู่สำเร็จแล้ว' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
 
 export async function setDefaultAddress(id: string) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    throw new Error('ไม่พบข้อมูลผู้ใช้งาน')
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
+
+    const customerId = await getCustomerId(session.user.id)
+    if (!customerId) {
+      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+    }
+
+    await prisma.$transaction([
+      prisma.address.updateMany({
+        where: { customerId },
+        data: { isDefault: false },
+      }),
+      prisma.address.update({
+        where: { id },
+        data: { isDefault: true },
+      }),
+    ])
+
+    return { success: true, message: 'ตั้งค่าที่อยู่เริ่มต้นสำเร็จแล้ว' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const customerId = await getCustomerId(session.user.id)
-
-  await prisma.$transaction([
-    prisma.address.updateMany({
-      where: { customerId },
-      data: { isDefault: false },
-    }),
-    prisma.address.update({
-      where: { id },
-      data: { isDefault: true },
-    }),
-  ])
 }

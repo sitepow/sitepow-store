@@ -31,7 +31,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
       <DialogHeader>
         <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
         <DialogDescription>
-          ร้านค้า: {order.store.name} | วันที่:{' '}
+          ร้านค้า: {order.store.name} | วันที่สั่งซื้อ:{' '}
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
@@ -75,7 +75,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               </Button>
             </div>
           ) : (
-            <div className="text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed p-4 text-sm">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-2 rounded-lg border border-dashed p-4 text-sm">
               <IconAlertCircle className="shrink-0" />
               {order.status === OrderStatus.PENDING
                 ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'

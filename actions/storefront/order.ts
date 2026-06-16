@@ -132,14 +132,12 @@ export async function getStorefrontOrders({
 
   try {
     const session = await auth()
-    const userId = session?.user?.id
-
-    if (!userId) {
+    if (!session?.user?.id) {
       return empty
     }
 
     const customer = await prisma.customer.findUnique({
-      where: { userId },
+      where: { userId: session.user.id },
       select: { id: true },
     })
 
@@ -197,9 +195,7 @@ export async function getStorefrontOrders({
 export async function createOrder(input: CreateOrderInput) {
   try {
     const session = await auth()
-    const userId = session?.user?.id
-
-    if (!userId) {
+    if (!session?.user?.id) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนสั่งซื้อสินค้า' }
     }
 
@@ -208,7 +204,7 @@ export async function createOrder(input: CreateOrderInput) {
     }
 
     const customer = await prisma.customer.findUnique({
-      where: { userId },
+      where: { userId: session.user.id },
       select: { id: true },
     })
 
@@ -426,6 +422,6 @@ export async function createOrder(input: CreateOrderInput) {
     }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการสั่งซื้อสินค้า' }
+    return { success: false }
   }
 }

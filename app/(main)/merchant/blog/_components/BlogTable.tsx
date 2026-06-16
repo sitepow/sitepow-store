@@ -39,6 +39,7 @@ export function BlogTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัสบทความ</TableHead>
               <TableHead>ชื่อบทความ</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>แท็ก</TableHead>
@@ -52,10 +53,9 @@ export function BlogTable() {
             ) : (
               blogs.map((blog) => (
                 <TableRow key={blog.id}>
-                  <TableCell className="font-medium">{blog.title}</TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-sm">
-                    {blog.slug}
-                  </TableCell>
+                  <TableCell>{blog.id}</TableCell>
+                  <TableCell>{blog.title}</TableCell>
+                  <TableCell>{blog.slug}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {blog.tags.length === 0 ? (

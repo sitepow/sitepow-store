@@ -35,10 +35,12 @@ export function PdpaManagementForm() {
 
   const handleDelete = () => {
     deleteAccount(undefined, {
-      onSuccess: async () => {
+      onSuccess: async (data) => {
         setOpen(false)
-        await signOut({ redirect: false })
-        router.replace('/')
+        if (data?.success) {
+          await signOut({ redirect: false })
+          router.replace('/')
+        }
       },
     })
   }

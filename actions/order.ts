@@ -60,7 +60,7 @@ export type GetOrdersItem = DecimalToNumber<
 >
 
 export interface GetOrdersResponse {
-  data: DecimalToNumber<GetOrdersItem[]>
+  data: GetOrdersItem[]
   meta: {
     currentPage: number
     limit: number
@@ -78,6 +78,18 @@ export async function getOrders({
   search,
   status,
 }: GetOrdersParams): Promise<GetOrdersResponse> {
+  const emptyResponse: GetOrdersResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   try {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
@@ -123,48 +135,48 @@ export async function getOrders({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+  } catch (error) {
+    console.error(error)
+    return emptyResponse
   }
 }
 
 export async function updateOrderStatus(id: string, status: OrderStatus) {
-  if (!id) {
-    throw new Error('ไม่พบ Order ID')
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Order ID' }
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: { storeId: true, orderNumber: true, status: true },
+    })
+
+    if (!order) {
+      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    await prisma.order.update({
+      where: { id },
+      data: { status },
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_ORDER_STATUS,
+      actorType: ActorType.MERCHANT,
+      storeId: order.storeId,
+      entity: 'Order',
+      entityId: id,
+      details: {
+        orderNumber: order.orderNumber,
+        from: order.status,
+        to: status,
+      },
+    })
+
+    return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const order = await prisma.order.findUnique({
-    where: { id },
-    select: { storeId: true, orderNumber: true, status: true },
-  })
-
-  await prisma.order.update({
-    where: { id },
-    data: { status },
-  })
-
-  await createLog({
-    action: LogAction.UPDATE_ORDER_STATUS,
-    actorType: ActorType.MERCHANT,
-    storeId: order?.storeId,
-    entity: 'Order',
-    entityId: id,
-    details: {
-      orderNumber: order?.orderNumber,
-      from: order?.status,
-      to: status,
-    },
-  })
-
-  return { message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
 }

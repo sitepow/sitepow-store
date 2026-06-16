@@ -6,6 +6,7 @@ import { IconMapPin } from '@tabler/icons-react'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
+import { CustomerAddressCreateDialog } from '../../cart/_components/CustomerAddressCreateDialog'
 import { AddressTable } from './_components/AddressTable'
 
 export default function StoreUserAddressesPage() {
@@ -15,6 +16,7 @@ export default function StoreUserAddressesPage() {
         icon={IconMapPin}
         title="ที่อยู่จัดส่งของฉัน"
         description="บันทึกสมุดที่อยู่รับสินค้า เพื่อความสะดวกและรวดเร็วในการกรอกฟอร์มปลายทางตอนสั่งซื้อผ่านหน้า Sale Page"
+        endContent={<CustomerAddressCreateDialog />}
       />
       <AddressTable />
     </DashboardSidebar>
