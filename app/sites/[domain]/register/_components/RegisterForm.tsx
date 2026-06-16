@@ -14,6 +14,7 @@ import { RegisterFormInputs } from '@/types/register'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeftIcon } from 'lucide-react'
 
+import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { Button } from '@/components/ui/button'
 import {
@@ -166,6 +167,8 @@ export function StoreRegisterForm() {
             </span>
           </Link>
         </p>
+
+        <ProtectedByBrand />
       </div>
     </div>
   )

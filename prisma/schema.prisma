@@ -49,12 +49,13 @@ enum CustomerType {
 }
 
 model Customer {
-  id        String  @id @default(cuid())
-  email     String  @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   firstName String?
   lastName  String?
   phone     String?
   avatar    String?
+  deletedAt DateTime?
 
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -184,6 +185,9 @@ model User {
   role               UserRole  @default(CUSTOMER)
   phone              String?
   createdAt          DateTime  @default(now())
+
+  orderNotify     Boolean @default(true)
+  marketingNotify Boolean @default(false)
 
   staffProfile    Staff?
   customerProfile Customer?

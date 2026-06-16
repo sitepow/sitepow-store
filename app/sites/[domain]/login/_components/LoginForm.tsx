@@ -11,6 +11,7 @@ import { LoginFormInputs } from '@/types/login'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
+import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -123,6 +124,8 @@ export function StoreLoginForm() {
             </span>
           </Link>
         </p>
+
+        <ProtectedByBrand />
       </div>
     </div>
   )

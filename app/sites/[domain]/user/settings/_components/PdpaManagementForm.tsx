@@ -1,12 +1,48 @@
 'use client'
 
+import { useState } from 'react'
+
+import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+
+import {
+  useDeleteUserAccount,
+  useExportUserData,
+} from '@/actions/hooks/storefront/pdpa'
 import { IconShieldLock } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 export function PdpaManagementForm() {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+
+  const { mutate: exportData, isPending: isExporting } = useExportUserData()
+  const { mutate: deleteAccount, isPending: isDeleting } =
+    useDeleteUserAccount()
+
+  const handleDelete = () => {
+    deleteAccount(undefined, {
+      onSuccess: async () => {
+        setOpen(false)
+        await signOut({ redirect: false })
+        router.replace('/')
+      },
+    })
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -29,7 +65,13 @@ export function PdpaManagementForm() {
               (JSON/CSV)
             </span>
           </div>
-          <Button variant="outline">ร้องขอไฟล์ข้อมูล</Button>
+          <Button
+            variant="outline"
+            disabled={isExporting}
+            onClick={() => exportData()}
+          >
+            {isExporting ? 'กำลังเตรียมไฟล์...' : 'ร้องขอไฟล์ข้อมูล'}
+          </Button>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-5 pt-4">
           <div className="pr-4">
@@ -41,9 +83,34 @@ export function PdpaManagementForm() {
               &quot;การถูกลืม&quot; (Right to Erasure)
             </span>
           </div>
-          <Button variant="destructive">ขอลบข้อมูลบัญชี</Button>
+          <Button variant="destructive" onClick={() => setOpen(true)}>
+            ขอลบข้อมูลบัญชี
+          </Button>
         </div>
       </CardContent>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ยืนยันการลบบัญชีถาวร</AlertDialogTitle>
+            <AlertDialogDescription>
+              การกระทำนี้ไม่สามารถย้อนกลับได้
+              บัญชีและข้อมูลโปรไฟล์ของคุณจะถูกลบออกจากระบบทันที
+              และคุณจะออกจากระบบโดยอัตโนมัติ
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={isDeleting}
+              onClick={handleDelete}
+            >
+              {isDeleting ? 'กำลังลบ...' : 'ยืนยันลบบัญชี'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }
