@@ -12,7 +12,9 @@ import {
 import { OrderStatus } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEye } from '@tabler/icons-react'
+import { User2 } from 'lucide-react'
 
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,8 +47,6 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
         .join(' ')
     : (order.guestName ?? '-')
 
-  const customerEmail = order.customer?.email ?? order.guestEmail ?? '-'
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -61,13 +61,21 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
 
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="text-sm font-medium">{customerName}</p>
-            <p className="text-muted-foreground text-xs">{customerEmail}</p>
-            {order.guestPhone && (
-              <p className="text-muted-foreground text-xs">
-                {order.guestPhone}
-              </p>
-            )}
+            <div className="flex items-center">
+              <Avatar className="size-8 border">
+                <AvatarFallback>
+                  <User2 size={16} />
+                </AvatarFallback>
+              </Avatar>
+              <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
+                <p className="text-sm leading-none font-medium">
+                  {customerName || 'ลูกค้า'}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {order.customer?.email ?? order.guestEmail ?? '-'}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">

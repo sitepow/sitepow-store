@@ -17,31 +17,43 @@ export async function exportUserData() {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
-        id: true,
         email: true,
         name: true,
         phone: true,
-        role: true,
         createdAt: true,
-        orderNotify: true,
-        marketingNotify: true,
         customerProfile: {
           select: {
-            id: true,
-            email: true,
             firstName: true,
             lastName: true,
             phone: true,
-            customerType: true,
-            createdAt: true,
-            addresses: true,
-            orders: true,
-            reviews: true,
-            stores: {
+            addresses: {
               select: {
-                totalSpent: true,
-                rewardPoints: true,
-                store: { select: { name: true, slug: true } },
+                receiverName: true,
+                addressLine: true,
+                subDistrict: true,
+                district: true,
+                province: true,
+                postalCode: true,
+              },
+            },
+            orders: {
+              select: {
+                orderNumber: true,
+                totalAmount: true,
+                status: true,
+                createdAt: true,
+                store: {
+                  select: {
+                    name: true,
+                  },
+                },
+                items: {
+                  select: {
+                    title: true,
+                    quantity: true,
+                    price: true,
+                  },
+                },
               },
             },
           },
@@ -82,13 +94,7 @@ export async function deleteUserAccount() {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    if (user.role === UserRole.MERCHANT || user.staffProfile) {
-      return {
-        success: false,
-        message:
-          'บัญชีนี้เป็นบัญชีร้านค้าไม่สามารถลบได้ กรุณาติดต่อทีมงานหากต้องการปิดร้านค้า',
-      }
-    }
+    const isMerchant = user.role === UserRole.MERCHANT || !!user.staffProfile
 
     await prisma.$transaction(async (tx) => {
       if (user.customerProfile) {
@@ -110,10 +116,24 @@ export async function deleteUserAccount() {
         })
       }
 
-      await tx.user.delete({ where: { id: userId } })
+      if (!isMerchant) {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            email: `deleted-${randomUUID()}@sitepow.store`,
+            name: 'Deleted User',
+            phone: null,
+          },
+        })
+      }
     })
 
-    return { success: true, message: 'ลบบัญชีผู้ใช้งานสำเร็จแล้ว' }
+    return {
+      success: true,
+      message: isMerchant
+        ? 'ลบข้อมูลส่วนตัวผู้ซื้อสำเร็จแล้ว'
+        : 'ลบบัญชีผู้ใช้งานสำเร็จแล้ว',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

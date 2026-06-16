@@ -288,7 +288,7 @@ export default function MerchantDashboardPage() {
                             <User2 size={16} />
                           </AvatarFallback>
                         </Avatar>
-                        <div className="ml-4 space-y-1">
+                        <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
                           <p className="text-sm leading-none font-medium">
                             {sale.name}
                           </p>

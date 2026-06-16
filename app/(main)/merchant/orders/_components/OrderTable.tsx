@@ -8,10 +8,12 @@ import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
+import { User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
@@ -71,11 +73,20 @@ export function OrderTable() {
                   <TableRow key={order.id}>
                     <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-sm">{customerName}</span>
-                        <span className="text-muted-foreground text-xs">
-                          {order.customer?.email ?? order.guestEmail ?? '-'}
-                        </span>
+                      <div className="flex items-center">
+                        <Avatar className="size-8 border">
+                          <AvatarFallback>
+                            <User2 size={16} />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
+                          <p className="text-sm leading-none font-medium">
+                            {customerName || 'ลูกค้า'}
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            {order.customer?.email ?? order.guestEmail ?? '-'}
+                          </p>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">

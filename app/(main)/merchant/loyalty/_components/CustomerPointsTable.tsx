@@ -100,7 +100,7 @@ export function CustomerPointsTable({
               ) : (
                 customers.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       {[item.customer.firstName, item.customer.lastName]
                         .filter(Boolean)
                         .join(' ') || item.customer.email}
