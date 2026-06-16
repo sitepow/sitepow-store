@@ -15,15 +15,6 @@ export const DEFAULT_WEIGHT_STEP = 1000
 export const DEFAULT_SHIPPING_FEE = 45
 export const INITIAL_MIN_WEIGHT = 0
 
-export const COURIER_MAPPING: Record<string, string> = {
-  EMST: 'THAIPOST_EMS',
-  FLE: 'FLASH_STANDARD',
-  KRYD: 'KERRY_STANDARD',
-  SPX: 'SPX_STANDARD',
-  BEST: 'BEST_STANDARD',
-  DHL: 'DHL_STANDARD',
-}
-
 export const COURIERS_LIST: CourierWithServices[] = [
   {
     id: 'c-thaipost',
@@ -352,14 +343,3 @@ export const ZONE_LABELS: Record<
     description: 'เกาะ ดอย สูง หรือ 3 จังหวัดชายแดนใต้',
   },
 }
-
-export const SHIPPING_WEIGHT_TIERS = [
-  { minWeight: 0, maxWeight: 1000, width: 14, length: 20, height: 6 },
-  { minWeight: 1001, maxWeight: 2000, width: 17, length: 25, height: 9 },
-  { minWeight: 2001, maxWeight: 3000, width: 20, length: 30, height: 11 },
-  { minWeight: 3001, maxWeight: 5000, width: 22, length: 35, height: 14 },
-  { minWeight: 5001, maxWeight: 7000, width: 24, length: 40, height: 17 },
-  { minWeight: 7001, maxWeight: 10000, width: 30, length: 45, height: 20 },
-  { minWeight: 10001, maxWeight: 15000, width: 35, length: 50, height: 25 },
-  { minWeight: 15001, maxWeight: 20000, width: 40, length: 50, height: 30 },
-]

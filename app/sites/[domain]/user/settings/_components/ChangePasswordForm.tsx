@@ -28,7 +28,7 @@ export function ChangePasswordForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconLock}
-          title="เปลี่ยนรหัสผ่าน (Change Password)"
+          title="เปลี่ยนรหัสผ่าน"
           description="แนะนำให้ใช้รหัสผ่านที่ปลอดภัย ผสมอักษรและตัวเลข เพื่อปกป้องกระเป๋าเงินรวมถึงแต้มสะสมทั้งหมดของคุณ"
         />
       </CardHeader>

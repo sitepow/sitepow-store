@@ -1,10 +1,16 @@
 'use client'
 
 import { BUYER_NAVIGATION } from '@/constants/navigation'
-import { IconSettings } from '@tabler/icons-react'
+import {
+  IconBell,
+  IconLock,
+  IconSettings,
+  IconShieldLock,
+} from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { ChangePasswordForm } from './_components/ChangePasswordForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
@@ -18,9 +24,34 @@ export default function StoreUserSettingsPage() {
         title="ตั้งค่าบัญชีและความเป็นส่วนตัว"
         description="จัดการความปลอดภัยของรหัสผ่าน การรับข้อมูลแจ้งเตือน และรักษาสิทธิ์ของข้อมูลส่วนบุคคล (PDPA) ของคุณ"
       />
-      <ChangePasswordForm />
-      <NotificationSettingsForm />
-      <PdpaManagementForm />
+
+      <Tabs
+        defaultValue="password"
+        orientation="vertical"
+        className="flex flex-col gap-6 xl:flex-row"
+      >
+        <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1 xl:sticky xl:top-5 xl:w-57.5 xl:flex-col">
+          <TabsTrigger value="password">
+            <IconLock size={14} /> เปลี่ยนรหัสผ่าน
+          </TabsTrigger>
+          <TabsTrigger value="notifications">
+            <IconBell size={14} /> ตั้งค่าการแจ้งเตือน
+          </TabsTrigger>
+          <TabsTrigger value="pdpa">
+            <IconShieldLock size={14} /> การจัดการข้อมูล (PDPA)
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="password" className="flex-1">
+          <ChangePasswordForm />
+        </TabsContent>
+        <TabsContent value="notifications" className="flex-1">
+          <NotificationSettingsForm />
+        </TabsContent>
+        <TabsContent value="pdpa" className="flex-1">
+          <PdpaManagementForm />
+        </TabsContent>
+      </Tabs>
     </DashboardSidebar>
   )
 }

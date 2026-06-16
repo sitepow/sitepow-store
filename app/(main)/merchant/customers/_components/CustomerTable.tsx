@@ -72,7 +72,7 @@ export function CustomerTable() {
                       {CUSTOMER_TYPE_TH[item.customer.customerType]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-primary text-right font-semibold">
                     {formatNumber(item.rewardPoints)}
                   </TableCell>
                 </TableRow>

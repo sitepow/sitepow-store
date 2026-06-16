@@ -103,6 +103,5 @@ export const NAVBAR_ITEMS = [
       },
     ],
   },
-  { title: 'ราคา', href: '/pricing' },
-  { title: 'ติดต่อเรา', href: '/contact' },
+  { title: 'ราคาและแพ็กเกจ', href: '/pricing' },
 ]

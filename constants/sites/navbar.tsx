@@ -31,5 +31,4 @@ export const STORE_NAVBAR_ITEMS = [
   },
   { title: 'การสั่งซื้อของฉัน', href: '/user/orders' },
   { title: 'บทความทั้งหมด', href: '/blogs' },
-  { title: 'ติดต่อร้านค้า', href: '/contact-us' },
 ]

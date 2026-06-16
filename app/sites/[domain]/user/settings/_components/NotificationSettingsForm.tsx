@@ -17,7 +17,7 @@ export function NotificationSettingsForm() {
       <CardHeader>
         <PageTabHeader
           variant="secondary"
-          title="ตั้งค่าการแจ้งเตือน (Notifications)"
+          title="ตั้งค่าการแจ้งเตือน"
           icon={IconBell}
         />
       </CardHeader>

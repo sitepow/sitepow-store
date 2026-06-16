@@ -35,7 +35,7 @@ export function HeroSection() {
         <div className="flex flex-wrap justify-center gap-2.5 px-10">
           <Link href="/pricing">
             <Button variant="outline" size="lg">
-              ดูราคาและแพ็กเกจ
+              ดูราคาและแพ็กเกจ <ArrowRight />
             </Button>
           </Link>
           <Link href="/register">
@@ -51,7 +51,7 @@ export function HeroSection() {
         <div className="flex flex-wrap justify-center gap-2.5 px-5">
           <Link href="/pricing">
             <Button variant="outline" size="lg">
-              ดูราคาและแพ็กเกจ
+              ดูราคาและแพ็กเกจ <ArrowRight />
             </Button>
           </Link>
           <Button size="lg" asChild>

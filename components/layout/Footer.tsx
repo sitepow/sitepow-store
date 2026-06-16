@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import { LogoBrand } from '../LogoBrand'
 import { FacebookIcon } from '../icon/Facebook'
 import { GithubIcon } from '../icon/Github'
@@ -9,11 +11,11 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
-    { icon: <FacebookIcon />, href: '#', label: 'Facebook' },
-    { icon: <InstagramIcon />, href: '#', label: 'Instagram' },
-    { icon: <TiktokIcon />, href: '#', label: 'Tiktok' },
-    { icon: <TwitterIcon />, href: '#', label: 'Twitter' },
-    { icon: <GithubIcon />, href: '#', label: 'Github' },
+    { icon: <FacebookIcon />, href: '/', label: 'Facebook' },
+    { icon: <InstagramIcon />, href: '/', label: 'Instagram' },
+    { icon: <TiktokIcon />, href: '/', label: 'Tiktok' },
+    { icon: <TwitterIcon />, href: '/', label: 'Twitter' },
+    { icon: <GithubIcon />, href: '/', label: 'Github' },
   ]
 
   return (
@@ -52,12 +54,12 @@ export function Footer() {
 
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
             <div className="flex flex-wrap justify-center gap-5 text-sm text-gray-400 sm:gap-6">
-              <a href="#" className="hover:text-gray-600 hover:underline">
+              <Link href="/" className="hover:text-gray-600 hover:underline">
                 นโยบายความเป็นส่วนตัว
-              </a>
-              <a href="#" className="hover:text-gray-600 hover:underline">
+              </Link>
+              <Link href="/" className="hover:text-gray-600 hover:underline">
                 ข้อตกลง และเงื่อนไข
-              </a>
+              </Link>
             </div>
           </div>
         </div>
