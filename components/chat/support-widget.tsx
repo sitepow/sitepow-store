@@ -9,7 +9,12 @@ import { IconAlertCircle, IconSparkles2 } from '@tabler/icons-react'
 import { ArrowLeft, Headset, User2, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 import { Avatar, AvatarBadge, AvatarFallback } from '../ui/avatar'
 import { Spinner } from '../ui/spinner'
@@ -51,12 +56,12 @@ export function SupportWidget() {
   }
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
-      {isOpen && (
-        <Card className="animate-in slide-in-from-bottom-10 flex h-125 w-87.5 flex-col gap-0 overflow-hidden shadow-2xl transition-all">
-          <CardHeader className="flex flex-row items-center justify-between border-b p-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              {selectedConversation && (
+    <div className="fixed right-4 bottom-4 z-50">
+      <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+        <DialogContent className="flex h-[80vh] w-100 flex-col gap-0 overflow-hidden p-0">
+          <DialogHeader className="flex shrink-0 flex-row items-center justify-between space-y-0 border-b p-4">
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              {selectedId && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -69,13 +74,18 @@ export function SupportWidget() {
               {selectedConversation
                 ? selectedConversation.merchantName
                 : 'แชท Support'}
-            </CardTitle>
-            <Button variant="ghost" size="icon" onClick={handleClose}>
-              <X />
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={handleClose}
+            >
+              <X className="size-4" />
             </Button>
-          </CardHeader>
+          </DialogHeader>
 
-          <CardContent className="flex-1 overflow-hidden p-0">
+          <div className="flex-1 overflow-hidden">
             {selectedId && selectedConversation ? (
               <ChatWindow
                 currentUserId={userId!}
@@ -116,11 +126,11 @@ export function SupportWidget() {
                           </AvatarBadge>
                         )}
                       </Avatar>
-                      <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
+                      <div className="ml-4 max-w-72 space-y-1">
                         <p className="text-sm leading-none font-medium">
                           {conv.merchantName}
                         </p>
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-muted-foreground line-clamp-3 text-sm">
                           {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
                         </p>
                         <p className="text-muted-foreground text-[10px]">
@@ -132,9 +142,9 @@ export function SupportWidget() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Button
         size="icon"
