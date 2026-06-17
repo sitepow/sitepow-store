@@ -112,7 +112,7 @@ export function SupportWidget() {
 
       <Button
         size="icon"
-        className="size-14 rounded-full border border-white shadow-lg"
+        className="size-14 rounded-full shadow-lg"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X /> : <Headset />}
