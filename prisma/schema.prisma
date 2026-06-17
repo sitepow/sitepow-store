@@ -54,7 +54,7 @@ model Message {
   type           MessageType  @default(TEXT)
   createdAt      DateTime     @default(now())
 
-  @@index([conversationId])
+  @@index([conversationId, createdAt(sort: Desc)])
 }
 
 model Coupon {

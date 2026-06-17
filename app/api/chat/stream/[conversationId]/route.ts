@@ -32,14 +32,15 @@ export async function GET(
     start(controller) {
       const encoder = new TextEncoder()
 
-      const onMessage = (msg: Message) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(msg)}\n\n`))
-      }
-
-      chatEvents.on(`message:${conversationId}`, onMessage)
+      const unsubscribe = chatEvents.subscribe(
+        `message:${conversationId}`,
+        (msg) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(msg)}\n\n`))
+        },
+      )
 
       req.signal.addEventListener('abort', () => {
-        chatEvents.off(`message:${conversationId}`, onMessage)
+        unsubscribe()
         controller.close()
       })
     },

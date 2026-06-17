@@ -174,7 +174,7 @@ export async function sendMessage(
     data: { lastMessageAt: message.createdAt },
   })
 
-  chatEvents.emit(`message:${conversationId}`, message)
+  chatEvents.publish(`message:${conversationId}`, message)
 
   return { success: true, data: message }
 }

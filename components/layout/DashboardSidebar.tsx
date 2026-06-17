@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { NavigationItem } from '@/constants/navigation'
+import { UserRole } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
 import { IconChevronRight } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
@@ -30,6 +32,9 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
+import { ChatWidget } from '../chat/chat-widget'
+import { SupportWidget } from '../chat/support-widget'
+
 interface DashboardSidebarProps extends PropsWithChildren {
   items: NavigationItem[]
   redirectPath: string
@@ -40,6 +45,9 @@ export function DashboardSidebar({
   redirectPath,
   children,
 }: DashboardSidebarProps) {
+  const { user } = useSession()
+  const userRole = user?.role
+
   const pathname = usePathname()
 
   return (
@@ -116,6 +124,8 @@ export function DashboardSidebar({
       <main className="w-full min-w-0 space-y-5 p-5">
         <SidebarTrigger />
         {children}
+        {userRole === UserRole.SUPPORT && <SupportWidget />}
+        {userRole !== UserRole.SUPPORT && <ChatWidget />}
       </main>
     </SidebarProvider>
   )
