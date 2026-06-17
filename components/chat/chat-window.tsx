@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { ChatData, useMessages, useSendMessage } from '@/actions/hooks/chat'
 import { chatKeys } from '@/actions/query-keys/chat'
@@ -27,9 +27,24 @@ export function ChatWindow({
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const messages = useMemo(() => {
+    const all = data?.pages.flatMap((p) => p.items) ?? []
+    const seen = new Set<string>()
+    const deduped: Message[] = []
+
+    for (const msg of all) {
+      if (!seen.has(msg.id)) {
+        seen.add(msg.id)
+        deduped.push(msg)
+      }
+    }
+
+    return deduped
+  }, [data])
+
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [data])
+  }, [messages])
 
   useEffect(() => {
     const eventSource = new EventSource(`/api/chat/stream/${conversationId}`)
@@ -39,6 +54,15 @@ export function ChatWindow({
         chatKeys.messages(conversationId),
         (old: InfiniteData<ChatData> | undefined) => {
           if (!old) return old
+
+          const alreadyExists = old.pages.some((p) =>
+            p.items.some((m) => m.id === newMessage.id),
+          )
+
+          if (alreadyExists) {
+            return old
+          }
+
           return {
             ...old,
             pages: old.pages.map((p, i) =>
@@ -65,42 +89,40 @@ export function ChatWindow({
     <div className="flex h-full flex-col">
       <ScrollArea className="min-h-0 flex-1 p-4">
         <div className="flex flex-col gap-4">
-          {data?.pages.map((page) =>
-            page.items.map((msg) => {
-              const isMe = msg.senderId === currentUserId
-              return (
+          {messages.map((msg) => {
+            const isMe = msg.senderId === currentUserId
+            return (
+              <div
+                key={msg.id}
+                className={cn(
+                  'flex w-full',
+                  isMe ? 'justify-end' : 'justify-start',
+                )}
+              >
                 <div
-                  key={msg.id}
                   className={cn(
-                    'flex w-full',
-                    isMe ? 'justify-end' : 'justify-start',
+                    'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',
+                    isMe
+                      ? 'rounded-tr-none bg-blue-600 text-white'
+                      : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
                   )}
                 >
-                  <div
+                  <p>{msg.content}</p>
+                  <span
                     className={cn(
-                      'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',
-                      isMe
-                        ? 'rounded-tr-none bg-blue-600 text-white'
-                        : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
+                      'mt-1 block text-[10px] opacity-70',
+                      isMe ? 'text-blue-100' : 'text-slate-500',
                     )}
                   >
-                    <p>{msg.content}</p>
-                    <span
-                      className={cn(
-                        'mt-1 block text-[10px] opacity-70',
-                        isMe ? 'text-blue-100' : 'text-slate-500',
-                      )}
-                    >
-                      {new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
                 </div>
-              )
-            }),
-          )}
+              </div>
+            )
+          })}
           <div ref={scrollRef} />
         </div>
       </ScrollArea>

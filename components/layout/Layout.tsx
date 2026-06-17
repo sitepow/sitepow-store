@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 
 import { ProtectedByBrand } from '../ProtectedByBrand'
 import { ChatWidget } from '../chat/chat-widget'
-import { SupportWidget } from '../chat/support/support-widget'
+import { SupportWidget } from '../chat/support-widget'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 

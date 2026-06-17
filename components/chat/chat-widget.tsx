@@ -47,7 +47,7 @@ export function ChatWidget() {
           setIsOpen(!isOpen)
         }}
       >
-        <MessageCircle />
+        {isOpen ? <X /> : <MessageCircle />}
       </Button>
     </div>
   )

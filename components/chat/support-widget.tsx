@@ -10,7 +10,7 @@ import { CustomerInfo } from '@/components/CustomerInfo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { ChatWindow } from '../chat-window'
+import { ChatWindow } from './chat-window'
 
 function formatRelativeTime(date: Date): string {
   const diffMs = Date.now() - date.getTime()
