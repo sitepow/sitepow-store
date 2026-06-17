@@ -4,9 +4,14 @@ import {
   createOrGetConversation,
   fetchMessages,
   fetchSupportConversations,
+  getUnreadCount,
   sendMessage,
   toggleUserAi,
 } from '@/actions/chat'
+import {
+  CHAT_REFETCH_INTERVAL,
+  UNREAD_COUNT_REFETCH_INTERVAL,
+} from '@/constants/system'
 import { ConversationType, Message } from '@/generated/prisma/client'
 import {
   InfiniteData,
@@ -48,7 +53,7 @@ export function useSupportConversations(enabled = true) {
       queryKey: chatKeys.supportConversations(),
       queryFn: () => fetchSupportConversations(),
       enabled,
-      refetchInterval: 15000,
+      refetchInterval: CHAT_REFETCH_INTERVAL,
     }),
   )
 }
@@ -120,4 +125,15 @@ export function useToggleUserAi() {
       })
     },
   })
+}
+
+export function useUnreadCount(enabled: boolean) {
+  return useQuery(
+    queryOptions({
+      queryKey: chatKeys.unreadCount(),
+      queryFn: () => getUnreadCount(),
+      enabled,
+      refetchInterval: UNREAD_COUNT_REFETCH_INTERVAL,
+    }),
+  )
 }

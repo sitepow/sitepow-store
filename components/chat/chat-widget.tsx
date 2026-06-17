@@ -1,6 +1,7 @@
 'use client'
 
-import { useConversation } from '@/actions/hooks/chat'
+import { useConversation, useUnreadCount } from '@/actions/hooks/chat'
+import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
@@ -19,6 +20,7 @@ import { ChatWindow } from './chat-window'
 export function ChatWidget() {
   const { userId } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
+  const { data: unreadCount = 0 } = useUnreadCount(!!userId)
   const { data } = useConversation(userId!, ConversationType.SUPPORT, isOpen)
 
   return (
@@ -41,11 +43,17 @@ export function ChatWidget() {
       </Dialog>
 
       <Button
-        size="icon"
-        className="size-14 rounded-full shadow-lg"
         onClick={toggleChat}
+        size="icon-lg"
+        className="relative size-14 shadow-lg"
       >
         {isOpen ? <X /> : <MessageCircle />}
+        {unreadCount > 0 && (
+          <CartBadge
+            className="text-primary bg-background border-primary border"
+            total={unreadCount}
+          />
+        )}
       </Button>
     </div>
   )

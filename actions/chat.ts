@@ -129,6 +129,12 @@ export async function fetchSupportConversations() {
     const merchantId = c.members[0]?.userId
     const merchant = merchantId ? merchantMap.get(merchantId) : undefined
 
+    const unreadCount =
+      c.messages.filter(
+        (m) =>
+          m.senderId !== session.user.id && !m.readBy.includes(session.user.id),
+      ).length || 0
+
     return {
       id: c.id,
       merchantName: merchant?.name ?? merchant?.email ?? 'ไม่ทราบชื่อร้าน',
@@ -136,6 +142,7 @@ export async function fetchSupportConversations() {
       lastMessageAt: c.lastMessageAt,
       merchantId: merchantId ?? '',
       isAiEnabled: merchant?.isAiEnabled ?? true,
+      unreadCount,
     }
   })
 
@@ -176,6 +183,7 @@ export async function sendMessage(
       senderId: session.user.id,
       content: cleanContent,
       type,
+      readBy: [session.user.id],
     },
     include: { sender: { select: { id: true, name: true, role: true } } },
   })
@@ -276,4 +284,17 @@ export async function toggleUserAi(userId: string, enabled: boolean) {
     console.error(error)
     return { success: false }
   }
+}
+
+export async function getUnreadCount() {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  return await prisma.message.count({
+    where: {
+      conversation: { members: { some: { userId } } },
+      senderId: { not: userId },
+      NOT: { readBy: { has: userId } },
+    },
+  })
 }

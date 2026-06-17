@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 
-import { useSupportConversations } from '@/actions/hooks/chat'
+import { useSupportConversations, useUnreadCount } from '@/actions/hooks/chat'
+import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
 import { IconAlertCircle, IconSparkles2 } from '@tabler/icons-react'
@@ -46,6 +47,7 @@ export function SupportWidget() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const { data, isLoading } = useSupportConversations(isOpen)
+  const { data: unreadCount = 0 } = useUnreadCount(!!userId)
 
   const conversations = data?.success && data.data ? data.data : []
   const selectedConversation = conversations.find((c) => c.id === selectedId)
@@ -115,7 +117,7 @@ export function SupportWidget() {
                     onClick={() => setSelectedId(conv.id)}
                     className="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50"
                   >
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                       <Avatar className="size-8 border">
                         <AvatarFallback>
                           <User2 size={16} />
@@ -126,16 +128,27 @@ export function SupportWidget() {
                           </AvatarBadge>
                         )}
                       </Avatar>
-                      <div className="ml-4 max-w-72 space-y-1">
-                        <p className="text-sm leading-none font-medium">
-                          {conv.merchantName}
-                        </p>
-                        <p className="text-muted-foreground line-clamp-3 text-sm">
-                          {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
-                        </p>
-                        <p className="text-muted-foreground text-[10px]">
-                          {formatRelativeTime(new Date(conv.lastMessageAt))}
-                        </p>
+
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium">
+                            {conv.merchantName}
+                          </p>
+
+                          <p className="text-muted-foreground line-clamp-1 text-sm">
+                            {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
+                          </p>
+
+                          <p className="text-muted-foreground text-[10px]">
+                            {formatRelativeTime(new Date(conv.lastMessageAt))}
+                          </p>
+                        </div>
+
+                        {conv.unreadCount > 0 && (
+                          <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-[10px]">
+                            {conv.unreadCount}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </button>
@@ -147,11 +160,17 @@ export function SupportWidget() {
       </Dialog>
 
       <Button
-        size="icon"
-        className="size-14 rounded-full shadow-lg"
-        onClick={() => toggleChat()}
+        onClick={toggleChat}
+        size="icon-lg"
+        className="relative size-14 shadow-lg"
       >
         {isOpen ? <X /> : <Headset />}
+        {unreadCount > 0 && (
+          <CartBadge
+            className="text-primary bg-background border-primary border"
+            total={unreadCount}
+          />
+        )}
       </Button>
     </div>
   )
