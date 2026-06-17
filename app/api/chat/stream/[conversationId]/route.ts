@@ -9,9 +9,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { conversationId: string } },
+  { params }: { params: Promise<{ conversationId: string }> },
 ) {
-  const { conversationId } = params
+  const { conversationId } = await params
   const session = await auth()
 
   if (!session?.user?.id) {
