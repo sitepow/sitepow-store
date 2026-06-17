@@ -1,8 +1,15 @@
+'use client'
+
 import { ComponentProps } from 'react'
+
+import { UserRole } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
 
 import { cn } from '@/lib/utils'
 
 import { ProtectedByBrand } from '../ProtectedByBrand'
+import { ChatWidget } from '../chat/chat-widget'
+import { SupportWidget } from '../chat/support/support-widget'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
@@ -11,6 +18,9 @@ export function MainLayout({
   className,
   ...props
 }: ComponentProps<'main'>) {
+  const { user } = useSession()
+  const userRole = user?.role
+
   return (
     <div className="flex flex-col gap-10">
       <Navbar />
@@ -19,6 +29,8 @@ export function MainLayout({
       </main>
       <Footer />
       <ProtectedByBrand />
+      {userRole === UserRole.SUPPORT && <SupportWidget />}
+      {userRole !== UserRole.SUPPORT && <ChatWidget />}
     </div>
   )
 }

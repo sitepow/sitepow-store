@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 
 import { auth } from '@/auth'
 import { Message } from '@/generated/prisma/client'
+import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
@@ -17,16 +18,13 @@ export async function GET(
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const member = await prisma.conversationMember.findUnique({
-    where: {
-      conversationId_userId: {
-        conversationId,
-        userId: session.user.id,
-      },
-    },
-  })
+  const hasAccess = await checkAccess(
+    conversationId,
+    session.user.id,
+    session.user.role,
+  )
 
-  if (!member) {
+  if (!hasAccess) {
     return new Response('Forbidden', { status: 403 })
   }
 
@@ -55,4 +53,26 @@ export async function GET(
       'X-Content-Type-Options': 'nosniff',
     },
   })
+}
+
+async function checkAccess(
+  conversationId: string,
+  userId: string,
+  userRole: UserRole,
+) {
+  if (userRole === UserRole.SUPPORT) {
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { type: true },
+    })
+    return conversation?.type === ConversationType.SUPPORT
+  }
+
+  const member = await prisma.conversationMember.findUnique({
+    where: {
+      conversationId_userId: { conversationId, userId },
+    },
+  })
+
+  return !!member
 }

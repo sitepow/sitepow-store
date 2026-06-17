@@ -1,20 +1,55 @@
 'use client'
 
-import { fetchMessages, sendMessage } from '@/actions/chat'
-import { Message } from '@/generated/prisma/client'
+import {
+  createOrGetConversation,
+  fetchMessages,
+  fetchSupportConversations,
+  sendMessage,
+} from '@/actions/chat'
+import { ConversationType, Message } from '@/generated/prisma/client'
 import {
   InfiniteData,
   infiniteQueryOptions,
+  queryOptions,
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
 
 import { chatKeys } from '../query-keys/chat'
 
-type ChatData = {
+export type ChatData = {
   items: Message[]
   nextCursor?: string
+}
+
+export function useConversation(
+  userId: string,
+  type: ConversationType,
+  enabled: boolean,
+) {
+  return useQuery(
+    queryOptions({
+      queryKey: chatKeys.conversation(userId, type),
+      queryFn: () => {
+        return createOrGetConversation([userId], type)
+      },
+      enabled: enabled,
+      staleTime: Infinity,
+    }),
+  )
+}
+
+export function useSupportConversations(enabled = true) {
+  return useQuery(
+    queryOptions({
+      queryKey: chatKeys.supportConversations(),
+      queryFn: () => fetchSupportConversations(),
+      enabled,
+      refetchInterval: 15000,
+    }),
+  )
 }
 
 const messageOptions = (conversationId: string) =>
@@ -62,6 +97,10 @@ export function useSendMessage(conversationId: string) {
             }
           },
         )
+
+        queryClient.invalidateQueries({
+          queryKey: chatKeys.supportConversations(),
+        })
       }
     },
   })

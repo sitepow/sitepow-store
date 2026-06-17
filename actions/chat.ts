@@ -1,44 +1,140 @@
 'use server'
 
 import { auth } from '@/auth'
-import { ConversationType, MessageType } from '@/generated/prisma/enums'
+import { BAD_WORD_LISTS } from '@/constants/badwords'
+import {
+  ConversationType,
+  MessageType,
+  UserRole,
+} from '@/generated/prisma/enums'
 
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
+
+const sortedBadWords = [...BAD_WORD_LISTS].sort((a, b) => b.length - a.length)
+
+function cleanBadWords(content: string): string {
+  let cleanContent = content
+
+  sortedBadWords.forEach((word) => {
+    const regex = new RegExp(word, 'gi')
+    cleanContent = cleanContent.replace(regex, '*'.repeat(word.length))
+  })
+
+  return cleanContent
+}
+
+async function canAccessConversation(
+  conversationId: string,
+  userId: string,
+  userRole: UserRole,
+) {
+  if (userRole === UserRole.SUPPORT) {
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { type: true },
+    })
+    return conversation?.type === ConversationType.SUPPORT
+  }
+
+  const member = await prisma.conversationMember.findUnique({
+    where: {
+      conversationId_userId: { conversationId, userId },
+    },
+  })
+
+  return !!member
+}
 
 export async function createOrGetConversation(
   participantIds: string[],
   type: ConversationType,
 ) {
   const session = await auth()
-  if (!session?.user?.id) {
+  const currentUserId = session?.user?.id
+  if (!currentUserId) {
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
-  const allParticipantIds = [...new Set([...participantIds, session.user.id])]
+  const allParticipantIds = [
+    ...new Set([...participantIds, currentUserId]),
+  ].filter((id): id is string => typeof id === 'string' && id.length > 0)
 
-  const existing = await prisma.conversation.findFirst({
+  const conversations = await prisma.conversation.findMany({
     where: {
       type,
       members: {
         every: { userId: { in: allParticipantIds } },
       },
     },
+    include: { members: true },
   })
+
+  const existing = conversations.find(
+    (c) =>
+      c.members.length === allParticipantIds.length &&
+      allParticipantIds.every((id) => c.members.some((m) => m.userId === id)),
+  )
 
   if (existing) {
     return { success: true, data: existing }
-  } else {
-    const newConversation = await prisma.conversation.create({
-      data: {
-        type,
-        members: {
-          create: allParticipantIds.map((userId) => ({ userId })),
-        },
-      },
-    })
-    return { success: true, data: newConversation }
   }
+
+  const newConversation = await prisma.conversation.create({
+    data: {
+      type,
+      members: {
+        create: allParticipantIds.map((userId) => ({ userId })),
+      },
+    },
+    include: { members: true },
+  })
+
+  return { success: true, data: newConversation }
+}
+
+export async function fetchSupportConversations() {
+  const session = await auth()
+  if (!session?.user?.id || session.user.role !== UserRole.SUPPORT) {
+    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+  }
+
+  const conversations = await prisma.conversation.findMany({
+    where: { type: ConversationType.SUPPORT },
+    orderBy: { lastMessageAt: 'desc' },
+    include: {
+      members: true,
+      messages: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
+    },
+  })
+
+  const merchantIds = conversations
+    .map((c) => c.members[0]?.userId)
+    .filter((id): id is string => !!id)
+
+  const merchants = await prisma.user.findMany({
+    where: { id: { in: merchantIds } },
+    select: { id: true, name: true, email: true },
+  })
+
+  const merchantMap = new Map(merchants.map((m) => [m.id, m]))
+
+  const items = conversations.map((c) => {
+    const merchantId = c.members[0]?.userId
+    const merchant = merchantId ? merchantMap.get(merchantId) : undefined
+
+    return {
+      id: c.id,
+      merchantName: merchant?.name ?? merchant?.email ?? 'ไม่ทราบชื่อร้าน',
+      lastMessage: c.messages[0]?.content ?? null,
+      lastMessageAt: c.lastMessageAt,
+    }
+  })
+
+  return { success: true, data: items }
 }
 
 export async function sendMessage(
@@ -51,33 +147,51 @@ export async function sendMessage(
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
-  const member = await prisma.conversationMember.findUnique({
-    where: {
-      conversationId_userId: { conversationId, userId: session.user.id },
+  const hasAccess = await canAccessConversation(
+    conversationId,
+    session.user.id,
+    session.user.role,
+  )
+
+  if (!hasAccess) {
+    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
+  }
+
+  const cleanContent =
+    type === MessageType.TEXT ? cleanBadWords(content) : content
+
+  const message = await prisma.message.create({
+    data: {
+      conversationId,
+      senderId: session.user.id,
+      content: cleanContent,
+      type,
     },
   })
 
-  if (!member) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
-  } else {
-    const message = await prisma.message.create({
-      data: {
-        conversationId,
-        senderId: session.user.id,
-        content,
-        type,
-      },
-    })
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { lastMessageAt: message.createdAt },
+  })
 
-    chatEvents.emit(`message:${conversationId}`, message)
+  chatEvents.emit(`message:${conversationId}`, message)
 
-    return { success: true, data: message }
-  }
+  return { success: true, data: message }
 }
 
 export async function fetchMessages(conversationId: string, cursor?: string) {
   const session = await auth()
   if (!session?.user?.id) {
+    return { items: [], nextCursor: undefined }
+  }
+
+  const hasAccess = await canAccessConversation(
+    conversationId,
+    session.user.id,
+    session.user.role,
+  )
+
+  if (!hasAccess) {
     return { items: [], nextCursor: undefined }
   }
 

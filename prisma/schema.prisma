@@ -160,6 +160,7 @@ model Branch {
 enum UserRole {
   MERCHANT
   CUSTOMER
+  SUPPORT
 }
 
 model Account {
