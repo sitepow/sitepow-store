@@ -4,13 +4,15 @@ import { useState } from 'react'
 
 import { useSupportConversations } from '@/actions/hooks/chat'
 import { useSession } from '@/hooks/use-session'
-import { IconSparkles2 } from '@tabler/icons-react'
+import { useChatStore } from '@/stores/use-chat-store'
+import { IconAlertCircle, IconSparkles2 } from '@tabler/icons-react'
 import { ArrowLeft, Headset, User2, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { Avatar, AvatarBadge, AvatarFallback } from '../ui/avatar'
+import { Spinner } from '../ui/spinner'
 import { ChatWindow } from './chat-window'
 
 function formatRelativeTime(date: Date): string {
@@ -35,7 +37,7 @@ function formatRelativeTime(date: Date): string {
 
 export function SupportWidget() {
   const { userId } = useSession()
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, setIsOpen, toggleChat } = useChatStore()
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const { data, isLoading } = useSupportConversations(isOpen)
@@ -51,7 +53,7 @@ export function SupportWidget() {
   return (
     <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
       {isOpen && (
-        <Card className="animate-in slide-in-from-bottom-10 flex h-125 w-87.5 flex-col overflow-hidden shadow-2xl transition-all">
+        <Card className="animate-in slide-in-from-bottom-10 flex h-125 w-87.5 flex-col gap-0 overflow-hidden shadow-2xl transition-all">
           <CardHeader className="flex flex-row items-center justify-between border-b p-4">
             <CardTitle className="flex items-center gap-2 text-lg">
               {selectedConversation && (
@@ -84,13 +86,15 @@ export function SupportWidget() {
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">
                 {isLoading && (
-                  <div className="flex h-full items-center justify-center text-sm text-slate-500">
+                  <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
+                    <Spinner />
                     กำลังโหลด...
                   </div>
                 )}
 
                 {!isLoading && conversations.length === 0 && (
-                  <div className="flex h-full items-center justify-center text-sm text-slate-500">
+                  <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
+                    <IconAlertCircle />
                     ยังไม่มีแชทเข้ามา
                   </div>
                 )}
@@ -135,7 +139,7 @@ export function SupportWidget() {
       <Button
         size="icon"
         className="size-14 rounded-full shadow-lg"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => toggleChat()}
       >
         {isOpen ? <X /> : <Headset />}
       </Button>

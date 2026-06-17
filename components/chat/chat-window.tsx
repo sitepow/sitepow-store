@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { cn } from '@/lib/utils'
 
+import { MarkdownRenderer } from '../MarkdownRenderer'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
 
@@ -130,7 +131,7 @@ export function ChatWindow({
         </div>
       )}
 
-      <ScrollArea className="min-h-0 flex-1 p-4">
+      <ScrollArea className="min-h-0 flex-1 px-4">
         <div className="flex flex-col gap-4">
           {messages.map((msg) => {
             const isMe = msg.senderId === currentUserId
@@ -161,7 +162,10 @@ export function ChatWindow({
                         : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
                   )}
                 >
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <MarkdownRenderer
+                    className="text-inherit md:w-fit dark:text-inherit"
+                    content={msg.content}
+                  />
                   <span
                     className={cn(
                       'mt-1 block text-[10px] opacity-70',
