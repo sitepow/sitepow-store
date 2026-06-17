@@ -5,6 +5,7 @@ import {
   fetchMessages,
   fetchSupportConversations,
   sendMessage,
+  toggleUserAi,
 } from '@/actions/chat'
 import { ConversationType, Message } from '@/generated/prisma/client'
 import {
@@ -102,6 +103,21 @@ export function useSendMessage(conversationId: string) {
           queryKey: chatKeys.supportConversations(),
         })
       }
+    },
+  })
+}
+
+export function useToggleUserAi() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ userId, enabled }: { userId: string; enabled: boolean }) => {
+      return toggleUserAi(userId, enabled)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: chatKeys.supportConversations(),
+      })
     },
   })
 }

@@ -4,12 +4,13 @@ import { useState } from 'react'
 
 import { useSupportConversations } from '@/actions/hooks/chat'
 import { useSession } from '@/hooks/use-session'
-import { ArrowLeft, Headset, X } from 'lucide-react'
+import { IconSparkles2 } from '@tabler/icons-react'
+import { ArrowLeft, Headset, User2, X } from 'lucide-react'
 
-import { CustomerInfo } from '@/components/CustomerInfo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+import { Avatar, AvatarBadge, AvatarFallback } from '../ui/avatar'
 import { ChatWindow } from './chat-window'
 
 function formatRelativeTime(date: Date): string {
@@ -73,8 +74,13 @@ export function SupportWidget() {
           </CardHeader>
 
           <CardContent className="flex-1 overflow-hidden p-0">
-            {selectedId ? (
-              <ChatWindow currentUserId={userId!} conversationId={selectedId} />
+            {selectedId && selectedConversation ? (
+              <ChatWindow
+                currentUserId={userId!}
+                conversationId={selectedId}
+                otherUserId={selectedConversation.merchantId}
+                isAiEnabled={selectedConversation.isAiEnabled}
+              />
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">
                 {isLoading && (
@@ -95,13 +101,29 @@ export function SupportWidget() {
                     onClick={() => setSelectedId(conv.id)}
                     className="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50"
                   >
-                    <CustomerInfo
-                      title={conv.merchantName}
-                      description={conv.lastMessage ?? 'ยังไม่มีข้อความ'}
-                      lastContent={formatRelativeTime(
-                        new Date(conv.lastMessageAt),
-                      )}
-                    />
+                    <div className="flex items-center">
+                      <Avatar className="size-8 border">
+                        <AvatarFallback>
+                          <User2 size={16} />
+                        </AvatarFallback>
+                        {conv.isAiEnabled && (
+                          <AvatarBadge>
+                            <IconSparkles2 />
+                          </AvatarBadge>
+                        )}
+                      </Avatar>
+                      <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
+                        <p className="text-sm leading-none font-medium">
+                          {conv.merchantName}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                          {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
+                        </p>
+                        <p className="text-muted-foreground text-[10px]">
+                          {formatRelativeTime(new Date(conv.lastMessageAt))}
+                        </p>
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>

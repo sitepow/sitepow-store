@@ -7,3 +7,4 @@ export const SUBSCRIPTION_DAYS = 30
 export const TRANSFER_EXPIRY_DAYS = 1
 export const SERVER_ERROR_MESSAGE =
   'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
+export const AI_BOT_ID = 'cmqhnrqen0000u8ujmvh3d6as'

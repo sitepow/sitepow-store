@@ -2,6 +2,7 @@
 
 import { auth } from '@/auth'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
+import { AI_BOT_ID } from '@/constants/system'
 import {
   ConversationType,
   MessageType,
@@ -10,6 +11,8 @@ import {
 
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
+
+import { generateAiSupportAction } from './ai-support'
 
 const sortedBadWords = [...BAD_WORD_LISTS].sort((a, b) => b.length - a.length)
 
@@ -117,7 +120,7 @@ export async function fetchSupportConversations() {
 
   const merchants = await prisma.user.findMany({
     where: { id: { in: merchantIds } },
-    select: { id: true, name: true, email: true },
+    select: { id: true, name: true, email: true, isAiEnabled: true },
   })
 
   const merchantMap = new Map(merchants.map((m) => [m.id, m]))
@@ -131,6 +134,8 @@ export async function fetchSupportConversations() {
       merchantName: merchant?.name ?? merchant?.email ?? 'ไม่ทราบชื่อร้าน',
       lastMessage: c.messages[0]?.content ?? null,
       lastMessageAt: c.lastMessageAt,
+      merchantId: merchantId ?? '',
+      isAiEnabled: merchant?.isAiEnabled ?? true,
     }
   })
 
@@ -146,6 +151,11 @@ export async function sendMessage(
   if (!session?.user?.id) {
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
+
+  const sender = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isAiEnabled: true, role: true },
+  })
 
   const hasAccess = await canAccessConversation(
     conversationId,
@@ -167,6 +177,7 @@ export async function sendMessage(
       content: cleanContent,
       type,
     },
+    include: { sender: { select: { id: true, name: true, role: true } } },
   })
 
   await prisma.conversation.update({
@@ -175,6 +186,37 @@ export async function sendMessage(
   })
 
   chatEvents.publish(`message:${conversationId}`, message)
+
+  if (
+    session.user.role !== UserRole.SUPPORT &&
+    session.user.role !== UserRole.BOT &&
+    sender?.isAiEnabled
+  ) {
+    generateAiSupportAction(cleanContent)
+      .then(async (aiResult) => {
+        if (aiResult.success && aiResult.data) {
+          const aiMessage = await prisma.message.create({
+            data: {
+              conversationId,
+              senderId: AI_BOT_ID,
+              content: aiResult.data,
+              type: MessageType.TEXT,
+            },
+            include: {
+              sender: { select: { id: true, role: true } },
+            },
+          })
+
+          await prisma.conversation.update({
+            where: { id: conversationId },
+            data: { lastMessageAt: aiMessage.createdAt },
+          })
+
+          chatEvents.publish(`message:${conversationId}`, aiMessage)
+        }
+      })
+      .catch(console.error)
+  }
 
   return { success: true, data: message }
 }
@@ -201,10 +243,37 @@ export async function fetchMessages(conversationId: string, cursor?: string) {
     take: 20,
     cursor: cursor ? { id: cursor } : undefined,
     skip: cursor ? 1 : 0,
+    include: {
+      sender: {
+        select: {
+          id: true,
+          role: true,
+        },
+      },
+    },
   })
 
   return {
     items: messages.reverse(),
     nextCursor: messages.length === 20 ? messages[0]?.id : undefined,
+  }
+}
+
+export async function toggleUserAi(userId: string, enabled: boolean) {
+  const session = await auth()
+  if (session?.user?.role !== UserRole.SUPPORT) {
+    return { success: false, message: 'คุณไม่มีสิทธิ์เปลี่ยนข้อมูลนี้' }
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isAiEnabled: enabled },
+    })
+
+    return { success: true, message: 'ปรับการตั้งค่าสำเร็จแล้ว' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
