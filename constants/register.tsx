@@ -1,13 +1,11 @@
 import { RegisterProvide } from '@/types/register'
 import { IconMail } from '@tabler/icons-react'
 
-import { FacebookIcon } from '@/components/icon/Facebook'
 import { GoogleIcon } from '@/components/icon/Google'
 import { LineIcon } from '@/components/icon/Line'
 
 export const REGISTER_PROVIDERS = [
   { id: 'google', icon: <GoogleIcon />, name: 'สมัครต่อด้วย Gmail' },
-  { id: 'facebook', icon: <FacebookIcon />, name: 'สมัครต่อด้วย Facebook' },
   {
     id: 'line',
     icon: <LineIcon />,

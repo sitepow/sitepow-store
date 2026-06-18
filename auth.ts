@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import Facebook from 'next-auth/providers/facebook'
 import Google from 'next-auth/providers/google'
 import Line from 'next-auth/providers/line'
 
@@ -14,7 +13,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: 'jwt' },
   providers: [
     Google({ allowDangerousEmailAccountLinking: true }),
-    Facebook({ allowDangerousEmailAccountLinking: true }),
     Line,
     Credentials({
       async authorize(credentials) {
