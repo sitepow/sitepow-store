@@ -7,5 +7,6 @@ export const chatKeys = {
     [...chatKeys.all, 'support-conversations'] as const,
   messages: (conversationId: string) =>
     [...chatKeys.all, 'messages', conversationId] as const,
-  unreadCount: () => [...chatKeys.all, 'unread-count'] as const,
+  unreadCount: (userId?: string) =>
+    [...chatKeys.all, 'unread-count', userId] as const,
 }

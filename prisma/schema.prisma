@@ -41,6 +41,10 @@ model ConversationMember {
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   userId         String
   joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime     @default(now())
+  unreadCount    Int          @default(0)
+
+  user User @relation(fields: [userId], references: [id])
 
   @@unique([conversationId, userId])
 }
@@ -53,7 +57,6 @@ model Message {
   senderId  String
   content   String      @db.Text
   type      MessageType @default(TEXT)
-  readBy    String[]
   createdAt DateTime    @default(now())
 
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
@@ -111,12 +114,11 @@ model Customer {
 
   customerType CustomerType @default(INDIVIDUAL)
 
-  stores         CustomerStore[]
-  reviews        Review[]
-  orders         Order[]
-  cart           Cart?
-  addresses      Address[]
-  contactTickets ContactTicket[]
+  stores    CustomerStore[]
+  reviews   Review[]
+  orders    Order[]
+  cart      Cart?
+  addresses Address[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -244,11 +246,12 @@ model User {
   staffProfile    Staff?
   customerProfile Customer?
 
-  accounts      Account[]
-  sessions      Session[]
-  Authenticator Authenticator[]
-  activityLogs  ActivityLog[]
-  messages      Message[]
+  accounts           Account[]
+  sessions           Session[]
+  Authenticator      Authenticator[]
+  activityLogs       ActivityLog[]
+  messages           Message[]
+  ConversationMember ConversationMember[]
 }
 
 model Staff {
@@ -488,7 +491,6 @@ model Store {
   branches             Branch[]
   activityLogs         ActivityLog[]
   coupons              Coupon[]
-  contactTickets       ContactTicket[]
   transferRequests     StoreTransferRequest[]
   stockTransfers       StockTransfer[]
   stockAdjustments     StockAdjustment[]
@@ -593,35 +595,6 @@ enum Plan {
   STARTER
   PRO
   ULTIMATE
-}
-
-enum TicketStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-}
-
-model ContactTicket {
-  id      String       @id @default(cuid())
-  subject String
-  message String       @db.Text
-  status  TicketStatus @default(OPEN)
-
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  orderId String?
-  order   Order?  @relation(fields: [orderId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId])
-  @@index([customerId])
 }
 
 model Blog {
@@ -903,7 +876,6 @@ model Order {
   shippingMethod String?
   shippingFee    Decimal?       @db.Decimal(10, 2)
   trackingNumber String?
-  shippopId      String?
   deliveryStatus DeliveryStatus @default(PENDING)
 
   paymentMethod PaymentMethod?
@@ -921,15 +893,11 @@ model Order {
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
 
-  guestEmail           String?
-  guestPhone           String?
-  guestName            String?
   shippingAddrSnapshot Json?
   storeSnapshot        Json?
 
-  items          OrderItem[]
-  contactTickets ContactTicket[]
-  createdAt      DateTime        @default(now())
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
 
   @@index([storeId])
   @@index([customerId])

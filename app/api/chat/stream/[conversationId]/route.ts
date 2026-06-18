@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server'
 
 import { auth } from '@/auth'
-import { Message } from '@/generated/prisma/client'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
 import { chatEvents } from '@/lib/events'
@@ -13,16 +12,14 @@ export async function GET(
 ) {
   const { conversationId } = await params
   const session = await auth()
+  const userId = session?.user?.id
+  const userRole = session?.user?.role
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const hasAccess = await checkAccess(
-    conversationId,
-    session.user.id,
-    session.user.role,
-  )
+  const hasAccess = await checkAccess(conversationId, userId!, userRole)
 
   if (!hasAccess) {
     return new Response('Forbidden', { status: 403 })
@@ -56,7 +53,7 @@ export async function GET(
   })
 }
 
-async function checkAccess(
+export async function checkAccess(
   conversationId: string,
   userId: string,
   userRole: UserRole,

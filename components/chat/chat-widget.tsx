@@ -1,6 +1,12 @@
 'use client'
 
-import { useConversation, useUnreadCount } from '@/actions/hooks/chat'
+import { useEffect } from 'react'
+
+import {
+  useConversation,
+  useMarkAsRead,
+  useUnreadCount,
+} from '@/actions/hooks/chat'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -20,8 +26,22 @@ import { ChatWindow } from './chat-window'
 export function ChatWidget() {
   const { userId } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
-  const { data: unreadCount = 0 } = useUnreadCount(!!userId)
-  const { data } = useConversation(userId!, ConversationType.SUPPORT, isOpen)
+
+  const { data: unreadCount = 0 } = useUnreadCount(userId ?? '')
+
+  const { data: convData } = useConversation(
+    userId ?? '',
+    ConversationType.SUPPORT,
+    !!userId && isOpen,
+  )
+
+  const { mutate: markAsRead } = useMarkAsRead(userId ?? '')
+
+  useEffect(() => {
+    if (isOpen && convData?.success && convData.data?.id) {
+      markAsRead(convData.data.id)
+    }
+  }, [isOpen, convData?.success, convData?.data?.id, markAsRead])
 
   return (
     <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
@@ -32,10 +52,10 @@ export function ChatWidget() {
           </DialogHeader>
 
           <div className="flex-1 overflow-hidden">
-            {data?.success && data.data && (
+            {userId && convData?.success && convData.data && (
               <ChatWindow
-                currentUserId={userId!}
-                conversationId={data.data.id}
+                currentUserId={userId}
+                conversationId={convData.data.id}
               />
             )}
           </div>

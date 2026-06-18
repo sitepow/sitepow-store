@@ -4,16 +4,14 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 import {
-  ChatData,
   useMessages,
   useSendMessage,
   useToggleUserAi,
 } from '@/actions/hooks/chat'
-import { chatKeys } from '@/actions/query-keys/chat'
 import { UserRole } from '@/generated/prisma/enums'
+import { useChatStream } from '@/hooks/use-chat-stream'
 import { useSession } from '@/hooks/use-session'
 import { IconSend2 } from '@tabler/icons-react'
-import { InfiniteData, useQueryClient } from '@tanstack/react-query'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,7 +38,6 @@ export function ChatWindow({
   otherUserId?: string
   isAiEnabled?: boolean
 }) {
-  const queryClient = useQueryClient()
   const { data } = useMessages(conversationId)
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { user } = useSession()
@@ -51,6 +48,7 @@ export function ChatWindow({
     defaultValues: { content: '' },
   })
 
+  useChatStream(conversationId)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const messages = useMemo(() => {
@@ -71,35 +69,6 @@ export function ChatWindow({
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  useEffect(() => {
-    const eventSource = new EventSource(`/api/chat/stream/${conversationId}`)
-    eventSource.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data)
-      queryClient.setQueryData(
-        chatKeys.messages(conversationId),
-        (old: InfiniteData<ChatData> | undefined) => {
-          if (!old) return old
-
-          const alreadyExists = old.pages.some((p) =>
-            p.items.some((m) => m.id === newMessage.id),
-          )
-
-          if (alreadyExists) return old
-
-          return {
-            ...old,
-            pages: old.pages.map((p, i) =>
-              i === old.pages.length - 1
-                ? { ...p, items: [...p.items, newMessage] }
-                : p,
-            ),
-          }
-        },
-      )
-    }
-    return () => eventSource.close()
-  }, [conversationId, queryClient])
 
   const onSubmit = ({ content }: ChatFormValues) => {
     if (content.trim() === '') return
@@ -124,7 +93,8 @@ export function ChatWindow({
               id="ai-mode"
               checked={isAiEnabled}
               onCheckedChange={(checked) =>
-                toggleAi({ userId: otherUserId!, enabled: checked })
+                otherUserId &&
+                toggleAi({ userId: otherUserId, enabled: checked })
               }
             />
           </div>
@@ -135,7 +105,6 @@ export function ChatWindow({
         <div className="flex flex-col gap-4">
           {messages.map((msg) => {
             const isMe = msg.senderId === currentUserId
-            const isAi = msg.sender?.role === UserRole.BOT
             const isLeft = !isMe
 
             return (
@@ -146,20 +115,12 @@ export function ChatWindow({
                   !isLeft ? 'items-end' : 'items-start',
                 )}
               >
-                {isLeft && isAi && (
-                  <span className="mb-1 ml-1 text-[10px] font-bold text-slate-500">
-                    AI Support 🤖
-                  </span>
-                )}
-
                 <div
                   className={cn(
                     'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',
                     !isLeft
                       ? 'rounded-tr-none bg-blue-600 text-white'
-                      : isAi
-                        ? 'rounded-tl-none border border-emerald-200 bg-emerald-50 text-slate-800'
-                        : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
+                      : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
                   )}
                 >
                   <MarkdownRenderer

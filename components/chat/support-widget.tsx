@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 
-import { useSupportConversations, useUnreadCount } from '@/actions/hooks/chat'
+import {
+  useMarkAsRead,
+  useSupportConversations,
+  useUnreadCount,
+} from '@/actions/hooks/chat'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
@@ -47,10 +51,17 @@ export function SupportWidget() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const { data, isLoading } = useSupportConversations(isOpen)
-  const { data: unreadCount = 0 } = useUnreadCount(!!userId)
+  const { data: unreadCount = 0 } = useUnreadCount(userId!)
+
+  const { mutate: markAsRead } = useMarkAsRead(userId!)
 
   const conversations = data?.success && data.data ? data.data : []
   const selectedConversation = conversations.find((c) => c.id === selectedId)
+
+  const handleSelectConversation = (id: string) => {
+    setSelectedId(id)
+    markAsRead(id)
+  }
 
   const handleClose = () => {
     setIsOpen(false)
@@ -114,7 +125,7 @@ export function SupportWidget() {
                 {conversations.map((conv) => (
                   <button
                     key={conv.id}
-                    onClick={() => setSelectedId(conv.id)}
+                    onClick={() => handleSelectConversation(conv.id)}
                     className="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50"
                   >
                     <div className="flex items-center gap-2">
@@ -135,7 +146,7 @@ export function SupportWidget() {
                             {conv.merchantName}
                           </p>
 
-                          <p className="text-muted-foreground line-clamp-1 text-sm">
+                          <p className="text-muted-foreground line-clamp-2 text-sm">
                             {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
                           </p>
 
@@ -145,7 +156,7 @@ export function SupportWidget() {
                         </div>
 
                         {conv.unreadCount > 0 && (
-                          <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-[10px]">
+                          <span className="bg-primary text-primary-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-[10px]">
                             {conv.unreadCount}
                           </span>
                         )}

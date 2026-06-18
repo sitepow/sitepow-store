@@ -1,10 +1,11 @@
 'use client'
 
 import {
-  createOrGetConversation,
-  fetchMessages,
-  fetchSupportConversations,
+  getConversation,
+  getMessages,
+  getSupportConversations,
   getUnreadCount,
+  markAsRead,
   sendMessage,
   toggleUserAi,
 } from '@/actions/chat'
@@ -38,11 +39,8 @@ export function useConversation(
   return useQuery(
     queryOptions({
       queryKey: chatKeys.conversation(userId, type),
-      queryFn: () => {
-        return createOrGetConversation([userId], type)
-      },
+      queryFn: () => getConversation(type),
       enabled: enabled,
-      staleTime: Infinity,
     }),
   )
 }
@@ -51,7 +49,7 @@ export function useSupportConversations(enabled = true) {
   return useQuery(
     queryOptions({
       queryKey: chatKeys.supportConversations(),
-      queryFn: () => fetchSupportConversations(),
+      queryFn: () => getSupportConversations(),
       enabled,
       refetchInterval: CHAT_REFETCH_INTERVAL,
     }),
@@ -62,7 +60,7 @@ const messageOptions = (conversationId: string) =>
   infiniteQueryOptions({
     queryKey: chatKeys.messages(conversationId),
     queryFn: ({ pageParam }) =>
-      fetchMessages(conversationId, pageParam as string),
+      getMessages(conversationId, pageParam as string),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   })
@@ -127,13 +125,26 @@ export function useToggleUserAi() {
   })
 }
 
-export function useUnreadCount(enabled: boolean) {
+export function useUnreadCount(userId: string) {
   return useQuery(
     queryOptions({
-      queryKey: chatKeys.unreadCount(),
+      queryKey: chatKeys.unreadCount(userId!),
       queryFn: () => getUnreadCount(),
-      enabled,
+      enabled: !!userId,
       refetchInterval: UNREAD_COUNT_REFETCH_INTERVAL,
     }),
   )
+}
+
+export function useMarkAsRead(userId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (conversationId: string) => markAsRead(conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: chatKeys.unreadCount(userId) })
+      queryClient.invalidateQueries({
+        queryKey: chatKeys.supportConversations(),
+      })
+    },
+  })
 }
