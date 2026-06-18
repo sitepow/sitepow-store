@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils'
 
 import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
+import { ModeToggle } from '../ModeToggle'
 import { Separator } from '../ui/separator'
 import { ListItem } from './_components/ListItem'
 
@@ -45,13 +46,13 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 w-full border-b bg-white">
+      <header className="border-border bg-background fixed top-0 left-0 z-50 w-full border-b">
         <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
           <LogoBrand />
 
           <div className="hidden lg:block">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="text-foreground">
                 {NAVBAR_ITEMS.map((item, idx) => (
                   <NavigationMenuItem key={idx}>
                     {item.children ? (
@@ -97,6 +98,7 @@ export function Navbar() {
               <Link href="/register">
                 <Button className="font-bold">สมัครเปิดร้าน</Button>
               </Link>
+              <ModeToggle />
             </div>
           )}
 
@@ -117,6 +119,7 @@ export function Navbar() {
                   จัดการร้านค้าของคุณ
                 </Link>
               </Button>
+              <ModeToggle />
             </div>
           )}
 
@@ -128,20 +131,23 @@ export function Navbar() {
               />
             )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="hover:bg-transparent"
-            >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <ModeToggle />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-foreground hover:bg-transparent"
+              >
+                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </Button>
+            </div>
           </div>
         </div>
 
         <div
           className={cn(
-            'container mx-auto overflow-y-auto border-t bg-white transition-all duration-300 ease-in-out lg:hidden',
+            'bg-background container mx-auto overflow-y-auto border-t transition-all duration-300 ease-in-out lg:hidden',
             isMenuOpen
               ? 'max-h-[calc(100vh-80px)] opacity-100'
               : 'pointer-events-none max-h-0 opacity-0',
@@ -152,16 +158,16 @@ export function Navbar() {
               <div key={idx} className="flex flex-col">
                 {item.children ? (
                   <div className="space-y-4">
-                    <p className="text-sm font-bold text-slate-400">
+                    <p className="text-foreground/40 text-sm font-bold">
                       {item.title}
                     </p>
-                    <div className="ml-2 flex flex-col space-y-4 border-l-2 border-slate-100 pl-4">
+                    <div className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4">
                       {item.children.map((child) => (
                         <Link
                           key={child.title}
                           href={child.href}
                           onClick={() => setIsMenuOpen(false)}
-                          className="active:text-primary text-lg font-semibold text-slate-700"
+                          className="active:text-primary text-foreground/80 text-lg font-semibold"
                         >
                           {child.title}
                         </Link>
@@ -172,7 +178,7 @@ export function Navbar() {
                   <Link
                     href={item.href!}
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-xl font-bold text-slate-700"
+                    className="text-foreground text-xl font-bold"
                   >
                     {item.title}
                   </Link>

@@ -27,9 +27,7 @@ export function FeatureCard({
             />
           )}
         </div>
-        <h3 className="group-hover:text-primary text-xl font-bold sm:text-2xl">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold sm:text-2xl">{title}</h3>
       </CardHeader>
       <CardContent className="-mt-5">
         <p className="text-lg leading-relaxed text-gray-500 opacity-80">

@@ -53,7 +53,7 @@ export function StoreNavbar() {
 
   return (
     <>
-      <header className="fixed z-50 w-full border-b border-gray-100 bg-white">
+      <header className="fixed z-50 w-full border-b border-border bg-background">
         <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
           <div className="flex items-center justify-between gap-4">
             <LogoBrand />

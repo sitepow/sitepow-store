@@ -43,7 +43,7 @@ export function ComparisonSection() {
               <TableRow>
                 <TableCell
                   colSpan={PROFIT_COMPARISON.columns.length}
-                  className="bg-gray-100 font-semibold"
+                  className="bg-foreground/10 dark:text-foreground font-semibold"
                 >
                   {category.name}
                 </TableCell>
@@ -51,7 +51,9 @@ export function ComparisonSection() {
 
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="font-medium">{feature.label}</TableCell>
+                  <TableCell className="text-foreground font-medium">
+                    {feature.label}
+                  </TableCell>
                   {feature.values.map((val, i) => (
                     <TableCell
                       key={i}

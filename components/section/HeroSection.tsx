@@ -32,7 +32,7 @@ export function HeroSection() {
       />
 
       {!isAuthenticated && (
-        <div className="flex flex-wrap justify-center gap-2.5 px-10">
+        <div className="text-foreground flex flex-wrap justify-center gap-2.5 px-10">
           <Link href="/pricing">
             <Button variant="outline" size="lg">
               ดูราคาและแพ็กเกจ <ArrowRight />
@@ -48,7 +48,7 @@ export function HeroSection() {
       )}
 
       {isAuthenticated && (
-        <div className="flex flex-wrap justify-center gap-2.5 px-5">
+        <div className="text-foreground flex flex-wrap justify-center gap-2.5 px-5">
           <Link href="/pricing">
             <Button variant="outline" size="lg">
               ดูราคาและแพ็กเกจ <ArrowRight />

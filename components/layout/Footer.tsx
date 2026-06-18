@@ -2,10 +2,8 @@ import Link from 'next/link'
 
 import { LogoBrand } from '../LogoBrand'
 import { FacebookIcon } from '../icon/Facebook'
-import { GithubIcon } from '../icon/Github'
 import { InstagramIcon } from '../icon/Instagram'
 import { TiktokIcon } from '../icon/Tiktok'
-import { TwitterIcon } from '../icon/Twitter'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -14,12 +12,10 @@ export function Footer() {
     { icon: <FacebookIcon />, href: '/', label: 'Facebook' },
     { icon: <InstagramIcon />, href: '/', label: 'Instagram' },
     { icon: <TiktokIcon />, href: '/', label: 'Tiktok' },
-    { icon: <TwitterIcon />, href: '/', label: 'Twitter' },
-    { icon: <GithubIcon />, href: '/', label: 'Github' },
   ]
 
   return (
-    <footer className="border-t border-gray-100 bg-white">
+    <footer className="bg-background border-border border-t">
       <div className="container mx-auto px-10 py-12">
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="max-w-sm">
@@ -35,7 +31,6 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 transition-colors hover:text-gray-600"
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -45,7 +40,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-6 border-t border-gray-100 pt-8 md:flex-row">
+        <div className="border-border mt-12 flex flex-col items-center justify-between gap-6 border-t pt-8 md:flex-row">
           <div className="order-2 md:order-1">
             <p className="text-sm text-gray-400">
               © {currentYear} Sitepow. All rights reserved.

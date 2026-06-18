@@ -42,7 +42,7 @@ export function PricingTables() {
               <TableRow>
                 <TableCell
                   colSpan={PRICING_TABLES.tiers.length + 1}
-                  className="bg-gray-100 text-start font-semibold"
+                  className="bg-foreground/10 dark:text-foreground text-start font-semibold"
                 >
                   {category.name}
                 </TableCell>
@@ -50,7 +50,9 @@ export function PricingTables() {
 
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="text-start">{feature.label}</TableCell>
+                  <TableCell className="text-foreground text-start">
+                    {feature.label}
+                  </TableCell>
                   {feature.access.map((hasAccess, i) => (
                     <TableCell key={i} className="text-center">
                       {hasAccess ? <CheckCircleIcon /> : <CloseCircleIcon />}

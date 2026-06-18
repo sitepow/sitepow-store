@@ -7,7 +7,7 @@ interface HeroHeaderProps {
 
 export function HeroHeader({ title, subtitle }: HeroHeaderProps) {
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="text-foreground flex flex-col items-center gap-4">
       <h1 className="max-w-2xl text-2xl leading-tight font-bold sm:text-4xl">
         {title}
       </h1>

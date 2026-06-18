@@ -22,7 +22,7 @@ export function MainLayout({
   const userRole = user?.role
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="bg-background flex flex-col gap-10">
       <Navbar />
       <main className={cn(className)} {...props}>
         {children}

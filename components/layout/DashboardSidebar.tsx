@@ -121,7 +121,7 @@ export function DashboardSidebar({
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-      <main className="w-full min-w-0 space-y-5 p-5">
+      <main className="bg-background w-full min-w-0 space-y-5 p-5">
         <SidebarTrigger />
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

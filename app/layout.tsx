@@ -10,6 +10,8 @@ import {
 import { QueryProviders } from '@/providers/QueryProviders'
 import { SessionProviders } from '@/providers/SessionProviders'
 
+import { ThemeProvider } from '@/components/ThemeProvider'
+
 import { cn } from '@/lib/utils'
 
 import './globals.css'
@@ -67,12 +69,20 @@ export default function RootLayout({
         'font-sans',
         inter.variable,
       )}
+      suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <Toaster />
-        <SessionProviders>
-          <QueryProviders>{children}</QueryProviders>
-        </SessionProviders>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster />
+          <SessionProviders>
+            <QueryProviders>{children}</QueryProviders>
+          </SessionProviders>
+        </ThemeProvider>
       </body>
     </html>
   )

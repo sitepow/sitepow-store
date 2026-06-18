@@ -13,7 +13,7 @@ export function LogoBrand({ className, ...props }: LogoBrandProps) {
     <Link
       href="/"
       className={cn(
-        'flex items-center gap-2.5 text-2xl font-bold tracking-tight',
+        'text-foreground flex items-center gap-2.5 text-2xl font-bold tracking-tight',
         className,
       )}
       {...props}
