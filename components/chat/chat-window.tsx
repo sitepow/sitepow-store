@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 import {
@@ -15,7 +15,6 @@ import { IconSend2 } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { cn } from '@/lib/utils'
 
@@ -38,26 +37,59 @@ export function ChatWindow({
   otherUserId?: string
   isAiEnabled?: boolean
 }) {
-  const { data } = useMessages(conversationId)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const topRef = useRef<HTMLDivElement>(null)
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMessages(conversationId)
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { user } = useSession()
   const userRole = user?.role
 
   const { mutate: toggleAi } = useToggleUserAi()
 
+  const prevScrollHeightRef = useRef<number | null>(null)
+  const prevMessageCountRef = useRef(0)
+  const prevLastMessageIdRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    const target = topRef.current
+    if (!container || !target) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          prevScrollHeightRef.current = container.scrollHeight
+          fetchNextPage()
+        }
+      },
+      { root: container, threshold: 1 },
+    )
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
   const { register, handleSubmit, reset, watch } = useForm<ChatFormValues>({
     defaultValues: { content: '' },
   })
 
   useChatStream(conversationId)
-  const scrollRef = useRef<HTMLDivElement>(null)
 
   const messages = useMemo(() => {
-    const all = data?.pages.flatMap((p) => p.items) ?? []
+    if (!data) {
+      return []
+    }
+
+    const allMessages = [...data.pages].reverse().flatMap((p) => p.items)
+
     const seen = new Set<string>()
     const deduped = []
 
-    for (const msg of all) {
+    for (const msg of allMessages) {
       if (!seen.has(msg.id)) {
         seen.add(msg.id)
         deduped.push(msg)
@@ -67,12 +99,35 @@ export function ChatWindow({
     return deduped
   }, [data])
 
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) {
+      return
+    }
+
+    const prevCount = prevMessageCountRef.current
+    const newCount = messages.length
+    const lastMessage = messages[messages.length - 1]
+    const isNewLastMessage =
+      !!lastMessage && lastMessage.id !== prevLastMessageIdRef.current
+
+    if (prevScrollHeightRef.current !== null) {
+      const newScrollHeight = container.scrollHeight
+      const delta = newScrollHeight - prevScrollHeightRef.current
+      container.scrollTop += delta
+      prevScrollHeightRef.current = null
+    } else if (newCount > prevCount && isNewLastMessage) {
+      container.scrollTop = container.scrollHeight
+    }
+
+    prevMessageCountRef.current = newCount
+    prevLastMessageIdRef.current = lastMessage?.id ?? null
   }, [messages])
 
   const onSubmit = ({ content }: ChatFormValues) => {
-    if (content.trim() === '') return
+    if (content.trim() === '') {
+      return
+    }
     sendMessage(content)
     reset()
   }
@@ -102,8 +157,10 @@ export function ChatWindow({
         </div>
       )}
 
-      <ScrollArea className="min-h-0 flex-1 px-4">
+      <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto px-4">
         <div className="flex flex-col gap-4">
+          <div ref={topRef} className="h-2" />
+
           {messages.map((msg) => {
             const isBot = msg?.sender?.role === UserRole.BOT
             const isMySender = msg.senderId === currentUserId
@@ -121,12 +178,15 @@ export function ChatWindow({
                   !isLeft ? 'items-end' : 'items-start',
                 )}
               >
+                {isBot && <span className="mb-1">AI Support</span>}
                 <div
                   className={cn(
                     'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',
                     !isLeft
                       ? 'rounded-tr-none bg-blue-600 text-white'
-                      : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
+                      : isBot
+                        ? 'bg-primary/50 rounded-tl-none border text-white'
+                        : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
                   )}
                 >
                   <MarkdownRenderer
@@ -136,7 +196,11 @@ export function ChatWindow({
                   <span
                     className={cn(
                       'mt-1 block text-[10px] opacity-70',
-                      !isLeft ? 'text-blue-100' : 'text-slate-500',
+                      !isLeft
+                        ? 'text-blue-100'
+                        : isBot
+                          ? 'text-white'
+                          : 'text-slate-500',
                     )}
                   >
                     {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -148,9 +212,8 @@ export function ChatWindow({
               </div>
             )
           })}
-          <div ref={scrollRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}

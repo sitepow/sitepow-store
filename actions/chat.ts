@@ -134,6 +134,11 @@ export async function sendMessage(
 
     const message = await tx.message.create({
       data: { conversationId, senderId: userId, content: cleanContent, type },
+      include: {
+        sender: {
+          select: { id: true, role: true },
+        },
+      },
     })
 
     await tx.conversation.update({
@@ -160,15 +165,7 @@ export async function sendMessage(
   })
 }
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 async function handleAiResponse(conversationId: string, content: string) {
-  const min = 2 * 1000
-  const max = 5 * 1000
-  const randomDelay = Math.floor(Math.random() * (max - min + 1) + min)
-
-  await delay(randomDelay)
-
   const aiResult = await generateAiSupportAction(content)
 
   if (aiResult.success && aiResult.data) {
@@ -178,6 +175,11 @@ async function handleAiResponse(conversationId: string, content: string) {
         senderId: AI_BOT_ID,
         content: aiResult.data,
         type: MessageType.TEXT,
+      },
+      include: {
+        sender: {
+          select: { id: true, role: true },
+        },
       },
     })
 
@@ -197,15 +199,14 @@ async function handleAiResponse(conversationId: string, content: string) {
 
 export async function getMessages(conversationId: string, cursor?: string) {
   const session = await auth()
+  const userId = session?.user?.id
+  const userRole = session?.user?.role
+
   if (!session?.user?.id) {
     return { items: [], nextCursor: undefined }
   }
 
-  const hasAccess = await checkAccess(
-    conversationId,
-    session.user.id,
-    session.user.role,
-  )
+  const hasAccess = await checkAccess(conversationId, userId!, userRole)
 
   if (!hasAccess) {
     return { items: [], nextCursor: undefined }
