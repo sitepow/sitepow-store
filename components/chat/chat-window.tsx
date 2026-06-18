@@ -14,7 +14,6 @@ import { useSession } from '@/hooks/use-session'
 import { IconSend2 } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 import { cn } from '@/lib/utils'
 

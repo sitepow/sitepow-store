@@ -11,6 +11,7 @@ import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { MessageCircle, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -24,7 +25,7 @@ import {
 import { ChatWindow } from './chat-window'
 
 export function ChatWidget() {
-  const { userId } = useSession()
+  const { userId, isAuthenticated } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
 
   const { data: unreadCount = 0 } = useUnreadCount(userId ?? '')
@@ -51,14 +52,23 @@ export function ChatWidget() {
             <DialogTitle>แชท Support</DialogTitle>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden">
-            {userId && convData?.success && convData.data && (
-              <ChatWindow
-                currentUserId={userId}
-                conversationId={convData.data.id}
-              />
-            )}
-          </div>
+          {!isAuthenticated && (
+            <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
+              <IconAlertCircle />
+              กรุณาเข้าสู่ระบบก่อนเริ่มการสนทนา
+            </div>
+          )}
+
+          {isAuthenticated && (
+            <div className="flex-1 overflow-hidden">
+              {userId && convData?.success && convData.data && (
+                <ChatWindow
+                  currentUserId={userId}
+                  conversationId={convData.data.id}
+                />
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
