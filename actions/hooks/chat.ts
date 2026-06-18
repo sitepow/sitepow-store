@@ -87,17 +87,16 @@ export function useSendMessage(conversationId: string) {
           (old: InfiniteData<ChatData> | undefined) => {
             if (!old) {
               return old
-            } else {
-              return {
-                ...old,
-                pages: old.pages.map((p, i) => {
-                  if (i === old.pages.length - 1) {
-                    return { ...p, items: [...p.items, newMessage] }
-                  } else {
-                    return p
-                  }
-                }),
-              }
+            }
+
+            return {
+              ...old,
+              pages: old.pages.map((p, i) => {
+                if (i === 0) {
+                  return { ...p, items: [...p.items, newMessage] }
+                }
+                return p
+              }),
             }
           },
         )

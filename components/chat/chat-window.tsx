@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
+import { Textarea } from '../ui/textarea'
 
 type ChatFormValues = {
   content: string
@@ -157,7 +158,7 @@ export function ChatWindow({
         </div>
       )}
 
-      <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto px-4">
+      <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="flex flex-col gap-4">
           <div ref={topRef} className="h-2" />
 
@@ -217,9 +218,9 @@ export function ChatWindow({
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex gap-2 border-t bg-white p-4"
+        className="flex gap-2 overflow-scroll border-t bg-white p-4"
       >
-        <Input
+        <Textarea
           {...register('content')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {

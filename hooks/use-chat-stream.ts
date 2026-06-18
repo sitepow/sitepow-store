@@ -23,18 +23,21 @@ export function useChatStream(conversationId: string) {
       queryClient.setQueryData(
         chatKeys.messages(conversationId),
         (old: InfiniteData<ChatData> | undefined) => {
-          if (!old) return old
+          if (!old) {
+            return old
+          }
+
           const alreadyExists = old.pages.some((p) =>
             p.items.some((m) => m.id === newMessage.id),
           )
-          if (alreadyExists) return old
+          if (alreadyExists) {
+            return old
+          }
 
           return {
             ...old,
             pages: old.pages.map((p, i) =>
-              i === old.pages.length - 1
-                ? { ...p, items: [...p.items, newMessage] }
-                : p,
+              i === 0 ? { ...p, items: [...p.items, newMessage] } : p,
             ),
           }
         },

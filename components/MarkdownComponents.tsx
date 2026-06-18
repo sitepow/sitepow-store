@@ -52,6 +52,15 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
     return null
   },
 
+  a: ({ node, ...props }) => (
+    <a
+      {...props}
+      className="underline underline-offset-4"
+      target="_blank"
+      rel="noopener noreferrer"
+    />
+  ),
+
   table: ({ children }) => (
     <div className="my-3 w-full overflow-x-auto">
       <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
