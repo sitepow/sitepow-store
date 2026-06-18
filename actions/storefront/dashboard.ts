@@ -1,8 +1,8 @@
 'use server'
 
-import { auth } from '@/auth'
 import { OrderStatus } from '@/generated/prisma/enums'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export interface GetStorefrontDashboardStats {

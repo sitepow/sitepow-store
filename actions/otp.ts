@@ -1,6 +1,5 @@
 'use server'
 
-import { auth } from '@/auth'
 import {
   MILLISECONDS_PER_MINUTE,
   OTP_EXPIRY_MINUTES,
@@ -9,6 +8,7 @@ import {
 } from '@/constants/system'
 import crypto from 'crypto'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function verifyOtp({ otp }: { otp: string }) {

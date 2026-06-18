@@ -6,14 +6,14 @@ import Line from 'next-auth/providers/line'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import bcrypt from 'bcryptjs'
 
-import { prisma } from './lib/prisma'
+import { prisma } from './prisma'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
   providers: [
     Google({ allowDangerousEmailAccountLinking: true }),
-    Line,
+    Line({ allowDangerousEmailAccountLinking: true }),
     Credentials({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {

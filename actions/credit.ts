@@ -1,6 +1,5 @@
 'use server'
 
-import { auth } from '@/auth'
 import { EXCHANGE_RATE } from '@/constants/credit'
 import {
   ActorType,
@@ -11,6 +10,7 @@ import {
 import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 const transactionSelect = {

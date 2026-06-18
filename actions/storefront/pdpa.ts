@@ -1,10 +1,10 @@
 'use server'
 
-import { auth } from '@/auth'
 import { UserRole } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import { randomUUID } from 'crypto'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function exportUserData() {

@@ -1,8 +1,8 @@
 'use server'
 
-import { auth } from '@/auth'
 import { NotificationSettingsFormValues } from '@/zod/storefront/notification-settings'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function getNotificationSettings() {

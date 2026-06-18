@@ -1,6 +1,5 @@
 'use server'
 
-import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
@@ -14,6 +13,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import crypto from 'crypto'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateOrderItemInput {

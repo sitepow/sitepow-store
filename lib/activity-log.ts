@@ -1,9 +1,9 @@
 import { headers } from 'next/headers'
 
-import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function createLog({

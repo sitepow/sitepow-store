@@ -1,7 +1,6 @@
 'use server'
 
 import { checkAccess } from '@/app/api/chat/stream/[conversationId]/route'
-import { auth } from '@/auth'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
 import { AI_BOT_ID } from '@/constants/system'
 import {
@@ -10,6 +9,7 @@ import {
   UserRole,
 } from '@/generated/prisma/enums'
 
+import { auth } from '@/lib/auth'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 

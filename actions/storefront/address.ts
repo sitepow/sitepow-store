@@ -1,8 +1,8 @@
 'use server'
 
-import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 const addressOptionSelect = {

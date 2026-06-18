@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 
 import { SessionProvider } from 'next-auth/react'
 
-import { auth } from '@/auth'
+import { auth } from '@/lib/auth'
 
 export async function SessionProviders({ children }: PropsWithChildren) {
   const session = await auth()

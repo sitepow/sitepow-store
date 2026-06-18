@@ -1,9 +1,9 @@
 'use server'
 
-import { auth } from '@/auth'
 import { ChangePasswordFormValues } from '@/zod/storefront/change-password'
 import bcrypt from 'bcryptjs'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function updatePassword(input: ChangePasswordFormValues) {

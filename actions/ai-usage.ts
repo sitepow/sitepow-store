@@ -1,9 +1,9 @@
 'use server'
 
-import { auth } from '@/auth'
 import { Prisma } from '@/generated/prisma/client'
 import { serializeDecimal } from '@/utils/decimal'
 
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 const storeAiCreditSelect = {

@@ -1,10 +1,10 @@
 'use server'
 
-import { auth } from '@/auth'
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateProductInput {
