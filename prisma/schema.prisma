@@ -191,24 +191,6 @@ model Account {
   @@id([provider, providerAccountId])
 }
 
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-}
-
 model Authenticator {
   credentialID         String  @unique
   userId               String
@@ -247,7 +229,6 @@ model User {
   customerProfile Customer?
 
   accounts           Account[]
-  sessions           Session[]
   Authenticator      Authenticator[]
   activityLogs       ActivityLog[]
   messages           Message[]

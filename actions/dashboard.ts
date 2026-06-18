@@ -170,8 +170,6 @@ export async function getDashboard(
       select: {
         id: true,
         totalAmount: true,
-        guestName: true,
-        guestEmail: true,
         customer: { select: { firstName: true, lastName: true, email: true } },
       },
     }),
@@ -217,8 +215,8 @@ export async function getDashboard(
     name: o.customer
       ? [o.customer.firstName, o.customer.lastName].filter(Boolean).join(' ') ||
         'ลูกค้า'
-      : (o.guestName ?? 'ลูกค้า'),
-    email: o.customer?.email ?? o.guestEmail ?? '-',
+      : 'ลูกค้า',
+    email: o.customer?.email ?? '-',
     amount: Number(o.totalAmount),
   }))
 
