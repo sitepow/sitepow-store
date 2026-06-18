@@ -41,9 +41,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/sitepow-store
-            docker network ls | grep -q "webnet" || docker network create webnet
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            docker compose down
+            docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
             docker compose pull
-            docker compose up -d --force-recreate
+            docker compose up -d --remove-orphans
             docker image prune -f
