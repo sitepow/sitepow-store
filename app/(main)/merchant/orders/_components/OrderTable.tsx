@@ -67,7 +67,7 @@ export function OrderTable() {
                   ? [order.customer.firstName, order.customer.lastName]
                       .filter(Boolean)
                       .join(' ')
-                  : (order.guestName ?? '-')
+                  : '-'
 
                 return (
                   <TableRow key={order.id}>
@@ -84,7 +84,7 @@ export function OrderTable() {
                             {customerName || 'ลูกค้า'}
                           </p>
                           <p className="text-muted-foreground text-sm">
-                            {order.customer?.email ?? order.guestEmail ?? '-'}
+                            {order.customer?.email ?? '-'}
                           </p>
                         </div>
                       </div>

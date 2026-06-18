@@ -33,9 +33,6 @@ const orderSelect = {
       email: true,
     },
   },
-  guestName: true,
-  guestEmail: true,
-  guestPhone: true,
   branch: {
     select: {
       id: true,
@@ -104,8 +101,6 @@ export async function getOrders({
     if (search) {
       whereClause.OR = [
         { orderNumber: { contains: search, mode: 'insensitive' } },
-        { guestName: { contains: search, mode: 'insensitive' } },
-        { guestEmail: { contains: search, mode: 'insensitive' } },
         { customer: { firstName: { contains: search, mode: 'insensitive' } } },
         { customer: { email: { contains: search, mode: 'insensitive' } } },
       ]

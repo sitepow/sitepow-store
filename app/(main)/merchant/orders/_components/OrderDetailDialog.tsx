@@ -45,7 +45,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
     ? [order.customer.firstName, order.customer.lastName]
         .filter(Boolean)
         .join(' ')
-    : (order.guestName ?? '-')
+    : '-'
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -72,7 +72,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
                   {customerName || 'ลูกค้า'}
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  {order.customer?.email ?? order.guestEmail ?? '-'}
+                  {order.customer?.email ?? '-'}
                 </p>
               </div>
             </div>
