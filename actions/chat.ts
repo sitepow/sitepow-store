@@ -163,8 +163,8 @@ export async function sendMessage(
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 async function handleAiResponse(conversationId: string, content: string) {
-  const min = 30 * 1000
-  const max = 60 * 1000
+  const min = 2 * 1000
+  const max = 5 * 1000
   const randomDelay = Math.floor(Math.random() * (max - min + 1) + min)
 
   await delay(randomDelay)

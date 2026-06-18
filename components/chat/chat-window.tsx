@@ -41,6 +41,7 @@ export function ChatWindow({
   const { data } = useMessages(conversationId)
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { user } = useSession()
+  const userRole = user?.role
 
   const { mutate: toggleAi } = useToggleUserAi()
 
@@ -80,7 +81,7 @@ export function ChatWindow({
 
   return (
     <div className="flex h-full flex-col">
-      {user?.role === UserRole.SUPPORT && (
+      {userRole === UserRole.SUPPORT && (
         <div className="flex items-center justify-between border-b bg-slate-50 p-3">
           <span className="text-xs font-semibold text-slate-600">
             ตั้งค่า AI สำหรับลูกค้ารายนี้
@@ -104,7 +105,12 @@ export function ChatWindow({
       <ScrollArea className="min-h-0 flex-1 px-4">
         <div className="flex flex-col gap-4">
           {messages.map((msg) => {
-            const isMe = msg.senderId === currentUserId
+            const isBot = msg?.sender?.role === UserRole.BOT
+            const isMySender = msg.senderId === currentUserId
+
+            const isMe =
+              userRole === UserRole.SUPPORT ? isMySender || isBot : isMySender
+
             const isLeft = !isMe
 
             return (
