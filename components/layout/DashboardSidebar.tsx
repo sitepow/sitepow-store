@@ -32,6 +32,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
+import { ModeToggle } from '../ModeToggle'
 import { ChatWidget } from '../chat/chat-widget'
 import { SupportWidget } from '../chat/support-widget'
 
@@ -122,7 +123,10 @@ export function DashboardSidebar({
         <SidebarFooter />
       </Sidebar>
       <main className="bg-background w-full min-w-0 space-y-5 p-5">
-        <SidebarTrigger />
+        <div className="flex flex-wrap gap-2.5">
+          <SidebarTrigger />
+          <ModeToggle />
+        </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}
         {userRole !== UserRole.SUPPORT && <ChatWidget />}
