@@ -71,11 +71,10 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
+    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
-        <div className="hidden w-full rounded-l-3xl bg-gray-200 lg:block" />
-
-        <div className="sm:shadow-airy flex w-full flex-col items-center gap-8 rounded-3xl bg-white px-0 py-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl">
+        <div className="bg-foreground/10 hidden w-full rounded-l-3xl lg:block" />
+        <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader
             className="text-center"
             title={'สมัครเปิดร้านค้าของคุณที่นี่'}
@@ -170,7 +169,7 @@ export function RegisterForm() {
                 </div>
               </div>
 
-              <p className="text-center text-sm text-slate-500">
+              <p className="text-center text-sm">
                 มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
                 <a
                   href="/login"
