@@ -10,7 +10,7 @@ import {
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
-import { IconAlertCircle, IconSparkles2 } from '@tabler/icons-react'
+import { IconSparkles2 } from '@tabler/icons-react'
 import { ArrowLeft, Headset, User2, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/dialog'
 
 import { Avatar, AvatarBadge, AvatarFallback } from '../ui/avatar'
-import { Spinner } from '../ui/spinner'
+import { AlertChat } from './_components/AlertChat'
+import { LoadingChat } from './_components/LoadingChat'
 import { ChatWindow } from './chat-window'
 
 function formatRelativeTime(date: Date): string {
@@ -108,18 +109,10 @@ export function SupportWidget() {
               />
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">
-                {isLoading && (
-                  <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
-                    <Spinner />
-                    กำลังโหลด...
-                  </div>
-                )}
+                {isLoading && <LoadingChat />}
 
                 {!isLoading && conversations.length === 0 && (
-                  <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
-                    <IconAlertCircle />
-                    ยังไม่มีแชทเข้ามา
-                  </div>
+                  <AlertChat title="ยังไม่มีแชทเข้ามา" />
                 )}
 
                 {conversations.map((conv) => (

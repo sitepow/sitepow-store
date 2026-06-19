@@ -61,14 +61,14 @@ export function EmailVerified() {
   }
 
   return (
-    <Alert className="w-full rounded-none border-l-4 border-l-orange-500 bg-orange-50/50 shadow-none">
+    <Alert className="w-full rounded-none border-l-4 border-l-orange-500 shadow-none">
       <AlertCircleIcon className="h-5 w-5 text-orange-500" />
       <AlertTitle className="font-semibold text-orange-600">
         มีสิ่งที่ต้องดำเนินการตอนนี้
       </AlertTitle>
       <AlertDescription className="text-muted-foreground mt-1">
         โปรดกรอกรหัสยืนยันที่ส่งไปยังอีเมลของคุณเพื่อเปิดใช้งานบัญชี
-        <span className="mt-0.5 block text-xs text-gray-500">
+        <span className="mt-0.5 block text-xs opacity-50">
           (หากไม่พบในกล่องขาเข้า โปรดตรวจสอบใน อีเมลขยะ หรือ ถังขยะ)
         </span>
       </AlertDescription>

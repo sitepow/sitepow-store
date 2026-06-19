@@ -18,7 +18,7 @@ export function StoreSelectField() {
     useStoreFilter()
 
   return (
-    <Field className="w-full sm:w-fit">
+    <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
         เลือกร้านค้าของคุณ

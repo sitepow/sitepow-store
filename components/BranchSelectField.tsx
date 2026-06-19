@@ -19,7 +19,7 @@ export function BranchSelectField() {
   const { data: branches = [], isLoading } = useBranchOptions(selectedStoreId)
 
   return (
-    <Field className="w-full sm:w-fit">
+    <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
         เลือกสาขาของร้านค้า

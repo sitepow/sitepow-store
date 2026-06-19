@@ -11,7 +11,6 @@ import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
-import { IconAlertCircle } from '@tabler/icons-react'
 import { MessageCircle, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -22,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
+import { AlertChat } from './_components/AlertChat'
 import { ChatWindow } from './chat-window'
 
 export function ChatWidget() {
@@ -53,10 +53,7 @@ export function ChatWidget() {
           </DialogHeader>
 
           {!isAuthenticated && (
-            <div className="flex h-full items-center justify-center gap-2 text-sm text-slate-500">
-              <IconAlertCircle />
-              กรุณาเข้าสู่ระบบก่อนเริ่มการสนทนา
-            </div>
+            <AlertChat title="กรุณาเข้าสู่ระบบก่อนเริ่มการสนทนา" />
           )}
 
           {isAuthenticated && (

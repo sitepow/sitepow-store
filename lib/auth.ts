@@ -42,11 +42,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, account, trigger }) {
+      if (user && account) {
+        const isOAuth =
+          account.provider === 'google' || account.provider === 'line'
+
+        if (isOAuth && token.isEmailVerified !== true) {
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                isEmailVerified: true,
+                emailVerified: new Date(),
+              },
+            })
+
+            token.isEmailVerified = true
+          } catch (error) {
+            console.error(error)
+          }
+        }
+      }
+
       if (user) {
         token.id = user.id as string
         token.role = user.role
-        token.isEmailVerified = user.isEmailVerified as boolean | null
+        token.isEmailVerified = token.isEmailVerified ?? user.isEmailVerified
       }
 
       if (trigger === 'update' && token.id) {
