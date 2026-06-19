@@ -76,20 +76,18 @@ export function StoreTable() {
                     <TableCell>{store.id}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="text-foreground font-medium">
-                          {store.name}
-                        </span>
-                        <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
-                          <span>sitepow.store/{store.slug}</span>
-                          <a
-                            href={`https://${store.slug}.sitepow.store`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-primary text-muted-foreground/70 transition-colors"
-                          >
+                        <span>{store.name}</span>
+                        <a
+                          href={`https://${store.slug}.sitepow.store`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className=""
+                        >
+                          <div className="hover:text-primary flex items-center gap-1.5">
+                            <span>sitepow.store/{store.slug}</span>
                             <IconExternalLink size={16} />
-                          </a>
-                        </div>
+                          </div>
+                        </a>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -114,9 +112,7 @@ export function StoreTable() {
                             : 'ถูกระงับการใช้งาน'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {formattedDate}
-                    </TableCell>
+                    <TableCell>{formattedDate}</TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button
                         variant="outline"

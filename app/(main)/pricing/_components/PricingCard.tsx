@@ -33,7 +33,7 @@ export function PricingCard({
 
   return (
     <section
-      className={`text-foreground dark:bg-foreground/10 flex flex-col items-center rounded-xl border p-2.5 text-start ${
+      className={`text-foreground dark:bg-foreground/5 flex flex-col items-center rounded-xl border p-2.5 text-start ${
         isPopular && 'border-primary shadow-md'
       }`}
     >

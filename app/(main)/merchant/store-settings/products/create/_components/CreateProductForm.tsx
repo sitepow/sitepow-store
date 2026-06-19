@@ -239,7 +239,7 @@ export function CreateProductForm() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
+      <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
           <FieldSet disabled={isPendingAiGen}>
             <FieldGroup className="mt-4 grid gap-6">
@@ -291,7 +291,10 @@ export function CreateProductForm() {
             ))}
           </FieldGroup>
 
-          <FieldSet disabled={isPending} className="rounded-lg border p-4">
+          <FieldSet
+            disabled={isPending}
+            className="dark:bg-foreground/5 rounded-lg border p-4"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
@@ -364,7 +367,10 @@ export function CreateProductForm() {
             </Field>
           </FieldSet>
 
-          <FieldSet disabled={isPending} className="rounded-lg border p-6">
+          <FieldSet
+            disabled={isPending}
+            className="dark:bg-foreground/5 rounded-lg border p-6"
+          >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
                 บริการเสริม (Addons)
@@ -382,7 +388,7 @@ export function CreateProductForm() {
             </div>
             <FieldGroup className="grid gap-4">
               {addonFields.map((item, index) => (
-                <Card key={item.id} className="border-blue-50 shadow-sm">
+                <Card key={item.id}>
                   <CardContent className="flex items-end gap-3 pt-6">
                     <div className="grid flex-1 gap-3">
                       <Field>
@@ -420,18 +426,18 @@ export function CreateProductForm() {
             </FieldGroup>
           </FieldSet>
 
-          <div className="flex flex-wrap justify-end gap-4 border-t pt-6">
+          <div className="flex flex-wrap justify-end gap-2.5">
             <Button
               type="button"
               disabled={isPending}
               variant="outline"
               onClick={() => reset()}
             >
-              ล้างฟอร์ม
+              ล้างการตั้งค่า
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPendingCreate && <Spinner />}
-              บันทึกสินค้าใหม่
+              บันทึกข้อมูล
             </Button>
           </div>
         </form>

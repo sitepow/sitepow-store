@@ -14,7 +14,7 @@ export function PageTabHeaderIcon({
   return (
     <div
       className={cn(
-        'border-border/50 text-foreground bg-foreground/10 mt-0.5 flex items-center justify-center rounded-lg border p-2',
+        'border-border/50 text-foreground bg-foreground/5 mt-0.5 flex items-center justify-center rounded-lg border p-2',
         className,
       )}
       {...props}

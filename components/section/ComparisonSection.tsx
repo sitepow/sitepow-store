@@ -43,7 +43,7 @@ export function ComparisonSection() {
               <TableRow>
                 <TableCell
                   colSpan={PROFIT_COMPARISON.columns.length}
-                  className="bg-foreground/10 dark:text-foreground font-semibold"
+                  className="bg-foreground/5 dark:text-foreground font-semibold"
                 >
                   {category.name}
                 </TableCell>

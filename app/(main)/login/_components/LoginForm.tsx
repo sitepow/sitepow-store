@@ -57,7 +57,7 @@ export function LoginForm() {
   return (
     <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
-        <div className="bg-foreground/10 hidden w-full rounded-l-3xl lg:block" />
+        <div className="bg-foreground/5 hidden w-full rounded-l-3xl lg:block" />
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader title="เข้าสู่ระบบหลังบ้านของคุณ" />
           <div className="w-full max-w-md space-y-8">

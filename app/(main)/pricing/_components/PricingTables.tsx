@@ -42,7 +42,7 @@ export function PricingTables() {
               <TableRow>
                 <TableCell
                   colSpan={PRICING_TABLES.tiers.length + 1}
-                  className="bg-foreground/10 dark:text-foreground text-start font-semibold"
+                  className="bg-foreground/5 dark:text-foreground text-start font-semibold"
                 >
                   {category.name}
                 </TableCell>

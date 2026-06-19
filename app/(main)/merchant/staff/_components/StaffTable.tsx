@@ -43,6 +43,7 @@ export function StaffTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัสพนักงาน</TableHead>
               <TableHead>ชื่อพนักงาน</TableHead>
               <TableHead>อีเมล</TableHead>
               <TableHead>บทบาท</TableHead>
@@ -58,6 +59,7 @@ export function StaffTable() {
             ) : (
               staffs.map((staff) => (
                 <TableRow key={staff.id}>
+                  <TableCell>{staff.id}</TableCell>
                   <TableCell>{staff.staff.name}</TableCell>
                   <TableCell>{staff.staff.email}</TableCell>
                   <TableCell>

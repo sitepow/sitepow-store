@@ -29,7 +29,7 @@ export function RadioCard({
       <Label
         htmlFor={id}
         className={cn(
-          'flex cursor-pointer justify-between gap-5 rounded-xl border border-gray-100 bg-white p-4 text-start font-normal transition-all select-none',
+          'dark:bg-foreground/5 border-border flex cursor-pointer justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
           'has-data-[state=checked]:border-primary',
         )}
       >
@@ -38,7 +38,7 @@ export function RadioCard({
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <div className="[[data-state=checked]~&]:text-primary has-data-[state=checked]:text-primary text-sm font-bold text-gray-700">
+              <div className="[[data-state=checked]~&]:text-primary has-data-[state=checked]:text-primary text-sm font-bold">
                 {title}
               </div>
               {trailing && (
@@ -47,9 +47,7 @@ export function RadioCard({
                 </div>
               )}
               {description && (
-                <div className="text-muted-foreground mt-0.5 text-xs">
-                  {description}
-                </div>
+                <div className="mt-0.5 text-xs opacity-60">{description}</div>
               )}
             </div>
           </div>

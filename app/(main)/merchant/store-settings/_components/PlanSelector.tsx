@@ -3,14 +3,13 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
+import { PLAN_DETAILS } from '@/config/planDetails'
 import { Plan } from '@/generated/prisma/enums'
 import { formatNumber } from '@/utils/pricing'
 import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError } from '@/components/ui/field'
 import { RadioGroup } from '@/components/ui/radio-group'
-
-import { PLAN_DETAILS } from '../../../../../config/planDetails'
 
 interface PlanSelectorProps {
   isPending: boolean
@@ -54,13 +53,11 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
                     <b className="text-primary text-xl">
                       {formatNumber(plan.price)} -.
                     </b>
-                    <span className="text-muted-foreground block text-[10px]">
-                      /เดือน
-                    </span>
+                    <span className="block text-[10px] opacity-60">/เดือน</span>
                   </div>
                 }
               >
-                <div className="text-muted-foreground text-xs">
+                <div className="text-xs opacity-60">
                   {plan.features.join(', ')}
                 </div>
               </RadioCard>

@@ -34,12 +34,12 @@ export function ShippingZoneTable({
             <TableRow key={key}>
               <TableCell className="align-top font-medium">
                 <div className="font-semibold">{label.title}</div>
-                <div className="text-muted-foreground mt-1 text-xs">
+                <div className="mt-1 text-xs opacity-60">
                   {label.description}
                 </div>
               </TableCell>
               <TableCell className="max-w-md min-w-md">
-                <div className="text-sm leading-relaxed wrap-break-word whitespace-normal text-neutral-700">
+                <div className="text-sm leading-relaxed wrap-break-word whitespace-normal opacity-60">
                   {getProvincesForZone({
                     zoneType: key as ShippingZoneType,
                     originProvince,

@@ -143,10 +143,10 @@ export function ShippingSettingsForm() {
                       {COURIERS_LIST.map((courier) => (
                         <div
                           key={courier.id}
-                          className="space-y-3 rounded-xl border bg-neutral-50/40 p-4"
+                          className="dark:bg-foreground/5 space-y-3 rounded-xl border p-4"
                         >
                           <div>
-                            <h4 className="text-sm font-bold text-neutral-900">
+                            <h4 className="text-sm font-bold">
                               {courier.name}
                             </h4>
                             <p className="text-muted-foreground text-xs">
@@ -170,7 +170,7 @@ export function ShippingSettingsForm() {
                               return (
                                 <div
                                   key={service.id}
-                                  className={`flex flex-wrap items-center justify-between gap-5 rounded-lg border bg-white p-3 transition-colors ${
+                                  className={`border-border flex flex-wrap items-center justify-between gap-5 rounded-lg border p-3 transition-colors ${
                                     isEnabled
                                       ? 'border-brand/20 bg-brand/5'
                                       : ''
@@ -224,7 +224,7 @@ export function ShippingSettingsForm() {
                           />
                         )}
                       />
-                      <span className="block text-sm font-semibold text-neutral-900">
+                      <span className="block text-sm font-semibold">
                         เงื่อนไขโปรโมชันส่งฟรีของร้าน
                       </span>
                     </div>

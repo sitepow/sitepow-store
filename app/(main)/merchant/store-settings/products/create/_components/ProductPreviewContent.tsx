@@ -38,35 +38,35 @@ export function ProductPreviewContent() {
   const description = `${formattedTags ? `${formattedTags}` : ''}ช้อปเลย! ${title || 'สินค้าคุณภาพ'}${priceText}พร้อมโปรโมชั่นพิเศษและตัวเลือกเสริมมากมาย การันตีของแท้ สั่งซื้อได้ที่นี่...`
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg border bg-white p-4">
-        <p className="mb-2 text-xs font-semibold text-slate-400 uppercase">
+    <div className="text-foreground space-y-6">
+      <div className="dark:bg-foreground/5 rounded-lg border p-4">
+        <p className="mb-2 text-xs font-semibold uppercase opacity-60">
           Google Search (ตัวอย่าง)
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
             https://{selectedStoreSlug}.sitepow.store › products › {displaySlug}
           </p>
-          <p className="cursor-pointer text-xl text-blue-700 hover:underline">
+          <p className="cursor-pointer text-xl hover:underline">
             {displayTitle}
           </p>
-          <p className="line-clamp-2 text-sm text-slate-600">{description}</p>
+          <p className="line-clamp-2 text-sm opacity-60">{description}</p>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border bg-white">
-        <p className="border-b p-3 text-xs font-semibold text-slate-400 uppercase">
+      <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
+        <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
           Social Share (ตัวอย่าง)
         </p>
-        <div className="flex aspect-video items-center justify-center bg-slate-100 text-slate-400">
+        <div className="bg-foreground/20 flex aspect-video items-center justify-center opacity-40">
           รูปภาพตัวอย่าง
         </div>
         <div className="p-3">
-          <p className="text-[12px] text-slate-500 uppercase">
+          <p className="text-[12px] text-emerald-700 uppercase">
             https://{selectedStoreSlug}.sitepow.store
           </p>
-          <p className="font-bold text-slate-800">{displayTitle}</p>
-          <p className="line-clamp-1 text-sm text-slate-600">{description}</p>
+          <p className="font-bold">{displayTitle}</p>
+          <p className="line-clamp-1 text-sm opacity-60">{description}</p>
         </div>
       </div>
     </div>

@@ -38,14 +38,11 @@ export function StoreTransferSettingsForm() {
         {selectedStoreId !== ALL_STORES && (
           <>
             <CardContent className="space-y-5">
-              <Alert
-                variant="destructive"
-                className="border-red-200 bg-red-50/50"
-              >
-                <AlertTitle className="text-sm font-semibold text-red-800">
+              <Alert variant="destructive">
+                <AlertTitle className="text-sm font-semibold">
                   คำเตือนและข้อควรระวัง
                 </AlertTitle>
-                <AlertDescription className="mt-1 text-xs leading-relaxed text-red-700">
+                <AlertDescription className="mt-1 text-xs leading-relaxed">
                   เมื่อผู้รับยืนยันการโอน
                   บัญชีปัจจุบันของคุณจะถูกลดระดับสิทธิ์ลงทันที
                   และไม่สามารถเข้าถึงการจัดการงบดุล รายได้

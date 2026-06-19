@@ -137,7 +137,7 @@ export function ChatWindow({
   return (
     <div className="flex h-full flex-col">
       {userRole === UserRole.SUPPORT && (
-        <div className="bg-foreground/10 flex items-center justify-between border-b p-3">
+        <div className="bg-foreground/5 flex items-center justify-between border-b p-3">
           <span className="text-foreground text-xs font-semibold">
             ตั้งค่า AI สำหรับลูกค้ารายนี้
           </span>

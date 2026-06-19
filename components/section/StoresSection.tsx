@@ -35,7 +35,7 @@ export function StoresSection() {
           : stores.map((store) => (
               <Card
                 key={store.id}
-                className="group bg-background relative flex flex-col overflow-hidden p-0 transition-all"
+                className="group from-background relative flex flex-col overflow-hidden bg-linear-to-t p-0 transition-all"
               >
                 <div className="bg-muted relative h-48 w-full overflow-hidden">
                   <div className="from-background/80 absolute inset-0 bg-linear-to-t to-transparent" />
@@ -50,7 +50,7 @@ export function StoresSection() {
                   <h3 className="line-clamp-2 text-xl font-bold sm:text-2xl">
                     {store.name}
                   </h3>
-                  <p className="mt-1 text-lg leading-relaxed text-gray-500 opacity-80">
+                  <p className="mt-1 text-lg leading-relaxed opacity-60">
                     ระบบจัดการออเดอร์และสต็อกที่ครบวงจร
                     ได้รับความไว้วางใจจากร้านค้าชั้นนำบน Sitepow Store
                   </p>
