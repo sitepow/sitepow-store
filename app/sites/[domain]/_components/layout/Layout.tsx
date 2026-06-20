@@ -19,10 +19,9 @@ export function StoreLayout({
   className,
   ...props
 }: ComponentProps<'main'>) {
+  const { store } = useStoreData()
   const { user } = useSession()
   const userRole = user?.role
-
-  const { store } = useStoreData()
 
   return (
     <div className="flex flex-col gap-10">

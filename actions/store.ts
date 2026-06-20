@@ -141,9 +141,11 @@ export async function getStore({
 
   const cacheKey = `store:${domain}`
 
-  const cachedStore = await redis.get(cacheKey)
-  if (cachedStore) {
-    return JSON.parse(cachedStore) as StoreData
+  try {
+    const cachedStore = await redis.get(cacheKey)
+    if (cachedStore) return JSON.parse(cachedStore) as StoreData
+  } catch (error) {
+    console.error(error)
   }
 
   const store = await prisma.store.findUnique({
@@ -158,7 +160,11 @@ export async function getStore({
   })
 
   if (store) {
-    await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
+    try {
+      await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
+    } catch (error) {
+      console.error('Redis Write Error:', error)
+    }
   }
 
   return store
