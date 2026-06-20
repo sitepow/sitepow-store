@@ -4,6 +4,7 @@ import { ComponentProps } from 'react'
 
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 
 import { ChatWidget } from '@/components/chat/chat-widget'
 import { SupportWidget } from '@/components/chat/support-widget'
@@ -21,6 +22,8 @@ export function StoreLayout({
   const { user } = useSession()
   const userRole = user?.role
 
+  const { store } = useStoreData()
+
   return (
     <div className="flex flex-col gap-10">
       <StoreNavbar />
@@ -28,9 +31,12 @@ export function StoreLayout({
         {children}
       </main>
       <StoreFooter />
-      {userRole === UserRole.MERCHANT && <SupportWidget />}
+      {userRole === UserRole.MERCHANT && <SupportWidget storeId={store?.id} />}
       {userRole !== UserRole.MERCHANT && (
-        <ChatWidget conversationType={ConversationType.STORE} />
+        <ChatWidget
+          conversationType={ConversationType.STORE}
+          storeId={store?.id}
+        />
       )}
     </div>
   )

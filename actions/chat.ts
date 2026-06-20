@@ -28,7 +28,10 @@ function cleanBadWords(content: string): string {
   return cleanContent
 }
 
-export async function getConversation(type: ConversationType) {
+export async function getConversation(
+  type: ConversationType,
+  storeId?: string,
+) {
   const session = await auth()
   const currentUserId = session?.user?.id
 
@@ -36,9 +39,14 @@ export async function getConversation(type: ConversationType) {
     return { success: false, message: 'ไม่พบผู้ใช้งาน' }
   }
 
+  if (type === ConversationType.STORE && !storeId) {
+    return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+  }
+
   let conversation = await prisma.conversation.findFirst({
     where: {
       type,
+      storeId: type === ConversationType.STORE ? storeId : undefined,
       members: { some: { userId: currentUserId } },
     },
     include: { members: true },
@@ -48,6 +56,7 @@ export async function getConversation(type: ConversationType) {
     conversation = await prisma.conversation.create({
       data: {
         type,
+        storeId: type === ConversationType.STORE ? storeId : undefined,
         members: { create: [{ userId: currentUserId }] },
       },
       include: { members: true },
@@ -57,17 +66,39 @@ export async function getConversation(type: ConversationType) {
   return { success: true, data: conversation }
 }
 
-export async function getSupportConversations() {
+export async function getSupportConversations(storeId?: string) {
   const session = await auth()
   const userId = session?.user?.id
   const userRole = session?.user?.role
 
-  if (!userId || userRole !== UserRole.SUPPORT) {
+  if (!userId) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
   }
 
+  if (userRole !== UserRole.SUPPORT && userRole !== UserRole.MERCHANT) {
+    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+  }
+
+  if (userRole === UserRole.MERCHANT) {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    const store = await prisma.store.findFirst({
+      where: { id: storeId, ownerId: userId },
+      select: { id: true },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+    }
+  }
+
   const conversations = await prisma.conversation.findMany({
-    where: { type: ConversationType.SUPPORT },
+    where:
+      userRole === UserRole.SUPPORT
+        ? { type: ConversationType.SUPPORT }
+        : { type: ConversationType.STORE, storeId },
     orderBy: { lastMessageAt: 'desc' },
     include: {
       members: { include: { user: true } },
@@ -88,17 +119,17 @@ export async function getSupportConversations() {
 
   const data = conversations.map((c) => {
     const me = c.members.find((m) => m.userId === userId)
-    const merchantMember = c.members.find((m) => m.userId !== userId)
-    const merchant = merchantMember?.user
+    const otherMember = c.members.find((m) => m.userId !== userId)
+    const other = otherMember?.user
 
     return {
       id: c.id,
-      merchantName: merchant?.name ?? merchant?.email ?? 'ไม่ทราบชื่อ',
-      merchantId: merchant?.id ?? '',
+      merchantName: other?.name ?? other?.email ?? 'ไม่ทราบชื่อ',
+      merchantId: other?.id ?? '',
       lastMessage: c.messages[0]?.content ?? null,
       lastMessageAt: c.lastMessageAt,
       unreadCount: me?.unreadCount ?? 0,
-      isAiEnabled: merchant?.isAiEnabled ?? false,
+      isAiEnabled: other?.isAiEnabled ?? false,
     }
   })
 

@@ -7,6 +7,8 @@ import { StoreStatus } from '@/generated/prisma/enums'
 
 import { AlertLayout } from '@/components/layout/AlertLayout'
 
+import { StoreInitializer } from './_components/layout/StoreInitializer'
+
 type Props = {
   params: Promise<{ domain: string }>
   children: React.ReactNode
@@ -83,5 +85,10 @@ export default async function StoreLayout({ children, params }: Props) {
     )
   }
 
-  return children
+  return (
+    <>
+      <StoreInitializer store={store} />
+      {children}
+    </>
+  )
 }

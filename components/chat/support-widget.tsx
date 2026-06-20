@@ -46,12 +46,12 @@ function formatRelativeTime(date: Date): string {
   return `${diffDay} วันที่แล้ว`
 }
 
-export function SupportWidget() {
+export function SupportWidget({ storeId }: { storeId?: string } = {}) {
   const { userId } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const { data, isLoading } = useSupportConversations(isOpen)
+  const { data, isLoading } = useSupportConversations(isOpen, storeId)
   const { data: unreadCount = 0 } = useUnreadCount(userId!)
 
   const { mutate: markAsRead } = useMarkAsRead(userId!)
@@ -119,7 +119,7 @@ export function SupportWidget() {
                   <button
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv.id)}
-                    className="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors hover:bg-slate-50"
+                    className="flex w-full flex-col gap-1 border-b p-4 text-left transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <Avatar className="size-8 border">
@@ -171,7 +171,7 @@ export function SupportWidget() {
         {isOpen ? <X /> : <Headset />}
         {unreadCount > 0 && (
           <CartBadge
-            className="text-primary bg-background border-primary border"
+            className="text-primary border-primary border bg-white"
             total={unreadCount}
           />
         )}

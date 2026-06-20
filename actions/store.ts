@@ -1,7 +1,11 @@
 'use server'
 
 import { PLAN_DETAILS } from '@/config/planDetails'
-import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
+import {
+  MILLISECONDS_PER_DAY,
+  REDIS_CACHE_TTL,
+  SUBSCRIPTION_DAYS,
+} from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
@@ -14,6 +18,7 @@ import {
 
 import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
 
 export interface CreateStoreInput {
   name: string
@@ -115,15 +120,34 @@ export async function getLandingStores(limit = 6): Promise<StoreLandingItem[]> {
   }
 }
 
-export async function getStore({ domain }: { domain: string }) {
+export type StoreData = Prisma.StoreGetPayload<{
+  select: {
+    id: true
+    name: true
+    description: true
+    logo: true
+    status: true
+  }
+}>
+
+export async function getStore({
+  domain,
+}: {
+  domain: string
+}): Promise<StoreData | null> {
   if (!domain) {
     return null
   }
 
-  return await prisma.store.findUnique({
-    where: {
-      slug: domain,
-    },
+  const cacheKey = `store:${domain}`
+
+  const cachedStore = await redis.get(cacheKey)
+  if (cachedStore) {
+    return JSON.parse(cachedStore) as StoreData
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { slug: domain },
     select: {
       id: true,
       name: true,
@@ -132,6 +156,12 @@ export async function getStore({ domain }: { domain: string }) {
       status: true,
     },
   })
+
+  if (store) {
+    await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
+  }
+
+  return store
 }
 
 export async function checkStoreAvailability(input: {

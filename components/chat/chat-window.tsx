@@ -136,26 +136,27 @@ export function ChatWindow({
 
   return (
     <div className="flex h-full flex-col">
-      {userRole === UserRole.SUPPORT && (
-        <div className="bg-foreground/5 flex items-center justify-between border-b p-3">
-          <span className="text-foreground text-xs font-semibold">
-            ตั้งค่า AI สำหรับลูกค้ารายนี้
-          </span>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="ai-mode" className="text-xs">
-              เปิดใช้งาน AI
-            </Label>
-            <Switch
-              id="ai-mode"
-              checked={isAiEnabled}
-              onCheckedChange={(checked) =>
-                otherUserId &&
-                toggleAi({ userId: otherUserId, enabled: checked })
-              }
-            />
+      {userRole === UserRole.SUPPORT ||
+        (userRole === UserRole.MERCHANT && (
+          <div className="bg-foreground/5 flex items-center justify-between border-b p-3">
+            <span className="text-foreground text-xs font-semibold">
+              ตั้งค่า AI สำหรับลูกค้ารายนี้
+            </span>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="ai-mode" className="text-xs">
+                เปิดใช้งาน AI
+              </Label>
+              <Switch
+                id="ai-mode"
+                checked={isAiEnabled}
+                onCheckedChange={(checked) =>
+                  otherUserId &&
+                  toggleAi({ userId: otherUserId, enabled: checked })
+                }
+              />
+            </div>
           </div>
-        </div>
-      )}
+        ))}
 
       <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="flex flex-col gap-4">
@@ -166,7 +167,9 @@ export function ChatWindow({
             const isMySender = msg.senderId === currentUserId
 
             const isMe =
-              userRole === UserRole.SUPPORT ? isMySender || isBot : isMySender
+              userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
+                ? isMySender || isBot
+                : isMySender
 
             const isLeft = !isMe
 

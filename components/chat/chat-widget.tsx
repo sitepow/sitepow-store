@@ -26,9 +26,10 @@ import { ChatWindow } from './chat-window'
 
 interface ChatWidgetProps {
   conversationType: ConversationType
+  storeId?: string
 }
 
-export function ChatWidget({ conversationType }: ChatWidgetProps) {
+export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
   const { userId, isAuthenticated } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
 
@@ -38,6 +39,7 @@ export function ChatWidget({ conversationType }: ChatWidgetProps) {
     userId ?? '',
     conversationType,
     !!userId && isOpen,
+    storeId,
   )
 
   const { mutate: markAsRead } = useMarkAsRead(userId ?? '')
@@ -81,7 +83,7 @@ export function ChatWidget({ conversationType }: ChatWidgetProps) {
         {isOpen ? <X /> : <MessageCircle />}
         {unreadCount > 0 && (
           <CartBadge
-            className="text-primary bg-background border-primary border"
+            className="text-primary border-primary border bg-white"
             total={unreadCount}
           />
         )}

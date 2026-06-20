@@ -35,21 +35,22 @@ export function useConversation(
   userId: string,
   type: ConversationType,
   enabled: boolean,
+  storeId?: string,
 ) {
   return useQuery(
     queryOptions({
-      queryKey: chatKeys.conversation(userId, type),
-      queryFn: () => getConversation(type),
+      queryKey: chatKeys.conversation(userId, type, storeId),
+      queryFn: () => getConversation(type, storeId),
       enabled: enabled,
     }),
   )
 }
 
-export function useSupportConversations(enabled = true) {
+export function useSupportConversations(enabled = true, storeId?: string) {
   return useQuery(
     queryOptions({
-      queryKey: chatKeys.supportConversations(),
-      queryFn: () => getSupportConversations(),
+      queryKey: chatKeys.supportConversations(storeId),
+      queryFn: () => getSupportConversations(storeId),
       enabled,
       refetchInterval: CHAT_REFETCH_INTERVAL,
     }),
