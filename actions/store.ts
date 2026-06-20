@@ -1,13 +1,7 @@
 'use server'
 
-import { cache } from 'react'
-
 import { PLAN_DETAILS } from '@/config/planDetails'
-import {
-  MILLISECONDS_PER_DAY,
-  REDIS_CACHE_TTL,
-  SUBSCRIPTION_DAYS,
-} from '@/constants/system'
+import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
@@ -19,8 +13,8 @@ import {
 } from '@/generated/prisma/enums'
 
 import { createLog } from '@/lib/activity-log'
+import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
-import { redis } from '@/lib/redis'
 
 export interface CreateStoreInput {
   name: string
@@ -132,39 +126,26 @@ export type StoreData = Prisma.StoreGetPayload<{
   }
 }>
 
-export const getStore = cache(async ({ domain }: { domain: string }) => {
+export const getStore = async ({ domain }: { domain: string }) => {
   if (!domain) {
     return null
   }
 
   const cacheKey = `store:${domain}`
 
-  try {
-    const cachedStore = await redis.get(cacheKey)
-    if (cachedStore) {
-      return JSON.parse(cachedStore) as StoreData
-    }
-  } catch (error) {
-    console.error(error)
-  }
-
-  const store = await prisma.store.findUnique({
-    where: { slug: domain },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      logo: true,
-      status: true,
-    },
+  return withCache(cacheKey, async () => {
+    return await prisma.store.findUnique({
+      where: { slug: domain },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        logo: true,
+        status: true,
+      },
+    })
   })
-
-  if (store) {
-    await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
-  }
-
-  return store
-})
+}
 
 export async function checkStoreAvailability(input: {
   name?: string
