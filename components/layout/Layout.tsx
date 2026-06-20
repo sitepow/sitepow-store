@@ -2,7 +2,7 @@
 
 import { ComponentProps } from 'react'
 
-import { UserRole } from '@/generated/prisma/enums'
+import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 
 import { cn } from '@/lib/utils'
@@ -30,7 +30,9 @@ export function MainLayout({
       <Footer />
       <ProtectedByBrand />
       {userRole === UserRole.SUPPORT && <SupportWidget />}
-      {userRole !== UserRole.SUPPORT && <ChatWidget />}
+      {userRole !== UserRole.SUPPORT && (
+        <ChatWidget conversationType={ConversationType.SUPPORT} />
+      )}
     </div>
   )
 }

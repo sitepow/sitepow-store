@@ -24,7 +24,11 @@ import {
 import { AlertChat } from './_components/AlertChat'
 import { ChatWindow } from './chat-window'
 
-export function ChatWidget() {
+interface ChatWidgetProps {
+  conversationType: ConversationType
+}
+
+export function ChatWidget({ conversationType }: ChatWidgetProps) {
   const { userId, isAuthenticated } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
 
@@ -32,7 +36,7 @@ export function ChatWidget() {
 
   const { data: convData } = useConversation(
     userId ?? '',
-    ConversationType.SUPPORT,
+    conversationType,
     !!userId && isOpen,
   )
 
