@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { NavigationItem } from '@/constants/navigation'
-import { UserRole } from '@/generated/prisma/enums'
+import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { IconChevronRight } from '@tabler/icons-react'
 
@@ -129,7 +129,9 @@ export function DashboardSidebar({
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}
-        {userRole !== UserRole.SUPPORT && <ChatWidget />}
+        {userRole !== UserRole.SUPPORT && (
+          <ChatWidget conversationType={ConversationType.SUPPORT} />
+        )}
       </main>
     </SidebarProvider>
   )
