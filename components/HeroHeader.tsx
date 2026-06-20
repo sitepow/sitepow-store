@@ -12,7 +12,7 @@ export function HeroHeader({ title, subtitle }: HeroHeaderProps) {
         {title}
       </h1>
 
-      <h2 className="-mt-4 flex flex-wrap items-center justify-center gap-2.5 text-xl font-medium opacity-70 sm:text-2xl">
+      <h2 className="-mt-4 flex flex-wrap items-center justify-center gap-2.5 text-xl font-medium opacity-60 sm:text-2xl">
         {subtitle}
       </h2>
     </div>

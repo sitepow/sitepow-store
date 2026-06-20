@@ -26,10 +26,10 @@ export function CheckoutSection({
       className={cn(
         'overflow-hidden rounded-xl border transition-all duration-300',
         isDisabled
-          ? 'border-gray-100 bg-gray-50 opacity-60'
+          ? 'bg-foreground/5 border-border opacity-60'
           : isActive
             ? 'border-primary shadow-md'
-            : 'border-gray-100 bg-gray-50/50',
+            : 'bg-foreground/5 border-border',
       )}
     >
       <div
@@ -72,7 +72,7 @@ export function CheckoutSection({
           </div>
 
           {!isActive && isCompleted && (
-            <div className="border-t border-gray-50 bg-white px-5 py-3">
+            <div className="border-border bg-background dark:bg-foreground/5 border-t px-5 py-3">
               {summaryView}
             </div>
           )}

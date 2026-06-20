@@ -71,8 +71,8 @@ export function StoreRegisterForm() {
   }
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-120px)] flex-col justify-center gap-5 p-4 sm:p-10">
-      <div className="sm:shadow-airy mx-auto flex w-full max-w-2xl flex-col items-center gap-8 rounded-2xl bg-white p-6 sm:gap-10 sm:p-14">
+    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-120px)] flex-col justify-center gap-5 p-4 sm:p-10">
+      <div className="sm:shadow-airy dark:bg-foreground/5 border-border mx-auto flex w-full max-w-2xl flex-col items-center gap-8 rounded-2xl border p-6 sm:gap-10 sm:p-14">
         <h1 className="text-center text-xl font-bold sm:text-2xl">
           สมัครบัญชีซื้อของออนไลน์ของคุณ
         </h1>
@@ -159,8 +159,9 @@ export function StoreRegisterForm() {
           </div>
         )}
 
-        <p className="text-center text-sm text-slate-600 sm:text-base">
-          มีบัญชีแล้วใช่มั้ย? <br className="sm:hidden" />
+        <p className="text-center text-sm sm:text-base">
+          <span className="opacity-60">มีบัญชีแล้วใช่มั้ย?</span>{' '}
+          <br className="sm:hidden" />
           <Link href="/login" className="mt-1 inline-block sm:mt-0">
             <span className="text-primary hover:text-primary/80 font-semibold underline underline-offset-4 transition-colors">
               เข้าสู่ระบบเลยสิ!

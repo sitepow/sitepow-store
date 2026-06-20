@@ -10,11 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all group hover:border hover:border-primary/50',
+  'h-full rounded-xl transition-all dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
   {
     variants: {
       variant: {
-        outline: 'border border-gray-100',
+        outline: 'border border-border',
         shadow: 'shadow-airy ',
       },
     },
@@ -33,7 +33,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
     <Link href={`/products/${product.slug}`}>
       <div className={cn(productCardVariants({ variant }), className)}>
         <div className="relative">
-          <div className="mb-2.5 h-52 w-full rounded-xl bg-gray-200" />
+          <div className="bg-foreground/20 mb-2.5 h-52 w-full rounded-xl" />
           {hasDiscount && (
             <Badge className="absolute top-0 right-0 size-12 rounded-full text-center">
               ลด

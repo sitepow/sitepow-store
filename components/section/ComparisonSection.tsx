@@ -55,13 +55,14 @@ export function ComparisonSection() {
                     {feature.label}
                   </TableCell>
                   {feature.values.map((val, i) => (
-                    <TableCell
-                      key={i}
-                      className={`${i === 1 ? 'text-primary font-bold' : 'text-muted-foreground'}`}
-                    >
+                    <TableCell key={i}>
                       <div className="flex items-center gap-2">
                         {i === 1 ? <CheckCircleIcon /> : <CloseCircleIcon />}
-                        <span>{val}</span>
+                        <span
+                          className={`${i === 1 ? 'text-primary font-bold' : 'opacity-60'}`}
+                        >
+                          {val}
+                        </span>
                       </div>
                     </TableCell>
                   ))}

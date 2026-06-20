@@ -87,7 +87,7 @@ export const MarkdownRenderer = ({
         'prose-pre:max-w-[90vw] md:prose-pre:max-w-none',
         'prose-table:block prose-table:overflow-x-auto',
 
-        'leading-relaxed text-slate-700 antialiased dark:text-slate-300',
+        'text-foreground leading-relaxed antialiased',
 
         className,
       )}

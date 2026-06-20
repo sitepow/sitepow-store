@@ -68,10 +68,10 @@ export function ProductSpecification() {
           <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
             {Object.entries(details).map(([key, value]) => (
               <div key={key} className="flex flex-col border-b pb-2">
-                <span className="text-muted-foreground text-sm">
+                <span className="text-sm opacity-60">
                   {metadataLabelMap[key] ?? key.replace(/_/g, ' ')}
                 </span>
-                <span className="font-medium text-slate-900">
+                <span className="font-medium">
                   {Array.isArray(value)
                     ? value
                         .map((v) =>

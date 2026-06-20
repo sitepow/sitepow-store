@@ -41,7 +41,7 @@ export function ProductGalleryThumbnail() {
         {images.map((image, index) => (
           <div
             key={image.id || index}
-            className="size-14 flex-none rounded-sm bg-gray-100 md:size-20 md:rounded-xl"
+            className="bg-foreground/20 size-14 flex-none rounded-sm md:size-20 md:rounded-xl"
           />
         ))}
       </div>

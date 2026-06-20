@@ -10,8 +10,8 @@ export function StoreNavbarCheckout() {
   const { isAuthenticated } = useSession()
 
   return (
-    <div className="fixed z-50 w-full bg-white">
-      <nav className="container mx-auto flex flex-col gap-5 border-b border-gray-100 px-10 py-5">
+    <div className="bg-background fixed z-50 w-full">
+      <nav className="border-border container mx-auto flex flex-col gap-5 border-b px-10 py-5">
         <div className="flex items-center justify-between">
           <LogoBrand />
 

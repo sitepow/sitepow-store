@@ -43,7 +43,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5 xl:col-span-9">
+    <div className="text-foreground flex flex-1 flex-col gap-5 xl:col-span-9">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-2.5">
         {isLoading ? (
           <Skeleton className="h-4 w-32 rounded" />

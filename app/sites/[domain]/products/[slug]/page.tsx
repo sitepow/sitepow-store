@@ -16,7 +16,7 @@ export default async function StoreProductDescriptionPage({ params }: Props) {
   return (
     <StoreLayout>
       <SectionContainer>
-        <div className="grid w-full items-start gap-x-10 gap-y-5 text-start xl:grid-cols-12">
+        <div className="text-foreground grid w-full items-start gap-x-10 gap-y-5 text-start xl:grid-cols-12">
           <div className="flex flex-col gap-5 xl:col-span-7">
             <ProductGallery />
           </div>

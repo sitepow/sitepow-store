@@ -17,6 +17,7 @@ import {
 
 import { EmailVerified } from '@/components/EmailVerified'
 import { LogoBrand } from '@/components/LogoBrand'
+import { ModeToggle } from '@/components/ModeToggle'
 import { ListItem } from '@/components/layout/_components/ListItem'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -53,12 +54,12 @@ export function StoreNavbar() {
 
   return (
     <>
-      <header className="fixed z-50 w-full border-b border-border bg-background">
+      <header className="border-border text-foreground bg-background fixed z-50 w-full border-b">
         <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
           <div className="flex items-center justify-between gap-4">
             <LogoBrand />
 
-            <div className="flex items-center gap-3 md:gap-5">
+            <div className="flex items-center gap-2.5 md:gap-5">
               <div className="mx-5 hidden max-w-md flex-1 lg:flex">
                 <ButtonGroup className="w-full">
                   <Input id="input-button-group" placeholder="ค้นหา" />
@@ -84,6 +85,7 @@ export function StoreNavbar() {
                 />
               )}
 
+              <ModeToggle />
               <CartDrawer />
 
               <Button
@@ -113,7 +115,7 @@ export function StoreNavbar() {
                   <NavigationMenuItem key={idx}>
                     {item.children ? (
                       <>
-                        <NavigationMenuTrigger className="text-lg font-bold opacity-50">
+                        <NavigationMenuTrigger className="text-lg font-bold opacity-60">
                           {item.title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
@@ -129,7 +131,7 @@ export function StoreNavbar() {
                         asChild
                         className={cn(
                           navigationMenuTriggerStyle(),
-                          'bg-transparent text-lg font-bold opacity-50 hover:bg-transparent',
+                          'bg-transparent text-lg font-bold opacity-60 hover:bg-transparent',
                         )}
                       >
                         <Link href={item.href!}>{item.title}</Link>
@@ -144,7 +146,7 @@ export function StoreNavbar() {
 
         <div
           className={cn(
-            'absolute top-18.25 left-0 w-full overflow-y-auto border-t bg-white shadow-lg transition-all duration-300 ease-in-out lg:hidden',
+            'bg-background absolute top-18.25 left-0 w-full overflow-y-auto border-t shadow-lg transition-all duration-300 ease-in-out lg:hidden',
             isMenuOpen
               ? 'max-h-[calc(100vh-73px)] opacity-100'
               : 'pointer-events-none max-h-0 opacity-0',
@@ -173,16 +175,16 @@ export function StoreNavbar() {
                 <div key={idx} className="flex flex-col">
                   {item.children ? (
                     <div className="space-y-4">
-                      <p className="text-sm font-bold text-slate-400">
+                      <p className="text-sm font-bold opacity-40">
                         {item.title}
                       </p>
-                      <div className="ml-2 flex flex-col space-y-4 border-l-2 border-slate-100 pl-4">
+                      <div className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4">
                         {item.children.map((child) => (
                           <Link
                             key={child.title}
                             href={child.href}
                             onClick={() => setIsMenuOpen(false)}
-                            className="active:text-primary text-lg font-semibold text-slate-700 transition-colors"
+                            className="active:text-primary text-lg font-semibold opacity-80 transition-colors"
                           >
                             {child.title}
                           </Link>
@@ -193,7 +195,7 @@ export function StoreNavbar() {
                     <Link
                       href={item.href!}
                       onClick={() => setIsMenuOpen(false)}
-                      className="text-xl font-bold text-slate-800"
+                      className="text-xl font-bold"
                     >
                       {item.title}
                     </Link>
@@ -202,25 +204,25 @@ export function StoreNavbar() {
               ))}
             </div>
 
-            <Separator />
-
             {!isAuthenticated && (
-              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="outline"
-                  className="w-full gap-3 border-2 py-8 text-lg font-bold"
-                >
-                  <LockKeyholeIcon size={22} />
-                  เข้าสู่ระบบ / สมัครสมาชิก
-                </Button>
-              </Link>
+              <>
+                <Separator />
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-3 border-2 py-8 text-lg font-bold"
+                  >
+                    <LockKeyholeIcon size={22} />
+                    เข้าสู่ระบบ / สมัครสมาชิก
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         </div>
 
         {isEmailUnverified && <EmailVerified />}
       </header>
-
       {isEmailUnverified && <div className="h-10" />}
     </>
   )

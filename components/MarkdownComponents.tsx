@@ -44,7 +44,7 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
         <input
           readOnly
           checked={checked}
-          className="text-primary focus:ring-primary mt-1.5 h-4 w-4 rounded border-gray-300"
+          className="text-primary focus:ring-primary border-border mt-1.5 h-4 w-4 rounded"
           type="checkbox"
         />
       )
@@ -62,33 +62,31 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
   ),
 
   table: ({ children }) => (
-    <div className="my-3 w-full overflow-x-auto">
-      <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
+    <div className="text-foreground my-3 w-full overflow-x-auto">
+      <table className="border-border w-full border-collapse border">
         {children}
       </table>
     </div>
   ),
 
   thead: ({ children }) => (
-    <thead className="bg-gray-100 dark:bg-gray-800">{children}</thead>
+    <thead className="bg-foreground/5">{children}</thead>
   ),
 
   th: ({ children }) => (
-    <th className="border border-gray-300 px-4 py-2 text-left font-bold dark:border-gray-700">
+    <th className="border-border border px-4 py-2 text-left font-bold">
       {children}
     </th>
   ),
 
   td: ({ children }) => (
-    <td className="border border-gray-300 px-4 py-2 dark:border-gray-700">
-      {children}
-    </td>
+    <td className="border-border border px-4 py-2">{children}</td>
   ),
 
   accordion: ({ children, className }: ComponentProps<'details'>) => (
     <details
       className={cn(
-        'group my-2 overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-transparent',
+        'group border-border bg-foreground/5 my-2 overflow-hidden rounded-xl border',
         className,
       )}
     >
@@ -99,7 +97,7 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
   accordionheader: ({ children, className }: ComponentProps<'summary'>) => (
     <summary
       className={cn(
-        'flex cursor-pointer list-none items-center justify-between p-4 font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50',
+        'flex cursor-pointer list-none items-center justify-between p-4 font-medium transition-colors',
         'list-none [&::-webkit-details-marker]:hidden',
         className,
       )}
@@ -112,7 +110,7 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
   accordioncontent: ({ children, className }: ComponentProps<'p'>) => (
     <div
       className={cn(
-        'border-t border-gray-100 p-6 text-gray-600 dark:border-gray-800 dark:text-gray-400',
+        'border-border border-t p-6',
         '[&>p]:m-0 [&>p]:leading-relaxed',
         className,
       )}
@@ -125,14 +123,12 @@ export const MarkdownComponents = (fallbackAlt: string): CustomComponents => ({
     <img
       {...props}
       alt={alt || fallbackAlt}
-      className="my-4 w-full rounded-xl border border-gray-100"
+      className="border-border my-4 w-full rounded-xl border"
       loading="lazy"
     />
   ),
 
-  hr: () => (
-    <hr className="my-8 border-t border-gray-200 dark:border-gray-800" />
-  ),
+  hr: () => <hr className="border-border my-8 border-t" />,
 
   div: ({ className, children, ...props }) => {
     const classList = className?.split(' ') || []

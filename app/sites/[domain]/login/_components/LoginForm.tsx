@@ -55,8 +55,8 @@ export function StoreLoginForm() {
   })
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-120px)] flex-col justify-center gap-5 p-4 sm:p-10">
-      <div className="sm:shadow-airy mx-auto flex w-full max-w-2xl flex-col items-center gap-8 rounded-2xl bg-white p-6 sm:gap-10 sm:p-14">
+    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-120px)] flex-col justify-center gap-5 p-4 sm:p-10">
+      <div className="sm:shadow-airy dark:bg-foreground/5 border-border mx-auto flex w-full max-w-2xl flex-col items-center gap-8 rounded-2xl border p-6 sm:gap-10 sm:p-14">
         <h1 className="text-xl font-bold sm:text-2xl">
           เข้าสู่ระบบร้านค้าของคุณ
         </h1>
@@ -117,7 +117,8 @@ export function StoreLoginForm() {
         </div>
 
         <p className="text-center text-sm leading-relaxed sm:text-base">
-          ยังไม่มีบัญชีใช่มั้ย? <br className="sm:hidden" />
+          <span className="opacity-60">ยังไม่มีบัญชีใช่มั้ย?</span>{' '}
+          <br className="sm:hidden" />
           <Link href="/register" className="mt-1 inline-block sm:mt-0">
             <span className="text-primary font-semibold underline underline-offset-4">
               สมัครสมาชิกเลยสิ!

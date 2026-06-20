@@ -9,5 +9,5 @@ export function ProductGalleryMain() {
     return <Skeleton className="h-96 w-full rounded-xl" />
   }
 
-  return <div className="h-96 rounded-xl bg-gray-100" />
+  return <div className="bg-foreground/20 h-96 rounded-xl" />
 }

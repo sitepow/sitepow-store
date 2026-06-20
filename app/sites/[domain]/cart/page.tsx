@@ -199,7 +199,7 @@ export default function StoreCartPage() {
   return (
     <StoreLayoutCheckout>
       <SectionContainer>
-        <div className="grid w-full items-start gap-5 lg:grid-cols-12">
+        <div className="text-foreground grid w-full items-start gap-5 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-7">
             <div className="flex items-center justify-between">
               <Link href={'/'}>
@@ -213,8 +213,8 @@ export default function StoreCartPage() {
               </Link>
             </div>
 
-            <div className="flex flex-col rounded-xl border border-gray-100">
-              <div className="rounded-xl bg-gray-50/50 px-5 py-2.5 text-start font-bold">
+            <div className="border-border flex flex-col rounded-xl border">
+              <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>ตะกร้าสินค้า</h2>
               </div>
 
@@ -258,7 +258,7 @@ export default function StoreCartPage() {
           </div>
 
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="flex items-center gap-5 rounded-xl border border-gray-100 bg-gray-50/50 px-5 py-2.5 text-start">
+            <div className="bg-foreground/5 border-border flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -460,7 +460,7 @@ export default function StoreCartPage() {
               )}
             </CheckoutSection>
 
-            <div className="rounded-xl border border-gray-100 bg-white p-5">
+            <div className="bg-foreground/5 border-border rounded-xl border p-5">
               <SummaryRow
                 label="ส่วนลด"
                 value={<DiscountForm subtotal={summary.finalPrice} />}

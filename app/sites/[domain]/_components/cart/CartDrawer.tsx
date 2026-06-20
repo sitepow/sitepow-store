@@ -77,7 +77,7 @@ export function CartDrawer() {
         </ScrollArea>
 
         {items.length > 0 && (
-          <DrawerFooter className="border-t bg-slate-50/50">
+          <DrawerFooter className="border-t">
             <CartSummary summary={summary} />
             <Link href="/cart">
               <Button size="lg" className="h-12 w-full shadow-md sm:text-lg">

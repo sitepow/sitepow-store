@@ -30,11 +30,9 @@ export function FeatureCard({
         <h3 className="text-xl font-bold sm:text-2xl">{title}</h3>
       </CardHeader>
       <CardContent className="-mt-5">
-        <p className="text-lg leading-relaxed text-gray-500 opacity-80">
-          {description}
-        </p>
+        <p className="text-lg leading-relaxed opacity-60">{description}</p>
         {image && (
-          <div className="relative mt-6 overflow-hidden rounded-xl border-2 border-dashed border-gray-100">
+          <div className="border-border relative mt-6 overflow-hidden rounded-xl border-2 border-dashed">
             <div className="flex h-48 w-full items-center justify-center" />
           </div>
         )}

@@ -82,7 +82,7 @@ export function CategorySection({
               <SeeMoreButton href={`/products?category=${categorySlug}`} />
             )}
           </div>
-          <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-10 bg-linear-to-l from-white to-transparent" />
+          <div className="from-background pointer-events-none absolute top-0 right-0 z-10 h-full w-10 bg-linear-to-l to-transparent" />
         </div>
       </div>
     </SectionContainer>

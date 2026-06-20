@@ -26,7 +26,7 @@ export function SectionHeader({
       </h2>
 
       {description && (
-        <p className="max-w-4xl text-lg font-medium opacity-70 sm:text-2xl">
+        <p className="max-w-4xl text-lg font-medium opacity-60 sm:text-2xl">
           {description}
         </p>
       )}

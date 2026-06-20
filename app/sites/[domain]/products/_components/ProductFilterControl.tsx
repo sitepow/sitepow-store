@@ -39,7 +39,7 @@ export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
   const clearAll = () => router.push('?')
 
   return (
-    <aside className="w-full shrink-0 space-y-8 xl:sticky xl:top-40 xl:col-span-3">
+    <aside className="text-foreground w-full shrink-0 space-y-8 xl:sticky xl:top-40 xl:col-span-3">
       <Accordion
         type="multiple"
         defaultValue={['categories']}

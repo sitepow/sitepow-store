@@ -147,7 +147,7 @@ export function Navbar() {
 
         <div
           className={cn(
-            'bg-background container mx-auto overflow-y-auto border-t transition-all duration-300 ease-in-out lg:hidden',
+            'bg-background text-foreground container mx-auto overflow-y-auto border-t transition-all duration-300 ease-in-out lg:hidden',
             isMenuOpen
               ? 'max-h-[calc(100vh-80px)] opacity-100'
               : 'pointer-events-none max-h-0 opacity-0',
@@ -158,16 +158,14 @@ export function Navbar() {
               <div key={idx} className="flex flex-col">
                 {item.children ? (
                   <div className="space-y-4">
-                    <p className="text-foreground/40 text-sm font-bold">
-                      {item.title}
-                    </p>
+                    <p className="text-sm font-bold opacity-40">{item.title}</p>
                     <div className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4">
                       {item.children.map((child) => (
                         <Link
                           key={child.title}
                           href={child.href}
                           onClick={() => setIsMenuOpen(false)}
-                          className="active:text-primary text-foreground/80 text-lg font-semibold"
+                          className="active:text-primary text-lg font-semibold opacity-80"
                         >
                           {child.title}
                         </Link>

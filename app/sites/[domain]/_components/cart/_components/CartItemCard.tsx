@@ -19,7 +19,7 @@ export function CartItemCard({
 }: CartItemCardProps) {
   return (
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
-      <div className="size-20 shrink-0 overflow-hidden rounded-md border bg-gray-100 sm:size-24" />
+      <div className="bg-foreground/20 size-20 shrink-0 overflow-hidden rounded-md border sm:size-24" />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="min-w-0">
           <h4 className="text-sm leading-tight font-medium sm:text-base">
