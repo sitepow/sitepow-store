@@ -18,7 +18,7 @@ services:
       [
         'redis-server',
         '--requirepass',
-        'your_strong_password',
+        'sitepow_store_rMYbQ6gAC0EH',
         '--maxmemory',
         '512mb',
         '--maxmemory-policy',
