@@ -1,5 +1,7 @@
 'use server'
 
+import { cache } from 'react'
+
 import { PLAN_DETAILS } from '@/config/planDetails'
 import {
   MILLISECONDS_PER_DAY,
@@ -130,11 +132,7 @@ export type StoreData = Prisma.StoreGetPayload<{
   }
 }>
 
-export async function getStore({
-  domain,
-}: {
-  domain: string
-}): Promise<StoreData | null> {
+export const getStore = cache(async ({ domain }: { domain: string }) => {
   if (!domain) {
     return null
   }
@@ -143,7 +141,9 @@ export async function getStore({
 
   try {
     const cachedStore = await redis.get(cacheKey)
-    if (cachedStore) return JSON.parse(cachedStore) as StoreData
+    if (cachedStore) {
+      return JSON.parse(cachedStore) as StoreData
+    }
   } catch (error) {
     console.error(error)
   }
@@ -160,15 +160,11 @@ export async function getStore({
   })
 
   if (store) {
-    try {
-      await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
-    } catch (error) {
-      console.error('Redis Write Error:', error)
-    }
+    await redis.setex(cacheKey, REDIS_CACHE_TTL, JSON.stringify(store))
   }
 
   return store
-}
+})
 
 export async function checkStoreAvailability(input: {
   name?: string

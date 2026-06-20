@@ -1,25 +1,31 @@
 'use client'
 
-import { useStorefrontCategories } from '@/actions/hooks/storefront/category'
+import { useStorefrontCategoriesProductsSections } from '@/actions/hooks/storefront/sections'
+
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { CategorySection } from './Category'
 
 export function CategoriesSection({ storeSlug }: { storeSlug: string }) {
-  const { data: categories, isLoading } = useStorefrontCategories({ storeSlug })
+  const { data, isLoading } = useStorefrontCategoriesProductsSections(storeSlug)
 
-  if (isLoading || !categories?.length) {
+  if (isLoading) {
+    return <Skeleton className="h-64 w-full" />
+  }
+
+  if (!data?.length) {
     return null
   }
 
   return (
     <>
-      {categories.map((category) => (
+      {data.map((categoryGroup) => (
         <CategorySection
-          {...category}
-          categorySlug={category.slug}
-          key={category.id}
-          categoryId={category.id}
-          storeSlug={storeSlug}
+          key={categoryGroup.id}
+          categorySlug={categoryGroup.slug}
+          title={categoryGroup.title}
+          image={categoryGroup.image}
+          products={categoryGroup.products}
         />
       ))}
     </>

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { StorefrontProductListItem } from '@/actions/storefront/product'
+import { SectionProductItem } from '@/actions/storefront/sections'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
 import { type VariantProps, cva } from 'class-variance-authority'
@@ -22,7 +22,7 @@ const productCardVariants = cva(
 )
 
 interface ProductCardProps extends VariantProps<typeof productCardVariants> {
-  product: StorefrontProductListItem
+  product: SectionProductItem
   className?: string
 }
 

@@ -9,10 +9,7 @@ const storefrontProductListSelect = {
   id: true,
   title: true,
   slug: true,
-  productType: true,
-  category: {
-    select: { id: true, title: true, slug: true },
-  },
+  categoryId: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },
@@ -21,20 +18,12 @@ const storefrontProductListSelect = {
   variants: {
     select: {
       id: true,
-      title: true,
       price: true,
-      discountActive: true,
       discountType: true,
       discountAmount: true,
-      pointsActive: true,
-      pointsAmount: true,
-      stocks: {
-        select: { quantity: true },
-      },
+      discountActive: true,
     },
-  },
-  reviews: {
-    select: { rating: true },
+    take: 1,
   },
 } satisfies Prisma.ProductSelect
 

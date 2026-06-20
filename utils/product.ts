@@ -1,7 +1,4 @@
-import { StorefrontProductListItem } from '@/actions/storefront/product'
 import { DiscountType } from '@/generated/prisma/enums'
-
-type StorefrontVariant = StorefrontProductListItem['variants'][number]
 
 export interface CalculatedProduct {
   original: PriceStats
@@ -10,13 +7,30 @@ export interface CalculatedProduct {
   maxDiscountPercent: number
 }
 
+export interface ProductForCalculation {
+  variants: {
+    price: number
+    discountActive: boolean
+    discountType: 'PERCENTAGE' | 'FIXED' | null
+    discountAmount: number | null
+  }[]
+}
+export interface VariantForCalculation {
+  price: number
+  discountActive: boolean
+  discountType: 'PERCENTAGE' | 'FIXED' | null
+  discountAmount: number | null
+}
+
 export interface PriceStats {
   min: number
   max: number
   avg: number
 }
 
-const calculateNetPriceFromVariant = (variant: StorefrontVariant): number => {
+const calculateNetPriceFromVariant = (
+  variant: VariantForCalculation,
+): number => {
   if (
     !variant.discountActive ||
     !variant.discountType ||
@@ -43,7 +57,7 @@ const getStats = (prices: number[]): PriceStats => {
 }
 
 export const calculateProduct = (
-  product: StorefrontProductListItem,
+  product: ProductForCalculation,
 ): CalculatedProduct => {
   const variants = product.variants ?? []
 
