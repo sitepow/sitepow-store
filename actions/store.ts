@@ -1,5 +1,7 @@
 'use server'
 
+import { cache } from 'react'
+
 import { PLAN_DETAILS } from '@/config/planDetails'
 import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
@@ -126,7 +128,7 @@ export type StoreData = Prisma.StoreGetPayload<{
   }
 }>
 
-export const getStore = async ({ domain }: { domain: string }) => {
+export const getStore = cache(async ({ domain }: { domain: string }) => {
   if (!domain) {
     return null
   }
@@ -145,7 +147,7 @@ export const getStore = async ({ domain }: { domain: string }) => {
       },
     })
   })
-}
+})
 
 export async function checkStoreAvailability(input: {
   name?: string
