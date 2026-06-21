@@ -3,6 +3,7 @@
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
 const storefrontProductListSelect = {
@@ -132,22 +133,12 @@ export async function getStorefrontProducts({
   storeSlug,
   page = 1,
   limit = 12,
-  search,
-  categorySlug,
+  search = '',
+  categorySlug = '',
 }: GetStorefrontProductsParams): Promise<GetStorefrontProductsResponse> {
-  const empty: GetStorefrontProductsResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
+  const cacheKey = `products:${storeSlug}:p${page}:l${limit}:s${search}:c${categorySlug}`
 
-  try {
+  const data = await withCache(cacheKey, async () => {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(50, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -160,7 +151,9 @@ export async function getStorefrontProducts({
       whereClause.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { slug: { contains: search, mode: 'insensitive' } },
-        { tags: { some: { name: { contains: search, mode: 'insensitive' } } } },
+        {
+          tags: { some: { name: { contains: search, mode: 'insensitive' } } },
+        },
       ]
     }
 
@@ -192,17 +185,31 @@ export async function getStorefrontProducts({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return empty
-  }
+  })
+
+  return (
+    data ?? {
+      data: [],
+      meta: {
+        currentPage: page,
+        limit,
+        totalItems: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    }
+  )
 }
 
 export async function getStorefrontProductDetail(
   storeSlug: string,
   productSlug: string,
 ): Promise<StorefrontProductDetail | null> {
-  try {
-    const product = await prisma.product.findFirst({
+  const cacheKey = `product:detail:${storeSlug}:${productSlug}`
+
+  const product = await withCache(cacheKey, async () => {
+    const res = await prisma.product.findFirst({
       where: {
         slug: productSlug,
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
@@ -210,12 +217,8 @@ export async function getStorefrontProductDetail(
       select: storefrontProductDetailSelect,
     })
 
-    if (!product) {
-      return null
-    }
+    return res ? serializeDecimal(res) : null
+  })
 
-    return serializeDecimal(product)
-  } catch {
-    return null
-  }
+  return product
 }

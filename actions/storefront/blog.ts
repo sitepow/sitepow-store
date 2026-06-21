@@ -2,6 +2,7 @@
 
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
 
+import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
 const storefrontBlogListSelect = {
@@ -54,21 +55,11 @@ export async function getStorefrontBlogs({
   storeSlug,
   page = 1,
   limit = 9,
-  search,
+  search = '',
 }: GetStorefrontBlogsParams): Promise<GetStorefrontBlogsResponse> {
-  const empty: GetStorefrontBlogsResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
+  const cacheKey = `blogs:${storeSlug}:p${page}:l${limit}:s${search}`
 
-  try {
+  const result = await withCache(cacheKey, async () => {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(50, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -105,16 +96,30 @@ export async function getStorefrontBlogs({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return empty
-  }
+  })
+
+  return (
+    result ?? {
+      data: [],
+      meta: {
+        currentPage: page,
+        limit,
+        totalItems: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    }
+  )
 }
 
 export async function getStorefrontBlogDetail(
   storeSlug: string,
   blogSlug: string,
 ): Promise<StorefrontBlogDetail | null> {
-  try {
+  const cacheKey = `blog:detail:${storeSlug}:${blogSlug}`
+
+  return await withCache(cacheKey, async () => {
     return await prisma.blog.findFirst({
       where: {
         slug: blogSlug,
@@ -122,7 +127,5 @@ export async function getStorefrontBlogDetail(
       },
       select: storefrontBlogDetailSelect,
     })
-  } catch {
-    return null
-  }
+  })
 }

@@ -3,6 +3,7 @@
 import { Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
 const storefrontSectionProductSelect = {
@@ -33,15 +34,29 @@ export type SectionProductItem = DecimalToNumber<
   }>
 >
 
+export type StorefrontSection = {
+  id: string
+  title: string
+  slug: string
+  image: string | null
+  products: SectionProductItem[]
+}
+
 export async function getStorefrontCategoriesProductsSections(
   storeSlug: string,
-) {
-  try {
+): Promise<StorefrontSection[]> {
+  const cacheKey = `storefront:${storeSlug}`
+
+  const data = await withCache(cacheKey, async () => {
     const categories = await prisma.category.findMany({
       where: { store: { slug: storeSlug } },
       select: { id: true, title: true, slug: true, image: true },
       orderBy: { title: 'asc' },
     })
+
+    if (categories.length === 0) {
+      return []
+    }
 
     const categoryIds = categories.map((c) => c.id)
 
@@ -54,14 +69,11 @@ export async function getStorefrontCategoriesProductsSections(
       }),
     )
 
-    const groupedData = categories.map((cat) => ({
+    return categories.map((cat) => ({
       ...cat,
       products: allProducts.filter((p) => p.categoryId === cat.id),
     }))
+  })
 
-    return groupedData
-  } catch (error) {
-    console.error(error)
-    return []
-  }
+  return data ?? []
 }

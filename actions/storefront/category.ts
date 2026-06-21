@@ -2,6 +2,7 @@
 
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
 
+import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
 const storefrontCategoryListSelect = {
@@ -36,9 +37,11 @@ export interface GetStorefrontCategoriesParams {
 
 export async function getStorefrontCategories({
   storeSlug,
-  search,
+  search = '',
 }: GetStorefrontCategoriesParams): Promise<StorefrontCategoryListItem[]> {
-  try {
+  const cacheKey = `categories:${storeSlug}:search:${search}`
+
+  const data = await withCache(cacheKey, async () => {
     const whereClause: Prisma.CategoryWhereInput = {
       store: { slug: storeSlug, status: StoreStatus.ACTIVE },
     }
@@ -52,15 +55,17 @@ export async function getStorefrontCategories({
       select: storefrontCategoryListSelect,
       orderBy: { title: 'asc' },
     })
-  } catch {
-    return []
-  }
+  })
+
+  return data ?? []
 }
 
 export async function getStorefrontCategoryOptions(
   storeSlug: string,
 ): Promise<StorefrontCategoryOption[]> {
-  try {
+  const cacheKey = `category:options:${storeSlug}`
+
+  const data = await withCache(cacheKey, async () => {
     return await prisma.category.findMany({
       where: {
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
@@ -69,7 +74,7 @@ export async function getStorefrontCategoryOptions(
       select: storefrontCategoryOptionsSelect,
       orderBy: { title: 'asc' },
     })
-  } catch {
-    return []
-  }
+  })
+
+  return data ?? []
 }

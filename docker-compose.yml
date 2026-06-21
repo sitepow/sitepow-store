@@ -23,12 +23,18 @@ services:
         '512mb',
         '--maxmemory-policy',
         'allkeys-lru',
+        '--appendonly',
+        'yes',
       ]
     ports:
       - '6379:6379'
+    volumes:
+      - redis_data:/data
     networks:
       - webnet
 
 networks:
   webnet:
     external: true
+volumes:
+  redis_data:
