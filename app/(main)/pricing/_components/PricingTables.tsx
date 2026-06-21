@@ -18,14 +18,7 @@ import {
 export function PricingTables() {
   return (
     <SectionContainer>
-      <SectionHeader
-        title={
-          <>
-            <span className="text-primary">เปรียบเทียบ</span> ความสามารถของแต่ละ
-            Package
-          </>
-        }
-      />
+      <SectionHeader title="เปรียบเทียบ ความสามารถของแต่ละ Package" />
 
       <Table>
         <TableHeader>

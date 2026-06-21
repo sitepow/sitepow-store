@@ -7,7 +7,6 @@ import { useSession } from '@/hooks/use-session'
 
 import { cn } from '@/lib/utils'
 
-import { ProtectedByBrand } from '../ProtectedByBrand'
 import { ChatWidget } from '../chat/chat-widget'
 import { SupportWidget } from '../chat/support-widget'
 import { Footer } from './Footer'
@@ -28,7 +27,6 @@ export function MainLayout({
         {children}
       </main>
       <Footer />
-      <ProtectedByBrand />
       {userRole === UserRole.SUPPORT && <SupportWidget />}
       {userRole !== UserRole.SUPPORT && (
         <ChatWidget conversationType={ConversationType.SUPPORT} />

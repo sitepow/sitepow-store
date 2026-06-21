@@ -1,29 +1,22 @@
+'use client'
+
 import { PAYMENTS_FEATURES } from '@/constants/payment'
 
-import { SectionContainer } from '../SectionContainer'
 import { SectionHeader } from '../SectionHeader'
-import { FeatureCard } from './_components/FeatureCard'
+import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function PaymentSection() {
   return (
-    <SectionContainer>
-      <SectionHeader
-        title={
-          <>
-            <span className="text-primary">รับเงินไว</span> เงินเข้าบัญชีโดยตรง
-            <br className="hidden md:block" />
-            ด้วยระบบ <span className="text-primary">QR PromptPay</span>{' '}
-            และโอนผ่านธนาคาร
-          </>
-        }
-        description="เริ่มขายได้ทันทีไม่ต้องรออนุมัติ! รับเงินเข้าบัญชีร้านค้าโดยตรง ไม่ต้องผ่านคนกลาง พร้อมระบบเช็คสลิปอัตโนมัติที่ช่วยให้คุณทำงานง่ายขึ้น"
-      />
-
-      <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {PAYMENTS_FEATURES.map((feature, idx) => {
-          return <FeatureCard key={idx} {...feature} />
-        })}
-      </div>
-    </SectionContainer>
+    <FeatureDisplay
+      imageUrl="https://images.unsplash.com/photo-1654895169143-75bf26433636?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      sectionHeader={
+        <SectionHeader
+          className="max-w-lg text-white"
+          title="รับเงินไว เงินเข้าบัญชีโดยตรง ด้วยระบบ QR PromptPay และโอนผ่านธนาคาร"
+          description="เริ่มขายได้ทันทีไม่ต้องรออนุมัติ! รับเงินเข้าบัญชีร้านค้าโดยตรง ไม่ต้องผ่านคนกลาง พร้อมระบบเช็คสลิปอัตโนมัติที่ช่วยให้คุณทำงานง่ายขึ้น"
+        />
+      }
+      featuresList={PAYMENTS_FEATURES}
+    />
   )
 }

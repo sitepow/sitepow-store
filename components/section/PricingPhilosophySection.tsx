@@ -1,28 +1,23 @@
+'use client'
+
 import { PHILOSOPHY_FEATURES } from '@/constants/pricing-philosophy'
 
-import { SectionContainer } from '../SectionContainer'
 import { SectionHeader } from '../SectionHeader'
-import { FeatureCard } from './_components/FeatureCard'
+import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function PricingPhilosophySection() {
   return (
-    <SectionContainer>
-      <SectionHeader
-        title={
-          <>
-            โมเดลราคาที่ <span className="text-primary">เข้าใจคนทำธุรกิจ</span>
-            <br />
-            เราเติบโตไปพร้อมกับยอดขายของคุณ
-          </>
-        }
-        description="ในฐานะนักพัฒนา เราเข้าใจดีว่าช่วงเริ่มต้นธุรกิจนั้นยากแค่ไหน เราจึงออกแบบระบบที่ให้คุณหายใจได้ ไม่ต้องแบกรับค่าเช่าหากยังไม่มีออเดอร์"
-      />
-
-      <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {PHILOSOPHY_FEATURES.map((feature, idx) => (
-          <FeatureCard key={idx} {...feature} />
-        ))}
-      </div>
-    </SectionContainer>
+    <FeatureDisplay
+      isLeft={false}
+      imageUrl="https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      sectionHeader={
+        <SectionHeader
+          className="max-w-lg text-white"
+          title="โมเดลราคาที่ เข้าใจคนทำธุรกิจ เราเติบโตไปพร้อมกับยอดขายของคุณ"
+          description="ในฐานะนักพัฒนา เราเข้าใจดีว่าช่วงเริ่มต้นธุรกิจนั้นยากแค่ไหน เราจึงออกแบบระบบที่ให้คุณหายใจได้ ไม่ต้องแบกรับค่าเช่าหากยังไม่มีออเดอร์"
+        />
+      }
+      featuresList={PHILOSOPHY_FEATURES}
+    />
   )
 }

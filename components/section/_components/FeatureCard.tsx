@@ -17,12 +17,12 @@ export function FeatureCard({
   icon,
 }: FeatureCardProps) {
   return (
-    <Card className="group hover:border-primary border border-transparent text-start">
+    <Card className="group h-full border border-none bg-transparent text-start text-white backdrop-blur-md">
       <CardHeader>
         <div className="mb-4 flex items-center gap-3">
           {icon && (
             <PageTabHeaderIcon
-              className="text-primary border-primary bg-primary/5"
+              className="border-white bg-white/5 text-white"
               icon={icon}
             />
           )}

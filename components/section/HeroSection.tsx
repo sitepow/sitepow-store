@@ -18,11 +18,7 @@ export function HeroSection() {
     <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden px-5 pt-20 pb-96 text-center">
       <HeroHeader
         title={
-          <>
-            เปลี่ยนเรื่องยุ่ง ๆ ให้เป็น
-            <span className="text-primary">เรื่องง่าย</span>{' '}
-            ของการขายสินค้าออนไลน์
-          </>
+          <>เปลี่ยนเรื่องยุ่ง ๆ ให้เป็น เรื่องง่าย ของการขายสินค้าออนไลน์</>
         }
         subtitle={
           <>
