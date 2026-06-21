@@ -15,5 +15,7 @@ export const getClientAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
     ? 'https://accounts.sitepow.store'
     : `http://accounts.lvh.me:${window.location.port || '3000'}`
 
-  return `${baseUrl}/${path}?callbackUrl=${encodeURIComponent(callbackUrl || '')}&role=${role}`
+  const finalCallbackUrl = callbackUrl || window.location.href
+
+  return `${baseUrl}/${path}?callbackUrl=${encodeURIComponent(finalCallbackUrl)}&role=${role}`
 }
