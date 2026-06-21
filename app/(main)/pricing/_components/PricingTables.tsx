@@ -20,7 +20,7 @@ export function PricingTables() {
     <SectionContainer>
       <SectionHeader title="เปรียบเทียบ ความสามารถของแต่ละ Package" />
 
-      <Table>
+      <Table className="border">
         <TableHeader>
           <TableRow>
             <TableHead>เลือก Package ที่เหมาะกับคุณ</TableHead>

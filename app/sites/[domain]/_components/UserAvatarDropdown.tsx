@@ -37,7 +37,7 @@ export function UserAvatarDropdown({
 
   const handleLogout = async () => {
     await signOut({
-      callbackUrl: '/',
+      callbackUrl: window.location.href,
       redirect: true,
     })
   }

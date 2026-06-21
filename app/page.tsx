@@ -1,4 +1,5 @@
 import { MainLayout } from '@/components/layout/Layout'
+import { ComparisonSection } from '@/components/section/ComparisonSection'
 import { FeatureSection } from '@/components/section/FeatureSection'
 import { HeroSection } from '@/components/section/HeroSection'
 import { InfrastructureSection } from '@/components/section/InfrastructureSection'
@@ -12,6 +13,7 @@ export default function HomePage() {
     <MainLayout>
       <HeroSection />
       <FeatureSection />
+      <ComparisonSection />
       <PricingPhilosophySection />
       <PaymentSection />
       <LogisticsSection />
