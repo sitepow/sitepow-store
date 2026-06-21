@@ -6,7 +6,10 @@ import Link from 'next/link'
 
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
+import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
+import { getAuthUrl } from '@/utils/auth'
 import {
   ChevronDownIcon,
   LockKeyholeIcon,
@@ -41,6 +44,11 @@ import { CartDrawer } from '../cart/CartDrawer'
 export function StoreNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
+  const isMounted = useIsMounted()
+
+  const loginHref = isMounted
+    ? getAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
+    : '#'
 
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
@@ -70,7 +78,11 @@ export function StoreNavbar() {
               </div>
 
               {!isAuthenticated && (
-                <Link href={'/login'} className="hidden lg:block">
+                <Link
+                  href={loginHref}
+                  suppressHydrationWarning
+                  className="hidden lg:block"
+                >
                   <Button variant="outline" size="lg">
                     <LockKeyholeIcon className="mr-2" />
                     เข้าสู่ระบบ
@@ -207,7 +219,7 @@ export function StoreNavbar() {
             {!isAuthenticated && (
               <>
                 <Separator />
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <Link href={loginHref} onClick={() => setIsMenuOpen(false)}>
                   <Button
                     variant="outline"
                     className="w-full gap-3 border-2 py-8 text-lg font-bold"

@@ -11,6 +11,19 @@ import { prisma } from './prisma'
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        domain:
+          process.env.NODE_ENV === 'production' ? '.sitepow.store' : undefined,
+      },
+    },
+  },
   providers: [
     Google({ allowDangerousEmailAccountLinking: true }),
     Line({ allowDangerousEmailAccountLinking: true }),
@@ -42,6 +55,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      return true
+    },
     async jwt({ token, user, account, trigger }) {
       if (user && account) {
         const isOAuth =
@@ -91,6 +107,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.isEmailVerified = token.isEmailVerified as boolean | null
       }
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`
+      }
+
+      if (url.includes('callbackUrl=')) {
+        const params = new URL(url).searchParams
+        return params.get('callbackUrl') || baseUrl
+      }
+
+      return url
     },
   },
 })

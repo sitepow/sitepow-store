@@ -1,15 +1,21 @@
+/* eslint-disable react-hooks/immutability */
 'use client'
 
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
 import { LOGIN_PROVIDERS } from '@/constants/login'
+import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { LoginFormInputs } from '@/types/login'
+import { getAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
+import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
 import { SupportContact } from '@/components/SupportContact'
@@ -19,6 +25,15 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 export function LoginForm() {
+  const isMounted = useIsMounted()
+  const searchParams = useSearchParams()
+  const role = searchParams.get('role') as UserRole
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
+
+  const registerHref = isMounted
+    ? getAuthUrl({ path: 'register', role, callbackUrl })
+    : '#'
+
   const {
     register,
     handleSubmit,
@@ -36,11 +51,13 @@ export function LoginForm() {
         email,
         password,
         redirect: false,
+        callbackUrl,
       })
 
       return result
     },
     onSuccess: (data) => {
+      alert(callbackUrl)
       if (data?.error) {
         if (data.error === 'CredentialsSignin') {
           toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
@@ -50,16 +67,28 @@ export function LoginForm() {
         return
       }
 
-      window.location.href = '/'
+      window.location.href = callbackUrl
     },
   })
+
+  const handleSSO = async (providerId: string) => {
+    await signIn(providerId, {
+      callbackUrl: callbackUrl,
+    })
+  }
 
   return (
     <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
         <div className="bg-foreground/5 hidden w-full rounded-l-3xl lg:block" />
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
-          <SectionHeader title="เข้าสู่ระบบหลังบ้านของคุณ" />
+          <SectionHeader
+            title={
+              role !== UserRole.CUSTOMER
+                ? 'เข้าสู่ระบบหลังบ้านของคุณ'
+                : 'เข้าสู่ระบบร้านค้าของคุณ'
+            }
+          />
           <div className="w-full max-w-md space-y-8">
             <div className="space-y-6">
               <ContentDivider name="ด้วย E-mail" />
@@ -102,7 +131,7 @@ export function LoginForm() {
                 {LOGIN_PROVIDERS.map((provider, idx) => (
                   <div key={idx} className="shrink-0">
                     <SSOButton
-                      onClick={async () => await signIn(provider.id)}
+                      onClick={() => handleSSO(provider.id)}
                       {...provider}
                     />
                   </div>
@@ -113,7 +142,7 @@ export function LoginForm() {
           <p className="text-center text-sm">
             ยังไม่มีบัญชีใช่มั้ย?{' '}
             <a
-              href="/register"
+              href={registerHref}
               className="text-primary transition-all hover:underline"
             >
               สมัครสมาชิก
@@ -121,7 +150,8 @@ export function LoginForm() {
           </p>
         </div>
       </div>
-      <SupportContact />
+      {role !== UserRole.CUSTOMER && <SupportContact />}
+      {role === UserRole.CUSTOMER && <ProtectedByBrand />}
     </div>
   )
 }

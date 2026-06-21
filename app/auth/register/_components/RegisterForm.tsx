@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 'use client'
 
 import { useState } from 'react'
@@ -5,14 +6,18 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
 import { registerUser } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { RegisterFormInputs } from '@/types/register'
+import { getAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeftIcon } from 'lucide-react'
 
+import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
 import { SupportContact } from '@/components/SupportContact'
@@ -27,7 +32,15 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 export function RegisterForm() {
+  const isMounted = useIsMounted()
+  const searchParams = useSearchParams()
+  const role = searchParams.get('role') as UserRole
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
   const [isCredentials, setIsCredentials] = useState<boolean>(false)
+
+  const registerHref = isMounted
+    ? getAuthUrl({ path: 'login', role, callbackUrl })
+    : '#'
 
   const {
     register,
@@ -48,17 +61,18 @@ export function RegisterForm() {
         email: variables.email,
         password: variables.password,
         redirect: false,
+        callbackUrl,
       })
 
       if (result?.error) {
         toast.error(
           'สมัครสมาชิกสำเร็จ แต่เข้าสู่ระบบล้มเหลว กรุณาเข้าสู่ระบบเอง',
         )
-        window.location.href = '/login'
+        window.location.href = callbackUrl
         return
       }
 
-      window.location.href = '/'
+      window.location.href = callbackUrl
     },
   })
 
@@ -66,7 +80,9 @@ export function RegisterForm() {
     if (providerId === 'credentials') {
       setIsCredentials(true)
     } else {
-      await signIn(providerId)
+      await signIn(providerId, {
+        callbackUrl: callbackUrl,
+      })
     }
   }
 
@@ -77,13 +93,19 @@ export function RegisterForm() {
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader
             className="text-center"
-            title={'สมัครเปิดร้านค้าของคุณที่นี่'}
+            title={
+              role !== UserRole.CUSTOMER
+                ? 'สมัครเปิดร้านค้าของคุณที่นี่'
+                : 'สมัครบัญชีซื้อของออนไลน์'
+            }
             description={
-              <>
-                เพื่อขอทดลองใช้งาน{' '}
-                <span className="text-bold text-primary">Pro Package</span> ฟรี
-                14 วัน ยังไม่ต้องชำระเงิน ไม่มีข้อผูกมัด
-              </>
+              role !== UserRole.CUSTOMER && (
+                <>
+                  เพื่อขอทดลองใช้งาน{' '}
+                  <span className="text-bold text-primary">Pro Package</span>{' '}
+                  ฟรี 14 วัน ยังไม่ต้องชำระเงิน ไม่มีข้อผูกมัด
+                </>
+              )
             }
           />
 
@@ -172,7 +194,7 @@ export function RegisterForm() {
               <p className="text-center text-sm">
                 มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
                 <a
-                  href="/login"
+                  href={registerHref}
                   className="text-primary transition-all hover:underline"
                 >
                   เข้าสู่ระบบที่นี่
@@ -183,7 +205,8 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <SupportContact />
+      {role !== UserRole.CUSTOMER && <SupportContact />}
+      {role === UserRole.CUSTOMER && <ProtectedByBrand />}
     </div>
   )
 }

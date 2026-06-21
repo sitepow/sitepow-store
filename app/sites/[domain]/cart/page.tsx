@@ -10,9 +10,10 @@ import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { useCreateOrder } from '@/actions/hooks/storefront/order'
 import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
 import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping'
-import { PaymentMethod } from '@/generated/prisma/enums'
+import { PaymentMethod, UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
+import { getAuthUrl } from '@/utils/auth'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
@@ -52,6 +53,10 @@ export default function StoreCartPage() {
   const storeSlug = params.domain as string
 
   const { isAuthenticated } = useSession()
+
+  const loginHref = isMounted
+    ? getAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
+    : '#'
 
   const {
     items,
@@ -509,7 +514,7 @@ export default function StoreCartPage() {
                 <Button
                   className="mt-6 h-12 w-full text-lg"
                   onClick={() => {
-                    router.push('/login')
+                    router.push(loginHref)
                   }}
                 >
                   <IconLock />

@@ -38,7 +38,7 @@ export function HeroSection() {
               ดูราคาและแพ็กเกจ <ArrowRight />
             </Button>
           </Link>
-          <Link href="/register">
+          <Link href="/auth/register">
             <Button size="lg">
               สมัครเปิดร้านฟรี
               <ArrowRight />

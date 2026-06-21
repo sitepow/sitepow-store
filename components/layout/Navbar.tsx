@@ -7,7 +7,10 @@ import Link from 'next/link'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
+import { getAuthUrl } from '@/utils/auth'
 import { IconLock } from '@tabler/icons-react'
 import { LockIcon, Menu, X } from 'lucide-react'
 
@@ -33,6 +36,14 @@ import { ListItem } from './_components/ListItem'
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
+  const isMounted = useIsMounted()
+
+  const loginHref = isMounted
+    ? getAuthUrl({ path: 'login', role: UserRole.MERCHANT })
+    : '#'
+  const registerHref = isMounted
+    ? getAuthUrl({ path: 'register', role: UserRole.MERCHANT })
+    : '#'
 
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
@@ -89,13 +100,13 @@ export function Navbar() {
 
           {!isAuthenticated && (
             <div className="hidden items-center gap-4 lg:flex">
-              <Link href="/login">
+              <Link href={loginHref}>
                 <Button variant="secondary" className="flex gap-2 font-bold">
                   <LockIcon size={18} />
                   เข้าสู่ระบบ
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href={registerHref}>
                 <Button className="font-bold">สมัครเปิดร้าน</Button>
               </Link>
               <ModeToggle />
@@ -191,7 +202,7 @@ export function Navbar() {
                 </div>
 
                 <div className="flex flex-col gap-3 pt-4 pb-10">
-                  <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Link href={loginHref} onClick={() => setIsMenuOpen(false)}>
                     <Button
                       variant="secondary"
                       className="w-full justify-center gap-2 py-7 text-lg font-bold"
@@ -200,7 +211,10 @@ export function Navbar() {
                       เข้าสู่ระบบ
                     </Button>
                   </Link>
-                  <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                  <Link
+                    href={registerHref}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <Button className="w-full justify-center py-7 text-lg font-bold">
                       สมัครเปิดร้าน
                     </Button>

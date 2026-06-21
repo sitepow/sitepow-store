@@ -1,36 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const config = {
-  matcher: [
-    /*
-     * Match all paths except for:
-     * 1. /api routes
-     * 2. /_next (static files)
-     * 3. /_static (public assets)
-     * 4. Static files (e.g. favicon.ico, sitemap.xml, robots.txt)
-     */
-    '/((?!api/|_next/|_static/|[\\w-]+\\.\\w+).*)',
-  ],
+  matcher: ['/((?!api/|_next/|_static/|[\\w-]+\\.\\w+).*)'],
 }
 
 export default function middleware(req: NextRequest) {
   const url = req.nextUrl
-
   const host = req.headers.get('host') || ''
-  const hostname = host.split(':')[0]
+  const hostname = host.replace(/^www\./, '').split(':')[0]
 
-  const searchParams = url.searchParams.toString()
-  const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`
+  const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
 
-  if (
-    hostname === 'localhost' ||
-    hostname === 'sitepow.store' ||
-    hostname === 'lvh.me'
-  ) {
+  if (url.pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
+  if (hostname === 'accounts.sitepow.store' || hostname === 'accounts.lvh.me') {
+    if (
+      !url.pathname.startsWith('/login') &&
+      !url.pathname.startsWith('/register')
+    ) {
+      return NextResponse.redirect(new URL(`/login${url.search}`, req.url))
+    }
+
+    return NextResponse.rewrite(
+      new URL(`/auth${url.pathname}${url.search}`, req.url),
+    )
+  }
+
+  if (rootDomains.includes(hostname)) {
     return NextResponse.next()
   }
 
   const slug = hostname.replace('.lvh.me', '').replace('.sitepow.store', '')
-
-  return NextResponse.rewrite(new URL(`/sites/${slug}${path}`, req.url))
+  return NextResponse.rewrite(
+    new URL(`/sites/${slug}${url.pathname}${url.search}`, req.url),
+  )
 }
