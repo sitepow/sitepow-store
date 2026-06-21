@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const config = {
-  matcher: ['/((?!api/|_next/|_static/|[\\w-]+\\.\\w+).*)'],
+  matcher: [
+    '/((?!api|_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|svg|css|js|map|json|txt|webmanifest)).*)',
+  ],
 }
 
 export default function middleware(req: NextRequest) {
   const url = req.nextUrl
+
+  if (
+    url.pathname.match(
+      /\.(?:ico|png|jpg|jpeg|svg|css|js|map|json|txt|webmanifest)$/,
+    )
+  ) {
+    return NextResponse.next()
+  }
+
   const host = req.headers.get('host') || ''
   const hostname = host.replace(/^www\./, '').split(':')[0]
 

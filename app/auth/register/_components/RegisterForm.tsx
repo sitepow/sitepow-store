@@ -12,6 +12,7 @@ import { registerUser } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useLandingImages } from '@/hooks/use-landing-images'
 import { RegisterFormInputs } from '@/types/register'
 import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
@@ -37,6 +38,8 @@ export function RegisterForm() {
   const role = searchParams.get('role') as UserRole
   const callbackUrl = searchParams.get('callbackUrl') || '/'
   const [isCredentials, setIsCredentials] = useState<boolean>(false)
+
+  const { currentImage } = useLandingImages()
 
   const registerHref = isMounted
     ? getClientAuthUrl({ path: 'login', role, callbackUrl })
@@ -89,7 +92,12 @@ export function RegisterForm() {
   return (
     <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
-        <div className="bg-foreground/5 hidden w-full rounded-l-3xl lg:block" />
+        <div
+          style={{
+            backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
+          }}
+          className="hidden w-full rounded-l-3xl lg:block"
+        />
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader
             className="text-center"

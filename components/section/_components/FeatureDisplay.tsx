@@ -1,6 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ReactNode } from 'react'
+
+import Image from 'next/image'
 
 import useEmblaCarousel from 'embla-carousel-react'
 
@@ -26,12 +27,14 @@ export function FeatureDisplay({
 
   return (
     <SectionContainer>
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white md:p-12">
+      <div className="relative overflow-hidden rounded-3xl p-8 text-white md:p-12">
         <div className="absolute inset-0">
-          <img
+          <Image
             src={imageUrl}
-            alt="Feature background"
+            alt=""
             className="absolute inset-0 h-full w-full object-cover opacity-20"
+            width={800}
+            height={800}
           />
         </div>
         <div className="relative z-10 grid min-w-0 gap-10 lg:grid-cols-2">

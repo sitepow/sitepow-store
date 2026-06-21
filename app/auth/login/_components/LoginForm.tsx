@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation'
 import { LOGIN_PROVIDERS } from '@/constants/login'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useLandingImages } from '@/hooks/use-landing-images'
 import { LoginFormInputs } from '@/types/login'
 import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
@@ -29,6 +30,8 @@ export function LoginForm() {
   const searchParams = useSearchParams()
   const role = searchParams.get('role') as UserRole
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+
+  const { currentImage } = useLandingImages()
 
   const registerHref = isMounted
     ? getClientAuthUrl({ path: 'register', role, callbackUrl })
@@ -80,7 +83,13 @@ export function LoginForm() {
   return (
     <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
       <div className="flex w-full">
-        <div className="bg-foreground/5 hidden w-full rounded-l-3xl lg:block" />
+        <div
+          style={{
+            backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
+          }}
+          className="hidden w-full rounded-l-3xl bg-cover bg-center lg:block"
+        />
+
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader
             title={
