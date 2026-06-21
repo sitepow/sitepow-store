@@ -3,6 +3,8 @@ import { ReactNode } from 'react'
 
 import Image from 'next/image'
 
+import { SECOND } from '@/constants/system'
+import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
@@ -23,11 +25,13 @@ export function FeatureDisplay({
   sectionHeader,
   featuresList,
 }: FeatureDisplayProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false })
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
+    Autoplay({ delay: 3 * SECOND, stopOnInteraction: false }),
+  ])
 
   return (
     <SectionContainer>
-      <div className="relative overflow-hidden rounded-3xl p-8 text-white md:p-12">
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white md:p-12">
         <div className="absolute inset-0">
           <Image
             src={imageUrl}
