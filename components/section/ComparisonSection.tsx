@@ -22,11 +22,11 @@ export function ComparisonSection() {
       <SectionHeader
         title={
           <>
-            <span className="text-primary">ตารางเปรียบเทียบ</span>{' '}
-            การขายสินค้าในแพลตฟอร์มออนไลน์
+            ตารางเปรียบเทียบ การขายสินค้าใน
+            <span className="text-primary">แพลตฟอร์มออนไลน์</span>
           </>
         }
-        description="ลองเช็คดูว่าคุณเหลือเงินกี่บาทจากการขาย? เปลี่ยนมาใช้ระบบที่ให้คุณเป็นเจ้าของกำไร 100% กันเถอะ"
+        description="ลองเช็คให้ชัดว่ากำไรเหลือเท่าไหร่หลังหักค่าธรรมเนียม และมาดูเหตุการณ์จริงที่คุณอาจต้องเจอเมื่อขายผ่านแพลตฟอร์ม"
       />
 
       <Table className="border text-start">

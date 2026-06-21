@@ -16,6 +16,10 @@ export default function middleware(req: NextRequest) {
   }
 
   if (hostname === 'accounts.sitepow.store' || hostname === 'accounts.lvh.me') {
+    if (url.pathname.startsWith('/auth')) {
+      return NextResponse.next()
+    }
+
     if (
       !url.pathname.startsWith('/login') &&
       !url.pathname.startsWith('/register')

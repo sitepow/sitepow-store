@@ -9,7 +9,7 @@ import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { getAuthUrl } from '@/utils/auth'
+import { getClientAuthUrl } from '@/utils/auth'
 import {
   ChevronDownIcon,
   LockKeyholeIcon,
@@ -47,7 +47,7 @@ export function StoreNavbar() {
   const isMounted = useIsMounted()
 
   const loginHref = isMounted
-    ? getAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
+    ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
 
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified

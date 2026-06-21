@@ -6,11 +6,14 @@ interface AuthUrlProps {
   callbackUrl?: string
 }
 
-export const getAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
-  const returnUrl = typeof window !== 'undefined' ? window.location.href : ''
+export const getClientAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
+  const hostname = window.location.hostname
 
-  const baseUrl = process.env.NEXT_PUBLIC_NEXTAUTH_URL || ''
-  const cleanBaseUrl = baseUrl.replace(/\/$/, '')
+  const isProd = hostname.includes('sitepow.store')
 
-  return `${cleanBaseUrl}/${path}?callbackUrl=${encodeURIComponent(callbackUrl ? callbackUrl : returnUrl)}&role=${role}`
+  const baseUrl = isProd
+    ? 'https://accounts.sitepow.store'
+    : `http://accounts.lvh.me:${window.location.port || '3000'}`
+
+  return `${baseUrl}/${path}?callbackUrl=${encodeURIComponent(callbackUrl || '')}&role=${role}`
 }

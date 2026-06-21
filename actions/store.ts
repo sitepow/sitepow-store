@@ -105,17 +105,21 @@ export type StoreLandingItem = Prisma.StoreGetPayload<{
   select: typeof storeLandingSelect
 }>
 
-export async function getLandingStores(limit = 6): Promise<StoreLandingItem[]> {
-  try {
-    return await prisma.store.findMany({
-      where: { status: StoreStatus.ACTIVE },
-      select: storeLandingSelect,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-    })
-  } catch {
-    return []
-  }
+export async function getLandingStores(
+  limit = 12,
+): Promise<StoreLandingItem[]> {
+  const cacheKey = `landing_stores:limit:${limit}`
+
+  return (
+    (await withCache(cacheKey, () =>
+      prisma.store.findMany({
+        where: { status: StoreStatus.ACTIVE },
+        select: storeLandingSelect,
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      }),
+    )) ?? []
+  )
 }
 
 export type StoreData = Prisma.StoreGetPayload<{

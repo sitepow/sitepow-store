@@ -13,7 +13,7 @@ import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shippin
 import { PaymentMethod, UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { getAuthUrl } from '@/utils/auth'
+import { getClientAuthUrl } from '@/utils/auth'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import {
@@ -55,7 +55,7 @@ export default function StoreCartPage() {
   const { isAuthenticated } = useSession()
 
   const loginHref = isMounted
-    ? getAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
+    ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
 
   const {

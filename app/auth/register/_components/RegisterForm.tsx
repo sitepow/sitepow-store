@@ -13,7 +13,7 @@ import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { RegisterFormInputs } from '@/types/register'
-import { getAuthUrl } from '@/utils/auth'
+import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeftIcon } from 'lucide-react'
 
@@ -39,7 +39,7 @@ export function RegisterForm() {
   const [isCredentials, setIsCredentials] = useState<boolean>(false)
 
   const registerHref = isMounted
-    ? getAuthUrl({ path: 'login', role, callbackUrl })
+    ? getClientAuthUrl({ path: 'login', role, callbackUrl })
     : '#'
 
   const {

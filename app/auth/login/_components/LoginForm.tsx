@@ -11,7 +11,7 @@ import { LOGIN_PROVIDERS } from '@/constants/login'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { LoginFormInputs } from '@/types/login'
-import { getAuthUrl } from '@/utils/auth'
+import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
@@ -31,7 +31,7 @@ export function LoginForm() {
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const registerHref = isMounted
-    ? getAuthUrl({ path: 'register', role, callbackUrl })
+    ? getClientAuthUrl({ path: 'register', role, callbackUrl })
     : '#'
 
   const {

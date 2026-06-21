@@ -13,7 +13,7 @@ export function InfrastructureSection() {
             โครงสร้างพื้นฐาน{' '}
             <span className="text-primary">ระดับ Enterprise</span>
             <br />
-            ที่คุณ<span className="text-primary"> วางใจได้</span>
+            ที่คุณ<span className="text-primary">วางใจได้</span>
           </>
         }
         description="Sitepow รันบน Infrastructure ที่ออกแบบมาเพื่อธุรกิจโดยเฉพาะ

@@ -10,7 +10,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { getAuthUrl } from '@/utils/auth'
+import { getClientAuthUrl } from '@/utils/auth'
 import { IconLock } from '@tabler/icons-react'
 import { LockIcon, Menu, X } from 'lucide-react'
 
@@ -39,10 +39,10 @@ export function Navbar() {
   const isMounted = useIsMounted()
 
   const loginHref = isMounted
-    ? getAuthUrl({ path: 'login', role: UserRole.MERCHANT })
+    ? getClientAuthUrl({ path: 'login', role: UserRole.MERCHANT })
     : '#'
   const registerHref = isMounted
-    ? getAuthUrl({ path: 'register', role: UserRole.MERCHANT })
+    ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
     : '#'
 
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
