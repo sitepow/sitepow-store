@@ -6,6 +6,7 @@ import { InfrastructureSection } from '@/components/section/InfrastructureSectio
 import { LogisticsSection } from '@/components/section/LogisticsSection'
 import { PaymentSection } from '@/components/section/PaymentSection'
 import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
+import { SecurityTrustSection } from '@/components/section/SecurityTrustSection'
 import { StoresSection } from '@/components/section/StoresSection'
 
 export default function HomePage() {
@@ -18,6 +19,7 @@ export default function HomePage() {
       <PaymentSection />
       <LogisticsSection />
       <InfrastructureSection />
+      <SecurityTrustSection />
       <StoresSection />
     </MainLayout>
   )

@@ -35,7 +35,7 @@ export function FeatureDisplay({
         <div className="absolute inset-0">
           <Image
             src={imageUrl}
-            alt=""
+            alt="feature-landing-background"
             className="absolute inset-0 h-full w-full object-cover opacity-20"
             width={800}
             height={800}
