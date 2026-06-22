@@ -10,7 +10,7 @@ import { StoresSection } from '@/components/section/StoresSection'
 
 export default function HomePage() {
   return (
-    <MainLayout>
+    <MainLayout className="-mt-12.5">
       <HeroSection />
       <FeatureSection />
       <ComparisonSection />

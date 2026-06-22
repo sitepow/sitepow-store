@@ -65,7 +65,7 @@ export function Navbar() {
             alt="footer-background"
             width={800}
             height={800}
-            className="h-full w-full object-cover opacity-40"
+            className="size-full object-cover opacity-40"
           />
         </div>
 

@@ -104,4 +104,5 @@ export const NAVBAR_ITEMS = [
     ],
   },
   { title: 'ราคาและแพ็กเกจ', href: '/pricing' },
+  { title: 'ติดต่อเรา', href: '/' },
 ]

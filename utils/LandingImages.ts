@@ -3,17 +3,27 @@
 import fs from 'fs'
 import path from 'path'
 
-export async function getLandingImages() {
-  const dirPath = path.join(process.cwd(), 'public/images/landing')
+import { withCache } from '@/lib/cache'
 
-  try {
-    const files = fs.readdirSync(dirPath)
+interface GetLandingImages {
+  imageFolder?: string
+}
 
-    const images = files.filter((file) => /\.(jpeg|jpg|png|svg)$/i.test(file))
+export async function getLandingImages({
+  imageFolder = 'landing',
+}: GetLandingImages = {}) {
+  const cacheKey = `landing-images:${imageFolder}`
 
-    return images.map((img) => `/images/landing/${img}`)
-  } catch (error) {
-    console.error(error)
-    return []
-  }
+  return await withCache(cacheKey, async () => {
+    const dirPath = path.join(process.cwd(), `public/images/${imageFolder}`)
+
+    try {
+      const files = fs.readdirSync(dirPath)
+      const images = files.filter((file) => /\.(jpeg|jpg|png|svg)$/i.test(file))
+      return images.map((img) => `/images/${imageFolder}/${img}`)
+    } catch (error) {
+      console.error(error)
+      return []
+    }
+  })
 }

@@ -3,13 +3,21 @@ import { useEffect, useState } from 'react'
 import { SECOND } from '@/constants/system'
 import { getLandingImages } from '@/utils/LandingImages'
 
-export function useLandingImages(intervalTime = 5 * SECOND) {
+interface LandingImages {
+  intervalTime?: number
+  imageFolder?: string
+}
+
+export function useLandingImages({
+  intervalTime = 5 * SECOND,
+  imageFolder,
+}: LandingImages = {}) {
   const [images, setImages] = useState<string[]>([])
   const [currentIdx, setCurrentIdx] = useState(0)
 
   useEffect(() => {
-    getLandingImages().then(setImages)
-  }, [])
+    getLandingImages({ imageFolder }).then(setImages)
+  }, [imageFolder])
 
   useEffect(() => {
     if (images.length === 0) {
