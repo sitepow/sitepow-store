@@ -106,14 +106,24 @@ export default function MerchantDashboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-5">
         <StoreSelectField />
         {selectedStoreId !== ALL_STORES && (
-          <Button variant="outline" asChild>
-            <Link
-              href={`https://${selectedStoreSlug}.sitepow.store`}
-              target="_blank"
-            >
-              ดูหน้าร้านค้าของคุณ <IconExternalLink />
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2.5">
+            <Button variant="outline" asChild>
+              <Link
+                href={`https://${selectedStoreSlug}.sitepow.store`}
+                target="_blank"
+              >
+                ดูหน้าร้านออนไลน์ของคุณ <IconExternalLink />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link
+                href={`https://${selectedStoreSlug}.sitepow.store/pos`}
+                target="_blank"
+              >
+                เข้าระบบ POS ขายหน้าร้าน <IconExternalLink />
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
 

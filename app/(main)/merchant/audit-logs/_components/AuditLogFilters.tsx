@@ -43,7 +43,6 @@ export function AuditLogFilters({
             placeholder="พิมพ์ค้นหาชื่อ, รหัสเป้าหมาย..."
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            className="bg-background h-9 text-xs"
           />
         </Field>
 
@@ -52,7 +51,7 @@ export function AuditLogFilters({
             <IconFilter size={14} /> กรองผู้ดำเนินการ (Actor Group)
           </FieldLabel>
           <Select value={actorFilter} onValueChange={onActorFilterChange}>
-            <SelectTrigger className="bg-background h-9">
+            <SelectTrigger>
               <SelectValue placeholder="ทั้งหมดทุกประเภท" />
             </SelectTrigger>
             <SelectContent>
@@ -71,7 +70,7 @@ export function AuditLogFilters({
             <IconFilter size={14} /> กรองตามประเภทเหตุการณ์ (Action)
           </FieldLabel>
           <Select value={actionFilter} onValueChange={onActionFilterChange}>
-            <SelectTrigger className="bg-background h-9">
+            <SelectTrigger>
               <SelectValue placeholder="ทุกเหตุการณ์" />
             </SelectTrigger>
             <SelectContent>

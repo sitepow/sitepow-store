@@ -3,12 +3,13 @@
 import { Fragment, PropsWithChildren } from 'react'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
+import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NavigationItem } from '@/constants/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { IconChevronRight } from '@tabler/icons-react'
+import { IconArrowLeft, IconChevronRight } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
 import {
@@ -35,6 +36,7 @@ import {
 import { ModeToggle } from '../ModeToggle'
 import { ChatWidget } from '../chat/chat-widget'
 import { SupportWidget } from '../chat/support-widget'
+import { Button } from '../ui/button'
 
 interface DashboardSidebarProps extends PropsWithChildren {
   items: NavigationItem[]
@@ -49,6 +51,7 @@ export function DashboardSidebar({
   const { user } = useSession()
   const userRole = user?.role
 
+  const router = useRouter()
   const pathname = usePathname()
 
   return (
@@ -126,6 +129,14 @@ export function DashboardSidebar({
         <div className="flex flex-wrap gap-2.5">
           <SidebarTrigger />
           <ModeToggle />
+          <Button
+            variant="outline"
+            onClick={() => router.push('/')}
+            size="icon-lg"
+          >
+            <IconArrowLeft />
+          </Button>
+          <UserAvatarDropdown redirectPath="merchant" items={items} />
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

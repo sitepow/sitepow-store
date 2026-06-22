@@ -49,7 +49,7 @@ export function AuditLogDetailDialog({
             ที่ระบบหลังบ้านบันทึกเก็บไว้ขณะเกิดรายการนี้
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-90 overflow-x-auto rounded-md border bg-black p-4 text-[11px] leading-relaxed text-white">
+        <div className="bg-foreground/5 text-foreground max-h-90 overflow-x-auto rounded-md border p-4 text-[11px] leading-relaxed">
           <pre>
             {JSON.stringify(
               logItem?.details || { message: 'ไม่มีข้อมูลรายละเอียดเพิ่มเติม' },

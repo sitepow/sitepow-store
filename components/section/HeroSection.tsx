@@ -60,7 +60,7 @@ export function HeroSection() {
       )}
 
       <div className="absolute -bottom-10 left-1/2">
-        <div className="relative">
+        <div className="relative md:max-w-[1890px]">
           {AVATARS_SEED.map(({ seed, left, top, size, bg, dur, delay }) => (
             <Image
               key={seed}
@@ -78,7 +78,7 @@ export function HeroSection() {
                 animation: `gentle-bounce ${dur}s ease-in-out ${delay}s infinite`,
                 transform: 'translateX(-50%)',
               }}
-              className="rounded-full border-2 border-white/70 bg-white shadow-md"
+              className="rounded-full"
             />
           ))}
 
