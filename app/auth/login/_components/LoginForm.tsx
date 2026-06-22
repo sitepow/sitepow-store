@@ -60,7 +60,6 @@ export function LoginForm() {
       return result
     },
     onSuccess: (data) => {
-      alert(callbackUrl)
       if (data?.error) {
         if (data.error === 'CredentialsSignin') {
           toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')

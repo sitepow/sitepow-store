@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
@@ -57,18 +58,28 @@ export function Navbar() {
 
   return (
     <>
-      <header className="border-border bg-background fixed top-0 left-0 z-50 w-full border-b">
+      <header className="fixed top-0 left-0 z-50 w-full bg-neutral-900">
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <Image
+            src="/images/navigation/navigation-header.jpeg"
+            alt="footer-background"
+            width={800}
+            height={800}
+            className="h-full w-full object-cover opacity-40"
+          />
+        </div>
+
         <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
-          <LogoBrand />
+          <LogoBrand className="text-white" />
 
           <div className="hidden lg:block">
             <NavigationMenu>
-              <NavigationMenuList className="text-foreground">
+              <NavigationMenuList className="text-white">
                 {NAVBAR_ITEMS.map((item, idx) => (
                   <NavigationMenuItem key={idx}>
                     {item.children ? (
                       <>
-                        <NavigationMenuTrigger className="bg-transparent text-lg font-bold opacity-50">
+                        <NavigationMenuTrigger className="text-lg font-bold opacity-60 hover:bg-neutral-900 focus:bg-neutral-900 data-open:bg-neutral-900/50 data-open:hover:bg-neutral-900 data-open:focus:bg-neutral-900 data-popup-open:bg-neutral-900/50 data-popup-open:hover:bg-neutral-900">
                           {item.title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
@@ -86,7 +97,7 @@ export function Navbar() {
                         asChild
                         className={cn(
                           navigationMenuTriggerStyle(),
-                          'bg-transparent text-lg font-bold opacity-50 hover:bg-transparent',
+                          'bg-transparent text-lg font-bold opacity-60 hover:bg-transparent',
                         )}
                       >
                         <Link href={item.href!}>{item.title}</Link>
@@ -109,7 +120,7 @@ export function Navbar() {
               <Link href={registerHref}>
                 <Button className="font-bold">สมัครเปิดร้าน</Button>
               </Link>
-              <ModeToggle />
+              <ModeToggle buttonVariant="secondary" />
             </div>
           )}
 
@@ -130,7 +141,7 @@ export function Navbar() {
                   จัดการร้านค้าของคุณ
                 </Link>
               </Button>
-              <ModeToggle />
+              <ModeToggle buttonVariant="secondary" />
             </div>
           )}
 
@@ -143,10 +154,10 @@ export function Navbar() {
             )}
 
             <div className="flex flex-wrap gap-2">
-              <ModeToggle />
+              <ModeToggle buttonVariant="secondary" />
               <Button
-                variant="outline"
-                size="icon"
+                variant="secondary"
+                size="icon-lg"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-foreground hover:bg-transparent"
               >
