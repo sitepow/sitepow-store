@@ -16,7 +16,9 @@ export function useLandingImages({
   const [currentIdx, setCurrentIdx] = useState(0)
 
   useEffect(() => {
-    getLandingImages({ imageFolder }).then(setImages)
+    getLandingImages({ imageFolder }).then((result) => {
+      setImages(result || [])
+    })
   }, [imageFolder])
 
   useEffect(() => {
