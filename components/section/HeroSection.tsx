@@ -15,7 +15,7 @@ export function HeroSection() {
   const { isAuthenticated } = useSession()
 
   return (
-    <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden px-5 pt-20 pb-96 text-center">
+    <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden px-5 pt-20 pb-96 text-center sm:px-10">
       <HeroHeader
         title={
           <>เปลี่ยนเรื่องยุ่ง ๆ ให้เป็น เรื่องง่าย ของการขายสินค้าออนไลน์</>

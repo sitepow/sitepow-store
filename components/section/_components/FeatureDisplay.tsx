@@ -26,7 +26,7 @@ export function FeatureDisplay({
   featuresList,
 }: FeatureDisplayProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
-    Autoplay({ delay: 3 * SECOND, stopOnInteraction: false }),
+    Autoplay({ delay: 3 * SECOND, stopOnInteraction: true }),
   ])
 
   return (
