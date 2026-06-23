@@ -108,6 +108,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string
         session.user.role = token.role
         session.user.isEmailVerified = token.isEmailVerified as boolean | null
+        session.user.image = token.picture || ''
       }
       return session
     },

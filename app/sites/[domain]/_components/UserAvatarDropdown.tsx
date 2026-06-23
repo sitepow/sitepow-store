@@ -53,7 +53,10 @@ export function UserAvatarDropdown({
           )}
           {...props}
         >
-          <AvatarImage src={BASE_FAVICON} alt="@sitepowStore" />
+          <AvatarImage
+            src={user?.image || BASE_FAVICON}
+            alt={user?.email || 'sitepowStore'}
+          />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
