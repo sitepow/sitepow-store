@@ -72,7 +72,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
   return (
     <div className="fixed right-4 bottom-4 z-50">
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent className="flex h-[80vh] w-100 flex-col gap-0 overflow-hidden p-0">
+        <DialogContent className="flex h-[80vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
           <DialogHeader className="flex shrink-0 flex-row items-center justify-between space-y-0 border-b p-4">
             <DialogTitle className="flex items-center gap-2 text-lg">
               {selectedId && (
@@ -105,7 +105,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
                 currentUserId={userId!}
                 conversationId={selectedId}
                 otherUserId={selectedConversation.merchantId}
-                isAiEnabled={selectedConversation.isAiEnabled}
+                isAiEnabled={selectedConversation.isAiSupportEnabled}
               />
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">

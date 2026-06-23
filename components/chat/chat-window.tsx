@@ -44,7 +44,10 @@ export function ChatWindow({
     useMessages(conversationId)
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { user } = useSession()
+
   const userRole = user?.role
+  const isCanToggleAiFeature =
+    userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
 
   const { mutate: toggleAi } = useToggleUserAi()
 
@@ -136,27 +139,26 @@ export function ChatWindow({
 
   return (
     <div className="flex h-full flex-col">
-      {userRole === UserRole.SUPPORT ||
-        (userRole === UserRole.MERCHANT && (
-          <div className="bg-foreground/5 flex items-center justify-between border-b p-3">
-            <span className="text-foreground text-xs font-semibold">
-              ตั้งค่า AI สำหรับลูกค้ารายนี้
-            </span>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="ai-mode" className="text-xs">
-                เปิดใช้งาน AI
-              </Label>
-              <Switch
-                id="ai-mode"
-                checked={isAiEnabled}
-                onCheckedChange={(checked) =>
-                  otherUserId &&
-                  toggleAi({ userId: otherUserId, enabled: checked })
-                }
-              />
-            </div>
+      {isCanToggleAiFeature && (
+        <div className="bg-foreground/5 flex items-center justify-between border-b p-3">
+          <span className="text-foreground text-xs font-semibold">
+            ตั้งค่า AI สำหรับลูกค้ารายนี้
+          </span>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="ai-mode" className="text-xs">
+              เปิดใช้งาน AI
+            </Label>
+            <Switch
+              id="ai-mode"
+              checked={isAiEnabled}
+              onCheckedChange={(checked) =>
+                otherUserId &&
+                toggleAi({ userId: otherUserId, enabled: checked })
+              }
+            />
           </div>
-        ))}
+        </div>
+      )}
 
       <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto p-4">
         <div className="flex flex-col gap-4">
@@ -166,13 +168,9 @@ export function ChatWindow({
             const isBot = msg?.sender?.role === UserRole.BOT
             const isMySender = msg.senderId === currentUserId
 
-            const isMe =
-              userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
-                ? isMySender || isBot
-                : isMySender
+            const isMe = isBot ? false : isMySender
 
             const isLeft = !isMe
-
             return (
               <div
                 key={msg.id}
@@ -188,7 +186,7 @@ export function ChatWindow({
                     !isLeft
                       ? 'rounded-tr-none bg-blue-600 text-white'
                       : isBot
-                        ? 'bg-primary/50 rounded-tl-none border text-white'
+                        ? 'bg-primary dark:bg-primary/50 rounded-tl-none border text-white'
                         : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
                   )}
                 >

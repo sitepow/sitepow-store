@@ -129,7 +129,12 @@ export async function getSupportConversations(storeId?: string) {
       lastMessage: c.messages[0]?.content ?? null,
       lastMessageAt: c.lastMessageAt,
       unreadCount: me?.unreadCount ?? 0,
-      isAiEnabled: other?.isAiEnabled ?? false,
+      isAiEnabled:
+        c.type === ConversationType.STORE
+          ? other?.isAiStoreEnabled
+          : other?.isAiSupportEnabled,
+      isAiSupportEnabled: other?.isAiSupportEnabled ?? false,
+      isAiStoreEnabled: other?.isAiStoreEnabled ?? false,
     }
   })
 
@@ -151,7 +156,14 @@ export async function sendMessage(
 
   const sender = await prisma.user.findUnique({
     where: { id: userId },
-    select: { isAiEnabled: true, role: true },
+    select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
+  })
+
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId },
+    select: {
+      type: true,
+    },
   })
 
   return await prisma.$transaction(async (tx) => {
@@ -184,10 +196,15 @@ export async function sendMessage(
 
     chatEvents.publish(`message:${conversationId}`, message)
 
+    const isAiEnabled =
+      conversation?.type === ConversationType.STORE
+        ? sender?.isAiStoreEnabled
+        : sender?.isAiSupportEnabled
+
     if (
       userRole !== UserRole.SUPPORT &&
       userRole !== UserRole.BOT &&
-      sender?.isAiEnabled
+      isAiEnabled
     ) {
       handleAiResponse(conversationId, cleanContent).catch(console.error)
     }
@@ -267,14 +284,24 @@ export async function getMessages(conversationId: string, cursor?: string) {
 
 export async function toggleUserAi(userId: string, enabled: boolean) {
   const session = await auth()
-  if (session?.user?.role !== UserRole.SUPPORT) {
+  const userRole = session?.user?.role
+
+  const isCanEdit =
+    userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
+
+  if (!isCanEdit) {
     return { success: false, message: 'คุณไม่มีสิทธิ์เปลี่ยนข้อมูลนี้' }
+  }
+
+  const updateData = {
+    [userRole === UserRole.SUPPORT ? 'isAiSupportEnabled' : 'isAiStoreEnabled']:
+      enabled,
   }
 
   try {
     await prisma.user.update({
       where: { id: userId },
-      data: { isAiEnabled: enabled },
+      data: updateData,
     })
 
     return { success: true, message: 'ปรับการตั้งค่าสำเร็จแล้ว' }

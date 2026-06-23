@@ -209,7 +209,8 @@ model User {
   role               UserRole  @default(CUSTOMER)
   phone              String?
   createdAt          DateTime  @default(now())
-  isAiEnabled        Boolean   @default(true)
+  isAiSupportEnabled Boolean   @default(true)
+  isAiStoreEnabled   Boolean   @default(true)
 
   orderNotify     Boolean @default(true)
   marketingNotify Boolean @default(false)
