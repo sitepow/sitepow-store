@@ -61,6 +61,8 @@ export async function getConversation(
       },
       include: { members: true },
     })
+
+    await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
   }
 
   return { success: true, data: conversation }
@@ -135,6 +137,7 @@ export async function getSupportConversations(storeId?: string) {
           : other?.isAiSupportEnabled,
       isAiSupportEnabled: other?.isAiSupportEnabled ?? false,
       isAiStoreEnabled: other?.isAiStoreEnabled ?? false,
+      type: c.type,
     }
   })
 
@@ -206,7 +209,7 @@ export async function sendMessage(
       userRole !== UserRole.BOT &&
       isAiEnabled
     ) {
-      handleAiResponse(conversationId, cleanContent).catch(console.error)
+      await handleAiResponse(conversationId, cleanContent).catch(console.error)
     }
 
     return { success: true, data: message }

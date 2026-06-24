@@ -68,6 +68,7 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
                 <ChatWindow
                   currentUserId={userId}
                   conversationId={convData.data.id}
+                  conversationType={convData?.data.type}
                 />
               )}
             </div>

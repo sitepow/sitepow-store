@@ -106,6 +106,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
                 conversationId={selectedId}
                 otherUserId={selectedConversation.merchantId}
                 isAiEnabled={selectedConversation.isAiSupportEnabled}
+                conversationType={selectedConversation?.type}
               />
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">

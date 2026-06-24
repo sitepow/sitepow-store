@@ -8,7 +8,7 @@ import {
   useSendMessage,
   useToggleUserAi,
 } from '@/actions/hooks/chat'
-import { UserRole } from '@/generated/prisma/enums'
+import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useChatStream } from '@/hooks/use-chat-stream'
 import { useSession } from '@/hooks/use-session'
 import { IconSend2 } from '@tabler/icons-react'
@@ -31,11 +31,13 @@ export function ChatWindow({
   currentUserId,
   otherUserId,
   isAiEnabled,
+  conversationType,
 }: {
   conversationId: string
   currentUserId: string
   otherUserId?: string
   isAiEnabled?: boolean
+  conversationType?: ConversationType
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const topRef = useRef<HTMLDivElement>(null)
@@ -47,7 +49,9 @@ export function ChatWindow({
 
   const userRole = user?.role
   const isCanToggleAiFeature =
-    userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
+    userRole === UserRole.SUPPORT ||
+    (userRole === UserRole.MERCHANT &&
+      conversationType === ConversationType.STORE)
 
   const { mutate: toggleAi } = useToggleUserAi()
 
@@ -187,7 +191,7 @@ export function ChatWindow({
                       ? 'rounded-tr-none bg-blue-600 text-white'
                       : isBot
                         ? 'bg-primary dark:bg-primary/50 rounded-tl-none border text-white'
-                        : 'rounded-tl-none border border-slate-200 bg-white text-slate-800',
+                        : 'dark:bg-foreground/5 dark:text-foreground border-border rounded-tl-none border bg-white text-slate-800',
                   )}
                 >
                   <MarkdownRenderer
