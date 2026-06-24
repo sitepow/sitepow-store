@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const config = {
   matcher: [
+    /*
+     * Match all paths except for:
+     * 1. /api routes
+     * 2. /_next (Next.js internals)
+     * 3. /_static (inside /public)
+     * 4. all root files inside /public (e.g. /favicon.ico)
+     */
     '/((?!api|_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|svg|css|js|map|json|txt|webmanifest)).*)',
   ],
 }
@@ -18,7 +25,10 @@ export default function middleware(req: NextRequest) {
   }
 
   const host = req.headers.get('host') || ''
-  const hostname = host.replace(/^www\./, '').split(':')[0]
+  const hostname = host
+    .replace(/^www\./, '')
+    .split(':')[0]
+    .toLowerCase()
 
   const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
 
@@ -47,8 +57,7 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const slug = hostname.replace('.lvh.me', '').replace('.sitepow.store', '')
   return NextResponse.rewrite(
-    new URL(`/sites/${slug}${url.pathname}${url.search}`, req.url),
+    new URL(`/sites/${hostname}${url.pathname}${url.search}`, req.url),
   )
 }
