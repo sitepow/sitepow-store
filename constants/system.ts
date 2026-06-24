@@ -11,4 +11,4 @@ export const UNREAD_COUNT_REFETCH_INTERVAL = 10 * SECOND
 export const SERVER_ERROR_MESSAGE =
   'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
 export const AI_BOT_ID = 'cmqhnrqen0000u8ujmvh3d6as'
-export const REDIS_CACHE_TTL = 30 * MILLISECONDS_PER_MINUTE
+export const REDIS_CACHE_TTL_SECONDS = 30 * 60

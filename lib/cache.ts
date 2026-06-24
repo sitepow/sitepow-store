@@ -1,11 +1,11 @@
-import { REDIS_CACHE_TTL } from '@/constants/system'
+import { REDIS_CACHE_TTL_SECONDS } from '@/constants/system'
 
 import { redis } from './redis'
 
 export async function withCache<T>(
   key: string,
   fetcher: () => Promise<T | null>,
-  ttl: number = REDIS_CACHE_TTL,
+  ttl: number = REDIS_CACHE_TTL_SECONDS,
 ): Promise<T | null> {
   try {
     const cachedData = await redis.get(key)
