@@ -409,6 +409,29 @@ model BankAccount {
   @@index([paymentSettingId])
 }
 
+enum DomainStatus {
+  PENDING
+  ACTIVE
+  FAILED
+}
+
+model StoreDomain {
+  id     String @id @default(cuid())
+  domain String @unique
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  status DomainStatus @default(PENDING)
+
+  verificationRecord Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
 model Store {
   id      String @id @default(cuid())
   name    String
@@ -468,6 +491,7 @@ model Store {
   StaffStore           StaffStore[]
   subscriptionInvoices SubscriptionInvoice[]
   conversations        Conversation[]
+  StoreDomain          StoreDomain[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
