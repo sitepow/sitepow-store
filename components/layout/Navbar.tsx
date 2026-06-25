@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NAVBAR_ITEMS } from '@/constants/navbar'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
@@ -36,8 +36,11 @@ import { ListItem } from './_components/ListItem'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { isAuthenticated, user } = useSession()
+  const { isAuthenticated, user, userRole } = useSession()
   const isMounted = useIsMounted()
+
+  const navbarItems =
+    user?.role === UserRole.SUPPORT ? SUPPORT_NAVIGATION : MERCHANT_NAVIGATION
 
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.MERCHANT })
@@ -128,29 +131,28 @@ export function Navbar() {
             <div className="hidden items-center gap-4 lg:flex">
               <UserAvatarDropdown
                 redirectPath="merchant"
-                items={MERCHANT_NAVIGATION}
+                items={navbarItems}
                 className="hidden lg:block"
               />
-              <Button
-                variant="secondary"
-                className="flex gap-2 font-bold"
-                asChild
-              >
-                <Link href="/merchant/dashboard" target="_blank">
-                  <IconLock />
-                  จัดการร้านค้าของคุณ
-                </Link>
-              </Button>
+              {userRole === UserRole.MERCHANT && (
+                <Button
+                  variant="secondary"
+                  className="flex gap-2 font-bold"
+                  asChild
+                >
+                  <Link href="/merchant/dashboard" target="_blank">
+                    <IconLock />
+                    จัดการร้านค้าของคุณ
+                  </Link>
+                </Button>
+              )}
               <ModeToggle buttonVariant="secondary" />
             </div>
           )}
 
           <div className="flex items-center gap-2 lg:hidden">
             {isAuthenticated && (
-              <UserAvatarDropdown
-                redirectPath="merchant"
-                items={MERCHANT_NAVIGATION}
-              />
+              <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
             )}
 
             <div className="flex flex-wrap gap-2">

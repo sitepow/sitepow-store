@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { UserRole } from './generated/prisma/enums'
+import { auth } from './lib/auth'
+
 export const config = {
   matcher: [
     /*
@@ -13,7 +16,7 @@ export const config = {
   ],
 }
 
-export default function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const url = req.nextUrl
 
   if (
@@ -29,6 +32,8 @@ export default function middleware(req: NextRequest) {
     .replace(/^www\./, '')
     .split(':')[0]
     .toLowerCase()
+  const session = await auth()
+  const userRole = session?.user?.role
 
   const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
 
@@ -51,6 +56,13 @@ export default function middleware(req: NextRequest) {
     return NextResponse.rewrite(
       new URL(`/auth${url.pathname}${url.search}`, req.url),
     )
+  }
+
+  if (
+    (url.pathname.startsWith('/merchant') && userRole !== UserRole.MERCHANT) ||
+    (url.pathname.startsWith('/user') && userRole !== UserRole.CUSTOMER)
+  ) {
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
   if (rootDomains.includes(hostname)) {

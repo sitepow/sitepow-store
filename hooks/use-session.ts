@@ -7,6 +7,7 @@ export function useSession() {
     session,
     user: session?.user ?? null,
     userId: session?.user?.id ?? null,
+    userRole: session?.user?.role,
     status,
     isAuthenticated: status === 'authenticated',
     isLoading: status === 'loading',

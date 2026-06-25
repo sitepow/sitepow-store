@@ -110,6 +110,7 @@ export async function getSupportConversations(storeId?: string) {
 
   for (const c of conversations) {
     const isMember = c.members.some((m) => m.userId === userId)
+
     if (!isMember) {
       await prisma.conversationMember
         .create({

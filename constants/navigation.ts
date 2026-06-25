@@ -34,6 +34,8 @@ export interface NavigationItem {
   }[]
 }
 
+export const SUPPORT_NAVIGATION: NavigationItem[] = []
+
 export const BUYER_NAVIGATION: NavigationItem[] = [
   {
     value: 'dashboard',

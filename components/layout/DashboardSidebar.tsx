@@ -40,7 +40,7 @@ import { Button } from '../ui/button'
 
 interface DashboardSidebarProps extends PropsWithChildren {
   items: NavigationItem[]
-  redirectPath: string
+  redirectPath: 'merchant' | 'user'
 }
 
 export function DashboardSidebar({
@@ -48,10 +48,10 @@ export function DashboardSidebar({
   redirectPath,
   children,
 }: DashboardSidebarProps) {
+  const router = useRouter()
   const { user } = useSession()
   const userRole = user?.role
 
-  const router = useRouter()
   const pathname = usePathname()
 
   return (
