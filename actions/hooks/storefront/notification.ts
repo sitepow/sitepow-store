@@ -1,6 +1,6 @@
 'use client'
 
-import { notificationKeys } from '@/actions/query-keys/storefront/notification'
+import { storefrontNotificationKeys } from '@/actions/query-keys/storefront/notification'
 import {
   getNotificationSettings,
   updateNotificationSettings,
@@ -16,7 +16,7 @@ import {
 export function useNotificationSettings() {
   return useQuery(
     queryOptions({
-      queryKey: notificationKeys.detail(),
+      queryKey: storefrontNotificationKeys.detail(),
       queryFn: getNotificationSettings,
     }),
   )
@@ -29,7 +29,9 @@ export function useUpdateNotificationSettings() {
     mutationFn: (input: NotificationSettingsFormValues) =>
       updateNotificationSettings(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      queryClient.invalidateQueries({
+        queryKey: storefrontNotificationKeys.all,
+      })
     },
   })
 }

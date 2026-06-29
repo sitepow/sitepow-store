@@ -1,5 +1,5 @@
-export const addressKeys = {
+export const storefrontAddressKeys = {
   all: ['addresses'] as const,
-  lists: () => [...addressKeys.all, 'list'] as const,
-  options: () => [...addressKeys.all, 'options'] as const,
+  lists: () => [...storefrontAddressKeys.all, 'list'] as const,
+  options: () => [...storefrontAddressKeys.all, 'options'] as const,
 }

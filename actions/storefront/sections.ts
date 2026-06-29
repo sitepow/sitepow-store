@@ -1,10 +1,13 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
+import { queryKeyToRedisKey } from '@/utils/cache'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
+
+import { storefrontSectionsKeys } from '../query-keys/storefront/sections'
 
 const storefrontSectionProductSelect = {
   id: true,
@@ -45,7 +48,9 @@ export type StorefrontSection = {
 export async function getStorefrontCategoriesProductsSections(
   storeSlug: string,
 ): Promise<StorefrontSection[]> {
-  const cacheKey = `storefront:${storeSlug}`
+  const cacheKey = queryKeyToRedisKey(
+    storefrontSectionsKeys.categoriesProductsSections(storeSlug),
+  )
 
   const data = await withCache(cacheKey, async () => {
     const categories = await prisma.category.findMany({

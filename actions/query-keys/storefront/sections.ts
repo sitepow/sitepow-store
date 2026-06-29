@@ -1,5 +1,9 @@
-export const storefrontKeys = {
+export const storefrontSectionsKeys = {
   all: ['storefront'] as const,
   categoriesProductsSections: (storeSlug: string) =>
-    [...storefrontKeys.all, 'categories-products-sections', storeSlug] as const,
+    [
+      ...storefrontSectionsKeys.all,
+      'categories-products-sections',
+      storeSlug,
+    ] as const,
 }

@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 import {
+  IconBolt,
   IconBrandNextjs,
   IconCpu,
   IconDatabase,
@@ -16,6 +17,12 @@ export interface InfrastructureFeature {
 }
 
 export const INFRASTRUCTURE_FEATURES: InfrastructureFeature[] = [
+  {
+    title: 'Redis Distributed Caching',
+    description:
+      'ใช้ Redis ช่วยจัดการ Cache ข้อมูลที่ถูกเรียกใช้บ่อย ลดภาระการคิวรีฐานข้อมูลโดยตรง ทำให้หน้าเว็บแสดงผลได้เกือบจะทันที (Near-instant loading)',
+    icon: IconBolt,
+  },
   {
     title: 'CPU AMD EPYC™ Enterprise Grade',
     description:

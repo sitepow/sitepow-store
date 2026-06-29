@@ -1,4 +1,4 @@
-export const notificationKeys = {
+export const storefrontNotificationKeys = {
   all: ['notification'] as const,
-  detail: () => [...notificationKeys.all, 'detail'] as const,
+  detail: () => [...storefrontNotificationKeys.all, 'detail'] as const,
 }

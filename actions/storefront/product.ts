@@ -1,10 +1,13 @@
 'use server'
 
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
+import { queryKeyToRedisKey } from '@/utils/cache'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
+
+import { storefrontProductKeys } from '../query-keys/storefront/product'
 
 const storefrontProductListSelect = {
   id: true,
@@ -136,7 +139,15 @@ export async function getStorefrontProducts({
   search = '',
   categorySlug = '',
 }: GetStorefrontProductsParams): Promise<GetStorefrontProductsResponse> {
-  const cacheKey = `products:${storeSlug}:p${page}:l${limit}:s${search}:c${categorySlug}`
+  const cacheKey = queryKeyToRedisKey(
+    storefrontProductKeys.list({
+      storeSlug,
+      page,
+      limit,
+      search,
+      categorySlug,
+    }),
+  )
 
   const data = await withCache(cacheKey, async () => {
     const sanitizedPage = Math.max(1, page)

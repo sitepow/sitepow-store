@@ -1,9 +1,12 @@
 'use server'
 
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
+import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
+
+import { storefrontCategoryKeys } from '../query-keys/storefront/category'
 
 const storefrontCategoryListSelect = {
   id: true,
@@ -39,7 +42,9 @@ export async function getStorefrontCategories({
   storeSlug,
   search = '',
 }: GetStorefrontCategoriesParams): Promise<StorefrontCategoryListItem[]> {
-  const cacheKey = `categories:${storeSlug}:search:${search}`
+  const cacheKey = queryKeyToRedisKey(
+    storefrontCategoryKeys.list({ storeSlug, search }),
+  )
 
   const data = await withCache(cacheKey, async () => {
     const whereClause: Prisma.CategoryWhereInput = {
@@ -63,7 +68,7 @@ export async function getStorefrontCategories({
 export async function getStorefrontCategoryOptions(
   storeSlug: string,
 ): Promise<StorefrontCategoryOption[]> {
-  const cacheKey = `category:options:${storeSlug}`
+  const cacheKey = queryKeyToRedisKey(storefrontCategoryKeys.options(storeSlug))
 
   const data = await withCache(cacheKey, async () => {
     return await prisma.category.findMany({

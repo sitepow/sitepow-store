@@ -2,7 +2,7 @@
 
 import toast from 'react-hot-toast'
 
-import { pdpaKeys } from '@/actions/query-keys/storefront/pdpa'
+import { storefrontPdpaKeys } from '@/actions/query-keys/storefront/pdpa'
 import { deleteUserAccount, exportUserData } from '@/actions/storefront/pdpa'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
@@ -34,7 +34,7 @@ export function useDeleteUserAccount() {
   return useMutation({
     mutationFn: deleteUserAccount,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: pdpaKeys.all })
+      queryClient.invalidateQueries({ queryKey: storefrontPdpaKeys.all })
     },
   })
 }

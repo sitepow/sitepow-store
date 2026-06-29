@@ -1,3 +1,3 @@
-export const pdpaKeys = {
+export const storefrontPdpaKeys = {
   all: ['pdpa'] as const,
 }

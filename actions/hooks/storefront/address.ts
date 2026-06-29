@@ -1,6 +1,6 @@
 'use client'
 
-import { addressKeys } from '@/actions/query-keys/storefront/address'
+import { storefrontAddressKeys } from '@/actions/query-keys/storefront/address'
 import {
   AddressDetail,
   createAddress,
@@ -20,7 +20,7 @@ import {
 export function useAddresses() {
   return useQuery(
     queryOptions({
-      queryKey: addressKeys.lists(),
+      queryKey: storefrontAddressKeys.lists(),
       queryFn: () => getAddresses(),
     }),
   )
@@ -29,7 +29,7 @@ export function useAddresses() {
 export function useAddressOptions() {
   return useQuery(
     queryOptions({
-      queryKey: addressKeys.options(),
+      queryKey: storefrontAddressKeys.options(),
       queryFn: () => getAddressOptions(),
     }),
   )
@@ -42,7 +42,7 @@ export function useCreateAddress() {
     mutationFn: (data: Omit<AddressDetail, 'id' | 'isDefault'>) =>
       createAddress(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: addressKeys.all })
+      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
     },
   })
 }
@@ -59,7 +59,7 @@ export function useUpdateAddress() {
       data: Partial<Omit<AddressDetail, 'id' | 'isDefault'>>
     }) => updateAddress(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: addressKeys.all })
+      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
     },
   })
 }
@@ -70,7 +70,7 @@ export function useDeleteAddress() {
   return useMutation({
     mutationFn: (id: string) => deleteAddress(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: addressKeys.all })
+      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
     },
   })
 }
@@ -81,7 +81,7 @@ export function useSetDefaultAddress() {
   return useMutation({
     mutationFn: (id: string) => setDefaultAddress(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: addressKeys.all })
+      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
     },
   })
 }

@@ -19,7 +19,7 @@ export function HeroSection() {
   const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
 
   return (
-    <section className="relative flex flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">
+    <section className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">
       <div className="absolute inset-0 z-0">
         <div
           key={currentImage}
@@ -98,10 +98,10 @@ export function HeroSection() {
             ))}
 
             <svg
+              className="h-[50vh]"
               style={{
                 animation: 'gentle-bounce 2.5s ease-in-out infinite',
                 width: '150vw',
-                height: '375px',
                 transform: 'translateX(-50%)',
               }}
               xmlns="http://www.w3.org/2000/svg"

@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 import { useDeleteProduct, useProducts } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
 import { IconPackage } from '@tabler/icons-react'
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/table'
 
 export function ProductsTable() {
+  const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -34,6 +36,10 @@ export function ProductsTable() {
     page,
     limit: 10,
   })
+
+  if (!isMounted) {
+    return
+  }
 
   return (
     <>

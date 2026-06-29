@@ -1,11 +1,14 @@
 'use server'
 
+import { invalidateStorefrontProductCache } from '@/actions/query-keys/storefront/invalidation/product'
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+
+import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
 
 export interface CreateProductInput {
   storeId: string
@@ -245,6 +248,18 @@ export async function createProduct(input: CreateProductInput) {
       select: productSelect,
     })
 
+    const store = await prisma.store.findUnique({
+      where: { id: input.storeId },
+      select: { slug: true },
+    })
+
+    if (store) {
+      await Promise.all([
+        invalidateStorefrontProductCache(store.slug),
+        invalidateStorefrontCategoryCache(store.slug),
+      ])
+    }
+
     await createLog({
       action: LogAction.CREATE_PRODUCT,
       actorType: ActorType.MERCHANT,
@@ -282,7 +297,12 @@ export async function deleteProduct(id: string) {
 
     const product = await prisma.product.findFirst({
       where: { id, store: { ownerId: userId } },
-      select: { id: true, title: true, storeId: true },
+      select: {
+        id: true,
+        title: true,
+        storeId: true,
+        store: { select: { slug: true } },
+      },
     })
 
     if (!product) {
@@ -290,6 +310,11 @@ export async function deleteProduct(id: string) {
     }
 
     await prisma.product.delete({ where: { id } })
+
+    await Promise.all([
+      invalidateStorefrontProductCache(product.store.slug),
+      invalidateStorefrontCategoryCache(product.store.slug),
+    ])
 
     await createLog({
       action: LogAction.DELETE_PRODUCT,

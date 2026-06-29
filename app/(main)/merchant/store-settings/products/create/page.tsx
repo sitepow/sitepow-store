@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconPlus } from '@tabler/icons-react'
 import { ArrowLeftIcon } from 'lucide-react'
@@ -19,6 +20,11 @@ import { CreateProductForm } from './_components/CreateProductForm'
 
 export default function StoreAdminProductNew() {
   const { selectedStoreId } = useStoreFilter()
+  const isMounted = useIsMounted()
+
+  if (!isMounted) {
+    return
+  }
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>

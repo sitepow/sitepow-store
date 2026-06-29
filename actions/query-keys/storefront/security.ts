@@ -1,4 +1,4 @@
-export const securityKeys = {
+export const storefrontSecurityKeys = {
   all: ['security'] as const,
-  settings: () => [...securityKeys.all, 'settings'] as const,
+  settings: () => [...storefrontSecurityKeys.all, 'settings'] as const,
 }
