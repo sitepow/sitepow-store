@@ -9,7 +9,7 @@ import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarD
 import { NavigationItem } from '@/constants/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { IconArrowLeft, IconChevronRight } from '@tabler/icons-react'
+import { IconChevronRight, IconHome } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
 import {
@@ -134,7 +134,7 @@ export function DashboardSidebar({
             onClick={() => router.push('/')}
             size="icon-lg"
           >
-            <IconArrowLeft />
+            <IconHome />
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
         </div>

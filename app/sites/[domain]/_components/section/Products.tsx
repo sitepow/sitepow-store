@@ -2,6 +2,7 @@
 
 import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { SectionContainer } from '@/components/SectionContainer'
 import { SectionHeader } from '@/components/SectionHeader'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,7 +15,15 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
   const products = data?.data ?? []
 
   if (!isLoading && products.length === 0) {
-    return null
+    return (
+      <SectionContainer>
+        <ActionRequiredAlert
+          className="w-fit"
+          title="ขออภัยครับ"
+          description="ไม่พบสินค้าในระบบที่คุณกำลังค้นหา โปรดติดต่อร้านค้าโดยตรง"
+        />
+      </SectionContainer>
+    )
   }
 
   return (

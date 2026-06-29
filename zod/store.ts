@@ -1,3 +1,4 @@
+import { RESERVED_STORE_SUBDOMAIN_SLUG } from '@/constants/system'
 import { Plan } from '@/generated/prisma/enums'
 import z from 'zod'
 
@@ -8,10 +9,18 @@ export const createStoreSchema = z
       .min(2, { message: 'ชื่อร้านค้าต้องระบุอย่างน้อย 2 ตัวอักษร' }),
     slug: z
       .string()
-      .min(3, { message: 'URL Slug ต้องระบุอย่างน้อย 3 ตัวอักษร' })
-      .regex(/^[a-zA-Z0-9-ก-๙]+$/, {
-        message: 'URL ต้องประกอบด้วยตัวอักษร ตัวเลข หรือเครื่องหมายขีดเท่านั้น',
-      }),
+      .min(3, { message: 'URL Slug ต้องมีความยาวอย่างน้อย 3 ตัวอักษร' })
+      .max(30, { message: 'URL Slug ยาวเกินไป' })
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+        message:
+          'URL ต้องเป็นตัวเลขหรือตัวอักษรภาษาอังกฤษเท่านั้น และห้ามขึ้นต้นหรือลงท้ายด้วยขีด',
+      })
+      .refine(
+        (val) => !RESERVED_STORE_SUBDOMAIN_SLUG.includes(val.toLowerCase()),
+        {
+          message: 'URL นี้ถูกสงวนไว้สำหรับระบบ กรุณาเลือกชื่ออื่น',
+        },
+      ),
     description: z.string().optional().or(z.literal('')),
     phone: z
       .string()

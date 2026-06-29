@@ -13,6 +13,7 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
+import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
 import { withCache } from '@/lib/cache'
@@ -284,11 +285,22 @@ export async function getStoreOptions(filters?: {
 
 export async function createStore(input: CreateStoreInput) {
   try {
-    const { name, slug } = input
+    const validatedInput = createStoreSchema.safeParse(input)
+
+    if (!validatedInput.success) {
+      const errorMessage = validatedInput.error.issues[0].message
+
+      return { success: false, message: errorMessage }
+    }
+
+    const { name, slug } = validatedInput.data
 
     const existingStore = await prisma.store.findFirst({
       where: {
-        OR: [{ slug }, { name }],
+        OR: [
+          { slug: slug.toLowerCase() },
+          { name: { equals: name, mode: 'insensitive' } },
+        ],
       },
     })
 

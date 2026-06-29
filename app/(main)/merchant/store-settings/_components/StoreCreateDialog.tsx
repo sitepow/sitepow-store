@@ -21,14 +21,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+// import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+// import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from './PlanSelector'
 import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
-import { VatSettingsField } from './VatSettingsField'
+
+// import { VatSettingsField } from './VatSettingsField'
 
 export function StoreCreateDialog() {
   const { user } = useSession()
@@ -56,10 +57,10 @@ export function StoreCreateDialog() {
   })
 
   const {
-    register,
+    // register,
     handleSubmit,
     reset,
-    formState: { errors },
+    // formState: { errors },
   } = methods
 
   const handleClose = () => {
@@ -124,7 +125,7 @@ export function StoreCreateDialog() {
             <StoreNameField isPending={createStoreMutation.isPending} />
             <StoreSlugField isPending={createStoreMutation.isPending} />
 
-            <Field className="sm:col-span-2">
+            {/* <Field className="sm:col-span-2">
               <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
               <Input
                 placeholder="อธิบายสั้นๆ เกี่ยวกับร้านค้าของคุณ"
@@ -132,9 +133,9 @@ export function StoreCreateDialog() {
                 disabled={createStoreMutation.isPending}
               />
               <FieldError>{errors?.description?.message}</FieldError>
-            </Field>
+            </Field> */}
 
-            <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
+            {/* <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
               3. ช่องทางการติดต่อ & ที่ตั้งร้าน
             </div>
 
@@ -169,7 +170,7 @@ export function StoreCreateDialog() {
               <FieldError>{errors?.facebookPage?.message}</FieldError>
             </Field>
 
-            {/* <Field className="sm:col-span-2">
+            <Field className="sm:col-span-2">
               <FieldLabel>ที่อยู่ร้านค้า / สำนักงาน</FieldLabel>
               <Input
                 placeholder="บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด..."
@@ -179,7 +180,7 @@ export function StoreCreateDialog() {
               <FieldError>{errors?.address?.message}</FieldError>
             </Field> */}
 
-            <VatSettingsField isPending={createStoreMutation.isPending} />
+            {/* <VatSettingsField isPending={createStoreMutation.isPending} /> */}
           </div>
         </FormProvider>
 
