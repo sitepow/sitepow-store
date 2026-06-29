@@ -17,7 +17,9 @@ export const FeatureCarousel = ({ features, emblaRef }: any) => {
       ? Array.from({ length: Math.ceil(features.length / 4) }, (_, i) =>
           features.slice(i * 4, i * 4 + 4),
         )
-      : features.map((f: any) => [f])
+      : Array.from({ length: Math.ceil(features.length / 2) }, (_, i) =>
+          features.slice(i * 2, i * 2 + 2),
+        )
   }, [features, shouldShowGrid])
 
   return (
