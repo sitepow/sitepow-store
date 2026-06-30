@@ -1,9 +1,12 @@
 'use server'
 
 import { Prisma, StoreStatus } from '@/generated/prisma/client'
+import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
+
+import { blogKeys } from '../query-keys/blog'
 
 const storefrontBlogListSelect = {
   id: true,
@@ -57,7 +60,9 @@ export async function getStorefrontBlogs({
   limit = 9,
   search = '',
 }: GetStorefrontBlogsParams): Promise<GetStorefrontBlogsResponse> {
-  const cacheKey = `blogs:${storeSlug}:p${page}:l${limit}:s${search}`
+  const cacheKey = queryKeyToRedisKey(
+    blogKeys.list({ storeId: storeSlug, page, limit, search }),
+  )
 
   const result = await withCache(cacheKey, async () => {
     const sanitizedPage = Math.max(1, page)
@@ -117,7 +122,7 @@ export async function getStorefrontBlogDetail(
   storeSlug: string,
   blogSlug: string,
 ): Promise<StorefrontBlogDetail | null> {
-  const cacheKey = `blog:detail:${storeSlug}:${blogSlug}`
+  const cacheKey = queryKeyToRedisKey(blogKeys.detail(blogSlug))
 
   return await withCache(cacheKey, async () => {
     return await prisma.blog.findFirst({

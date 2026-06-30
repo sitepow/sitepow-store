@@ -217,7 +217,9 @@ export async function getStorefrontProductDetail(
   storeSlug: string,
   productSlug: string,
 ): Promise<StorefrontProductDetail | null> {
-  const cacheKey = `product:detail:${storeSlug}:${productSlug}`
+  const cacheKey = queryKeyToRedisKey(
+    storefrontProductKeys.detail(storeSlug, productSlug),
+  )
 
   const product = await withCache(cacheKey, async () => {
     const res = await prisma.product.findFirst({

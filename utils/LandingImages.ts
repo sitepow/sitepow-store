@@ -1,9 +1,12 @@
 'use server'
 
+import { landingImageKeys } from '@/actions/query-keys/landing-image'
 import fs from 'fs'
 import path from 'path'
 
 import { withCache } from '@/lib/cache'
+
+import { queryKeyToRedisKey } from './cache'
 
 interface GetLandingImages {
   imageFolder?: string
@@ -12,7 +15,7 @@ interface GetLandingImages {
 export async function getLandingImages({
   imageFolder = 'landing',
 }: GetLandingImages = {}) {
-  const cacheKey = `landing-images:${imageFolder}`
+  const cacheKey = queryKeyToRedisKey(landingImageKeys.folder(imageFolder))
 
   return await withCache(cacheKey, async () => {
     const dirPath = path.join(process.cwd(), `public/images/${imageFolder}`)

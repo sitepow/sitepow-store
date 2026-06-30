@@ -13,11 +13,15 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
+import { queryKeyToRedisKey } from '@/utils/cache'
 import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
+
+import { invalidateStoreCache } from './query-keys/invalidation/store'
+import { storeKeys } from './query-keys/store'
 
 export interface CreateStoreInput {
   name: string
@@ -109,7 +113,7 @@ export type StoreLandingItem = Prisma.StoreGetPayload<{
 export async function getLandingStores(
   limit = 12,
 ): Promise<StoreLandingItem[]> {
-  const cacheKey = `landing_stores:limit:${limit}`
+  const cacheKey = queryKeyToRedisKey(storeKeys.landing())
 
   return (
     (await withCache(cacheKey, () =>
@@ -137,8 +141,7 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
   if (!domain) {
     return null
   }
-
-  const cacheKey = `store:${domain}`
+  const cacheKey = queryKeyToRedisKey(storeKeys.detail(domain))
 
   return withCache(cacheKey, async () => {
     return await prisma.store.findUnique({
@@ -352,7 +355,7 @@ export async function createStore(input: CreateStoreInput) {
       select: storeSelect,
     })
 
-    await createLog({
+    await await createLog({
       action: LogAction.CREATE_STORE,
       actorType: ActorType.MERCHANT,
       storeId: store.id,
@@ -360,6 +363,8 @@ export async function createStore(input: CreateStoreInput) {
       entityId: store.id,
       details: { name: store.name, slug: store.slug, plan: store.plan },
     })
+
+    await invalidateStoreCache(slug)
 
     return { success: true, message: 'สร้างร้านค้าสำเร็จแล้ว', data: store }
   } catch (error) {
@@ -416,8 +421,9 @@ export async function deleteStore(id: string) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    await prisma.store.delete({
+    const store = await prisma.store.delete({
       where: { id },
+      select: { slug: true },
     })
 
     await createLog({
@@ -427,6 +433,8 @@ export async function deleteStore(id: string) {
       entity: 'Store',
       entityId: id,
     })
+
+    await invalidateStoreCache(store.slug)
 
     return { success: true, message: 'ลบร้านค้าสำเร็จ' }
   } catch (error) {

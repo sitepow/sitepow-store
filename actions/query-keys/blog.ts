@@ -7,4 +7,5 @@ export const blogKeys = {
     limit?: number
     search?: string
   }) => [...blogKeys.lists(), filters] as const,
+  detail: (blogSlug: string) => [...blogKeys.all, 'detail', blogSlug] as const,
 }

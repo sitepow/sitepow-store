@@ -18,5 +18,5 @@ export const storeKeys = {
     slug?: string
     excludeId?: string
   }) => [...storeKeys.all, 'availability', params] as const,
-  landing: (limit: number) => [...storeKeys.all, 'landing', limit] as const,
+  landing: (limit?: number) => [...storeKeys.all, 'landing', limit] as const,
 }
