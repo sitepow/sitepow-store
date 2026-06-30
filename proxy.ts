@@ -12,7 +12,7 @@ export const config = {
      * 3. /_static (inside /public)
      * 4. all root files inside /public (e.g. /favicon.ico)
      */
-    '/((?!api|_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|svg|css|js|map|json|txt|webmanifest)).*)',
+    '/((?!api|_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)).*)',
   ],
 }
 
@@ -27,7 +27,7 @@ export default async function middleware(req: NextRequest) {
 
   if (
     url.pathname.match(
-      /\.(?:ico|png|jpg|jpeg|svg|css|js|map|json|txt|webmanifest)$/,
+      /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)$/,
     )
   ) {
     return NextResponse.next()

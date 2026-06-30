@@ -19,7 +19,9 @@ export async function getLandingImages({
 
     try {
       const files = fs.readdirSync(dirPath)
-      const images = files.filter((file) => /\.(jpeg|jpg|png|svg)$/i.test(file))
+      const images = files.filter((file) =>
+        /\.(jpeg|jpg|avif|png|svg)$/i.test(file),
+      )
       return images.map((img) => `/images/${imageFolder}/${img}`)
     } catch (error) {
       console.error(error)

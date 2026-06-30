@@ -27,7 +27,7 @@ export function CategorySection({
   products,
   isLoading,
 }: CategorySectionProps) {
-  const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
+  const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
   // const fallbackGradient = useRandomGradient()
   const { emblaRef } = useCarousel()
@@ -40,9 +40,9 @@ export function CategorySection({
     <SectionContainer>
       <div className="flex w-full flex-col gap-6 md:flex-row">
         {isLoading ? (
-          <Skeleton className="h-48 w-full shrink-0 rounded-xl md:h-88.75 md:w-72" />
+          <Skeleton className="h-48 w-full shrink-0 rounded-xl md:h-88.75 md:w-96" />
         ) : (
-          <div className="border-border relative h-48 w-full shrink-0 rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-72">
+          <div className="border-border relative h-48 w-full shrink-0 rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-96">
             <div className="absolute inset-0 z-0">
               <div
                 key={currentImage}
