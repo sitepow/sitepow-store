@@ -66,9 +66,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                 <div className="text-muted-foreground text-xs">
                   เลขพัสดุ (Tracking Number)
                 </div>
-                <div className="font-mono font-bold">
-                  {order.trackingNumber}
-                </div>
+                <div className="font-bold">{order.trackingNumber}</div>
               </div>
               <Button variant="outline" size="sm" onClick={handleCopyTracking}>
                 <IconCopy size={16} className="mr-1" /> คัดลอก

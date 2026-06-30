@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
+import { useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -20,7 +21,14 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 // import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconImageGeneration, IconTrash } from '@tabler/icons-react'
+import {
+  IconArrowForward,
+  IconArrowWaveRightDown,
+  IconImageGeneration,
+  IconPlus,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
@@ -55,6 +63,9 @@ import { VariantItem } from './VariantItem'
 export function CreateProductForm() {
   const router = useRouter()
   const { selectedStoreId } = useStoreFilter()
+
+  const [showPresets, setShowPresets] = useState(false)
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
@@ -224,18 +235,27 @@ export function CreateProductForm() {
               <IconImageGeneration className="mr-2 size-4" />
             )}
             {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
+          </Button>{' '}
+          <Button
+            type="button"
+            variant={showPresets ? 'secondary' : 'default'}
+            onClick={() => setShowPresets(!showPresets)}
+          >
+            {showPresets ? <IconX /> : <IconPlus />}
+            {showPresets ? 'ปิดตัวอย่างสินค้า' : 'โหลดข้อมูลสินค้าตัวอย่าง'}
           </Button>
-          {PRODUCT_PRESETS_MASTER.map((preset) => (
-            <Button
-              key={preset.id}
-              type="button"
-              variant="outline"
-              disabled={isPending}
-              onClick={() => handleApplyPreset(preset.id)}
-            >
-              [ตัวอย่าง] {preset.label}
-            </Button>
-          ))}
+          {showPresets &&
+            PRODUCT_PRESETS_MASTER.map((preset) => (
+              <Button
+                key={preset.id}
+                type="button"
+                variant="outline"
+                disabled={isPending}
+                onClick={() => handleApplyPreset(preset.id)}
+              >
+                <IconArrowForward /> {preset.label}
+              </Button>
+            ))}
         </CardContent>
       </Card>
 

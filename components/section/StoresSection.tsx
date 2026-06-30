@@ -126,15 +126,15 @@ export function StoresSection() {
           ))}
 
         {!isLoading && (
-          <Card className="group hover:border-primary/50 hover:bg-muted/50 flex h-full cursor-pointer items-center justify-center border-dashed transition-colors">
+          <Card className="group hover:border-primary/50 flex h-full cursor-pointer items-center justify-center border-dashed transition-colors">
             <CardContent className="flex h-full w-full flex-col items-center justify-center p-10 text-center">
-              <div className="text-muted-foreground group-hover:text-primary rounded-full border border-dashed p-4 transition-colors">
+              <div className="group-hover:text-primary group-hover:border-primary rounded-full border border-dashed p-4 transition-colors">
                 <IconPlus className="size-10 stroke-1" />
               </div>
-              <h3 className="text-muted-foreground group-hover:text-foreground mt-6 text-xl font-bold transition-colors sm:text-2xl">
+              <h3 className="group-hover:text-foreground mt-6 text-xl font-bold transition-colors sm:text-2xl">
                 สร้างร้านค้าของคุณ
               </h3>
-              <p className="text-muted-foreground group-hover:text-foreground mt-2 text-lg opacity-60 transition-colors">
+              <p className="group-hover:text-foreground mt-2 text-lg opacity-60 transition-colors">
                 เริ่มต้นสร้างประสบการณ์การช้อปปิ้งที่ยอดเยี่ยมด้วย Sitepow Store
               </p>
               <div className="mt-8">

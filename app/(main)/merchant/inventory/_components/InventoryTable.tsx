@@ -9,6 +9,7 @@ import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -40,7 +41,8 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสินค้า</TableHead>
+              {/* <TableHead>รหัสสินค้า</TableHead> */}
+              <TableHead>รูปภาพสินค้า</TableHead>
               <TableHead>สินค้า</TableHead>
               <TableHead>ตัวเลือก</TableHead>
               <TableHead>SKU</TableHead>
@@ -64,15 +66,26 @@ export function InventoryTable() {
 
                 return (
                   <TableRow key={stock.id}>
-                    <TableCell>{stock.id}</TableCell>
+                    {/* <TableCell>{stock.id}</TableCell> */}
+                    <TableCell>
+                      <TableImage />
+                    </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                      {stock.variant.product.title}
+                      <div className="flex flex-col">
+                        <span>{stock.variant.product.title}</span>
+                        <span className="text-muted-foreground text-xs">
+                          รหัสสินค้า: {stock.variant.product.id}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
                         <span>{stock.variant.title}</span>
                         <span className="text-muted-foreground text-xs">
-                          {formatCurrency(Number(stock.variant.price))}
+                          รหัสตัวเลือกสินค้า: {stock.variant.id}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          ราคา: {formatCurrency(Number(stock.variant.price))}
                         </span>
                       </div>
                     </TableCell>

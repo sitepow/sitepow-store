@@ -151,7 +151,7 @@ export function VariantItem({
                 control={control}
                 render={({ field }) => (
                   <Field>
-                    <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                    <FieldLabel className="text-muted-foreground text-[10px]">
                       คะแนนที่ได้รับ
                     </FieldLabel>
                     <Input

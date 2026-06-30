@@ -91,7 +91,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           </div>
 
           {order.trackingNumber && (
-            <p className="text-muted-foreground font-mono text-xs">
+            <p className="text-muted-foreground text-xs">
               Tracking: {order.trackingNumber}
             </p>
           )}

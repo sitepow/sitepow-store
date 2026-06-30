@@ -73,7 +73,7 @@ export function DiscountField({ index }: { index: number }) {
           control={control}
           render={({ field, fieldState }) => (
             <Field>
-              <FieldLabel className="text-muted-foreground text-[10px] tracking-wider uppercase">
+              <FieldLabel className="text-muted-foreground text-[10px]">
                 มูลค่าส่วนลด
               </FieldLabel>
               <Input

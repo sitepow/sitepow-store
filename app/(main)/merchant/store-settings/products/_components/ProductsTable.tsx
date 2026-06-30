@@ -13,6 +13,7 @@ import { IconPackage } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,7 +48,8 @@ export function ProductsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสินค้า</TableHead>
+              {/* <TableHead>รหัสสินค้า</TableHead> */}
+              <TableHead>รูปภาพสินค้า</TableHead>
               <TableHead>ชื่อสินค้า</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>
@@ -69,13 +71,19 @@ export function ProductsTable() {
 
                 return (
                   <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
+                    {/* <TableCell>{product.id}</TableCell> */}
+                    <TableCell>
+                      <TableImage />
+                    </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex items-center gap-3">
                         <div className="flex flex-col">
                           <span>{product.title}</span>
                           <span className="text-muted-foreground text-xs">
-                            {product.slug}
+                            รหัสสินค้า: {product.id}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            slug: {product.slug}
                           </span>
                         </div>
                       </div>
