@@ -72,8 +72,8 @@ export function FeatureDisplay({
         </div>
       </div>
       <div className="bg-foreground/30 mx-auto h-8 w-full rounded-b-3xl" />
-      <div className="bg-foreground/20 mx-auto h-8 w-[90%] rounded-b-3xl lg:w-[95%]" />
-      <div className="bg-foreground/10 mx-auto h-8 w-[80%] rounded-b-3xl lg:w-[90%]" />
+      <div className="bg-foreground/20 mx-auto h-8 w-[85%] rounded-b-3xl sm:w-[90%] lg:w-[95%]" />
+      <div className="bg-foreground/10 mx-auto h-8 w-[70%] rounded-b-3xl sm:w-[80%] lg:w-[90%]" />
     </SectionContainer>
   )
 }
