@@ -1,10 +1,12 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { useLandingStores } from '@/actions/hooks/store'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
 import { getClientAuthUrl } from '@/utils/auth'
 import { IconArrowUpRight, IconPlus } from '@tabler/icons-react'
@@ -17,6 +19,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function StoresSection() {
   const isMounted = useIsMounted()
+  const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
+
   const { data: stores = [], isLoading } = useLandingStores(6)
   const { isAuthenticated } = useSession()
 
@@ -60,16 +64,14 @@ export function StoresSection() {
             className="group from-background relative flex h-full flex-col overflow-hidden bg-linear-to-t p-0 transition-all"
           >
             <div className="bg-muted relative h-48 w-full overflow-hidden">
-              <img
-                className="size-full object-cover object-center"
-                src="https://plus.unsplash.com/premium_photo-1679003074247-9c70a2822cb6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              <Image
+                key={currentImage}
+                className="animate-in fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
+                src={currentImage}
+                width={800}
+                height={800}
+                alt="store-preview-image"
               />
-              {/* <div className="from-background/80 absolute inset-0 bg-linear-to-t to-transparent" /> */}
-              {/* <div className="text-muted-foreground/30 flex h-full items-center justify-center">
-                <span className="text-sm font-medium tracking-widest uppercase">
-                  Preview
-                </span>
-              </div> */}
             </div>
 
             <CardContent className="flex flex-1 flex-col pb-5">
