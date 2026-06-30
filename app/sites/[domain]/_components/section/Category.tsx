@@ -2,7 +2,9 @@
 
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { useCarousel } from '@/hooks/use-carousel'
-import { useRandomGradient } from '@/hooks/use-random-gradient'
+import { useLandingImages } from '@/hooks/use-landing-images'
+
+// import { useRandomGradient } from '@/hooks/use-random-gradient'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -25,7 +27,9 @@ export function CategorySection({
   products,
   isLoading,
 }: CategorySectionProps) {
-  const fallbackGradient = useRandomGradient()
+  const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
+
+  // const fallbackGradient = useRandomGradient()
   const { emblaRef } = useCarousel()
 
   if (products.length === 0) {
@@ -38,13 +42,19 @@ export function CategorySection({
         {isLoading ? (
           <Skeleton className="h-48 w-full shrink-0 rounded-xl md:h-88.75 md:w-72" />
         ) : (
-          <div
-            className="animate-gradient relative h-48 w-full shrink-0 rounded-xl bg-cover bg-center text-start md:h-88.75 md:w-72"
-            style={{
-              backgroundImage: image ? `url('${image}')` : fallbackGradient,
-            }}
-            suppressHydrationWarning
-          >
+          <div className="border-border relative h-48 w-full shrink-0 rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-72">
+            <div className="absolute inset-0 z-0">
+              <div
+                key={currentImage}
+                className="animate-in fade-in relative size-full rounded-xl bg-cover bg-center opacity-40 duration-1000"
+                style={{
+                  backgroundImage: image
+                    ? `url('${image}')`
+                    : `url('${currentImage}')`,
+                }}
+              ></div>
+            </div>
+
             <div className="absolute inset-0 rounded-xl bg-black/20" />
             <div className="p-5">
               <h2 className="relative z-10 line-clamp-2 text-2xl font-bold break-all whitespace-normal text-white drop-shadow-md md:text-4xl">
@@ -55,7 +65,7 @@ export function CategorySection({
         )}
 
         <div className="relative w-full overflow-hidden" ref={emblaRef}>
-          <div className="flex h-87.5 items-center gap-5 p-2.5">
+          <div className="flex h-87.5 items-center gap-5">
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton

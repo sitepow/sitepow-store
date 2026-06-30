@@ -3,6 +3,8 @@
 import Image from 'next/image'
 
 import { PRICING_VALUE } from '@/constants/pricing'
+import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useRandomGradient } from '@/hooks/use-random-gradient'
 import { PricingPlanProps } from '@/types/pricing'
 import { calculatePlanPrice, formatCurrency } from '@/utils/pricing'
 
@@ -21,6 +23,8 @@ export function PricingCard({
   isPopular,
   seed,
 }: PricingPlanProps) {
+  const isMounted = useIsMounted()
+  const fallbackGradient = useRandomGradient()
   const selectedTab = usePricingStore((state) => state.selectedTab)
 
   const {
@@ -31,11 +35,18 @@ export function PricingCard({
     averagePerMonth,
   } = calculatePlanPrice(price, selectedTab)
 
+  if (!isMounted) {
+    return
+  }
+
   return (
     <section
       className={`text-foreground dark:bg-foreground/5 flex flex-col items-center rounded-xl border p-2.5 text-start ${
-        isPopular && 'border-primary shadow-md'
+        isPopular && 'text-white shadow-md'
       }`}
+      style={{
+        backgroundImage: isPopular ? fallbackGradient : '',
+      }}
     >
       <Image
         src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&skinColor=fbd3ad`}

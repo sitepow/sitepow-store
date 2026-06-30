@@ -30,8 +30,8 @@ export function FeatureDisplay({
   ])
 
   return (
-    <SectionContainer>
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white md:p-12">
+    <SectionContainer className="gap-0">
+      <div className="relative overflow-hidden rounded-t-3xl bg-slate-900 p-8 text-white md:p-12">
         <div className="absolute inset-0">
           <Image
             src={imageUrl}
@@ -71,6 +71,9 @@ export function FeatureDisplay({
           )}
         </div>
       </div>
+      <div className="bg-foreground/30 mx-auto h-8 w-full rounded-b-3xl" />
+      <div className="bg-foreground/20 mx-auto h-8 w-[90%] rounded-b-3xl lg:w-[95%]" />
+      <div className="bg-foreground/10 mx-auto h-8 w-[80%] rounded-b-3xl lg:w-[90%]" />
     </SectionContainer>
   )
 }
