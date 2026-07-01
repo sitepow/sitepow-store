@@ -12,6 +12,7 @@ export function StoreLogo({ image }: StoreLogoProps) {
         width={200}
         height={80}
         alt="store-logo"
+        unoptimized
         src={image || '/images/navigation/navigation-header.jpeg'}
         className="size-full object-contain object-center"
       />
