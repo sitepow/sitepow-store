@@ -6,6 +6,8 @@ import { StoreProfileFormValues } from '@/zod/store-profile'
 import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
 
+import { invalidateStoreCache } from './query-keys/invalidation/store'
+
 const storeProfileSelect = {
   id: true,
   name: true,
@@ -13,6 +15,7 @@ const storeProfileSelect = {
   email: true,
   taxId: true,
   logo: true,
+  description: true,
 } satisfies Prisma.StoreSelect
 
 export type GetStoreProfileResult = Prisma.StoreGetPayload<{
@@ -55,13 +58,14 @@ export async function updateStoreProfile(
       }
     }
 
-    await prisma.store.update({
+    const store = await prisma.store.update({
       where: { id: storeId },
       data: {
         ...input,
         email: input.email || null,
         taxId: input.taxId || null,
       },
+      select: { slug: true },
     })
 
     await createLog({
@@ -72,6 +76,8 @@ export async function updateStoreProfile(
       entityId: storeId,
       details: { setting: 'profile', updatedFields: Object.keys(input) },
     })
+
+    await invalidateStoreCache(store?.slug)
 
     return { success: true, message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }
   } catch (error) {

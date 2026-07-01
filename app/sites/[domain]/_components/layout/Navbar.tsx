@@ -9,6 +9,7 @@ import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { getClientAuthUrl } from '@/utils/auth'
 import {
   ChevronDownIcon,
@@ -19,8 +20,8 @@ import {
 } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrand } from '@/components/LogoBrand'
 import { ModeToggle } from '@/components/ModeToggle'
+import { StoreLogo } from '@/components/StoreLogo'
 import { ListItem } from '@/components/layout/_components/ListItem'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -42,6 +43,8 @@ import { UserAvatarDropdown } from '../UserAvatarDropdown'
 import { CartDrawer } from '../cart/CartDrawer'
 
 export function StoreNavbar() {
+  const { store } = useStoreData()
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
   const isMounted = useIsMounted()
@@ -65,7 +68,8 @@ export function StoreNavbar() {
       <header className="border-border text-foreground bg-background fixed z-50 w-full border-b">
         <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
           <div className="flex items-center justify-between gap-4">
-            <LogoBrand />
+            {store?.logo && <StoreLogo image={store?.logo} />}
+            {!store?.logo && <StoreLogo />}
 
             <div className="flex items-center gap-2.5 md:gap-5">
               <div className="mx-5 hidden max-w-md flex-1 lg:flex">

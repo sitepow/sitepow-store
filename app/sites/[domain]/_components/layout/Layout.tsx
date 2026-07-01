@@ -26,7 +26,7 @@ export function StoreLayout({
   return (
     <div className="flex flex-col gap-10">
       <StoreNavbar />
-      <main className={cn(className, 'mt-20 lg:mt-30')} {...props}>
+      <main className={cn(className, 'mt-32 lg:mt-48')} {...props}>
         {children}
       </main>
       <StoreFooter />

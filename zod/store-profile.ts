@@ -18,6 +18,8 @@ export const storeProfileSchema = z.object({
     .refine((val) => !val || val.length === 13, {
       message: 'เลขผู้เสียภาษีต้องมี 13 หลักพอดี',
     }),
+  logo: z.any().optional(),
+  description: z.string().optional(),
 })
 
 export type StoreProfileFormValues = z.infer<typeof storeProfileSchema>

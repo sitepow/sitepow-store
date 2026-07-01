@@ -1,12 +1,16 @@
 import Link from 'next/link'
 
-import { LogoBrand } from '@/components/LogoBrand'
+import { Plan } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
+import { StoreLogo } from '@/components/StoreLogo'
 import { FacebookIcon } from '@/components/icon/Facebook'
 import { InstagramIcon } from '@/components/icon/Instagram'
 import { TiktokIcon } from '@/components/icon/Tiktok'
 
 export function StoreFooter() {
+  const { store } = useStoreData()
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
@@ -20,10 +24,17 @@ export function StoreFooter() {
       <div className="container mx-auto px-10 py-12">
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="max-w-sm">
-            <LogoBrand />
+            {store?.logo && <StoreLogo image={store?.logo} />}
+            {!store?.logo && <StoreLogo />}
+
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              สร้างสรรค์ประสบการณ์ดิจิทัลที่ดีที่สุดสำหรับคุณ
-              เชื่อมต่อทุกความเป็นไปได้ด้วยเทคโนโลยีที่ทันสมัย
+              {store?.description
+                ? store?.description
+                : 'เราคัดสรรสินค้าคุณภาพดีในราคาที่จับต้องได้ ช้อปง่าย ได้ของไว และตั้งใจดูแลทุกออเดอร์ให้ส่งถึงมือคุณอย่างปลอดภัย'}
+            </p>
+            <p className="mt-4 text-sm leading-relaxed opacity-60">
+              อีเมล: {store?.email || '-'} เลขประจำตัวผู้เสียภาษี:{' '}
+              {store?.taxId || '-'}
             </p>
             <div className="mt-5 flex gap-5">
               {socialLinks.map((social) => (
@@ -61,7 +72,7 @@ export function StoreFooter() {
         </div>
       </div>
 
-      <ProtectedByBrand />
+      {store?.plan === Plan.FREE && <ProtectedByBrand />}
     </footer>
   )
 }

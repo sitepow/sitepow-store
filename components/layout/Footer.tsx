@@ -24,6 +24,10 @@ export function Footer() {
               สร้างสรรค์ประสบการณ์ดิจิทัลที่ดีที่สุดสำหรับคุณ
               เชื่อมต่อทุกความเป็นไปได้ด้วยเทคโนโลยีที่ทันสมัย
             </p>
+            <p className="mt-4 text-sm leading-relaxed opacity-60">
+              อีเมล: {'kteeraphatt@gmail.com'} เลขประจำตัวผู้เสียภาษี:{' '}
+              {'1348500011161'}
+            </p>
             <div className="mt-5 flex gap-5">
               {socialLinks.map((social) => (
                 <a

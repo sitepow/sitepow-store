@@ -1,4 +1,5 @@
 import { useStoreOptions } from '@/actions/hooks/store'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
@@ -13,9 +14,14 @@ import {
 import { Field, FieldLabel } from './ui/field'
 
 export function StoreSelectField() {
+  const isMounted = useIsMounted()
   const { data: stores = [], isLoading } = useStoreOptions()
   const { selectedStoreId, setSelectedStoreId, setSelectedStoreSlug } =
     useStoreFilter()
+
+  if (!isMounted) {
+    return
+  }
 
   return (
     <Field className="text-foreground w-full sm:w-fit">

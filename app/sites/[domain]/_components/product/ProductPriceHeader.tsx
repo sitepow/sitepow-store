@@ -17,7 +17,7 @@ export function ProductPriceHeader() {
       {isLoading ? (
         <Skeleton className="h-10 w-3/4 rounded-lg" />
       ) : (
-        <h1 className="text-start text-4xl leading-tight font-bold">
+        <h1 className="text-start text-3xl leading-tight font-bold sm:text-4xl">
           {product?.title}
         </h1>
       )}
@@ -29,7 +29,10 @@ export function ProductPriceHeader() {
           <>
             <Label className="text-lg font-semibold">ราคาสินค้า</Label>
             <div className="flex items-end gap-2">
-              <data value={totalPrice} className="text-5xl font-bold">
+              <data
+                value={totalPrice}
+                className="text-4xl font-bold sm:text-5xl"
+              >
                 {formatCurrency(totalPrice || 0)}
               </data>
             </div>
