@@ -13,7 +13,7 @@ export function StoreLayoutCheckout({
     <div className="flex flex-col gap-10">
       <StoreNavbarCheckout />
 
-      <main className={cn(className, 'mt-20')} {...props}>
+      <main className={cn(className, 'mt-32')} {...props}>
         {children}
       </main>
     </div>
