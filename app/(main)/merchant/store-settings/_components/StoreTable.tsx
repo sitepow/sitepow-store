@@ -18,8 +18,8 @@ import {
 } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
-import { StoreLogo } from '@/components/StoreLogo'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
+import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -75,7 +75,7 @@ export function StoreTable() {
                 return (
                   <TableRow key={store.id}>
                     <TableCell>
-                      <StoreLogo image={store?.logo ?? ''} />
+                      <TableImage imageUrl={store?.logo ?? ''} />
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
