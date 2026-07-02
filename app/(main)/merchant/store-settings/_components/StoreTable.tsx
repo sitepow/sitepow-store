@@ -19,7 +19,6 @@ import {
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -48,7 +47,7 @@ export function StoreTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รูปร้านค้า</TableHead>
+              <TableHead>รหัสร้านค้า</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>สถานะ</TableHead>
@@ -74,9 +73,7 @@ export function StoreTable() {
 
                 return (
                   <TableRow key={store.id}>
-                    <TableCell>
-                      <TableImage imageUrl={store?.logo ?? ''} />
-                    </TableCell>
+                    <TableCell>{store.id}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span>{store.name}</span>

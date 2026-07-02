@@ -1,11 +1,11 @@
 'use client'
 
 import { ComponentProps, useCallback, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
-import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { UpdateProfileSchema } from '@/zod/profile'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -34,14 +34,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     handleSubmit,
     reset,
     formState: { isDirty, errors },
-  } = useForm<UpdateProfileSchema>({
-    resolver: zodResolver(updateProfileSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-    },
-  })
+  } = useFormContext<UpdateProfileSchema>()
 
   const resetForm = useCallback(() => {
     if (!profile?.name) {
@@ -61,10 +54,35 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     resetForm()
   }, [profile, reset, resetForm])
 
-  function onSubmit(values: UpdateProfileSchema) {
-    updateProfile({
-      ...values,
-    })
+  async function onSubmit(values: UpdateProfileSchema) {
+    let imageUrl = values.image
+
+    if (values.image instanceof File) {
+      if (profile?.image) {
+        const oldKey = profile.image.split('/').slice(-2).join('/')
+        await r2DeleteImage(oldKey)
+      }
+
+      const formData = new FormData()
+      formData.append('file', values.image)
+
+      const res = await r2UploadImage(formData, `user/${profile?.id}`)
+      if (res.success) {
+        imageUrl = res.url
+      }
+    }
+
+    updateProfile(
+      {
+        ...values,
+        image: imageUrl,
+      },
+      {
+        onSuccess: async () => {
+          reset(values)
+        },
+      },
+    )
   }
 
   return (

@@ -41,6 +41,9 @@ importers:
       '@teispace/next-themes':
         specifier: ^2.0.2
         version: 2.0.2(next@16.2.3(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@thesvg/react':
+        specifier: ^3.0.19
+        version: 3.0.19(react@19.2.4)
       axios:
         specifier: ^1.16.1
         version: 1.18.0
@@ -2075,6 +2078,12 @@ packages:
     peerDependenciesMeta:
       next:
         optional: true
+
+  '@thesvg/react@3.0.19':
+    resolution: {integrity: sha512-BsI/JlniPC0+s775vKAY0XdWXAC1s8A5kiPG5pkb1jZM9SskzB6JOxCksOSINNzEAZWD89R34xUnGyOXyPdZ2A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: '>=18'
 
   '@trivago/prettier-plugin-sort-imports@6.0.2':
     resolution: {integrity: sha512-3DgfkukFyC/sE/VuYjaUUWoFfuVjPK55vOFDsxD56XXynFMCZDYFogH2l/hDfOsQAm1myoU/1xByJ3tWqtulXA==}
@@ -7405,6 +7414,10 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
     optionalDependencies:
       next: 16.2.3(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+
+  '@thesvg/react@3.0.19(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
 
   '@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.8.4)':
     dependencies:
