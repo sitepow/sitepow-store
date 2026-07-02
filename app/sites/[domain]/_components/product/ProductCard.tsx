@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
+  'h-full rounded-xl transition-all pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
   {
     variants: {
       variant: {
@@ -27,7 +27,8 @@ interface ProductCardProps extends VariantProps<typeof productCardVariants> {
 }
 
 export function ProductCard({ variant, className, product }: ProductCardProps) {
-  const { hasDiscount, net, maxDiscountPercent } = calculateProduct(product)
+  const { hasDiscount, net, original, maxDiscountPercent } =
+    calculateProduct(product)
 
   return (
     <Link href={`/products/${product.slug}`}>
@@ -47,16 +48,21 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           {product.title}
         </h3>
 
-        {hasDiscount && (
-          <span className="text-muted-foreground group-hover:text-primary text-sm line-through">
-            {formatCurrency(net?.min || 0)}
-          </span>
-        )}
-
-        <div className="group-hover:text-primary flex items-end justify-center gap-2">
-          <data value={net?.min} className="text-2xl font-bold">
-            {formatCurrency(net?.min || 0)}
-          </data>
+        <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
+          {hasDiscount ? (
+            <>
+              <span className="text-muted-foreground text-sm line-through">
+                {formatCurrency(original?.min || 0)}
+              </span>
+              <data value={net?.min} className="text-2xl font-bold">
+                {formatCurrency(net?.min || 0)}
+              </data>
+            </>
+          ) : (
+            <data value={original?.min} className="text-2xl font-bold">
+              {formatCurrency(original?.min || 0)}
+            </data>
+          )}
         </div>
       </div>
     </Link>

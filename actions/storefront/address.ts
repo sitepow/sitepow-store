@@ -43,28 +43,34 @@ export type AddressDetail = Prisma.AddressGetPayload<{
 }>
 
 async function getCustomerId(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true, name: true },
-  })
-
-  if (!user) {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user?.email) {
     return null
   }
 
-  const [firstName, ...rest] = (user.name ?? '').split(' ')
+  let customer = await prisma.customer.findUnique({ where: { userId } })
 
-  const customer = await prisma.customer.upsert({
-    where: { userId },
-    create: {
-      userId,
-      email: user.email!,
-      firstName: firstName || null,
-      lastName: rest.join(' ') || null,
-    },
-    update: {},
-    select: { id: true },
-  })
+  if (!customer) {
+    customer = await prisma.customer.findUnique({
+      where: { email: user.email },
+    })
+
+    if (customer) {
+      customer = await prisma.customer.update({
+        where: { id: customer.id },
+        data: { userId: userId },
+      })
+    } else {
+      customer = await prisma.customer.create({
+        data: {
+          userId: userId,
+          email: user.email,
+          firstName: user.name?.split(' ')[0] || '',
+          lastName: user.name?.split(' ').slice(1).join(' ') || '',
+        },
+      })
+    }
+  }
 
   return customer.id
 }
@@ -72,6 +78,7 @@ async function getCustomerId(userId: string) {
 export async function getAddressOptions() {
   try {
     const session = await auth()
+
     if (!session?.user?.id) {
       return []
     }

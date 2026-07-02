@@ -1,6 +1,6 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
-import { CalculatedProduct } from '@/utils/product'
-import { calculateProduct, getVariantNetPrice } from '@/utils/product'
+import { CalculatedProduct, calculateNetPrice } from '@/utils/product'
+import { calculateProduct } from '@/utils/product'
 import { create } from 'zustand'
 
 type StorefrontVariant = StorefrontProductDetail['variants'][number]
@@ -97,15 +97,32 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
     set({ quantity: Math.max(1, Math.min(qty, stock)) })
   },
 
-  getVariantPrice: (variant) => getVariantNetPrice(variant),
+  getVariantPrice: (variant) => {
+    const discount = {
+      active: variant.discountActive ?? false,
+      type: variant.discountType ?? '',
+      amount: variant.discountAmount ?? 0,
+    }
+
+    return calculateNetPrice({
+      price: variant.price,
+      discount: discount,
+    })
+  },
 
   getTotalPrice: () => {
-    const { selectedVariant, selectedAddons, product, quantity } = get()
+    const {
+      selectedVariant,
+      selectedAddons,
+      product,
+      quantity,
+      getVariantPrice,
+    } = get()
     if (!selectedVariant) {
       return 0
     }
 
-    let unitPrice = getVariantNetPrice(selectedVariant)
+    let unitPrice = getVariantPrice(selectedVariant)
 
     selectedAddons.forEach((id) => {
       const addon = product?.addons.find((a) => a.id === id)

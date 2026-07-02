@@ -1,5 +1,6 @@
 'use client'
 
+import { DiscountType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
 
@@ -26,26 +27,27 @@ export function ProductVariantSelector() {
           </div>
         ) : (
           <>
-            {' '}
             <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
             >
               {product?.variants?.map((variant) => {
-                const netPrice = calculateNetPrice({
-                  price: variant.price,
-                  discount: variant.discountActive
+                const discountConfig =
+                  variant.discountActive && variant.discountType
                     ? {
-                        active: variant.discountActive,
-                        type: variant.discountType ?? '',
+                        active: true,
+                        type: variant.discountType as DiscountType,
                         amount: variant.discountAmount ?? 0,
                       }
-                    : undefined,
+                    : undefined
+
+                const netPrice = calculateNetPrice({
+                  price: variant.price,
+                  discount: discountConfig,
                 })
 
-                const hasDiscount =
-                  variant.discountActive && netPrice < variant.price
+                const hasDiscount = !!discountConfig && netPrice < variant.price
                 const hasPoint = variant.pointsActive
 
                 return (
@@ -64,7 +66,7 @@ export function ProductVariantSelector() {
                       </Label>
                       <div className="flex gap-2.5">
                         {hasDiscount &&
-                          variant.discountType === 'PERCENTAGE' && (
+                          variant.discountType === DiscountType.PERCENTAGE && (
                             <span className="text-primary text-xs font-semibold">
                               ลด {variant.discountAmount}%
                             </span>

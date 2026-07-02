@@ -17,6 +17,9 @@ export function CartItemCard({
   onRemove,
   isMaxStock = false,
 }: CartItemCardProps) {
+  const hasDiscount = item.variant.discountActive
+  const originalUnitPrice = item.variant.price
+
   return (
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
       <div className="bg-foreground/20 size-20 shrink-0 overflow-hidden rounded-md border sm:size-24" />
@@ -71,7 +74,12 @@ export function CartItemCard({
           )}
 
           <div className="flex items-center gap-1">
-            <p className="text-sm font-bold sm:text-base">
+            {hasDiscount && (
+              <span className="text-muted-foreground text-xs line-through sm:text-sm">
+                {formatCurrency(originalUnitPrice * item.quantity)}
+              </span>
+            )}
+            <p className="text-primary text-sm font-bold sm:text-base">
               {formatCurrency(item.totalPrice)}
             </p>
             {onRemove && (
