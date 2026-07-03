@@ -1,13 +1,21 @@
+import { ComponentProps } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
 
-interface StoreLogoProps {
+import { cn } from '@/lib/utils'
+
+interface StoreLogoProps extends Omit<ComponentProps<typeof Link>, 'href'> {
   image?: string
 }
 
-export function StoreLogo({ image }: StoreLogoProps) {
+export function StoreLogo({ image, className, ...props }: StoreLogoProps) {
   return (
-    <Link href="/" className="block h-20 w-fit max-w-50 overflow-hidden">
+    <Link
+      href="/"
+      className={cn('block h-20 w-fit max-w-50 overflow-hidden', className)}
+      {...props}
+    >
       <Image
         width={200}
         height={80}
