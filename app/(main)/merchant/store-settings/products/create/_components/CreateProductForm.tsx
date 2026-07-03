@@ -292,7 +292,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               <IconX /> ล้างการตั้งค่า
             </Button>
           )}
-          <Button type="submit" disabled={isPending}>
+          <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
             {isCreating && <Spinner />}
             บันทึกข้อมูล
           </Button>
@@ -300,7 +300,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       </Card>
 
       <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+        <div className="space-y-10">
           <FieldSet disabled={isPendingAiGen}>
             <FieldGroup className="mt-4 grid gap-6">
               <ProductTitleField isPending={isPendingAiGen} />
@@ -489,7 +489,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           {/* <div className="flex flex-wrap justify-end gap-2.5">
             
           </div> */}
-        </form>
+        </div>
 
         <div className="sticky top-6 space-y-6 xl:col-span-1">
           <ProductPreviewContent />
