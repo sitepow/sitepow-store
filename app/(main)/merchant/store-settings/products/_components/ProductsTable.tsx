@@ -9,7 +9,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
-import { IconPackage } from '@tabler/icons-react'
+import { IconEdit, IconPackage } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -106,6 +106,13 @@ export function ProductsTable() {
                       <Button variant="outline" size="icon-lg" asChild>
                         <Link href={'/merchant/inventory'}>
                           <IconPackage />
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="icon-lg" asChild>
+                        <Link
+                          href={`/merchant/store-settings/products/create/${product.id}`}
+                        >
+                          <IconEdit className="size-4" />
                         </Link>
                       </Button>
                       <DeleteButton

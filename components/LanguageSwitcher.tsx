@@ -6,9 +6,10 @@ import {
 } from 'next/navigation'
 
 import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
+import { VariantProps } from 'class-variance-authority'
 import { Languages } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export function LanguageSwitcher() {
+type ButtonVariants = VariantProps<typeof buttonVariants>
+
+interface ModeToggleProps {
+  buttonVariant?: ButtonVariants['variant']
+}
+
+export function LanguageSwitcher({
+  buttonVariant = 'outline',
+}: ModeToggleProps) {
   const pathname = usePathname()
   // const router = useRouter()
 
@@ -32,7 +41,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" size="icon-lg">
+        <Button variant={buttonVariant} size="icon-lg">
           <Languages className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Toggle language</span>
         </Button>

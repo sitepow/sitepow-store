@@ -126,7 +126,7 @@ export function Navbar() {
                 <Button className="font-bold">สมัครเปิดร้าน</Button>
               </Link>
               <ModeToggle buttonVariant="secondary" />
-              <LanguageSwitcher />
+              <LanguageSwitcher buttonVariant="secondary" />
             </div>
           )}
 
@@ -150,7 +150,7 @@ export function Navbar() {
                 </Button>
               )}
               <ModeToggle buttonVariant="secondary" />
-              <LanguageSwitcher />
+              <LanguageSwitcher buttonVariant="secondary" />
             </div>
           )}
 
@@ -161,7 +161,7 @@ export function Navbar() {
 
             <div className="flex flex-wrap gap-2">
               <ModeToggle buttonVariant="secondary" />
-              <LanguageSwitcher />
+              <LanguageSwitcher buttonVariant="secondary" />
               <Button
                 variant="secondary"
                 size="icon-lg"

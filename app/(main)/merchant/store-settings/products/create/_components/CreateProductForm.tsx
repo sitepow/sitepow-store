@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -13,17 +13,22 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 
 import { generateProductAiAction } from '@/actions/ai'
-import { createProduct } from '@/actions/product'
+import {
+  useCreateProduct,
+  useProduct,
+  useUpdateProduct,
+} from '@/actions/hooks/product'
+import { CreateProductInput, createProduct } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { transformProductToFormValues } from '@/utils/product'
 // import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconArrowForward,
-  IconArrowWaveRightDown,
   IconImageGeneration,
   IconPlus,
   IconTrash,
@@ -60,9 +65,15 @@ import { ProductSlugField } from './ProductSlugField'
 import { ProductTitleField } from './ProductTitleField'
 import { VariantItem } from './VariantItem'
 
-export function CreateProductForm() {
+export function CreateProductForm({ productId }: { productId?: string }) {
   const router = useRouter()
   const { selectedStoreId } = useStoreFilter()
+  const { data: product, isLoading: isProductLoading } = useProduct(
+    productId ?? '',
+  )
+
+  const { mutate: create, isPending: isCreating } = useCreateProduct()
+  const { mutate: update, isPending: isUpdating } = useUpdateProduct()
 
   const [showPresets, setShowPresets] = useState(false)
 
@@ -89,7 +100,20 @@ export function CreateProductForm() {
     },
   })
 
-  const { register, handleSubmit, reset, getValues } = form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { isDirty },
+  } = form
+
+  useEffect(() => {
+    if (product && product?.length !== 0) {
+      const formValues = transformProductToFormValues(product)
+      form.reset(formValues)
+    }
+  }, [product, form.reset, form])
 
   const handleApplyPreset = (id: string) => {
     const preset = PRODUCT_PRESETS_MASTER.find((p) => p.id === id)
@@ -134,51 +158,52 @@ export function CreateProductForm() {
     name: 'metadata',
   })
 
-  const { mutate: handleCreateProduct, isPending: isPendingCreate } =
-    useMutation({
-      mutationFn: async (data: ProductFormValues) => {
-        if (!selectedStoreId || selectedStoreId === ALL_STORES) return
-        return await createProduct({
-          storeId: selectedStoreId,
-          categoryId: data.categoryId,
-          title: data.title,
-          slug: data.slug,
-          tags: data.tags,
-          // images: data.images,
-          variants: data.variants.map((v) => ({
-            title: v.title,
-            price: v.price,
-            sku: v.sku,
-            stocks: v.stocks.map((s) => ({
-              branchId: s.branchId,
-              quantity: s.quantity ?? 0,
-              minStock: s.minStock ?? 0,
-            })),
-            discount: {
-              active: v.discount.active ?? false,
-              type: v.discount.type ?? DiscountType.PERCENTAGE,
-              amount: v.discount.amount ?? 0,
-            },
-            rewardPoints: {
-              isActive: v.rewardPoints.isActive ?? false,
-              amount: v.rewardPoints.amount ?? 0,
-            },
-          })),
-          addons: data.addons?.map((a) => ({
-            title: a.title,
-            price: a.price,
-            isAvailable: a.isAvailable ?? true,
-          })),
-          metadata: data.metadata,
-        })
-      },
-      onSuccess: () => {
-        router.push('/merchant/store-settings/products')
-      },
-    })
-
   const onSubmit = (data: ProductFormValues) => {
-    handleCreateProduct(data)
+    if (!selectedStoreId || selectedStoreId === ALL_STORES) {
+      return
+    }
+
+    const payload: CreateProductInput = {
+      storeId: selectedStoreId,
+      categoryId: data.categoryId,
+      title: data.title,
+      slug: data.slug,
+      tags: data.tags,
+      // images: data.images,
+      variants: data.variants.map((v) => ({
+        title: v.title,
+        price: v.price,
+        sku: v.sku,
+        stocks: v.stocks.map((s) => ({
+          branchId: s.branchId,
+          quantity: s.quantity ?? 0,
+          minStock: s.minStock ?? 0,
+        })),
+        discount: {
+          active: v.discount.active ?? false,
+          type: v.discount.type ?? DiscountType.PERCENTAGE,
+          amount: v.discount.amount ?? 0,
+        },
+        rewardPoints: {
+          isActive: v.rewardPoints.isActive ?? false,
+          amount: v.rewardPoints.amount ?? 0,
+        },
+      })),
+      addons: data.addons?.map((a) => ({
+        title: a.title,
+        price: a.price,
+        isAvailable: a.isAvailable ?? true,
+      })),
+      metadata: data.metadata,
+    }
+
+    if (productId) {
+      update({ id: productId, data: payload })
+    } else {
+      create(payload)
+    }
+
+    router.push('/merchant/store-settings/products')
   }
 
   const { mutate: handleAiGen, isPending: isPendingAiGen } = useMutation({
@@ -218,7 +243,8 @@ export function CreateProductForm() {
     },
   })
 
-  const isPending = isPendingAiGen || isPendingCreate
+  const isPending =
+    isPendingAiGen || isCreating || isUpdating || isProductLoading
 
   return (
     <FormProvider {...form}>
@@ -241,7 +267,7 @@ export function CreateProductForm() {
             variant={showPresets ? 'secondary' : 'default'}
             onClick={() => setShowPresets(!showPresets)}
           >
-            {showPresets ? <IconX /> : <IconPlus />}
+            {showPresets ? <IconX /> : <IconArrowForward />}
             {showPresets ? 'ปิดตัวอย่างสินค้า' : 'โหลดข้อมูลสินค้าตัวอย่าง'}
           </Button>
           {showPresets &&
@@ -256,6 +282,20 @@ export function CreateProductForm() {
                 <IconArrowForward /> {preset.label}
               </Button>
             ))}
+          {isDirty && (
+            <Button
+              type="button"
+              disabled={isPending}
+              variant="outline"
+              onClick={() => reset()}
+            >
+              <IconX /> ล้างการตั้งค่า
+            </Button>
+          )}
+          <Button type="submit" disabled={isPending}>
+            {isCreating && <Spinner />}
+            บันทึกข้อมูล
+          </Button>
         </CardContent>
       </Card>
 
@@ -446,20 +486,9 @@ export function CreateProductForm() {
             </FieldGroup>
           </FieldSet>
 
-          <div className="flex flex-wrap justify-end gap-2.5">
-            <Button
-              type="button"
-              disabled={isPending}
-              variant="outline"
-              onClick={() => reset()}
-            >
-              ล้างการตั้งค่า
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPendingCreate && <Spinner />}
-              บันทึกข้อมูล
-            </Button>
-          </div>
+          {/* <div className="flex flex-wrap justify-end gap-2.5">
+            
+          </div> */}
         </form>
 
         <div className="sticky top-6 space-y-6 xl:col-span-1">

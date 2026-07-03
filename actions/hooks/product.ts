@@ -11,7 +11,9 @@ import {
   createProduct,
   deleteProduct,
   getProducts,
+  updateProduct,
 } from '../product'
+import { getProductById } from '../product'
 import { productKeys } from '../query-keys/product'
 
 export function useProducts({
@@ -51,6 +53,33 @@ export function useDeleteProduct() {
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all })
+    },
+  })
+}
+
+export function useProduct(id: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: productKeys.detail(id),
+      queryFn: async () => {
+        return await getProductById(id)
+      },
+      enabled: !!id,
+    }),
+  )
+}
+
+export function useUpdateProduct() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateProductInput }) =>
+      updateProduct(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all })
+      queryClient.invalidateQueries({
+        queryKey: productKeys.detail(variables.id),
+      })
     },
   })
 }

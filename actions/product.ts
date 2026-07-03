@@ -331,3 +331,129 @@ export async function deleteProduct(id: string) {
     return { success: false }
   }
 }
+
+export async function getProductById(id: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return null
+  }
+
+  try {
+    const product = await prisma.product.findFirst({
+      where: {
+        id,
+        store: { ownerId: userId },
+      },
+      include: {
+        images: true,
+        tags: true,
+        variants: {
+          include: { stocks: true },
+        },
+        addons: true,
+      },
+    })
+
+    if (!product) {
+      return null
+    }
+
+    return serializeDecimal(product)
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function updateProduct(id: string, input: CreateProductInput) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false }
+  }
+
+  try {
+    const { variants, addons, metadata, tags, images, categoryId, ...rest } =
+      input
+
+    const tagsArray = tags
+      ? tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : []
+    const details = metadata?.length
+      ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
+      : undefined
+
+    await prisma.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id },
+        data: {
+          ...rest,
+          categoryId,
+          details,
+        },
+      })
+
+      await tx.productVariant.deleteMany({ where: { productId: id } })
+      await tx.productAddon.deleteMany({ where: { productId: id } })
+      await tx.productTag.deleteMany({ where: { productId: id } })
+      await tx.productImage.deleteMany({ where: { productId: id } })
+
+      const product = await tx.product.update({
+        where: { id },
+        data: {
+          tags: { create: tagsArray.map((name) => ({ name })) },
+          images: {
+            create:
+              images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+          },
+          variants: {
+            create: variants.map((v) => ({
+              title: v.title,
+              price: v.price,
+              sku: v.sku ?? '',
+              discountActive: v.discount.active,
+              discountType: v.discount.active ? v.discount.type : null,
+              discountAmount: v.discount.active ? v.discount.amount : null,
+              pointsActive: v.rewardPoints.isActive,
+              pointsAmount: v.rewardPoints.amount,
+              stocks: {
+                create: v.stocks.map((s) => ({
+                  branchId: s.branchId,
+                  quantity: s.quantity,
+                  minStock: s.minStock,
+                })),
+              },
+            })),
+          },
+          addons: {
+            create:
+              addons?.map((a) => ({
+                title: a.title,
+                price: a.price,
+                isAvailable: a.isAvailable,
+              })) ?? [],
+          },
+        },
+        select: {
+          store: { select: { slug: true } },
+        },
+      })
+
+      await Promise.all([
+        invalidateStorefrontProductCache(product.store.slug),
+        invalidateStorefrontCategoryCache(product.store.slug),
+      ])
+    })
+
+    return { success: true, message: 'อัปเดตสินค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}

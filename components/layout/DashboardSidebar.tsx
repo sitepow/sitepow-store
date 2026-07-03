@@ -33,6 +33,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
+import { LanguageSwitcher } from '../LanguageSwitcher'
 import { ModeToggle } from '../ModeToggle'
 import { ChatWidget } from '../chat/chat-widget'
 import { SupportWidget } from '../chat/support-widget'
@@ -129,6 +130,7 @@ export function DashboardSidebar({
         <div className="flex flex-wrap gap-2.5">
           <SidebarTrigger />
           <ModeToggle />
+          <LanguageSwitcher />
           <Button
             variant="outline"
             onClick={() => router.push('/')}

@@ -1,4 +1,6 @@
 import { DiscountType } from '@/generated/prisma/enums'
+import { ProductWithRelations } from '@/types/product'
+import { ProductFormValues } from '@/zod/product'
 
 export interface CalculatedProduct {
   original: PriceStats
@@ -128,4 +130,54 @@ export const getVariantNetPrice = (variant: {
   discount?: { active: boolean; type: string; amount: number }
 }): number => {
   return calculateNetPrice({ price: variant.price, discount: variant.discount })
+}
+
+export const transformProductToFormValues = (
+  product: ProductWithRelations,
+): ProductFormValues => {
+  return {
+    title: product.title,
+    slug: product.slug,
+    categoryId: product.categoryId,
+    tags: product.tags.map((t) => t.name).join(', '),
+    images: product.images.map((img) => ({ url: img.url })),
+
+    variants: product.variants.map((v) => ({
+      title: v.title,
+      price: Number(v.price),
+      sku: v.sku || '',
+      stocks: v.stocks.map((s) => ({
+        branchId: s.branchId,
+        quantity: s.quantity,
+        minStock: s.minStock,
+      })),
+      discount: {
+        active: v.discountActive,
+        type: v.discountType ?? DiscountType.PERCENTAGE,
+        amount: Number(v.discountAmount ?? 0),
+      },
+      rewardPoints: {
+        isActive: v.pointsActive,
+        amount: v.pointsAmount,
+      },
+    })),
+
+    addons: product.addons.map((a) => ({
+      title: a.title,
+      price: Number(a.price),
+      isAvailable: a.isAvailable,
+    })),
+
+    metadata: Object.entries(
+      (product.details as Record<string, string>) || {},
+    ).map(([key, value]) => ({
+      key,
+      value,
+    })),
+
+    weight: product.weight ?? 0,
+    width: product.width ?? 0,
+    height: product.height ?? 0,
+    length: product.length ?? 0,
+  }
 }

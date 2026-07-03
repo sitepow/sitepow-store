@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { useCategoryOptions } from '@/actions/hooks/category'
@@ -19,7 +19,7 @@ import {
 export function CategoryField({ isPending }: { isPending: boolean }) {
   const {
     control,
-    setValue,
+    // setValue,
     formState: { errors },
   } = useFormContext<ProductFormValues>()
 
@@ -28,12 +28,12 @@ export function CategoryField({ isPending }: { isPending: boolean }) {
     storeId: storeId === 'all' ? undefined : storeId,
   })
 
-  useEffect(() => {
-    const noCategory = categories.find((c) => c.title === 'ไม่มีหมวดหมู่')
-    if (noCategory) {
-      setValue('categoryId', noCategory.id)
-    }
-  }, [categories, setValue])
+  // useEffect(() => {
+  //   const noCategory = categories.find((c) => c.title === 'ไม่มีหมวดหมู่')
+  //   if (noCategory) {
+  //     setValue('categoryId', noCategory.id)
+  //   }
+  // }, [categories, setValue])
 
   return (
     <Field>

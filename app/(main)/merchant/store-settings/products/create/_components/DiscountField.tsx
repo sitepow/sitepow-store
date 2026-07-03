@@ -26,7 +26,7 @@ export function DiscountField({ index }: { index: number }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between px-1">
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="space-y-0.5">
           <span className="text-sm font-medium">เปิดใช้งานส่วนลด</span>
         </div>

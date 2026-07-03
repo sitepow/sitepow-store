@@ -127,11 +127,11 @@ export function VariantItem({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
+          <div className="grid grid-cols-2 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
             <DiscountField index={index} />
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between px-1">
+              <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <div className="space-y-0.5">
                   <span className="text-sm font-medium">สะสมคะแนน</span>
                 </div>

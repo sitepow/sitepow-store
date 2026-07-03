@@ -47,7 +47,7 @@ export function ProductPreviewContent() {
           <p className="text-sm text-emerald-700">
             https://{selectedStoreSlug}.sitepow.store › products › {displaySlug}
           </p>
-          <p className="cursor-pointer text-xl text-purple-900 hover:underline">
+          <p className="cursor-pointer text-xl text-purple-600 hover:underline">
             {displayTitle}
           </p>
           <p className="line-clamp-2 text-sm opacity-60">{description}</p>
