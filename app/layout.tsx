@@ -1,22 +1,21 @@
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+// import { NextIntlClientProvider } from 'next-intl'
+// import { getMessages } from 'next-intl/server'
 import {
   Dancing_Script,
   IBM_Plex_Sans_Thai_Looped,
   Inter,
 } from 'next/font/google'
 
+import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
 import { SessionProviders } from '@/providers/SessionProviders'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
-
-import '../../globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
@@ -56,17 +55,17 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params,
+  // params,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ lng: string }>
+  // params: Promise<{ lng: string }>
 }>) {
-  const { lng } = await params
-  const messages = await getMessages({ locale: lng })
+  // const { lng } = await params
+  // const messages = await getMessages({ locale: lng })
 
   return (
     <html
-      lang={lng}
+      // lang={lng}
       className={cn(
         'h-full',
         'antialiased',
@@ -85,11 +84,11 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <NextIntlClientProvider locale={lng} messages={messages}>
-            <SessionProviders>
-              <QueryProviders>{children}</QueryProviders>
-            </SessionProviders>
-          </NextIntlClientProvider>
+          {/* <NextIntlClientProvider locale={lng} messages={messages}> */}
+          <SessionProviders>
+            <QueryProviders>{children}</QueryProviders>
+          </SessionProviders>
+          {/* </NextIntlClientProvider> */}
         </ThemeProvider>
       </body>
     </html>

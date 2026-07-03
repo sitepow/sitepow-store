@@ -125,5 +125,10 @@ export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'sandbox',
   'invite',
 ]
-export const SUPPORTED_LNGS = ['th', 'en']
+export const SUPPORTED_LNGS = ['th', 'en', 'cn']
+export const LANGUAGE_NAMES: Record<string, string> = {
+  th: 'ภาษาไทย',
+  en: 'English',
+  cn: '简体中文',
+}
 export const FALLBACK_IMAGE = '/images/navigation/navigation-header.jpeg'

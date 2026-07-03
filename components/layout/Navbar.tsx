@@ -126,6 +126,7 @@ export function Navbar() {
                 <Button className="font-bold">สมัครเปิดร้าน</Button>
               </Link>
               <ModeToggle buttonVariant="secondary" />
+              <LanguageSwitcher />
             </div>
           )}
 

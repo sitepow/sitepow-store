@@ -1,8 +1,11 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import {
+  usePathname,
+  // useRouter
+} from 'next/navigation'
 
-import { SUPPORTED_LNGS } from '@/constants/system'
+import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
 import { Languages } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -15,15 +18,15 @@ import {
 
 export function LanguageSwitcher() {
   const pathname = usePathname()
-  const router = useRouter()
+  // const router = useRouter()
 
   const currentLocale = pathname.split('/')[1]
 
   const switchLocale = (locale: string) => {
-    if (currentLocale === locale) return
-    const segments = pathname.split('/')
-    segments[1] = locale
-    router.push(segments.join('/'))
+    // if (currentLocale === locale) return
+    // const segments = pathname.split('/')
+    // segments[1] = locale
+    // router.push(segments.join('/'))
   }
 
   return (
@@ -41,7 +44,7 @@ export function LanguageSwitcher() {
             onClick={() => switchLocale(lng)}
             className={currentLocale === lng ? 'bg-accent' : ''}
           >
-            {lng === 'th' ? 'ภาษาไทย' : 'English'}
+            {LANGUAGE_NAMES[lng] || lng}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
