@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   IconBox,
   IconBuildingStore,
@@ -106,3 +107,18 @@ export const NAVBAR_ITEMS = [
   { title: 'ราคาและแพ็กเกจ', href: '/pricing' },
   { title: 'ติดต่อเรา', href: '/' },
 ]
+
+export const FEATURE_ICONS: Record<string, any> = {
+  'AI Product Listing': IconSparkles,
+  '0% GP Fee': IconPercentage,
+  'Smart Stock Management': IconBox,
+  'Professional Online Storefront': IconBuildingStore,
+  'Centralized Order Management': IconClipboardList,
+  'Deep Sales Analytics': IconChartBar,
+  'Flexible Payment System': IconCreditCard,
+  'Membership & CRM': IconUsers,
+  'Coupons & Flash Sales': IconTicket,
+  'Rapid Data Migration': IconDatabaseImport,
+  'All-in-One Shipping': IconTruckDelivery,
+  'Thermal Label Printing': IconClipboardList,
+}

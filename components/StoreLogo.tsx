@@ -3,6 +3,8 @@ import { ComponentProps } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { FALLBACK_IMAGE } from '@/constants/system'
+
 import { cn } from '@/lib/utils'
 
 interface StoreLogoProps extends Omit<ComponentProps<typeof Link>, 'href'> {
@@ -21,7 +23,7 @@ export function StoreLogo({ image, className, ...props }: StoreLogoProps) {
         height={80}
         alt="store-logo"
         unoptimized
-        src={image || '/images/navigation/navigation-header.jpeg'}
+        src={image || FALLBACK_IMAGE}
         className="size-full object-contain object-center"
       />
     </Link>

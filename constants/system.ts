@@ -125,3 +125,5 @@ export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'sandbox',
   'invite',
 ]
+export const SUPPORTED_LNGS = ['th', 'en']
+export const FALLBACK_IMAGE = '/images/navigation/navigation-header.jpeg'

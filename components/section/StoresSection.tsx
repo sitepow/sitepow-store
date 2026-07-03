@@ -67,7 +67,7 @@ export function StoresSection() {
               <Image
                 key={currentImage}
                 className="animate-in fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
-                src={currentImage}
+                src={currentImage ?? ''}
                 width={800}
                 height={800}
                 alt="store-preview-image"

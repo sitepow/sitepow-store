@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
+import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
@@ -29,6 +30,7 @@ import {
 import { cn } from '@/lib/utils'
 
 import { EmailVerified } from '../EmailVerified'
+import { LanguageSwitcher } from '../LanguageSwitcher'
 import { LogoBrand } from '../LogoBrand'
 import { ModeToggle } from '../ModeToggle'
 import { Separator } from '../ui/separator'
@@ -64,7 +66,7 @@ export function Navbar() {
       <header className="fixed top-0 left-0 z-50 w-full bg-neutral-900">
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <Image
-            src="/images/navigation/navigation-header.jpeg"
+            src={FALLBACK_IMAGE}
             alt="footer-background"
             width={800}
             height={800}
@@ -147,6 +149,7 @@ export function Navbar() {
                 </Button>
               )}
               <ModeToggle buttonVariant="secondary" />
+              <LanguageSwitcher />
             </div>
           )}
 
@@ -157,6 +160,7 @@ export function Navbar() {
 
             <div className="flex flex-wrap gap-2">
               <ModeToggle buttonVariant="secondary" />
+              <LanguageSwitcher />
               <Button
                 variant="secondary"
                 size="icon-lg"

@@ -1,6 +1,8 @@
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import {
   Dancing_Script,
   IBM_Plex_Sans_Thai_Looped,
@@ -14,7 +16,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-import './globals.css'
+import '../../globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
@@ -40,7 +42,6 @@ export const metadata: Metadata = {
     'ระบบหลังบ้านร้านค้า',
     'ขายของออนไลน์',
     'โปรแกรมสต็อกสินค้า',
-    'E-commerce Platform Thailand',
   ],
   robots: {
     index: false,
@@ -53,14 +54,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params: Promise<{ lng: string }>
 }>) {
+  const { lng } = await params
+  const messages = await getMessages({ locale: lng })
+
   return (
     <html
-      lang="th"
+      lang={lng}
       className={cn(
         'h-full',
         'antialiased',
@@ -79,9 +85,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <SessionProviders>
-            <QueryProviders>{children}</QueryProviders>
-          </SessionProviders>
+          <NextIntlClientProvider locale={lng} messages={messages}>
+            <SessionProviders>
+              <QueryProviders>{children}</QueryProviders>
+            </SessionProviders>
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

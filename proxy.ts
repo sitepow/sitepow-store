@@ -1,7 +1,11 @@
+import createIntlMiddleware from 'next-intl/middleware'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { UserRole } from './generated/prisma/enums'
+import { routing } from './i18n/routing'
 import { auth } from './lib/auth'
+
+const intlMiddleware = createIntlMiddleware(routing)
 
 export const config = {
   matcher: [
@@ -71,5 +75,5 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  return NextResponse.next()
+  return intlMiddleware(req)
 }
