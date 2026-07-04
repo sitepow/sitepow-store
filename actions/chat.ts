@@ -218,7 +218,18 @@ export async function sendMessage(
 }
 
 async function handleAiResponse(conversationId: string, content: string) {
-  const aiResult = await generateAiSupportAction(content)
+  const recentMessages = await prisma.message.findMany({
+    where: { conversationId },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  })
+
+  const formattedHistory = recentMessages
+    .reverse()
+    .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
+    .join('\n')
+
+  const aiResult = await generateAiSupportAction(content, formattedHistory)
 
   if (aiResult.success && aiResult.data) {
     const aiMessage = await prisma.message.create({

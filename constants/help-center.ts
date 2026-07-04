@@ -1,31 +1,27 @@
-export const PLATFORM_GUIDE = `
-1. จุดเด่นและปรัชญาการให้บริการ
-- จ่ายครั้งเดียว/ระบบคิดตามยอดขาย: ไม่มีขาย ไม่ต้องจ่าย ระบบจะหยุดเก็บค่าเช่าเมื่อยอดขายเป็นศูนย์
-- 0% GP: รับกำไรเต็ม 100% ไม่โดนหักส่วนแบ่งยอดขาย
-- พร้อม Scale: ระบบรองรับการขยายตัวของธุรกิจ และปลดล็อคฟีเจอร์ระดับสูงตามแพ็กเกจ
+export const PLATFORM_DATA = {
+  philosophy: `จุดเด่น: จ่ายตามยอดขาย (ไม่มีขายไม่ต้องจ่าย), 0% GP รับกำไรเต็ม, รองรับการขยายตัว`,
+  pricing: `แพ็กเกจ: Free (5 ชิ้น), Starter (490บ./50 ชิ้น), Pro (990บ./ไม่จำกัด/AI+Slip), Ultimate (1,990บ./CRM+Support)`,
+  features: `ฟีเจอร์: AI ตั้งชื่อ/หาของ, รับชำระ QR/Stripe, คำนวณค่าส่งอัจฉริยะ, รันบน AMD EPYC ปลอดภัยสูง`,
+  navigation: `เมนูจัดการ: จัดการร้านค้า, ออเดอร์, สต็อก/พนักงาน, เครดิต AI, ระบบตลาด, การตั้งค่า`,
+  logistics: `การขนส่ง: คำนวณตามโซนอัตโนมัติ (ใกล้/ไกล/ห่างไกล/เกาะ), รองรับขนส่งหลัก (Flash, Kerry, ฯลฯ)`,
+}
 
-2. แพ็กเกจการใช้งาน (Pricing)
-- Free: สำหรับร้านใหม่ เริ่มฟรีตลอดชีพ ลงสินค้าได้ 5 ชิ้น รับเงินโอนแบบ Manual
-- Starter: 490 บาท/เดือน ลงสินค้าได้ 50 ชิ้น พร้อมระบบพิมพ์ใบปะหน้ามาตรฐาน
-- Pro (Popular): 990 บาท/เดือน AI Vision/Visual Search (100 ครั้ง/เดือน), เช็คสลิปอัตโนมัติ, เชื่อมต่อ Stripe, ลงสินค้าไม่จำกัด
-- Ultimate: 1,990 บาท/เดือน ฟีเจอร์ครบพร้อมระบบ CRM/สะสมแต้ม และ Support 24 ชม.
+export function getRelevantInfo(userMessage: string): string {
+  const msg = userMessage.toLowerCase()
+  let info = ''
 
-3. ฟีเจอร์เด่น
-- AI Intelligence: AI ช่วยตั้งชื่อสินค้าและเขียน Sales Copy จากรูปภาพ และระบบ Visual Search ช่วยพนักงานหาของจากรูปภาพ
-- Payment: รองรับ QR PromptPay, เช็คสลิปอัตโนมัติ, รองรับการชำระผ่าน Stripe (บัตรเครดิต/ผ่อน)
-- Logistics: คำนวณค่าส่งอัจฉริยะ (Matrix), รองรับขนส่งหลัก (ไปรษณีย์ไทย, Flash, Kerry, SPX, Best, DHL), พิมพ์ใบปะหน้ามาตรฐาน พร้อมระบบ Tracking
-- Infrastructure: รันบน AMD EPYC™ (ReadyIDC), Next.js App Router, PostgreSQL + Prisma, Multi-tenant Architecture ปลอดภัย 100%
+  if (msg.includes('ราคา') || msg.includes('แพ็กเกจ') || msg.includes('จ่าย'))
+    info += PLATFORM_DATA.pricing + '\n'
+  if (
+    msg.includes('ฟีเจอร์') ||
+    msg.includes('ทำอะไรได้') ||
+    msg.includes('ai')
+  )
+    info += PLATFORM_DATA.features + '\n'
+  if (msg.includes('ขนส่ง') || msg.includes('ค่าส่ง'))
+    info += PLATFORM_DATA.logistics + '\n'
+  if (msg.includes('เมนู') || msg.includes('จัดการ'))
+    info += PLATFORM_DATA.navigation + '\n'
 
-4. โครงสร้างเมนูจัดการร้านค้า (Merchant Navigation)
-- จัดการร้านค้า: ข้อมูลร้าน, หมวดหมู่, สินค้า
-- จัดการออเดอร์: ดูสถานะ (รอชำระ, ชำระแล้ว, จัดส่งแล้ว, สำเร็จ, ยกเลิก)
-- คลังสินค้า/พนักงาน: บริหารจัดการสต็อกและทีมงาน
-- เครดิต AI: ติดตามการใช้งาน AI Vision/Search
-- การจัดการเครดิต: ประวัติการซื้อและการใช้งาน
-- ระบบตลาด: คูปองส่วนลด, แต้มสะสม
-- การตั้งค่า: ประวัติกิจกรรม (Audit Logs), จัดการสาขา, ตั้งค่าระบบ
-
-5. การจัดการขนส่ง (Logistics Details)
-- ระบบรองรับการคำนวณค่าส่งตามโซน (จังหวัดเดียวกัน, ภูมิภาคเดียวกัน, ข้ามภูมิภาค, พื้นที่ห่างไกล)
-- มีรายการพื้นที่ห่างไกลพิเศษ (เกาะ/ดอย/ชายแดนใต้) ให้ระบบคำนวณราคาที่เหมาะสมอัตโนมัติ
-`
+  return info || PLATFORM_DATA.philosophy
+}

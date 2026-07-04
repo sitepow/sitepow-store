@@ -263,7 +263,7 @@ export default function StoreCartPage() {
           </div>
 
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="bg-foreground/5 border-border flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
+            <div className="border-border flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
