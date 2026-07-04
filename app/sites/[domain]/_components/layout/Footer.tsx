@@ -21,7 +21,7 @@ export function StoreFooter() {
 
   return (
     <footer className="bg-background border-border text-foreground border-t">
-      <div className="container mx-auto px-5 py-12">
+      <div className="container mx-auto px-5 py-12 sm:px-10">
         <div className="flex flex-col gap-10 md:flex-row">
           <div className="max-w-sm">
             {store?.logo && <StoreLogo image={store?.logo} />}
