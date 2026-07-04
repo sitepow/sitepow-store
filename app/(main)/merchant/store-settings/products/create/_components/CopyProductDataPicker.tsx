@@ -10,9 +10,18 @@ import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
 import { IconCloudDownload } from '@tabler/icons-react'
+import { ChevronsUpDown } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -21,18 +30,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 type ProductPreview = Awaited<ReturnType<typeof getProductById>>
 
 export function CopyProductDataPicker({ storeId }: { storeId: string }) {
-  // ... (โค้ดส่วนที่เหลือของคุณเหมือนเดิม)
   const [open, setOpen] = useState(false)
+  const [popoverOpen, setPopoverOpen] = useState(false)
   const { setValue } = useFormContext<ProductFormValues>()
   const [previewData, setPreviewData] = useState<ProductPreview>(null)
   const [sourceId, setSourceId] = useState<string>('')
@@ -46,19 +53,27 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
   }
 
   const handleCopy = async () => {
-    if (!previewData) return
+    if (!previewData) {
+      return
+    }
 
     if (selectedFields.includes('basic')) {
-      setValue('title', previewData.title)
-      setValue('slug', `${previewData.slug}-copy`)
-      setValue('categoryId', previewData.categoryId)
+      setValue('title', previewData.title, {
+        shouldDirty: true,
+      })
+      setValue('slug', `${previewData.slug}-copy`, {
+        shouldDirty: true,
+      })
+      setValue('categoryId', previewData.categoryId, {
+        shouldDirty: true,
+      })
     }
 
     if (selectedFields.includes('metadata')) {
       const m = Object.entries(previewData.details || {}).map(
         ([key, value]) => ({ key, value: String(value) }),
       )
-      setValue('metadata', m)
+      setValue('metadata', m, { shouldDirty: true })
     }
 
     if (selectedFields.includes('variants') && previewData?.variants) {
@@ -83,15 +98,20 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
             amount: v.pointsAmount,
           },
         })),
+        { shouldDirty: true },
       )
     }
 
     if (selectedFields.includes('addons')) {
-      setValue('addons', previewData.addons)
+      setValue('addons', previewData.addons, {
+        shouldDirty: true,
+      })
     }
 
     if (selectedFields.includes('tags')) {
-      setValue('tags', previewData.tags.map((t) => t.name).join(', '))
+      setValue('tags', previewData.tags.map((t) => t.name).join(', '), {
+        shouldDirty: true,
+      })
     }
 
     toast.success('คัดลอกข้อมูลที่เลือกเรียบร้อย')
@@ -113,27 +133,46 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>คัดลอกข้อมูลสินค้า</DialogTitle>
+          <DialogTitle>คัดลอกข้อมูลสินค้าจาก</DialogTitle>
         </DialogHeader>
 
-        <Select
-          value={sourceId}
-          onValueChange={async (id) => {
-            setSourceId(id)
-            setPreviewData(await getProductById(id))
-          }}
-        >
-          <SelectTrigger className="w-full text-start whitespace-normal">
-            <SelectValue placeholder="เลือกสินค้าต้นแบบ" />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
-                {p.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full justify-between wrap-break-word whitespace-pre-line"
+            >
+              {sourceId
+                ? options.find((p) => p.id === sourceId)?.title
+                : 'ค้นหาสินค้าต้นแบบ...'}
+              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="max-w-100 p-0">
+            <Command>
+              <CommandInput placeholder="พิมพ์ชื่อสินค้าเพื่อค้นหา..." />
+              <CommandList>
+                <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
+                <CommandGroup>
+                  {options.map((p) => (
+                    <CommandItem
+                      key={p.id}
+                      value={p.title}
+                      onSelect={async () => {
+                        setSourceId(p.id)
+                        setPreviewData(await getProductById(p.id))
+                        setPopoverOpen(false)
+                      }}
+                    >
+                      {p.title}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
 
         {previewData && (
           <div className="grid gap-3 py-4">
@@ -148,7 +187,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
                     onCheckedChange={() => toggleField(field)}
                   />
                   <span className="text-sm font-medium">
-                    {FIELD_LABELS[field] || field}
+                    [คัดลอก] {FIELD_LABELS[field] || field}
                   </span>
                 </label>
               ),
