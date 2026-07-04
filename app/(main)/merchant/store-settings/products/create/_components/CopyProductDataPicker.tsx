@@ -31,6 +31,7 @@ import {
 type ProductPreview = Awaited<ReturnType<typeof getProductById>>
 
 export function CopyProductDataPicker({ storeId }: { storeId: string }) {
+  // ... (โค้ดส่วนที่เหลือของคุณเหมือนเดิม)
   const [open, setOpen] = useState(false)
   const { setValue } = useFormContext<ProductFormValues>()
   const [previewData, setPreviewData] = useState<ProductPreview>(null)
@@ -42,14 +43,10 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
-    if (!isOpen) {
-    }
   }
 
   const handleCopy = async () => {
-    if (!previewData) {
-      return
-    }
+    if (!previewData) return
 
     if (selectedFields.includes('basic')) {
       setValue('title', previewData.title)
@@ -126,7 +123,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
             setPreviewData(await getProductById(id))
           }}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full text-start whitespace-normal">
             <SelectValue placeholder="เลือกสินค้าต้นแบบ" />
           </SelectTrigger>
           <SelectContent>
