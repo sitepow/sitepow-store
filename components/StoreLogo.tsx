@@ -15,7 +15,7 @@ export function StoreLogo({ image, className, ...props }: StoreLogoProps) {
   return (
     <Link
       href="/"
-      className={cn('block h-20 w-fit max-w-50 overflow-hidden', className)}
+      className={cn('block h-14 w-fit max-w-50 overflow-hidden', className)}
       {...props}
     >
       <Image

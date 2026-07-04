@@ -74,14 +74,16 @@ export function CartItemCard({
           )}
 
           <div className="flex items-center gap-1">
-            {hasDiscount && (
-              <span className="text-muted-foreground text-xs line-through sm:text-sm">
-                {formatCurrency(originalUnitPrice * item.quantity)}
-              </span>
-            )}
-            <p className="text-primary text-sm font-bold sm:text-base">
-              {formatCurrency(item.totalPrice)}
-            </p>
+            <div className="flex flex-col">
+              {hasDiscount && (
+                <span className="text-muted-foreground text-xs line-through sm:text-sm">
+                  {formatCurrency(originalUnitPrice * item.quantity)}
+                </span>
+              )}
+              <p className="text-primary text-sm font-bold sm:text-base">
+                {formatCurrency(item.totalPrice)}
+              </p>
+            </div>
             {onRemove && (
               <Button
                 size="icon"

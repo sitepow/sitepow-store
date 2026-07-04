@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
+  'h-full rounded-xl transition-all border pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
   {
     variants: {
       variant: {
@@ -44,20 +44,23 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           )}
         </div>
 
-        <h3 className="group-hover:text-primary line-clamp-2 px-5">
+        <h3 className="group-hover:text-primary line-clamp-2 px-5 font-medium">
           {product.title}
         </h3>
 
         <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
           {hasDiscount ? (
-            <>
+            <div className="flex flex-col">
               <span className="text-muted-foreground text-sm line-through">
                 {formatCurrency(original?.min || 0)}
               </span>
-              <data value={net?.min} className="text-2xl font-bold">
+              <data
+                value={net?.min}
+                className="text-primary text-2xl font-bold"
+              >
                 {formatCurrency(net?.min || 0)}
               </data>
-            </>
+            </div>
           ) : (
             <data value={original?.min} className="text-2xl font-bold">
               {formatCurrency(original?.min || 0)}
