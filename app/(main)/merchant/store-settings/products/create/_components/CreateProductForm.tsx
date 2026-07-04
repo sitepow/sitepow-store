@@ -59,6 +59,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 import { CategoryField } from './CategoryField'
+import { CopyProductDataPicker } from './CopyProductDataPicker'
 import { ImageUploadSection } from './ImageUploadSection'
 import { ProductPreviewContent } from './ProductPreviewContent'
 import { ProductSlugField } from './ProductSlugField'
@@ -111,9 +112,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   useEffect(() => {
     if (product && product?.length !== 0) {
       const formValues = transformProductToFormValues(product)
-      form.reset(formValues)
+      reset(formValues, {
+        keepDirty: false,
+        keepValues: false,
+      })
     }
-  }, [product, form.reset, form])
+  }, [product, reset])
 
   const handleApplyPreset = (id: string) => {
     const preset = PRODUCT_PRESETS_MASTER.find((p) => p.id === id)
@@ -282,6 +286,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 <IconArrowForward /> {preset.label}
               </Button>
             ))}
+          {<CopyProductDataPicker storeId={selectedStoreId!} />}
           {isDirty && (
             <Button
               type="button"
@@ -292,10 +297,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               <IconX /> ล้างการตั้งค่า
             </Button>
           )}
-          <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-            {isCreating && <Spinner />}
-            บันทึกข้อมูล
-          </Button>
+          {!!isDirty && (
+            <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
+              {isCreating && <Spinner />}
+              บันทึกข้อมูล
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -356,7 +363,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             className="dark:bg-foreground/5 rounded-lg border p-4"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-              <FieldLegend className="text-lg font-bold">
+              {/* <FieldLegend className="text-lg font-bold">
+                Metadata (ข้อมูลทางเทคนิค)
+              </FieldLegend> */}
+              <FieldLegend variant="label" className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
               </FieldLegend>
               <Button

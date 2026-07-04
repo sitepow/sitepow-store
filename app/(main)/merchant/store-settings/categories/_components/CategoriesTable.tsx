@@ -9,7 +9,6 @@ import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
@@ -40,8 +39,7 @@ export function CategoriesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              {/* <TableHead>รหัสหมวดหมู่</TableHead> */}
-              <TableHead>รูปภาพหมวดหมู่</TableHead>
+              <TableHead>รหัสหมวดหมู่</TableHead>
               <TableHead>ชื่อหมวดหมู่</TableHead>
               <TableHead>คำอธิบาย</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
@@ -55,21 +53,8 @@ export function CategoriesTable() {
             ) : (
               categories.map((category) => (
                 <TableRow key={category.id}>
-                  {/* <TableCell>{category.id}</TableCell> */}
-                  <TableCell>
-                    <TableImage />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span>{category.title}</span>
-                      <span className="text-muted-foreground text-xs">
-                        รหัสหมวดหมู่: {category.id}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        slug: {category.slug}
-                      </span>
-                    </div>
-                  </TableCell>
+                  <TableCell>{category.id}</TableCell>
+                  <TableCell>{category.title}</TableCell>
                   <TableCell>
                     <span className="text-muted-foreground text-sm">
                       {category.description || '-'}

@@ -1,3 +1,4 @@
+import { ALL_STORES } from '@/stores/use-store-filter'
 import {
   queryOptions,
   useMutation,
@@ -10,6 +11,7 @@ import {
   GetProductsParams,
   createProduct,
   deleteProduct,
+  getProductOptions,
   getProducts,
   updateProduct,
 } from '../product'
@@ -82,4 +84,14 @@ export function useUpdateProduct() {
       })
     },
   })
+}
+
+export const useProductOptions = (storeId: string) => {
+  return useQuery(
+    queryOptions({
+      queryKey: productKeys.options(storeId),
+      queryFn: () => getProductOptions(storeId),
+      enabled: !!storeId && storeId !== ALL_STORES,
+    }),
+  )
 }

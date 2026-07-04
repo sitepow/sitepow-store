@@ -36,6 +36,7 @@ const inventorySelect = {
         select: {
           id: true,
           title: true,
+          slug: true,
         },
       },
     },

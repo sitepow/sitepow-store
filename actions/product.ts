@@ -457,3 +457,29 @@ export async function updateProduct(id: string, input: CreateProductInput) {
     return { success: false }
   }
 }
+
+export async function getProductOptions(storeId: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return []
+  }
+
+  try {
+    return await prisma.product.findMany({
+      where: {
+        storeId,
+        store: { ownerId: userId },
+      },
+      select: {
+        id: true,
+        title: true,
+      },
+      orderBy: { title: 'asc' },
+    })
+  } catch (error) {
+    console.error(error)
+    return []
+  }
+}

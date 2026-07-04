@@ -108,6 +108,11 @@ export default function MerchantDashboardPage() {
         {selectedStoreId !== ALL_STORES && (
           <div className="flex flex-wrap gap-2.5">
             <Button variant="outline" asChild>
+              <Link href="/merchant/settings" target="_blank">
+                ตั้งค่าร้านค้า <IconExternalLink />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link
                 href={`https://${selectedStoreSlug}.sitepow.store`}
                 target="_blank"

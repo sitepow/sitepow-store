@@ -9,4 +9,6 @@ export const productKeys = {
     categoryId?: string
   }) => [...productKeys.lists(), filters] as const,
   detail: (id: string) => [...productKeys.all, 'detail', id] as const,
+  options: (storeId: string) =>
+    [...productKeys.all, 'options', storeId] as const,
 }

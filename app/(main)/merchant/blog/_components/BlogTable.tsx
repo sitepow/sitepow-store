@@ -8,7 +8,6 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableImage } from '@/components/TableImage'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -41,7 +40,6 @@ export function BlogTable() {
           <TableHeader>
             <TableRow>
               <TableHead>รหัสบทความ</TableHead>
-              <TableHead>รูปภาพบทความ</TableHead>
               <TableHead>ชื่อบทความ</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>แท็ก</TableHead>
@@ -56,9 +54,6 @@ export function BlogTable() {
               blogs.map((blog) => (
                 <TableRow key={blog.id}>
                   <TableCell>{blog.id}</TableCell>
-                  <TableCell>
-                    <TableImage />
-                  </TableCell>
                   <TableCell>{blog.title}</TableCell>
                   <TableCell>{blog.slug}</TableCell>
                   <TableCell>

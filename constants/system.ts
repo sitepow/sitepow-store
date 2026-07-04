@@ -131,4 +131,11 @@ export const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English',
   cn: '简体中文',
 }
+export const FIELD_LABELS: Record<string, string> = {
+  basic: 'ข้อมูลพื้นฐาน (ชื่อ, slug, หมวดหมู่)',
+  metadata: 'Metadata (ข้อมูลทางเทคนิค)',
+  variants: 'ตัวเลือกสินค้า (Variants)',
+  addons: 'บริการเสริม (Addons)',
+  tags: 'แท็กสินค้า (Tags)',
+}
 export const FALLBACK_IMAGE = '/images/navigation/navigation-header.jpeg'
