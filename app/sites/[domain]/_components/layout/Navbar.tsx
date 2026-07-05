@@ -11,13 +11,7 @@ import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { getClientAuthUrl } from '@/utils/auth'
-import {
-  ChevronDownIcon,
-  LockKeyholeIcon,
-  Menu,
-  SearchIcon,
-  X,
-} from 'lucide-react'
+import { LockKeyholeIcon, Menu, SearchIcon, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
 import { ModeToggle } from '@/components/ModeToggle'
@@ -39,6 +33,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 
+import { CategoryDropdown } from '../CategoryDropdown'
 import { UserAvatarDropdown } from '../UserAvatarDropdown'
 import { CartDrawer } from '../cart/CartDrawer'
 
@@ -120,10 +115,7 @@ export function StoreNavbar() {
           </div>
 
           <div className="hidden items-center justify-between lg:flex">
-            <Button variant="outline">
-              <span>หมวดหมู่สินค้า</span>
-              <ChevronDownIcon />
-            </Button>
+            <CategoryDropdown storeSlug={'faos'} />
 
             <NavigationMenu>
               <NavigationMenuList>
@@ -176,13 +168,7 @@ export function StoreNavbar() {
               </Button>
             </ButtonGroup>
 
-            <Button
-              variant="secondary"
-              className="w-full justify-between py-7 text-lg font-bold"
-            >
-              <span>หมวดหมู่สินค้า</span>
-              <ChevronDownIcon />
-            </Button>
+            <CategoryDropdown storeSlug="faos" />
 
             <Separator />
 
