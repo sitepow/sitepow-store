@@ -22,6 +22,11 @@ export const config = {
 
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl
+
+  if (url.pathname.startsWith('/_next/server-action')) {
+    return NextResponse.next()
+  }
+
   const host = req.headers.get('host') || ''
 
   const hostname = host
