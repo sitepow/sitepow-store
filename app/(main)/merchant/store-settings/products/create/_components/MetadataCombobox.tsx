@@ -3,9 +3,8 @@
 import * as React from 'react'
 
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronDownIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -37,15 +36,19 @@ export function MetadataCombobox({ value, onChange }: Props) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          size="lg"
-          className="w-full justify-between wrap-break-word whitespace-pre-line"
+        <button
+          className={cn(
+            'border-input bg-input/30 flex w-24 items-center justify-between gap-1.5 rounded-4xl border px-3 py-2 text-sm whitespace-nowrap transition-colors outline-none sm:w-full',
+            'focus-visible:border-ring focus-visible:ring-ring/50 h-9 focus-visible:ring-[3px]',
+            !value && 'text-muted-foreground',
+            'hover:bg-input/50',
+          )}
         >
-          {value ? selectedLabel : 'เลือกคุณสมบัติ...'}
-          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-        </Button>
+          <span className="line-clamp-1 flex items-center gap-1.5">
+            {selectedLabel || 'เลือกคุณสมบัติ...'}
+          </span>
+          <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-75 p-0">
         <Command>

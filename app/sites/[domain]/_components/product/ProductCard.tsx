@@ -51,15 +51,15 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
         <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
           {hasDiscount ? (
             <div className="flex flex-col">
-              <span className="text-muted-foreground text-sm line-through">
-                {formatCurrency(original?.min || 0)}
-              </span>
               <data
                 value={net?.min}
                 className="text-primary text-2xl font-bold"
               >
                 {formatCurrency(net?.min || 0)}
               </data>
+              <span className="text-muted-foreground text-sm line-through">
+                {formatCurrency(original?.min || 0)}
+              </span>
             </div>
           ) : (
             <data value={original?.min} className="text-2xl font-bold">

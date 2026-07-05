@@ -10,8 +10,8 @@ import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
-import { IconArrowDown } from '@tabler/icons-react'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { IconArrowForward } from '@tabler/icons-react'
+import { Check, ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -155,7 +155,8 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconArrowDown className="mr-2 size-4" /> คัดลอกข้อมูลสินค้า
+          <IconArrowForward className="mr-2 size-4" />{' '}
+          คัดลอกข้อมูลสินค้าในฐานข้อมูล
         </Button>
       </DialogTrigger>
       <DialogContent className="flex min-h-96 flex-col">
@@ -165,16 +166,21 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
 
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full justify-between wrap-break-word whitespace-pre-line"
+            <button
+              className={cn(
+                'border-input bg-input/30 flex items-center justify-between gap-1.5 rounded-4xl border px-3 py-2 text-sm whitespace-nowrap transition-colors outline-none sm:w-full',
+                'focus-visible:border-ring focus-visible:ring-ring/50 h-9 focus-visible:ring-[3px]',
+                !sourceId && 'text-muted-foreground',
+                'hover:bg-input/50',
+              )}
             >
-              {sourceId
-                ? options.find((p) => p.id === sourceId)?.title
-                : 'ค้นหาสินค้าต้นแบบ...'}
-              <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
-            </Button>
+              <span className="line-clamp-1 flex items-center gap-1.5">
+                {sourceId
+                  ? options.find((p) => p.id === sourceId)?.title
+                  : 'ค้นหาสินค้าต้นแบบ...'}
+              </span>
+              <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
+            </button>
           </PopoverTrigger>
           <PopoverContent className="max-w-100 p-0">
             <Command>

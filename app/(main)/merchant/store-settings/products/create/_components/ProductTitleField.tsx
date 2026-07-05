@@ -7,7 +7,7 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { ProductFormValues } from '@/zod/product'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 function toSlug(str: string) {
   return str
@@ -37,7 +37,7 @@ export function ProductTitleField({ isPending }: { isPending: boolean }) {
   return (
     <Field>
       <FieldLabel>ชื่อสินค้า</FieldLabel>
-      <Input
+      <Textarea
         placeholder="เช่น เสื้อยืดลายพิเศษ"
         {...register('title')}
         disabled={isPending}
