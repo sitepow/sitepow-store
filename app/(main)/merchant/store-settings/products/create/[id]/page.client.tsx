@@ -1,7 +1,10 @@
 'use client'
 
+import { useState } from 'react'
+
 import Link from 'next/link'
 
+import { BranchCreateDialog } from '@/app/(main)/merchant/organization-branches/_components/BranchCreateDialog'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -14,8 +17,7 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Button } from '@/components/ui/button'
 
-import { BranchCreateDialog } from '../../../../organization-branches/_components/BranchCreateDialog'
-import { CategoryCreateDialog } from '../../../categories/_components/CategoryCreateDialog'
+import { CategoryDialog } from '../../../categories/_components/CategoryDialog'
 import { CreateProductForm } from '../_components/CreateProductForm'
 
 interface StoreAdminProductNewClientProps {
@@ -25,6 +27,7 @@ interface StoreAdminProductNewClientProps {
 export function StoreAdminProductNewClient({
   productId,
 }: StoreAdminProductNewClientProps) {
+  const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
   const isMounted = useIsMounted()
 
@@ -47,7 +50,7 @@ export function StoreAdminProductNewClient({
             </Button>
             {selectedStoreId !== ALL_STORES && (
               <>
-                <CategoryCreateDialog />
+                <CategoryDialog open={open} setOpen={setOpen} />
                 <BranchCreateDialog />
               </>
             )}

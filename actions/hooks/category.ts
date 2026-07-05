@@ -11,6 +11,7 @@ import {
   createCategory,
   deleteCategory,
   getCategories,
+  getCategory,
   getCategoryOptions,
   updateCategory,
 } from '../category'
@@ -92,4 +93,14 @@ export function useDeleteCategory() {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all })
     },
   })
+}
+
+export function useCategory(id: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: categoryKeys.detail(id),
+      queryFn: async () => await getCategory(id),
+      enabled: !!id,
+    }),
+  )
 }

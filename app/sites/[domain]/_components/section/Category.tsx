@@ -1,10 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 'use client'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useLandingImages } from '@/hooks/use-landing-images'
-
-// import { useRandomGradient } from '@/hooks/use-random-gradient'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -29,7 +29,6 @@ export function CategorySection({
 }: CategorySectionProps) {
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
-  // const fallbackGradient = useRandomGradient()
   const { emblaRef } = useCarousel()
 
   if (products.length === 0) {
@@ -44,7 +43,7 @@ export function CategorySection({
         ) : (
           <div className="border-border relative h-48 w-full shrink-0 rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-96">
             <div className="absolute inset-0 z-0">
-              <div
+              <img
                 key={currentImage}
                 className="animate-in fade-in relative size-full rounded-xl bg-cover bg-center opacity-40 duration-1000"
                 style={{
@@ -52,7 +51,10 @@ export function CategorySection({
                     ? `url('${image}')`
                     : `url('${currentImage}')`,
                 }}
-              ></div>
+                onError={(e) => {
+                  e.currentTarget.src = currentImage
+                }}
+              />
             </div>
 
             <div className="absolute inset-0 rounded-xl bg-black/20" />

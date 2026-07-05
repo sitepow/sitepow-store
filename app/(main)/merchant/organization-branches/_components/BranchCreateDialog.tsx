@@ -96,7 +96,7 @@ export function BranchCreateDialog() {
           </Field>
         </div>
 
-        <DialogFooter className="mt-2 flex gap-2 border-t pt-4">
+        <DialogFooter className="gap-2">
           <Button
             variant="outline"
             onClick={handleClose}

@@ -20,7 +20,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function CategoriesTable() {
+interface CategoriesTableProps {
+  onEdit: (id: string) => void
+}
+
+export function CategoriesTable({ onEdit }: CategoriesTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -61,7 +65,11 @@ export function CategoriesTable() {
                     </span>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
-                    <Button variant="outline" size="icon-lg">
+                    <Button
+                      variant="outline"
+                      size="icon-lg"
+                      onClick={() => onEdit(category.id)}
+                    >
                       <IconEdit />
                     </Button>
                     <DeleteButton

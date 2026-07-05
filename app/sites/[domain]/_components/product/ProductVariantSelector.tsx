@@ -60,7 +60,7 @@ export function ProductVariantSelector() {
                     <div className="flex flex-1 flex-col gap-0.5">
                       <Label
                         htmlFor={variant.id}
-                        className="cursor-pointer font-medium"
+                        className="cursor-pointer font-medium sm:w-1/2"
                       >
                         {variant.title}
                       </Label>

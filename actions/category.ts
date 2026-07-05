@@ -1,9 +1,13 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
+
+import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
+import { r2DeleteImage } from './r2'
 
 const categorySelect = {
   id: true,
@@ -54,6 +58,24 @@ const categoryDropdownSelect = {
 export type GetCategoryOptionsItem = Prisma.CategoryGetPayload<{
   select: typeof categoryDropdownSelect
 }>
+
+export async function getCategory(id: string) {
+  try {
+    if (!id) {
+      return null
+    }
+
+    const category = await prisma.category.findUnique({
+      where: { id },
+      select: categorySelect,
+    })
+
+    return category
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
 
 export async function getCategories({
   page = 1,
@@ -168,18 +190,33 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       return { success: false, message: 'ไม่พบ Category ID' }
     }
 
-    const updated = await prisma.category.update({ where: { id }, data: input })
+    const category = await prisma.category.update({
+      where: { id },
+      data: input,
+      select: {
+        store: {
+          select: {
+            id: true,
+            slug: true,
+          },
+        },
+      },
+    })
 
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
-      storeId: updated.storeId,
+      storeId: category.store.id,
       entity: 'Category',
       entityId: id,
       details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
-    return { success: true, data: updated }
+    if (category) {
+      await invalidateStorefrontCategoryCache(category.store.slug)
+    }
+
+    return { success: true, data: category }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -194,8 +231,22 @@ export async function deleteCategory(id: string) {
 
     const category = await prisma.category.findUnique({
       where: { id },
-      select: { storeId: true, title: true },
+      select: {
+        storeId: true,
+        store: { select: { slug: true } },
+        title: true,
+        image: true,
+      },
     })
+
+    if (!category) {
+      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
+    }
+
+    if (category.image) {
+      const oldKey = getPathR2FromUrl(category.image)
+      await r2DeleteImage(oldKey)
+    }
 
     await prisma.category.delete({ where: { id } })
 
@@ -207,6 +258,10 @@ export async function deleteCategory(id: string) {
       entityId: id,
       details: { title: category?.title, type: 'deleted' },
     })
+
+    if (category) {
+      await invalidateStorefrontCategoryCache(category.store.slug)
+    }
 
     return { success: true, message: 'ลบหมวดหมู่สำเร็จ' }
   } catch (error) {

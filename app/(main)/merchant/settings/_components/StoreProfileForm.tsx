@@ -9,6 +9,7 @@ import {
 } from '@/actions/hooks/store-profile'
 import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { getPathR2FromUrl } from '@/utils/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBuildingStore } from '@tabler/icons-react'
@@ -93,7 +94,7 @@ export function StoreProfileForm() {
 
     if (values.logo instanceof File) {
       if (storeProfile?.logo) {
-        const oldKey = storeProfile.logo.split('/').slice(-2).join('/')
+        const oldKey = getPathR2FromUrl(storeProfile.logo)
         await r2DeleteImage(oldKey)
       }
 

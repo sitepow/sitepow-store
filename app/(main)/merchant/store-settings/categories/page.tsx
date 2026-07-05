@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconCategory } from '@tabler/icons-react'
 
@@ -8,9 +10,24 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { CategoriesTable } from './_components/CategoriesTable'
-import { CategoryCreateDialog } from './_components/CategoryCreateDialog'
+import { CategoryDialog } from './_components/CategoryDialog'
 
 export default function MerchantStoreSettingsCategoriesPage() {
+  const [selectedCategoryId, setSelectedCategoryId] = useState<
+    string | undefined
+  >()
+  const [open, setOpen] = useState(false)
+
+  const handleEdit = (id: string) => {
+    setSelectedCategoryId(id)
+    setOpen(true)
+  }
+
+  const handleAdd = () => {
+    setSelectedCategoryId(undefined)
+    setOpen(true)
+  }
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -20,11 +37,16 @@ export default function MerchantStoreSettingsCategoriesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <CategoryCreateDialog />
+            <CategoryDialog
+              categoryId={selectedCategoryId}
+              open={open}
+              setOpen={setOpen}
+              onAdd={handleAdd}
+            />
           </div>
         }
       />
-      <CategoriesTable />
+      <CategoriesTable onEdit={handleEdit} />
     </DashboardSidebar>
   )
 }

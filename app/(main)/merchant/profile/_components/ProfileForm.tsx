@@ -5,6 +5,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
 import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { getPathR2FromUrl } from '@/utils/image'
 import { UpdateProfileSchema } from '@/zod/profile'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
@@ -59,7 +60,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
 
     if (values.image instanceof File) {
       if (profile?.image) {
-        const oldKey = profile.image.split('/').slice(-2).join('/')
+        const oldKey = getPathR2FromUrl(profile.image)
         await r2DeleteImage(oldKey)
       }
 

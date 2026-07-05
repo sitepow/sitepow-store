@@ -28,7 +28,7 @@ export function CartItemCard({
           <h4 className="text-sm leading-tight font-medium sm:text-base">
             {item.productTitle}
           </h4>
-          <p className="text-muted-foreground mt-0.5 text-[11px] sm:text-xs">
+          <p className="text-primary mt-0.5 text-[11px] sm:text-xs">
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}

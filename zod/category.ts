@@ -11,7 +11,7 @@ export const createCategorySchema = z.object({
       message: 'URL ต้องประกอบด้วยตัวอักษร ตัวเลข หรือเครื่องหมายขีดเท่านั้น',
     }),
   description: z.string().optional().or(z.literal('')),
-  image: z.string().optional().or(z.literal('')),
+  image: z.any().optional(),
 })
 
 export type CreateCategoryFormValues = z.input<typeof createCategorySchema>
