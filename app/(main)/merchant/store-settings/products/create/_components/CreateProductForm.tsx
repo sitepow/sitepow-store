@@ -47,20 +47,12 @@ import {
   FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
 import { CategoryField } from './CategoryField'
 import { CopyProductDataPicker } from './CopyProductDataPicker'
 import { ImageUploadSection } from './ImageUploadSection'
+import { MetadataCombobox } from './MetadataCombobox'
 import { ProductPreviewContent } from './ProductPreviewContent'
 import { ProductSlugField } from './ProductSlugField'
 import { ProductTitleField } from './ProductTitleField'
@@ -268,7 +260,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           </Button>{' '}
           <Button
             type="button"
-            variant={showPresets ? 'secondary' : 'default'}
+            variant="outline"
             onClick={() => setShowPresets(!showPresets)}
           >
             {showPresets ? <IconX /> : <IconArrowForward />}
@@ -389,26 +381,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                       control={form.control}
                       name={`metadata.${index}.key`}
                       render={({ field: selectField }) => (
-                        <Select
-                          onValueChange={selectField.onChange}
-                          value={selectField.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="เลือกคุณสมบัติ" />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-75">
-                            {PRODUCT_METADATA_MASTER.map((group) => (
-                              <SelectGroup key={group.category}>
-                                <SelectLabel>{group.category}</SelectLabel>
-                                {group.fields.map((item) => (
-                                  <SelectItem key={item.key} value={item.key}>
-                                    {item.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <MetadataCombobox
+                          value={selectField.value!}
+                          onChange={selectField.onChange}
+                        />
                       )}
                     />
                   </div>

@@ -475,6 +475,11 @@ export async function getProductOptions(storeId: string) {
       select: {
         id: true,
         title: true,
+        category: {
+          select: {
+            title: true,
+          },
+        },
       },
       orderBy: { title: 'asc' },
     })

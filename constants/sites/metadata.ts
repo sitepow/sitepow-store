@@ -237,4 +237,50 @@ export const PRODUCT_METADATA_MASTER = [
       { key: 'fire_retardant', label: 'คุณสมบัติการทนไฟ / ไม่ลามไฟ' },
     ],
   },
+  {
+    category: 'การจัดการและการใช้งาน',
+    fields: [
+      { key: 'usage_instructions', label: 'วิธีใช้งาน / วิธีติดตั้ง' },
+      { key: 'maintenance_instructions', label: 'วิธีดูแลรักษา / ทำความสะอาด' },
+      {
+        key: 'storage_conditions',
+        label: 'วิธีเก็บรักษา / ข้อควรระวังในการจัดเก็บ',
+      },
+      { key: 'warning_labels', label: 'ข้อควรระวัง / คำเตือนด้านความปลอดภัย' },
+      { key: 'troubleshooting', label: 'การแก้ไขปัญหาเบื้องต้น' },
+      {
+        key: 'disposal_instructions',
+        label: 'วิธีทิ้ง / การกำจัดเมื่อหมดอายุการใช้งาน',
+      },
+    ],
+  },
+  {
+    category: 'รายละเอียดอาหารและโภชนาการ',
+    fields: [
+      { key: 'ingredients_list', label: 'ส่วนประกอบหลัก' },
+      { key: 'nutrition_facts', label: 'ข้อมูลทางโภชนาการ (ต่อหน่วยบริโภค)' },
+      { key: 'serving_size', label: 'ปริมาณต่อหน่วยบริโภค' },
+      { key: 'calories', label: 'พลังงาน (แคลอรี)' },
+      {
+        key: 'taste_profile',
+        label: 'ลักษณะรสชาติ (เช่น หวาน, เปรี้ยว, เผ็ด)',
+      },
+      {
+        key: 'texture_mouthfeel',
+        label: 'เนื้อสัมผัส (เช่น กรอบ, นุ่ม, หนึบ)',
+      },
+      {
+        key: 'storage_temperature',
+        label: 'อุณหภูมิที่ควรเก็บรักษา (เช่น แช่เย็น, เก็บในอุณหภูมิห้อง)',
+      },
+      {
+        key: 'serving_suggestion',
+        label: 'คำแนะนำในการรับประทาน / เมนูที่แนะนำ',
+      },
+      {
+        key: 'country_of_origin_ingredients',
+        label: 'แหล่งกำเนิดวัตถุดิบหลัก',
+      },
+    ],
+  },
 ]
