@@ -1,4 +1,4 @@
-import { StoreAdminProductNewClient } from './page.client'
+import { ProductCreateClient } from '../_components/ProductCreateClient'
 
 export default async function StoreAdminProductUpdate({
   params,
@@ -7,5 +7,5 @@ export default async function StoreAdminProductUpdate({
 }) {
   const { id } = await params
 
-  return <StoreAdminProductNewClient productId={id} />
+  return <ProductCreateClient productId={id} />
 }

@@ -20,13 +20,11 @@ import { Button } from '@/components/ui/button'
 import { CategoryDialog } from '../../../categories/_components/CategoryDialog'
 import { CreateProductForm } from '../_components/CreateProductForm'
 
-interface StoreAdminProductNewClientProps {
+interface ProductCreateClientProps {
   productId?: string
 }
 
-export function StoreAdminProductNewClient({
-  productId,
-}: StoreAdminProductNewClientProps) {
+export function ProductCreateClient({ productId }: ProductCreateClientProps) {
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
   const isMounted = useIsMounted()

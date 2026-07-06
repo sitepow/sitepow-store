@@ -2,7 +2,11 @@ import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
   allowedDevOrigins: ['lvh.me', '*.lvh.me'],
   images: {
     remotePatterns: [new URL('https://images.sitepow.store/**')],
