@@ -51,7 +51,7 @@ export const productFormSchema = z.object({
   categoryId: z.string().min(1, { message: 'กรุณาเลือกหมวดหมู่' }),
   images: z.array(
     z.object({
-      url: z.string(),
+      url: z.union([z.string(), z.instanceof(File)]),
     }),
   ),
   variants: z

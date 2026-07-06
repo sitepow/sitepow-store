@@ -101,7 +101,7 @@ export function StoreProfileForm() {
       const formData = new FormData()
       formData.append('file', values.logo)
 
-      const res = await r2UploadImage(formData, `store/${selectedStoreId}`)
+      const res = await r2UploadImage(formData, `store/${selectedStoreId}/logo`)
       if (res.success) {
         logoUrl = res.url
       }

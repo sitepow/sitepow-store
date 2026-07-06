@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
@@ -30,16 +31,39 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
+  const primaryImage = product.images?.[0]
+  const isVideo = primaryImage?.url.match(/\.(mp4|webm|ogg)$/i)
+
   return (
     <Link href={`/products/${product.slug}`}>
       <div className={cn(productCardVariants({ variant }), className)}>
-        <div className="relative">
-          <div className="bg-foreground/20 mb-2.5 h-52 w-full rounded-xl" />
+        <div className="relative overflow-hidden rounded-t-xl">
+          {primaryImage ? (
+            <div className="mb-2.5 h-52 w-full overflow-hidden">
+              {isVideo ? (
+                <video
+                  src={primaryImage.url}
+                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  muted
+                  playsInline
+                />
+              ) : (
+                <img
+                  src={primaryImage.url}
+                  alt={product.title}
+                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
+            </div>
+          ) : (
+            <div className="bg-foreground/20 text-muted-foreground mb-2.5 flex h-52 w-full items-center justify-center rounded-t-xl">
+              ไม่มีรูปภาพ
+            </div>
+          )}
+
           {hasDiscount && (
             <Badge className="absolute top-0 right-0 size-12 rounded-full text-center">
-              ลด
-              <br />
-              {maxDiscountPercent}%
+              -{maxDiscountPercent}%
             </Badge>
           )}
         </div>

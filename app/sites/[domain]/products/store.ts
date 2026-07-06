@@ -27,6 +27,9 @@ interface ProductStore {
   getVariantPrice: (variant: StorefrontVariant) => number
   getTotalPrice: () => number
   getCurrentPoints: () => number
+
+  activeImageIndex: number
+  setActiveImageIndex: (index: number) => void
 }
 
 export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
@@ -141,4 +144,7 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
     }
     return selectedVariant.pointsAmount * quantity
   },
+
+  activeImageIndex: 0,
+  setActiveImageIndex: (index) => set({ activeImageIndex: index }),
 }))

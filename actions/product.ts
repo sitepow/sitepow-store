@@ -3,12 +3,14 @@
 import { invalidateStorefrontProductCache } from '@/actions/query-keys/storefront/invalidation/product'
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
+import { r2DeleteImage } from './r2'
 
 export interface CreateProductInput {
   storeId: string
@@ -302,11 +304,23 @@ export async function deleteProduct(id: string) {
         title: true,
         storeId: true,
         store: { select: { slug: true } },
+        images: { select: { url: true } },
       },
     })
 
     if (!product) {
       return { success: false, message: 'ไม่พบสินค้า หรือคุณไม่มีสิทธิ์ลบ' }
+    }
+
+    if (product.images && product.images.length > 0) {
+      await Promise.all(
+        product.images.map(async (img) => {
+          const key = getPathR2FromUrl(img.url)
+          if (key) {
+            await r2DeleteImage(key)
+          }
+        }),
+      )
     }
 
     await prisma.product.delete({ where: { id } })

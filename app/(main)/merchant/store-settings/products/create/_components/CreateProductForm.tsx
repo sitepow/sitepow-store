@@ -19,10 +19,12 @@ import {
   useUpdateProduct,
 } from '@/actions/hooks/product'
 import { CreateProductInput, createProduct } from '@/actions/product'
+import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
 // import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
@@ -154,10 +156,44 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     name: 'metadata',
   })
 
-  const onSubmit = (data: ProductFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
     if (!selectedStoreId || selectedStoreId === ALL_STORES) {
       return
     }
+
+    const oldImageUrls = product?.images.map((img) => img.url) || []
+
+    const newImages = await Promise.all(
+      data.images.map(async (img) => {
+        if (img.url instanceof File) {
+          const formData = new FormData()
+          formData.append('file', img.url)
+          const res = await r2UploadImage(
+            formData,
+            `store/${selectedStoreId}/products`,
+          )
+          return res.success ? res.url : null
+        }
+        return img.url
+      }),
+    )
+
+    const finalImageUrls = newImages.filter(
+      (url): url is string => url !== null,
+    )
+
+    const imagesToDelete = oldImageUrls.filter(
+      (url) => !finalImageUrls.includes(url),
+    )
+
+    await Promise.all(
+      imagesToDelete.map(async (url) => {
+        const path = getPathR2FromUrl(url)
+        if (path) {
+          await r2DeleteImage(path)
+        }
+      }),
+    )
 
     const payload: CreateProductInput = {
       storeId: selectedStoreId,
@@ -165,7 +201,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       title: data.title,
       slug: data.slug,
       tags: data.tags,
-      // images: data.images,
+      images: finalImageUrls,
       variants: data.variants.map((v) => ({
         title: v.title,
         price: v.price,

@@ -67,7 +67,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
       const formData = new FormData()
       formData.append('file', values.image)
 
-      const res = await r2UploadImage(formData, `user/${profile?.id}`)
+      const res = await r2UploadImage(formData, `user/${profile?.id}/profile`)
       if (res.success) {
         imageUrl = res.url
       }

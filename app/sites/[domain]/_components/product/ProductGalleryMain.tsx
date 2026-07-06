@@ -1,13 +1,47 @@
+/* eslint-disable @next/next/no-img-element */
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../products/store'
 
 export function ProductGalleryMain() {
-  const isLoading = useProductPurchaseStore((s) => s.isLoading)
+  const { product, isLoading, activeImageIndex } = useProductPurchaseStore()
+
+  const isVideo = (url: string) => url.match(/\.(mp4|webm|ogg)$/i)
+  const activeImage = product?.images?.[activeImageIndex]
 
   if (isLoading) {
-    return <Skeleton className="h-96 w-full rounded-xl" />
+    return (
+      <Skeleton className="aspect-square w-full rounded-xl md:aspect-4/3" />
+    )
   }
 
-  return <div className="bg-foreground/20 h-96 rounded-xl" />
+  if (!activeImage) {
+    return (
+      <div className="bg-muted flex aspect-square w-full items-center justify-center rounded-xl md:aspect-4/3">
+        ไม่มีรูปภาพ
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-foreground/5 border-border/50 flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl border md:aspect-4/3">
+      {isVideo(activeImage.url) ? (
+        <video
+          key={activeImage.url}
+          src={activeImage.url}
+          className="size-full object-contain"
+          controls
+          autoPlay
+          muted
+        />
+      ) : (
+        <img
+          key={activeImage.url}
+          src={activeImage.url}
+          alt="Main Product"
+          className="size-full object-contain"
+        />
+      )}
+    </div>
+  )
 }
