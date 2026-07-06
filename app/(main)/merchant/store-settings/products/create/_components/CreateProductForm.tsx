@@ -258,11 +258,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             )}
             {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
           </Button>{' '}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowPresets(!showPresets)}
-          >
+          <Button type="button" onClick={() => setShowPresets(!showPresets)}>
             {showPresets ? <IconX /> : <IconArrowForward />}
             {showPresets ? 'ปิดตัวอย่างสินค้า' : 'โหลดข้อมูลสินค้าตัวอย่าง'}
           </Button>

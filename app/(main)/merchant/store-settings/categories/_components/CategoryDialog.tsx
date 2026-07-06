@@ -16,7 +16,7 @@ import { CreateCategoryFormValues, createCategorySchema } from '@/zod/category'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 
-import { ImageUpload } from '@/components/ImageUpload'
+import { FileUpload } from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -149,7 +149,7 @@ export function CategoryDialog({
           <div className="grid gap-4">
             <Field>
               <FieldLabel>รูปภาพหมวดหมู่</FieldLabel>
-              <ImageUpload name="image" />
+              <FileUpload name="image" />
             </Field>
             <Field>
               <FieldLabel>ชื่อหมวดหมู่</FieldLabel>

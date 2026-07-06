@@ -115,7 +115,7 @@ export function StoreNavbar() {
           </div>
 
           <div className="hidden items-center justify-between lg:flex">
-            <CategoryDropdown storeSlug={'faos'} />
+            <CategoryDropdown storeSlug={store?.slug} />
 
             <NavigationMenu>
               <NavigationMenuList>
@@ -168,7 +168,7 @@ export function StoreNavbar() {
               </Button>
             </ButtonGroup>
 
-            <CategoryDropdown storeSlug="faos" />
+            <CategoryDropdown storeSlug={store?.slug} />
 
             <Separator />
 

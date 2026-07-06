@@ -1,5 +1,5 @@
-/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 'use client'
 
 import { useEffect, useRef } from 'react'
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 
 import { cn } from '@/lib/utils'
 
-export function ImageUpload({
+export function FileUpload({
   name,
   className,
 }: {
@@ -21,9 +21,14 @@ export function ImageUpload({
 }) {
   const { setValue, watch } = useFormContext()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const image = watch(name)
+  const fileValue = watch(name)
 
-  const previewUrl = image instanceof File ? URL.createObjectURL(image) : image
+  const isVideo =
+    (fileValue instanceof File && fileValue.type.startsWith('video/')) ||
+    (typeof fileValue === 'string' && fileValue.match(/\.(mp4|webm|ogg)$/i))
+
+  const previewUrl =
+    fileValue instanceof File ? URL.createObjectURL(fileValue) : fileValue
 
   useEffect(() => {
     return () => {
@@ -42,16 +47,25 @@ export function ImageUpload({
     >
       {previewUrl ? (
         <div className="relative size-full">
-          <img
-            src={previewUrl}
-            className="size-full object-cover object-center"
-            onError={(e) => {
-              e.currentTarget.src = FALLBACK_IMAGE
-            }}
-          />
+          {isVideo ? (
+            <video
+              src={previewUrl}
+              className="size-full object-cover"
+              muted
+              playsInline
+            />
+          ) : (
+            <img
+              src={previewUrl}
+              className="size-full object-cover object-center"
+              onError={(e) => {
+                e.currentTarget.src = FALLBACK_IMAGE
+              }}
+            />
+          )}
           <button
             type="button"
-            className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white"
+            className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70"
             onClick={() => setValue(name, '')}
           >
             <IconX size={14} />
@@ -61,6 +75,7 @@ export function ImageUpload({
         <Button
           type="button"
           variant="ghost"
+          size="icon-lg"
           onClick={() => fileInputRef.current?.click()}
         >
           <IconCamera size={24} />
@@ -70,7 +85,7 @@ export function ImageUpload({
         type="file"
         ref={fileInputRef}
         className="hidden"
-        accept="image/*"
+        accept="image/*,video/*"
         onChange={(e) => {
           const file = e.target.files?.[0]
           if (file) setValue(name, file)

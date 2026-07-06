@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 interface CategoryDropdownProps {
-  storeSlug: string
+  storeSlug?: string
 }
 
 export function CategoryDropdown({ storeSlug }: CategoryDropdownProps) {

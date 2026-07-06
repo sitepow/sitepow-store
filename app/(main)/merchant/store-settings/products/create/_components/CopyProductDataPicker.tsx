@@ -10,7 +10,7 @@ import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
-import { IconArrowForward } from '@tabler/icons-react'
+import { IconArrowDown } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -117,7 +117,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
           })),
           discount: {
             active: v.discountActive,
-            type: v.discountType as DiscountType,
+            type: (v.discountType as DiscountType) || DiscountType.PERCENTAGE,
             amount: Number(v.discountAmount || 0),
           },
           rewardPoints: {
@@ -154,8 +154,8 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <IconArrowForward className="mr-2 size-4" />{' '}
+        <Button size="sm">
+          <IconArrowDown className="mr-2 size-4" />{' '}
           คัดลอกข้อมูลสินค้าในฐานข้อมูล
         </Button>
       </DialogTrigger>

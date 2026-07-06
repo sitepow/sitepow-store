@@ -66,7 +66,7 @@ export function StoresSection() {
             <div className="bg-muted relative h-48 w-full overflow-hidden">
               <Image
                 key={currentImage}
-                className="animate-in fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
+                className="animate-ken-burns fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
                 src={currentImage ?? ''}
                 width={800}
                 height={800}

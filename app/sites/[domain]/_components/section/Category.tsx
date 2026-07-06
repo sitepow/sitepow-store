@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable jsx-a11y/alt-text */
 'use client'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
@@ -28,8 +26,12 @@ export function CategorySection({
   isLoading,
 }: CategorySectionProps) {
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
-
   const { emblaRef } = useCarousel()
+
+  const isVideo =
+    image?.match(/\.(mp4|webm|ogg)$/i) ||
+    currentImage?.match(/\.(mp4|webm|ogg)$/i)
+  const displayMedia = image || currentImage
 
   if (products.length === 0) {
     return null
@@ -41,20 +43,23 @@ export function CategorySection({
         {isLoading ? (
           <Skeleton className="h-48 w-full shrink-0 rounded-xl md:h-88.75 md:w-96" />
         ) : (
-          <div className="border-border relative h-48 w-full shrink-0 rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-96">
+          <div className="border-border relative h-48 w-full shrink-0 overflow-hidden rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-96">
             <div className="absolute inset-0 z-0">
-              <img
-                key={currentImage}
-                className="animate-in fade-in relative size-full rounded-xl bg-cover bg-center opacity-40 duration-1000"
-                style={{
-                  backgroundImage: image
-                    ? `url('${image}')`
-                    : `url('${currentImage}')`,
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = currentImage
-                }}
-              />
+              {isVideo ? (
+                <video
+                  src={displayMedia ?? ''}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="animate-ken-burns size-full object-cover opacity-40"
+                />
+              ) : (
+                <div
+                  className="animate-ken-burns size-full bg-cover bg-center opacity-40"
+                  style={{ backgroundImage: `url('${displayMedia}')` }}
+                />
+              )}
             </div>
 
             <div className="absolute inset-0 rounded-xl bg-black/20" />
