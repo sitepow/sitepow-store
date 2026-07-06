@@ -45,6 +45,7 @@ jobs:
           script: |
             cd /var/www/sitepow-store
             docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
+            docker compose stop app
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f

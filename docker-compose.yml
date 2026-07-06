@@ -2,6 +2,9 @@ services:
   app:
     image: 'kteeraphatt/sitepow-store:latest'
     restart: always
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     env_file:
       - .env
     ports:
