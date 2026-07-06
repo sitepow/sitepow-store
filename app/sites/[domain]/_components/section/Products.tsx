@@ -30,7 +30,7 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
     <SectionContainer>
       <SectionHeader title="สินค้าใหม่" />
 
-      <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid w-full grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         {isLoading
           ? Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="h-72 w-full rounded-xl" />

@@ -39,11 +39,11 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
       <div className={cn(productCardVariants({ variant }), className)}>
         <div className="relative overflow-hidden rounded-t-xl">
           {primaryImage ? (
-            <div className="mb-2.5 h-52 w-full overflow-hidden">
+            <div className="relative mb-2.5 aspect-square size-32 w-full overflow-hidden bg-gray-50">
               {isVideo ? (
                 <video
                   src={primaryImage.url}
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="size-full object-contain"
                   muted
                   playsInline
                 />
@@ -51,12 +51,12 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
                 <img
                   src={primaryImage.url}
                   alt={product.title}
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="size-full object-contain p-2"
                 />
               )}
             </div>
           ) : (
-            <div className="bg-foreground/20 text-muted-foreground mb-2.5 flex h-52 w-full items-center justify-center rounded-t-xl">
+            <div className="bg-foreground/20 text-muted-foreground mb-2.5 flex h-32 w-full items-center justify-center rounded-t-xl">
               ไม่มีรูปภาพ
             </div>
           )}
@@ -68,7 +68,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           )}
         </div>
 
-        <h3 className="group-hover:text-primary line-clamp-2 px-5 font-medium">
+        <h3 className="group-hover:text-primary line-clamp-2 h-11 px-5 font-medium">
           {product.title}
         </h3>
 
@@ -86,7 +86,10 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
               </span>
             </div>
           ) : (
-            <data value={original?.min} className="text-2xl font-bold">
+            <data
+              value={original?.min}
+              className="text-primary text-2xl font-bold"
+            >
               {formatCurrency(original?.min || 0)}
             </data>
           )}

@@ -72,7 +72,7 @@ export function CategorySection({
         )}
 
         <div className="relative w-full overflow-hidden p-2.5" ref={emblaRef}>
-          <div className="flex h-87.5 items-center gap-5">
+          <div className="flex items-center gap-5">
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton
@@ -83,7 +83,7 @@ export function CategorySection({
               : products.map((product) => (
                   <div
                     key={product.id}
-                    className="h-full min-w-0 flex-[0_0_288px]"
+                    className="h-fit min-w-0 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                   >
                     <ProductCard product={product} variant="shadow" />
                   </div>

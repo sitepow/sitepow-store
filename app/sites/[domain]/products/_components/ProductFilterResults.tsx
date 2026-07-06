@@ -72,7 +72,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-5 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 12 }).map((_, i) => (
             <Skeleton key={i} className="h-72 w-full rounded-xl" />
           ))}
@@ -82,7 +82,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           <p className="text-muted-foreground">ไม่พบสินค้าที่คุณกำลังมองหา</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-5 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} variant="outline" />
           ))}

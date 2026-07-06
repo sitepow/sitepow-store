@@ -23,7 +23,7 @@ export function StoreLogo({ image, className, ...props }: StoreLogoProps) {
         height={80}
         alt="store-logo"
         unoptimized
-        src={image!}
+        src={image || FALLBACK_IMAGE}
         className="size-full object-contain object-center"
         onError={(e) => {
           e.currentTarget.src = FALLBACK_IMAGE
