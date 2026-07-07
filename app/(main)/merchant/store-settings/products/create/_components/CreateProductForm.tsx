@@ -18,6 +18,7 @@ import {
   useProduct,
   useUpdateProduct,
 } from '@/actions/hooks/product'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { CreateProductInput, createProduct } from '@/actions/product'
 import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
@@ -69,6 +70,9 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
   const { mutate: create, isPending: isCreating } = useCreateProduct()
   const { mutate: update, isPending: isUpdating } = useUpdateProduct()
+
+  const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/products`)
+  const deleteMutation = useR2DeleteImage()
 
   const [showPresets, setShowPresets] = useState(false)
 
@@ -161,81 +165,82 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       return
     }
 
-    const oldImageUrls = product?.images.map((img) => img.url) || []
+    try {
+      const oldImageUrls = product?.images.map((img) => img.url) || []
 
-    const newImages = await Promise.all(
-      data.images.map(async (img) => {
-        if (img.url instanceof File) {
-          const formData = new FormData()
-          formData.append('file', img.url)
-          const res = await r2UploadImage(
-            formData,
-            `store/${selectedStoreId}/products`,
-          )
-          return res.success ? res.url : null
-        }
-        return img.url
-      }),
-    )
+      const newImages = await Promise.all(
+        data.images.map(async (img) => {
+          if (img.url instanceof File) {
+            const formData = new FormData()
+            formData.append('file', img.url)
+            const res = await uploadMutation.mutateAsync(formData)
+            return res.success ? res.url : null
+          }
+          return img.url
+        }),
+      )
 
-    const finalImageUrls = newImages.filter(
-      (url): url is string => url !== null,
-    )
+      const finalImageUrls = newImages.filter(
+        (url): url is string => url !== null,
+      )
 
-    const imagesToDelete = oldImageUrls.filter(
-      (url) => !finalImageUrls.includes(url),
-    )
+      const imagesToDelete = oldImageUrls.filter(
+        (url) => !finalImageUrls.includes(url),
+      )
 
-    await Promise.all(
-      imagesToDelete.map(async (url) => {
-        const path = getPathR2FromUrl(url)
-        if (path) {
-          await r2DeleteImage(path)
-        }
-      }),
-    )
+      await Promise.all(
+        imagesToDelete.map(async (url) => {
+          const path = getPathR2FromUrl(url)
+          if (path) {
+            await deleteMutation.mutateAsync(path)
+          }
+        }),
+      )
 
-    const payload: CreateProductInput = {
-      storeId: selectedStoreId,
-      categoryId: data.categoryId,
-      title: data.title,
-      slug: data.slug,
-      tags: data.tags,
-      images: finalImageUrls,
-      variants: data.variants.map((v) => ({
-        title: v.title,
-        price: v.price,
-        sku: v.sku,
-        stocks: v.stocks.map((s) => ({
-          branchId: s.branchId,
-          quantity: s.quantity ?? 0,
-          minStock: s.minStock ?? 0,
+      const payload: CreateProductInput = {
+        storeId: selectedStoreId,
+        categoryId: data.categoryId,
+        title: data.title,
+        slug: data.slug,
+        tags: data.tags,
+        images: finalImageUrls,
+        variants: data.variants.map((v) => ({
+          title: v.title,
+          price: v.price,
+          sku: v.sku,
+          stocks: v.stocks.map((s) => ({
+            branchId: s.branchId,
+            quantity: s.quantity ?? 0,
+            minStock: s.minStock ?? 0,
+          })),
+          discount: {
+            active: v.discount.active ?? false,
+            type: v.discount.type ?? DiscountType.PERCENTAGE,
+            amount: v.discount.amount ?? 0,
+          },
+          rewardPoints: {
+            isActive: v.rewardPoints.isActive ?? false,
+            amount: v.rewardPoints.amount ?? 0,
+          },
         })),
-        discount: {
-          active: v.discount.active ?? false,
-          type: v.discount.type ?? DiscountType.PERCENTAGE,
-          amount: v.discount.amount ?? 0,
-        },
-        rewardPoints: {
-          isActive: v.rewardPoints.isActive ?? false,
-          amount: v.rewardPoints.amount ?? 0,
-        },
-      })),
-      addons: data.addons?.map((a) => ({
-        title: a.title,
-        price: a.price,
-        isAvailable: a.isAvailable ?? true,
-      })),
-      metadata: data.metadata,
-    }
+        addons: data.addons?.map((a) => ({
+          title: a.title,
+          price: a.price,
+          isAvailable: a.isAvailable ?? true,
+        })),
+        metadata: data.metadata,
+      }
 
-    if (productId) {
-      update({ id: productId, data: payload })
-    } else {
-      create(payload)
-    }
+      if (productId) {
+        update({ id: productId, data: payload })
+      } else {
+        create(payload)
+      }
 
-    router.push('/merchant/store-settings/products')
+      router.push('/merchant/store-settings/products')
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const { mutate: handleAiGen, isPending: isPendingAiGen } = useMutation({
@@ -276,7 +281,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   })
 
   const isPending =
-    isPendingAiGen || isCreating || isUpdating || isProductLoading
+    isPendingAiGen ||
+    isCreating ||
+    isUpdating ||
+    isProductLoading ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending
 
   return (
     <FormProvider {...form}>

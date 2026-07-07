@@ -4,7 +4,7 @@ import { ComponentProps, useCallback, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
-import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { getPathR2FromUrl } from '@/utils/image'
 import { UpdateProfileSchema } from '@/zod/profile'
 import { IconDeviceFloppy } from '@tabler/icons-react'
@@ -25,10 +25,14 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 
 export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
   const { data: profile } = useProfile()
-  const { mutate: updateProfile, isPending } = useUpdateProfile()
+  const updateProfileMutation = useUpdateProfile()
+
+  const uploadMutation = useR2UploadImage(`user/${profile?.id}/profile`)
+  const deleteMutation = useR2DeleteImage()
 
   const {
     register,
@@ -47,44 +51,52 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
       firstName,
       lastName: rest.join(' '),
       phone: profile.phone ?? undefined,
+      image: profile.image ?? '',
     }
     reset(values, { keepDefaultValues: false })
   }, [profile, reset])
 
   useEffect(() => {
     resetForm()
-  }, [profile, reset, resetForm])
+  }, [profile, resetForm])
 
   async function onSubmit(values: UpdateProfileSchema) {
     let imageUrl = values.image
 
-    if (values.image instanceof File) {
-      if (profile?.image) {
-        const oldKey = getPathR2FromUrl(profile.image)
-        await r2DeleteImage(oldKey)
+    try {
+      if (values.image instanceof File) {
+        if (profile?.image) {
+          const oldKey = getPathR2FromUrl(profile.image)
+          await deleteMutation.mutateAsync(oldKey)
+        }
+
+        const formData = new FormData()
+        formData.append('file', values.image)
+
+        const res = await uploadMutation.mutateAsync(formData)
+
+        if (res.success) {
+          imageUrl = res.url
+        }
       }
 
-      const formData = new FormData()
-      formData.append('file', values.image)
-
-      const res = await r2UploadImage(formData, `user/${profile?.id}/profile`)
-      if (res.success) {
-        imageUrl = res.url
-      }
-    }
-
-    updateProfile(
-      {
-        ...values,
-        image: imageUrl,
-      },
-      {
-        onSuccess: async () => {
-          reset(values)
+      updateProfileMutation.mutate(
+        { ...values, image: imageUrl },
+        {
+          onSuccess: () => {
+            reset(values)
+          },
         },
-      },
-    )
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
+
+  const isPending =
+    updateProfileMutation.isPending ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending
 
   return (
     <Card {...props}>
@@ -120,13 +132,22 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
       </CardContent>
       <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
         {isDirty && (
-          <Button type="button" variant="outline" onClick={resetForm}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={resetForm}
+            disabled={isPending}
+          >
             ล้างค่าการตั้งค่า
           </Button>
         )}
 
         <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-          <IconDeviceFloppy size={14} />
+          {isPending ? (
+            <Spinner className="mr-2" />
+          ) : (
+            <IconDeviceFloppy size={14} className="mr-2" />
+          )}
           {isPending ? 'กำลังบันทึก...' : 'บันทึกโปรไฟล์ส่วนตัว'}
         </Button>
       </CardFooter>
