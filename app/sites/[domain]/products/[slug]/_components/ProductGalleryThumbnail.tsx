@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { cn } from '@/lib/utils'
 
-import { useProductPurchaseStore } from '../../products/store'
+import { useProductPurchaseStore } from '../../store'
 
 export function ProductGalleryThumbnail() {
   const { product, isLoading, activeImageIndex, setActiveImageIndex } =

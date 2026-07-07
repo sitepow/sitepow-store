@@ -7,8 +7,8 @@ import { User2Icon } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 
+import { StarRating } from '../../../_components/product/StarRating'
 import { ReviewMedia } from './ReviewMedia'
-import { StarRating } from './StarRating'
 
 type ReviewItem = StorefrontProductDetail['reviews'][number]
 

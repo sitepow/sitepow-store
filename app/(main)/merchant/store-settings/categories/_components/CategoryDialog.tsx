@@ -159,7 +159,9 @@ export function CategoryDialog({
 
           <div className="grid gap-4">
             <Field>
-              <FieldLabel>รูปภาพหมวดหมู่</FieldLabel>
+              <FieldLabel>
+                รูปภาพหมวดหมู่ (รองรับรูปภาพและวิดีโอ ขนาดไฟล์สูงสุด 10 MB)
+              </FieldLabel>
               <FileUpload name="image" />
             </Field>
             <Field>

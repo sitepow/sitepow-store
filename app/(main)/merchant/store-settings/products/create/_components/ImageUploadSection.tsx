@@ -33,7 +33,7 @@ export function ImageUploadSection() {
         สื่อสินค้า ({fields.length})
       </FieldLegend>
       <FieldDescription>
-        รองรับรูปภาพและวิดีโอ (รองรับขนาดไฟล์สูงสุด 10 MB)
+        รองรับรูปภาพและวิดีโอ (ขนาดไฟล์สูงสุด 10 MB)
       </FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field, index) => {

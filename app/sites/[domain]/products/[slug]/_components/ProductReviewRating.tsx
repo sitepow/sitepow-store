@@ -4,7 +4,7 @@ import { StorefrontProductDetail } from '@/actions/storefront/product'
 
 import { Progress } from '@/components/ui/progress'
 
-import { StarRating } from './StarRating'
+import { StarRating } from '../../../_components/product/StarRating'
 
 type ReviewItem = StorefrontProductDetail['reviews'][number]
 

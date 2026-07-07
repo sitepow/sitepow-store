@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 
-import { useCartStore } from '../../cart/store'
-import { useProductPurchaseStore } from '../../products/store'
 import { QuantitySelector } from './QuantitySelector'
+import { useCartStore } from '../../../cart/store'
+import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddToCart() {
   const {

@@ -1,11 +1,11 @@
 import { SectionContainer } from '@/components/SectionContainer'
 
 import { StoreLayout } from '../../_components/layout/Layout'
-import { ProductGallery } from '../../_components/product/ProductGallery'
-import { ProductPurchasePanel } from '../../_components/product/ProductPurchasePanel'
-import { ProductReviewLists } from '../../_components/product/ProductReviewLists'
-import { ProductSpecification } from '../../_components/product/ProductSpecification'
+import { ProductGallery } from './_components/ProductGallery'
+import { ProductPurchasePanel } from './_components/ProductPurchasePanel'
 import { ProductRelated } from './_components/ProductRelated'
+import { ProductReviewLists } from './_components/ProductReviewLists'
+import { ProductSpecification } from './_components/ProductSpecification'
 
 type Props = {
   params: Promise<{ domain: string; slug: string }>

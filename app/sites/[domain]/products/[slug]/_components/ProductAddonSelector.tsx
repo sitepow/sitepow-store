@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { useProductPurchaseStore } from '../../products/store'
+import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddonSelector() {
   const { product, selectedAddons, toggleAddon, isLoading } =

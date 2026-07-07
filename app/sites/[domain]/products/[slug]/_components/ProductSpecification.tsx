@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { useProductPurchaseStore } from '../../products/store'
+import { useProductPurchaseStore } from '../../store'
 
 const metadataLabelMap = PRODUCT_METADATA_MASTER.reduce<Record<string, string>>(
   (acc, category) => {

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { useProductPurchaseStore } from '../../products/store'
+import { useProductPurchaseStore } from '../../store'
 
 export function ProductGalleryMain() {
   const { product, isLoading, activeImageIndex } = useProductPurchaseStore()

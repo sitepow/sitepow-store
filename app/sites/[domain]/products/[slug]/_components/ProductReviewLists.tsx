@@ -2,7 +2,7 @@
 
 import { Separator } from '@/components/ui/separator'
 
-import { useProductPurchaseStore } from '../../products/store'
+import { useProductPurchaseStore } from '../../store'
 import { ProductReviewRating } from './ProductReviewRating'
 import { ReviewCard } from './ReviewCard'
 
@@ -19,9 +19,7 @@ export function ProductReviewLists() {
         <h3 className="text-xl font-bold">รีวิวจากลูกค้า</h3>
         <Separator className="flex-1" />
       </div>
-
       <ProductReviewRating reviews={reviews} />
-
       <div className="space-y-10 pt-4">
         {reviews.map((review) => (
           <ReviewCard key={review.id} review={review} />
