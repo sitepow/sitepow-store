@@ -19,6 +19,7 @@ export const storeProfileSchema = z.object({
       message: 'เลขผู้เสียภาษีต้องมี 13 หลักพอดี',
     }),
   logo: z.any().optional(),
+  coverImage: z.any().optional(),
   description: z.string().optional(),
 })
 

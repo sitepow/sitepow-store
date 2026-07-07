@@ -39,7 +39,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
       <div className={cn(productCardVariants({ variant }), className)}>
         <div className="relative overflow-hidden rounded-t-xl">
           {primaryImage ? (
-            <div className="relative mb-2.5 aspect-square size-32 w-full overflow-hidden bg-gray-50">
+            <div className="relative mb-2.5 aspect-square size-32 w-full overflow-hidden bg-transparent">
               {isVideo ? (
                 <video
                   src={primaryImage.url}

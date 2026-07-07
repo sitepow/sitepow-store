@@ -15,6 +15,7 @@ const storeProfileSelect = {
   email: true,
   taxId: true,
   logo: true,
+  coverImage: true,
   description: true,
 } satisfies Prisma.StoreSelect
 

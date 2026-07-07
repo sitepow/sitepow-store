@@ -73,10 +73,8 @@ export function Navbar() {
             className="size-full object-cover opacity-40"
           />
         </div>
-
         <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
           <LogoBrand className="text-white" />
-
           <div className="hidden lg:block">
             <NavigationMenu>
               <NavigationMenuList className="text-white">
@@ -113,7 +111,6 @@ export function Navbar() {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-
           {!isAuthenticated && (
             <div className="hidden items-center gap-4 lg:flex">
               <Link href={loginHref}>
@@ -129,7 +126,6 @@ export function Navbar() {
               <LanguageSwitcher buttonVariant="secondary" />
             </div>
           )}
-
           {isAuthenticated && (
             <div className="hidden items-center gap-4 lg:flex">
               <UserAvatarDropdown
@@ -153,12 +149,10 @@ export function Navbar() {
               <LanguageSwitcher buttonVariant="secondary" />
             </div>
           )}
-
           <div className="flex items-center gap-2 lg:hidden">
             {isAuthenticated && (
               <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
             )}
-
             <div className="flex flex-wrap gap-2">
               <ModeToggle buttonVariant="secondary" />
               <LanguageSwitcher buttonVariant="secondary" />
@@ -173,7 +167,6 @@ export function Navbar() {
             </div>
           </div>
         </div>
-
         <div
           className={cn(
             'bg-background text-foreground container mx-auto overflow-y-auto border-t transition-all duration-300 ease-in-out lg:hidden',
@@ -212,13 +205,11 @@ export function Navbar() {
                 )}
               </div>
             ))}
-
             {!isAuthenticated && (
               <>
                 <div className="pt-4">
                   <Separator />
                 </div>
-
                 <div className="flex flex-col gap-3 pt-4 pb-10">
                   <Link href={loginHref} onClick={() => setIsMenuOpen(false)}>
                     <Button
@@ -242,10 +233,8 @@ export function Navbar() {
             )}
           </div>
         </div>
-
         {isEmailUnverified && <EmailVerified />}
       </header>
-
       <div
         className={cn(
           'h-18.25 lg:h-20.25',

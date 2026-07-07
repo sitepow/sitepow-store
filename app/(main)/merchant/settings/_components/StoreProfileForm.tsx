@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
@@ -27,6 +29,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -35,7 +38,8 @@ export function StoreProfileForm() {
   const { data: storeProfile } = useStoreProfile(selectedStoreId as string)
   const profileMutation = useUpdateStoreProfile()
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -52,13 +56,19 @@ export function StoreProfileForm() {
       email: '',
       taxId: '',
       logo: '',
+      coverImage: '',
       description: '',
     },
   })
 
   const logo = watch('logo')
+  const coverImage = watch('coverImage')
 
-  const previewUrl = useMemo(() => {
+  const isVideo =
+    (coverImage instanceof File && coverImage.type.startsWith('video/')) ||
+    (typeof coverImage === 'string' && coverImage.match(/\.(mp4|webm|ogg)$/i))
+
+  const previewLogoUrl = useMemo(() => {
     if (logo instanceof File) {
       return URL.createObjectURL(logo)
     }
@@ -68,11 +78,27 @@ export function StoreProfileForm() {
 
   useEffect(() => {
     return () => {
-      if (previewUrl?.startsWith('blob:')) {
-        URL.revokeObjectURL(previewUrl)
+      if (previewLogoUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewLogoUrl)
       }
     }
-  }, [previewUrl])
+  }, [previewLogoUrl])
+
+  const previewBannerUrl = useMemo(() => {
+    if (coverImage instanceof File) {
+      return URL.createObjectURL(coverImage)
+    }
+
+    return coverImage
+  }, [coverImage])
+
+  useEffect(() => {
+    return () => {
+      if (previewBannerUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewBannerUrl)
+      }
+    }
+  }, [previewBannerUrl])
 
   const resetForm = useCallback(() => {
     if (storeProfile) {
@@ -91,6 +117,7 @@ export function StoreProfileForm() {
 
   const onSubmit = async (values: StoreProfileFormValues) => {
     let logoUrl = values.logo
+    let bannerUrl = values.coverImage
 
     if (values.logo instanceof File) {
       if (storeProfile?.logo) {
@@ -107,10 +134,28 @@ export function StoreProfileForm() {
       }
     }
 
+    if (values.coverImage instanceof File) {
+      if (storeProfile?.coverImage) {
+        const oldKey = getPathR2FromUrl(storeProfile.coverImage)
+        await r2DeleteImage(oldKey)
+      }
+
+      const formData = new FormData()
+      formData.append('file', values.coverImage)
+
+      const res = await r2UploadImage(
+        formData,
+        `store/${selectedStoreId}/banner`,
+      )
+      if (res.success) {
+        bannerUrl = res.url
+      }
+    }
+
     profileMutation.mutate(
       {
         storeId: selectedStoreId as string,
-        input: { ...values, logo: logoUrl },
+        input: { ...values, logo: logoUrl, coverImage: bannerUrl },
       },
       { onSuccess: () => reset(values) },
     )
@@ -127,7 +172,6 @@ export function StoreProfileForm() {
           endContent={<StoreSelectField />}
         />
       </CardHeader>
-
       {selectedStoreId === ALL_STORES ? (
         <CardContent>
           <ActionRequiredAlert />
@@ -135,44 +179,84 @@ export function StoreProfileForm() {
       ) : (
         <>
           <CardContent className="space-y-6">
-            <Field>
-              <FieldLabel>โลโก้ประจำแบรนด์ร้านค้า</FieldLabel>
-              <div className="flex flex-wrap items-center gap-5">
-                <div className="flex h-16.25 w-50 shrink-0 items-center justify-center">
-                  {logo && <StoreLogo image={previewUrl ?? logo} />}
-                  {!logo && <StoreLogo />}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field>
+                <FieldLabel>โลโก้ประจำแบรนด์ร้านค้า</FieldLabel>
+                <div className="flex flex-wrap items-center gap-5">
+                  <div className="flex h-16.25 w-50 shrink-0 items-center justify-center">
+                    {logo && <StoreLogo image={previewLogoUrl ?? logo} />}
+                    {!logo && <StoreLogo />}
+                  </div>
+                  <input
+                    type="file"
+                    ref={logoInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+
+                      if (file) {
+                        setValue('logo', file, { shouldDirty: true })
+                      }
+                    }}
+                  />
+                  <div className="space-y-2 pt-1">
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={() => logoInputRef.current?.click()}
+                    >
+                      อัปโหลดรูปภาพใหม่
+                    </Button>
+                    <FieldDescription className="max-w-xs text-xs leading-normal">
+                      แนะนำไฟล์สี่เหลี่ยมจัตุรัส PNG หรือ JPG ขนาดไม่เกิน 2MB
+                      (ขนาดรูปที่แนะนำ 200x70)
+                    </FieldDescription>
+                  </div>
                 </div>
-
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-
-                    if (file) {
-                      setValue('logo', file, { shouldDirty: true })
-                    }
-                  }}
-                />
-
-                <div className="space-y-2 pt-1">
+              </Field>
+              <Field>
+                <FieldLabel>รูปภาพแบนเนอร์หน้าร้าน</FieldLabel>
+                <div className="flex flex-col gap-3">
+                  {coverImage && (
+                    <div>
+                      {isVideo ? (
+                        <video
+                          src={previewBannerUrl ?? coverImage}
+                          className="h-32 w-full rounded-xl object-cover object-center"
+                        />
+                      ) : (
+                        <img
+                          src={previewBannerUrl ?? coverImage}
+                          className="h-32 w-full rounded-xl object-cover object-center"
+                        />
+                      )}
+                    </div>
+                  )}
                   <Button
                     variant="outline"
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => bannerInputRef.current?.click()}
                   >
-                    อัปโหลดรูปภาพใหม่
+                    อัปโหลดรูปภาพแบนเนอร์
                   </Button>
-                  <FieldDescription className="max-w-xs text-xs leading-normal">
-                    แนะนำไฟล์สี่เหลี่ยมจัตุรัส PNG หรือ JPG ขนาดไม่เกิน 2MB
-                    (ขนาดรูปที่แนะนำ 200x70)
-                  </FieldDescription>
+                  <input
+                    type="file"
+                    ref={bannerInputRef}
+                    className="hidden"
+                    accept="image/*,video/*"
+                    onChange={(e) =>
+                      setValue('coverImage', e.target.files?.[0])
+                    }
+                  />
                 </div>
-              </div>
-            </Field>
-
+                <FieldDescription className="max-w-xs text-xs leading-normal">
+                  แนะนำไฟล์สี่เหลี่ยมจัตุรัส PNG หรือ JPG หรือ MP4 ขนาดไม่เกิน
+                  10MB (ขนาดรูปที่แนะนำ 1980x500) สามารถใช้ไฟล์วิดีโอได้
+                </FieldDescription>
+              </Field>
+            </div>
+            <Separator />
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <Field>
                 <FieldLabel>ชื่อร้านค้า / ชื่อจดทะเบียนพาณิชย์</FieldLabel>
@@ -183,7 +267,6 @@ export function StoreProfileForm() {
                 />
                 <FieldError>{errors?.name?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>Store URL Slug</FieldLabel>
                 <div className="flex items-center overflow-hidden rounded-md">
@@ -198,7 +281,6 @@ export function StoreProfileForm() {
                 </div>
                 <FieldError>{errors?.slug?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>อีเมลติดต่อหลัก</FieldLabel>
                 <Input
@@ -209,7 +291,6 @@ export function StoreProfileForm() {
                 />
                 <FieldError>{errors?.email?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>เลขประจำตัวผู้เสียภาษี 13 หลัก</FieldLabel>
                 <Input
@@ -220,7 +301,6 @@ export function StoreProfileForm() {
                 />
                 <FieldError>{errors?.taxId?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
                 <Textarea
@@ -232,7 +312,6 @@ export function StoreProfileForm() {
               </Field>
             </div>
           </CardContent>
-
           <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
             {isDirty && (
               <Button

@@ -138,6 +138,7 @@ export type StoreData = Prisma.StoreGetPayload<{
     email: true
     taxId: true
     slug: true
+    coverImage: true
   }
 }>
 
@@ -155,6 +156,7 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         name: true,
         description: true,
         logo: true,
+        coverImage: true,
         status: true,
         plan: true,
         email: true,

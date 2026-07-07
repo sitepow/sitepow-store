@@ -25,7 +25,10 @@ export function CategoryDropdown({ storeSlug }: CategoryDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button
+          variant="ghost"
+          className="text-lg font-bold text-white opacity-60 hover:bg-neutral-900 hover:text-white focus:bg-neutral-900 data-open:bg-neutral-900/50 data-open:hover:bg-neutral-900 data-open:focus:bg-neutral-900 data-popup-open:bg-neutral-900/50 data-popup-open:hover:bg-neutral-900"
+        >
           <span>หมวดหมู่สินค้า</span>
           <ChevronDownIcon className="ml-2 size-4" />
         </Button>

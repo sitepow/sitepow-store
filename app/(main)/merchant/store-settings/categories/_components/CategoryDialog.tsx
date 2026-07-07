@@ -156,7 +156,6 @@ export function CategoryDialog({
               กรอกข้อมูลหมวดหมู่สินค้าสำหรับจัดระเบียบสินค้าในร้านค้าของคุณ
             </DialogDescription>
           </DialogHeader>
-
           <div className="grid gap-4">
             <Field>
               <FieldLabel>
@@ -173,7 +172,6 @@ export function CategoryDialog({
               />
               <FieldError>{errors?.title?.message}</FieldError>
             </Field>
-
             <Field>
               <FieldLabel>URL Slug</FieldLabel>
               <Input
@@ -183,7 +181,6 @@ export function CategoryDialog({
               />
               <FieldError>{errors?.slug?.message}</FieldError>
             </Field>
-
             <Field>
               <FieldLabel>คำอธิบาย</FieldLabel>
               <Textarea

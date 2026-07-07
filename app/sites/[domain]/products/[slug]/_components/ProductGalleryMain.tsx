@@ -24,7 +24,7 @@ export function ProductGalleryMain() {
   }
 
   return (
-    <div className="flex aspect-square h-52 w-full items-center justify-center overflow-hidden rounded-xl bg-gray-50 md:aspect-4/3 md:h-full">
+    <div className="flex aspect-square h-52 w-full items-center justify-center overflow-hidden rounded-xl bg-transparent md:aspect-4/3 md:h-full">
       {isVideo(activeImage.url) ? (
         <video
           key={activeImage.url}
