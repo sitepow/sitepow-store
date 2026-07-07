@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import {
   useCategory,
   useCreateCategory,
   useUpdateCategory,
 } from '@/actions/hooks/category'
-import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatSlug } from '@/utils/slug'
@@ -48,6 +49,8 @@ export function CategoryDialog({
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateCategory()
   const updateMutation = useUpdateCategory()
+  const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/category`)
+  const deleteMutation = useR2DeleteImage()
 
   const createCategoryMutation = useCreateCategory()
 
@@ -87,25 +90,29 @@ export function CategoryDialog({
 
     if (values.image === '' && categoryData?.image) {
       const oldKey = getPathR2FromUrl(categoryData.image)
-      await r2DeleteImage(oldKey)
+      await deleteMutation.mutateAsync(oldKey)
       imageUrl = ''
     }
 
     if (values.image instanceof File) {
       if (categoryData?.image) {
         const oldKey = getPathR2FromUrl(categoryData.image)
-        await r2DeleteImage(oldKey)
+        await deleteMutation.mutateAsync(oldKey)
       }
 
       const formData = new FormData()
       formData.append('file', values.image)
-      const res = await r2UploadImage(
-        formData,
-        `store/${selectedStoreId}/category`,
-      )
-      if (res.success) {
-        imageUrl = res.url
+      const res = await uploadMutation.mutateAsync(formData)
+
+      if (!res.success) {
+        return toast.error('อัพโหลดรูปภาพไม่สำเร็จ')
       }
+
+      imageUrl = res.url
+    } else if (values.image === '' && categoryData?.image) {
+      const oldKey = getPathR2FromUrl(categoryData.image)
+      await deleteMutation.mutateAsync(oldKey)
+      imageUrl = ''
     }
 
     const payload = {
@@ -125,7 +132,11 @@ export function CategoryDialog({
     }
   }
 
-  const isPending = createMutation.isPending || updateMutation.isPending
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}>
