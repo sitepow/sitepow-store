@@ -155,9 +155,7 @@
   h4,
   h5,
   h6 {
-    line-height: var(--thai-heading-line-height) !important;
     padding-top: 0.2em;
-    padding-bottom: 0.05em;
   }
 }
 

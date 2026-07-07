@@ -71,7 +71,7 @@ export function ProductSpecification() {
                 <span className="text-sm opacity-60">
                   {metadataLabelMap[key] ?? key.replace(/_/g, ' ')}
                 </span>
-                <span className="font-medium">
+                <span className="text-sm">
                   {Array.isArray(value)
                     ? value
                         .map((v) =>
@@ -97,7 +97,7 @@ export function ProductSpecification() {
 
           <div className="flex flex-wrap gap-2 pt-4">
             {tags.map((tag) => (
-              <Badge key={tag.name} variant="outline" className="capitalize">
+              <Badge key={tag.name} variant="outline" className="font-normal">
                 <TagIcon /> {tag.name}
               </Badge>
             ))}

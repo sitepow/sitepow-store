@@ -283,4 +283,173 @@ export const PRODUCT_METADATA_MASTER = [
       },
     ],
   },
+  {
+    category: 'เกมและสินค้าดิจิทัล (Game Keys & Top-up)',
+    fields: [
+      {
+        key: 'game_platform',
+        label: 'แพลตฟอร์ม (เช่น Steam, PlayStation, Xbox, Mobile)',
+      },
+      { key: 'region_lock', label: 'โซนที่รองรับ (Region Lock / Global)' },
+      {
+        key: 'game_edition',
+        label: 'รุ่นของเกม (เช่น Standard, Deluxe, GOTY)',
+      },
+      {
+        key: 'delivery_method',
+        label:
+          'รูปแบบการจัดส่ง (เช่น รหัสผ่านอีเมล, เติมเข้า ID, Link แลกสินค้า)',
+      },
+      {
+        key: 'activation_instruction',
+        label: 'วิธีการเปิดใช้งาน (Activation Guide)',
+      },
+      { key: 'is_giftable', label: 'สามารถส่งเป็นของขวัญได้หรือไม่' },
+      { key: 'in_game_currency_amount', label: 'จำนวนหน่วยเงินในเกม (ถ้ามี)' },
+      { key: 'validity_period', label: 'วันหมดอายุของรหัส (ถ้ามี)' },
+      { key: 'developer_publisher', label: 'ผู้พัฒนา / ผู้จัดจำหน่ายเกม' },
+      { key: 'online_multiplayer_support', label: 'รองรับการเล่นออนไลน์' },
+      { key: 'system_requirements_link', label: 'ลิงก์สเปคความต้องการของระบบ' },
+    ],
+  },
+  {
+    category: 'บริการและสินค้าแบบ Subscription',
+    fields: [
+      {
+        key: 'subscription_type',
+        label: 'ประเภทการสมัครสมาชิก (เช่น รายเดือน, รายปี, รายครั้ง)',
+      },
+      { key: 'trial_available', label: 'มีการทดลองใช้ฟรีหรือไม่' },
+      {
+        key: 'account_requirement',
+        label: 'ความต้องการของบัญชี (เช่น ต้องเป็นบัญชีใหม่)',
+      },
+      { key: 'renewal_policy', label: 'นโยบายการต่ออายุอัตโนมัติ' },
+      { key: 'cancellation_policy', label: 'เงื่อนไขการยกเลิก' },
+    ],
+  },
+  {
+    category: 'เงื่อนไขและคำแนะนำการใช้งาน (Digital Goods Policy)',
+    fields: [
+      {
+        key: 'activation_conditions',
+        label:
+          'เงื่อนไขการเปิดใช้งาน (เช่น ต้องใช้ VPN, ต้องเปิดใช้งานภายในกี่วัน)',
+      },
+      {
+        key: 'platform_terms_link',
+        label: 'ลิงก์นโยบายการใช้งานของแพลตฟอร์ม (Terms of Service)',
+      },
+      {
+        key: 'account_safety_warning',
+        label:
+          'คำเตือนเรื่องความปลอดภัยของบัญชี (เช่น ห้ามให้รหัสผ่านกับผู้อื่น)',
+      },
+      {
+        key: 'refund_policy_digital',
+        label: 'เงื่อนไขการคืนเงิน (เช่น หากเติมไปแล้วไม่รับคืนทุกกรณี)',
+      },
+      {
+        key: 'usage_limitations',
+        label: 'ข้อจำกัดในการใช้งาน (เช่น 1 ไอดีต่อ 1 รหัส)',
+      },
+      {
+        key: 'support_contact',
+        label: 'ช่องทางการติดต่อเมื่อพบปัญหาการใช้งาน',
+      },
+    ],
+  },
+  {
+    category: 'คำเตือนและข้อมูลสำหรับผู้ซื้อ (Customer Action Required)',
+    fields: [
+      {
+        key: 'require_uid_verification',
+        label: 'ต้องกรอก UID / Server หรือไม่',
+        type: 'boolean',
+      },
+      {
+        key: 'uid_format_hint',
+        label: 'ตัวอย่างรูปแบบ UID ที่ถูกต้อง',
+        placeholder: 'เช่น 12345678 (ห้ามเว้นวรรค)',
+      },
+      {
+        key: 'warning_message',
+        label: 'ข้อความเตือนพิเศษก่อนซื้อ',
+        description:
+          'เช่น "กรุณาตรวจสอบ UID ให้ถูกต้อง หากกรอกผิดจะไม่สามารถแก้ไขได้"',
+      },
+      {
+        key: 'is_login_required',
+        label: 'ต้องฝากไอดีเพื่อเติมหรือไม่',
+        type: 'boolean',
+      },
+      {
+        key: 'account_safety_guide',
+        label: 'คำแนะนำความปลอดภัย (กรณีต้องฝากไอดี)',
+        description:
+          'เช่น "กรุณาปิดระบบ 2FA ชั่วคราว หรือใช้รหัสผ่านชั่วคราวในการเติม"',
+      },
+    ],
+  },
+  {
+    category: 'คอมพิวเตอร์และฮาร์ดแวร์ (PC & Hardware)',
+    fields: [
+      { key: 'cpu_model', label: 'รุ่น CPU (เช่น Intel Core i7-14700K)' },
+      { key: 'gpu_model', label: 'รุ่นการ์ดจอ (GPU)' },
+      {
+        key: 'ram_capacity_bus',
+        label: 'ความจุ RAM และ Bus (เช่น 32GB DDR5 5600MHz)',
+      },
+      {
+        key: 'storage_type_capacity',
+        label: 'ประเภทและความจุ SSD (เช่น 1TB M.2 NVMe Gen4)',
+      },
+      { key: 'motherboard_model', label: 'เมนบอร์ด (Motherboard)' },
+      {
+        key: 'psu_wattage_rating',
+        label: 'พาวเวอร์ซัพพลาย (Watt / Rating เช่น 750W 80+ Gold)',
+      },
+      { key: 'monitor_resolution', label: 'ความละเอียดจอภาพ' },
+      { key: 'refresh_rate', label: 'อัตราการรีเฟรชหน้าจอ (Hz)' },
+      { key: 'panel_type', label: 'ประเภทพาเนลหน้าจอ (IPS, VA, OLED)' },
+      {
+        key: 'os_included',
+        label: 'ระบบปฏิบัติการที่แถมมา (Windows 11 Home/Pro)',
+      },
+      {
+        key: 'upgradeability',
+        label: 'ความสามารถในการอัปเกรด (เช่น เพิ่ม RAM ได้อีกกี่ช่อง)',
+      },
+      {
+        key: 'cooling_system',
+        label: 'ระบบระบายความร้อน (เช่น ชุดน้ำ, พัดลม)',
+      },
+      { key: 'case_model', label: 'เคสคอมพิวเตอร์' },
+    ],
+  },
+  {
+    category: 'ความเข้ากันได้และอุปกรณ์เสริม (Compatibility & Peripherals)',
+    fields: [
+      { key: 'socket_type', label: 'ซ็อกเก็ต (Socket Type เช่น LGA1700, AM5)' },
+      { key: 'form_factor', label: 'ขนาดเมนบอร์ด (ATX, Micro-ATX, ITX)' },
+      { key: 'driver_support_link', label: 'ลิงก์ดาวน์โหลดไดรเวอร์' },
+      {
+        key: 'peripheral_connectivity',
+        label: 'การเชื่อมต่ออุปกรณ์เสริม (พอร์ตเชื่อมต่อทั้งหมด)',
+      },
+    ],
+  },
+  {
+    category: 'ข้อมูลสรุปและรายละเอียดสเปก (Specifications Summary)',
+    fields: [
+      {
+        key: 'full_specs_text',
+        label: 'สเปกสินค้าแบบละเอียด',
+      },
+      {
+        key: 'highlight_features',
+        label: 'จุดเด่นของสินค้า (Highlight)',
+      },
+    ],
+  },
 ]

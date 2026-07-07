@@ -20,17 +20,19 @@ export function ProductVariantSelector() {
     <>
       <div className="space-y-4">
         {isLoading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-lg" />
+          <div className="grid grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-lg" />
             ))}
           </div>
         ) : (
           <>
             <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
+
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
+              className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2"
             >
               {product?.variants?.map((variant) => {
                 const discountConfig =
@@ -53,47 +55,49 @@ export function ProductVariantSelector() {
                 return (
                   <div
                     key={variant.id}
-                    className="hover:bg-accent flex items-center space-y-0 space-x-3 rounded-lg border p-3 transition-colors"
+                    className="hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors"
                   >
-                    <RadioGroupItem value={variant.id} id={variant.id} />
+                    <RadioGroupItem
+                      value={variant.id}
+                      id={variant.id}
+                      className="mt-1"
+                    />
 
-                    <div className="flex flex-1 flex-col gap-0.5">
-                      <Label
-                        htmlFor={variant.id}
-                        className="cursor-pointer font-medium sm:w-1/2"
-                      >
+                    <div className="flex flex-1 flex-col gap-1">
+                      <span className="cursor-pointer text-xs">
                         {variant.title}
-                      </Label>
-                      <div className="flex gap-2.5">
+                      </span>
+
+                      <div className="flex flex-wrap gap-2">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
-                            <span className="text-primary text-xs font-semibold">
+                            <span className="text-primary text-[10px] font-semibold">
                               ลด {variant.discountAmount}%
                             </span>
                           )}
                         {hasPoint && (
-                          <span className="text-primary text-xs font-semibold">
-                            + {variant.pointsAmount} แต้มสะสม
+                          <span className="text-[10px] font-semibold text-amber-600">
+                            + {variant.pointsAmount} แต้ม
                           </span>
                         )}
                       </div>
-                    </div>
 
-                    <div className="flex flex-col items-end">
-                      {hasDiscount ? (
-                        <>
-                          <span className="text-primary text-sm font-bold">
-                            {formatCurrency(netPrice)}
-                          </span>
-                          <span className="text-muted-foreground text-xs line-through">
+                      <div className="mt-1">
+                        {hasDiscount ? (
+                          <div className="flex flex-col">
+                            <span className="text-primary text-sm font-bold">
+                              {formatCurrency(netPrice)}
+                            </span>
+                            <span className="text-muted-foreground text-[10px] line-through">
+                              {formatCurrency(variant.price)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-sm font-semibold">
                             {formatCurrency(variant.price)}
                           </span>
-                        </>
-                      ) : (
-                        <span className="text-sm font-semibold">
-                          {formatCurrency(variant.price)}
-                        </span>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 )

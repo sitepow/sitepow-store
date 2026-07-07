@@ -68,7 +68,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           )}
         </div>
 
-        <h3 className="group-hover:text-primary line-clamp-2 h-11 px-5 font-medium">
+        <h3 className="group-hover:text-primary line-clamp-2 h-12 px-5 font-medium">
           {product.title}
         </h3>
 

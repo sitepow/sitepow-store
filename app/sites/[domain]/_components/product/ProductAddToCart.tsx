@@ -7,6 +7,7 @@ import { PackageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
 
 import { useCartStore } from '../../cart/store'
 import { useProductPurchaseStore } from '../../products/store'
@@ -129,6 +130,16 @@ export function ProductAddToCart() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2">
+        <Label className="text-lg font-semibold">
+          ข้อมูลเพิ่มเติม / UID (ถ้ามี)
+        </Label>
+        <Textarea
+          placeholder="กรอก UID, ชื่อในเกม หรือข้อความถึงผู้ขายที่นี่"
+          className="min-h-20"
+        />
       </div>
 
       <Button

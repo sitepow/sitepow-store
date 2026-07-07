@@ -69,19 +69,23 @@ export function ProductGalleryThumbnail() {
             key={image.id || index}
             onClick={() => setActiveImageIndex(index)}
             className={cn(
-              'border-border relative size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 transition-all md:size-20',
+              'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 bg-gray-50 transition-all md:size-20',
               activeImageIndex === index
                 ? 'border-primary'
                 : 'border-transparent',
             )}
           >
             {isVideo(image.url) ? (
-              <video src={image.url} className="size-full object-cover" muted />
+              <video
+                src={image.url}
+                className="size-full object-contain"
+                muted
+              />
             ) : (
               <img
                 src={image.url}
                 alt={`Product ${index}`}
-                className="size-full object-cover"
+                className="size-full object-contain"
               />
             )}
           </div>

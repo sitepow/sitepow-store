@@ -17,7 +17,7 @@ export function ProductPriceHeader() {
       {isLoading ? (
         <Skeleton className="h-10 w-3/4 rounded-lg" />
       ) : (
-        <h1 className="text-start text-3xl leading-tight font-bold sm:text-4xl">
+        <h1 className="text-start text-xl leading-tight font-bold sm:text-2xl lg:text-3xl">
           {product?.title}
         </h1>
       )}
@@ -31,7 +31,7 @@ export function ProductPriceHeader() {
             <div className="flex items-end gap-2">
               <data
                 value={totalPrice}
-                className="text-4xl font-bold sm:text-5xl"
+                className="text-primary text-4xl font-bold sm:text-5xl"
               >
                 {formatCurrency(totalPrice || 0)}
               </data>
