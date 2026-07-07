@@ -111,7 +111,7 @@ export function useDeleteStore() {
   })
 }
 
-export function useLandingStores(limit: number = 6) {
+export function useLandingStores(limit: number = 12) {
   return useQuery(
     queryOptions({
       queryKey: storeKeys.landing(limit),

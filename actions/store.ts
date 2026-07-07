@@ -397,7 +397,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
       }
     }
 
-    const updatedStore = await prisma.store.update({
+    const store = await prisma.store.update({
       where: { id },
       data: input,
       select: storeSelect,
@@ -412,10 +412,12 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
       details: { updatedFields: Object.keys(input) },
     })
 
+    await invalidateStoreCache(store?.slug)
+
     return {
       success: true,
       message: 'อัปเดตข้อมูลร้านค้าสำเร็จแล้ว',
-      data: updatedStore,
+      data: store,
     }
   } catch (error) {
     console.error(error)

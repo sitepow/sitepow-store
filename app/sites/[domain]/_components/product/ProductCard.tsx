@@ -63,7 +63,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
 
           {hasDiscount && (
             <Badge className="absolute top-0 right-0 size-12 rounded-full text-center">
-              -{maxDiscountPercent}%
+              ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )}
         </div>

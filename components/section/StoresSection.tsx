@@ -17,11 +17,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { ActionRequiredAlert } from '../ActionRequiredAlert'
+
 export function StoresSection() {
   const isMounted = useIsMounted()
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
-  const { data: stores = [], isLoading } = useLandingStores(6)
+  const { data: stores = [], isLoading } = useLandingStores()
   const { isAuthenticated } = useSession()
 
   const registerHref = isMounted
@@ -78,6 +80,11 @@ export function StoresSection() {
               <h3 className="line-clamp-2 text-xl font-bold sm:text-2xl">
                 {store.name}
               </h3>
+              <ActionRequiredAlert
+                title="ปิดการค้นหา"
+                description="เนื่องจากเป็นร้านค้าตัวอย่าง เราจึงปิดการทำงานของ Search Engine
+                  เพื่อป้องกันไม่ให้ข้อมูลสินค้าในร้านตัวอย่างไปปรากฏในการค้นหาจริงของลูกค้า"
+              />
               <p className="mt-1 text-lg leading-relaxed opacity-60">
                 ระบบจัดการออเดอร์และสต็อกที่ครบวงจร
                 ได้รับความไว้วางใจจากร้านค้าชั้นนำบน Sitepow Store

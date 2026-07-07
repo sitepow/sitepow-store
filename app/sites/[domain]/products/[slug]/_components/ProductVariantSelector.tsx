@@ -53,7 +53,8 @@ export function ProductVariantSelector() {
                 const hasPoint = variant.pointsActive
 
                 return (
-                  <div
+                  <Label
+                    htmlFor={variant.id}
                     key={variant.id}
                     className="hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors"
                   >
@@ -99,7 +100,7 @@ export function ProductVariantSelector() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </Label>
                 )
               })}
             </RadioGroup>

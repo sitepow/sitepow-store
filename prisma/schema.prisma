@@ -222,6 +222,7 @@ model User {
   activityLogs       ActivityLog[]
   messages           Message[]
   ConversationMember ConversationMember[]
+  ownedStores        Store[]              @relation("StoreOwner")
 }
 
 model Staff {
@@ -437,6 +438,7 @@ model Store {
   name    String
   slug    String @unique
   ownerId String
+  owner   User   @relation("StoreOwner", fields: [ownerId], references: [id])
 
   email       String?
   logo        String?
