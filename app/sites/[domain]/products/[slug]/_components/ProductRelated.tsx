@@ -25,7 +25,7 @@ export function ProductRelated() {
   return (
     <div className="w-full space-y-6 overflow-hidden">
       <div className="flex items-center gap-2">
-        <h3 className="text-xl font-bold">สินค้าใกล้เคียง</h3>
+        <h3 className="text-foreground text-xl font-bold">สินค้าใกล้เคียง</h3>
         <Separator className="flex-1" />
       </div>
       <div className="w-full overflow-hidden p-2.5">
