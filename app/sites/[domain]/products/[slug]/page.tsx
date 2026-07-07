@@ -5,6 +5,7 @@ import { ProductGallery } from '../../_components/product/ProductGallery'
 import { ProductPurchasePanel } from '../../_components/product/ProductPurchasePanel'
 import { ProductReviewLists } from '../../_components/product/ProductReviewLists'
 import { ProductSpecification } from '../../_components/product/ProductSpecification'
+import { ProductRelated } from './_components/ProductRelated'
 
 type Props = {
   params: Promise<{ domain: string; slug: string }>
@@ -20,15 +21,16 @@ export default async function StoreProductDescriptionPage({ params }: Props) {
           <div className="flex flex-col gap-5 xl:col-span-7">
             <ProductGallery />
           </div>
-
           <div className="flex flex-col gap-5 xl:sticky xl:top-40 xl:col-span-5 xl:col-start-8 xl:row-start-1 xl:row-end-3">
             <ProductPurchasePanel storeSlug={domain} productSlug={slug} />
           </div>
-
           <div className="xl:col-span-7">
             <ProductSpecification />
             <ProductReviewLists />
           </div>
+        </div>
+        <div className="flex w-full">
+          <ProductRelated />
         </div>
       </SectionContainer>
     </StoreLayout>

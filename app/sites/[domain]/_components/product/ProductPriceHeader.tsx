@@ -1,4 +1,4 @@
-import { formatCurrency } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -40,7 +40,9 @@ export function ProductPriceHeader() {
             {points > 0 && (
               <p>
                 คุณจะได้รับ{' '}
-                <span className="text-primary text-lg font-bold">{points}</span>{' '}
+                <span className="text-primary text-lg font-bold">
+                  {formatNumber(points)}
+                </span>{' '}
                 แต้มสะสม
               </p>
             )}

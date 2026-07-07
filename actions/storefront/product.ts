@@ -235,3 +235,30 @@ export async function getStorefrontProductDetail(
 
   return product
 }
+
+export async function getRelatedProducts(
+  productId: string,
+  categoryId: string,
+  limit: number = 6,
+) {
+  return serializeDecimal(
+    await prisma.product.findMany({
+      where: {
+        categoryId: categoryId,
+        id: {
+          not: productId,
+        },
+      },
+      take: limit,
+      include: {
+        images: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+        variants: {
+          take: 1,
+        },
+      },
+    }),
+  )
+}

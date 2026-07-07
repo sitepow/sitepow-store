@@ -32,7 +32,9 @@ export function ImageUploadSection() {
       <FieldLegend variant="label" className="text-lg font-bold">
         สื่อสินค้า ({fields.length})
       </FieldLegend>
-      <FieldDescription>รองรับรูปภาพและวิดีโอ</FieldDescription>
+      <FieldDescription>
+        รองรับรูปภาพและวิดีโอ (รองรับขนาดไฟล์สูงสุด 10 MB)
+      </FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field, index) => {
           const file = field.url

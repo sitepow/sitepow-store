@@ -12,4 +12,7 @@ export const storefrontProductKeys = {
   details: () => [...storefrontProductKeys.all, 'detail'] as const,
   detail: (storeSlug: string, productSlug: string) =>
     [...storefrontProductKeys.all, 'detail', storeSlug, productSlug] as const,
+  related: () => [...storefrontProductKeys.all, 'related'] as const,
+  relatedList: (productId: string, categoryId: string) =>
+    [...storefrontProductKeys.related(), productId, categoryId] as const,
 }

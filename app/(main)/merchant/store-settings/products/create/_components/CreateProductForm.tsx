@@ -19,21 +19,17 @@ import {
   useUpdateProduct,
 } from '@/actions/hooks/product'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
-import { CreateProductInput, createProduct } from '@/actions/product'
-import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { CreateProductInput } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
-import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
-// import { MetadataDetail } from '@/types/sites/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconArrowForward,
   IconImageGeneration,
-  IconPlus,
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
@@ -255,12 +251,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
       const productData = result.data
 
-      // const metadataDynamicFields =
-      //   (productData.metadata?.details as MetadataDetail[])?.map((item) => ({
-      //     key: String(item.key),
-      //     value: String(item.value),
-      //   })) || []
-
       const {
         variants: _variants,
         metadata: _metadata,
@@ -275,7 +265,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         tags: productData.metadata?.tags
           ? productData.metadata.tags.join(', ')
           : '',
-        // metadata: metadataDynamicFields,
       })
     },
   })
@@ -333,7 +322,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           )}
           {!!isDirty && (
             <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-              {isCreating && <Spinner />}
+              {isPending && <Spinner />}
               บันทึกข้อมูล
             </Button>
           )}
@@ -360,7 +349,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </FieldLegend>
             <Button
               type="button"
-              variant="outline"
               size="sm"
               onClick={() =>
                 appendVariant({
@@ -394,18 +382,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
           <FieldSet
             disabled={isPending}
-            className="dark:bg-foreground/5 rounded-lg border p-4"
+            className="dark:bg-foreground/5 border-l-primary rounded-lg border p-4"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-              {/* <FieldLegend className="text-lg font-bold">
-                Metadata (ข้อมูลทางเทคนิค)
-              </FieldLegend> */}
               <FieldLegend variant="label" className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
               </FieldLegend>
               <Button
                 type="button"
-                variant="outline"
                 size="sm"
                 onClick={() => appendMetadata({ key: '', value: '' })}
               >
@@ -457,7 +441,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
           <FieldSet
             disabled={isPending}
-            className="dark:bg-foreground/5 rounded-lg border p-6"
+            className="dark:bg-foreground/5 border-l-primary rounded-lg border p-6"
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
@@ -465,7 +449,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               </FieldLegend>
               <Button
                 type="button"
-                variant="outline"
                 size="sm"
                 onClick={() =>
                   appendAddon({ title: '', price: 0, isAvailable: true })
@@ -513,10 +496,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               )}
             </FieldGroup>
           </FieldSet>
-
-          {/* <div className="flex flex-wrap justify-end gap-2.5">
-            
-          </div> */}
         </div>
 
         <div className="sticky top-6 space-y-6 xl:col-span-1">

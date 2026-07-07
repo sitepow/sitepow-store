@@ -133,11 +133,9 @@ export function ProductAddToCart() {
       </div>
 
       <div className="mt-4 flex flex-col gap-2">
-        <Label className="text-lg font-semibold">
-          ข้อมูลเพิ่มเติม / UID (ถ้ามี)
-        </Label>
+        <Label className="text-lg font-semibold">ข้อมูลเพิ่มเติม (ถ้ามี)</Label>
         <Textarea
-          placeholder="กรอก UID, ชื่อในเกม หรือข้อความถึงผู้ขายที่นี่"
+          placeholder="กรอกข้อความถึงผู้ขายที่นี่"
           className="min-h-20"
         />
       </div>

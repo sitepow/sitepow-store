@@ -1,6 +1,7 @@
 import { storefrontProductKeys } from '@/actions/query-keys/storefront/product'
 import {
   GetStorefrontProductsParams,
+  getRelatedProducts,
   getStorefrontProductDetail,
   getStorefrontProducts,
 } from '@/actions/storefront/product'
@@ -34,6 +35,16 @@ export function useStorefrontProductDetail(
       queryKey: storefrontProductKeys.detail(storeSlug, productSlug),
       queryFn: () => getStorefrontProductDetail(storeSlug, productSlug),
       enabled: !!storeSlug && !!productSlug,
+    }),
+  )
+}
+
+export function useRelatedProducts(productId: string, categoryId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: storefrontProductKeys.relatedList(productId, categoryId),
+      queryFn: () => getRelatedProducts(productId, categoryId),
+      enabled: !!productId && !!categoryId,
     }),
   )
 }
