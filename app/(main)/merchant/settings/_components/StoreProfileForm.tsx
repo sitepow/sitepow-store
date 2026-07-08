@@ -3,13 +3,14 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 import {
   useStoreProfile,
   useUpdateStoreProfile,
 } from '@/actions/hooks/store-profile'
 import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
+import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
@@ -29,6 +30,13 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
@@ -46,6 +54,7 @@ export function StoreProfileForm() {
     handleSubmit,
     reset,
     setValue,
+    control,
     watch,
     formState: { isDirty, errors },
   } = useForm<StoreProfileFormValues>({
@@ -57,6 +66,7 @@ export function StoreProfileForm() {
       taxId: '',
       logo: '',
       coverImage: '',
+      primaryColor: '',
       description: '',
     },
   })
@@ -107,6 +117,7 @@ export function StoreProfileForm() {
         email: storeProfile.email ?? '',
         taxId: storeProfile.taxId ?? '',
         description: storeProfile.description ?? '',
+        primaryColor: storeProfile.primaryColor ?? '',
       })
     }
   }, [storeProfile, reset])
@@ -155,7 +166,11 @@ export function StoreProfileForm() {
     profileMutation.mutate(
       {
         storeId: selectedStoreId as string,
-        input: { ...values, logo: logoUrl, coverImage: bannerUrl },
+        input: {
+          ...values,
+          logo: logoUrl,
+          coverImage: bannerUrl,
+        },
       },
       { onSuccess: () => reset(values) },
     )
@@ -257,6 +272,36 @@ export function StoreProfileForm() {
               </Field>
             </div>
             <Separator />
+            <Field>
+              <FieldLabel>สีประจำแบรนด์ (Primary Color)</FieldLabel>
+              <Controller
+                control={control}
+                name="primaryColor"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="เลือกสีประจำแบรนด์" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRIMARY_COLOR_OPTIONS.map((color) => (
+                        <SelectItem key={color.value} value={color.value}>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-4 w-4 rounded-full border border-black/10"
+                              style={{ backgroundColor: color.value }}
+                            />
+                            {color.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldDescription>
+                เลือกสีหลักสำหรับปุ่มและองค์ประกอบสำคัญในหน้าร้านของคุณ
+              </FieldDescription>
+            </Field>
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <Field>
                 <FieldLabel>ชื่อร้านค้า / ชื่อจดทะเบียนพาณิชย์</FieldLabel>

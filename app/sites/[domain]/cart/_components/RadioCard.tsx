@@ -30,15 +30,14 @@ export function RadioCard({
         htmlFor={id}
         className={cn(
           'dark:bg-foreground/5 border-border flex cursor-pointer justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
-          'has-data-[state=checked]:border-primary',
+          'has-data-[state=checked]:border-(--brand-color)',
         )}
       >
-        <RadioGroupItem value={value} id={id} className="shrink-0" />
-
+        <RadioGroupItem value={value} id={id} variant="brand" />
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <div className="[[data-state=checked]~&]:text-primary has-data-[state=checked]:text-primary text-sm font-bold">
+              <div className="text-sm font-bold has-data-[state=checked]:text-(--brand-color) [[data-state=checked]~&]:text-(--brand-color)">
                 {title}
               </div>
               {trailing && (

@@ -17,6 +17,7 @@ const storeProfileSelect = {
   logo: true,
   coverImage: true,
   description: true,
+  primaryColor: true,
 } satisfies Prisma.StoreSelect
 
 export type GetStoreProfileResult = Prisma.StoreGetPayload<{

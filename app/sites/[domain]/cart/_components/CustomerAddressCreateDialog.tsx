@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { useCreateAddress } from '@/actions/hooks/storefront/address'
 import { AddressType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { AddressSchema, addressSchema } from '@/zod/address'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
@@ -31,6 +32,8 @@ import { Address } from '@/lib/address/logic'
 const InputThaiAddress = CreateInput()
 
 export function CustomerAddressCreateDialog() {
+  const { store } = useStoreData()
+
   const [open, setOpen] = useState(false)
   const { mutate: createAddress, isPending } = useCreateAddress()
 
@@ -94,22 +97,22 @@ export function CustomerAddressCreateDialog() {
           <span>เพิ่มที่อยู่จัดส่ง/ภาษี</span>
         </Button>
       </DialogTrigger>
-
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent
+        className="sm:max-w-xl"
+        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>เพิ่มที่อยู่ใหม่</DialogTitle>
           </DialogHeader>
-
           <FieldGroup className="grid grid-cols-2 gap-x-5 gap-y-4 py-4">
             <Field className="col-span-2">
               <Label>ป้ายกำกับที่อยู่ (เช่น บ้าน, ที่ทำงาน) *</Label>
               <Input {...register('name')} placeholder="ระบุป้ายกำกับ" />
               <FieldError>{errors.name?.message}</FieldError>
             </Field>
-
             <Field className="col-span-2">
-              <Label className="text-primary mb-3 block font-bold">
+              <Label className="mb-3 block font-bold">
                 วัตถุประสงค์ของที่อยู่นี้
               </Label>
               <Controller
@@ -123,6 +126,7 @@ export function CustomerAddressCreateDialog() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem
+                        variant="brand"
                         value={AddressType.SHIPPING}
                         id="shipping"
                       />
@@ -134,7 +138,11 @@ export function CustomerAddressCreateDialog() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value={AddressType.TAX} id="tax" />
+                      <RadioGroupItem
+                        variant="brand"
+                        value={AddressType.TAX}
+                        id="tax"
+                      />
                       <Label
                         htmlFor="tax"
                         className="cursor-pointer font-normal"
@@ -143,7 +151,11 @@ export function CustomerAddressCreateDialog() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value={AddressType.BOTH} id="both" />
+                      <RadioGroupItem
+                        variant="brand"
+                        value={AddressType.BOTH}
+                        id="both"
+                      />
                       <Label
                         htmlFor="both"
                         className="cursor-pointer font-normal"
@@ -155,9 +167,7 @@ export function CustomerAddressCreateDialog() {
                 )}
               />
             </Field>
-
             <Separator className="col-span-2" />
-
             {showShippingFields && (
               <Field className="col-span-2">
                 <Label>ชื่อ-นามสกุล ผู้รับพัสดุ *</Label>
@@ -168,7 +178,6 @@ export function CustomerAddressCreateDialog() {
                 <FieldError>{errors.receiverName?.message}</FieldError>
               </Field>
             )}
-
             {showTaxFields && (
               <div className="bg-muted/30 col-span-2 grid grid-cols-12 gap-4 rounded-lg border border-dashed p-4">
                 <div className="text-muted-foreground col-span-12 text-sm font-semibold">
@@ -202,13 +211,11 @@ export function CustomerAddressCreateDialog() {
                 </Field>
               </div>
             )}
-
             <Field className="col-span-2">
               <Label>หมายเลขโทรศัพท์ติดต่อ *</Label>
               <Input {...register('phone')} type="tel" />
               <FieldError>{errors.phone?.message}</FieldError>
             </Field>
-
             <Field className="col-span-2">
               <Label>บ้านเลขที่, หมู่ที่, ซอย, ถนน *</Label>
               <Input
@@ -217,7 +224,6 @@ export function CustomerAddressCreateDialog() {
               />
               <FieldError>{errors.addressLine?.message}</FieldError>
             </Field>
-
             <Field>
               <Label>ตำบล / แขวง *</Label>
               <Controller
@@ -233,7 +239,6 @@ export function CustomerAddressCreateDialog() {
               />
               <FieldError>{errors.subDistrict?.message}</FieldError>
             </Field>
-
             <Field>
               <Label>อำเภอ / เขต *</Label>
               <Controller
@@ -249,7 +254,6 @@ export function CustomerAddressCreateDialog() {
               />
               <FieldError>{errors.district?.message}</FieldError>
             </Field>
-
             <Field>
               <Label>จังหวัด *</Label>
               <Controller
@@ -265,7 +269,6 @@ export function CustomerAddressCreateDialog() {
               />
               <FieldError>{errors.province?.message}</FieldError>
             </Field>
-
             <Field>
               <Label>รหัสไปรษณีย์ *</Label>
               <Controller
@@ -282,7 +285,6 @@ export function CustomerAddressCreateDialog() {
               <FieldError>{errors.postalCode?.message}</FieldError>
             </Field>
           </FieldGroup>
-
           <DialogFooter className="flex flex-wrap border-t pt-5">
             <Button
               className="w-full"

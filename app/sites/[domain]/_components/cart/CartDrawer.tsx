@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { ShoppingCartIcon } from 'lucide-react'
@@ -23,6 +24,8 @@ import { CartItemCard } from './_components/CartItemCard'
 import { CartSummary } from './_components/CartSummary'
 
 export function CartDrawer() {
+  const { store } = useStoreData()
+
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
   const summary = getCartSummary()
 
@@ -34,14 +37,16 @@ export function CartDrawer() {
           {items.length > 0 && <CartBadge total={summary.totalQuantity} />}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="ml-auto h-full w-full max-w-md">
+      <DrawerContent
+        className="ml-auto h-full w-full max-w-md"
+        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      >
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center gap-2">
             <ShoppingCartIcon className="size-5" />
             ตะกร้าสินค้า ({summary.totalQuantity})
           </DrawerTitle>
         </DrawerHeader>
-
         <ScrollArea className="flex-1 overflow-y-scroll px-4">
           {items.length === 0 ? (
             <div className="text-muted-foreground flex h-[60vh] flex-col items-center justify-center gap-2">
@@ -75,12 +80,15 @@ export function CartDrawer() {
             </div>
           )}
         </ScrollArea>
-
         {items.length > 0 && (
           <DrawerFooter className="border-t">
             <CartSummary summary={summary} />
             <Link href="/cart">
-              <Button size="lg" className="h-12 w-full shadow-md sm:text-lg">
+              <Button
+                size="lg"
+                variant="brand"
+                className="h-12 w-full text-lg shadow-md sm:text-lg"
+              >
                 สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
               </Button>
             </Link>

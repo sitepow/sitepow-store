@@ -31,7 +31,7 @@ export function ProductPriceHeader() {
             <div className="flex items-end gap-2">
               <data
                 value={totalPrice}
-                className="text-primary text-4xl font-bold sm:text-5xl"
+                className="text-4xl font-bold text-(--brand-color) sm:text-5xl"
               >
                 {formatCurrency(totalPrice || 0)}
               </data>
@@ -40,7 +40,7 @@ export function ProductPriceHeader() {
             {points > 0 && (
               <p>
                 คุณจะได้รับ{' '}
-                <span className="text-primary text-lg font-bold">
+                <span className="text-lg font-bold text-(--brand-color)">
                   {formatNumber(points)}
                 </span>{' '}
                 แต้มสะสม

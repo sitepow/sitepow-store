@@ -71,7 +71,7 @@ export function ProductGalleryThumbnail() {
             className={cn(
               'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 bg-transparent transition-all md:size-20',
               activeImageIndex === index
-                ? 'border-primary'
+                ? 'border-(--brand-color)'
                 : 'border-transparent',
             )}
           >

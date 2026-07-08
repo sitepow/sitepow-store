@@ -9,6 +9,7 @@ import {
   useValidateCoupon,
 } from '@/actions/hooks/storefront/discount'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
@@ -40,6 +41,8 @@ interface DiscountFormProps {
 }
 
 export function DiscountForm({ subtotal }: DiscountFormProps) {
+  const { store } = useStoreData()
+
   const params = useParams()
   const storeSlug = params.domain as string
 
@@ -116,15 +119,16 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
           เพิ่มส่วนลด
         </Button>
       </DialogTrigger>
-
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <IconTicket className="text-primary" />
+            <IconTicket className="text-(--brand-color)" />
             ใช้ส่วนลด
           </DialogTitle>
         </DialogHeader>
-
         <div className="grid gap-6 py-4">
           {loyalty?.isPointsEnabled && (
             <>
@@ -134,12 +138,11 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                     <IconWallet className="text-muted-foreground size-4" />
                     ใช้แต้มสะสม
                   </Label>
-                  <span className="text-primary text-sm font-semibold">
+                  <span className="text-sm font-semibold text-(--brand-color)">
                     {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
                     แต้ม
                   </span>
                 </div>
-
                 <Slider
                   max={maxUsablePoints}
                   step={10}
@@ -148,7 +151,6 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                   disabled={maxUsablePoints === 0}
                   className="cursor-pointer"
                 />
-
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
@@ -164,30 +166,26 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                     </strong>
                   </span>
                 </div>
-
                 <p className="text-muted-foreground text-xs">
                   คุณมีแต้มสะสม {formatNumber(customerPoints)} แต้ม (1 แต้ม ={' '}
                   {formatCurrency(pointRedeemRate)})
                 </p>
               </div>
-
               <Separator />
             </>
           )}
-
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <IconDiscount2 className="text-muted-foreground size-4" />
               รหัสส่วนลด
             </Label>
-
             {appliedCoupon ? (
-              <div className="bg-primary/5 border-primary/20 flex items-center justify-between rounded-md border px-3 py-2">
+              <div className="flex items-center justify-between rounded-md border border-(--brand-color)/20 bg-(--brand-color)/5 px-3 py-2">
                 <span className="text-sm font-medium">
                   {appliedCoupon.code}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-primary text-sm font-semibold">
+                  <span className="text-sm font-semibold text-(--brand-color)">
                     -{formatCurrency(appliedCoupon.discountAmount)}
                   </span>
                   <Button
@@ -220,12 +218,10 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                 </Button>
               </div>
             )}
-
             {couponError && (
               <p className="text-destructive text-xs">{couponError}</p>
             )}
           </div>
-
           <div className="bg-muted/20 space-y-3 rounded-xl border p-4">
             <SummaryRow
               label="ส่วนลดจากแต้มสะสม"

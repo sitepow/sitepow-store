@@ -440,10 +440,11 @@ model Store {
   ownerId String
   owner   User   @relation("StoreOwner", fields: [ownerId], references: [id])
 
-  email       String?
-  logo        String?
-  coverImage  String?
-  description String? @db.Text
+  email        String?
+  logo         String?
+  coverImage   String?
+  primaryColor String? @default("#ca3500")
+  description  String? @db.Text
 
   phone        String?
   lineId       String?

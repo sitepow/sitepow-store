@@ -139,3 +139,23 @@ export const FIELD_LABELS: Record<string, string> = {
   tags: 'แท็กสินค้า (Tags)',
 }
 export const FALLBACK_IMAGE = '/images/navigation/navigation-header.jpeg'
+export const PRIMARY_COLOR_OPTIONS = [
+  { label: 'Neutral', value: '#737373' },
+  { label: 'Amber', value: '#f59e0b' },
+  { label: 'Blue', value: '#3b82f6' },
+  { label: 'Cyan', value: '#06b6d4' },
+  { label: 'Emerald', value: '#10b981' },
+  { label: 'Fuchsia', value: '#d946ef' },
+  { label: 'Green', value: '#22c55e' },
+  { label: 'Indigo', value: '#6366f1' },
+  { label: 'Lime', value: '#84cc16' },
+  { label: 'Orange', value: '#f97316' },
+  { label: 'Pink', value: '#ec4899' },
+  { label: 'Purple', value: '#a855f7' },
+  { label: 'Red', value: '#ef4444' },
+  { label: 'Rose', value: '#f43f5e' },
+  { label: 'Sky', value: '#0ea5e9' },
+  { label: 'Teal', value: '#14b8a6' },
+  { label: 'Violet', value: '#8b5cf6' },
+  { label: 'Yellow', value: '#eab308' },
+]

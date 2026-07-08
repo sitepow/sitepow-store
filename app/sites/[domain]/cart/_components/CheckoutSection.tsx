@@ -28,14 +28,16 @@ export function CheckoutSection({
         isDisabled
           ? 'bg-foreground/5 border-border opacity-60'
           : isActive
-            ? 'border-primary shadow-md'
+            ? 'border-(--brand-color) shadow-md'
             : 'bg-foreground/5 border-border',
       )}
     >
       <div
         className={cn(
           'flex items-center justify-between px-5 py-3 transition-colors',
-          isActive && !isDisabled ? 'bg-primary text-white' : 'bg-transparent',
+          isActive && !isDisabled
+            ? 'bg-(--brand-color) text-white'
+            : 'bg-transparent',
         )}
       >
         <div className="flex items-center gap-2">
@@ -57,7 +59,6 @@ export function CheckoutSection({
           </button>
         )}
       </div>
-
       {!isDisabled && (
         <>
           <div
@@ -70,7 +71,6 @@ export function CheckoutSection({
           >
             {isActive && editView}
           </div>
-
           {!isActive && isCompleted && (
             <div className="border-border bg-background dark:bg-foreground/5 border-t px-5 py-3">
               {summaryView}

@@ -28,7 +28,6 @@ export function ProductVariantSelector() {
         ) : (
           <>
             <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
-
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
@@ -61,32 +60,29 @@ export function ProductVariantSelector() {
                     <RadioGroupItem
                       value={variant.id}
                       id={variant.id}
-                      className="mt-1"
+                      className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-(--brand-color) data-checked:border-(--brand-color) data-checked:bg-(--brand-color) dark:data-checked:bg-(--brand-color)"
                     />
-
                     <div className="flex flex-1 flex-col gap-1">
                       <span className="cursor-pointer text-xs">
                         {variant.title}
                       </span>
-
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
-                            <span className="text-primary text-[10px] font-semibold">
+                            <span className="text-[10px] font-semibold text-(--brand-color)">
                               ลด {variant.discountAmount}%
                             </span>
                           )}
                         {hasPoint && (
-                          <span className="text-[10px] font-semibold text-amber-600">
+                          <span className="text-[10px] font-semibold text-(--brand-color)">
                             + {variant.pointsAmount} แต้ม
                           </span>
                         )}
                       </div>
-
                       <div className="mt-1">
                         {hasDiscount ? (
                           <div className="flex flex-col">
-                            <span className="text-primary text-sm font-bold">
+                            <span className="text-sm font-bold text-(--brand-color)">
                               {formatCurrency(netPrice)}
                             </span>
                             <span className="text-muted-foreground text-[10px] line-through">
@@ -107,7 +103,6 @@ export function ProductVariantSelector() {
           </>
         )}
       </div>
-
       {!isLoading && hasVariant && <Separator />}
     </>
   )

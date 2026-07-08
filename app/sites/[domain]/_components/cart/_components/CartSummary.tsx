@@ -28,22 +28,18 @@ export function CartSummary({ summary, className }: CartSummaryProps) {
         label="รวมราคาสินค้า"
         value={formatCurrency(summary.subtotal)}
       />
-
       <SummaryRow
         label="ส่วนลด"
         value={formatCurrency(Math.abs(summary.totalDiscount))}
         isDiscount
       />
-
       <Separator className="my-2" />
-
       <SummaryTotal
         label="ราคาสุทธิ"
         value={formatCurrency(summary.finalPrice)}
       />
-
       {summary.totalPoints > 0 && (
-        <p className="text-primary text-right text-xs font-medium">
+        <p className="text-right text-xs font-medium text-(--brand-color)">
           คุณจะได้รับ {formatNumber(summary.totalPoints)} แต้ม
         </p>
       )}

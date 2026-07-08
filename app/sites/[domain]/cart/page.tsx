@@ -208,21 +208,16 @@ export default function StoreCartPage() {
           <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-7">
             <div className="flex items-center justify-between">
               <Link href={'/'}>
-                <Button
-                  variant="ghost"
-                  className="text-muted-foreground hover:text-primary -ml-4"
-                >
+                <Button variant="ghost" className="text-muted-foreground -ml-4">
                   <ChevronLeftIcon />
                   <span>แก้ไขรายการสินค้า</span>
                 </Button>
               </Link>
             </div>
-
             <div className="border-border flex flex-col rounded-xl border">
               <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>ตะกร้าสินค้า</h2>
               </div>
-
               {items?.length === 0 && (
                 <div className="p-5">
                   <Alert>
@@ -232,7 +227,6 @@ export default function StoreCartPage() {
                   </Alert>
                 </div>
               )}
-
               {items?.length !== 0 && (
                 <div className="space-y-8 p-5 text-start">
                   {items.map((item) => {
@@ -261,7 +255,6 @@ export default function StoreCartPage() {
               )}
             </div>
           </div>
-
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
             <div className="border-border flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
               <CircularProgress
@@ -276,7 +269,6 @@ export default function StoreCartPage() {
                 <p className="text-xs opacity-50">เลือกที่อยู่การจัดส่ง</p>
               </div>
             </div>
-
             <CheckoutSection
               title="1. ที่อยู่สำหรับการจัดส่ง"
               isActive={activeSection === 'address'}
@@ -300,7 +292,6 @@ export default function StoreCartPage() {
                     </AlertDescription>
                   </Alert>
                 )}
-
                 {addressOptions?.length !== 0 && (
                   <RadioGroup
                     value={selectedAddress}
@@ -319,16 +310,15 @@ export default function StoreCartPage() {
                     </div>
                   </RadioGroup>
                 )}
-
                 <Button
                   className="w-full"
+                  variant="brand"
                   disabled={!selectedAddressData}
                   onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
               </div>
-
               {selectedAddressData && (
                 <RadioGroup value={selectedAddress}>
                   <RadioCard
@@ -340,7 +330,6 @@ export default function StoreCartPage() {
                 </RadioGroup>
               )}
             </CheckoutSection>
-
             <CheckoutSection
               title="2. เลือกช่องทางจัดส่ง"
               isActive={activeSection === 'shipping'}
@@ -381,16 +370,15 @@ export default function StoreCartPage() {
                     </div>
                   </RadioGroup>
                 )}
-
                 <Button
                   className="w-full"
+                  variant="brand"
                   disabled={!selectedShippingData}
                   onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
               </div>
-
               {selectedShippingData && (
                 <RadioGroup value={selectedShipping}>
                   <RadioCard
@@ -406,7 +394,6 @@ export default function StoreCartPage() {
                 </RadioGroup>
               )}
             </CheckoutSection>
-
             <CheckoutSection
               title="3. วิธีชำระเงิน"
               isActive={activeSection === 'payment'}
@@ -424,7 +411,6 @@ export default function StoreCartPage() {
                     </AlertDescription>
                   </Alert>
                 )}
-
                 {paymentMethods.length !== 0 && (
                   <RadioGroup
                     value={selectedPayment}
@@ -443,16 +429,15 @@ export default function StoreCartPage() {
                     </div>
                   </RadioGroup>
                 )}
-
                 <Button
                   className="mt-2 h-11 w-full"
+                  variant="brand"
                   disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
                   ดำเนินการต่อ
                 </Button>
               </div>
-
               {selectedPaymentData && (
                 <RadioGroup value={selectedPayment}>
                   <RadioCard
@@ -464,14 +449,12 @@ export default function StoreCartPage() {
                 </RadioGroup>
               )}
             </CheckoutSection>
-
             <div className="bg-foreground/5 border-border rounded-xl border p-5">
               <SummaryRow
                 label="ส่วนลด"
                 value={<DiscountForm subtotal={summary.finalPrice} />}
               />
               <CartSummary summary={summary} />
-
               {(pointsDiscount > 0 || couponDiscount > 0) && (
                 <div className="mt-2 space-y-1 border-t pt-2">
                   {pointsDiscount > 0 && (
@@ -492,11 +475,11 @@ export default function StoreCartPage() {
                   />
                 </div>
               )}
-
               {isAuthenticated && (
                 <Button
                   className="mt-6 h-12 w-full text-lg"
                   size="lg"
+                  variant="brand"
                   disabled={
                     activeSection !== 'review' ||
                     createOrderMutation.isPending ||
@@ -509,10 +492,10 @@ export default function StoreCartPage() {
                     : 'สั่งสินค้า'}
                 </Button>
               )}
-
               {!isAuthenticated && (
                 <Button
                   className="mt-6 h-12 w-full text-lg"
+                  variant="brand"
                   onClick={() => {
                     router.push(loginHref)
                   }}

@@ -20,6 +20,7 @@ export function StoreLayout({
   ...props
 }: ComponentProps<'main'>) {
   const { store } = useStoreData()
+
   const { user } = useSession()
   const userRole = user?.role
 
@@ -28,6 +29,7 @@ export function StoreLayout({
       <StoreNavbar />
       <main
         className={cn(className, 'mt-24 sm:mt-20 lg:mt-32 xl:mt-36')}
+        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
         {...props}
       >
         {children}

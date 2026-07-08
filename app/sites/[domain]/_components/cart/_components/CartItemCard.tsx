@@ -28,18 +28,17 @@ export function CartItemCard({
           <h4 className="text-sm leading-tight font-medium sm:text-base">
             {item.productTitle}
           </h4>
-          <p className="text-primary mt-0.5 text-[11px] sm:text-xs">
+          <p className="mt-0.5 text-[11px] text-(--brand-color) sm:text-xs">
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
           </p>
           {item.selectedAddons.length > 0 && (
-            <p className="text-primary mt-0.5 text-[10px] sm:text-[11px]">
+            <p className="mt-0.5 text-[10px] text-(--brand-color) sm:text-[11px]">
               + {item.selectedAddons.map((a) => a.title).join(', ')}
             </p>
           )}
         </div>
-
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           {onUpdateQuantity && (
             <div className="flex items-center gap-1 rounded-lg border p-0.5 shadow-sm sm:gap-1.5 sm:p-1">
@@ -72,7 +71,6 @@ export function CartItemCard({
               </Button>
             </div>
           )}
-
           <div className="flex items-center gap-1">
             <div className="flex flex-col">
               {hasDiscount && (
@@ -80,7 +78,7 @@ export function CartItemCard({
                   {formatCurrency(originalUnitPrice * item.quantity)}
                 </span>
               )}
-              <p className="text-primary text-sm font-bold sm:text-base">
+              <p className="text-sm font-bold text-(--brand-color) sm:text-base">
                 {formatCurrency(item.totalPrice)}
               </p>
             </div>

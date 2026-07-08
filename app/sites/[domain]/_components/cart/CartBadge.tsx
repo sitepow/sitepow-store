@@ -1,5 +1,7 @@
 import { ComponentProps } from 'react'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
+
 import { cn } from '@/lib/utils'
 
 interface CartBadgeProps extends ComponentProps<'span'> {
@@ -7,10 +9,13 @@ interface CartBadgeProps extends ComponentProps<'span'> {
 }
 
 export function CartBadge({ total, className, ...props }: CartBadgeProps) {
+  const { store } = useStoreData()
+
   return (
     <span
+      style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
       className={cn(
-        'bg-primary text-primary-foreground absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full text-[10px]',
+        'text-primary-foreground absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-(--brand-color) text-[10px]',
         className,
       )}
       {...props}

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all border pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
+  'h-full rounded-xl transition-all border pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-(--brand-color)/50',
   {
     variants: {
       variant: {
@@ -39,19 +39,20 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
       <div className={cn(productCardVariants({ variant }), className)}>
         <div className="relative overflow-hidden rounded-t-xl">
           {primaryImage ? (
-            <div className="relative mb-2.5 aspect-square size-32 w-full overflow-hidden bg-transparent">
+            <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
               {isVideo ? (
                 <video
                   src={primaryImage.url}
-                  className="size-full object-contain"
+                  className="size-full object-cover"
                   muted
                   playsInline
+                  loop
                 />
               ) : (
                 <img
                   src={primaryImage.url}
                   alt={product.title}
-                  className="size-full object-contain p-2"
+                  className="size-full object-cover"
                 />
               )}
             </div>
@@ -62,22 +63,22 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           )}
 
           {hasDiscount && (
-            <Badge className="absolute top-0 right-0 size-12 rounded-full text-center">
+            <Badge className="absolute top-0 right-0 size-12 rounded-full bg-(--brand-color) text-center">
               ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )}
         </div>
 
-        <h3 className="group-hover:text-primary line-clamp-2 h-12 px-5 font-medium">
+        <h3 className="line-clamp-2 h-12 px-5 font-medium hover:text-(--brand-color)">
           {product.title}
         </h3>
 
-        <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
+        <div className="mt-2 flex items-end justify-center gap-2 group-hover:text-(--brand-color)">
           {hasDiscount ? (
             <div className="flex flex-col">
               <data
                 value={net?.min}
-                className="text-primary text-2xl font-bold"
+                className="text-2xl font-bold text-(--brand-color)"
               >
                 {formatCurrency(net?.min || 0)}
               </data>
@@ -88,7 +89,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           ) : (
             <data
               value={original?.min}
-              className="text-primary text-2xl font-bold"
+              className="text-2xl font-bold text-(--brand-color)"
             >
               {formatCurrency(original?.min || 0)}
             </data>

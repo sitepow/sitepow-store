@@ -21,6 +21,7 @@ export const storeProfileSchema = z.object({
   logo: z.any().optional(),
   coverImage: z.any().optional(),
   description: z.string().optional(),
+  primaryColor: z.string().optional().nullable(),
 })
 
 export type StoreProfileFormValues = z.infer<typeof storeProfileSchema>

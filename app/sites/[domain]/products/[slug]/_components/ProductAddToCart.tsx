@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 
-import { QuantitySelector } from './QuantitySelector'
 import { useCartStore } from '../../../cart/store'
 import { useProductPurchaseStore } from '../../store'
+import { QuantitySelector } from './QuantitySelector'
 
 export function ProductAddToCart() {
   const {
@@ -125,13 +125,12 @@ export function ProductAddToCart() {
           />
           {selectedVariant && (
             <div className="flex gap-2.5">
-              <PackageIcon className="text-primary" />
+              <PackageIcon className="text-(--brand-color)" />
               <span>{formatNumber(stock)} ชิ้น</span>
             </div>
           )}
         </div>
       </div>
-
       <div className="mt-4 flex flex-col gap-2">
         <Label className="text-lg font-semibold">ข้อมูลเพิ่มเติม (ถ้ามี)</Label>
         <Textarea
@@ -139,10 +138,9 @@ export function ProductAddToCart() {
           className="min-h-20"
         />
       </div>
-
       <Button
         size="lg"
-        className="mt-4 h-14 w-full text-lg shadow-lg"
+        className="mt-4 h-14 w-full bg-(--brand-color) text-lg shadow-lg hover:bg-(--brand-color)/80"
         onClick={handleAddToCart}
       >
         เพิ่มลงตะกร้า
