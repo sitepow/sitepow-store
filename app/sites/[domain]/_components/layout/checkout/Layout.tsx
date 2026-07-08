@@ -19,7 +19,7 @@ export function StoreLayoutCheckout({
       style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
     >
       <StoreNavbarCheckout />
-      <main className={cn(className, 'mt-32')} {...props}>
+      <main className={cn(className, 'mt-24 sm:mt-20 lg:mt-24')} {...props}>
         {children}
       </main>
     </div>

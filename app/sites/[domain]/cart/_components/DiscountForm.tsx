@@ -110,11 +110,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="secondary"
-          className="gap-2"
-          disabled={!isAuthenticated}
-        >
+        <Button variant="outline" className="gap-2" disabled={!isAuthenticated}>
           <IconTicket />
           เพิ่มส่วนลด
         </Button>

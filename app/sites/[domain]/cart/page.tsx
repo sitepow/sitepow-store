@@ -240,6 +240,7 @@ export default function StoreCartPage() {
                         item={item}
                         onRemove={removeItem}
                         onUpdateQuantity={updateQuantity}
+                        productClassName="sm:w-1/2"
                         isMaxStock={
                           item.quantity >=
                           getRemainingStock(items, {
@@ -256,7 +257,7 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="border-border flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
+            <div className="flex items-center gap-5 rounded-xl border border-(--brand-color) px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -264,7 +265,10 @@ export default function StoreCartPage() {
               />
               <div className="space-y-0.5">
                 <h3 className="font-bold" suppressHydrationWarning>
-                  ยอดที่ต้องชำระ: {formatCurrency(grandTotal)}
+                  ยอดที่ต้องชำระ{' '}
+                  <span className="text-(--brand-color)">
+                    {formatCurrency(grandTotal)}
+                  </span>
                 </h3>
                 <p className="text-xs opacity-50">เลือกที่อยู่การจัดส่ง</p>
               </div>

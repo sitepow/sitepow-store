@@ -70,7 +70,7 @@ export function ProductVariantSelector() {
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
                             <span className="text-[10px] font-semibold text-(--brand-color)">
-                              ลด {variant.discountAmount}%
+                              ส่วนลด {variant.discountAmount}%
                             </span>
                           )}
                         {hasPoint && (
@@ -79,7 +79,7 @@ export function ProductVariantSelector() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-1">
+                      <div>
                         {hasDiscount ? (
                           <div className="flex flex-col">
                             <span className="text-sm font-bold text-(--brand-color)">

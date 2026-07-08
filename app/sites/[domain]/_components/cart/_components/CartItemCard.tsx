@@ -1,14 +1,19 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
+import { cn } from '@/lib/utils'
+
 interface CartItemCardProps {
   item: CartItem
   onUpdateQuantity?: (id: string, newQuantity: number) => void
   onRemove?: (id: string) => void
   isMaxStock?: boolean
+  productClassName?: string
 }
 
 export function CartItemCard({
@@ -16,15 +21,25 @@ export function CartItemCard({
   onUpdateQuantity,
   onRemove,
   isMaxStock = false,
+  productClassName,
 }: CartItemCardProps) {
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
 
   return (
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
-      <div className="bg-foreground/20 size-20 shrink-0 overflow-hidden rounded-md border sm:size-24" />
+      <div
+        className={
+          'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 bg-transparent transition-all md:size-20'
+        }
+      >
+        <img
+          src={item.image}
+          className="size-full object-cover object-center"
+        />
+      </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="min-w-0">
+        <div className={cn('min-w-0', productClassName)}>
           <h4 className="text-sm leading-tight font-medium sm:text-base">
             {item.productTitle}
           </h4>

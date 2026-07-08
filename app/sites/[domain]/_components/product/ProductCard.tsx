@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all border pb-5 dark:bg-foreground/5 text-foreground group hover:border hover:border-(--brand-color)/50',
+  'h-full rounded-xl transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-(--brand-color)/50',
   {
     variants: {
       variant: {
@@ -61,18 +61,15 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
               ไม่มีรูปภาพ
             </div>
           )}
-
           {hasDiscount && (
             <Badge className="absolute top-0 right-0 size-12 rounded-full bg-(--brand-color) text-center">
               ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )}
         </div>
-
-        <h3 className="line-clamp-2 h-12 px-5 font-medium hover:text-(--brand-color)">
+        <h3 className="line-clamp-2 h-12 px-1 font-medium group-hover:text-(--brand-color)">
           {product.title}
         </h3>
-
         <div className="mt-2 flex items-end justify-center gap-2 group-hover:text-(--brand-color)">
           {hasDiscount ? (
             <div className="flex flex-col">

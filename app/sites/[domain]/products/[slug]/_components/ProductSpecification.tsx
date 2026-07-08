@@ -94,8 +94,7 @@ export function ProductSpecification() {
             <h3 className="text-xl font-bold">แท็กสินค้า</h3>
             <Separator className="flex-1" />
           </div>
-
-          <div className="flex flex-wrap gap-2 pt-4">
+          <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
               <Badge key={tag.name} variant="outline" className="font-normal">
                 <TagIcon /> {tag.name}

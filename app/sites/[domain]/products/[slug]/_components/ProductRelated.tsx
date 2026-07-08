@@ -28,7 +28,7 @@ export function ProductRelated() {
         <h3 className="text-foreground text-xl font-bold">สินค้าใกล้เคียง</h3>
         <Separator className="flex-1" />
       </div>
-      <div className="w-full overflow-hidden p-2.5">
+      <div className="w-full overflow-hidden">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex items-center gap-5">
             {isLoading
