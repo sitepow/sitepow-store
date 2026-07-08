@@ -140,7 +140,8 @@ export function ProductAddToCart() {
       </div>
       <Button
         size="lg"
-        className="mt-4 h-14 w-full bg-(--brand-color) text-lg shadow-lg hover:bg-(--brand-color)/80"
+        variant="brand"
+        className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >
         เพิ่มลงตะกร้า

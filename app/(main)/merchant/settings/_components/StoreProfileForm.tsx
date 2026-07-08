@@ -278,7 +278,10 @@ export function StoreProfileForm() {
                 control={control}
                 name="primaryColor"
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ?? ''}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="เลือกสีประจำแบรนด์" />
                     </SelectTrigger>

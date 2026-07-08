@@ -26,7 +26,6 @@ export function StoreFooter() {
           <div className="max-w-sm">
             {store?.logo && <StoreLogo image={store?.logo} />}
             {!store?.logo && <StoreLogo />}
-
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               {store?.description
                 ? store?.description
@@ -51,14 +50,12 @@ export function StoreFooter() {
             </div>
           </div>
         </div>
-
-        <div className="border-border mt-12 flex flex-col items-center justify-between gap-6 border-t pt-8 opacity-60 md:flex-row">
+        <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
           <div className="order-2 md:order-1">
             <p className="text-sm">
               © {currentYear} Sitepow. All rights reserved.
             </p>
           </div>
-
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
             <div className="flex flex-wrap justify-center gap-5 text-sm sm:gap-6">
               <Link href="/privacy-policy" className="hover:underline">
@@ -71,7 +68,6 @@ export function StoreFooter() {
           </div>
         </div>
       </div>
-
       {store?.plan === Plan.FREE && <ProtectedByBrand />}
     </footer>
   )

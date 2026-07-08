@@ -290,6 +290,7 @@ export function CustomerAddressCreateDialog() {
               className="w-full"
               type="submit"
               size="lg"
+              variant="brand"
               disabled={isPending}
             >
               {isPending ? (
