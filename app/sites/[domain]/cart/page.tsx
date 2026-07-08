@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -9,10 +9,14 @@ import { useAddressOptions } from '@/actions/hooks/storefront/address'
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { useCreateOrder } from '@/actions/hooks/storefront/order'
 import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
-import { useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping'
+import {
+  useShippingCalculation,
+  useStorefrontShippingOptions,
+} from '@/actions/hooks/storefront/shipping'
 import { PaymentMethod, UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { getClientAuthUrl } from '@/utils/auth'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
@@ -26,6 +30,7 @@ import {
 } from '@tabler/icons-react'
 import { ChevronLeftIcon } from 'lucide-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { SectionContainer } from '@/components/SectionContainer'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -46,6 +51,7 @@ import { useCartStore } from './store'
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const { store } = useStoreData()
   const isMounted = useIsMounted()
 
   const router = useRouter()
@@ -79,6 +85,14 @@ export default function StoreCartPage() {
     couponDiscount,
   })
 
+  const { data: shippingFees } = useShippingCalculation({
+    storeId: store?.id ?? '',
+    originProvince: 'กรุงเทพมหานคร',
+    destinationProvince: 'อุบลราชธานี',
+    destinationPostcode: '34000',
+    weight: summary.totalWeight || 20000,
+  })
+
   const [selectedAddress, setSelectedAddress] = useState<string>('')
   const [selectedShipping, setSelectedShipping] = useState<string>('')
   const [selectedPayment, setSelectedPayment] = useState<string>('')
@@ -87,6 +101,16 @@ export default function StoreCartPage() {
   const { data: addressOptions = [] } = useAddressOptions()
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
   const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
+
+  const shippingOptionsWithFees = useMemo(() => {
+    return shippingOptions.map((option) => {
+      const feeData = shippingFees?.find((f) => f.serviceId === option.id)
+      return {
+        ...option,
+        fee: feeData?.fee ?? null,
+      }
+    })
+  }, [shippingOptions, shippingFees])
 
   const createOrderMutation = useCreateOrder()
 
@@ -101,7 +125,7 @@ export default function StoreCartPage() {
     ...(paymentOptions?.isBankTransferEnabled
       ? paymentOptions.bankAccounts.map((acc) => ({
           id: acc.id,
-          title: `โอนเงิน - ${acc.bankName}`,
+          title: acc.bankName,
           description: `${acc.accountNumber} · ${acc.accountName}`,
         }))
       : []),
@@ -124,7 +148,7 @@ export default function StoreCartPage() {
   const selectedAddressData = addressOptions.find(
     (a) => a.id === selectedAddress,
   )
-  const selectedShippingData = shippingOptions.find(
+  const selectedShippingData = shippingOptionsWithFees.find(
     (s) => s.id === selectedShipping,
   )
   const selectedPaymentData = paymentMethods.find(
@@ -257,7 +281,7 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="flex items-center gap-5 rounded-xl border border-(--brand-color) px-5 py-2.5 text-start">
+            <div className="dark:bg-muted flex items-center gap-5 rounded-xl border border-(--brand-color) px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -289,12 +313,10 @@ export default function StoreCartPage() {
                 </div>
 
                 {addressOptions?.length === 0 && (
-                  <Alert>
-                    <AlertDescription className="flex flex-wrap items-center gap-2">
-                      <IconAlertCircle />
-                      ไม่มีที่อยู่สำหรับการจัดส่งสินค้า
-                    </AlertDescription>
-                  </Alert>
+                  <ActionRequiredAlert
+                    title="พบข้อผิดพลาด"
+                    description="ไม่มีที่อยู่สำหรับการจัดส่งสินค้า"
+                  />
                 )}
                 {addressOptions?.length !== 0 && (
                   <RadioGroup
@@ -343,27 +365,23 @@ export default function StoreCartPage() {
             >
               <div className="space-y-4">
                 {shippingOptions.length === 0 && (
-                  <Alert>
-                    <AlertDescription className="flex flex-wrap items-center gap-2">
-                      <IconAlertCircle />
-                      ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง
-                      กรุณาติดต่อร้านค้าโดยตรง
-                    </AlertDescription>
-                  </Alert>
+                  <ActionRequiredAlert
+                    title="พบข้อผิดพลาด"
+                    description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง กรุณาติดต่อร้านค้าโดยตรง"
+                  />
                 )}
-
-                {shippingOptions.length !== 0 && (
+                {shippingOptionsWithFees.length !== 0 && (
                   <RadioGroup
                     value={selectedShipping}
                     onValueChange={setSelectedShipping}
                   >
                     <div className="grid gap-2">
-                      {shippingOptions.map((method) => (
+                      {shippingOptionsWithFees.map((method) => (
                         <RadioCard
                           key={method.id}
                           id={`ship-${method.id}`}
                           value={method.id}
-                          title={method.courierService.name}
+                          title={`${method.courierService.name} (${method.fee ? formatCurrency(method.fee) : 'ไม่รองรับน้ำหนักนี้'})`}
                           description={
                             method.courierService.estimatedDays
                               ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
@@ -388,7 +406,11 @@ export default function StoreCartPage() {
                   <RadioCard
                     id={`summary-ship-${selectedShippingData.id}`}
                     value={selectedShippingData.id}
-                    title={selectedShippingData.courierService.name}
+                    title={`${selectedShippingData.courierService.name} ${
+                      selectedShippingData.fee !== null
+                        ? `(${formatCurrency(selectedShippingData.fee)})`
+                        : 'ไม่รองรับน้ำหนักนี้'
+                    }`}
                     description={
                       selectedShippingData.courierService.estimatedDays
                         ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
@@ -407,13 +429,10 @@ export default function StoreCartPage() {
             >
               <div className="space-y-3">
                 {paymentMethods.length === 0 && (
-                  <Alert>
-                    <AlertDescription className="flex flex-wrap items-center gap-2">
-                      <IconAlertCircle />
-                      ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางชำระเงิน
-                      กรุณาติดต่อร้านค้าโดยตรง
-                    </AlertDescription>
-                  </Alert>
+                  <ActionRequiredAlert
+                    title="พบข้อผิดพลาด"
+                    description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางชำระเงิน กรุณาติดต่อร้านค้าโดยตรง"
+                  />
                 )}
                 {paymentMethods.length !== 0 && (
                   <RadioGroup

@@ -1,5 +1,6 @@
 'use server'
 
+import { REMOTE_AREAS } from '@/constants/shipping'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
@@ -8,6 +9,7 @@ import {
 } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import {
+  getRegionKey,
   mapStoreToShippingForm,
   syncStoreServiceWeightRates,
 } from '@/utils/shipping'
@@ -135,4 +137,51 @@ export async function updateStoreShippingSettings(
     console.error(error)
     return { success: false }
   }
+}
+
+export async function calculateShippingFee({
+  storeId,
+  originProvince,
+  destinationProvince,
+  destinationPostcode,
+  weight,
+}: {
+  storeId: string
+  originProvince: string
+  destinationProvince: string
+  destinationPostcode: string
+  weight: number
+}) {
+  const isRemote = REMOTE_AREAS.some(
+    (area) => area.postcode === destinationPostcode,
+  )
+
+  let zoneType: ShippingZoneType = ShippingZoneType.CROSS_REGION
+  if (isRemote) {
+    zoneType = ShippingZoneType.REMOTE_AREA
+  } else if (originProvince === destinationProvince) {
+    zoneType = ShippingZoneType.SAME_PROVINCE
+  } else if (
+    getRegionKey(originProvince) === getRegionKey(destinationProvince)
+  ) {
+    zoneType = ShippingZoneType.SAME_REGION
+  }
+
+  const courierServices = await prisma.storeCourierService.findMany({
+    where: { storeId, isEnabled: true },
+    include: { weightRates: true },
+  })
+
+  return courierServices.map((cs) => {
+    const rate = cs.weightRates.find(
+      (r) =>
+        r.zoneType === zoneType &&
+        weight >= Number(r.minWeight) &&
+        weight <= Number(r.maxWeight),
+    )
+    return {
+      serviceId: cs.id,
+      fee: rate ? Number(rate.fee) : null,
+    }
+  })
 }

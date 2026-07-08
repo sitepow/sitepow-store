@@ -14,6 +14,7 @@ export interface CartItem {
   productId: string
   productTitle: string
   image: string
+  weight: number
   variant: CartVariant
   selectedOptions: SelectedOption[]
   selectedAddons: CartAddon[]
@@ -29,4 +30,5 @@ export interface CartSummary {
   totalPoints: number
   totalQuantity: number
   finalPrice: number
+  totalWeight: number
 }

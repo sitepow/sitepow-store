@@ -66,7 +66,7 @@ export function CheckoutSection({
         <>
           <div
             className={cn(
-              'transition-all duration-300',
+              'dark:bg-muted transition-all duration-300',
               isActive
                 ? 'px-5 py-3 opacity-100'
                 : 'h-0 overflow-hidden opacity-0',
@@ -75,7 +75,7 @@ export function CheckoutSection({
             {isActive && editView}
           </div>
           {!isActive && isCompleted && (
-            <div className="border-border bg-background border-t px-5 py-3">
+            <div className="border-border bg-background dark:bg-muted border-t px-5 py-3">
               {summaryView}
             </div>
           )}

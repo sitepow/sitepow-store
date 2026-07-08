@@ -136,6 +136,7 @@ export const useCartStore = create<CartStore>()(
             totalPoints: acc.totalPoints + item.rewardPoints,
             totalQuantity: acc.totalQuantity + item.quantity,
             finalPrice: acc.finalPrice + item.totalPrice,
+            totalWeight: acc.totalWeight + (item.weight || 0) * item.quantity,
           }),
           {
             subtotal: 0,
@@ -143,6 +144,7 @@ export const useCartStore = create<CartStore>()(
             totalPoints: 0,
             totalQuantity: 0,
             finalPrice: 0,
+            totalWeight: 0,
           },
         )
       },
