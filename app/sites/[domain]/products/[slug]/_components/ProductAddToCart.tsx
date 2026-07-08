@@ -84,6 +84,7 @@ export function ProductAddToCart() {
     addItem({
       productId: product.id,
       productTitle: product.title,
+      weight: product.weight || 0,
       image:
         product.images.find((img) => img.isPrimary)?.url ||
         product.images[0]?.url ||
