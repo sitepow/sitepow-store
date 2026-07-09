@@ -307,15 +307,20 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             type="button"
             disabled={isPending}
             onClick={() => handleAiGen()}
+            variant="outline"
           >
             {isPendingAiGen ? (
               <Spinner />
             ) : (
               <IconImageGeneration className="mr-2 size-4" />
             )}
-            {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหา'}
+            {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหาทั้งหมด'}
           </Button>{' '}
-          <Button type="button" onClick={() => setShowPresets(!showPresets)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowPresets(!showPresets)}
+          >
             {showPresets ? <IconX /> : <IconArrowForward />}
             {showPresets ? 'ปิดตัวอย่างสินค้า' : 'โหลดข้อมูลสินค้าตัวอย่าง'}
           </Button>
@@ -427,13 +432,28 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               <FieldLegend variant="label" className="text-lg font-bold">
                 Metadata (ข้อมูลทางเทคนิค)
               </FieldLegend>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => appendMetadata({ key: '', value: '' })}
-              >
-                <CirclePlus className="mr-1 size-4" /> เพิ่มฟิลด์
-              </Button>
+              <div className="flex flex-wrap gap-2.5">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                >
+                  {isPendingAiGen ? (
+                    <Spinner />
+                  ) : (
+                    <IconImageGeneration className="mr-2 size-4" />
+                  )}
+                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Metadata'}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => appendMetadata({ key: '', value: '' })}
+                >
+                  <CirclePlus className="mr-1 size-4" /> เพิ่มฟิลด์
+                </Button>
+              </div>
             </div>
             <div className="space-y-3">
               {metadataFields.map((field, index) => (
@@ -471,10 +491,25 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </div>
             <Field className="mt-4">
               <FieldLabel>Tags (คั่นด้วยเครื่องหมายคอมม่า)</FieldLabel>
-              <Input
-                placeholder="เสื้อผ้า, แฟชั่น, cotton"
-                {...register('tags')}
-              />
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Input
+                  placeholder="เสื้อผ้า, แฟชั่น, cotton"
+                  {...register('tags')}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                >
+                  {isPendingAiGen ? (
+                    <Spinner />
+                  ) : (
+                    <IconImageGeneration className="mr-2 size-4" />
+                  )}
+                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Tags'}
+                </Button>
+              </div>
             </Field>
           </FieldSet>
           <FieldSet
@@ -485,15 +520,30 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               <FieldLegend variant="label" className="text-lg font-bold">
                 บริการเสริม (Addons)
               </FieldLegend>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() =>
-                  appendAddon({ title: '', price: 0, isAvailable: true })
-                }
-              >
-                <PlusCircle className="mr-2 size-4" /> เพิ่มบริการเสริม
-              </Button>
+              <div className="flex flex-wrap gap-2.5">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                >
+                  {isPendingAiGen ? (
+                    <Spinner />
+                  ) : (
+                    <IconImageGeneration className="mr-2 size-4" />
+                  )}
+                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Addons'}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() =>
+                    appendAddon({ title: '', price: 0, isAvailable: true })
+                  }
+                >
+                  <PlusCircle className="mr-2 size-4" /> เพิ่มบริการเสริม
+                </Button>
+              </div>
             </div>
             <FieldGroup className="grid gap-4">
               {addonFields.map((item, index) => (

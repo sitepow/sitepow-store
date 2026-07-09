@@ -139,8 +139,8 @@ export function VariantItem({
         </Button>
       </div>
       <CardContent className="grid gap-6 pt-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-          <div className="md:col-span-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
+          <div className="sm:col-span-6">
             <Controller
               name={`variants.${index}.title`}
               control={control}
@@ -154,7 +154,7 @@ export function VariantItem({
               )}
             />
           </div>
-          <div className="md:col-span-6">
+          <div className="sm:col-span-6">
             <Controller
               name={`variants.${index}.price`}
               control={control}
@@ -176,7 +176,7 @@ export function VariantItem({
               )}
             />
           </div>
-          <div className="grid grid-cols-2 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
+          <div className="grid gap-5 border-t pt-5 sm:col-span-12 sm:grid-cols-2 xl:col-span-12">
             <DiscountField index={index} />
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
@@ -218,7 +218,7 @@ export function VariantItem({
             </div>
           </div>
           {isDigitalLink && (
-            <div className="md:col-span-12">
+            <div className="sm:col-span-12">
               <Controller
                 name={`variants.${index}.digitalUrl`}
                 control={control}
@@ -238,8 +238,8 @@ export function VariantItem({
             </div>
           )}
           {isPhysical && (
-            <>
-              <Separator className="col-span-12" />
+            <div className="space-y-5 sm:col-span-12">
+              <Separator />
               <div className="grid grid-cols-2 gap-4 md:col-span-12">
                 <div className="col-span-2">
                   <FieldLabel className="text-muted-foreground text-xs font-bold">
@@ -311,7 +311,7 @@ export function VariantItem({
                   )}
                 />
               </div>
-            </>
+            </div>
           )}
         </div>
         {isPhysical && (

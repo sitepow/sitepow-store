@@ -1,5 +1,8 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import Image from 'next/image'
+
+import { FALLBACK_IMAGE } from '@/constants/system'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
@@ -7,9 +10,9 @@ export function ProductPreviewContent() {
   const { control } = useFormContext()
   const { selectedStoreSlug } = useStoreFilter()
 
-  const [title, slug, tags, variants] = useWatch({
+  const [title, slug, tags, variants, images] = useWatch({
     control,
-    name: ['title', 'slug', 'tags', 'variants'],
+    name: ['title', 'slug', 'tags', 'variants', 'images'],
   })
 
   const displayTitle = title || 'ชื่อสินค้าจะแสดงตรงนี้'
@@ -58,9 +61,13 @@ export function ProductPreviewContent() {
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
           Social Share (ตัวอย่าง)
         </p>
-        <div className="bg-foreground/20 flex aspect-video items-center justify-center opacity-40">
-          รูปภาพตัวอย่าง
-        </div>
+        <Image
+          src={images[0]?.url ?? FALLBACK_IMAGE}
+          className="h-96 w-full object-cover object-center"
+          width={800}
+          height={800}
+          alt="preview-image"
+        />
         <div className="p-3">
           <p className="text-[12px] text-emerald-700 uppercase">
             https://{selectedStoreSlug}.sitepow.store

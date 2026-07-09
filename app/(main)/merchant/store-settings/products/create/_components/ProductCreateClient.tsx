@@ -58,7 +58,6 @@ export function ProductCreateClient({ productId }: ProductCreateClientProps) {
           </div>
         }
       />
-
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
       {selectedStoreId !== ALL_STORES && (
         <CreateProductForm productId={productId} />
