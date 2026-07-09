@@ -6,7 +6,9 @@ import { InfrastructureSection } from '@/components/section/InfrastructureSectio
 import { LogisticsSection } from '@/components/section/LogisticsSection'
 import { PaymentSection } from '@/components/section/PaymentSection'
 import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
+import { ProductTypeSection } from '@/components/section/ProductTypeSection'
 import { SecurityTrustSection } from '@/components/section/SecurityTrustSection'
+import { StoreCustomizationSection } from '@/components/section/StoreCustomizationSection'
 import { StoresSection } from '@/components/section/StoresSection'
 
 export default function HomePage() {
@@ -14,12 +16,14 @@ export default function HomePage() {
     <MainLayout className="-mt-12.5">
       <HeroSection />
       <FeatureSection />
+      <ProductTypeSection />
       <ComparisonSection />
       <PricingPhilosophySection />
       <PaymentSection />
       <LogisticsSection />
       <InfrastructureSection />
       <SecurityTrustSection />
+      <StoreCustomizationSection />
       <StoresSection />
     </MainLayout>
   )
