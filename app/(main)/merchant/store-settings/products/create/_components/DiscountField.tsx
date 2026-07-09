@@ -58,11 +58,9 @@ export function DiscountField({ index }: { index: number }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={DiscountType.PERCENTAGE}>
-                    เปอร์เซ็นต์ (%)
+                    เปอร์เซ็นต์
                   </SelectItem>
-                  <SelectItem value={DiscountType.FIXED}>
-                    จำนวนเงิน (฿)
-                  </SelectItem>
+                  <SelectItem value={DiscountType.FIXED}>จำนวนเงิน</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -81,6 +79,8 @@ export function DiscountField({ index }: { index: number }) {
                 type="number"
                 placeholder="0"
                 className="h-9"
+                min="0"
+                step="1"
                 disabled={!discountActive}
                 onChange={(e) => field.onChange(Number(e.target.value))}
               />

@@ -156,7 +156,7 @@ model Branch {
   address     String? @db.Text
 
   staffs           StaffBranch[]
-  orders           Order[]
+  orderItem        OrderItem[]
   stocks           ProductStock[]
   coupons          Coupon[]
   transfersOut     StockTransfer[]   @relation("TransferFrom")
@@ -331,7 +331,10 @@ model StoreCourierService {
   courierServiceId String
   courierService   CourierService @relation(fields: [courierServiceId], references: [id], onDelete: Cascade)
 
-  isEnabled Boolean @default(false)
+  isEnabled    Boolean       @default(false)
+  isCodEnabled Boolean       @default(false)
+  codFeeType   DiscountType? @default(PERCENTAGE)
+  codFeeAmount Decimal?      @default(2.3) @db.Decimal(10, 2)
 
   weightRates StoreServiceWeightRate[]
   zoneRates   StoreServiceZoneRate[]
@@ -635,15 +638,9 @@ model Product {
   slug  String
 
   productType ProductType @default(PHYSICAL)
-  digitalUrl  String?
 
   tags    ProductTag[]
   details Json?
-
-  weight Float?
-  width  Float?
-  height Float?
-  length Float?
 
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -685,14 +682,20 @@ model ProductImage {
 }
 
 model ProductVariant {
-  id    String  @id @default(cuid())
-  title String
-  price Decimal @db.Decimal(10, 2)
-  sku   String
+  id         String  @id @default(cuid())
+  title      String
+  price      Decimal @db.Decimal(10, 2)
+  sku        String
+  digitalUrl String?
 
   discountType   DiscountType?
   discountAmount Decimal?      @db.Decimal(10, 2)
   discountActive Boolean       @default(false)
+
+  weight Float?
+  width  Float?
+  height Float?
+  length Float?
 
   pointsAmount Int     @default(0)
   pointsActive Boolean @default(false)
@@ -852,9 +855,6 @@ model Order {
   totalAmount Decimal     @db.Decimal(10, 2)
   status      OrderStatus @default(PENDING)
 
-  branchId String?
-  branch   Branch? @relation(fields: [branchId], references: [id])
-
   couponId String?
   coupon   Coupon? @relation(fields: [couponId], references: [id])
 
@@ -867,6 +867,7 @@ model Order {
   usedPoints     Int?     @default(0)
   pointsDiscount Decimal? @default(0) @db.Decimal(10, 2)
   earnedPoints   Int?     @default(0)
+  codFee         Decimal? @default(0) @db.Decimal(10, 2)
 
   pointRedeemRateSnapshot  Decimal? @db.Decimal(10, 2)
   pointEarningRateSnapshot Decimal? @db.Decimal(10, 2)
@@ -905,6 +906,9 @@ model OrderItem {
   id      String @id @default(cuid())
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
 
   productId    String
   title        String

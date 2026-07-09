@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconGitBranch } from '@tabler/icons-react'
 
@@ -7,10 +9,23 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
-import { BranchCreateDialog } from './_components/BranchCreateDialog'
+import { BranchDialog } from './_components/BranchDialog'
 import { BranchesTable } from './_components/BranchesTable'
 
 export default function MerchantStoreSettingsBranchesPage() {
+  const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>()
+  const [open, setOpen] = useState(false)
+
+  const handleEdit = (id: string) => {
+    setSelectedBranchId(id)
+    setOpen(true)
+  }
+
+  const handleAdd = () => {
+    setSelectedBranchId(undefined)
+    setOpen(true)
+  }
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -20,11 +35,16 @@ export default function MerchantStoreSettingsBranchesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <BranchCreateDialog />
+            <BranchDialog
+              branchId={selectedBranchId}
+              open={open}
+              setOpen={setOpen}
+              onAdd={handleAdd}
+            />
           </div>
         }
       />
-      <BranchesTable />
+      <BranchesTable onEdit={handleEdit} />
     </DashboardSidebar>
   )
 }

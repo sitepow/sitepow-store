@@ -1,7 +1,8 @@
 import toast from 'react-hot-toast'
 
+import { ProductType } from '@/generated/prisma/enums'
 import { formatNumber } from '@/utils/pricing'
-import { calculateNetPrice } from '@/utils/product'
+import { calculateNetPrice, getStockQuantity } from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -22,9 +23,13 @@ export function ProductAddToCart() {
     selectedOptions,
     selectedAddons,
     isLoading,
+    selectedBranchId,
+    selectedBranchName,
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
+  const isDigital = product?.productType === ProductType.DIGITAL
+  const stock = getStockQuantity(selectedVariant, selectedBranchId)
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
@@ -84,7 +89,9 @@ export function ProductAddToCart() {
     addItem({
       productId: product.id,
       productTitle: product.title,
-      weight: product.weight || 0,
+      branchId: selectedBranchId ?? '',
+      branchName: selectedBranchName ?? '',
+      weight: selectedVariant.weight || 0,
       image:
         product.images.find((img) => img.isPrimary)?.url ||
         product.images[0]?.url ||
@@ -99,9 +106,6 @@ export function ProductAddToCart() {
         : 0,
     })
   }
-
-  const stock =
-    selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0
 
   if (isLoading) {
     return (
@@ -124,7 +128,7 @@ export function ProductAddToCart() {
             value={quantity}
             onChange={(val) => setQuantity(val)}
           />
-          {selectedVariant && (
+          {!isDigital && selectedVariant && (
             <div className="flex gap-2.5">
               <PackageIcon className="text-(--brand-color)" />
               <span>{formatNumber(stock)} ชิ้น</span>

@@ -1,20 +1,53 @@
 'use client'
 
-import { DiscountType } from '@/generated/prisma/enums'
+import { useEffect } from 'react'
+
+import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
-import { calculateNetPrice } from '@/utils/product'
+import { calculateNetPrice, getStockQuantity } from '@/utils/product'
 
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductVariantSelector() {
-  const { product, selectedVariant, selectVariant, isLoading } =
-    useProductPurchaseStore()
+  const {
+    product,
+    selectedVariant,
+    selectVariant,
+    isLoading,
+    selectedBranchId,
+    setSelectedBranch,
+  } = useProductPurchaseStore()
+
+  const isDigital = product?.productType === ProductType.DIGITAL
   const hasVariant = product?.variants?.length !== 0
+
+  useEffect(() => {
+    if (isDigital) {
+      return
+    }
+
+    const firstVariant = product?.variants?.[0]
+    const firstStock = firstVariant?.stocks?.[0]
+
+    if (!selectedBranchId && firstStock) {
+      setSelectedBranch(
+        firstStock.branchId,
+        firstStock.branch?.name || `สาขา ${firstStock.branchId}`,
+      )
+    }
+  }, [product, selectedBranchId, setSelectedBranch, isDigital])
 
   return (
     <>
@@ -27,6 +60,34 @@ export function ProductVariantSelector() {
           </div>
         ) : (
           <>
+            {!isDigital && (
+              <div className="space-y-2">
+                <Label className="text-lg font-semibold">
+                  สาขาที่รับสินค้า
+                </Label>
+                <Select
+                  value={selectedBranchId || ''}
+                  onValueChange={(val) => {
+                    const selectedBranchName =
+                      product?.variants[0]?.stocks.find(
+                        (s) => s.branchId === val,
+                      )?.branch?.name
+                    setSelectedBranch(val, selectedBranchName || `สาขา ${val}`)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="กรุณาเลือกสาขา" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product?.variants[0]?.stocks.map((stock) => (
+                      <SelectItem key={stock.branchId} value={stock.branchId}>
+                        {stock?.branch?.name || `สาขา ${stock.branchId}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
             <RadioGroup
               value={selectedVariant?.id}
@@ -51,20 +112,32 @@ export function ProductVariantSelector() {
                 const hasDiscount = !!discountConfig && netPrice < variant.price
                 const hasPoint = variant.pointsActive
 
+                const stock = isDigital
+                  ? 999
+                  : getStockQuantity(variant, selectedBranchId)
+
                 return (
                   <Label
                     htmlFor={variant.id}
                     key={variant.id}
-                    className="hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors"
+                    className={`hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors ${!isDigital && stock === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     <RadioGroupItem
                       value={variant.id}
                       id={variant.id}
+                      disabled={!isDigital && stock === 0}
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-(--brand-color) data-checked:border-(--brand-color) data-checked:bg-(--brand-color) dark:data-checked:bg-(--brand-color)"
                     />
                     <div className="flex flex-1 flex-col gap-1">
                       <span className="cursor-pointer text-xs">
                         {variant.title}
+                      </span>
+                      <span className="text-muted-foreground text-[10px]">
+                        {isDigital
+                          ? 'พร้อมส่ง (สินค้าดิจิทัล)'
+                          : stock > 0
+                            ? `คงเหลือ ${stock} ชิ้น`
+                            : 'สินค้าหมด'}
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&

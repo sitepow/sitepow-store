@@ -25,7 +25,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function BranchesTable() {
+interface BranchesTableProps {
+  onEdit: (id: string) => void
+}
+
+export function BranchesTable({ onEdit }: BranchesTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -83,7 +87,11 @@ export function BranchesTable() {
                         <IconStar />
                       </Button>
                     )}
-                    <Button variant="outline" size="icon-lg">
+                    <Button
+                      variant="outline"
+                      size="icon-lg"
+                      onClick={() => onEdit(branch.id)}
+                    >
                       <IconEdit />
                     </Button>
                     <DeleteButton

@@ -22,6 +22,8 @@ export interface CartItem {
   unitPrice: number
   totalPrice: number
   rewardPoints: number
+  branchId: string
+  branchName: string
 }
 
 export interface CartSummary {

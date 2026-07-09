@@ -1,7 +1,12 @@
 'use server'
 
 import { invalidateStorefrontProductCache } from '@/actions/query-keys/storefront/invalidation/product'
-import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import {
+  ActorType,
+  LogAction,
+  Prisma,
+  ProductType,
+} from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
 
@@ -19,20 +24,22 @@ export interface CreateProductInput {
   slug: string
   tags?: string
   images?: string[]
-  weight?: number
-  width?: number
-  height?: number
-  length?: number
   variants: {
     title: string
     price: number
     sku?: string
+    digitalUrl: string
+    weight?: number
+    width?: number
+    height?: number
+    length?: number
     stocks: { branchId: string; quantity: number; minStock: number }[]
     discount: { active: boolean; type: 'PERCENTAGE' | 'FIXED'; amount: number }
     rewardPoints: { isActive: boolean; amount: number }
   }[]
   addons?: { title: string; price: number; isAvailable: boolean }[]
   metadata?: { key: string; value: string }[]
+  productType: ProductType
 }
 
 const productSelect = {
@@ -40,6 +47,7 @@ const productSelect = {
   title: true,
   slug: true,
   createdAt: true,
+  productType: true,
   category: {
     select: {
       id: true,
@@ -65,6 +73,7 @@ const productSelect = {
       title: true,
       price: true,
       sku: true,
+      digitalUrl: true,
     },
   },
 } satisfies Prisma.ProductSelect

@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
-import { BranchCreateDialog } from '@/app/(main)/merchant/organization-branches/_components/BranchCreateDialog'
+import { BranchDialog } from '@/app/(main)/merchant/organization-branches/_components/BranchDialog'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -25,7 +25,9 @@ interface ProductCreateClientProps {
 }
 
 export function ProductCreateClient({ productId }: ProductCreateClientProps) {
-  const [open, setOpen] = useState(false)
+  const [openCategory, setOpenCategory] = useState(false)
+  const [openBranch, setOpenBranch] = useState(false)
+
   const { selectedStoreId } = useStoreFilter()
   const isMounted = useIsMounted()
 
@@ -48,8 +50,8 @@ export function ProductCreateClient({ productId }: ProductCreateClientProps) {
             </Button>
             {selectedStoreId !== ALL_STORES && (
               <>
-                <CategoryDialog open={open} setOpen={setOpen} />
-                <BranchCreateDialog />
+                <CategoryDialog open={openCategory} setOpen={setOpenCategory} />
+                <BranchDialog open={openBranch} setOpen={setOpenBranch} />
               </>
             )}
             <StoreSelectField />

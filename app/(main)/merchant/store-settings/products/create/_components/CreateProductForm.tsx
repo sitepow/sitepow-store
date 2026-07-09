@@ -21,7 +21,7 @@ import {
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { CreateProductInput } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
-import { DiscountType } from '@/generated/prisma/enums'
+import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
@@ -40,12 +40,20 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Field,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldLegend,
   FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
 import { CategoryField } from './CategoryField'
@@ -84,6 +92,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           title: 'มาตรฐาน',
           price: 0,
           sku: '',
+          weight: 0,
+          width: 0,
+          height: 0,
+          length: 0,
           stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
           discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
           rewardPoints: { isActive: false, amount: 0 },
@@ -92,6 +104,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       addons: [],
       metadata: [{ key: 'brand', value: '' }],
       tags: '',
+      productType: ProductType.PHYSICAL,
     },
   })
 
@@ -104,7 +117,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   } = form
 
   useEffect(() => {
-    if (product && product?.length !== 0) {
+    if (product) {
       const formValues = transformProductToFormValues(product)
       reset(formValues, {
         keepDirty: false,
@@ -204,6 +217,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           title: v.title,
           price: v.price,
           sku: v.sku,
+          digitalUrl: v.digitalUrl ?? '',
           stocks: v.stocks.map((s) => ({
             branchId: s.branchId,
             quantity: s.quantity ?? 0,
@@ -225,6 +239,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           isAvailable: a.isAvailable ?? true,
         })),
         metadata: data.metadata,
+        productType: data.productType as ProductType,
       }
 
       if (productId) {
@@ -328,7 +343,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           )}
         </CardContent>
       </Card>
-
       <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <div className="space-y-10">
           <FieldSet disabled={isPendingAiGen}>
@@ -340,9 +354,29 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               </div>
             </FieldGroup>
           </FieldSet>
-
+          <Field>
+            <FieldLabel>ประเภทสินค้า</FieldLabel>
+            <Controller
+              control={form.control}
+              name="productType"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกประเภทสินค้า" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ProductType.PHYSICAL}>
+                      สินค้าทั่วไป (Physical)
+                    </SelectItem>
+                    <SelectItem value={ProductType.DIGITAL}>
+                      สินค้าดิจิทัล (Digital)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
           <ImageUploadSection />
-
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <FieldLegend variant="label" className="text-lg font-bold">
               ตัวเลือกสินค้า
@@ -379,7 +413,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               />
             ))}
           </FieldGroup>
-
           <FieldSet
             disabled={isPending}
             className="dark:bg-foreground/5 border-l-primary rounded-lg border p-4"
@@ -438,7 +471,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               />
             </Field>
           </FieldSet>
-
           <FieldSet
             disabled={isPending}
             className="dark:bg-foreground/5 border-l-primary rounded-lg border p-6"
@@ -497,7 +529,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </FieldGroup>
           </FieldSet>
         </div>
-
         <div className="sticky top-6 space-y-6 xl:col-span-1">
           <ProductPreviewContent />
         </div>

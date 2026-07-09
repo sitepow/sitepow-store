@@ -13,6 +13,9 @@ interface ProductStore {
   selectedOptions: Record<string, string[]>
   selectedAddons: string[]
   quantity: number
+  selectedBranchId: string | null
+  selectedBranchName: string | null
+
   setIsLoading: (isLoading: boolean) => void
   setProduct: (product: StorefrontProductDetail) => void
   selectVariant: (variantId: string) => void
@@ -23,11 +26,11 @@ interface ProductStore {
   ) => void
   toggleAddon: (addonId: string) => void
   setQuantity: (qty: number) => void
+  setSelectedBranch: (id: string, name: string) => void
 
   getVariantPrice: (variant: StorefrontVariant) => number
   getTotalPrice: () => number
   getCurrentPoints: () => number
-
   activeImageIndex: number
   setActiveImageIndex: (index: number) => void
 }
@@ -40,7 +43,21 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   selectedOptions: {},
   selectedAddons: [],
   quantity: 1,
+  selectedBranchId: null,
+  selectedBranchName: null,
+
   setIsLoading: (isLoading) => set({ isLoading }),
+
+  setSelectedBranch: (id, name) => {
+    const { selectedVariant, quantity } = get()
+    const stock =
+      selectedVariant?.stocks.find((s) => s.branchId === id)?.quantity ?? 0
+    set({
+      selectedBranchId: id,
+      selectedBranchName: name,
+      quantity: Math.max(1, Math.min(quantity, stock || 1)),
+    })
+  },
 
   setProduct: (product) => {
     set({
@@ -50,27 +67,42 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
       selectedOptions: {},
       selectedAddons: [],
       quantity: 1,
+      selectedBranchId: null,
+      selectedBranchName: null,
     })
   },
 
   selectVariant: (variantId) => {
-    const { product, quantity } = get()
+    const { product, quantity, selectedBranchId } = get()
     const variant = product?.variants.find((v) => v.id === variantId) ?? null
 
     if (variant) {
-      const stock = variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
+      const stock = selectedBranchId
+        ? (variant.stocks.find((s) => s.branchId === selectedBranchId)
+            ?.quantity ?? 0)
+        : variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
+
       set({
         selectedVariant: variant,
-        quantity: Math.max(1, Math.min(quantity, stock)),
+        quantity: Math.max(1, Math.min(quantity, stock || 1)),
       })
     }
+  },
+
+  setQuantity: (qty) => {
+    const { selectedVariant, selectedBranchId } = get()
+    const stock = selectedBranchId
+      ? (selectedVariant?.stocks.find((s) => s.branchId === selectedBranchId)
+          ?.quantity ?? 0)
+      : (selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0)
+
+    set({ quantity: Math.max(1, Math.min(qty, stock || 1)) })
   },
 
   toggleOption: (optionTitle, choiceName, maxSelect) => {
     set((state) => {
       const current = state.selectedOptions[optionTitle] ?? []
       let next: string[]
-
       if (current.includes(choiceName)) {
         next = current.filter((n) => n !== choiceName)
       } else {
@@ -79,7 +111,6 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
             ? [choiceName]
             : [...current, choiceName].slice(-maxSelect)
       }
-
       return {
         selectedOptions: { ...state.selectedOptions, [optionTitle]: next },
       }
@@ -94,22 +125,14 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
     }))
   },
 
-  setQuantity: (qty) => {
-    const stock =
-      get().selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0
-    set({ quantity: Math.max(1, Math.min(qty, stock)) })
-  },
-
   getVariantPrice: (variant) => {
-    const discount = {
-      active: variant.discountActive ?? false,
-      type: variant.discountType ?? '',
-      amount: variant.discountAmount ?? 0,
-    }
-
     return calculateNetPrice({
       price: variant.price,
-      discount: discount,
+      discount: {
+        active: variant.discountActive ?? false,
+        type: variant.discountType ?? '',
+        amount: variant.discountAmount ?? 0,
+      },
     })
   },
 
@@ -121,28 +144,20 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
       quantity,
       getVariantPrice,
     } = get()
-    if (!selectedVariant) {
-      return 0
-    }
-
+    if (!selectedVariant) return 0
     let unitPrice = getVariantPrice(selectedVariant)
-
     selectedAddons.forEach((id) => {
       const addon = product?.addons.find((a) => a.id === id)
-      if (addon?.isAvailable) {
-        unitPrice += addon.price
-      }
+      if (addon?.isAvailable) unitPrice += addon.price
     })
-
     return unitPrice * quantity
   },
 
   getCurrentPoints: () => {
     const { selectedVariant, quantity } = get()
-    if (!selectedVariant?.pointsActive) {
-      return 0
-    }
-    return selectedVariant.pointsAmount * quantity
+    return selectedVariant?.pointsActive
+      ? selectedVariant.pointsAmount * quantity
+      : 0
   },
 
   activeImageIndex: 0,

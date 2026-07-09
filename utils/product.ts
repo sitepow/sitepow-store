@@ -141,11 +141,14 @@ export const transformProductToFormValues = (
     categoryId: product.categoryId,
     tags: product.tags.map((t) => t.name).join(', '),
     images: product.images.map((img) => ({ url: img.url })),
-
     variants: product.variants.map((v) => ({
       title: v.title,
       price: Number(v.price),
       sku: v.sku || '',
+      weight: v.weight ?? 0,
+      width: v.width ?? 0,
+      height: v.height ?? 0,
+      length: v.length ?? 0,
       stocks: v.stocks.map((s) => ({
         branchId: s.branchId,
         quantity: s.quantity,
@@ -161,23 +164,34 @@ export const transformProductToFormValues = (
         amount: v.pointsAmount,
       },
     })),
-
     addons: product.addons.map((a) => ({
       title: a.title,
       price: Number(a.price),
       isAvailable: a.isAvailable,
     })),
-
     metadata: Object.entries(
       (product.details as Record<string, string>) || {},
     ).map(([key, value]) => ({
       key,
       value,
     })),
-
-    weight: product.weight ?? 0,
-    width: product.width ?? 0,
-    height: product.height ?? 0,
-    length: product.length ?? 0,
   }
+}
+
+export const getStockQuantity = (
+  variant:
+    | { stocks: { quantity: number; branchId: string }[] }
+    | null
+    | undefined,
+  branchId?: string | null,
+): number => {
+  if (!variant) {
+    return 0
+  }
+
+  if (branchId) {
+    return variant.stocks.find((s) => s.branchId === branchId)?.quantity ?? 0
+  }
+
+  return variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
 }

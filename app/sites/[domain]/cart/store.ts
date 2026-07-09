@@ -28,11 +28,13 @@ interface CartStore {
   getCartSummary: () => CartSummary
 }
 
-const getStock = (variant: CartItem['variant']) =>
-  variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
-
 const getRewardPoints = (variant: CartItem['variant'], quantity: number) =>
   variant.pointsActive ? variant.pointsAmount * quantity : 0
+
+const getStockByBranch = (variant: CartItem['variant'], branchId: string) => {
+  const stock = variant.stocks.find((s) => s.branchId === branchId)
+  return stock ? stock.quantity : 0
+}
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -44,19 +46,26 @@ export const useCartStore = create<CartStore>()(
       addItem: (newItem) => {
         const { items } = get()
 
-        const remaining = getRemainingStock(items, {
+        const branchStock = getStockByBranch(newItem.variant, newItem.branchId)
+
+        const itemsInSameBranch = items.filter(
+          (i) => i.branchId === newItem.branchId,
+        )
+        const remaining = getRemainingStock(itemsInSameBranch, {
           variantId: newItem.variant.id,
-          stock: getStock(newItem.variant),
+          stock: branchStock,
         })
 
         if (remaining <= 0) {
-          toast.error('สินค้าในสต็อกไม่เพียงพอ')
+          toast.error('สินค้าสาขานี้หมด')
           return
         }
 
-        const existingIndex = items.findIndex((item) =>
-          isSameCartItem(item, newItem),
+        const existingIndex = items.findIndex(
+          (item) =>
+            isSameCartItem(item, newItem) && item.branchId === newItem.branchId,
         )
+
         const finalQty = Math.min(newItem.quantity, remaining)
 
         if (existingIndex > -1) {
@@ -97,10 +106,15 @@ export const useCartStore = create<CartStore>()(
           return
         }
 
-        const remaining = getRemainingStock(items, {
+        const branchStock = getStockByBranch(target.variant, target.branchId)
+
+        const itemsInSameBranch = items.filter(
+          (i) => i.branchId === target.branchId && i.cartItemId !== cartItemId,
+        )
+
+        const remaining = getRemainingStock(itemsInSameBranch, {
           variantId: target.variant.id,
-          stock: getStock(target.variant),
-          excludeCartItemId: cartItemId,
+          stock: branchStock,
         })
 
         const validatedQty = Math.max(1, Math.min(qty, remaining))

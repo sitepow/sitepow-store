@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 
 import { DiscountField } from './DiscountField'
@@ -43,7 +44,7 @@ export function VariantItem({
   removeVariant,
   isOnlyOne,
 }: VariantItemProps) {
-  const { control, setValue } = useFormContext<ProductFormValues>()
+  const { control, setValue, watch } = useFormContext<ProductFormValues>()
 
   const {
     fields: stockFields,
@@ -68,6 +69,9 @@ export function VariantItem({
       control,
       name: `variants.${index}.stocks`,
     })?.map((s) => s.branchId) ?? []
+
+  const productType = watch('productType')
+  const isDigital = productType === 'DIGITAL'
 
   const stocks = useWatch({
     control,
@@ -105,7 +109,6 @@ export function VariantItem({
               )}
             />
           </div>
-
           <div className="md:col-span-6">
             <Controller
               name={`variants.${index}.price`}
@@ -116,6 +119,8 @@ export function VariantItem({
                   <Input
                     {...field}
                     type="number"
+                    min="0"
+                    step="1"
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     aria-invalid={fieldState.invalid}
                   />
@@ -126,10 +131,8 @@ export function VariantItem({
               )}
             />
           </div>
-
           <div className="grid grid-cols-2 gap-5 border-t pt-5 sm:col-span-12 xl:col-span-12">
             <DiscountField index={index} />
-
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <div className="space-y-0.5">
@@ -159,6 +162,8 @@ export function VariantItem({
                       type="number"
                       placeholder="ระบุจำนวนแต้ม"
                       className="h-9"
+                      min="0"
+                      step="1"
                       disabled={!pointsActive}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
@@ -167,8 +172,103 @@ export function VariantItem({
               />
             </div>
           </div>
+          {isDigital && (
+            <div className="md:col-span-12">
+              <Controller
+                name={`variants.${index}.digitalUrl`}
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-xs">
+                      ลิงก์ดาวน์โหลด (Digital URL)
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="ระบุลิงค์ดาว์นโหลดของคุณ (zip, ...etc.)"
+                    />
+                  </Field>
+                )}
+              />
+            </div>
+          )}
+          {!isDigital && (
+            <>
+              <Separator className="col-span-12" />
+              <div className="grid grid-cols-2 gap-4 md:col-span-12">
+                <div className="col-span-2">
+                  <FieldLabel className="text-muted-foreground text-xs font-bold">
+                    ข้อมูลการจัดส่ง
+                  </FieldLabel>
+                </div>
+                <Controller
+                  name={`variants.${index}.weight`}
+                  control={control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel className="text-xs">น้ำหนัก (g)</FieldLabel>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name={`variants.${index}.width`}
+                  control={control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel className="text-xs">กว้าง (cm)</FieldLabel>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name={`variants.${index}.height`}
+                  control={control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel className="text-xs">สูง (cm)</FieldLabel>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name={`variants.${index}.length`}
+                  control={control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel className="text-xs">ยาว (cm)</FieldLabel>
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </Field>
+                  )}
+                />
+              </div>
+            </>
+          )}
         </div>
-
         <div className="bg-muted/20 rounded-lg border p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
             <FieldLegend variant="label" className="text-lg font-bold">
@@ -186,7 +286,6 @@ export function VariantItem({
               <PlusCircle className="mr-2 size-4" /> เพิ่มสาขา
             </Button>
           </div>
-
           <div className="space-y-2">
             {stockFields.map((stock, stockIndex) => (
               <div
@@ -224,6 +323,8 @@ export function VariantItem({
                     <Input
                       {...field}
                       type="number"
+                      min="0"
+                      step="1"
                       className="h-8 text-xs"
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
@@ -243,7 +344,6 @@ export function VariantItem({
           </div>
         </div>
       </CardContent>
-
       <div className="absolute top-2 right-2">
         <Button
           variant="destructive"
