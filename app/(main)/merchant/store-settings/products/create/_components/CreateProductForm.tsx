@@ -21,6 +21,7 @@ import {
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { CreateProductInput } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
+import { PRODUCT_TYPE_OPTIONS } from '@/constants/translate'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
@@ -364,12 +365,11 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     <SelectValue placeholder="เลือกประเภทสินค้า" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={ProductType.PHYSICAL}>
-                      สินค้าทั่วไป (Physical)
-                    </SelectItem>
-                    <SelectItem value={ProductType.DIGITAL}>
-                      สินค้าดิจิทัล (Digital)
-                    </SelectItem>
+                    {PRODUCT_TYPE_OPTIONS.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               )}

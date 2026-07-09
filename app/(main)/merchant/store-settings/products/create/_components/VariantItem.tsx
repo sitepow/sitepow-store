@@ -7,6 +7,7 @@ import {
 } from 'react-hook-form'
 
 import { useBranches } from '@/actions/hooks/branch'
+import { ProductType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
 import { IconTrash } from '@tabler/icons-react'
@@ -71,7 +72,7 @@ export function VariantItem({
     })?.map((s) => s.branchId) ?? []
 
   const productType = watch('productType')
-  const isDigital = productType === 'DIGITAL'
+  const isDigitalLink = productType === ProductType.DIGITAL_LINK
 
   const stocks = useWatch({
     control,
@@ -172,7 +173,7 @@ export function VariantItem({
               />
             </div>
           </div>
-          {isDigital && (
+          {isDigitalLink && (
             <div className="md:col-span-12">
               <Controller
                 name={`variants.${index}.digitalUrl`}
@@ -192,7 +193,7 @@ export function VariantItem({
               />
             </div>
           )}
-          {!isDigital && (
+          {!isDigitalLink && (
             <>
               <Separator className="col-span-12" />
               <div className="grid grid-cols-2 gap-4 md:col-span-12">

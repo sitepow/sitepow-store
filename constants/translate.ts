@@ -8,6 +8,7 @@ import {
   OrderStatus,
   PaymentMethod,
   Plan,
+  ProductType,
   StaffRole,
   StockAdjustmentReason,
   SubStatus,
@@ -132,6 +133,20 @@ export const TRANSFER_STATUS_TH: Record<TransferStatus, string> = {
   [TransferStatus.CANCELLED]: 'ยกเลิกแล้ว',
 }
 
+export const PRODUCT_TYPE_TH: Record<ProductType, string> = {
+  [ProductType.PHYSICAL]: 'สินค้าทั่วไป (Physical)',
+  [ProductType.DIGITAL_LINK]: 'สินค้าดิจิทัลแบบลิงก์ (Digital Link)',
+  [ProductType.DIGITAL_ITEM]: 'สินค้าดิจิทัลแบบไฟล์/คีย์ (Digital Item)',
+  [ProductType.DIGITAL_SERVICE]: 'บริการเติมเกม/งานบริการ (Service)',
+}
+
+export const PRODUCT_TYPE_OPTIONS = Object.entries(PRODUCT_TYPE_TH).map(
+  ([value, label]) => ({
+    value,
+    label,
+  }),
+)
+
 export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
@@ -146,4 +161,5 @@ export const getLabel = {
   transactionType: (v: TransactionType) => TRANSACTION_TYPE_TH[v] || v,
   subStatus: (v: SubStatus) => SUB_STATUS_TH[v] || v,
   transferStatus: (v: TransferStatus) => TRANSFER_STATUS_TH[v] || v,
+  productType: (v: ProductType) => PRODUCT_TYPE_TH[v] || v,
 }

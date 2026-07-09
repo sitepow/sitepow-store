@@ -28,7 +28,7 @@ export function ProductAddToCart() {
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
-  const isDigital = product?.productType === ProductType.DIGITAL
+  const isDigitalLink = product?.productType === ProductType.DIGITAL_LINK
   const stock = getStockQuantity(selectedVariant, selectedBranchId)
 
   const handleAddToCart = () => {
@@ -104,6 +104,7 @@ export function ProductAddToCart() {
       rewardPoints: selectedVariant.pointsActive
         ? selectedVariant.pointsAmount * quantity
         : 0,
+      productType: product?.productType ?? ProductType.PHYSICAL,
     })
   }
 
@@ -128,7 +129,7 @@ export function ProductAddToCart() {
             value={quantity}
             onChange={(val) => setQuantity(val)}
           />
-          {!isDigital && selectedVariant && (
+          {!isDigitalLink && selectedVariant && (
             <div className="flex gap-2.5">
               <PackageIcon className="text-(--brand-color)" />
               <span>{formatNumber(stock)} ชิ้น</span>

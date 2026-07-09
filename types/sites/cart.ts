@@ -1,4 +1,5 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { ProductType } from '@/generated/prisma/enums'
 
 export type CartVariant = StorefrontProductDetail['variants'][number]
 export type CartAddon = NonNullable<StorefrontProductDetail['addons']>[number]
@@ -24,6 +25,7 @@ export interface CartItem {
   rewardPoints: number
   branchId: string
   branchName: string
+  productType: ProductType
 }
 
 export interface CartSummary {

@@ -30,11 +30,11 @@ export function ProductVariantSelector() {
     setSelectedBranch,
   } = useProductPurchaseStore()
 
-  const isDigital = product?.productType === ProductType.DIGITAL
+  const isDigitalLink = product?.productType === ProductType.DIGITAL_LINK
   const hasVariant = product?.variants?.length !== 0
 
   useEffect(() => {
-    if (isDigital) {
+    if (isDigitalLink) {
       return
     }
 
@@ -47,7 +47,7 @@ export function ProductVariantSelector() {
         firstStock.branch?.name || `สาขา ${firstStock.branchId}`,
       )
     }
-  }, [product, selectedBranchId, setSelectedBranch, isDigital])
+  }, [product, selectedBranchId, setSelectedBranch, isDigitalLink])
 
   return (
     <>
@@ -60,7 +60,7 @@ export function ProductVariantSelector() {
           </div>
         ) : (
           <>
-            {!isDigital && (
+            {!isDigitalLink && (
               <div className="space-y-2">
                 <Label className="text-lg font-semibold">
                   สาขาที่รับสินค้า
@@ -112,7 +112,7 @@ export function ProductVariantSelector() {
                 const hasDiscount = !!discountConfig && netPrice < variant.price
                 const hasPoint = variant.pointsActive
 
-                const stock = isDigital
+                const stock = isDigitalLink
                   ? 999
                   : getStockQuantity(variant, selectedBranchId)
 
@@ -120,12 +120,12 @@ export function ProductVariantSelector() {
                   <Label
                     htmlFor={variant.id}
                     key={variant.id}
-                    className={`hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors ${!isDigital && stock === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                    className={`hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors ${!isDigitalLink && stock === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
                     <RadioGroupItem
                       value={variant.id}
                       id={variant.id}
-                      disabled={!isDigital && stock === 0}
+                      disabled={!isDigitalLink && stock === 0}
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-(--brand-color) data-checked:border-(--brand-color) data-checked:bg-(--brand-color) dark:data-checked:bg-(--brand-color)"
                     />
                     <div className="flex flex-1 flex-col gap-1">
@@ -133,7 +133,7 @@ export function ProductVariantSelector() {
                         {variant.title}
                       </span>
                       <span className="text-muted-foreground text-[10px]">
-                        {isDigital
+                        {isDigitalLink
                           ? 'พร้อมส่ง (สินค้าดิจิทัล)'
                           : stock > 0
                             ? `คงเหลือ ${stock} ชิ้น`

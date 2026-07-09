@@ -7,6 +7,7 @@ import {
   LogAction,
   OrderStatus,
   PaymentMethod,
+  ProductType,
 } from '@/generated/prisma/enums'
 import { calculateDiscounts } from '@/utils/cart'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
@@ -23,25 +24,21 @@ export interface CreateOrderItemInput {
   variantTitle: string
   quantity: number
   price: number
+  productType: ProductType
 }
 
 export interface CreateOrderInput {
   storeSlug: string
   addressId: string
-
   shippingMethod: string
   shippingFee: number
   storeCourierServiceId?: string
-
   paymentMethod: PaymentMethod
-
   couponId?: string
   couponDiscount?: number
-
   usedPoints?: number
   pointsDiscount?: number
   earnedPoints?: number
-
   items: CreateOrderItemInput[]
 }
 
@@ -393,6 +390,7 @@ export async function createOrder(input: CreateOrderInput) {
               quantity: item.quantity,
               price: item.price,
               branchId: branch.id,
+              productType: item.productType,
             })),
           },
         },

@@ -629,7 +629,9 @@ model Category {
 
 enum ProductType {
   PHYSICAL
-  DIGITAL
+  DIGITAL_LINK
+  DIGITAL_ITEM
+  DIGITAL_SERVICE
 }
 
 model Product {
@@ -681,12 +683,27 @@ model ProductImage {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
+model DigitalItem {
+  id      String  @id @default(cuid())
+  content String  @db.Text
+  isUsed  Boolean @default(false)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
 model ProductVariant {
-  id         String  @id @default(cuid())
-  title      String
-  price      Decimal @db.Decimal(10, 2)
-  sku        String
-  digitalUrl String?
+  id          String  @id @default(cuid())
+  title       String
+  price       Decimal @db.Decimal(10, 2)
+  sku         String
+  digitalUrl  String? @db.Text
+  isAvailable Boolean @default(true)
 
   discountType   DiscountType?
   discountAmount Decimal?      @db.Decimal(10, 2)
@@ -710,6 +727,7 @@ model ProductVariant {
   stocks           ProductStock[]
   stockTransfers   StockTransfer[]
   stockAdjustments StockAdjustment[]
+  digitalItems     DigitalItem[]
 }
 
 model ProductOption {
@@ -895,8 +913,9 @@ model Order {
   shippingAddrSnapshot Json?
   storeSnapshot        Json?
 
-  items     OrderItem[]
-  createdAt DateTime    @default(now())
+  items       OrderItem[]
+  digitalItem DigitalItem[]
+  createdAt   DateTime      @default(now())
 
   @@index([storeId])
   @@index([customerId])
@@ -910,12 +929,14 @@ model OrderItem {
   branchId String
   branch   Branch @relation(fields: [branchId], references: [id])
 
+  productType  ProductType
+  customerNote String?     @db.Text
   productId    String
   title        String
   variantId    String
   variantTitle String
   quantity     Int
-  price        Decimal @db.Decimal(10, 2)
+  price        Decimal     @db.Decimal(10, 2)
 
   @@index([orderId])
 }

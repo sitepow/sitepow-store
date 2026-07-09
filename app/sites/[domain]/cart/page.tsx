@@ -208,6 +208,7 @@ export default function StoreCartPage() {
           variantTitle: item.variant.title,
           quantity: item.quantity,
           price: item.unitPrice,
+          productType: item.productType,
         })),
       },
       {
