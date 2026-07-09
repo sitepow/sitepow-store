@@ -392,6 +392,7 @@ export async function createOrder(input: CreateOrderInput) {
               variantTitle: item.variantTitle,
               quantity: item.quantity,
               price: item.price,
+              branchId: branch.id,
             })),
           },
         },

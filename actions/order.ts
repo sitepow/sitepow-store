@@ -33,12 +33,6 @@ const orderSelect = {
       email: true,
     },
   },
-  branch: {
-    select: {
-      id: true,
-      name: true,
-    },
-  },
   items: {
     select: {
       id: true,
