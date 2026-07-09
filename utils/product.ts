@@ -136,9 +136,7 @@ export const transformProductToFormValues = (
   product: ProductWithRelations,
 ): ProductFormValues => {
   return {
-    title: product.title,
-    slug: product.slug,
-    categoryId: product.categoryId,
+    ...product,
     tags: product.tags.map((t) => t.name).join(', '),
     images: product.images.map((img) => ({ url: img.url })),
     variants: product.variants.map((v) => ({
@@ -149,6 +147,7 @@ export const transformProductToFormValues = (
       width: v.width ?? 0,
       height: v.height ?? 0,
       length: v.length ?? 0,
+      digitalUrl: v.digitalUrl ?? '',
       stocks: v.stocks.map((s) => ({
         branchId: s.branchId,
         quantity: s.quantity,

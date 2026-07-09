@@ -446,7 +446,7 @@ model Store {
   email        String?
   logo         String?
   coverImage   String?
-  primaryColor String? @default("#ca3500")
+  primaryColor String? @default("#f97316")
   description  String? @db.Text
 
   phone        String?

@@ -125,8 +125,8 @@ export default function StoreCartPage() {
     ...(paymentOptions?.isBankTransferEnabled
       ? paymentOptions.bankAccounts.map((acc) => ({
           id: acc.id,
-          title: acc.bankName,
-          description: `${acc.accountNumber} · ${acc.accountName}`,
+          title: 'โอนเงินบัญชีธนาคาร',
+          description: `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
         }))
       : []),
     ...(paymentOptions?.isStripeEnabled

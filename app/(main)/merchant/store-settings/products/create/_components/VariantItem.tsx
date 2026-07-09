@@ -185,7 +185,7 @@ export function VariantItem({
                     <Input
                       {...field}
                       value={field.value ?? ''}
-                      placeholder="ระบุลิงค์ดาว์นโหลดของคุณ (zip, ...etc.)"
+                      placeholder="ระบุลิงค์ดาว์นโหลดของคุณ"
                     />
                   </Field>
                 )}

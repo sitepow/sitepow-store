@@ -47,6 +47,7 @@ export function CartItemCard({
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
+            , {item.branchName}
           </p>
           {item.selectedAddons.length > 0 && (
             <p className="mt-0.5 text-[10px] text-(--brand-color) sm:text-[11px]">

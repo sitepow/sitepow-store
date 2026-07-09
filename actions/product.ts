@@ -233,6 +233,7 @@ export async function createProduct(input: CreateProductInput) {
             title: v.title,
             price: v.price,
             sku: v.sku ?? '',
+            digitalUrl: v.digitalUrl ?? '',
             discountActive: v.discount.active,
             discountType: v.discount.active ? v.discount.type : null,
             discountAmount: v.discount.active ? v.discount.amount : null,
@@ -373,7 +374,9 @@ export async function getProductById(id: string) {
         images: true,
         tags: true,
         variants: {
-          include: { stocks: true },
+          include: {
+            stocks: true,
+          },
         },
         addons: true,
       },
@@ -440,6 +443,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
               title: v.title,
               price: v.price,
               sku: v.sku ?? '',
+              digitalUrl: v.digitalUrl ?? '',
               discountActive: v.discount.active,
               discountType: v.discount.active ? v.discount.type : null,
               discountAmount: v.discount.active ? v.discount.amount : null,
