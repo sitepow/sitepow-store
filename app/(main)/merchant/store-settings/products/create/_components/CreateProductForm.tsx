@@ -235,7 +235,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           },
           digitalItems:
             v.digitalItems?.map((item) => ({
-              content: item.content,
+              content: item.content ?? '',
               isUsed: !!item.isUsed,
             })) || [],
           isAvailable: v.isAvailable ?? false,

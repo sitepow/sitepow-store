@@ -2,7 +2,7 @@ import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import z from 'zod'
 
 const digitalItemSchema = z.object({
-  content: z.string().min(1, { message: 'กรุณาระบุรหัสสินค้าหรือเนื้อหา' }),
+  content: z.string().optional(),
   isUsed: z.boolean().default(false),
 })
 

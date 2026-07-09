@@ -33,6 +33,8 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 
+import { cn } from '@/lib/utils'
+
 import { DiscountField } from './DiscountField'
 
 interface VariantItemProps {
@@ -92,6 +94,8 @@ export function VariantItem({
     name: `variants.${index}.stocks`,
   })
 
+  const isAvailable = watch(`variants.${index}.isAvailable`)
+
   const availableBranches = branches.filter(
     (b) => !usedBranchIds.includes(b.id),
   )
@@ -106,13 +110,16 @@ export function VariantItem({
   }, [branches, stocks, index, setValue])
 
   return (
-    <Card className="border-primary relative overflow-hidden rounded-lg border-l">
+    <Card
+      className={cn(
+        'relative overflow-hidden rounded-lg border-l',
+        isAvailable && 'border-primary',
+      )}
+    >
       <div className="flex flex-wrap justify-between gap-2.5 border-b px-5 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
-            {watch(`variants.${index}.isAvailable`)
-              ? 'เปิดใช้งาน'
-              : 'ปิดใช้งาน'}
+            {isAvailable ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
           </span>
           <Controller
             name={`variants.${index}.isAvailable`}
