@@ -33,9 +33,14 @@ export interface CreateProductInput {
     width?: number
     height?: number
     length?: number
+    digitalItems?: {
+      content: string
+      isUsed: boolean
+    }[]
     stocks: { branchId: string; quantity: number; minStock: number }[]
     discount: { active: boolean; type: 'PERCENTAGE' | 'FIXED'; amount: number }
     rewardPoints: { isActive: boolean; amount: number }
+    isAvailable: boolean
   }[]
   addons?: { title: string; price: number; isAvailable: boolean }[]
   metadata?: { key: string; value: string }[]
@@ -239,6 +244,13 @@ export async function createProduct(input: CreateProductInput) {
             discountAmount: v.discount.active ? v.discount.amount : null,
             pointsActive: v.rewardPoints.isActive,
             pointsAmount: v.rewardPoints.amount,
+            digitalItems: {
+              create:
+                v.digitalItems?.map((item) => ({
+                  content: item.content,
+                  isUsed: item.isUsed,
+                })) ?? [],
+            },
             stocks: {
               create: v.stocks.map((s) => ({
                 branchId: s.branchId,
@@ -246,6 +258,7 @@ export async function createProduct(input: CreateProductInput) {
                 minStock: s.minStock,
               })),
             },
+            isAvailable: v.isAvailable ?? false,
           })),
         },
         addons: {
@@ -376,6 +389,7 @@ export async function getProductById(id: string) {
         variants: {
           include: {
             stocks: true,
+            digitalItems: true,
           },
         },
         addons: true,
@@ -449,6 +463,14 @@ export async function updateProduct(id: string, input: CreateProductInput) {
               discountAmount: v.discount.active ? v.discount.amount : null,
               pointsActive: v.rewardPoints.isActive,
               pointsAmount: v.rewardPoints.amount,
+              isAvailable: v.isAvailable,
+              digitalItems: {
+                create:
+                  v.digitalItems?.map((item) => ({
+                    content: item.content,
+                    isUsed: item.isUsed,
+                  })) ?? [],
+              },
               stocks: {
                 create: v.stocks.map((s) => ({
                   branchId: s.branchId,

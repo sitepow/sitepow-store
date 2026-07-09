@@ -13,6 +13,7 @@ import { ProductFormValues } from '@/zod/product'
 import { IconTrash } from '@tabler/icons-react'
 import { PlusCircle } from 'lucide-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -72,7 +73,19 @@ export function VariantItem({
     })?.map((s) => s.branchId) ?? []
 
   const productType = watch('productType')
+  const isPhysical = productType === ProductType.PHYSICAL
   const isDigitalLink = productType === ProductType.DIGITAL_LINK
+  const isDigitalItem = productType === ProductType.DIGITAL_ITEM
+  const isDigitalService = productType === ProductType.DIGITAL_SERVICE
+
+  const {
+    fields: digitalFields,
+    append: appendDigital,
+    remove: removeDigital,
+  } = useFieldArray({
+    control,
+    name: `variants.${index}.digitalItems`,
+  })
 
   const stocks = useWatch({
     control,
@@ -94,6 +107,30 @@ export function VariantItem({
 
   return (
     <Card className="border-primary relative overflow-hidden rounded-lg border-l">
+      <div className="flex flex-wrap justify-between gap-2.5 border-b px-5 pb-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">
+            {watch(`variants.${index}.isAvailable`)
+              ? 'เปิดใช้งาน'
+              : 'ปิดใช้งาน'}
+          </span>
+          <Controller
+            name={`variants.${index}.isAvailable`}
+            control={control}
+            render={({ field }) => (
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            )}
+          />
+        </div>
+        <Button
+          variant="destructive"
+          size="icon-lg"
+          onClick={() => removeVariant(index)}
+          disabled={isOnlyOne}
+        >
+          <IconTrash />
+        </Button>
+      </div>
       <CardContent className="grid gap-6 pt-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
           <div className="md:col-span-6">
@@ -193,7 +230,7 @@ export function VariantItem({
               />
             </div>
           )}
-          {!isDigitalLink && (
+          {isPhysical && (
             <>
               <Separator className="col-span-12" />
               <div className="grid grid-cols-2 gap-4 md:col-span-12">
@@ -270,91 +307,158 @@ export function VariantItem({
             </>
           )}
         </div>
-        <div className="bg-muted/20 rounded-lg border p-4">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-            <FieldLegend variant="label" className="text-lg font-bold">
-              สต็อกรายสาขา
-            </FieldLegend>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={availableBranches.length === 0}
-              onClick={() =>
-                appendStock({ branchId: '', quantity: 0, minStock: 0 })
-              }
-            >
-              <PlusCircle className="mr-2 size-4" /> เพิ่มสาขา
-            </Button>
-          </div>
-          <div className="space-y-2">
-            {stockFields.map((stock, stockIndex) => (
-              <div
-                key={stock.id}
-                className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
+        {isPhysical && (
+          <div className="bg-muted/20 rounded-lg border p-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+              <FieldLegend variant="label" className="text-lg font-bold">
+                สต็อกรายสาขา
+              </FieldLegend>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={availableBranches.length === 0}
+                onClick={() =>
+                  appendStock({ branchId: '', quantity: 0, minStock: 0 })
+                }
               >
-                <Controller
-                  name={`variants.${index}.stocks.${stockIndex}.branchId`}
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="h-8 w-full text-xs">
-                        <SelectValue placeholder="เลือกสาขา" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {branches
-                          .filter(
-                            (b) =>
-                              !usedBranchIds.includes(b.id) ||
-                              b.id === field.value,
-                          )
-                          .map((branch) => (
-                            <SelectItem key={branch.id} value={branch.id}>
-                              {branch.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <Controller
-                  name={`variants.${index}.stocks.${stockIndex}.quantity`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="number"
-                      min="0"
-                      step="1"
-                      className="h-8 text-xs"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  )}
-                />
-                <Button
-                  variant="destructive"
-                  className="col-span-2"
-                  size="icon"
-                  onClick={() => removeStock(stockIndex)}
-                  disabled={stockFields.length === 1}
+                <PlusCircle className="mr-2 size-4" /> เพิ่มสาขา
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {stockFields.map((stock, stockIndex) => (
+                <div
+                  key={stock.id}
+                  className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
                 >
-                  <IconTrash />
-                </Button>
-              </div>
-            ))}
+                  <Controller
+                    name={`variants.${index}.stocks.${stockIndex}.branchId`}
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="h-8 w-full text-xs">
+                          <SelectValue placeholder="เลือกสาขา" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {branches
+                            .filter(
+                              (b) =>
+                                !usedBranchIds.includes(b.id) ||
+                                b.id === field.value,
+                            )
+                            .map((branch) => (
+                              <SelectItem key={branch.id} value={branch.id}>
+                                {branch.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Controller
+                    name={`variants.${index}.stocks.${stockIndex}.quantity`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="1"
+                        className="h-8 text-xs"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    )}
+                  />
+                  <Button
+                    variant="destructive"
+                    className="col-span-2"
+                    size="icon"
+                    onClick={() => removeStock(stockIndex)}
+                    disabled={stockFields.length === 1}
+                  >
+                    <IconTrash />
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+        {isDigitalItem && (
+          <div className="bg-muted/20 mt-6 rounded-lg border p-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+              <FieldLegend variant="label" className="text-lg font-bold">
+                รายการสินค้าดิจิทัล (Key/Content)
+              </FieldLegend>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => appendDigital({ content: '', isUsed: false })}
+              >
+                <PlusCircle className="mr-2 size-4" /> เพิ่มเนื้อหา/คีย์
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {digitalFields.map((item, dIndex) => (
+                <div key={item.id} className="flex gap-2">
+                  <Controller
+                    name={`variants.${index}.digitalItems.${dIndex}.content`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder="ระบุคีย์สินค้า หรือเนื้อหาดิจิทัล"
+                      />
+                    )}
+                  />
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-muted-foreground text-[10px]">
+                      ใช้แล้ว
+                    </span>
+                    <Controller
+                      name={`variants.${index}.digitalItems.${dIndex}.isUsed`}
+                      control={control}
+                      render={({ field }) => (
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="scale-90"
+                        />
+                      )}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => removeDigital(dIndex)}
+                  >
+                    <IconTrash />
+                  </Button>
+                </div>
+              ))}
+              {digitalFields.length === 0 && (
+                <p className="text-muted-foreground py-4 text-center text-sm">
+                  ยังไม่มีข้อมูลดิจิทัล
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+        {isDigitalService && (
+          <ActionRequiredAlert
+            title="ข้อมูลแจ้งเตือน"
+            description=" ระบบจะส่งเหตุการณ์ตัวเลือกของสินค้านี้เข้าไปใน Webhook
+              ที่ตั้งค่าไว้ในลิงก์ API Webhooks ของคุณ
+              เพื่อนำข้อมูลการสั่งซื้อไปทำงานต่อใน Logic ของคุณ
+              หากยังไม่ได้ตั้งค่า Webhook
+              โปรดไปตั้งค่าและตรวจสอบให้เรียบร้อยครับ"
+          />
+        )}
       </CardContent>
-      <div className="absolute top-2 right-2">
-        <Button
-          variant="destructive"
-          size="icon-lg"
-          onClick={() => removeVariant(index)}
-          disabled={isOnlyOne}
-        >
-          <IconTrash />
-        </Button>
-      </div>
     </Card>
   )
 }

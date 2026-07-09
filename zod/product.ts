@@ -1,6 +1,11 @@
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import z from 'zod'
 
+const digitalItemSchema = z.object({
+  content: z.string().min(1, { message: 'กรุณาระบุรหัสสินค้าหรือเนื้อหา' }),
+  isUsed: z.boolean().default(false),
+})
+
 const discountSchema = z.object({
   active: z.boolean().default(false),
   type: z.enum(DiscountType).default(DiscountType.PERCENTAGE),
@@ -30,6 +35,8 @@ const variantSchema = z.object({
   stocks: z.array(stockSchema).min(1),
   discount: discountSchema,
   rewardPoints: rewardPointsSchema,
+  digitalItems: z.array(digitalItemSchema).default([]),
+  isAvailable: z.boolean().default(true),
 })
 
 const addonSchema = z.object({

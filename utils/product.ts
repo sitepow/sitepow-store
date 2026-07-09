@@ -158,10 +158,16 @@ export const transformProductToFormValues = (
         type: v.discountType ?? DiscountType.PERCENTAGE,
         amount: Number(v.discountAmount ?? 0),
       },
+      digitalItems:
+        v.digitalItems?.map((item) => ({
+          content: item.content,
+          isUsed: item.isUsed,
+        })) ?? [],
       rewardPoints: {
         isActive: v.pointsActive,
         amount: v.pointsAmount,
       },
+      isAvailable: v.isAvailable ?? false,
     })),
     addons: product.addons.map((a) => ({
       title: a.title,

@@ -99,6 +99,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
           discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
           rewardPoints: { isActive: false, amount: 0 },
+          isAvailable: true,
         },
       ],
       addons: [],
@@ -232,6 +233,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             isActive: v.rewardPoints.isActive ?? false,
             amount: v.rewardPoints.amount ?? 0,
           },
+          digitalItems:
+            v.digitalItems?.map((item) => ({
+              content: item.content,
+              isUsed: !!item.isUsed,
+            })) || [],
+          isAvailable: v.isAvailable ?? false,
         })),
         addons: data.addons?.map((a) => ({
           title: a.title,
