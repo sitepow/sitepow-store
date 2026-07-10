@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { Plan } from '@/generated/prisma/enums'
@@ -5,24 +6,129 @@ import { useStoreData } from '@/stores/sites/use-store-data'
 
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { StoreLogo } from '@/components/StoreLogo'
-import { FacebookIcon } from '@/components/icon/Facebook'
-import { InstagramIcon } from '@/components/icon/Instagram'
-import { TiktokIcon } from '@/components/icon/Tiktok'
 
 export function StoreFooter() {
   const { store } = useStoreData()
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
-    { icon: <FacebookIcon />, href: '/', label: 'Facebook' },
-    { icon: <InstagramIcon />, href: '/', label: 'Instagram' },
-    { icon: <TiktokIcon />, href: '/', label: 'Tiktok' },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/meta/default.svg"
+          alt="Meta"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Facebook',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/instagram/default.svg"
+          alt="Instagram"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Instagram',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/tiktok/default.svg"
+          alt="Tiktok"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Tiktok',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/messenger/default.svg"
+          alt="Messenger"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Messenger',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/line/default.svg"
+          alt="Line"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Line',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/discord/default.svg"
+          alt="Discord"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Discord',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/shopee/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Shopee',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/ebay/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Ebay',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/amazon/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Amazon',
+    },
   ]
 
   return (
-    <footer className="bg-background border-border text-foreground border-t">
+    <footer
+      className="bg-background border-border text-foreground border-t"
+      style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+    >
       <div className="container mx-auto px-5 py-12 sm:px-10">
-        <div className="flex flex-col gap-10 md:flex-row">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div className="max-w-sm">
             {store?.logo && <StoreLogo image={store?.logo} />}
             {!store?.logo && <StoreLogo />}
@@ -35,36 +141,65 @@ export function StoreFooter() {
               อีเมล: {store?.email || '-'} เลขประจำตัวผู้เสียภาษี:{' '}
               {store?.taxId || '-'}
             </p>
-            <div className="mt-5 flex gap-5">
+            <div className="mt-5 flex flex-wrap items-center gap-5">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={social.label}
                 >
                   {social.icon}
                 </a>
               ))}
             </div>
           </div>
+          <div>
+            <h3 className="mb-4 font-bold">ที่ตั้งร้าน</h3>
+            <div className="border-border mb-4 overflow-hidden rounded-lg border">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.545199616017!2d100.64771637583688!3d13.56543990263677!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x311d60c41094056b%3A0x678b667e452a2305!2sBang%20Pu%20Recreation%20Center!5e0!3m2!1sen!2sth!4v1720573881476!5m2!1sen!2sth"
+                width="100%"
+                height="200"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <p className="text-sm leading-relaxed opacity-60">
+              123/45 ถนนสุขุมวิท ตำบลบางปู <br />
+              อำเภอเมือง จังหวัดสมุทรปราการ 10280
+            </p>
+            <a
+              href="#"
+              className="mt-3 inline-block text-sm font-medium text-(--brand-color) hover:underline"
+            >
+              📍 ดูแผนที่บน Google Maps
+            </a>
+          </div>
+          <div>
+            <h3 className="mb-4 font-bold">เวลาทำการ</h3>
+            <div className="space-y-1 text-sm opacity-60">
+              <p>จันทร์ - ศุกร์: 09:00 - 18:00 น.</p>
+              <p>เสาร์ - อาทิตย์: 10:00 - 17:00 น.</p>
+              <p className="pt-2 text-(--brand-color)">
+                หยุดทุกวันหยุดนักขัตฤกษ์
+              </p>
+            </div>
+          </div>
         </div>
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
-          <div className="order-2 md:order-1">
-            <p className="text-sm">
-              © {currentYear} Sitepow. All rights reserved.
-            </p>
-          </div>
-          <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
-            <div className="flex flex-wrap justify-center gap-5 text-sm sm:gap-6">
-              <Link href="/privacy-policy" className="hover:underline">
-                นโยบายความเป็นส่วนตัว
-              </Link>
-              <Link href="/refund-return-policy" className="hover:underline">
-                ข้อตกลง และเงื่อนไข
-              </Link>
-            </div>
+          <p className="text-sm">
+            © {currentYear} Sitepow. All rights reserved.
+          </p>
+          <div className="flex gap-6 text-sm">
+            <Link href="/privacy-policy" className="hover:underline">
+              นโยบายความเป็นส่วนตัว
+            </Link>
+            <Link href="/refund-return-policy" className="hover:underline">
+              ข้อตกลง และเงื่อนไข
+            </Link>
           </div>
         </div>
       </div>

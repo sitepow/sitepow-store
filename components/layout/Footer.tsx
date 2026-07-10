@@ -1,17 +1,120 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { LogoBrand } from '../LogoBrand'
-import { FacebookIcon } from '../icon/Facebook'
-import { InstagramIcon } from '../icon/Instagram'
-import { TiktokIcon } from '../icon/Tiktok'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
-    { icon: <FacebookIcon />, href: '/', label: 'Facebook' },
-    { icon: <InstagramIcon />, href: '/', label: 'Instagram' },
-    { icon: <TiktokIcon />, href: '/', label: 'Tiktok' },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/meta/default.svg"
+          alt="Meta"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Facebook',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/instagram/default.svg"
+          alt="Instagram"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Instagram',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/tiktok/default.svg"
+          alt="Tiktok"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Tiktok',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/messenger/default.svg"
+          alt="Messenger"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Messenger',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/line/default.svg"
+          alt="Line"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Line',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/discord/default.svg"
+          alt="Discord"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Discord',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/shopee/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Shopee',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/ebay/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Ebay',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/amazon/default.svg"
+          alt="Shopee"
+          width={24}
+          height={24}
+        />
+      ),
+      href: '/',
+      label: 'Amazon',
+    },
   ]
 
   return (
@@ -27,7 +130,7 @@ export function Footer() {
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               อีเมล: {'-'} เลขประจำตัวผู้เสียภาษี: {'-'}
             </p>
-            <div className="mt-5 flex gap-5">
+            <div className="mt-5 flex flex-wrap items-center gap-5">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
