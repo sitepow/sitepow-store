@@ -1,7 +1,9 @@
 import toast from 'react-hot-toast'
 
+import { ProductType } from '@/generated/prisma/enums'
 import { CartItem, CartSummary } from '@/types/sites/cart'
 import { getRemainingStock, isSameCartItem } from '@/utils/cart'
+import { getStockQuantity } from '@/utils/product'
 import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -46,18 +48,38 @@ export const useCartStore = create<CartStore>()(
       addItem: (newItem) => {
         const { items } = get()
 
-        const branchStock = getStockByBranch(newItem.variant, newItem.branchId)
+        const getAvailableStock = () => {
+          if (
+            newItem.productType === ProductType.DIGITAL_LINK ||
+            newItem.productType === ProductType.DIGITAL_SERVICE
+          ) {
+            return 999999
+          }
+
+          return getStockQuantity(
+            newItem.variant,
+            newItem.productType,
+            newItem.branchId,
+          )
+        }
+
+        const branchStock = getAvailableStock()
 
         const itemsInSameBranch = items.filter(
           (i) => i.branchId === newItem.branchId,
         )
+
         const remaining = getRemainingStock(itemsInSameBranch, {
           variantId: newItem.variant.id,
           stock: branchStock,
         })
 
-        if (remaining <= 0) {
-          toast.error('สินค้าสาขานี้หมด')
+        if (
+          newItem.productType !== ProductType.DIGITAL_LINK &&
+          newItem.productType !== ProductType.DIGITAL_SERVICE &&
+          remaining <= 0
+        ) {
+          toast.error('สินค้าในสาขานี้หมดแล้ว')
           return
         }
 
@@ -66,7 +88,11 @@ export const useCartStore = create<CartStore>()(
             isSameCartItem(item, newItem) && item.branchId === newItem.branchId,
         )
 
-        const finalQty = Math.min(newItem.quantity, remaining)
+        const finalQty =
+          newItem.productType === ProductType.DIGITAL_LINK ||
+          newItem.productType === ProductType.DIGITAL_SERVICE
+            ? newItem.quantity
+            : Math.min(newItem.quantity, remaining)
 
         if (existingIndex > -1) {
           const updatedItems = [...items]

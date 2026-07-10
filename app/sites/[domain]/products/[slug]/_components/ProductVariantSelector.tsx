@@ -18,6 +18,8 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { cn } from '@/lib/utils'
+
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductVariantSelector() {
@@ -30,11 +32,11 @@ export function ProductVariantSelector() {
     setSelectedBranch,
   } = useProductPurchaseStore()
 
-  const isDigitalLink = product?.productType === ProductType.DIGITAL_LINK
+  const isPhysical = product?.productType === ProductType.PHYSICAL
   const hasVariant = product?.variants?.length !== 0
 
   useEffect(() => {
-    if (isDigitalLink) {
+    if (!isPhysical) {
       return
     }
 
@@ -47,7 +49,7 @@ export function ProductVariantSelector() {
         firstStock.branch?.name || `สาขา ${firstStock.branchId}`,
       )
     }
-  }, [product, selectedBranchId, setSelectedBranch, isDigitalLink])
+  }, [product, selectedBranchId, setSelectedBranch, isPhysical])
 
   return (
     <>
@@ -60,7 +62,7 @@ export function ProductVariantSelector() {
           </div>
         ) : (
           <>
-            {!isDigitalLink && (
+            {isPhysical && (
               <div className="space-y-2">
                 <Label className="text-lg font-semibold">
                   สาขาที่รับสินค้า
@@ -112,32 +114,32 @@ export function ProductVariantSelector() {
                 const hasDiscount = !!discountConfig && netPrice < variant.price
                 const hasPoint = variant.pointsActive
 
-                const stock = isDigitalLink
-                  ? 999
-                  : getStockQuantity(variant, selectedBranchId)
+                const isAvaliable = variant.isAvailable
+                const stock = getStockQuantity(
+                  variant,
+                  product.productType,
+                  selectedBranchId,
+                )
 
                 return (
                   <Label
                     htmlFor={variant.id}
                     key={variant.id}
-                    className={`hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors ${!isDigitalLink && stock === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                    className={cn(
+                      'hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors',
+                      (!isAvaliable || stock <= 0) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
                   >
                     <RadioGroupItem
                       value={variant.id}
                       id={variant.id}
-                      disabled={!isDigitalLink && stock === 0}
+                      disabled={!isAvaliable || stock <= 0}
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-(--brand-color) data-checked:border-(--brand-color) data-checked:bg-(--brand-color) dark:data-checked:bg-(--brand-color)"
                     />
                     <div className="flex flex-1 flex-col gap-1">
                       <span className="cursor-pointer text-xs">
                         {variant.title}
-                      </span>
-                      <span className="text-muted-foreground text-[10px]">
-                        {isDigitalLink
-                          ? 'พร้อมส่ง (สินค้าดิจิทัล)'
-                          : stock > 0
-                            ? `คงเหลือ ${stock} ชิ้น`
-                            : 'สินค้าหมด'}
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&

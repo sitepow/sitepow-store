@@ -1,5 +1,9 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
-import { CalculatedProduct, calculateNetPrice } from '@/utils/product'
+import {
+  CalculatedProduct,
+  calculateNetPrice,
+  getStockQuantity,
+} from '@/utils/product'
 import { calculateProduct } from '@/utils/product'
 import { create } from 'zustand'
 
@@ -15,7 +19,6 @@ interface ProductStore {
   quantity: number
   selectedBranchId: string | null
   selectedBranchName: string | null
-
   setIsLoading: (isLoading: boolean) => void
   setProduct: (product: StorefrontProductDetail) => void
   selectVariant: (variantId: string) => void
@@ -27,7 +30,6 @@ interface ProductStore {
   toggleAddon: (addonId: string) => void
   setQuantity: (qty: number) => void
   setSelectedBranch: (id: string, name: string) => void
-
   getVariantPrice: (variant: StorefrontVariant) => number
   getTotalPrice: () => number
   getCurrentPoints: () => number
@@ -49,9 +51,13 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   setIsLoading: (isLoading) => set({ isLoading }),
 
   setSelectedBranch: (id, name) => {
-    const { selectedVariant, quantity } = get()
-    const stock =
-      selectedVariant?.stocks.find((s) => s.branchId === id)?.quantity ?? 0
+    const { selectedVariant, quantity, product } = get()
+    if (!product || !selectedVariant) {
+      return
+    }
+
+    const stock = getStockQuantity(selectedVariant, product.productType, id)
+
     set({
       selectedBranchId: id,
       selectedBranchName: name,
@@ -76,11 +82,12 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
     const { product, quantity, selectedBranchId } = get()
     const variant = product?.variants.find((v) => v.id === variantId) ?? null
 
-    if (variant) {
-      const stock = selectedBranchId
-        ? (variant.stocks.find((s) => s.branchId === selectedBranchId)
-            ?.quantity ?? 0)
-        : variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
+    if (variant && product) {
+      const stock = getStockQuantity(
+        variant,
+        product.productType,
+        selectedBranchId,
+      )
 
       set({
         selectedVariant: variant,
@@ -90,11 +97,16 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   },
 
   setQuantity: (qty) => {
-    const { selectedVariant, selectedBranchId } = get()
-    const stock = selectedBranchId
-      ? (selectedVariant?.stocks.find((s) => s.branchId === selectedBranchId)
-          ?.quantity ?? 0)
-      : (selectedVariant?.stocks.reduce((sum, s) => sum + s.quantity, 0) ?? 0)
+    const { selectedVariant, selectedBranchId, product } = get()
+    if (!selectedVariant || !product) {
+      return
+    }
+
+    const stock = getStockQuantity(
+      selectedVariant,
+      product.productType,
+      selectedBranchId,
+    )
 
     set({ quantity: Math.max(1, Math.min(qty, stock || 1)) })
   },

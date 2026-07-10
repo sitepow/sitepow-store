@@ -1,4 +1,5 @@
-import { DiscountType } from '@/generated/prisma/enums'
+import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { ProductWithRelations } from '@/types/product'
 import { ProductFormValues } from '@/zod/product'
 
@@ -183,20 +184,34 @@ export const transformProductToFormValues = (
   }
 }
 
+type StorefrontVariant = StorefrontProductDetail['variants'][number]
+
 export const getStockQuantity = (
-  variant:
-    | { stocks: { quantity: number; branchId: string }[] }
-    | null
-    | undefined,
+  variant: StorefrontVariant,
+  productType: ProductType,
   branchId?: string | null,
 ): number => {
   if (!variant) {
     return 0
   }
 
-  if (branchId) {
-    return variant.stocks.find((s) => s.branchId === branchId)?.quantity ?? 0
+  if (productType === ProductType.PHYSICAL) {
+    if (branchId) {
+      return variant.stocks?.find((s) => s.branchId === branchId)?.quantity ?? 0
+    }
+    return variant.stocks?.reduce((sum: number, s) => sum + s.quantity, 0) ?? 0
   }
 
-  return variant.stocks.reduce((sum, s) => sum + s.quantity, 0)
+  if (productType === ProductType.DIGITAL_ITEM) {
+    return variant.digitalItems?.filter((item) => !item.isUsed).length ?? 0
+  }
+
+  if (
+    productType === ProductType.DIGITAL_LINK ||
+    productType === ProductType.DIGITAL_SERVICE
+  ) {
+    return 1
+  }
+
+  return 0
 }
