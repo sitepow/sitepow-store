@@ -6,8 +6,8 @@ import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 
-import { ChatWidget } from '@/components/chat/chat-widget'
-import { SupportWidget } from '@/components/chat/support-widget'
+import { ChatWidget } from '@/components/chat/ChatWidget'
+import { SupportWidget } from '@/components/chat/SupportWidget'
 
 import { cn } from '@/lib/utils'
 
@@ -35,8 +35,9 @@ export function StoreLayout({
         {children}
       </main>
       <StoreFooter />
-      {userRole === UserRole.MERCHANT && <SupportWidget storeId={store?.id} />}
-      {userRole !== UserRole.MERCHANT && (
+      {userRole === UserRole.MERCHANT ? (
+        <SupportWidget storeId={store?.id} />
+      ) : (
         <ChatWidget
           conversationType={ConversationType.STORE}
           storeId={store?.id}

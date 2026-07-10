@@ -2,7 +2,10 @@
 
 import {
   getConversation,
+  getCustomerConversations,
+  getMerchantConversations,
   getMessages,
+  getOrCreateStoreConversation,
   getSupportConversations,
   getUnreadCount,
   markAsRead,
@@ -52,6 +55,16 @@ export function useSupportConversations(enabled = true, storeId?: string) {
       queryKey: chatKeys.supportConversations(storeId),
       queryFn: () => getSupportConversations(storeId),
       enabled,
+      refetchInterval: CHAT_REFETCH_INTERVAL,
+    }),
+  )
+}
+
+export function useCustomerConversations() {
+  return useQuery(
+    queryOptions({
+      queryKey: chatKeys.customerConversations(),
+      queryFn: getCustomerConversations,
       refetchInterval: CHAT_REFETCH_INTERVAL,
     }),
   )
@@ -145,6 +158,31 @@ export function useMarkAsRead(userId: string) {
       queryClient.invalidateQueries({
         queryKey: chatKeys.supportConversations(),
       })
+    },
+  })
+}
+
+export function useMerchantConversations(storeSlug: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: chatKeys.merchantConversations(storeSlug),
+      queryFn: () => getMerchantConversations(storeSlug),
+      refetchInterval: CHAT_REFETCH_INTERVAL,
+    }),
+  )
+}
+
+export function useOrCreateStoreConversation(storeId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => getOrCreateStoreConversation(storeId),
+    onSuccess: (result) => {
+      if (result.success) {
+        queryClient.invalidateQueries({
+          queryKey: chatKeys.customerConversations(),
+        })
+      }
     },
   })
 }

@@ -7,8 +7,8 @@ import { useSession } from '@/hooks/use-session'
 
 import { cn } from '@/lib/utils'
 
-import { ChatWidget } from '../chat/chat-widget'
-import { SupportWidget } from '../chat/support-widget'
+import { ChatWidget } from '../chat/ChatWidget'
+import { SupportWidget } from '../chat/SupportWidget'
 import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
@@ -27,8 +27,9 @@ export function MainLayout({
         {children}
       </main>
       <Footer />
-      {userRole === UserRole.SUPPORT && <SupportWidget />}
-      {userRole !== UserRole.SUPPORT && (
+      {userRole === UserRole.SUPPORT ? (
+        <SupportWidget />
+      ) : (
         <ChatWidget conversationType={ConversationType.SUPPORT} />
       )}
     </div>

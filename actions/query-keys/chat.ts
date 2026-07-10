@@ -13,4 +13,10 @@ export const chatKeys = {
     [...chatKeys.all, 'messages', conversationId] as const,
   unreadCount: (userId?: string) =>
     [...chatKeys.all, 'unread-count', userId] as const,
+  customerConversations: () =>
+    [...chatKeys.all, 'customer-conversations'] as const,
+  merchantConversations: (storeSlug: string) =>
+    [...chatKeys.all, 'merchant-conversations', storeSlug] as const,
+  storeConversation: (storeId: string) =>
+    [...chatKeys.all, 'store-conversation', storeId] as const,
 }

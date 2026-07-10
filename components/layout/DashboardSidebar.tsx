@@ -35,8 +35,8 @@ import {
 
 import { LanguageSwitcher } from '../LanguageSwitcher'
 import { ModeToggle } from '../ModeToggle'
-import { ChatWidget } from '../chat/chat-widget'
-import { SupportWidget } from '../chat/support-widget'
+import { ChatWidget } from '../chat/ChatWidget'
+import { SupportWidget } from '../chat/SupportWidget'
 import { Button } from '../ui/button'
 
 interface DashboardSidebarProps extends PropsWithChildren {

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import {
   useConversation,
   useMarkAsRead,
+  useOrCreateStoreConversation,
   useUnreadCount,
 } from '@/actions/hooks/chat'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
@@ -22,7 +23,7 @@ import {
 } from '@/components/ui/dialog'
 
 import { AlertChat } from './_components/AlertChat'
-import { ChatWindow } from './chat-window'
+import { ChatWindow } from './_components/ChatWindow'
 
 interface ChatWidgetProps {
   conversationType: ConversationType
@@ -33,16 +34,25 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
   const { userId, isAuthenticated } = useSession()
   const { isOpen, setIsOpen, toggleChat } = useChatStore()
 
-  const { data: unreadCount = 0 } = useUnreadCount(userId ?? '')
+  const { mutate: createChat, data: chatData } = useOrCreateStoreConversation(
+    storeId!,
+  )
+  const { data: unreadCount = 0 } = useUnreadCount(userId!)
+
+  useEffect(() => {
+    if (isOpen && storeId && !chatData) {
+      createChat()
+    }
+  }, [isOpen, chatData, createChat, storeId])
 
   const { data: convData } = useConversation(
-    userId ?? '',
+    userId!,
     conversationType,
     !!userId && isOpen,
     storeId,
   )
 
-  const { mutate: markAsRead } = useMarkAsRead(userId ?? '')
+  const { mutate: markAsRead } = useMarkAsRead(userId!)
 
   useEffect(() => {
     if (isOpen && convData?.success && convData.data?.id) {
@@ -57,11 +67,9 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
           <DialogHeader className="border-b p-4">
             <DialogTitle>แชท Support</DialogTitle>
           </DialogHeader>
-
           {!isAuthenticated && (
             <AlertChat title="กรุณาเข้าสู่ระบบก่อนเริ่มการสนทนา" />
           )}
-
           {isAuthenticated && (
             <div className="flex-1 overflow-hidden">
               {userId && convData?.success && convData.data && (
@@ -69,13 +77,16 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
                   currentUserId={userId}
                   conversationId={convData.data.id}
                   conversationType={convData?.data.type}
+                  otherUserId={
+                    convData.data.members.find((m) => m.userId !== userId)
+                      ?.userId
+                  }
                 />
               )}
             </div>
           )}
         </DialogContent>
       </Dialog>
-
       <Button
         onClick={toggleChat}
         size="icon-lg"

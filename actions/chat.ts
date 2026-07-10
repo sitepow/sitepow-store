@@ -2,7 +2,7 @@
 
 import { checkAccess } from '@/app/api/chat/stream/[conversationId]/route'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
-import { AI_BOT_ID } from '@/constants/system'
+// import { AI_BOT_ID } from '@/constants/system'
 import {
   ConversationType,
   MessageType,
@@ -13,7 +13,7 @@ import { auth } from '@/lib/auth'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
-import { generateAiSupportAction } from './ai-support'
+// import { generateAiSupportAction } from './ai-support'
 
 const sortedBadWords = [...BAD_WORD_LISTS].sort((a, b) => b.length - a.length)
 
@@ -26,6 +26,82 @@ function cleanBadWords(content: string): string {
   })
 
   return cleanContent
+}
+
+export async function getMerchantConversations(storeSlug: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false, message: 'ไม่พบผู้ใช้งาน' }
+  }
+
+  const store = await prisma.store.findFirst({
+    where: { slug: storeSlug, ownerId: userId },
+    select: { id: true },
+  })
+
+  if (!store) {
+    return { success: false, message: 'ไม่พบร้านค้าหรือไม่มีสิทธิ์' }
+  }
+
+  const conversations = await prisma.conversation.findMany({
+    where: {
+      type: ConversationType.STORE,
+      storeId: store.id,
+    },
+    orderBy: { lastMessageAt: 'desc' },
+    include: {
+      members: {
+        include: { user: true },
+        where: { userId: { not: userId } },
+      },
+      messages: { orderBy: { createdAt: 'desc' }, take: 1 },
+    },
+  })
+
+  return { success: true, data: conversations }
+}
+
+export async function getOrCreateStoreConversation(storeId: string) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId || !storeId) {
+    return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งานหรือร้านค้า' }
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { id: storeId },
+    select: { ownerId: true },
+  })
+
+  if (!store) {
+    return { success: false, message: 'ไม่พบร้านค้า' }
+  }
+
+  let conversation = await prisma.conversation.findFirst({
+    where: {
+      storeId,
+      members: {
+        every: { userId: { in: [userId, store.ownerId] } },
+      },
+    },
+  })
+
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        type: ConversationType.STORE,
+        storeId,
+        members: {
+          create: [{ userId: userId }, { userId: store.ownerId }],
+        },
+      },
+    })
+  }
+
+  return { success: true, data: conversation }
 }
 
 export async function getConversation(
@@ -43,7 +119,7 @@ export async function getConversation(
     return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
   }
 
-  let conversation = await prisma.conversation.findFirst({
+  const conversation = await prisma.conversation.findFirst({
     where: {
       type,
       storeId: type === ConversationType.STORE ? storeId : undefined,
@@ -52,20 +128,56 @@ export async function getConversation(
     include: { members: true },
   })
 
-  if (!conversation) {
-    conversation = await prisma.conversation.create({
-      data: {
-        type,
-        storeId: type === ConversationType.STORE ? storeId : undefined,
-        members: { create: [{ userId: currentUserId }] },
-      },
-      include: { members: true },
-    })
+  // if (!conversation) {
+  //   conversation = await prisma.conversation.create({
+  //     data: {
+  //       type,
+  //       storeId: type === ConversationType.STORE ? storeId : undefined,
+  //       members: { create: [{ userId: currentUserId }] },
+  //     },
+  //     include: { members: true },
+  //   })
 
-    await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
-  }
+  //   await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
+  // }
 
   return { success: true, data: conversation }
+}
+
+export async function getCustomerConversations() {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+  }
+
+  const conversations = await prisma.conversation.findMany({
+    where: {
+      members: { some: { userId } },
+    },
+    orderBy: { lastMessageAt: 'desc' },
+    include: {
+      store: { select: { name: true } },
+      messages: { orderBy: { createdAt: 'desc' }, take: 1 },
+      members: { include: { user: true } },
+    },
+  })
+
+  const data = conversations.map((c) => {
+    const me = c.members.find((m) => m.userId === userId)
+
+    return {
+      id: c.id,
+      name: c.type === ConversationType.STORE ? c.store?.name : 'Support Team',
+      lastMessage: c.messages[0]?.content ?? null,
+      lastMessageAt: c.lastMessageAt,
+      unreadCount: me?.unreadCount ?? 0,
+      type: c.type,
+    }
+  })
+
+  return { success: true, data }
 }
 
 export async function getSupportConversations(storeId?: string) {
@@ -100,7 +212,12 @@ export async function getSupportConversations(storeId?: string) {
     where:
       userRole === UserRole.SUPPORT
         ? { type: ConversationType.SUPPORT }
-        : { type: ConversationType.STORE, storeId },
+        : {
+            OR: [
+              { type: ConversationType.STORE, storeId },
+              { type: ConversationType.SUPPORT },
+            ],
+          },
     orderBy: { lastMessageAt: 'desc' },
     include: {
       members: { include: { user: true } },
@@ -158,17 +275,17 @@ export async function sendMessage(
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
-  const sender = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
-  })
+  // const sender = await prisma.user.findUnique({
+  //   where: { id: userId },
+  //   select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
+  // })
 
-  const conversation = await prisma.conversation.findFirst({
-    where: { id: conversationId },
-    select: {
-      type: true,
-    },
-  })
+  // const conversation = await prisma.conversation.findFirst({
+  //   where: { id: conversationId },
+  //   select: {
+  //     type: true,
+  //   },
+  // })
 
   return await prisma.$transaction(async (tx) => {
     const hasAccess = await checkAccess(conversationId, userId, userRole)
@@ -200,65 +317,65 @@ export async function sendMessage(
 
     chatEvents.publish(`message:${conversationId}`, message)
 
-    const isAiEnabled =
-      conversation?.type === ConversationType.STORE
-        ? sender?.isAiStoreEnabled
-        : sender?.isAiSupportEnabled
+    // const isAiEnabled =
+    //   conversation?.type === ConversationType.STORE
+    //     ? sender?.isAiStoreEnabled
+    //     : sender?.isAiSupportEnabled
 
-    if (
-      userRole !== UserRole.SUPPORT &&
-      userRole !== UserRole.BOT &&
-      isAiEnabled
-    ) {
-      await handleAiResponse(conversationId, cleanContent).catch(console.error)
-    }
+    // if (
+    //   userRole !== UserRole.SUPPORT &&
+    //   userRole !== UserRole.BOT &&
+    //   isAiEnabled
+    // ) {
+    //   await handleAiResponse(conversationId, cleanContent).catch(console.error)
+    // }
 
     return { success: true, data: message }
   })
 }
 
-async function handleAiResponse(conversationId: string, content: string) {
-  const recentMessages = await prisma.message.findMany({
-    where: { conversationId },
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-  })
+// async function handleAiResponse(conversationId: string, content: string) {
+//   const recentMessages = await prisma.message.findMany({
+//     where: { conversationId },
+//     orderBy: { createdAt: 'desc' },
+//     take: 10,
+//   })
 
-  const formattedHistory = recentMessages
-    .reverse()
-    .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
-    .join('\n')
+//   const formattedHistory = recentMessages
+//     .reverse()
+//     .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
+//     .join('\n')
 
-  const aiResult = await generateAiSupportAction(content, formattedHistory)
+//   const aiResult = await generateAiSupportAction(content, formattedHistory)
 
-  if (aiResult.success && aiResult.data) {
-    const aiMessage = await prisma.message.create({
-      data: {
-        conversationId,
-        senderId: AI_BOT_ID,
-        content: aiResult.data,
-        type: MessageType.TEXT,
-      },
-      include: {
-        sender: {
-          select: { id: true, role: true },
-        },
-      },
-    })
+//   if (aiResult.success && aiResult.data) {
+//     const aiMessage = await prisma.message.create({
+//       data: {
+//         conversationId,
+//         senderId: AI_BOT_ID,
+//         content: aiResult.data,
+//         type: MessageType.TEXT,
+//       },
+//       include: {
+//         sender: {
+//           select: { id: true, role: true },
+//         },
+//       },
+//     })
 
-    await prisma.conversation.update({
-      where: { id: conversationId },
-      data: { lastMessageAt: aiMessage.createdAt },
-    })
+//     await prisma.conversation.update({
+//       where: { id: conversationId },
+//       data: { lastMessageAt: aiMessage.createdAt },
+//     })
 
-    await prisma.conversationMember.updateMany({
-      where: { conversationId, userId: { not: AI_BOT_ID } },
-      data: { unreadCount: { increment: 1 } },
-    })
+//     await prisma.conversationMember.updateMany({
+//       where: { conversationId, userId: { not: AI_BOT_ID } },
+//       data: { unreadCount: { increment: 1 } },
+//     })
 
-    chatEvents.publish(`message:${conversationId}`, aiMessage)
-  }
-}
+//     chatEvents.publish(`message:${conversationId}`, aiMessage)
+//   }
+// }
 
 export async function getMessages(conversationId: string, cursor?: string) {
   const session = await auth()
