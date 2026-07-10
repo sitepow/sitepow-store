@@ -41,10 +41,13 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
               : 'dark:bg-foreground/5 dark:text-foreground border-border rounded-tl-none border bg-white text-slate-800',
         )}
       >
-        <MarkdownRenderer className="text-inherit" content={msg.content} />
+        <MarkdownRenderer
+          className="w-fit max-w-[80%] overflow-hidden wrap-break-word text-inherit"
+          content={msg.content}
+        />
         <span
           className={cn(
-            'mt-1 block text-[10px] opacity-70',
+            'mt-1 block text-[10px] text-blue-100 opacity-70',
             !isLeft ? 'text-blue-100' : 'text-slate-500',
           )}
         >

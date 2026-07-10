@@ -2,7 +2,8 @@
 
 import { checkAccess } from '@/app/api/chat/stream/[conversationId]/route'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
-// import { AI_BOT_ID } from '@/constants/system'
+import { AI_BOT_ID } from '@/constants/system'
+import { Message } from '@/generated/prisma/client'
 import {
   ConversationType,
   MessageType,
@@ -13,7 +14,7 @@ import { auth } from '@/lib/auth'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
-// import { generateAiSupportAction } from './ai-support'
+import { generateAiSupportAction } from './ai-support'
 
 const sortedBadWords = [...BAD_WORD_LISTS].sort((a, b) => b.length - a.length)
 
@@ -119,7 +120,7 @@ export async function getConversation(
     return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
   }
 
-  const conversation = await prisma.conversation.findFirst({
+  let conversation = await prisma.conversation.findFirst({
     where: {
       type,
       storeId: type === ConversationType.STORE ? storeId : undefined,
@@ -128,18 +129,18 @@ export async function getConversation(
     include: { members: true },
   })
 
-  // if (!conversation) {
-  //   conversation = await prisma.conversation.create({
-  //     data: {
-  //       type,
-  //       storeId: type === ConversationType.STORE ? storeId : undefined,
-  //       members: { create: [{ userId: currentUserId }] },
-  //     },
-  //     include: { members: true },
-  //   })
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        type,
+        storeId: type === ConversationType.STORE ? storeId : undefined,
+        members: { create: [{ userId: currentUserId }] },
+      },
+      include: { members: true },
+    })
 
-  //   await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
-  // }
+    await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
+  }
 
   return { success: true, data: conversation }
 }
@@ -275,29 +276,99 @@ export async function sendMessage(
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
-  // const sender = await prisma.user.findUnique({
-  //   where: { id: userId },
-  //   select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
-  // })
+  const sender = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
+  })
 
-  // const conversation = await prisma.conversation.findFirst({
-  //   where: { id: conversationId },
-  //   select: {
-  //     type: true,
-  //   },
-  // })
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: conversationId },
+    select: { type: true },
+  })
 
-  return await prisma.$transaction(async (tx) => {
-    const hasAccess = await checkAccess(conversationId, userId, userRole)
-    if (!hasAccess) {
-      return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
-    }
+  const result = await prisma
+    .$transaction(async (tx) => {
+      const hasAccess = await checkAccess(conversationId, userId, userRole)
+      if (!hasAccess) {
+        throw new Error('ไม่พบสิทธิ์เข้าถึงห้องแชท')
+      }
 
-    const cleanContent =
-      type === MessageType.TEXT ? cleanBadWords(content) : content
+      const cleanContent =
+        type === MessageType.TEXT ? cleanBadWords(content) : content
 
-    const message = await tx.message.create({
-      data: { conversationId, senderId: userId, content: cleanContent, type },
+      const msg = await tx.message.create({
+        data: { conversationId, senderId: userId, content: cleanContent, type },
+        include: {
+          sender: {
+            select: { id: true, role: true },
+          },
+        },
+      })
+
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: { lastMessageAt: msg.createdAt },
+      })
+
+      await tx.conversationMember.updateMany({
+        where: { conversationId, userId: { not: userId } },
+        data: { unreadCount: { increment: 1 } },
+      })
+
+      return msg
+    })
+    .catch((err) => {
+      return { success: false, message: err.message || 'เกิดข้อผิดพลาด' }
+    })
+
+  if ('success' in result && result.success === false) {
+    return result
+  }
+
+  const message = result as Message
+
+  chatEvents.publish(`message:${conversationId}`, message)
+
+  const isAiEnabled =
+    conversation?.type === ConversationType.STORE
+      ? sender?.isAiStoreEnabled
+      : sender?.isAiSupportEnabled
+
+  if (
+    userRole !== UserRole.SUPPORT &&
+    userRole !== UserRole.BOT &&
+    isAiEnabled
+  ) {
+    handleAiResponse(conversationId, content).catch(console.error)
+  }
+
+  return { success: true, data: result }
+}
+
+async function handleAiResponse(conversationId: string, content: string) {
+  await ensureBotUser()
+
+  const recentMessages = await prisma.message.findMany({
+    where: { conversationId },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  })
+
+  const formattedHistory = recentMessages
+    .reverse()
+    .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
+    .join('\n')
+
+  const aiResult = await generateAiSupportAction(content, formattedHistory)
+
+  if (aiResult.success && aiResult.data) {
+    const aiMessage = await prisma.message.create({
+      data: {
+        conversationId,
+        senderId: AI_BOT_ID,
+        content: aiResult.data,
+        type: MessageType.AI_ASSISTANT,
+      },
       include: {
         sender: {
           select: { id: true, role: true },
@@ -305,77 +376,19 @@ export async function sendMessage(
       },
     })
 
-    await tx.conversation.update({
+    await prisma.conversation.update({
       where: { id: conversationId },
-      data: { lastMessageAt: message.createdAt },
+      data: { lastMessageAt: aiMessage.createdAt },
     })
 
-    await tx.conversationMember.updateMany({
-      where: { conversationId, userId: { not: userId } },
+    await prisma.conversationMember.updateMany({
+      where: { conversationId, userId: { not: AI_BOT_ID } },
       data: { unreadCount: { increment: 1 } },
     })
 
-    chatEvents.publish(`message:${conversationId}`, message)
-
-    // const isAiEnabled =
-    //   conversation?.type === ConversationType.STORE
-    //     ? sender?.isAiStoreEnabled
-    //     : sender?.isAiSupportEnabled
-
-    // if (
-    //   userRole !== UserRole.SUPPORT &&
-    //   userRole !== UserRole.BOT &&
-    //   isAiEnabled
-    // ) {
-    //   await handleAiResponse(conversationId, cleanContent).catch(console.error)
-    // }
-
-    return { success: true, data: message }
-  })
+    chatEvents.publish(`message:${conversationId}`, aiMessage)
+  }
 }
-
-// async function handleAiResponse(conversationId: string, content: string) {
-//   const recentMessages = await prisma.message.findMany({
-//     where: { conversationId },
-//     orderBy: { createdAt: 'desc' },
-//     take: 10,
-//   })
-
-//   const formattedHistory = recentMessages
-//     .reverse()
-//     .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
-//     .join('\n')
-
-//   const aiResult = await generateAiSupportAction(content, formattedHistory)
-
-//   if (aiResult.success && aiResult.data) {
-//     const aiMessage = await prisma.message.create({
-//       data: {
-//         conversationId,
-//         senderId: AI_BOT_ID,
-//         content: aiResult.data,
-//         type: MessageType.TEXT,
-//       },
-//       include: {
-//         sender: {
-//           select: { id: true, role: true },
-//         },
-//       },
-//     })
-
-//     await prisma.conversation.update({
-//       where: { id: conversationId },
-//       data: { lastMessageAt: aiMessage.createdAt },
-//     })
-
-//     await prisma.conversationMember.updateMany({
-//       where: { conversationId, userId: { not: AI_BOT_ID } },
-//       data: { unreadCount: { increment: 1 } },
-//     })
-
-//     chatEvents.publish(`message:${conversationId}`, aiMessage)
-//   }
-// }
 
 export async function getMessages(conversationId: string, cursor?: string) {
   const session = await auth()
@@ -470,4 +483,23 @@ export async function getUnreadCount() {
     _sum: { unreadCount: true },
   })
   return result._sum.unreadCount || 0
+}
+
+export async function ensureBotUser() {
+  const botUser = await prisma.user.findUnique({
+    where: { id: AI_BOT_ID },
+  })
+
+  if (!botUser) {
+    await prisma.user.create({
+      data: {
+        id: AI_BOT_ID,
+        name: 'AI Assistant',
+        role: UserRole.BOT,
+        email: 'ai-assistant@sitepow.store',
+      },
+    })
+  }
+
+  return AI_BOT_ID
 }
