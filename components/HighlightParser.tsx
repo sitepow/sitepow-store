@@ -1,5 +1,7 @@
 'use client'
 
+import { useIsMounted } from '@/hooks/use-is-mounted'
+
 import { PointerHighlight } from './ui/pointer-highlight'
 
 interface HighlightParserProps {
@@ -7,6 +9,11 @@ interface HighlightParserProps {
 }
 
 export function HighlightParser({ text }: HighlightParserProps) {
+  const isMounted = useIsMounted()
+
+  if (!isMounted) {
+    return
+  }
   const parts = text.split(/(<hilight>.*?<\/hilight>)/g)
 
   return (

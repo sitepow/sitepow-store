@@ -29,9 +29,7 @@ export function HeroSection() {
       <div className="z-10 space-y-5">
         <HeroHeader
           className="text-white"
-          title={
-            <>เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย ของการขายสินค้าออนไลน์</>
-          }
+          title="เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย ของการขายสินค้าออนไลน์"
           subtitle={
             <>
               ด้วยระบบจัดการร้านค้าออนไลน์ จาก{' '}
