@@ -91,34 +91,34 @@ export function useSendMessage(conversationId: string) {
       return sendMessage(conversationId, content)
     },
     onSuccess: (result) => {
-      if (!result.success || !result.data) {
+      if (!result.success || !('data' in result)) {
         return
-      } else {
-        const newMessage = result.data
-
-        queryClient.setQueryData(
-          chatKeys.messages(conversationId),
-          (old: InfiniteData<ChatData> | undefined) => {
-            if (!old) {
-              return old
-            }
-
-            return {
-              ...old,
-              pages: old.pages.map((p, i) => {
-                if (i === 0) {
-                  return { ...p, items: [...p.items, newMessage] }
-                }
-                return p
-              }),
-            }
-          },
-        )
-
-        queryClient.invalidateQueries({
-          queryKey: chatKeys.supportConversations(),
-        })
       }
+
+      const newMessage = result.data
+
+      queryClient.setQueryData(
+        chatKeys.messages(conversationId),
+        (old: InfiniteData<ChatData> | undefined) => {
+          if (!old) {
+            return old
+          }
+
+          return {
+            ...old,
+            pages: old.pages.map((p, i) => {
+              if (i === 0) {
+                return { ...p, items: [...p.items, newMessage] }
+              }
+              return p
+            }),
+          }
+        },
+      )
+
+      queryClient.invalidateQueries({
+        queryKey: chatKeys.supportConversations(),
+      })
     },
   })
 }
