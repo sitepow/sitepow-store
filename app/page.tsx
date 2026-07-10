@@ -4,6 +4,7 @@ import { FeatureSection } from '@/components/section/FeatureSection'
 import { HeroSection } from '@/components/section/HeroSection'
 import { InfrastructureSection } from '@/components/section/InfrastructureSection'
 import { LogisticsSection } from '@/components/section/LogisticsSection'
+import { POSSection } from '@/components/section/POSSection'
 import { PaymentSection } from '@/components/section/PaymentSection'
 import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
 import { ProductTypeSection } from '@/components/section/ProductTypeSection'
@@ -17,6 +18,7 @@ export default function HomePage() {
       <HeroSection />
       <FeatureSection />
       <ProductTypeSection />
+      <POSSection />
       <ComparisonSection />
       <PricingPhilosophySection />
       <PaymentSection />

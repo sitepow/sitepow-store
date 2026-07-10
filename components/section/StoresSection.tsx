@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useLandingStores } from '@/actions/hooks/store'
+import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
@@ -75,9 +76,8 @@ export function StoresSection() {
                 alt="store-preview-image"
               />
             </div>
-
             <CardContent className="flex flex-1 flex-col pb-5">
-              <h3 className="line-clamp-2 text-xl font-bold sm:text-2xl">
+              <h3 className="mb-5 line-clamp-2 text-xl font-bold sm:text-2xl">
                 {store.name}
               </h3>
               <ActionRequiredAlert
@@ -85,34 +85,20 @@ export function StoresSection() {
                 description="เนื่องจากเป็นร้านค้าตัวอย่าง เราจึงปิดการทำงานของ Search Engine
                   เพื่อป้องกันไม่ให้ข้อมูลสินค้าในร้านตัวอย่างไปปรากฏในการค้นหาจริงของลูกค้า"
               />
-              <p className="mt-1 text-lg leading-relaxed opacity-60">
-                ระบบจัดการออเดอร์และสต็อกที่ครบวงจร
-                ได้รับความไว้วางใจจากร้านค้าชั้นนำบน Sitepow Store
-              </p>
-
-              <div className="mt-6 flex flex-1 items-end">
-                <Button
-                  variant="ghost"
-                  className="group/btn w-full flex-wrap justify-end gap-2 px-0 hover:bg-transparent"
-                  asChild
-                >
+              <div className="mt-6 flex items-end justify-end">
+                <Button variant="outline" asChild>
                   <Link
                     href={`https://${store.slug}.sitepow.store`}
                     target="_blank"
                   >
-                    <span className="text-primary text-sm font-semibold">
-                      เยี่ยมชมเว็บไซต์
-                    </span>
-                    <div className="rounded-full p-1.5 transition-transform group-hover/btn:translate-x-1">
-                      <IconArrowUpRight className="text-primary size-4" />
-                    </div>
+                    เยี่ยมชมเว็บไซต์
+                    <IconArrowUpRight className="size-4" />
                   </Link>
                 </Button>
               </div>
             </CardContent>
           </Card>
         ))}
-
         {isLoading &&
           Array.from({
             length: Math.max(0, targetBoxes - 1 - displayedStores.length),
@@ -131,17 +117,21 @@ export function StoresSection() {
               </CardContent>
             </Card>
           ))}
-
         {!isLoading && (
-          <Card className="group hover:border-primary/50 flex h-full cursor-pointer items-center justify-center border-dashed transition-colors">
-            <CardContent className="flex h-full w-full flex-col items-center justify-center p-10 text-center">
-              <div className="group-hover:text-primary group-hover:border-primary rounded-full border border-dashed p-4 transition-colors">
+          <Card
+            style={{
+              backgroundImage: `url('${FALLBACK_IMAGE}')`,
+            }}
+            className="group hover:border-primary/50 flex h-full cursor-pointer items-center justify-center border-dashed bg-center transition-colors"
+          >
+            <CardContent className="flex h-full w-full flex-col items-center justify-center p-10 text-center text-white">
+              <div className="rounded-full border border-dashed p-4">
                 <IconPlus className="size-10 stroke-1" />
               </div>
-              <h3 className="group-hover:text-foreground mt-6 text-xl font-bold transition-colors sm:text-2xl">
+              <h3 className="mt-6 text-xl font-bold sm:text-2xl">
                 สร้างร้านค้าของคุณ
               </h3>
-              <p className="group-hover:text-foreground mt-2 text-lg opacity-60 transition-colors">
+              <p className="mt-2 text-lg opacity-60">
                 เริ่มต้นสร้างประสบการณ์การช้อปปิ้งที่ยอดเยี่ยมด้วย Sitepow Store
               </p>
               <div className="mt-8">

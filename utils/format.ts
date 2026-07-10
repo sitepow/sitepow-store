@@ -23,3 +23,11 @@ export const arrayToString = (
 
   return `${list.join(separator)}${suffix}`
 }
+
+export const cleanTag = (text: React.ReactNode, tagTarget: string) => {
+  if (typeof text === 'string') {
+    const regex = new RegExp(`<\/?${tagTarget}>`, 'g')
+    return text.replace(regex, '')
+  }
+  return text
+}

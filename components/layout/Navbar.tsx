@@ -13,6 +13,7 @@ import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { getClientAuthUrl } from '@/utils/auth'
+import { cleanTag } from '@/utils/format'
 import { IconLock } from '@tabler/icons-react'
 import { LockIcon, Menu, X } from 'lucide-react'
 
@@ -89,7 +90,7 @@ export function Navbar() {
                           <ul className="grid w-100 gap-3 p-4 md:w-2xl md:grid-cols-3 lg:w-3xl">
                             {item.children.map(({ description, ...rest }) => (
                               <ListItem key={rest.title} {...rest}>
-                                {description}
+                                {cleanTag(description, 'hilight')}
                               </ListItem>
                             ))}
                           </ul>

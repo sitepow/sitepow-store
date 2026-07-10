@@ -4,6 +4,7 @@ import { FeatureCard as FeatureCardType } from '@/types/payment'
 
 import { PageTabHeaderIcon } from '@/components/PageTabHeaderIcon'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { HighlightParser } from '@/components/HighlightParser'
 
 interface FeatureCardProps extends FeatureCardType {
   image?: string
@@ -30,7 +31,7 @@ export function FeatureCard({
         <h3 className="text-xl font-bold sm:text-2xl">{title}</h3>
       </CardHeader>
       <CardContent className="-mt-5">
-        <p className="text-lg leading-relaxed opacity-60">{description}</p>
+        <p className="text-lg leading-relaxed opacity-60"><HighlightParser text={description} /></p>
         {image && (
           <div className="border-border relative mt-6 overflow-hidden rounded-xl border-2 border-dashed">
             <div className="flex h-48 w-full items-center justify-center" />
