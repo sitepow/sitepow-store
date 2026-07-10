@@ -186,22 +186,26 @@ export function ShippingSettingsForm() {
                                   </div>
 
                                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                                    {isEnabled && (
-                                      <ServiceConfigDialog
-                                        serviceName={`${courier.name} - ${service.name}`}
-                                        serviceIndex={formFieldIndex}
-                                      />
-                                    )}
-                                    <Switch
-                                      checked={!!isEnabled}
-                                      onCheckedChange={(checked) =>
-                                        setValue(
-                                          `services.${formFieldIndex}.isEnabled`,
-                                          checked,
-                                          { shouldDirty: true },
-                                        )
-                                      }
+                                    <ServiceConfigDialog
+                                      isDisable={!isEnabled}
+                                      serviceName={`${courier.name} - ${service.name}`}
+                                      serviceIndex={formFieldIndex}
                                     />
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium">
+                                        {isEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                                      </span>
+                                      <Switch
+                                        checked={!!isEnabled}
+                                        onCheckedChange={(checked) =>
+                                          setValue(
+                                            `services.${formFieldIndex}.isEnabled`,
+                                            checked,
+                                            { shouldDirty: true },
+                                          )
+                                        }
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               )

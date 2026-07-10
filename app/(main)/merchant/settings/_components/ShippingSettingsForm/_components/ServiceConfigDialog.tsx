@@ -27,11 +27,13 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface ServiceConfigDialogProps {
+  isDisable: boolean
   serviceName: string
   serviceIndex: number
 }
 
 export function ServiceConfigDialog({
+  isDisable,
   serviceName,
   serviceIndex,
 }: ServiceConfigDialogProps) {
@@ -69,7 +71,13 @@ export function ServiceConfigDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="h-8 gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isDisable}
+          size="sm"
+          className="h-8 gap-1"
+        >
           <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
         </Button>
       </DialogTrigger>

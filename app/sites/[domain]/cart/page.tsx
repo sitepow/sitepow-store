@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -13,7 +14,7 @@ import {
   useShippingCalculation,
   useStorefrontShippingOptions,
 } from '@/actions/hooks/storefront/shipping'
-import { PaymentMethod, UserRole } from '@/generated/prisma/enums'
+import { PaymentMethod, ProductType, UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -53,13 +54,10 @@ type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 export default function StoreCartPage() {
   const { store } = useStoreData()
   const isMounted = useIsMounted()
-
   const router = useRouter()
   const params = useParams()
   const storeSlug = params.domain as string
-
   const { isAuthenticated } = useSession()
-
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
@@ -79,24 +77,29 @@ export default function StoreCartPage() {
   const pointsDiscount = usedPoints * (loyalty?.pointRedeemRate ?? 0)
   const couponDiscount = appliedCoupon?.discountAmount ?? 0
 
-  const grandTotal = calculateGrandTotal({
-    subtotal: summary.finalPrice,
-    pointsDiscount,
-    couponDiscount,
-  })
+  const physicalItems = items.filter(
+    (item) => item.productType === ProductType.PHYSICAL,
+  )
+  const hasPhysical = physicalItems.length > 0
+  const physicalTotalWeight = physicalItems.reduce(
+    (sum, item) => sum + (item.weight || 0) * item.quantity,
+    0,
+  )
 
   const { data: shippingFees } = useShippingCalculation({
     storeId: store?.id ?? '',
     originProvince: 'กรุงเทพมหานคร',
     destinationProvince: 'อุบลราชธานี',
     destinationPostcode: '34000',
-    weight: summary.totalWeight || 20000,
+    weight: physicalTotalWeight || 780,
   })
 
   const [selectedAddress, setSelectedAddress] = useState<string>('')
   const [selectedShipping, setSelectedShipping] = useState<string>('')
   const [selectedPayment, setSelectedPayment] = useState<string>('')
-  const [activeSection, setActiveSection] = useState<CheckoutStep>('address')
+  const [userSelectedSection, setUserSelectedSection] =
+    useState<CheckoutStep | null>(null)
+  const [hasUserIntervened, setHasUserIntervened] = useState(false)
 
   const { data: addressOptions = [] } = useAddressOptions()
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
@@ -121,29 +124,31 @@ export default function StoreCartPage() {
     review: IconShoppingCartCheck,
   }
 
-  const paymentMethods = [
-    ...(paymentOptions?.isBankTransferEnabled
-      ? paymentOptions.bankAccounts.map((acc) => ({
-          id: acc.id,
-          title: 'โอนเงินบัญชีธนาคาร',
-          description: `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
-        }))
-      : []),
-    ...(paymentOptions?.isStripeEnabled
-      ? [
-          {
-            id: 'promptpay',
-            title: 'QR พร้อมเพย์',
-            description: 'รองรับแอปธนาคารทุกแห่ง',
-          },
-          {
-            id: 'stripe',
-            title: 'บัตรเครดิต / เดบิต',
-            description: 'ชำระผ่าน Visa หรือ Mastercard',
-          },
-        ]
-      : []),
-  ]
+  const paymentMethods = useMemo(() => {
+    return [
+      ...(paymentOptions?.isBankTransferEnabled
+        ? paymentOptions.bankAccounts.map((acc) => ({
+            id: acc.id,
+            title: 'โอนเงินบัญชีธนาคาร',
+            description: `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
+          }))
+        : []),
+      ...(paymentOptions?.isStripeEnabled
+        ? [
+            {
+              id: 'promptpay',
+              title: 'QR พร้อมเพย์',
+              description: 'รองรับแอปธนาคารทุกแห่ง',
+            },
+            {
+              id: 'stripe',
+              title: 'บัตรเครดิต / เดบิต',
+              description: 'ชำระผ่าน Visa หรือ Mastercard',
+            },
+          ]
+        : []),
+    ]
+  }, [paymentOptions])
 
   const selectedAddressData = addressOptions.find(
     (a) => a.id === selectedAddress,
@@ -155,25 +160,53 @@ export default function StoreCartPage() {
     (p) => p.id === selectedPayment,
   )
 
-  const stepsOrder: CheckoutStep[] = [
-    'address',
-    'shipping',
-    'payment',
-    'review',
-  ]
-  const progressValue = ((stepsOrder.indexOf(activeSection) + 1) / 4) * 100
-
-  const goToNextIncompleteStep = () => {
-    if (!selectedAddress) {
-      setActiveSection('address')
-    } else if (!selectedShipping) {
-      setActiveSection('shipping')
-    } else if (!selectedPayment) {
-      setActiveSection('payment')
-    } else {
-      setActiveSection('review')
+  const stepsOrder = useMemo(() => {
+    const steps: CheckoutStep[] = []
+    if (hasPhysical) {
+      steps.push('address', 'shipping')
     }
+    steps.push('payment', 'review')
+    return steps
+  }, [hasPhysical])
+
+  const activeSection = useMemo(() => {
+    if (userSelectedSection) {
+      return userSelectedSection
+    }
+
+    return hasPhysical ? 'address' : 'payment'
+  }, [hasPhysical, userSelectedSection])
+
+  const progressValue =
+    ((stepsOrder.indexOf(activeSection) + 1) / stepsOrder.length) * 100
+
+  const handleSectionChange = (section: CheckoutStep) => {
+    setUserSelectedSection(section)
+    setHasUserIntervened(true)
   }
+
+  const getStepNumber = (step: CheckoutStep) => {
+    return stepsOrder.indexOf(step) + 1
+  }
+
+  const goToNextIncompleteStep = useCallback(() => {
+    const currentIndex = stepsOrder.indexOf(activeSection)
+    const nextStep = stepsOrder[currentIndex + 1]
+
+    if (nextStep) {
+      setUserSelectedSection(nextStep)
+    } else {
+      setUserSelectedSection('review')
+    }
+  }, [stepsOrder, activeSection])
+
+  const shippingFee = selectedShippingData?.fee ?? 0
+  const grandTotal =
+    calculateGrandTotal({
+      subtotal: summary.finalPrice,
+      pointsDiscount,
+      couponDiscount,
+    }) + shippingFee
 
   const getPaymentMethod = (paymentId: string): PaymentMethod => {
     if (paymentId === 'promptpay') {
@@ -185,18 +218,36 @@ export default function StoreCartPage() {
     return PaymentMethod.TRANSFER
   }
 
+  const sectionDescription = useMemo(() => {
+    switch (activeSection) {
+      case 'address':
+        return 'เลือกที่อยู่การจัดส่ง'
+      case 'shipping':
+        return 'เลือกช่องทางจัดส่งสินค้า'
+      case 'payment':
+        return 'เลือกวิธีชำระเงิน'
+      case 'review':
+        return 'ตรวจสอบรายการและยืนยันการสั่งซื้อ'
+      default:
+        return 'ดำเนินการสั่งซื้อ'
+    }
+  }, [activeSection])
+
   const handleCreateOrder = () => {
-    if (!selectedAddressData || !selectedShippingData || !selectedPaymentData) {
+    if (hasPhysical && (!selectedAddressData || !selectedShippingData)) {
+      return
+    }
+    if (!selectedPaymentData) {
       return
     }
 
     createOrderMutation.mutate(
       {
         storeSlug,
-        addressId: selectedAddressData.id,
-        shippingMethod: selectedShippingData.courierService.name,
-        storeCourierServiceId: selectedShippingData.id,
-        shippingFee: 0,
+        addressId: selectedAddressData?.id ?? '',
+        shippingMethod: selectedShippingData?.courierService.name ?? '',
+        storeCourierServiceId: selectedShippingData?.id ?? '',
+        shippingFee: shippingFee,
         paymentMethod: getPaymentMethod(selectedPaymentData.id),
         couponId: appliedCoupon?.id,
         usedPoints,
@@ -221,6 +272,80 @@ export default function StoreCartPage() {
       },
     )
   }
+
+  const cheapestShippingId = useMemo(() => {
+    if (!hasPhysical) {
+      return ''
+    }
+
+    const availableOptions = shippingOptionsWithFees.filter(
+      (opt) => opt.fee !== null,
+    )
+
+    if (availableOptions.length === 0) {
+      return ''
+    }
+
+    return availableOptions.reduce((prev, curr) =>
+      prev.fee! < curr.fee! ? prev : curr,
+    ).id
+  }, [hasPhysical, shippingOptionsWithFees])
+
+  useEffect(() => {
+    if (hasUserIntervened) {
+      return
+    }
+
+    if (
+      !hasPhysical &&
+      activeSection !== 'payment' &&
+      activeSection !== 'review'
+    ) {
+      setUserSelectedSection('payment')
+      return
+    }
+
+    if (hasPhysical) {
+      const defaultAddress = addressOptions.find((addr) => addr.isDefault)
+      if (defaultAddress && !selectedAddress) {
+        setSelectedAddress(defaultAddress.id)
+        setUserSelectedSection('shipping')
+        return
+      }
+
+      if (
+        cheapestShippingId &&
+        !selectedShipping &&
+        activeSection === 'shipping'
+      ) {
+        setSelectedShipping(cheapestShippingId)
+        setUserSelectedSection('payment')
+        return
+      }
+    }
+
+    if (paymentMethods.length === 1 && !selectedPayment) {
+      setSelectedPayment(paymentMethods[0].id)
+      return
+    }
+
+    const isPhysicalReady = hasPhysical
+      ? selectedAddress && selectedShipping
+      : true
+    if (isPhysicalReady && selectedPayment && activeSection !== 'review') {
+      setUserSelectedSection('review')
+    }
+  }, [
+    hasPhysical,
+    activeSection,
+    addressOptions,
+    selectedAddress,
+    cheapestShippingId,
+    selectedShipping,
+    paymentMethods,
+    selectedPayment,
+    hasUserIntervened,
+  ])
 
   if (!isMounted) {
     return null
@@ -295,137 +420,141 @@ export default function StoreCartPage() {
                     {formatCurrency(grandTotal)}
                   </span>
                 </h3>
-                <p className="text-xs opacity-50">เลือกที่อยู่การจัดส่ง</p>
+                <p className="text-xs opacity-50">{sectionDescription}</p>
               </div>
             </div>
-            <CheckoutSection
-              title="1. ที่อยู่สำหรับการจัดส่ง"
-              isActive={activeSection === 'address'}
-              isCompleted={!!selectedAddressData}
-              onEdit={() => setActiveSection('address')}
-              isDisabled={!isAuthenticated}
-            >
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2.5">
-                  <span className="text-muted-foreground text-sm">
-                    เลือกที่อยู่ที่ต้องการให้จัดส่ง
-                  </span>
-                  <CustomerAddressCreateDialog />
-                </div>
+            {physicalItems?.length > 0 && (
+              <CheckoutSection
+                title={`${getStepNumber('address')}. ที่อยู่สำหรับการจัดส่ง`}
+                isActive={activeSection === 'address'}
+                isCompleted={!!selectedAddressData}
+                onEdit={() => handleSectionChange('address')}
+                isDisabled={!isAuthenticated}
+              >
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5">
+                    <span className="text-muted-foreground text-sm">
+                      เลือกที่อยู่ที่ต้องการให้จัดส่ง
+                    </span>
+                    <CustomerAddressCreateDialog />
+                  </div>
 
-                {addressOptions?.length === 0 && (
-                  <ActionRequiredAlert
-                    title="พบข้อผิดพลาด"
-                    description="ไม่มีที่อยู่สำหรับการจัดส่งสินค้า"
-                  />
-                )}
-                {addressOptions?.length !== 0 && (
-                  <RadioGroup
-                    value={selectedAddress}
-                    onValueChange={setSelectedAddress}
+                  {addressOptions?.length === 0 && (
+                    <ActionRequiredAlert
+                      title="พบข้อผิดพลาด"
+                      description="ไม่มีที่อยู่สำหรับการจัดส่งสินค้า"
+                    />
+                  )}
+                  {addressOptions?.length !== 0 && (
+                    <RadioGroup
+                      value={selectedAddress}
+                      onValueChange={setSelectedAddress}
+                    >
+                      <div className="grid gap-2">
+                        {addressOptions.map((addr) => (
+                          <RadioCard
+                            key={addr.id}
+                            id={`addr-${addr.id}`}
+                            value={addr.id}
+                            title={`${addr.receiverName} (${addr.name})`}
+                            description={`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province}`}
+                          />
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  )}
+                  <Button
+                    className="w-full"
+                    variant="brand"
+                    disabled={!selectedAddressData}
+                    onClick={goToNextIncompleteStep}
                   >
-                    <div className="grid gap-2">
-                      {addressOptions.map((addr) => (
-                        <RadioCard
-                          key={addr.id}
-                          id={`addr-${addr.id}`}
-                          value={addr.id}
-                          title={`${addr.receiverName} (${addr.name})`}
-                          description={`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province}`}
-                        />
-                      ))}
-                    </div>
+                    ดำเนินการต่อ
+                  </Button>
+                </div>
+                {selectedAddressData && (
+                  <RadioGroup value={selectedAddress}>
+                    <RadioCard
+                      id={`summary-addr-${selectedAddressData.id}`}
+                      value={selectedAddressData.id}
+                      title={`${selectedAddressData.receiverName} (${selectedAddressData.name})`}
+                      description={`${selectedAddressData.addressLine} ${selectedAddressData.subDistrict} ${selectedAddressData.district} ${selectedAddressData.province}`}
+                    />
                   </RadioGroup>
                 )}
-                <Button
-                  className="w-full"
-                  variant="brand"
-                  disabled={!selectedAddressData}
-                  onClick={goToNextIncompleteStep}
-                >
-                  ดำเนินการต่อ
-                </Button>
-              </div>
-              {selectedAddressData && (
-                <RadioGroup value={selectedAddress}>
-                  <RadioCard
-                    id={`summary-addr-${selectedAddressData.id}`}
-                    value={selectedAddressData.id}
-                    title={`${selectedAddressData.receiverName} (${selectedAddressData.name})`}
-                    description={`${selectedAddressData.addressLine} ${selectedAddressData.subDistrict} ${selectedAddressData.district} ${selectedAddressData.province}`}
-                  />
-                </RadioGroup>
-              )}
-            </CheckoutSection>
-            <CheckoutSection
-              title="2. เลือกช่องทางจัดส่ง"
-              isActive={activeSection === 'shipping'}
-              isCompleted={!!selectedShipping}
-              onEdit={() => setActiveSection('shipping')}
-              isDisabled={!isAuthenticated}
-            >
-              <div className="space-y-4">
-                {shippingOptions.length === 0 && (
-                  <ActionRequiredAlert
-                    title="พบข้อผิดพลาด"
-                    description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง กรุณาติดต่อร้านค้าโดยตรง"
-                  />
-                )}
-                {shippingOptionsWithFees.length !== 0 && (
-                  <RadioGroup
-                    value={selectedShipping}
-                    onValueChange={setSelectedShipping}
+              </CheckoutSection>
+            )}
+            {physicalItems?.length > 0 && (
+              <CheckoutSection
+                title={`${getStepNumber('shipping')}. เลือกช่องทางจัดส่ง`}
+                isActive={activeSection === 'shipping'}
+                isCompleted={!!selectedShipping}
+                onEdit={() => handleSectionChange('shipping')}
+                isDisabled={!isAuthenticated}
+              >
+                <div className="space-y-4">
+                  {shippingOptions.length === 0 && (
+                    <ActionRequiredAlert
+                      title="พบข้อผิดพลาด"
+                      description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง กรุณาติดต่อร้านค้าโดยตรง"
+                    />
+                  )}
+                  {shippingOptionsWithFees.length !== 0 && (
+                    <RadioGroup
+                      value={selectedShipping}
+                      onValueChange={setSelectedShipping}
+                    >
+                      <div className="grid gap-2">
+                        {shippingOptionsWithFees.map((method) => (
+                          <RadioCard
+                            key={method.id}
+                            id={`ship-${method.id}`}
+                            value={method.id}
+                            title={`${method.courierService.name} (${method.fee ? formatCurrency(method.fee) : 'ไม่รองรับน้ำหนักนี้'})`}
+                            description={
+                              method.courierService.estimatedDays
+                                ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
+                                : method.courierService.courier.name
+                            }
+                          />
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  )}
+                  <Button
+                    className="w-full"
+                    variant="brand"
+                    disabled={!selectedShippingData}
+                    onClick={goToNextIncompleteStep}
                   >
-                    <div className="grid gap-2">
-                      {shippingOptionsWithFees.map((method) => (
-                        <RadioCard
-                          key={method.id}
-                          id={`ship-${method.id}`}
-                          value={method.id}
-                          title={`${method.courierService.name} (${method.fee ? formatCurrency(method.fee) : 'ไม่รองรับน้ำหนักนี้'})`}
-                          description={
-                            method.courierService.estimatedDays
-                              ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
-                              : method.courierService.courier.name
-                          }
-                        />
-                      ))}
-                    </div>
+                    ดำเนินการต่อ
+                  </Button>
+                </div>
+                {selectedShippingData && (
+                  <RadioGroup value={selectedShipping}>
+                    <RadioCard
+                      id={`summary-ship-${selectedShippingData.id}`}
+                      value={selectedShippingData.id}
+                      title={`${selectedShippingData.courierService.name} ${
+                        selectedShippingData.fee !== null
+                          ? `(${formatCurrency(selectedShippingData.fee)})`
+                          : 'ไม่รองรับน้ำหนักนี้'
+                      }`}
+                      description={
+                        selectedShippingData.courierService.estimatedDays
+                          ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
+                          : selectedShippingData.courierService.courier.name
+                      }
+                    />
                   </RadioGroup>
                 )}
-                <Button
-                  className="w-full"
-                  variant="brand"
-                  disabled={!selectedShippingData}
-                  onClick={goToNextIncompleteStep}
-                >
-                  ดำเนินการต่อ
-                </Button>
-              </div>
-              {selectedShippingData && (
-                <RadioGroup value={selectedShipping}>
-                  <RadioCard
-                    id={`summary-ship-${selectedShippingData.id}`}
-                    value={selectedShippingData.id}
-                    title={`${selectedShippingData.courierService.name} ${
-                      selectedShippingData.fee !== null
-                        ? `(${formatCurrency(selectedShippingData.fee)})`
-                        : 'ไม่รองรับน้ำหนักนี้'
-                    }`}
-                    description={
-                      selectedShippingData.courierService.estimatedDays
-                        ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
-                        : selectedShippingData.courierService.courier.name
-                    }
-                  />
-                </RadioGroup>
-              )}
-            </CheckoutSection>
+              </CheckoutSection>
+            )}
             <CheckoutSection
-              title="3. วิธีชำระเงิน"
+              title={`${getStepNumber('payment')}. วิธีชำระเงิน`}
               isActive={activeSection === 'payment'}
               isCompleted={!!selectedPayment}
-              onEdit={() => setActiveSection('payment')}
+              onEdit={() => handleSectionChange('payment')}
               isDisabled={!isAuthenticated}
             >
               <div className="space-y-3">
@@ -478,6 +607,10 @@ export default function StoreCartPage() {
                 label="ส่วนลด"
                 value={<DiscountForm subtotal={summary.finalPrice} />}
               />
+              <SummaryRow
+                label="ค่าจัดส่ง"
+                value={formatCurrency(shippingFee)}
+              />
               <CartSummary summary={summary} />
               {(pointsDiscount > 0 || couponDiscount > 0) && (
                 <div className="mt-2 space-y-1 border-t pt-2">
@@ -493,12 +626,12 @@ export default function StoreCartPage() {
                       value={`-${formatCurrency(couponDiscount)}`}
                     />
                   )}
-                  <SummaryTotal
-                    label="ยอดที่ต้องชำระ"
-                    value={formatCurrency(grandTotal)}
-                  />
                 </div>
               )}
+              <SummaryTotal
+                label="ยอดที่ต้องชำระ"
+                value={formatCurrency(grandTotal)}
+              />
               {isAuthenticated && (
                 <Button
                   className="mt-6 h-12 w-full text-lg"
