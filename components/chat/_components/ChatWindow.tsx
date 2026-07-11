@@ -38,13 +38,19 @@ export function ChatWindow({
   const { register, handleSubmit, reset, watch } = useForm<ChatFormValues>()
 
   const { user } = useSession()
+  const userRole = user?.role
+
   useChatScroll(messages, containerRef)
   useChatStream(conversationId)
 
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { mutate: toggleAi } = useToggleUserAi()
 
-  const userRole = user?.role
+  const fieldType =
+    conversationType === ConversationType.STORE
+      ? ConversationType.STORE
+      : ConversationType.SUPPORT
+
   const isCanToggleAiFeature =
     userRole === UserRole.SUPPORT ||
     (userRole === UserRole.MERCHANT &&
@@ -57,9 +63,15 @@ export function ChatWindow({
       {isCanToggleAiFeature && (
         <ChatAIToggle
           enabled={isAiEnabled}
-          onToggle={(c) =>
-            otherUserId && toggleAi({ userId: otherUserId, enabled: c })
-          }
+          onToggle={(c) => {
+            if (otherUserId) {
+              toggleAi({
+                userId: otherUserId,
+                enabled: c,
+                fieldType: fieldType,
+              })
+            }
+          }}
         />
       )}
       <div

@@ -133,11 +133,31 @@ export async function getConversation(
   })
 
   if (!conversation) {
+    let extraMemberIds: string[] = []
+
+    if (type === ConversationType.STORE) {
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { ownerId: true },
+      })
+
+      if (!store) {
+        return { success: false, message: 'ไม่พบร้านค้า' }
+      }
+
+      extraMemberIds = [store.ownerId]
+    }
+
     conversation = await prisma.conversation.create({
       data: {
         type,
         storeId: type === ConversationType.STORE ? storeId : undefined,
-        members: { create: [{ userId: currentUserId }] },
+        members: {
+          create: [
+            { userId: currentUserId },
+            ...extraMemberIds.map((id) => ({ userId: id })),
+          ],
+        },
       },
       include: { members: true },
     })
@@ -217,10 +237,8 @@ export async function getSupportConversations(storeId?: string) {
       userRole === UserRole.SUPPORT
         ? { type: ConversationType.SUPPORT }
         : {
-            OR: [
-              { type: ConversationType.STORE, storeId },
-              { type: ConversationType.SUPPORT },
-            ],
+            type: ConversationType.STORE,
+            storeId: storeId,
           },
     orderBy: { lastMessageAt: 'desc' },
     include: {
@@ -228,18 +246,6 @@ export async function getSupportConversations(storeId?: string) {
       messages: { orderBy: { createdAt: 'desc' }, take: 1 },
     },
   })
-
-  for (const c of conversations) {
-    const isMember = c.members.some((m) => m.userId === userId)
-
-    if (!isMember) {
-      await prisma.conversationMember
-        .create({
-          data: { conversationId: c.id, userId: userId },
-        })
-        .catch(() => {})
-    }
-  }
 
   const data = conversations.map((c) => {
     const me = c.members.find((m) => m.userId === userId)
@@ -257,9 +263,13 @@ export async function getSupportConversations(storeId?: string) {
         c.type === ConversationType.STORE
           ? other?.isAiStoreEnabled
           : other?.isAiSupportEnabled,
-      isAiSupportEnabled: other?.isAiSupportEnabled ?? false,
       isAiStoreEnabled: other?.isAiStoreEnabled ?? false,
+      isAiSupportEnabled: other?.isAiSupportEnabled ?? false,
       type: c.type,
+      currentAiStatus:
+        c.type === ConversationType.STORE
+          ? other?.isAiStoreEnabled
+          : other?.isAiSupportEnabled,
     }
   })
 
@@ -279,23 +289,18 @@ export async function sendMessage(
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
-  const sender = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { isAiStoreEnabled: true, isAiSupportEnabled: true, role: true },
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: { members: { include: { user: true } }, store: true },
   })
 
-  const conversation = await prisma.conversation.findFirst({
-    where: { id: conversationId },
-    select: { type: true },
-  })
+  const hasAccess = await checkAccess(conversationId, userId, userRole)
+  if (!hasAccess) {
+    throw new Error('ไม่พบสิทธิ์เข้าถึงห้องแชท')
+  }
 
   const result = await prisma
     .$transaction(async (tx) => {
-      const hasAccess = await checkAccess(conversationId, userId, userRole)
-      if (!hasAccess) {
-        throw new Error('ไม่พบสิทธิ์เข้าถึงห้องแชท')
-      }
-
       const cleanContent =
         type === MessageType.TEXT ? cleanBadWords(content) : content
 
@@ -332,16 +337,34 @@ export async function sendMessage(
 
   chatEvents.publish(`message:${conversationId}`, message)
 
-  const isAiEnabled =
-    conversation?.type === ConversationType.STORE
-      ? sender?.isAiStoreEnabled
-      : sender?.isAiSupportEnabled
+  let targetUser: {
+    isAiStoreEnabled?: boolean
+    isAiSupportEnabled?: boolean
+  } | null = null
 
-  if (
-    userRole !== UserRole.SUPPORT &&
-    userRole !== UserRole.BOT &&
-    isAiEnabled
-  ) {
+  if (conversation?.type === ConversationType.STORE && conversation.storeId) {
+    const store = await prisma.store.findUnique({
+      where: { id: conversation.storeId },
+      select: {
+        owner: { select: { id: true, isAiStoreEnabled: true, role: true } },
+      },
+    })
+    targetUser = store?.owner ?? null
+  } else if (conversation?.type === ConversationType.SUPPORT) {
+    targetUser = await prisma.user.findFirst({
+      where: { role: UserRole.SUPPORT, isAiSupportEnabled: true },
+      select: { id: true, isAiSupportEnabled: true },
+    })
+  }
+
+  let shouldEnableAi = false
+  if (conversation?.type === ConversationType.STORE) {
+    shouldEnableAi = targetUser?.isAiStoreEnabled ?? false
+  } else if (conversation?.type === ConversationType.SUPPORT) {
+    shouldEnableAi = !!targetUser
+  }
+
+  if (shouldEnableAi && userRole !== UserRole.BOT) {
     handleAiResponse(conversationId, content).catch(console.error)
   }
 
@@ -430,31 +453,29 @@ export async function getMessages(conversationId: string, cursor?: string) {
   }
 }
 
-export async function toggleUserAi(userId: string, enabled: boolean) {
+export async function toggleUserAi(
+  userId: string,
+  enabled: boolean,
+  fieldType: ConversationType,
+) {
   const session = await auth()
-  const userRole = session?.user?.role
-
-  const isCanEdit =
-    userRole === UserRole.SUPPORT || userRole === UserRole.MERCHANT
-
-  if (!isCanEdit) {
-    return { success: false, message: 'คุณไม่มีสิทธิ์เปลี่ยนข้อมูลนี้' }
+  if (!session?.user?.id) {
+    return { success: false, message: 'ไม่ได้รับอนุญาต' }
   }
 
-  const updateData = {
-    [userRole === UserRole.SUPPORT ? 'isAiSupportEnabled' : 'isAiStoreEnabled']:
-      enabled,
-  }
+  const fieldName =
+    fieldType === ConversationType.STORE
+      ? 'isAiStoreEnabled'
+      : 'isAiSupportEnabled'
 
   try {
     await prisma.user.update({
       where: { id: userId },
-      data: updateData,
+      data: { [fieldName]: enabled },
     })
 
-    return { success: true, message: 'ปรับการตั้งค่าสำเร็จแล้ว' }
-  } catch (error) {
-    console.error(error)
+    return { success: true, message: 'ปรับการตั้งค่าสำเร็จ' }
+  } catch {
     return { success: false }
   }
 }
@@ -466,11 +487,15 @@ export async function markAsRead(conversationId: string) {
     return
   }
 
-  await prisma.conversationMember.update({
+  await prisma.conversationMember.updateMany({
     where: {
-      conversationId_userId: { conversationId, userId: session.user.id },
+      conversationId: conversationId,
+      userId: session.user.id,
     },
-    data: { unreadCount: 0, lastReadAt: new Date() },
+    data: {
+      unreadCount: 0,
+      lastReadAt: new Date(),
+    },
   })
 }
 

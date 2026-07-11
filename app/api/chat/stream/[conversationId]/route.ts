@@ -58,19 +58,30 @@ export async function checkAccess(
   userId: string,
   userRole: UserRole,
 ) {
-  if (userRole === UserRole.SUPPORT) {
-    const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
-      select: { type: true },
-    })
-    return conversation?.type === ConversationType.SUPPORT
-  }
-
-  const member = await prisma.conversationMember.findUnique({
-    where: {
-      conversationId_userId: { conversationId, userId },
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: {
+      store: true,
+      members: { where: { userId } },
     },
   })
 
-  return !!member
+  if (!conversation) {
+    return false
+  }
+
+  if (userRole === UserRole.SUPPORT) {
+    return conversation.type === ConversationType.SUPPORT
+  }
+
+  if (userRole === UserRole.MERCHANT) {
+    if (conversation.type === ConversationType.STORE) {
+      return conversation.store?.ownerId === userId
+    }
+    if (conversation.type === ConversationType.SUPPORT) {
+      return conversation.members.length > 0
+    }
+  }
+
+  return conversation.members.length > 0
 }

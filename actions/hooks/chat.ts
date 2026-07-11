@@ -127,8 +127,16 @@ export function useToggleUserAi() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ userId, enabled }: { userId: string; enabled: boolean }) => {
-      return toggleUserAi(userId, enabled)
+    mutationFn: ({
+      userId,
+      enabled,
+      fieldType,
+    }: {
+      userId: string
+      enabled: boolean
+      fieldType: ConversationType
+    }) => {
+      return toggleUserAi(userId, enabled, fieldType)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
