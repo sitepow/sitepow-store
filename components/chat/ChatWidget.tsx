@@ -52,7 +52,7 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
     storeId,
   )
 
-  const { mutate: markAsRead } = useMarkAsRead(userId!)
+  const { mutate: markAsRead } = useMarkAsRead()
 
   useEffect(() => {
     if (isOpen && convData?.success && convData.data?.id) {
@@ -76,12 +76,7 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
                 <ChatWindow
                   currentUserId={userId}
                   conversationId={convData.data.id}
-                  conversationType={convData?.data.type}
                   isAiEnabled={convData.data.isAiEnabled}
-                  otherUserId={
-                    convData.data.members.find((m) => m.userId !== userId)
-                      ?.userId
-                  }
                 />
               )}
             </div>

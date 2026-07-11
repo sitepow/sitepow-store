@@ -28,7 +28,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
 
   const { data: unreadCount = 0 } = useUnreadCount(userId!)
   const { data, isLoading } = useSupportConversations(isOpen, storeId)
-  const { mutate: markAsRead } = useMarkAsRead(userId!)
+  const { mutate: markAsRead } = useMarkAsRead()
 
   const conversations = data?.success && data.data ? data.data : []
   const selectedConv = conversations.find((c) => c.id === selectedId)
@@ -48,9 +48,8 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
               <ChatWindow
                 currentUserId={userId!}
                 conversationId={selectedId}
-                otherUserId={selectedConv.merchantId}
                 isAiEnabled={selectedConv.isAiEnabled}
-                conversationType={selectedConv?.type}
+                canToggleAi
               />
             ) : (
               <div className="flex h-full flex-col overflow-y-auto">

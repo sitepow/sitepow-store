@@ -31,7 +31,7 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
         !isLeft ? 'items-end' : 'items-start',
       )}
     >
-      {isBot && <span className="mb-1 text-xs">AI Support</span>}
+      {isBot && <span className="mb-1 text-xs">AI Assistant</span>}
       <div
         className={cn(
           'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',

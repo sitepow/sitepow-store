@@ -4,11 +4,9 @@ import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useSendMessage, useToggleConversationAi } from '@/actions/hooks/chat'
-import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useChatMessages } from '@/hooks/use-chat-messages'
 import { useChatScroll } from '@/hooks/use-chat-scroll'
 import { useChatStream } from '@/hooks/use-chat-stream'
-import { useSession } from '@/hooks/use-session'
 
 import { ChatAIToggle } from './ChatAIToggle'
 import { ChatInput } from './ChatInput'
@@ -21,24 +19,19 @@ type ChatFormValues = {
 interface ChatWindowProps {
   conversationId: string
   currentUserId: string
-  otherUserId?: string
   isAiEnabled?: boolean
-  conversationType?: ConversationType
+  canToggleAi?: boolean
 }
 
 export function ChatWindow({
   conversationId,
   currentUserId,
-  otherUserId,
   isAiEnabled,
-  conversationType,
+  canToggleAi = false,
 }: ChatWindowProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChatMessages(conversationId)
   const { register, handleSubmit, reset, watch } = useForm<ChatFormValues>()
-
-  const { user } = useSession()
-  const userRole = user?.role
 
   useChatScroll(messages, containerRef)
   useChatStream(conversationId)
@@ -46,25 +39,18 @@ export function ChatWindow({
   const { mutate: sendMessage } = useSendMessage(conversationId)
   const { mutate: toggleAi } = useToggleConversationAi()
 
-  const isCanToggleAiFeature =
-    userRole === UserRole.SUPPORT ||
-    (userRole === UserRole.MERCHANT &&
-      conversationType === ConversationType.STORE)
-
   const hasContent = !!watch('content')?.trim()
 
   return (
     <div className="flex h-full flex-col">
-      {isCanToggleAiFeature && (
+      {canToggleAi && (
         <ChatAIToggle
           enabled={isAiEnabled}
           onToggle={(c) => {
-            if (otherUserId) {
-              toggleAi({
-                conversationId: conversationId,
-                enabled: c,
-              })
-            }
+            toggleAi({
+              conversationId: conversationId,
+              enabled: c,
+            })
           }}
         />
       )}

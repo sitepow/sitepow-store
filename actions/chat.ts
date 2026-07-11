@@ -84,8 +84,16 @@ export async function getOrCreateStoreConversation(storeId: string) {
     return { success: false, message: 'ไม่พบร้านค้า' }
   }
 
+  if (store.ownerId === userId) {
+    return {
+      success: false,
+      message: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
+    }
+  }
+
   let conversation = await prisma.conversation.findFirst({
     where: {
+      type: ConversationType.STORE,
       storeId,
       members: {
         every: { userId: { in: [userId, store.ownerId] } },
@@ -99,7 +107,7 @@ export async function getOrCreateStoreConversation(storeId: string) {
         type: ConversationType.STORE,
         storeId,
         members: {
-          create: [{ userId: userId }, { userId: store.ownerId }],
+          create: [{ userId }, { userId: store.ownerId }],
         },
       },
     })
@@ -140,9 +148,18 @@ export async function getConversation(
         where: { id: storeId },
         select: { ownerId: true },
       })
+
       if (!store) {
         return { success: false, message: 'ไม่พบร้านค้า' }
       }
+
+      if (store.ownerId === currentUserId) {
+        return {
+          success: false,
+          message: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
+        }
+      }
+
       extraMemberIds = [store.ownerId]
     }
 
@@ -282,6 +299,7 @@ export async function sendMessage(
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
+    include: { store: { select: { ownerId: true } } },
   })
 
   const hasAccess = await checkAccess(conversationId, userId, userRole)
@@ -319,7 +337,18 @@ export async function sendMessage(
 
   chatEvents.publish(`message:${conversationId}`, result as Message)
 
-  if (conversation?.isAiEnabled && userRole !== UserRole.BOT) {
+  const isSenderTheAnsweringParty =
+    conversation?.type === ConversationType.STORE
+      ? conversation.store?.ownerId === userId
+      : conversation?.type === ConversationType.SUPPORT
+        ? userRole === UserRole.SUPPORT
+        : false
+
+  if (
+    conversation?.isAiEnabled &&
+    userRole !== UserRole.BOT &&
+    !isSenderTheAnsweringParty
+  ) {
     handleAiResponse(conversationId, content).catch(console.error)
   }
 

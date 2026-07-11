@@ -70,17 +70,16 @@ export function useCustomerConversations() {
   )
 }
 
-const messageOptions = (conversationId: string) =>
-  infiniteQueryOptions({
-    queryKey: chatKeys.messages(conversationId),
-    queryFn: ({ pageParam }) =>
-      getMessages(conversationId, pageParam as string),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  })
-
 export function useMessages(conversationId: string) {
-  return useInfiniteQuery(messageOptions(conversationId))
+  return useInfiniteQuery(
+    infiniteQueryOptions({
+      queryKey: chatKeys.messages(conversationId),
+      queryFn: ({ pageParam }) =>
+        getMessages(conversationId, pageParam as string),
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }),
+  )
 }
 
 export function useSendMessage(conversationId: string) {
@@ -103,22 +102,16 @@ export function useSendMessage(conversationId: string) {
           if (!old) {
             return old
           }
-
           return {
             ...old,
-            pages: old.pages.map((p, i) => {
-              if (i === 0) {
-                return { ...p, items: [...p.items, newMessage] }
-              }
-              return p
-            }),
+            pages: old.pages.map((p, i) =>
+              i === 0 ? { ...p, items: [...p.items, newMessage] } : p,
+            ),
           }
         },
       )
 
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.supportConversations(),
-      })
+      queryClient.invalidateQueries({ queryKey: chatKeys.all })
     },
   })
 }
@@ -137,12 +130,6 @@ export function useToggleConversationAi() {
       return toggleConversationAi(conversationId, enabled)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.supportConversations(),
-      })
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.customerConversations(),
-      })
       queryClient.invalidateQueries({ queryKey: chatKeys.all })
     },
   })
@@ -159,15 +146,12 @@ export function useUnreadCount(userId: string) {
   )
 }
 
-export function useMarkAsRead(userId: string) {
+export function useMarkAsRead() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (conversationId: string) => markAsRead(conversationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: chatKeys.unreadCount(userId) })
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.supportConversations(),
-      })
+      queryClient.invalidateQueries({ queryKey: chatKeys.all })
     },
   })
 }

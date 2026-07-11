@@ -70,18 +70,20 @@ export async function checkAccess(
     return false
   }
 
+  const isMember = conversation.members.length > 0
+
   if (userRole === UserRole.SUPPORT) {
     return conversation.type === ConversationType.SUPPORT
   }
 
   if (userRole === UserRole.MERCHANT) {
     if (conversation.type === ConversationType.STORE) {
-      return conversation.store?.ownerId === userId
+      return conversation.store?.ownerId === userId || isMember
     }
     if (conversation.type === ConversationType.SUPPORT) {
-      return conversation.members.length > 0
+      return isMember
     }
   }
 
-  return conversation.members.length > 0
+  return isMember
 }
