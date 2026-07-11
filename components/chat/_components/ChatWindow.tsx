@@ -67,13 +67,12 @@ export function ChatWindow({
         className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4"
       >
         <div className="flex flex-col gap-4">
-          {messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              msg={msg}
-              isMySender={msg.senderId === currentUserId}
-            />
-          ))}
+          {messages.map((msg) => {
+            const isMySender = msg.senderId === currentUserId
+            return (
+              <MessageBubble key={msg.id} msg={msg} isMySender={isMySender} />
+            )
+          })}
         </div>
       </div>
       <ChatInput

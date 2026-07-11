@@ -21,7 +21,8 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
   const isBot = msg?.sender?.role === UserRole.BOT
-  const isLeft = isBot || !isMySender
+  const isMe = isBot ? false : isMySender
+  const isLeft = !isMe
 
   return (
     <div
@@ -42,13 +43,13 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
         )}
       >
         <MarkdownRenderer
-          className="w-fit max-w-[80%] overflow-hidden wrap-break-word text-inherit"
+          className="text-inherit md:w-fit dark:text-inherit"
           content={msg.content}
         />
         <span
           className={cn(
-            'mt-1 block text-[10px] text-blue-100 opacity-70',
-            !isLeft ? 'text-blue-100' : 'text-slate-500',
+            'mt-1 block text-[10px] opacity-70',
+            !isLeft ? 'text-blue-100' : isBot ? 'text-white' : 'text-slate-500',
           )}
         >
           {new Date(msg.createdAt).toLocaleTimeString([], {
