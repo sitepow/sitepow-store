@@ -9,12 +9,15 @@ import {
   MessageType,
   UserRole,
 } from '@/generated/prisma/enums'
+import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { auth } from '@/lib/auth'
+import { withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
 import { generateAiSupportAction } from './ai-support'
+import { chatKeys } from './query-keys/chat'
 
 const sortedBadWords = [...BAD_WORD_LISTS].sort((a, b) => b.length - a.length)
 
@@ -486,20 +489,23 @@ export async function getUnreadCount() {
 }
 
 export async function ensureBotUser() {
-  const botUser = await prisma.user.findUnique({
-    where: { id: AI_BOT_ID },
-  })
+  const key = queryKeyToRedisKey(chatKeys.bot())
 
-  if (!botUser) {
-    await prisma.user.create({
-      data: {
-        id: AI_BOT_ID,
-        name: 'AI Assistant',
-        role: UserRole.BOT,
-        email: 'ai-assistant@sitepow.store',
-      },
+  return await withCache(key, async () => {
+    const botUser = await prisma.user.findUnique({
+      where: { id: AI_BOT_ID },
     })
-  }
 
-  return AI_BOT_ID
+    if (!botUser) {
+      return await prisma.user.create({
+        data: {
+          id: AI_BOT_ID,
+          name: 'AI Assistant',
+          role: UserRole.BOT,
+          email: 'ai-assistant@sitepow.store',
+        },
+      })
+    }
+    return botUser
+  })
 }

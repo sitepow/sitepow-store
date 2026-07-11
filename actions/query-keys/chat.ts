@@ -19,4 +19,5 @@ export const chatKeys = {
     [...chatKeys.all, 'merchant-conversations', storeSlug] as const,
   storeConversation: (storeId: string) =>
     [...chatKeys.all, 'store-conversation', storeId] as const,
+  bot: () => [...chatKeys.all, 'bot-user'] as const,
 }
