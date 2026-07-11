@@ -1,8 +1,15 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
+import path from 'path' // เพิ่มบรรทัดนี้
+
+const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // ใช้ path.resolve เพื่อให้ได้ค่า Absolute Path ที่ถูกต้อง
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '100mb',
@@ -10,9 +17,14 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ['lvh.me', '*.lvh.me'],
   images: {
-    remotePatterns: [new URL('https://images.sitepow.store/**')],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.sitepow.store',
+        pathname: '/**',
+      },
+    ],
   },
 }
 
-const withNextIntl = createNextIntlPlugin()
 export default withNextIntl(nextConfig)
