@@ -43,14 +43,14 @@ export function CartItemCard({
           <h4 className="text-sm leading-tight font-medium sm:text-base">
             {item.productTitle}
           </h4>
-          <p className="mt-0.5 text-[11px] text-(--brand-color) sm:text-xs">
+          <p className="text-primary mt-0.5 text-[11px] sm:text-xs">
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
             , {item.branchName}
           </p>
           {item.selectedAddons.length > 0 && (
-            <p className="mt-0.5 text-[10px] text-(--brand-color) sm:text-[11px]">
+            <p className="text-primary mt-0.5 text-[10px] sm:text-[11px]">
               + {item.selectedAddons.map((a) => a.title).join(', ')}
             </p>
           )}
@@ -94,7 +94,7 @@ export function CartItemCard({
                   {formatCurrency(originalUnitPrice * item.quantity)}
                 </span>
               )}
-              <p className="text-sm font-bold text-(--brand-color) sm:text-base">
+              <p className="text-primary text-sm font-bold sm:text-base">
                 {formatCurrency(item.totalPrice)}
               </p>
             </div>

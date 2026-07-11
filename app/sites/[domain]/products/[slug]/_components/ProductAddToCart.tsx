@@ -138,7 +138,7 @@ export function ProductAddToCart() {
           />
           {(isPhysical || isDigitalItem) && (
             <div className="flex gap-2.5">
-              <PackageIcon className="text-(--brand-color)" />
+              <PackageIcon className="text-primary" />
               <span>{formatNumber(stock)} ชิ้น</span>
             </div>
           )}
@@ -153,7 +153,7 @@ export function ProductAddToCart() {
       </div>
       <Button
         size="lg"
-        variant="brand"
+
         className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >

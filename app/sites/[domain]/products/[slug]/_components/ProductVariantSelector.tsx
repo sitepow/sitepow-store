@@ -135,7 +135,7 @@ export function ProductVariantSelector() {
                       value={variant.id}
                       id={variant.id}
                       disabled={!isAvaliable || stock <= 0}
-                      className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-(--brand-color) data-checked:border-(--brand-color) data-checked:bg-(--brand-color) dark:data-checked:bg-(--brand-color)"
+                      className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-primary data-checked:border-primary data-checked:bg-primary dark:data-checked:bg-primary"
                     />
                     <div className="flex flex-1 flex-col gap-1">
                       <span className="cursor-pointer text-xs">
@@ -144,12 +144,12 @@ export function ProductVariantSelector() {
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
-                            <span className="text-[10px] font-semibold text-(--brand-color)">
+                            <span className="text-primary text-[10px] font-semibold">
                               ส่วนลด {variant.discountAmount}%
                             </span>
                           )}
                         {hasPoint && (
-                          <span className="text-[10px] font-semibold text-(--brand-color)">
+                          <span className="text-primary text-[10px] font-semibold">
                             + {variant.pointsAmount} แต้ม
                           </span>
                         )}
@@ -157,7 +157,7 @@ export function ProductVariantSelector() {
                       <div>
                         {hasDiscount ? (
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold text-(--brand-color)">
+                            <span className="text-primary text-sm font-bold">
                               {formatCurrency(netPrice)}
                             </span>
                             <span className="text-muted-foreground text-[10px] line-through">

@@ -99,7 +99,7 @@ export function CustomerAddressCreateDialog() {
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-xl"
-        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
@@ -126,7 +126,6 @@ export function CustomerAddressCreateDialog() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem
-                        variant="brand"
                         value={AddressType.SHIPPING}
                         id="shipping"
                       />
@@ -138,11 +137,7 @@ export function CustomerAddressCreateDialog() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        variant="brand"
-                        value={AddressType.TAX}
-                        id="tax"
-                      />
+                      <RadioGroupItem value={AddressType.TAX} id="tax" />
                       <Label
                         htmlFor="tax"
                         className="cursor-pointer font-normal"
@@ -151,11 +146,7 @@ export function CustomerAddressCreateDialog() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        variant="brand"
-                        value={AddressType.BOTH}
-                        id="both"
-                      />
+                      <RadioGroupItem value={AddressType.BOTH} id="both" />
                       <Label
                         htmlFor="both"
                         className="cursor-pointer font-normal"
@@ -290,7 +281,7 @@ export function CustomerAddressCreateDialog() {
               className="w-full"
               type="submit"
               size="lg"
-              variant="brand"
+
               disabled={isPending}
             >
               {isPending ? (

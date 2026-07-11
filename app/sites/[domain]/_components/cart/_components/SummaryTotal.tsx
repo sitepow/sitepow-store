@@ -8,7 +8,7 @@ export function SummaryTotal({
   return (
     <div className="flex justify-between text-lg font-bold">
       <span>{label}</span>
-      <span className="text-(--brand-color)">{value}</span>
+      <span className="text-primary">{value}</span>
     </div>
   )
 }

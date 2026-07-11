@@ -2,6 +2,7 @@
 
 import { Message as PrismaMessage } from '@/generated/prisma/client'
 import { UserRole } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 
@@ -20,6 +21,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
+  const { store } = useStoreData()
   const isBot = msg?.sender?.role === UserRole.BOT
   const isMe = isBot ? false : isMySender
   const isLeft = !isMe
@@ -30,6 +32,7 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
         'flex w-full flex-col',
         !isLeft ? 'items-end' : 'items-start',
       )}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       {isBot && <span className="mb-1 text-xs">AI Assistant</span>}
       <div

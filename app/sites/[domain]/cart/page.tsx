@@ -407,7 +407,7 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="dark:bg-muted flex items-center gap-5 rounded-xl border border-(--brand-color) px-5 py-2.5 text-start">
+            <div className="dark:bg-muted border-primary flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -416,7 +416,7 @@ export default function StoreCartPage() {
               <div className="space-y-0.5">
                 <h3 className="font-bold" suppressHydrationWarning>
                   ยอดที่ต้องชำระ{' '}
-                  <span className="text-(--brand-color)">
+                  <span className="text-primary">
                     {formatCurrency(grandTotal)}
                   </span>
                 </h3>
@@ -465,7 +465,7 @@ export default function StoreCartPage() {
                   )}
                   <Button
                     className="w-full"
-                    variant="brand"
+
                     disabled={!selectedAddressData}
                     onClick={goToNextIncompleteStep}
                   >
@@ -523,7 +523,7 @@ export default function StoreCartPage() {
                   )}
                   <Button
                     className="w-full"
-                    variant="brand"
+
                     disabled={!selectedShippingData}
                     onClick={goToNextIncompleteStep}
                   >
@@ -584,7 +584,7 @@ export default function StoreCartPage() {
                 )}
                 <Button
                   className="mt-2 h-11 w-full"
-                  variant="brand"
+
                   disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
@@ -636,7 +636,7 @@ export default function StoreCartPage() {
                 <Button
                   className="mt-6 h-12 w-full text-lg"
                   size="lg"
-                  variant="brand"
+
                   disabled={
                     activeSection !== 'review' ||
                     createOrderMutation.isPending ||
@@ -652,7 +652,7 @@ export default function StoreCartPage() {
               {!isAuthenticated && (
                 <Button
                   className="mt-6 h-12 w-full text-lg"
-                  variant="brand"
+
                   onClick={() => {
                     router.push(loginHref)
                   }}

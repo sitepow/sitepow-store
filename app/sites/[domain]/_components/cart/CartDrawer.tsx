@@ -39,7 +39,7 @@ export function CartDrawer() {
       </DrawerTrigger>
       <DrawerContent
         className="ml-auto h-full w-full max-w-md"
-        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export function CartDrawer() {
             <Link href="/cart">
               <Button
                 size="lg"
-                variant="brand"
+
                 className="h-12 w-full text-lg shadow-md sm:text-lg"
               >
                 สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})

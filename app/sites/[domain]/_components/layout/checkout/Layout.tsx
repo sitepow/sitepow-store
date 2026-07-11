@@ -16,7 +16,7 @@ export function StoreLayoutCheckout({
   return (
     <div
       className="flex flex-col gap-10"
-      style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       <StoreNavbarCheckout />
       <main className={cn(className, 'mt-24 sm:mt-20 lg:mt-24')} {...props}>

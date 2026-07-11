@@ -61,9 +61,9 @@ export function EmailVerified() {
   }
 
   return (
-    <Alert className="w-full rounded-none border-l-4 border-l-orange-500 shadow-none">
-      <AlertCircleIcon className="h-5 w-5 text-orange-500" />
-      <AlertTitle className="font-semibold text-orange-600">
+    <Alert className="border-l-primary w-full rounded-none border-l-4 shadow-none">
+      <AlertCircleIcon className="text-primary h-5 w-5" />
+      <AlertTitle className="text-primary font-semibold">
         มีสิ่งที่ต้องดำเนินการตอนนี้
       </AlertTitle>
       <AlertDescription className="text-muted-foreground mt-1">
@@ -75,14 +75,10 @@ export function EmailVerified() {
       <AlertAction className="mt-3 sm:mt-0">
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              variant="default"
-              className="bg-orange-600 text-white hover:bg-orange-700"
-            >
+            <Button variant="default" className="bg-primary text-white">
               ยืนยันอีเมล
             </Button>
           </DialogTrigger>
-
           <DialogContent className="sm:max-w-md">
             <DialogHeader className="space-y-2">
               <DialogTitle className="text-center text-xl font-bold tracking-tight sm:text-left">
@@ -97,7 +93,6 @@ export function EmailVerified() {
                 แล้ว
               </DialogDescription>
             </DialogHeader>
-
             <div className="flex flex-col items-center justify-center space-y-4 py-2">
               <InputOTP
                 maxLength={6}
@@ -117,25 +112,23 @@ export function EmailVerified() {
                   <InputOTPSlot index={5} />
                 </InputOTPGroup>
               </InputOTP>
-
               <div className="text-muted-foreground text-sm">
                 ไม่ได้รับรหัสใช่หรือไม่?{' '}
                 {countdown > 0 ? (
-                  <span className="font-medium text-orange-600">
+                  <span className="text-primary font-medium">
                     ส่งรหัสอีกครั้งใน ({countdown} วินาที)
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleResend}
-                    className="font-semibold text-orange-600 hover:underline"
+                    className="text-primary font-semibold hover:underline"
                   >
                     ส่งรหัสใหม่
                   </button>
                 )}
               </div>
             </div>
-
             <DialogFooter className="gap-2 sm:justify-end">
               <Button
                 type="button"

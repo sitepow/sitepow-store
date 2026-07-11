@@ -39,7 +39,7 @@ export function CartSummary({ summary, className }: CartSummaryProps) {
         value={formatCurrency(summary.finalPrice)}
       />
       {summary.totalPoints > 0 && (
-        <p className="text-right text-xs font-medium text-(--brand-color)">
+        <p className="text-primary text-right text-xs font-medium">
           คุณจะได้รับ {formatNumber(summary.totalPoints)} แต้ม
         </p>
       )}

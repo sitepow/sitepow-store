@@ -91,7 +91,7 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
         {isOpen ? <X /> : <MessageCircle />}
         {unreadCount > 0 && (
           <CartBadge
-            className="text-primary border-primary border bg-white"
+            className="border-primary text-primary border bg-white"
             total={unreadCount}
           />
         )}

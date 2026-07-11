@@ -13,9 +13,9 @@ export function CartBadge({ total, className, ...props }: CartBadgeProps) {
 
   return (
     <span
-      style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       className={cn(
-        'text-primary-foreground absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-(--brand-color) text-[10px]',
+        'text-primary-foreground bg-primary absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full text-[10px]',
         className,
       )}
       {...props}

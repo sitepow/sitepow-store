@@ -11,7 +11,7 @@ type LogoBrandProps = Omit<ComponentProps<typeof Link>, 'href'>
 export function LogoBrand({ className, ...props }: LogoBrandProps) {
   return (
     <Link
-      href="https://sitepow.store"
+      href="/"
       className={cn(
         'text-foreground flex items-center gap-2.5 text-2xl font-bold tracking-tight',
         className,

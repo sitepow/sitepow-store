@@ -13,7 +13,7 @@ export function SummaryRow({
     <div
       className={cn(
         'flex items-center justify-between text-sm',
-        isDiscount && 'text-(--brand-color)',
+        isDiscount && 'text-primary',
       )}
     >
       <span className={'text-muted-foreground'}>{label}</span>

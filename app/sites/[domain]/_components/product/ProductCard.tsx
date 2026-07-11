@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-(--brand-color)/50',
+  'h-full rounded-xl transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
   {
     variants: {
       variant: {
@@ -62,20 +62,20 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
             </div>
           )}
           {hasDiscount && (
-            <Badge className="absolute top-0 right-0 size-12 rounded-full bg-(--brand-color) text-center">
+            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
               ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )}
         </div>
-        <h3 className="line-clamp-2 h-12 px-1 font-medium group-hover:text-(--brand-color)">
+        <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
           {product.title}
         </h3>
-        <div className="mt-2 flex items-end justify-center gap-2 group-hover:text-(--brand-color)">
+        <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
           {hasDiscount ? (
             <div className="flex flex-col">
               <data
                 value={net?.min}
-                className="text-2xl font-bold text-(--brand-color)"
+                className="text-primary text-2xl font-bold"
               >
                 {formatCurrency(net?.min || 0)}
               </data>
@@ -86,7 +86,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
           ) : (
             <data
               value={original?.min}
-              className="text-2xl font-bold text-(--brand-color)"
+              className="text-primary text-2xl font-bold"
             >
               {formatCurrency(original?.min || 0)}
             </data>

@@ -28,8 +28,8 @@ export function CheckoutSection({
         isDisabled
           ? 'bg-foreground/5 border opacity-60'
           : isActive
-            ? 'border-(--brand-color) shadow-md'
-            : 'border-(--brand-color) bg-(--brand-color)',
+            ? 'border-primary shadow-md'
+            : 'border-primary bg-primary',
         !isActive &&
           !isCompleted &&
           !isDisabled &&
@@ -39,7 +39,7 @@ export function CheckoutSection({
       <div
         className={cn(
           'flex items-center justify-between px-5 py-3 text-white transition-colors',
-          isActive && !isDisabled ? 'bg-(--brand-color)' : 'bg-transparent',
+          isActive && !isDisabled ? 'bg-primary' : 'bg-transparent',
         )}
       >
         <div className="flex items-center gap-2">

@@ -25,11 +25,13 @@ export function StoreLayout({
   const isOwner = !!user?.id && !!store?.ownerId && user.id === store.ownerId
 
   return (
-    <div className="flex flex-col gap-10">
+    <div
+      className="flex flex-col gap-10"
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+    >
       <StoreNavbar />
       <main
         className={cn(className, 'mt-24 sm:mt-20 lg:mt-32 xl:mt-36')}
-        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
         {...props}
       >
         {children}

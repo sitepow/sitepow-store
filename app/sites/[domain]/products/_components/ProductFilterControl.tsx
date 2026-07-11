@@ -79,11 +79,7 @@ export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
       </Accordion>
 
       <Separator />
-      <Button
-        variant="link"
-        className="text-(--brand-color)"
-        onClick={clearAll}
-      >
+      <Button variant="link" className="text-primary" onClick={clearAll}>
         ล้างตัวกรองทั้งหมด
       </Button>
     </aside>

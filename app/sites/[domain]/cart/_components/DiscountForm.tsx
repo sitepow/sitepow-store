@@ -117,11 +117,11 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-md"
-        style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <IconTicket className="text-(--brand-color)" />
+            <IconTicket className="text-primary" />
             ใช้ส่วนลด
           </DialogTitle>
         </DialogHeader>
@@ -134,7 +134,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                     <IconWallet className="text-muted-foreground size-4" />
                     ใช้แต้มสะสม
                   </Label>
-                  <span className="text-sm font-semibold text-(--brand-color)">
+                  <span className="text-primary text-sm font-semibold">
                     {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
                     แต้ม
                   </span>
@@ -176,12 +176,12 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
               รหัสส่วนลด
             </Label>
             {appliedCoupon ? (
-              <div className="flex items-center justify-between rounded-md border border-(--brand-color)/20 bg-(--brand-color)/5 px-3 py-2">
+              <div className="border-primary/20 bg-primary/5 flex items-center justify-between rounded-md border px-3 py-2">
                 <span className="text-sm font-medium">
                   {appliedCoupon.code}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-(--brand-color)">
+                  <span className="text-primary text-sm font-semibold">
                     -{formatCurrency(appliedCoupon.discountAmount)}
                   </span>
                   <Button

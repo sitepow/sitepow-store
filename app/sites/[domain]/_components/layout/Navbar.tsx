@@ -16,6 +16,7 @@ import { getClientAuthUrl } from '@/utils/auth'
 import { LockKeyholeIcon, Menu, SearchIcon, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
+import { LogoBrand } from '@/components/LogoBrand'
 import { ModeToggle } from '@/components/ModeToggle'
 import { StoreLogo } from '@/components/StoreLogo'
 import { ListItem } from '@/components/layout/_components/ListItem'
@@ -66,7 +67,10 @@ export function StoreNavbar() {
 
   return (
     <>
-      <header className="text-foreground fixed z-50 w-full bg-neutral-900">
+      <header
+        className="text-foreground fixed z-50 w-full bg-neutral-900"
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      >
         <div className="absolute inset-0 -z-10 overflow-hidden">
           {isVideo ? (
             <video
@@ -93,7 +97,7 @@ export function StoreNavbar() {
         <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
           <div className="flex items-center justify-between gap-4">
             {store?.logo && <StoreLogo image={store?.logo} />}
-            {!store?.logo && <StoreLogo />}
+            {!store?.logo && <LogoBrand className="text-white" />}
             <div className="flex items-center gap-2.5 md:gap-5">
               <div className="mx-5 hidden max-w-md flex-1 lg:flex">
                 <ButtonGroup className="w-full">

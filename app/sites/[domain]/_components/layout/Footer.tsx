@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 
+import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { StoreLogo } from '@/components/StoreLogo'
 
@@ -89,13 +90,13 @@ export function StoreFooter() {
   return (
     <footer
       className="bg-background border-border text-foreground border-t"
-      style={{ '--brand-color': store?.primaryColor } as React.CSSProperties}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       <div className="container mx-auto px-5 py-12 sm:px-10">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div className="max-w-sm">
             {store?.logo && <StoreLogo image={store?.logo} />}
-            {!store?.logo && <StoreLogo />}
+            {!store?.logo && <LogoBrand />}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               {store?.description
                 ? store?.description
@@ -137,7 +138,7 @@ export function StoreFooter() {
             </p>
             <a
               href="#"
-              className="mt-3 inline-block text-sm font-medium text-(--brand-color) hover:underline"
+              className="text-primary mt-3 inline-block text-sm font-medium hover:underline"
             >
               📍 ดูแผนที่บน Google Maps
             </a>
@@ -147,9 +148,7 @@ export function StoreFooter() {
             <div className="space-y-1 text-sm opacity-60">
               <p>จันทร์ - ศุกร์: 09:00 - 18:00 น.</p>
               <p>เสาร์ - อาทิตย์: 10:00 - 17:00 น.</p>
-              <p className="pt-2 text-(--brand-color)">
-                หยุดทุกวันหยุดนักขัตฤกษ์
-              </p>
+              <p className="text-primary pt-2">หยุดทุกวันหยุดนักขัตฤกษ์</p>
             </div>
           </div>
         </div>

@@ -66,10 +66,7 @@ export function UserAvatarDropdown({
               บัญชีผู้ใช้งานของคุณ
             </p>
             <p className="text-muted-foreground text-xs leading-none">
-              {user?.email}{' '}
-              {!user?.isEmailVerified && (
-                <span className="text-orange-500">(โปรดยืนยันอีเมลของคุณ)</span>
-              )}
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>
