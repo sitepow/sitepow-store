@@ -8,7 +8,6 @@ import {
   useUnreadCount,
 } from '@/actions/hooks/chat'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
-import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'
 import { MessageCircle, X } from 'lucide-react'
@@ -50,11 +49,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
                 currentUserId={userId!}
                 conversationId={selectedId}
                 otherUserId={selectedConv.merchantId}
-                isAiEnabled={
-                  selectedConv.type === ConversationType.STORE
-                    ? selectedConv.isAiStoreEnabled
-                    : selectedConv.isAiSupportEnabled
-                }
+                isAiEnabled={selectedConv.isAiEnabled}
                 conversationType={selectedConv?.type}
               />
             ) : (

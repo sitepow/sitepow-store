@@ -32,6 +32,7 @@ model Conversation {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   lastMessageAt DateTime         @default(now())
+  isAiEnabled   Boolean          @default(true)
 
   members  ConversationMember[]
   messages Message[]
@@ -209,8 +210,6 @@ model User {
   role               UserRole  @default(CUSTOMER)
   phone              String?
   createdAt          DateTime  @default(now())
-  isAiSupportEnabled Boolean   @default(true)
-  isAiStoreEnabled   Boolean   @default(true)
 
   orderNotify     Boolean @default(true)
   marketingNotify Boolean @default(false)

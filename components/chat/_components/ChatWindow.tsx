@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useSendMessage, useToggleUserAi } from '@/actions/hooks/chat'
+import { useSendMessage, useToggleConversationAi } from '@/actions/hooks/chat'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useChatMessages } from '@/hooks/use-chat-messages'
 import { useChatScroll } from '@/hooks/use-chat-scroll'
@@ -44,12 +44,7 @@ export function ChatWindow({
   useChatStream(conversationId)
 
   const { mutate: sendMessage } = useSendMessage(conversationId)
-  const { mutate: toggleAi } = useToggleUserAi()
-
-  const fieldType =
-    conversationType === ConversationType.STORE
-      ? ConversationType.STORE
-      : ConversationType.SUPPORT
+  const { mutate: toggleAi } = useToggleConversationAi()
 
   const isCanToggleAiFeature =
     userRole === UserRole.SUPPORT ||
@@ -66,9 +61,8 @@ export function ChatWindow({
           onToggle={(c) => {
             if (otherUserId) {
               toggleAi({
-                userId: otherUserId,
+                conversationId: conversationId,
                 enabled: c,
-                fieldType: fieldType,
               })
             }
           }}

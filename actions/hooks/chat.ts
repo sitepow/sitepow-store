@@ -10,7 +10,7 @@ import {
   getUnreadCount,
   markAsRead,
   sendMessage,
-  toggleUserAi,
+  toggleConversationAi,
 } from '@/actions/chat'
 import {
   CHAT_REFETCH_INTERVAL,
@@ -123,25 +123,27 @@ export function useSendMessage(conversationId: string) {
   })
 }
 
-export function useToggleUserAi() {
+export function useToggleConversationAi() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({
-      userId,
+      conversationId,
       enabled,
-      fieldType,
     }: {
-      userId: string
+      conversationId: string
       enabled: boolean
-      fieldType: ConversationType
     }) => {
-      return toggleUserAi(userId, enabled, fieldType)
+      return toggleConversationAi(conversationId, enabled)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: chatKeys.supportConversations(),
       })
+      queryClient.invalidateQueries({
+        queryKey: chatKeys.customerConversations(),
+      })
+      queryClient.invalidateQueries({ queryKey: chatKeys.all })
     },
   })
 }
