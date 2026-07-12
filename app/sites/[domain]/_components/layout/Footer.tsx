@@ -144,28 +144,29 @@ export function StoreFooter() {
               ))}
             </div>
           </div>
-          {mainBranch && (
-            <div>
-              <h3 className="mb-4 font-bold">ที่ตั้งร้าน (สาขาหลัก)</h3>
-              {mainBranch?.mapUrl && (
-                <div className="border-border mb-4 overflow-hidden rounded-lg border">
-                  <iframe
-                    src={mainBranch.mapUrl}
-                    width="100%"
-                    height="200"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </div>
-              )}
-              <p className="text-sm leading-relaxed opacity-60">
-                {mainBranch?.address} {mainBranch?.subDistrict}{' '}
-                {mainBranch?.district} <br />
-                {mainBranch?.province} {mainBranch?.postcode}
-              </p>
-            </div>
-          )}
+          {mainBranch?.address ||
+            (mainBranch?.subDistrict && (
+              <div>
+                <h3 className="mb-4 font-bold">ที่ตั้งร้าน (สาขาหลัก)</h3>
+                {mainBranch?.mapUrl && (
+                  <div className="border-border mb-4 overflow-hidden rounded-lg border">
+                    <iframe
+                      src={mainBranch.mapUrl}
+                      width="100%"
+                      height="200"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                <p className="text-sm leading-relaxed opacity-60">
+                  {mainBranch?.address} {mainBranch?.subDistrict}{' '}
+                  {mainBranch?.district} <br />
+                  {mainBranch?.province} {mainBranch?.postcode}
+                </p>
+              </div>
+            ))}
           {mainBranch?.openingHours &&
             Array.isArray(mainBranch.openingHours) && (
               <div>

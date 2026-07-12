@@ -1,14 +1,19 @@
 'use server'
 
+import { GEMINI_MODEL } from '@/constants/ai'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+import { Plan } from '@/generated/prisma/enums'
+import { CreditUsageType } from '@/types/ai'
+import { estimateCost } from '@/utils/ai'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const model = genAI.getGenerativeModel({ model: GEMINI_MODEL })
 
 export async function generateProductAiAction(title: string) {
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-3.1-flash-lite-preview',
+      model: GEMINI_MODEL,
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -106,4 +111,15 @@ export async function generateProductAiAction(title: string) {
     console.error(error)
     return { success: false }
   }
+}
+
+async function getPreciseTokenCount(prompt: string) {
+  const result = await model.countTokens(prompt)
+  return result.totalTokens
+}
+
+export async function handleUserPrompt(prompt: string, plan: Plan) {
+  const inputTokens = await getPreciseTokenCount(prompt)
+  const outputTokens = 150
+  return estimateCost(CreditUsageType.AI, plan, inputTokens, outputTokens)
 }
