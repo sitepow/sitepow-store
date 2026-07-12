@@ -23,7 +23,6 @@ export function ComparisonSection() {
         title="ตารางเปรียบเทียบ การขายสินค้าใน แพลตฟอร์มออนไลน์"
         description="ลองเช็คให้ชัดว่ากำไรเหลือเท่าไหร่หลังหักค่าธรรมเนียม และมาดูเหตุการณ์จริงที่คุณอาจต้องเจอเมื่อขายผ่านแพลตฟอร์ม"
       />
-
       <Table className="border text-start">
         <TableHeader>
           <TableRow>
@@ -43,7 +42,6 @@ export function ComparisonSection() {
                   {category.name}
                 </TableCell>
               </TableRow>
-
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="text-foreground font-medium">
@@ -52,12 +50,8 @@ export function ComparisonSection() {
                   {feature.values.map((val, i) => (
                     <TableCell key={i}>
                       <div className="flex items-center gap-2">
-                        {i === 1 ? <CheckCircleIcon /> : <CloseCircleIcon />}
-                        <span
-                          className={`${i === 1 ? 'text-primary font-bold' : 'opacity-60'}`}
-                        >
-                          {val}
-                        </span>
+                        {i === 2 ? <CheckCircleIcon /> : <CloseCircleIcon />}
+                        <span>{val}</span>
                       </div>
                     </TableCell>
                   ))}

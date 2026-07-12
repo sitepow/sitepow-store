@@ -57,16 +57,7 @@ export function StoresSection() {
   return (
     <SectionContainer>
       <SectionHeader
-        title={
-          <PointerHighlight
-            rectangleClassName="bg-neutral-700 border-neutral-600"
-            pointerClassName="text-yellow-500"
-          >
-            <span className="relative z-10 text-white">
-              ร้านค้าที่ไว้วางใจเรา
-            </span>
-          </PointerHighlight>
-        }
+        title="ร้านค้าที่ไว้วางใจเรา"
         description="สัมผัสประสบการณ์ร้านค้าที่รันบนโครงสร้างพื้นฐานระดับสูง"
       />
 

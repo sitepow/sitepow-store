@@ -1,17 +1,25 @@
 import { PricingOption, PricingPlanProps, PricingTables } from '@/types/pricing'
 import {
   IconBolt,
+  IconBoxSeam,
+  IconBrandNextjs,
   IconBuildingStore,
   IconChartBar,
   IconCircleCheck,
+  IconCpu,
   IconCreditCard,
   IconDatabaseExport,
+  IconDeviceDesktopAnalytics,
   IconHeadset,
   IconInfinity,
   IconLayersIntersect,
+  IconPalette,
   IconPrinter,
+  IconShieldCheck,
   IconSparkles,
+  IconTicket,
   IconTrophy,
+  IconTruckDelivery,
   IconWorld,
 } from '@tabler/icons-react'
 
@@ -50,7 +58,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 4.00 เครดิต/ครั้ง',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 4.00 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -84,6 +92,38 @@ export const PRICING_PLANS: PricingPlanProps[] = [
       {
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
         icon: <IconTrophy size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
+        icon: <IconShieldCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
+        icon: <IconBoxSeam size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
+        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
+        icon: <IconCpu size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
+        icon: <IconTicket size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
+        icon: <IconPalette size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'เริ่มฟรีเลย ไม่ต้องใส่บัตร',
@@ -108,7 +148,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.67 เครดิต/ครั้ง',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.67 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -142,6 +182,42 @@ export const PRICING_PLANS: PricingPlanProps[] = [
       {
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
         icon: <IconTrophy size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
+        icon: <IconShieldCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
+        icon: <IconBoxSeam size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
+        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
+        icon: <IconCpu size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
+        icon: <IconTicket size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
+        icon: <IconPalette size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        icon: <IconBrandNextjs size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'เริ่มต้นสร้างกำไร',
@@ -168,7 +244,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.60 เครดิต/ครั้ง',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.60 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -203,8 +279,44 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
         icon: <IconTrophy size={18} stroke={1.5} />,
       },
+      {
+        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
+        icon: <IconShieldCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
+        icon: <IconBoxSeam size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
+        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
+        icon: <IconCpu size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
+        icon: <IconTicket size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
+        icon: <IconPalette size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        icon: <IconBrandNextjs size={18} stroke={1.5} />,
+      },
     ],
-    buttonText: 'ทดลองใช้ Pro ฟรี 14 วัน',
+    buttonText: 'ทดลองใช้ Pro',
   },
   {
     title: 'Ultimate',
@@ -227,7 +339,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.07 เครดิต/ครั้ง',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.07 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -263,6 +375,42 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconTrophy size={18} stroke={1.5} />,
       },
       {
+        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
+        icon: <IconShieldCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
+        icon: <IconBoxSeam size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
+        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
+        icon: <IconCpu size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
+        icon: <IconTicket size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
+        icon: <IconTruckDelivery size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
+        icon: <IconPalette size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        icon: <IconBrandNextjs size={18} stroke={1.5} />,
+      },
+      {
         text: 'Support พิเศษดูแลส่วนตัวตลอด 24 ชม.',
         icon: <IconHeadset size={18} stroke={1.5} />,
       },
@@ -275,35 +423,36 @@ export const PRICING_TABLES: PricingTables = {
   tiers: ['Free', 'Starter', 'Pro', 'Ultimate'],
   categories: [
     {
-      name: 'ฟีเจอร์ AI อัจฉริยะ',
+      name: 'ข้อจำกัดการใช้งาน',
       features: [
         {
-          label: 'AI ช่วยตั้งชื่อสินค้าจากรูปภาพ',
-          access: [true, true, true, true],
+          label: 'จำนวนสินค้าที่ลงได้ไม่จำกัด',
+          access: [false, false, true, true],
         },
+      ],
+    },
+    {
+      name: 'ฟีเจอร์ AI อัจฉริยะ (ราคาสิทธิการใช้งานเครดิต)',
+      features: [
         {
-          label: 'AI ช่วยเขียน Sales Copy ภาษาไทย',
-          access: [true, true, true, true],
-        },
-        {
-          label: 'AI Visual Search (ค้นหาสินค้าด้วยรูป)',
+          label: 'AI ช่วยตอบแชทและเขียนรายละเอียดสินค้า',
           access: [true, true, true, true],
         },
       ],
     },
     {
-      name: 'การชำระเงินและค่าธรรมเนียม',
+      name: 'ระบบรับชำระเงินและสลิป',
       features: [
         {
-          label: 'รับเงินเข้าบัญชีร้านโดยตรง (0% GP)',
-          access: [true, true, true, true],
-        },
-        {
-          label: 'ระบบเช็คสลิปอัตโนมัติ',
-          access: [true, true, true, true],
-        },
-        {
           label: 'เชื่อมต่อ Stripe (บัตร/PromptPay)',
+          access: [true, true, true, true],
+        },
+        {
+          label: 'ระบบตรวจสอบสลิปอัตโนมัติ',
+          access: [true, true, true, true],
+        },
+        {
+          label: '0% ค่าคอมมิชชั่นทุกออเดอร์',
           access: [true, true, true, true],
         },
       ],
@@ -312,16 +461,15 @@ export const PRICING_TABLES: PricingTables = {
       name: 'การจัดการร้านค้าและสต็อก',
       features: [
         {
-          label: 'ลงสินค้าได้ตามจำนวนที่กำหนด',
-          access: [true, true, true, true],
-        },
-        { label: 'ระบบจัดการสต็อกสินค้า', access: [true, true, true, true] },
-        {
-          label: 'รายงานวิเคราะห์ยอดขายและกำไร',
+          label: 'ระบบจัดการสต็อกและ POS หน้าร้าน',
           access: [true, true, true, true],
         },
         {
-          label: 'นำเข้า-ส่งออกข้อมูล (CSV/JSON)',
+          label: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+          access: [true, true, true, true],
+        },
+        {
+          label: 'ส่งออกข้อมูลสินค้า (CSV/JSON)',
           access: [true, true, true, true],
         },
       ],
@@ -330,12 +478,41 @@ export const PRICING_TABLES: PricingTables = {
       name: 'การตลาดและขนส่ง',
       features: [
         {
-          label: 'ระบบสมาชิกและสะสมแต้ม (CRM)',
+          label: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
           access: [true, true, true, true],
         },
         {
-          label: 'พิมพ์ใบปะหน้าและจัดการสถานะออเดอร์',
+          label: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้า',
           access: [true, true, true, true],
+        },
+        {
+          label: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix)',
+          access: [true, true, true, true],
+        },
+        {
+          label: 'เครื่องมือสร้างโปรโมชั่น/คูปอง',
+          access: [true, true, true, true],
+        },
+      ],
+    },
+    {
+      name: 'การปรับแต่งและความเป็นมืออาชีพ',
+      features: [
+        {
+          label: 'ปรับแต่งดีไซน์หน้าร้านและ Header',
+          access: [true, true, true, true],
+        },
+        {
+          label: 'เชื่อมโดเมนส่วนตัว (.com, .net, ...)',
+          access: [false, true, true, true],
+        },
+        {
+          label: 'ลบ Footer ลายน้ำ Sitepow Store',
+          access: [false, true, true, true],
+        },
+        {
+          label: 'Support พิเศษดูแลส่วนตัว 24 ชม.',
+          access: [false, false, false, true],
         },
       ],
     },
@@ -344,83 +521,118 @@ export const PRICING_TABLES: PricingTables = {
 
 export const PROFIT_COMPARISON = {
   columns: [
-    'เลือกช่องการการขาย',
-    'ขายใน Marketplace (ส้ม/ฟ้า)',
-    'ขายที่ Sitepow Store',
+    'จุดเปรียบเทียบ',
+    'ขายใน Marketplace',
+    'SaaS ร้านค้าเจ้าอื่น',
+    'Sitepow Store',
   ],
   categories: [
     {
-      name: 'ต้นทุนและกำไร',
+      name: 'ต้นทุนและการเงิน',
       features: [
         {
-          label: 'ค่าธรรมเนียม (GP)',
-          values: ['15% - 25% (หักทุกออเดอร์)', '0% (ไม่หักเลยสักบาท)'],
+          label: 'ค่าธรรมเนียม (GP/Transaction)',
+          values: [
+            '15% - 25% (หักทุกออเดอร์)',
+            'อาจมีค่าธรรมเนียมแอบแฝง',
+            '0% (ไม่หักเลยสักบาท)',
+          ],
         },
         {
-          label: 'รายได้สุทธิ',
+          label: 'โมเดลราคา',
           values: [
-            'ยิ่งขายดี ยิ่งโดนหักเยอะ',
-            'ยิ่งขายดี กำไรยิ่งเหลือเยอะขึ้น',
+            'หัก % จากยอดขาย',
+            'จ่ายรายเดือน/รายปีคงที่',
+            'ไม่มีขาย ไม่ต้องจ่าย (แฟร์ที่สุด)',
           ],
         },
       ],
     },
     {
-      name: 'การจัดการร้านค้า',
+      name: 'ประสิทธิภาพของ AI และเทคโนโลยี',
       features: [
         {
-          label: 'การลงสินค้า',
+          label: 'การจัดการสินค้าด้วย AI',
           values: [
-            'นั่งพิมพ์เอง นึกชื่อเอง',
-            'AI Vision ถ่ายรูปปุ๊บ เจนให้ปั๊บ',
+            'นั่งพิมพ์เอง',
+            'กรอกข้อมูลเอง',
+            'AI Vision ถ่ายรูปปุ๊บ เจนรายละเอียดให้ปั๊บ',
           ],
         },
         {
-          label: 'เมื่อพนักงานหาของไม่เจอ',
-          values: [
-            'ต้องโทรหาเจ้าของ/ซ้อ (เสียเวลาลูกค้า)',
-            'AI Visual Search ถ่ายรูปแล้วหาเจอทันที',
-          ],
+          label: 'การค้นหาสินค้า (Visual Search)',
+          values: ['ไม่มี', 'ไม่มี', 'มี (ถ่ายรูปปุ๊บ หาของในคลังเจอทันที)'],
         },
         {
-          label: 'ฐานลูกค้า',
+          label: 'โครงสร้างพื้นฐาน',
           values: [
-            'โดนปิดกั้นการมองเห็น (ต้องจ่ายค่า Ads เพื่อดันให้ลูกค้าเห็น)',
-            'เป็นเจ้าของฐานลูกค้าเอง 100%',
+            'ทั่วไป',
+            'Shared Hosting',
+            'Enterprise (Cloud-Native + Redis Caching)',
           ],
         },
       ],
     },
     {
-      name: 'Case Study 1: ร้านค้าเริ่มต้น (ยอดขาย 100,000.-)',
+      name: 'ระบบจัดการร้านค้าและหน้าร้าน',
       features: [
         {
-          label: 'เงินที่โดนหักไปฟรีๆ',
-          values: ['~20,000 บาท / เดือน', '0 บาท'],
+          label: 'ระบบจัดการหน้าร้าน (POS)',
+          values: ['ไม่มี', 'มีพื้นฐาน', 'ครบวงจร (POS + ตัดสต็อก Real-time)'],
         },
         {
-          label: 'กำไรที่เหลือจริง',
-          values: ['80,000 บาท', '99,010 บาท'],
+          label: 'การปรับแต่งหน้าร้าน',
+          values: ['ตามแบบ Platform', 'จำกัด', 'อิสระ 100% (สี, สื่อ, Header)'],
+        },
+        {
+          label: 'ความปลอดภัย',
+          values: [
+            'ตามมาตรฐานแพลตฟอร์ม',
+            'มาตรฐานทั่วไป',
+            'ระดับธนาคาร + สำรองข้อมูลอัตโนมัติ',
+          ],
         },
       ],
     },
     {
-      name: 'Case Study 2: ร้านค้ามือโปร (ยอดขาย 500,000.-)',
+      name: 'การตลาดและการขนส่งอัจฉริยะ',
       features: [
         {
-          label: 'เงินที่โดนหักไปฟรีๆ',
-          values: ['~100,000 บาท / เดือน', '0 บาท'],
-        },
-        {
-          label: 'สิ่งที่คุณเสียไปใน 1 ปี',
+          label: 'ระบบจัดการค่าส่ง',
           values: [
-            'เงิน 1,200,000 บาท (ซื้อรถได้ 1 คัน)',
-            'จ่ายแค่ค่าระบบรายปี ไม่ถึง 1.2 หมื่น',
+            'เรทแพลตฟอร์ม',
+            'เรทบริษัทฯ ตายตัว',
+            'Rate Matrix (ตั้งราคาอิสระไม่ขาดทุน)',
           ],
         },
         {
-          label: 'กำไรสุทธิที่ได้เพิ่มขึ้น',
-          values: ['หายไป 1 แสนทุกเดือน', 'รับเต็มๆ 5 แสนทุกเดือน'],
+          label: 'ระบบ CRM และโปรโมชั่น',
+          values: ['จำกัด', 'มีบ้าง', 'ระบบสมาชิก + คูปองเร่งยอด (ครบวงจร)'],
+        },
+        {
+          label: 'การจัดการออเดอร์',
+          values: [
+            'ในระบบ',
+            'จัดการทั่วไป',
+            'รวมศูนย์ทุกช่องทาง + พิมพ์ใบปะหน้ามาตรฐาน',
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Case Study: ร้านค้ามือโปร (ยอดขาย 500,000.-/เดือน)',
+      features: [
+        {
+          label: 'เงินที่โดนหักไปฟรีๆ ต่อปี',
+          values: [
+            '~1,200,000 บาท',
+            'ค่าระบบรายปี + GP บางส่วน',
+            '0 บาท (จ่ายแค่ค่าระบบ)',
+          ],
+        },
+        {
+          label: 'กำไรสุทธิที่เหลือจริง',
+          values: ['น้อย', 'ปานกลาง', 'สูงที่สุด (รับเต็ม 5 แสน/เดือน)'],
         },
       ],
     },

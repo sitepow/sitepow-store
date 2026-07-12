@@ -9,7 +9,7 @@ export interface CustomizationFeature {
 }
 
 export const CUSTOMIZATION_FEATURES: CustomizationFeature[] = [
- {
+  {
     title: 'ปรับแต่งสีร้านค้าตามใจชอบ',
     description:
       'สร้างตัวตนให้โดดเด่นด้วยการเลือกโทนสีร้านค้าให้เข้ากับแบรนด์ของคุณ ช่วยสร้าง<hilight>ความจดจำและดึงดูดลูกค้าตั้งแต่วินาทีแรก</hilight>',
