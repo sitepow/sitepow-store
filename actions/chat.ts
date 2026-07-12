@@ -456,13 +456,15 @@ export async function getMessages(conversationId: string, cursor?: string) {
 
   const cacheKey = `chat:messages:${conversationId}:latest`
 
-  return await withCache(
+  const result = await withCache(
     cacheKey,
     async () => {
       return await fetchMessagesFromDb(conversationId, cursor)
     },
     LATEST_MESSAGES_CACHE_TTL_SECONDS,
   )
+
+  return result ?? { items: [], nextCursor: undefined }
 }
 
 async function fetchMessagesFromDb(conversationId: string, cursor?: string) {
