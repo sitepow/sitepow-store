@@ -1,6 +1,8 @@
 'use server'
 
 import { checkAccessWithCache } from '@/app/api/chat/stream/[conversationId]/route'
+import { PLAN_DETAILS } from '@/config/planDetails'
+import { GEMINI_MODEL } from '@/constants/ai'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
 import {
   AI_BOT_ID,
@@ -8,12 +10,18 @@ import {
 } from '@/constants/system'
 import { Message } from '@/generated/prisma/client'
 import {
+  ActorType,
   ConversationType,
+  LogAction,
   MessageType,
+  Plan,
+  TransactionType,
   UserRole,
 } from '@/generated/prisma/enums'
+import { calculateAiCost } from '@/utils/ai'
 import { queryKeyToRedisKey } from '@/utils/cache'
 
+import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
@@ -366,7 +374,12 @@ export async function sendMessage(
     userRole !== UserRole.BOT &&
     !isSenderTheAnsweringParty
   ) {
-    handleAiResponse(conversationId, content).catch(console.error)
+    const billingStoreId =
+      conversation.type === ConversationType.STORE ? conversation.storeId : null
+
+    handleAiResponse(conversationId, content, billingStoreId).catch(
+      console.error,
+    )
   }
 
   return { success: true, data: result }
@@ -400,8 +413,85 @@ async function appendMessageToLatestCache(
   }
 }
 
-async function handleAiResponse(conversationId: string, content: string) {
+async function hasAiCredit(storeId: string) {
+  const store = await prisma.store.findUnique({
+    where: { id: storeId },
+    select: { balance: true },
+  })
+  return Number(store?.balance ?? 0) > 0
+}
+
+async function chargeAiUsage({
+  storeId,
+  conversationId,
+  prompt,
+  cost,
+  inputTokens,
+  outputTokens,
+}: {
+  storeId: string
+  conversationId: string
+  prompt: string
+  cost: number
+  inputTokens: number
+  outputTokens: number
+}) {
+  try {
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: storeId },
+        data: { balance: { decrement: cost } },
+      }),
+      prisma.aiLog.create({
+        data: {
+          storeId,
+          action: 'CHAT_REPLY',
+          prompt,
+          cost: inputTokens + outputTokens,
+        },
+      }),
+      prisma.transaction.create({
+        data: {
+          storeId,
+          amount: cost,
+          type: TransactionType.AI_USAGE,
+          description: `AI ตอบแชทลูกค้า (conversationId: ${conversationId}, tokens: ${inputTokens}+${outputTokens})`,
+        },
+      }),
+    ])
+
+    createLog({
+      action: LogAction.ADJUST_CREDITS,
+      actorType: ActorType.SYSTEM,
+      storeId,
+      entity: 'Store',
+      entityId: storeId,
+      details: {
+        reason: 'AI_CHAT_REPLY',
+        conversationId,
+        cost,
+        inputTokens,
+        outputTokens,
+      },
+    }).catch(console.error)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function handleAiResponse(
+  conversationId: string,
+  content: string,
+  storeId: string | null,
+) {
   await ensureBotUser()
+
+  if (storeId) {
+    const canUseAi = await hasAiCredit(storeId)
+    if (!canUseAi) {
+      return
+    }
+  }
 
   const cacheKey = `chat:messages:${conversationId}:latest`
   const cachedData = await redis.get(cacheKey)
@@ -446,6 +536,33 @@ async function handleAiResponse(conversationId: string, content: string) {
     })
     chatEvents.publish(`message:${conversationId}`, aiMessage)
     await appendMessageToLatestCache(conversationId, aiMessage)
+
+    if (storeId && aiResult.usage) {
+      const store = await prisma.store.findFirst({
+        where: {
+          id: storeId,
+        },
+        select: {
+          plan: true,
+        },
+      })
+
+      const cost = calculateAiCost(
+        GEMINI_MODEL,
+        aiResult.usage.inputTokens,
+        aiResult.usage.outputTokens,
+        PLAN_DETAILS[store?.plan || Plan.FREE].aiUsageMultiplier,
+      )
+
+      await chargeAiUsage({
+        storeId,
+        conversationId,
+        prompt: content,
+        cost,
+        inputTokens: aiResult.usage.inputTokens,
+        outputTokens: aiResult.usage.outputTokens,
+      })
+    }
   }
 }
 

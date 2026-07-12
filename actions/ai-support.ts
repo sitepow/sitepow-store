@@ -1,5 +1,6 @@
 'use server'
 
+import { GEMINI_MODEL } from '@/constants/ai'
 import { getRelevantInfo } from '@/constants/help-center'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
@@ -13,7 +14,7 @@ export async function generateAiSupportAction(
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-3.1-flash-lite-preview',
+      model: GEMINI_MODEL,
       systemInstruction: `
         คุณคือผู้ช่วยอัจฉริยะสำหรับร้านค้าออนไลน์ ตอบแชทแทนเจ้าของร้านด้วยความเป็นกันเองและเป็นธรรมชาติเหมือนคนจริงๆ
         ข้อมูลร้านค้าอ้างอิง: ${relevantInfo || 'ไม่มีข้อมูลเฉพาะ'}
@@ -37,8 +38,16 @@ export async function generateAiSupportAction(
 
     const result = await model.generateContent(prompt)
     const responseText = result.response.text()
+    const usageMetadata = result.response.usageMetadata
 
-    return { success: true, data: responseText }
+    return {
+      success: true,
+      data: responseText,
+      usage: {
+        inputTokens: usageMetadata?.promptTokenCount ?? 0,
+        outputTokens: usageMetadata?.candidatesTokenCount ?? 0,
+      },
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

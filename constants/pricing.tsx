@@ -12,6 +12,7 @@ import {
   IconPrinter,
   IconSparkles,
   IconTrophy,
+  IconWorld,
 } from '@tabler/icons-react'
 
 export const PRICING_VALUE = {
@@ -45,16 +46,44 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconLayersIntersect size={18} stroke={1.5} />,
       },
       {
-        text: 'หน้าร้านออนไลน์ส่วนตัว',
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.35 บาท/เครดิต)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 4.00 เครดิต/ครั้ง',
+        icon: <IconCircleCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
         icon: <IconBuildingStore size={18} stroke={1.5} />,
       },
       {
-        text: 'รับเงินโอนแบบ Manual',
+        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
         icon: <IconCreditCard size={18} stroke={1.5} />,
       },
       {
         text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
         icon: <IconBolt size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+        icon: <IconChartBar size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
+        icon: <IconPrinter size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
+        icon: <IconDatabaseExport size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
+        icon: <IconTrophy size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'เริ่มฟรีเลย ไม่ต้องใส่บัตร',
@@ -71,20 +100,48 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconLayersIntersect size={18} stroke={1.5} />,
       },
       {
-        text: 'ระบบหน้าร้านออนไลน์ส่วนตัว',
+        text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
+        icon: <IconWorld size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.15 บาท/เครดิต)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.67 เครดิต/ครั้ง',
+        icon: <IconCircleCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
         icon: <IconBuildingStore size={18} stroke={1.5} />,
       },
       {
-        text: 'รองรับการรับเงินโอน (Manual)',
+        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
         icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+        icon: <IconBolt size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+        icon: <IconChartBar size={18} stroke={1.5} />,
       },
       {
         text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
         icon: <IconPrinter size={18} stroke={1.5} />,
       },
       {
-        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
-        icon: <IconBolt size={18} stroke={1.5} />,
+        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
+        icon: <IconDatabaseExport size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
+        icon: <IconTrophy size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'เริ่มต้นสร้างกำไร',
@@ -99,28 +156,52 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     seed: 'expert',
     features: [
       {
-        text: 'AI Vision ช่วยลงของ (100 ครั้ง/เดือน)',
-        icon: <IconSparkles size={18} stroke={1.5} />,
-      },
-      {
-        text: 'AI Visual Search ช่วยพนักงานหาของ (100 ครั้ง/เดือน)',
-        icon: <IconSparkles size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เช็คสลิปอัตโนมัติ',
-        icon: <IconCircleCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เชื่อมต่อ Stripe (บัตร/PromptPay)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
         text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
         icon: <IconInfinity size={18} stroke={1.5} />,
       },
       {
+        text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
+        icon: <IconWorld size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.00 บาท/เครดิต)',
+        icon: <IconSparkles size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.60 เครดิต/ครั้ง',
+        icon: <IconCircleCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
+        icon: <IconBuildingStore size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+        icon: <IconBolt size={18} stroke={1.5} />,
+      },
+      {
         text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
         icon: <IconChartBar size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
+        icon: <IconPrinter size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
+        icon: <IconDatabaseExport size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
+        icon: <IconTrophy size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'ทดลองใช้ Pro ฟรี 14 วัน',
@@ -134,12 +215,44 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     seed: 'legend',
     features: [
       {
-        text: 'AI Vision ช่วยลงของ (500 ครั้ง/เดือน)',
+        text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
+        icon: <IconInfinity size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
+        icon: <IconWorld size={18} stroke={1.5} />,
+      },
+      {
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 0.85 บาท/เครดิต)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'AI Visual Search ช่วยพนักงานหาของ (ไม่จำกัด)',
-        icon: <IconSparkles size={18} stroke={1.5} />,
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.07 เครดิต/ครั้ง',
+        icon: <IconCircleCheck size={18} stroke={1.5} />,
+      },
+      {
+        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
+        icon: <IconBuildingStore size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
+        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+        icon: <IconBolt size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+        icon: <IconChartBar size={18} stroke={1.5} />,
+      },
+      {
+        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
+        icon: <IconPrinter size={18} stroke={1.5} />,
       },
       {
         text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
@@ -166,11 +279,15 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         {
           label: 'AI ช่วยตั้งชื่อสินค้าจากรูปภาพ',
-          access: [false, false, true, true],
+          access: [true, true, true, true],
         },
         {
           label: 'AI ช่วยเขียน Sales Copy ภาษาไทย',
-          access: [false, false, true, true],
+          access: [true, true, true, true],
+        },
+        {
+          label: 'AI Visual Search (ค้นหาสินค้าด้วยรูป)',
+          access: [true, true, true, true],
         },
       ],
     },
@@ -183,64 +300,42 @@ export const PRICING_TABLES: PricingTables = {
         },
         {
           label: 'ระบบเช็คสลิปอัตโนมัติ',
-          access: [false, false, true, true],
+          access: [true, true, true, true],
         },
-        { label: 'เชื่อมต่อ Stripe', access: [false, false, true, true] },
+        {
+          label: 'เชื่อมต่อ Stripe (บัตร/PromptPay)',
+          access: [true, true, true, true],
+        },
       ],
     },
     {
-      name: 'การจัดการร้านค้า',
+      name: 'การจัดการร้านค้าและสต็อก',
       features: [
-        { label: 'ลงสินค้าไม่จำกัดจำนวน', access: [false, false, true, true] },
-        { label: 'ระบบจัดการสต็อกสินค้า', access: [false, true, true, true] },
+        {
+          label: 'ลงสินค้าได้ตามจำนวนที่กำหนด',
+          access: [true, true, true, true],
+        },
+        { label: 'ระบบจัดการสต็อกสินค้า', access: [true, true, true, true] },
         {
           label: 'รายงานวิเคราะห์ยอดขายและกำไร',
-          access: [false, false, true, true],
+          access: [true, true, true, true],
         },
         {
-          label: 'นำเข้าสินค้าจาก Lazada/Shopee (CSV/JSON)',
-          access: [false, true, true, true],
-        },
-        {
-          label: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-          access: [false, false, false, true],
+          label: 'นำเข้า-ส่งออกข้อมูล (CSV/JSON)',
+          access: [true, true, true, true],
         },
       ],
     },
     {
-      name: 'การตลาดและลูกค้าสัมพันธ์',
-      features: [
-        { label: 'ระบบคูปองส่วนลด', access: [false, true, true, true] },
-        { label: 'ระบบสมาชิกและสะสมแต้ม', access: [false, false, false, true] },
-      ],
-    },
-    {
-      name: 'ระบบจัดการหน้าร้าน (POS)',
+      name: 'การตลาดและขนส่ง',
       features: [
         {
-          label: 'ระบบ POS ขายหน้าร้านพื้นฐาน',
-          access: [false, true, true, true],
+          label: 'ระบบสมาชิกและสะสมแต้ม (CRM)',
+          access: [true, true, true, true],
         },
         {
-          label: 'AI Visual Search (หาของจากรูปภาพสำหรับพนักงาน)',
-          access: [false, false, true, true],
-        },
-      ],
-    },
-    {
-      name: 'ระบบจัดการคำสั่งซื้อและขนส่ง',
-      features: [
-        {
-          label: 'ระบบจัดการสถานะออเดอร์',
-          access: [false, true, true, true],
-        },
-        {
-          label: 'พิมพ์ใบปะหน้าพัสดุ (พร้อม Packing List)',
-          access: [false, true, true, true],
-        },
-        {
-          label: 'ระบบบันทึกและแจ้งเลข Tracking ให้ลูกค้า',
-          access: [false, true, true, true],
+          label: 'พิมพ์ใบปะหน้าและจัดการสถานะออเดอร์',
+          access: [true, true, true, true],
         },
       ],
     },
