@@ -16,9 +16,7 @@ export async function generateAiSupportAction(
       model: 'gemini-3.1-flash-lite-preview',
       systemInstruction: `
         คุณคือผู้ช่วยอัจฉริยะสำหรับร้านค้าออนไลน์ ตอบแชทแทนเจ้าของร้านด้วยความเป็นกันเองและเป็นธรรมชาติเหมือนคนจริงๆ
-        
         ข้อมูลร้านค้าอ้างอิง: ${relevantInfo || 'ไม่มีข้อมูลเฉพาะ'}
-
         กฎการตอบ:
         - ตอบสั้น กระชับ อ่านง่าย ใช้ Markdown ได้
         - หากไม่ทราบคำตอบ ให้ตอบว่า "ขออภัยครับ เดี๋ยวให้แอดมินมาตรวจสอบรายละเอียดเพิ่มเติมให้สักครู่นะครับ"
@@ -34,7 +32,6 @@ export async function generateAiSupportAction(
     const prompt = `
       ประวัติการสนทนาล่าสุด:
       ${history}
-      
       คำถามจากลูกค้า: "${userMessage}"
     `
 

@@ -1,8 +1,10 @@
 import { NextRequest } from 'next/server'
 
+import { REDIS_CACHE_TTL_SECONDS } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
 import { auth } from '@/lib/auth'
+import { withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
@@ -19,7 +21,11 @@ export async function GET(
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const hasAccess = await checkAccess(conversationId, userId!, userRole)
+  const hasAccess = await checkAccessWithCache(
+    conversationId,
+    userId!,
+    userRole,
+  )
 
   if (!hasAccess) {
     return new Response('Forbidden', { status: 403 })
@@ -53,37 +59,45 @@ export async function GET(
   })
 }
 
-export async function checkAccess(
+export async function checkAccessWithCache(
   conversationId: string,
   userId: string,
   userRole: UserRole,
 ) {
-  const conversation = await prisma.conversation.findUnique({
-    where: { id: conversationId },
-    include: {
-      store: true,
-      members: { where: { userId } },
-    },
-  })
+  const cacheKey = `chat:access:${userId}:${conversationId}`
 
-  if (!conversation) {
-    return false
-  }
+  return await withCache(
+    cacheKey,
+    async () => {
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+          store: true,
+          members: { where: { userId } },
+        },
+      })
 
-  const isMember = conversation.members.length > 0
+      if (!conversation) {
+        return false
+      }
 
-  if (userRole === UserRole.SUPPORT) {
-    return conversation.type === ConversationType.SUPPORT
-  }
+      const isMember = conversation.members.length > 0
 
-  if (userRole === UserRole.MERCHANT) {
-    if (conversation.type === ConversationType.STORE) {
-      return conversation.store?.ownerId === userId || isMember
-    }
-    if (conversation.type === ConversationType.SUPPORT) {
+      if (userRole === UserRole.SUPPORT) {
+        return conversation.type === ConversationType.SUPPORT
+      }
+
+      if (userRole === UserRole.MERCHANT) {
+        if (conversation.type === ConversationType.STORE) {
+          return conversation.store?.ownerId === userId || isMember
+        }
+        if (conversation.type === ConversationType.SUPPORT) {
+          return isMember
+        }
+      }
+
       return isMember
-    }
-  }
-
-  return isMember
+    },
+    REDIS_CACHE_TTL_SECONDS,
+  )
 }

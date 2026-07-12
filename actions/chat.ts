@@ -1,8 +1,11 @@
 'use server'
 
-import { checkAccess } from '@/app/api/chat/stream/[conversationId]/route'
+import { checkAccessWithCache } from '@/app/api/chat/stream/[conversationId]/route'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
-import { AI_BOT_ID } from '@/constants/system'
+import {
+  AI_BOT_ID,
+  LATEST_MESSAGES_CACHE_TTL_SECONDS,
+} from '@/constants/system'
 import { Message } from '@/generated/prisma/client'
 import {
   ConversationType,
@@ -12,9 +15,10 @@ import {
 import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { auth } from '@/lib/auth'
-import { withCache } from '@/lib/cache'
+import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
 
 import { generateAiSupportAction } from './ai-support'
 import { chatKeys } from './query-keys/chat'
@@ -40,31 +44,29 @@ export async function getMerchantConversations(storeSlug: string) {
     return { success: false, message: 'ไม่พบผู้ใช้งาน' }
   }
 
-  const store = await prisma.store.findFirst({
-    where: { slug: storeSlug, ownerId: userId },
-    select: { id: true },
-  })
+  const cacheKey = `merchant:convs:${userId}:${storeSlug}`
 
-  if (!store) {
-    return { success: false, message: 'ไม่พบร้านค้าหรือไม่มีสิทธิ์' }
-  }
+  return await withCache(cacheKey, async () => {
+    const store = await prisma.store.findFirst({
+      where: { slug: storeSlug, ownerId: userId },
+      select: { id: true },
+    })
+    if (!store)
+      return { success: false, message: 'ไม่พบร้านค้าหรือไม่มีสิทธิ์' }
 
-  const conversations = await prisma.conversation.findMany({
-    where: {
-      type: ConversationType.STORE,
-      storeId: store.id,
-    },
-    orderBy: { lastMessageAt: 'desc' },
-    include: {
-      members: {
-        include: { user: true },
-        where: { userId: { not: userId } },
+    const conversations = await prisma.conversation.findMany({
+      where: { type: ConversationType.STORE, storeId: store.id },
+      orderBy: { lastMessageAt: 'desc' },
+      include: {
+        members: {
+          include: { user: true },
+          where: { userId: { not: userId } },
+        },
+        messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
-      messages: { orderBy: { createdAt: 'desc' }, take: 1 },
-    },
+    })
+    return { success: true, data: conversations }
   })
-
-  return { success: true, data: conversations }
 }
 
 export async function getOrCreateStoreConversation(storeId: string) {
@@ -176,10 +178,6 @@ export async function getConversation(
       },
       include: { members: true },
     })
-
-    if (conversation.isAiEnabled) {
-      await handleAiResponse(conversation.id, 'สวัสดีครับ').catch(console.error)
-    }
   }
 
   return { success: true, data: conversation }
@@ -297,12 +295,17 @@ export async function sendMessage(
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
   }
 
+  const members = await prisma.conversationMember.findMany({
+    where: { conversationId },
+    select: { userId: true },
+  })
+
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
     include: { store: { select: { ownerId: true } } },
   })
 
-  const hasAccess = await checkAccess(conversationId, userId, userRole)
+  const hasAccess = await checkAccessWithCache(conversationId, userId, userRole)
   if (!hasAccess) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
   }
@@ -335,7 +338,21 @@ export async function sendMessage(
     return result
   }
 
-  chatEvents.publish(`message:${conversationId}`, result as Message)
+  const newMessage = result as Message
+
+  chatEvents.publish(`message:${conversationId}`, newMessage)
+
+  const invalidateTasks: Promise<unknown>[] = [
+    appendMessageToLatestCache(conversationId, newMessage),
+  ]
+
+  members.forEach((m) => {
+    invalidateTasks.push(
+      invalidateCacheByPattern(`merchant:convs:${m.userId}:*`),
+    )
+  })
+
+  await Promise.all(invalidateTasks)
 
   const isSenderTheAnsweringParty =
     conversation?.type === ConversationType.STORE
@@ -355,13 +372,52 @@ export async function sendMessage(
   return { success: true, data: result }
 }
 
+async function appendMessageToLatestCache(
+  conversationId: string,
+  message: Message,
+) {
+  const cacheKey = `chat:messages:${conversationId}:latest`
+
+  try {
+    const cachedRaw = await redis.get(cacheKey)
+    if (!cachedRaw) return
+
+    const cached = JSON.parse(cachedRaw) as {
+      items: Message[]
+      nextCursor?: string
+    }
+
+    const updatedItems = [...cached.items, message].slice(-20)
+
+    await redis.setex(
+      cacheKey,
+      LATEST_MESSAGES_CACHE_TTL_SECONDS,
+      JSON.stringify({ items: updatedItems, nextCursor: cached.nextCursor }),
+    )
+  } catch (error) {
+    console.error(error)
+    await redis.del(cacheKey).catch(() => {})
+  }
+}
+
 async function handleAiResponse(conversationId: string, content: string) {
   await ensureBotUser()
-  const recentMessages = await prisma.message.findMany({
-    where: { conversationId },
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-  })
+
+  const cacheKey = `chat:messages:${conversationId}:latest`
+  const cachedData = await redis.get(cacheKey)
+
+  let recentMessages: Message[] = []
+
+  if (cachedData) {
+    const allMessages = JSON.parse(cachedData).items
+    recentMessages = allMessages.slice(-10)
+  } else {
+    recentMessages = await prisma.message.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    })
+  }
 
   const formattedHistory = recentMessages
     .reverse()
@@ -389,10 +445,27 @@ async function handleAiResponse(conversationId: string, content: string) {
       data: { unreadCount: { increment: 1 } },
     })
     chatEvents.publish(`message:${conversationId}`, aiMessage)
+    await appendMessageToLatestCache(conversationId, aiMessage)
   }
 }
 
 export async function getMessages(conversationId: string, cursor?: string) {
+  if (cursor) {
+    return await fetchMessagesFromDb(conversationId, cursor)
+  }
+
+  const cacheKey = `chat:messages:${conversationId}:latest`
+
+  return await withCache(
+    cacheKey,
+    async () => {
+      return await fetchMessagesFromDb(conversationId, cursor)
+    },
+    LATEST_MESSAGES_CACHE_TTL_SECONDS,
+  )
+}
+
+async function fetchMessagesFromDb(conversationId: string, cursor?: string) {
   const session = await auth()
   const userId = session?.user?.id
   const userRole = session?.user?.role
@@ -401,8 +474,11 @@ export async function getMessages(conversationId: string, cursor?: string) {
     return { items: [], nextCursor: undefined }
   }
 
-  const hasAccess = await checkAccess(conversationId, userId!, userRole)
-
+  const hasAccess = await checkAccessWithCache(
+    conversationId,
+    userId!,
+    userRole,
+  )
   if (!hasAccess) {
     return { items: [], nextCursor: undefined }
   }
@@ -413,14 +489,7 @@ export async function getMessages(conversationId: string, cursor?: string) {
     take: 20,
     cursor: cursor ? { id: cursor } : undefined,
     skip: cursor ? 1 : 0,
-    include: {
-      sender: {
-        select: {
-          id: true,
-          role: true,
-        },
-      },
-    },
+    include: { sender: { select: { id: true, role: true } } },
   })
 
   return {
@@ -441,7 +510,7 @@ export async function toggleConversationAi(
     return { success: false, message: 'ไม่ได้รับอนุญาต' }
   }
 
-  const hasAccess = await checkAccess(conversationId, userId, userRole)
+  const hasAccess = await checkAccessWithCache(conversationId, userId, userRole)
   if (!hasAccess) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
   }

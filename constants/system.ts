@@ -11,7 +11,8 @@ export const UNREAD_COUNT_REFETCH_INTERVAL = 10 * SECOND
 export const SERVER_ERROR_MESSAGE =
   'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
 export const AI_BOT_ID = 'cmqhnrqen0000u8ujmvh3d6as'
-export const REDIS_CACHE_TTL_SECONDS = 30 * 60
+export const REDIS_CACHE_TTL_SECONDS = 60 * 60
+export const LATEST_MESSAGES_CACHE_TTL_SECONDS = 300
 export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'www',
   'api',
