@@ -1,14 +1,16 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Controller, useForm, useWatch } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 
 import {
   useBranch,
   useCreateBranch,
   useUpdateBranch,
 } from '@/actions/hooks/branch'
+import { THAI_DAYS } from '@/constants/system'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { OpeningHours } from '@/types/branch'
 import { CreateBranchFormValues, createBranchSchema } from '@/zod/branch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
@@ -27,10 +29,12 @@ import {
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+import { Switch } from '@/components/ui/switch'
 
 import { Address } from '@/lib/address/logic'
 
 const InputThaiAddress = CreateInput()
+
 const DEFAULT_VALUES = {
   name: '',
   address: '',
@@ -38,6 +42,13 @@ const DEFAULT_VALUES = {
   district: '',
   province: '',
   postcode: '',
+  mapUrl: '',
+  openingHours: THAI_DAYS.map((day) => ({
+    day,
+    open: '09:00',
+    close: '18:00',
+    isOpen: true,
+  })),
 }
 
 export function BranchDialog({
@@ -62,12 +73,14 @@ export function BranchDialog({
     reset,
     setValue,
     control,
+    watch,
     formState: { errors },
   } = useForm<CreateBranchFormValues>({
     resolver: zodResolver(createBranchSchema),
     defaultValues: DEFAULT_VALUES,
   })
 
+  const mapUrl = useWatch({ control, name: 'mapUrl' })
   const subDistrict = useWatch({ control, name: 'subDistrict' })
   const district = useWatch({ control, name: 'district' })
   const province = useWatch({ control, name: 'province' })
@@ -83,6 +96,9 @@ export function BranchDialog({
 
   useEffect(() => {
     if (branchData) {
+      const dbOpeningHours =
+        branchData.openingHours as unknown as OpeningHours[]
+
       reset({
         name: branchData.name ?? '',
         address: branchData.address ?? '',
@@ -90,6 +106,10 @@ export function BranchDialog({
         district: branchData.district ?? '',
         subDistrict: branchData.subDistrict ?? '',
         postcode: branchData.postcode ?? '',
+        mapUrl: branchData.mapUrl ?? '',
+        openingHours:
+          (Array.isArray(dbOpeningHours) ? dbOpeningHours : null) ??
+          DEFAULT_VALUES.openingHours,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -121,6 +141,7 @@ export function BranchDialog({
     }
   }
 
+  const { fields } = useFieldArray({ control, name: 'openingHours' })
   const isPending = createMutation.isPending || updateMutation.isPending
 
   return (
@@ -219,6 +240,65 @@ export function BranchDialog({
             </Field>
           </div>
         </div>
+        {!!fields?.length && (
+          <div className="space-y-3">
+            <FieldLabel>เวลาทำการ</FieldLabel>
+            {fields.map((field, index) => {
+              const isOpen = watch(`openingHours.${index}.isOpen`)
+
+              return (
+                <div
+                  key={field.id}
+                  className="border-border/50 grid grid-cols-2 gap-3 rounded-lg border p-3 sm:grid-cols-[80px_1fr_1fr_120px] sm:items-center sm:border-none sm:p-0"
+                >
+                  <span className="col-span-2 text-sm font-semibold sm:col-span-1 sm:font-medium">
+                    {field.day}
+                  </span>
+                  <Input
+                    {...register(`openingHours.${index}.open`)}
+                    type="time"
+                    className="h-9"
+                    disabled={!isOpen}
+                  />
+                  <Input
+                    {...register(`openingHours.${index}.close`)}
+                    type="time"
+                    className="h-9"
+                    disabled={!isOpen}
+                  />
+                  <div className="flex w-fit flex-col items-center gap-2">
+                    <span className="text-muted-foreground text-xs">
+                      {isOpen ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                    </span>
+                    <Controller
+                      control={control}
+                      name={`openingHours.${index}.isOpen`}
+                      render={({ field }) => (
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        <Field>
+          <FieldLabel>Google Maps Embed URL</FieldLabel>
+          <Input
+            placeholder="วาง URL จาก Google Maps"
+            {...register('mapUrl')}
+          />
+        </Field>
+        {mapUrl && mapUrl.includes('google.com/maps') && (
+          <div className="border-primary h-48 w-full overflow-hidden rounded-lg border">
+            <iframe src={mapUrl} className="h-full w-full" loading="lazy" />
+          </div>
+        )}
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={isPending}>
             ยกเลิก

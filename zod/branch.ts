@@ -7,6 +7,17 @@ export const createBranchSchema = z.object({
   district: z.string().min(1, 'กรุณาเลือกอำเภอ'),
   subDistrict: z.string().min(1, 'กรุณาเลือกตำบล'),
   postcode: z.string().length(5, 'รหัสไปรษณีย์ต้องมี 5 หลัก'),
+  mapUrl: z.url('URL แผนที่ไม่ถูกต้อง').optional().or(z.literal('')),
+  openingHours: z
+    .array(
+      z.object({
+        day: z.string(),
+        open: z.string().default('09:00'),
+        close: z.string().default('18:00'),
+        isOpen: z.boolean().default(false),
+      }),
+    )
+    .optional(),
 })
 
 export type CreateBranchFormValues = z.input<typeof createBranchSchema>

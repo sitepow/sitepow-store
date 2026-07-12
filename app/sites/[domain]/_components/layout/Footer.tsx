@@ -1,8 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useBranches } from '@/actions/hooks/branch'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { OpeningHours } from '@/types/branch'
 
 import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
@@ -11,6 +13,29 @@ import { StoreLogo } from '@/components/StoreLogo'
 export function StoreFooter() {
   const { store } = useStoreData()
   const currentYear = new Date().getFullYear()
+
+  const { data: branchesData } = useBranches({ storeId: store?.id as string })
+  const mainBranch =
+    branchesData?.data.find((b) => b.isMain) || branchesData?.data[0]
+
+  const renderOpeningHours = (openingHours: OpeningHours[]) => {
+    if (!Array.isArray(openingHours)) {
+      return null
+    }
+
+    return openingHours.map((row) => (
+      <div key={row.day} className="flex flex-wrap justify-between gap-1">
+        <span>{row.day}</span>
+        <span>
+          {!row.isOpen ? (
+            <span className="text-primary">ปิดทำการ (ออนไลน์ปกติ)</span>
+          ) : (
+            `${row.open} - ${row.close}`
+          )}
+        </span>
+      </div>
+    ))
+  }
 
   const socialLinks = [
     {
@@ -119,38 +144,39 @@ export function StoreFooter() {
               ))}
             </div>
           </div>
-          <div>
-            <h3 className="mb-4 font-bold">ที่ตั้งร้าน</h3>
-            <div className="border-border mb-4 overflow-hidden rounded-lg border">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.545199616017!2d100.64771637583688!3d13.56543990263677!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x311d60c41094056b%3A0x678b667e452a2305!2sBang%20Pu%20Recreation%20Center!5e0!3m2!1sen!2sth!4v1720573881476!5m2!1sen!2sth"
-                width="100%"
-                height="200"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+          {mainBranch && (
+            <div>
+              <h3 className="mb-4 font-bold">ที่ตั้งร้าน (สาขาหลัก)</h3>
+              {mainBranch?.mapUrl && (
+                <div className="border-border mb-4 overflow-hidden rounded-lg border">
+                  <iframe
+                    src={mainBranch.mapUrl}
+                    width="100%"
+                    height="200"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <p className="text-sm leading-relaxed opacity-60">
+                {mainBranch?.address} {mainBranch?.subDistrict}{' '}
+                {mainBranch?.district} <br />
+                {mainBranch?.province} {mainBranch?.postcode}
+              </p>
             </div>
-            <p className="text-sm leading-relaxed opacity-60">
-              123/45 ถนนสุขุมวิท ตำบลบางปู <br />
-              อำเภอเมือง จังหวัดสมุทรปราการ 10280
-            </p>
-            <a
-              href="#"
-              className="text-primary mt-3 inline-block text-sm font-medium hover:underline"
-            >
-              📍 ดูแผนที่บน Google Maps
-            </a>
-          </div>
-          <div>
-            <h3 className="mb-4 font-bold">เวลาทำการ</h3>
-            <div className="space-y-1 text-sm opacity-60">
-              <p>จันทร์ - ศุกร์: 09:00 - 18:00 น.</p>
-              <p>เสาร์ - อาทิตย์: 10:00 - 17:00 น.</p>
-              <p className="text-primary pt-2">หยุดทุกวันหยุดนักขัตฤกษ์</p>
-            </div>
-          </div>
+          )}
+          {mainBranch?.openingHours &&
+            Array.isArray(mainBranch.openingHours) && (
+              <div>
+                <h3 className="mb-4 font-bold">เวลาทำการ (หน้าร้าน)</h3>
+                <div className="space-y-1 text-sm opacity-60">
+                  {renderOpeningHours(
+                    mainBranch.openingHours as OpeningHours[],
+                  )}
+                </div>
+              </div>
+            )}
         </div>
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
           <p className="text-sm">

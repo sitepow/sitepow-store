@@ -150,11 +150,13 @@ model Branch {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  province    String?
-  district    String?
-  subDistrict String?
-  postcode    String?
-  address     String? @db.Text
+  address      String? @db.Text
+  province     String?
+  district     String?
+  subDistrict  String?
+  postcode     String?
+  mapUrl       String? @db.Text
+  openingHours Json?
 
   staffs           StaffBranch[]
   orderItem        OrderItem[]

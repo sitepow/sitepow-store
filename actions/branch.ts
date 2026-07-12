@@ -31,6 +31,8 @@ const branchSelect = {
   district: true,
   province: true,
   postcode: true,
+  mapUrl: true,
+  openingHours: true,
   storeId: true,
   createdAt: true,
   updatedAt: true,

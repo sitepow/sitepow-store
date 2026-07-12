@@ -159,3 +159,12 @@ export const PRIMARY_COLOR_OPTIONS = [
   { label: 'Violet', value: '#8b5cf6' },
   { label: 'Yellow', value: '#eab308' },
 ]
+export const THAI_DAYS = [
+  'จันทร์',
+  'อังคาร',
+  'พุธ',
+  'พฤหัสบดี',
+  'ศุกร์',
+  'เสาร์',
+  'อาทิตย์',
+]
