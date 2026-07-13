@@ -60,7 +60,7 @@ export async function purchaseCredit({
           storeId,
           amount: creditAmount,
           type: TransactionType.CREDIT_PURCHASE,
-          description: description || `ซื้อเครดิต ${creditAmount} Credits`,
+          description: `ซื้อเครดิต ${creditAmount} Credits`,
         },
         select: transactionSelect,
       }),

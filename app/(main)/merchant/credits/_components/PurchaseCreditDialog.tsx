@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useCheckout } from '@/actions/hooks/checkout'
-import { PACKAGES } from '@/constants/credit'
+import { CREDIT_TIERS, PACKAGES } from '@/constants/credit'
+import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CheckoutType } from '@/types/checkout'
 import { getCredits } from '@/utils/credit'
@@ -32,10 +33,11 @@ import { cn } from '@/lib/utils'
 export function PurchaseCreditDialog() {
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
+  const { userId } = useSession()
 
   const getBonusCredits = (amount: number) => {
     const credits = getCredits(amount)
-    const baseRate = 0.8
+    const baseRate = CREDIT_TIERS[0].rate
     const baseCredits = Math.floor(amount * baseRate)
     return credits - baseCredits
   }
@@ -66,14 +68,17 @@ export function PurchaseCreditDialog() {
       return
     }
 
+    const totalCredits = getCredits(data.amount)
+    const ratePerBaht = (totalCredits / data.amount).toFixed(2)
+
     checkout({
       amount: data.amount,
-      description: `เติมเครดิต AI จำนวน ${formatNumber(getCredits(amount))} เครดิต`,
+      description: `เติมเครดิต AI จำนวน ${formatNumber(getCredits(amount))} เครดิต (${ratePerBaht} เครดิต/บาท)`,
       successUrl: `${window.location.origin}/merchant/credits`,
       cancelUrl: `${window.location.origin}/merchant/credits`,
       metadata: {
         type: CheckoutType.CREDIT,
-        relatedId: '',
+        relatedId: userId!,
         storeId: selectedStoreId,
       },
     })

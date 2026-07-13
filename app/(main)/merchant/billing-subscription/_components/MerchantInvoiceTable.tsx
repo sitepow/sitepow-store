@@ -104,11 +104,9 @@ export function MerchantInvoiceTable() {
                   <TableCell>
                     <Badge
                       variant={
-                        inv.status === InvoiceStatus.PAID
-                          ? 'default'
-                          : inv.status === InvoiceStatus.FAILED
-                            ? 'destructive'
-                            : 'outline'
+                        inv.status === InvoiceStatus.FAILED
+                          ? 'destructive'
+                          : 'outline'
                       }
                     >
                       {inv.status === InvoiceStatus.PAID

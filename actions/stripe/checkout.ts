@@ -1,7 +1,5 @@
 'use server'
 
-import { redirect } from 'next/navigation'
-
 import { CheckoutParams, PaymentMethod } from '@/types/checkout'
 
 import { stripe } from '@/lib/stripe'
@@ -29,7 +27,11 @@ export async function createCheckoutSession(params: CheckoutParams) {
     cancel_url: params.cancelUrl,
   })
 
-  if (session.url) {
-    redirect(session.url)
+  if (!session?.url) {
+    return {
+      success: false,
+    }
   }
+
+  return { success: true, url: session.url }
 }

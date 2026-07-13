@@ -40,8 +40,7 @@ export async function POST(req: Request) {
 
     if (
       !type ||
-      !relatedId ||
-      (type === CheckoutType.SUBSCRIPTION && !storeId)
+      (type === CheckoutType.SUBSCRIPTION && (!relatedId || !storeId))
     ) {
       return NextResponse.json({ error: 'Missing metadata' }, { status: 400 })
     }
@@ -66,12 +65,12 @@ export async function POST(req: Request) {
 
         const result = await purchaseCredit({
           storeId,
+          userId: relatedId,
           amount: amountInBaht,
-          description: `เติมเครดิต (Invoice: ${relatedId})`,
         })
 
         if (!result.success) {
-          console.error('Credit purchase failed:', result.message)
+          console.error(result.message)
           return NextResponse.json(
             { error: 'Credit purchase failed' },
             { status: 500 },
@@ -79,7 +78,7 @@ export async function POST(req: Request) {
         }
       }
     } catch (error) {
-      console.error('Database update failed:', error)
+      console.error(error)
       return NextResponse.json(
         { error: 'Database update failed' },
         { status: 500 },
