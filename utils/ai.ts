@@ -1,4 +1,3 @@
-import { PLAN_DETAILS } from '@/config/planDetails'
 import {
   AI_MARGIN_MULTIPLIER,
   BASE_CREDIT_VALUE_THB,
@@ -8,6 +7,7 @@ import {
   TOKENS_PER_UNIT,
   USD_TO_THB_RATE,
 } from '@/constants/ai'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan } from '@/generated/prisma/enums'
 import { CreditUsageType } from '@/types/ai'
 

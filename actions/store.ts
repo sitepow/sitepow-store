@@ -2,7 +2,7 @@
 
 import { cache } from 'react'
 
-import { PLAN_DETAILS } from '@/config/planDetails'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import {

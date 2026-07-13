@@ -5,8 +5,15 @@ export interface PlanDetails {
   price: number
   description: string
   features: string[]
-  isAiSupported: boolean
   aiUsageMultiplier: number
+  maxProducts: number | null
+}
+
+export const PLAN_RANK: Record<Plan, number> = {
+  [Plan.FREE]: 0,
+  [Plan.STARTER]: 1,
+  [Plan.PRO]: 2,
+  [Plan.ULTIMATE]: 3,
 }
 
 export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
@@ -19,7 +26,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'สิทธิ์ใช้งาน AI อัจฉริยะ (ราคา 1.35 บาท/เครดิต)',
       'เช็คสลิปอัตโนมัติ (4.00 เครดิต/สลิป)',
     ],
-    isAiSupported: true,
+    maxProducts: 5,
     aiUsageMultiplier: 1.8,
   },
   STARTER: {
@@ -33,7 +40,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'เช็คสลิปอัตโนมัติ (2.67 เครดิต/สลิป)',
       'ปลดล็อกลบ Footer ลายน้ำ Sitepow Store',
     ],
-    isAiSupported: true,
+    maxProducts: 50,
     aiUsageMultiplier: 1.5,
   },
   PRO: {
@@ -48,7 +55,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'เช็คสลิปอัตโนมัติ (1.60 เครดิต/สลิป)',
       'ปลดล็อกลบ Footer ลายน้ำ Sitepow Store',
     ],
-    isAiSupported: true,
+    maxProducts: null,
     aiUsageMultiplier: 1.3,
   },
   ULTIMATE: {
@@ -64,7 +71,7 @@ export const PLAN_DETAILS: Record<Plan, PlanDetails> = {
       'ปลดล็อกลบ Footer ลายน้ำ Sitepow Store',
       'Support พิเศษดูแลส่วนตัวตลอด 24 ชม.',
     ],
-    isAiSupported: true,
+    maxProducts: null,
     aiUsageMultiplier: 1.1,
   },
 }

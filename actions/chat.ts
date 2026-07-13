@@ -1,9 +1,9 @@
 'use server'
 
 import { checkAccessWithCache } from '@/app/api/chat/stream/[conversationId]/route'
-import { PLAN_DETAILS } from '@/config/planDetails'
 import { GEMINI_MODEL } from '@/constants/ai'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
+import { PLAN_DETAILS } from '@/constants/plan'
 import {
   AI_BOT_ID,
   LATEST_MESSAGES_CACHE_TTL_SECONDS,
@@ -28,6 +28,7 @@ import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
 
+import { handleUserPrompt } from './ai'
 import { generateAiSupportAction } from './ai-support'
 import { chatKeys } from './query-keys/chat'
 
@@ -413,14 +414,6 @@ async function appendMessageToLatestCache(
   }
 }
 
-async function hasAiCredit(storeId: string) {
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    select: { balance: true },
-  })
-  return Number(store?.balance ?? 0) > 0
-}
-
 async function chargeAiUsage({
   storeId,
   conversationId,
@@ -437,7 +430,7 @@ async function chargeAiUsage({
   try {
     await prisma.$transaction([
       prisma.store.update({
-        where: { id: storeId },
+        where: { id: storeId, balance: { gte: cost } },
         data: { balance: { decrement: cost } },
       }),
       prisma.transaction.create({
@@ -477,8 +470,17 @@ async function handleAiResponse(
   await ensureBotUser()
 
   if (storeId) {
-    const canUseAi = await hasAiCredit(storeId)
-    if (!canUseAi) {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { balance: true, plan: true },
+    })
+
+    if (!store) {
+      return
+    }
+
+    const costEstimate = await handleUserPrompt(content, store.plan)
+    if (Number(store.balance) < costEstimate.credits) {
       return
     }
   }

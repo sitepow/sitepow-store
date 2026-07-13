@@ -4,7 +4,7 @@ import {
   useCancelSubscription,
   useStoreSubscriptions,
 } from '@/actions/hooks/subscription'
-import { PLAN_DETAILS } from '@/config/planDetails'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan, SubStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDate } from '@/utils/date'

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import { useDeleteStore, useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { PLAN_DETAILS } from '@/config/planDetails'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'

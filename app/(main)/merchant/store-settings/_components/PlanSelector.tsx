@@ -3,7 +3,7 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
-import { PLAN_DETAILS } from '@/config/planDetails'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan } from '@/generated/prisma/enums'
 import { formatNumber } from '@/utils/pricing'
 import { CreateStoreFormValues } from '@/zod/store'

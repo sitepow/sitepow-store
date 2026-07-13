@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { PLAN_DETAILS } from '@/config/planDetails'
+import { PLAN_DETAILS } from '@/constants/plan'
 import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

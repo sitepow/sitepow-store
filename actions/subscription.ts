@@ -1,6 +1,6 @@
 'use server'
 
-import { PLAN_RANK } from '@/config/plans'
+import { PLAN_RANK } from '@/constants/plan'
 import {
   ActorType,
   LogAction,
