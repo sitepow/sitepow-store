@@ -1,7 +1,12 @@
 'use client'
 
 import { useStoreCredit } from '@/actions/hooks/credit'
+import { AVG_INPUT_TOKENS, AVG_OUTPUT_TOKENS } from '@/constants/ai'
+import { Plan } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { CreditUsageType } from '@/types/ai'
+import { estimateCost } from '@/utils/ai'
 import { formatNumber } from '@/utils/pricing'
 
 import { Button } from '@/components/ui/button'
@@ -20,15 +25,25 @@ import { PurchaseCreditDialog } from './PurchaseCreditDialog'
 export function StoreCreditCard() {
   const { selectedStoreId } = useStoreFilter()
   const storeId = selectedStoreId === ALL_STORES ? '' : selectedStoreId
+  const { store } = useStoreData()
   const { data, isLoading } = useStoreCredit(storeId)
 
   const balance = Number(data?.balance ?? 0)
 
-  const COST_PER_AI_MESSAGE = 1.5
-  const COST_PER_SLIP = 4
+  const aiCost = estimateCost(
+    CreditUsageType.AI,
+    store?.plan || Plan.FREE,
+    AVG_INPUT_TOKENS,
+    AVG_OUTPUT_TOKENS,
+  )
 
-  const estimateAiMessages = Math.floor(balance / COST_PER_AI_MESSAGE)
-  const estimateSlipChecks = Math.floor(balance / COST_PER_SLIP)
+  const slipCost = estimateCost(CreditUsageType.SLIP, store?.plan || Plan.FREE)
+
+  const estimateAiMessages =
+    balance > 0 ? Math.floor(balance / aiCost.credits) : 0
+  const estimateSlipChecks =
+    balance > 0 ? Math.floor(balance / slipCost.credits) : 0
+
   return (
     <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
       <CardHeader className="pb-2">
@@ -55,9 +70,9 @@ export function StoreCreditCard() {
               เครดิตนี้ใช้งานได้ประมาณ
             </p>
             <p>
-              • ตอบแชท AI ได้อีก ~{formatNumber(estimateAiMessages)} ข้อความ
+              - ตอบแชท AI ได้อีก ~{formatNumber(estimateAiMessages)} ข้อความ
             </p>
-            <p>• ตรวจสลิปได้อีก ~{formatNumber(estimateSlipChecks)} สลิป</p>
+            <p>- ตรวจสลิปได้อีก ~{formatNumber(estimateSlipChecks)} สลิป</p>
           </div>
         )}
       </CardContent>
