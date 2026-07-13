@@ -1,12 +1,12 @@
 'use server'
 
-import { EXCHANGE_RATE } from '@/constants/credit'
 import {
   ActorType,
   LogAction,
   Prisma,
   TransactionType,
 } from '@/generated/prisma/client'
+import { getCredits } from '@/utils/credit'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
@@ -36,6 +36,10 @@ export async function purchaseCredit({
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
+    if (amount < 60) {
+      return { success: false, message: 'จำนวนเงินขั้นต่ำคือ 60 บาท' }
+    }
+
     const store = await prisma.store.findUnique({
       where: { id: storeId, ownerId: session.user.id },
       select: { id: true },
@@ -45,7 +49,7 @@ export async function purchaseCredit({
       return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
     }
 
-    const creditAmount = Math.floor(amount * EXCHANGE_RATE)
+    const creditAmount = getCredits(amount)
 
     const [transaction] = await prisma.$transaction([
       prisma.transaction.create({

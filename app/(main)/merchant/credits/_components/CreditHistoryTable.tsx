@@ -8,6 +8,7 @@ import { getLabel } from '@/constants/translate'
 import { TransactionType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
+import { formatNumber } from '@/utils/pricing'
 import {
   IconArrowDownLeft,
   IconCpu,
@@ -115,7 +116,9 @@ export function CreditHistoryTable() {
                         isIncome ? 'text-green-600' : 'text-foreground',
                       )}
                     >
-                      {isIncome ? `+${tx.amount}` : `-${tx.amount}`}
+                      {isIncome
+                        ? `+${formatNumber(tx.amount)}`
+                        : `-${formatNumber(tx.amount)}`}
                     </TableCell>
                   </TableRow>
                 )
@@ -124,7 +127,6 @@ export function CreditHistoryTable() {
           </TableBody>
         </Table>
       </div>
-
       {meta && meta.totalPages > 1 && (
         <StorePagination
           currentPage={meta.currentPage}

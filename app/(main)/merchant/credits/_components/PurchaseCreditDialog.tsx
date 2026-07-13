@@ -4,13 +4,15 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { usePurchaseCredit } from '@/actions/hooks/credit'
-import { EXCHANGE_RATE, PACKAGES } from '@/constants/credit'
+import { PACKAGES } from '@/constants/credit'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { getCredits } from '@/utils/credit'
 import { formatNumber } from '@/utils/pricing'
 import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/credit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCoins, IconPlus } from '@tabler/icons-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -24,10 +26,19 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
+import { cn } from '@/lib/utils'
+
 export function PurchaseCreditDialog() {
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
   const { mutate: purchase, isPending } = usePurchaseCredit()
+
+  const getBonusCredits = (amount: number) => {
+    const credits = getCredits(amount)
+    const baseRate = 0.8
+    const baseCredits = Math.floor(amount * baseRate)
+    return credits - baseCredits
+  }
 
   const {
     register,
@@ -76,7 +87,6 @@ export function PurchaseCreditDialog() {
           <IconPlus size={16} /> ซื้อเครดิต
         </Button>
       </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle>ซื้อเครดิตสำหรับใช้งาน AI</DialogTitle>
@@ -85,16 +95,29 @@ export function PurchaseCreditDialog() {
           <div className="space-y-2">
             <FieldLabel>เลือกแพ็กเกจ</FieldLabel>
             <div className="grid grid-cols-3 gap-2">
-              {PACKAGES.map((pkg) => (
-                <Button
-                  key={pkg}
-                  type="button"
-                  variant={amount === pkg ? 'default' : 'outline'}
-                  onClick={() => setValue('amount', pkg)}
-                >
-                  {formatNumber(pkg)} บาท
-                </Button>
-              ))}
+              {PACKAGES.map((pkg) => {
+                const bonusCredits = getBonusCredits(pkg)
+
+                return (
+                  <Button
+                    key={pkg}
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      'relative flex flex-col items-center justify-center py-6',
+                      amount === pkg && 'border-primary',
+                    )}
+                    onClick={() => setValue('amount', pkg)}
+                  >
+                    <span>{formatNumber(pkg)} บาท</span>
+                    {bonusCredits > 0 && (
+                      <Badge className="absolute -top-2 -right-2 text-white">
+                        + {formatNumber(bonusCredits)} เครดิต
+                      </Badge>
+                    )}
+                  </Button>
+                )
+              })}
             </div>
           </div>
           <Field>
@@ -105,19 +128,24 @@ export function PurchaseCreditDialog() {
               min={60}
               placeholder="ระบุจำนวนเงิน"
             />
+            {amount >= 60 && getBonusCredits(amount) > 0 && (
+              <p className="text-primary mt-1 text-sm">
+                คุณได้รับฟรี +{formatNumber(getBonusCredits(amount))} เครดิต!
+              </p>
+            )}
             <FieldError>{errors.amount?.message}</FieldError>
           </Field>
-          <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
+          <div className="bg-muted/50 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm">
               <IconCoins className="text-primary" size={20} />
-              <span className="font-medium">จะได้รับเครดิต:</span>
+              <span className="font-medium">จะได้รับเครดิต</span>
             </div>
             <span className="text-primary text-xl font-bold">
-              {Math.floor(amount * EXCHANGE_RATE)} Credits
+              {formatNumber(getCredits(amount))} Credits
             </span>
           </div>
           <Field>
-            <FieldLabel>หมายเหตุ (ไม่บังคับ)</FieldLabel>
+            <FieldLabel>หมายเหตุ</FieldLabel>
             <Input
               {...register('description')}
               placeholder="เช่น เติมเครดิตเพื่อจ่ายค่า AI"
