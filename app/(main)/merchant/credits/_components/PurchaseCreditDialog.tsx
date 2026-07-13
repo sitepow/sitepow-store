@@ -49,7 +49,9 @@ export function PurchaseCreditDialog() {
   }
 
   const onSubmit = (data: PurchaseCreditSchema) => {
-    if (selectedStoreId === ALL_STORES) return
+    if (selectedStoreId === ALL_STORES) {
+      return
+    }
 
     purchase(
       {
@@ -79,7 +81,6 @@ export function PurchaseCreditDialog() {
         <DialogHeader>
           <DialogTitle>ซื้อเครดิตสำหรับใช้งาน AI</DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             <FieldLabel>เลือกแพ็กเกจ</FieldLabel>
@@ -96,17 +97,16 @@ export function PurchaseCreditDialog() {
               ))}
             </div>
           </div>
-
           <Field>
             <FieldLabel>หรือระบุจำนวนเงิน (บาท)</FieldLabel>
             <Input
               type="number"
               {...register('amount', { valueAsNumber: true })}
+              min={60}
               placeholder="ระบุจำนวนเงิน"
             />
             <FieldError>{errors.amount?.message}</FieldError>
           </Field>
-
           <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm">
               <IconCoins className="text-primary" size={20} />
@@ -116,7 +116,6 @@ export function PurchaseCreditDialog() {
               {Math.floor(amount * EXCHANGE_RATE)} Credits
             </span>
           </div>
-
           <Field>
             <FieldLabel>หมายเหตุ (ไม่บังคับ)</FieldLabel>
             <Input
@@ -124,7 +123,6 @@ export function PurchaseCreditDialog() {
               placeholder="เช่น เติมเครดิตเพื่อจ่ายค่า AI"
             />
           </Field>
-
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose}>
               ยกเลิก

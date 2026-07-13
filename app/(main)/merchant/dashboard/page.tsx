@@ -12,9 +12,7 @@ import {
   ArrowRight,
   CreditCard,
   DollarSign,
-  Eye,
   Package,
-  Search,
   TrendingUp,
   User2,
   Users,
@@ -46,19 +44,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 function pctChange(current: number, previous: number): string {
-  if (previous === 0 && current === 0) return '0% จากเดือนที่แล้ว'
-  if (previous === 0) return '+100% จากเดือนที่แล้ว'
+  if (previous === 0 && current === 0) {
+    return '0% จากเดือนที่แล้ว'
+  }
+  if (previous === 0) {
+    return '+100% จากเดือนที่แล้ว'
+  }
   const pct = ((current - previous) / previous) * 100
   return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% จากเดือนที่แล้ว`
 }
 
 const chartConfig = {
   total: { label: 'ยอดขาย', color: 'hsl(var(--primary))' },
-} satisfies ChartConfig
-
-const aiChartConfig = {
-  vision: { label: 'AI Vision', color: 'hsl(var(--chart-1))' },
-  search: { label: 'AI Search', color: 'hsl(var(--chart-2))' },
 } satisfies ChartConfig
 
 export default function MerchantDashboardPage() {
@@ -131,9 +128,7 @@ export default function MerchantDashboardPage() {
           </div>
         )}
       </div>
-
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
-
       {selectedStoreId !== ALL_STORES && isLoading && (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -141,7 +136,6 @@ export default function MerchantDashboardPage() {
               <Skeleton key={i} className="h-28" />
             ))}
           </div>
-
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             <Skeleton className="h-64" />
             <Skeleton className="h-64" />
@@ -150,7 +144,6 @@ export default function MerchantDashboardPage() {
           </div>
         </div>
       )}
-
       {selectedStoreId !== ALL_STORES && !isLoading && data && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -164,7 +157,6 @@ export default function MerchantDashboardPage() {
               />
             ))}
           </div>
-
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             <Card>
               <CardHeader>
@@ -213,75 +205,6 @@ export default function MerchantDashboardPage() {
                 </div>
               </CardFooter>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>การใช้งาน AI Credit</CardTitle>
-                <CardDescription>
-                  เครดิตคงเหลือใน Vision และ Search
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={aiChartConfig}>
-                  <AreaChart
-                    data={[
-                      {
-                        name: 'คงเหลือ',
-                        vision: data?.aiCreditUsage.vision ?? 0,
-                        search: data?.aiCreditUsage.search ?? 0,
-                      },
-                    ]}
-                    margin={{ left: 12, right: 12 }}
-                  >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={8}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={8}
-                      fontSize={12}
-                      width={50}
-                    />
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent indicator="dot" />}
-                    />
-                    <Area
-                      dataKey="vision"
-                      type="monotone"
-                      fill="var(--color-vision)"
-                      fillOpacity={0.4}
-                      stroke="var(--color-vision)"
-                      strokeWidth={2}
-                    />
-                    <Area
-                      dataKey="search"
-                      type="monotone"
-                      fill="var(--color-search)"
-                      fillOpacity={0.3}
-                      stroke="var(--color-search)"
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ChartContainer>
-              </CardContent>
-              <CardFooter className="text-muted-foreground flex gap-4 text-xs">
-                <div className="flex items-center gap-1.5">
-                  <Eye className="size-3.5" /> AI Vision:{' '}
-                  {formatNumber(data?.aiCreditUsage.vision ?? 0)}
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Search className="size-3.5" /> AI Search:{' '}
-                  {formatNumber(data?.aiCreditUsage.search ?? 0)}
-                </div>
-              </CardFooter>
-            </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle>รายการขายล่าสุด</CardTitle>
@@ -320,7 +243,6 @@ export default function MerchantDashboardPage() {
                 )}
               </CardContent>
             </Card>
-
             <Card className="h-fit">
               <CardHeader>
                 <CardTitle>สินค้าใกล้หมด</CardTitle>

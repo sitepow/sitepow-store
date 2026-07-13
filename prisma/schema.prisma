@@ -461,15 +461,12 @@ model Store {
   isVatRegistered Boolean @default(false)
   vatRate         Decimal @default(7.0) @db.Decimal(10, 2)
 
-  plan            Plan        @default(STARTER)
-  status          StoreStatus @default(ACTIVE)
-  balance         Decimal     @default(0) @db.Decimal(10, 2)
-  aiVisionCredits Int         @default(0)
-  aiSearchCredits Int         @default(0)
+  plan    Plan        @default(STARTER)
+  status  StoreStatus @default(ACTIVE)
+  balance Decimal     @default(0) @db.Decimal(10, 2)
 
   platformPoints Int           @default(0)
   subscription   Subscription?
-  usage          StoreUsage?
 
   isPointsEnabled  Boolean  @default(false)
   pointEarningRate Decimal? @db.Decimal(10, 2)
@@ -487,7 +484,6 @@ model Store {
   customers            CustomerStore[]
   transactions         Transaction[]
   carts                Cart[]
-  aiLogs               AiLog[]
   branches             Branch[]
   activityLogs         ActivityLog[]
   coupons              Coupon[]
@@ -571,18 +567,6 @@ model Subscription {
   externalId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-}
-
-model StoreUsage {
-  id      String @id @default(cuid())
-  storeId String @unique
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  aiVisionUsed Int @default(0)
-  aiSearchUsed Int @default(0)
-  productCount Int @default(0)
-
-  lastResetDate DateTime @default(now())
 }
 
 enum SubStatus {
@@ -978,17 +962,6 @@ model CartItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model AiLog {
-  id      String @id @default(cuid())
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  action  String
-  prompt  String @db.Text
-  cost    Int    @default(1)
-
-  createdAt DateTime @default(now())
 }
 
 enum LogAction {

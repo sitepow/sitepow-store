@@ -1,5 +1,8 @@
 'use server'
 
+import { THAI_MONTHS } from '@/constants/system'
+import { OrderStatus } from '@/generated/prisma/enums'
+
 import { prisma } from '@/lib/prisma'
 
 export interface GetDashboardStatsResult {
@@ -36,23 +39,7 @@ export interface GetDashboardResult {
   salesTrend: SalesTrendItem[]
   recentSales: RecentSaleItem[]
   lowStock: LowStockItem[]
-  aiCreditUsage: { vision: number; search: number }
 }
-
-const THAI_MONTHS = [
-  'ม.ค.',
-  'ก.พ.',
-  'มี.ค.',
-  'เม.ย.',
-  'พ.ค.',
-  'มิ.ย.',
-  'ก.ค.',
-  'ส.ค.',
-  'ก.ย.',
-  'ต.ค.',
-  'พ.ย.',
-  'ธ.ค.',
-]
 
 export async function getDashboard(
   storeId: string,
@@ -103,13 +90,12 @@ export async function getDashboard(
     salesTrendRaw,
     recentOrdersRaw,
     lowStockRaw,
-    store,
   ] = await Promise.all([
     prisma.order.aggregate({
       where: {
         storeId,
         createdAt: { gte: startOfThisMonth },
-        status: { not: 'CANCELLED' },
+        status: { not: OrderStatus.CANCELLED },
       },
       _sum: { totalAmount: true },
     }),
@@ -117,7 +103,7 @@ export async function getDashboard(
       where: {
         storeId,
         createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-        status: { not: 'CANCELLED' },
+        status: { not: OrderStatus.CANCELLED },
       },
       _sum: { totalAmount: true },
     }),
@@ -134,7 +120,7 @@ export async function getDashboard(
       where: {
         storeId,
         createdAt: { gte: startOfToday },
-        status: { not: 'CANCELLED' },
+        status: { not: OrderStatus.CANCELLED },
       },
       _sum: { totalAmount: true },
     }),
@@ -142,7 +128,7 @@ export async function getDashboard(
       where: {
         storeId,
         createdAt: { gte: startOfYesterday, lte: endOfYesterday },
-        status: { not: 'CANCELLED' },
+        status: { not: OrderStatus.CANCELLED },
       },
       _sum: { totalAmount: true },
     }),
@@ -159,12 +145,12 @@ export async function getDashboard(
       where: {
         storeId,
         createdAt: { gte: sixMonthsAgo },
-        status: { not: 'CANCELLED' },
+        status: { not: OrderStatus.CANCELLED },
       },
       select: { totalAmount: true, createdAt: true },
     }),
     prisma.order.findMany({
-      where: { storeId, status: { not: 'CANCELLED' } },
+      where: { storeId, status: { not: OrderStatus.CANCELLED } },
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: {
@@ -185,10 +171,6 @@ export async function getDashboard(
         variant: { select: { product: { select: { id: true, title: true } } } },
       },
       take: 10,
-    }),
-    prisma.store.findUnique({
-      where: { id: storeId },
-      select: { aiVisionCredits: true, aiSearchCredits: true },
     }),
   ])
 
@@ -250,9 +232,5 @@ export async function getDashboard(
     salesTrend,
     recentSales,
     lowStock: Object.values(lowStockMap),
-    aiCreditUsage: {
-      vision: store?.aiVisionCredits ?? 0,
-      search: store?.aiSearchCredits ?? 0,
-    },
   }
 }

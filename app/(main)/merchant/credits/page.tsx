@@ -23,7 +23,6 @@ export default function CreditPage() {
         description="ตรวจสอบยอดเครดิตคงเหลือและประวัติการใช้บริการ AI และตรวจสลิปของคุณ"
         endContent={<StoreSelectField />}
       />
-
       {selectedStoreId !== ALL_STORES && (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <StoreCreditCard />
@@ -32,7 +31,6 @@ export default function CreditPage() {
           </div>
         </div>
       )}
-
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
     </DashboardSidebar>
   )

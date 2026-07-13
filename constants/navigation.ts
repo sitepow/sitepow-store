@@ -13,7 +13,6 @@ import {
   IconPackage,
   IconSettings,
   IconShoppingCart,
-  IconSparkles,
   IconTicket,
   IconUser,
   IconUsers,
@@ -163,12 +162,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'billing',
     icon: IconCreditCard,
     hasSeparatorBefore: true,
-  },
-  {
-    value: 'ai-usage',
-    label: 'เครดิต AI (Vision/Search)',
-    tab: 'ai',
-    icon: IconSparkles,
   },
   {
     value: 'loyalty',

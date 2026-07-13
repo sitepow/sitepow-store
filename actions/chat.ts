@@ -424,14 +424,12 @@ async function hasAiCredit(storeId: string) {
 async function chargeAiUsage({
   storeId,
   conversationId,
-  prompt,
   cost,
   inputTokens,
   outputTokens,
 }: {
   storeId: string
   conversationId: string
-  prompt: string
   cost: number
   inputTokens: number
   outputTokens: number
@@ -441,14 +439,6 @@ async function chargeAiUsage({
       prisma.store.update({
         where: { id: storeId },
         data: { balance: { decrement: cost } },
-      }),
-      prisma.aiLog.create({
-        data: {
-          storeId,
-          action: 'CHAT_REPLY',
-          prompt,
-          cost: inputTokens + outputTokens,
-        },
       }),
       prisma.transaction.create({
         data: {
@@ -511,7 +501,10 @@ async function handleAiResponse(
 
   const formattedHistory = recentMessages
     .reverse()
-    .map((m) => `${m.senderId === AI_BOT_ID ? 'AI' : 'User'}: ${m.content}`)
+    .map(
+      (m) =>
+        `${m.senderId === AI_BOT_ID ? UserRole.BOT : UserRole.CUSTOMER}: ${m.content}`,
+    )
     .join('\n')
 
   const aiResult = await generateAiSupportAction(content, formattedHistory)
@@ -557,7 +550,6 @@ async function handleAiResponse(
       await chargeAiUsage({
         storeId,
         conversationId,
-        prompt: content,
         cost,
         inputTokens: aiResult.usage.inputTokens,
         outputTokens: aiResult.usage.outputTokens,

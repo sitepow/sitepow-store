@@ -115,7 +115,7 @@ export async function getActivityLogs({
       },
     }
   } catch (error) {
-    console.error('Error fetching activity logs:', error)
+    console.error(error)
     return emptyResponse
   }
 }
