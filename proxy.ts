@@ -16,13 +16,17 @@ export const config = {
      * 3. /_static (inside /public)
      * 4. all root files inside /public (e.g. /favicon.ico)
      */
-    '/((?!api|_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)).*)',
+    '/((?!_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)).*)',
   ],
 }
 
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
+
+  if (url.pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
 
   const hostname = host
     .replace(/^www\./, '')
@@ -34,10 +38,6 @@ export default async function middleware(req: NextRequest) {
       /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)$/,
     )
   ) {
-    return NextResponse.next()
-  }
-
-  if (url.pathname.startsWith('/api')) {
     return NextResponse.next()
   }
 

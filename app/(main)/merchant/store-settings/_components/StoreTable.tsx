@@ -52,7 +52,7 @@ export function StoreTable() {
               <TableHead>ร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>สถานะ</TableHead>
-              <TableHead>วันที่เปิดใช้งาน</TableHead>
+              <TableHead>วันที่สร้างร้านค้า</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>

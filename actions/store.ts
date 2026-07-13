@@ -3,7 +3,7 @@
 import { cache } from 'react'
 
 import { PLAN_DETAILS } from '@/constants/plan'
-import { MILLISECONDS_PER_DAY, SUBSCRIPTION_DAYS } from '@/constants/system'
+import { PRICING_VALUE } from '@/constants/pricing'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
@@ -14,6 +14,8 @@ import {
   SubStatus,
 } from '@/generated/prisma/enums'
 import { queryKeyToRedisKey } from '@/utils/cache'
+import { formatDate } from '@/utils/date'
+import { calculatePlanPrice } from '@/utils/pricing'
 import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
@@ -38,12 +40,11 @@ export interface CreateStoreInput {
   isVatRegistered?: boolean
   vatRate?: number | string | Prisma.Decimal
   plan?: Plan
+  billingCycle?: string
   status?: StoreStatus
   isPointsEnabled?: boolean
   pointEarningRate?: number | string | Prisma.Decimal | null
   pointRedeemRate?: number | string | Prisma.Decimal | null
-  aiVisionCredits?: number
-  aiSearchCredits?: number
 }
 
 export interface UpdateStoreInput extends Partial<
@@ -302,6 +303,7 @@ export async function getStoreOptions(filters?: {
 
 export async function createStore(input: CreateStoreInput) {
   try {
+    const { billingCycle, ...storeData } = input
     const validatedInput = createStoreSchema.safeParse(input)
 
     if (!validatedInput.success) {
@@ -309,6 +311,28 @@ export async function createStore(input: CreateStoreInput) {
 
       return { success: false, message: errorMessage }
     }
+
+    const cycle = input.billingCycle ?? PRICING_VALUE.ONE_MONTH
+    const months =
+      cycle === PRICING_VALUE.TWELVE_MONTHS
+        ? 12
+        : cycle === PRICING_VALUE.SIX_MONTHS
+          ? 6
+          : cycle === PRICING_VALUE.THREE_MONTHS
+            ? 3
+            : 1
+
+    const startDate = new Date()
+    const endDate = new Date()
+    endDate.setMonth(endDate.getMonth() + months)
+
+    const selectedPlan = input.plan ?? Plan.STARTER
+    const isFreePlan = selectedPlan === Plan.FREE
+
+    const { finalPrice } = calculatePlanPrice(
+      PLAN_DETAILS[input.plan ?? Plan.STARTER].price.toString(),
+      cycle,
+    )
 
     const { name, slug } = validatedInput.data
 
@@ -332,35 +356,40 @@ export async function createStore(input: CreateStoreInput) {
 
     const store = await prisma.store.create({
       data: {
-        ...input,
+        ...storeData,
         subscription: {
           create: {
             plan: input.plan ?? Plan.STARTER,
             status: SubStatus.ACTIVE,
-            startDate: new Date(),
-            endDate: new Date(
-              Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
-            ),
+            startDate,
+            endDate,
           },
         },
         subscriptionInvoices: {
           create: {
             plan: input.plan ?? Plan.STARTER,
-            amount: PLAN_DETAILS[input.plan ?? Plan.STARTER].price,
-            status: InvoiceStatus.PAID,
-            paidAt: new Date(),
-            periodStart: new Date(),
-            periodEnd: new Date(
-              Date.now() + SUBSCRIPTION_DAYS * MILLISECONDS_PER_DAY,
-            ),
-            description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} เดือนแรก`,
+            amount: new Prisma.Decimal(finalPrice),
+            status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
+            paidAt: isFreePlan ? new Date() : undefined,
+            periodStart: startDate,
+            periodEnd: endDate,
+            description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
           },
         },
       },
-      select: storeSelect,
+      select: {
+        ...storeSelect,
+        subscriptionInvoices: {
+          select: { id: true },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
     })
 
-    await await createLog({
+    const invoiceId = store.subscriptionInvoices[0]?.id
+
+    await createLog({
       action: LogAction.CREATE_STORE,
       actorType: ActorType.MERCHANT,
       storeId: store.id,
@@ -371,7 +400,12 @@ export async function createStore(input: CreateStoreInput) {
 
     await invalidateStoreCache(slug)
 
-    return { success: true, message: 'สร้างร้านค้าสำเร็จแล้ว', data: store }
+    return {
+      success: true,
+      message: 'สร้างร้านค้าสำเร็จแล้ว',
+      data: store,
+      invoiceId,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

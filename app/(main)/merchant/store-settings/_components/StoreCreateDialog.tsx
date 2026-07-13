@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { useCreateStore } from '@/actions/hooks/store'
+import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
+import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatSlug } from '@/utils/slug'
@@ -28,6 +30,7 @@ import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 
 export function StoreCreateDialog() {
+  const { selectedTab } = usePricingStore()
   const { user } = useSession()
   const [open, setOpen] = useState(false)
   const createStoreMutation = useCreateStore()
@@ -62,6 +65,7 @@ export function StoreCreateDialog() {
     createStoreMutation.mutate(
       {
         ...values,
+        billingCycle: selectedTab,
         slug: formatSlug(values.slug),
         ownerId: user?.id ?? '',
       },
@@ -102,7 +106,8 @@ export function StoreCreateDialog() {
             <div className="text-muted-foreground border-b pb-1 text-sm font-semibold sm:col-span-2">
               1. เลือกแพลนการใช้งานของคุณ
             </div>
-            <div className="sm:col-span-2">
+            <div className="flex flex-col items-center gap-5 sm:col-span-2">
+              <PricingTabs />
               <PlanSelector isPending={createStoreMutation.isPending} />
             </div>
             <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">

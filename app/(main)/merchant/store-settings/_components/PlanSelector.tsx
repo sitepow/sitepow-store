@@ -2,10 +2,12 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { usePricingStore } from '@/app/(main)/pricing/store'
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
 import { PLAN_DETAILS } from '@/constants/plan'
+import { PRICING_VALUE } from '@/constants/pricing'
 import { Plan } from '@/generated/prisma/enums'
-import { formatNumber } from '@/utils/pricing'
+import { calculatePlanPrice, formatCurrency } from '@/utils/pricing'
 import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError } from '@/components/ui/field'
@@ -16,6 +18,7 @@ interface PlanSelectorProps {
 }
 
 export function PlanSelector({ isPending }: PlanSelectorProps) {
+  const selectedTab = usePricingStore((state) => state.selectedTab)
   const {
     control,
     setValue,
@@ -39,6 +42,13 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
         <div className="grid gap-3 sm:grid-cols-2">
           {(Object.keys(PLAN_DETAILS) as Plan[]).map((key) => {
             const plan = PLAN_DETAILS[key]
+            const {
+              finalPrice,
+              basePrice,
+              averagePerMonth,
+              totalPriceBeforeDiscount,
+              discountPercent,
+            } = calculatePlanPrice(plan.price.toString(), selectedTab)
 
             return (
               <RadioCard
@@ -49,11 +59,26 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
                 title={plan.name}
                 description={plan.description}
                 trailing={
-                  <div className="flex items-end gap-1 text-right">
-                    <b className="text-primary text-xl">
-                      {formatNumber(plan.price)} -.
-                    </b>
-                    <span className="block text-[10px] opacity-60">/เดือน</span>
+                  <div className="flex flex-col gap-0.5">
+                    {basePrice > 0 && discountPercent > 0 && (
+                      <span className="text-muted-foreground text-[10px] line-through">
+                        {formatCurrency(Number(totalPriceBeforeDiscount))}
+                      </span>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <b className="text-primary text-xl">
+                        {basePrice === 0
+                          ? formatCurrency(0)
+                          : formatCurrency(Number(finalPrice))}
+                      </b>
+                    </div>
+                    {basePrice > 0 &&
+                      selectedTab !== PRICING_VALUE.ONE_MONTH && (
+                        <span className="text-[10px] font-medium opacity-60">
+                          เฉลี่ย {formatCurrency(Number(averagePerMonth))} /
+                          เดือน
+                        </span>
+                      )}
                   </div>
                 }
               >

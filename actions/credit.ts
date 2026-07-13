@@ -25,13 +25,16 @@ export async function purchaseCredit({
   storeId,
   amount,
   description,
+  userId,
 }: {
   storeId: string
   amount: number
   description?: string
+  userId?: string
 }) {
   try {
-    const session = await auth()
+    const session = userId ? { user: { id: userId } } : await auth()
+
     if (!session?.user?.id) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }

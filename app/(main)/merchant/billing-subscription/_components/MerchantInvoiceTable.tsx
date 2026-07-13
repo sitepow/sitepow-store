@@ -2,15 +2,18 @@
 
 import { useState } from 'react'
 
+import { useCheckout } from '@/actions/hooks/checkout'
 import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
+import { GetSubscriptionInvoiceItemSerialized } from '@/actions/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { CheckoutType } from '@/types/checkout'
 import { formatDate } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
-import { IconDownload } from '@tabler/icons-react'
+import { IconArrowRight, IconDownload } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
@@ -30,6 +33,8 @@ export function MerchantInvoiceTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { mutate: checkout, isPending } = useCheckout()
+
   const { data: { data: invoices = [], meta } = {}, isLoading } =
     useSubscriptionInvoices({
       ownerId: user?.id ?? '',
@@ -37,6 +42,20 @@ export function MerchantInvoiceTable() {
       page,
       limit: 10,
     })
+
+  const handleCheckout = (inv: GetSubscriptionInvoiceItemSerialized) => {
+    checkout({
+      amount: Number(inv.amount),
+      description: inv.description!,
+      successUrl: `${window.location.origin}/merchant/billing-subscription`,
+      cancelUrl: `${window.location.origin}/merchant/billing-subscription`,
+      metadata: {
+        type: CheckoutType.SUBSCRIPTION,
+        relatedId: inv.id,
+        storeId: inv.store.id,
+      },
+    })
+  }
 
   return (
     <>
@@ -89,7 +108,7 @@ export function MerchantInvoiceTable() {
                           ? 'default'
                           : inv.status === InvoiceStatus.FAILED
                             ? 'destructive'
-                            : 'secondary'
+                            : 'outline'
                       }
                     >
                       {inv.status === InvoiceStatus.PAID
@@ -100,9 +119,20 @@ export function MerchantInvoiceTable() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="icon">
-                      <IconDownload />
-                    </Button>
+                    {inv.status === InvoiceStatus.UNPAID ? (
+                      <Button
+                        size="sm"
+                        onClick={() => handleCheckout(inv)}
+                        disabled={isPending}
+                      >
+                        {isPending ? 'กำลังไปยังหน้าชำระเงิน...' : 'ชำระเงิน'}
+                        <IconArrowRight />
+                      </Button>
+                    ) : (
+                      <Button variant="outline" size="icon">
+                        <IconDownload className="size-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

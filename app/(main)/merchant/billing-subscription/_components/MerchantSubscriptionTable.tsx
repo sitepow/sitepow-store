@@ -94,7 +94,7 @@ export function MerchantSubscriptionTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge>{plan.name}</Badge>
+                    <Badge variant="outline">{plan.name}</Badge>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">

@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { usePurchaseCredit } from '@/actions/hooks/credit'
+import { useCheckout } from '@/actions/hooks/checkout'
 import { PACKAGES } from '@/constants/credit'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { CheckoutType } from '@/types/checkout'
 import { getCredits } from '@/utils/credit'
 import { formatNumber } from '@/utils/pricing'
 import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/credit'
@@ -31,7 +32,6 @@ import { cn } from '@/lib/utils'
 export function PurchaseCreditDialog() {
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
-  const { mutate: purchase, isPending } = usePurchaseCredit()
 
   const getBonusCredits = (amount: number) => {
     const credits = getCredits(amount)
@@ -52,6 +52,8 @@ export function PurchaseCreditDialog() {
     defaultValues: { amount: 100, description: '' },
   })
 
+  const { mutate: checkout, isPending } = useCheckout()
+
   const amount = watch('amount') || 0
 
   const handleClose = () => {
@@ -64,14 +66,17 @@ export function PurchaseCreditDialog() {
       return
     }
 
-    purchase(
-      {
+    checkout({
+      amount: data.amount,
+      description: `เติมเครดิต AI จำนวน ${formatNumber(getCredits(amount))} เครดิต`,
+      successUrl: `${window.location.origin}/merchant/credits`,
+      cancelUrl: `${window.location.origin}/merchant/credits`,
+      metadata: {
+        type: CheckoutType.CREDIT,
+        relatedId: '',
         storeId: selectedStoreId,
-        amount: data.amount,
-        description: data.description,
       },
-      { onSuccess: handleClose },
-    )
+    })
   }
 
   return (
