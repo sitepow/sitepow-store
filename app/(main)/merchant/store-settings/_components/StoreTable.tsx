@@ -13,6 +13,7 @@ import { formatDateTime } from '@/utils/date'
 import {
   IconCreditCard,
   IconExternalLink,
+  IconHierarchy2,
   IconPackage,
   IconSettings,
 } from '@tabler/icons-react'
@@ -123,6 +124,16 @@ export function StoreTable() {
                         }}
                       >
                         <IconSettings />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        onClick={() => {
+                          setSelectedStoreId(store.id)
+                          router.push('/merchant/organization-branches')
+                        }}
+                      >
+                        <IconHierarchy2 />
                       </Button>
                       <Button
                         variant="outline"

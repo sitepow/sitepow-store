@@ -333,15 +333,6 @@ export async function createStore(input: CreateStoreInput) {
     const store = await prisma.store.create({
       data: {
         ...input,
-        usage: {
-          create: {},
-        },
-        branches: {
-          create: {
-            name: 'สาขาหลัก',
-            isMain: true,
-          },
-        },
         subscription: {
           create: {
             plan: input.plan ?? Plan.STARTER,

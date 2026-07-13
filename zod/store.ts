@@ -31,7 +31,6 @@ export const createStoreSchema = z
       }),
     lineId: z.string().optional().or(z.literal('')),
     facebookPage: z.string().optional().or(z.literal('')),
-    // address: z.string().optional().or(z.literal('')),
     taxId: z
       .string()
       .optional()
