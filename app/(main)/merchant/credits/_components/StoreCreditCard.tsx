@@ -61,7 +61,7 @@ export function StoreCreditCard() {
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="text-muted-foreground pb-4 text-[11px] leading-relaxed">
+      <CardContent className="text-muted-foreground max-w-96 pb-4 text-[11px] leading-relaxed">
         ใช้ชำระค่าบริการ AI และตรวจสลิปอัตโนมัติ ช่วยลดงานแมนนวล เพิ่มความแม่นยำ
         และปิดการขายได้อย่างรวดเร็วตลอด 24 ชั่วโมง
         {!isLoading && balance > 0 && (

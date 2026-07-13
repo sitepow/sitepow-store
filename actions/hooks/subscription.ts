@@ -39,8 +39,14 @@ export function useChangePlan() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ storeId, plan }: { storeId: string; plan: Plan }) =>
-      await changePlan(storeId, plan),
+    mutationFn: async ({
+      storeId,
+      plan,
+    }: {
+      storeId: string
+      plan: Plan
+      billingCycle?: string
+    }) => await changePlan(storeId, plan),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: subscriptionKeys.all })
     },

@@ -1,6 +1,7 @@
 'use server'
 
 import { PLAN_RANK } from '@/constants/plan'
+import { PRICING_VALUE } from '@/constants/pricing'
 import {
   ActorType,
   LogAction,
@@ -157,7 +158,11 @@ export async function cancelSubscription(storeId: string) {
   return { success: true, message: 'ยกเลิก Subscription สำเร็จแล้ว' }
 }
 
-export async function changePlan(storeId: string, newPlan: Plan) {
+export async function changePlan(
+  storeId: string,
+  newPlan: Plan,
+  billingCycle: string = PRICING_VALUE.ONE_MONTH,
+) {
   try {
     if (!storeId) {
       return { success: false, message: 'ไม่พบ Store ID' }
@@ -171,6 +176,18 @@ export async function changePlan(storeId: string, newPlan: Plan) {
     if (!subscription) {
       return { success: false, message: 'ไม่พบข้อมูล Subscription' }
     }
+
+    const months =
+      billingCycle === PRICING_VALUE.TWELVE_MONTHS
+        ? 12
+        : billingCycle === PRICING_VALUE.SIX_MONTHS
+          ? 6
+          : billingCycle === PRICING_VALUE.THREE_MONTHS
+            ? 3
+            : 1
+
+    const nextEndDate = new Date()
+    nextEndDate.setMonth(nextEndDate.getMonth() + months)
 
     const isUpgrade = PLAN_RANK[newPlan] > PLAN_RANK[subscription.plan]
     const isSamePlan = newPlan === subscription.plan
@@ -191,6 +208,7 @@ export async function changePlan(storeId: string, newPlan: Plan) {
           data: {
             plan: newPlan,
             status: SubStatus.ACTIVE,
+            endDate: nextEndDate,
             pendingPlan: null,
             pendingPlanAt: null,
           },
@@ -203,7 +221,12 @@ export async function changePlan(storeId: string, newPlan: Plan) {
         storeId,
         entity: 'Subscription',
         entityId: storeId,
-        details: { from: subscription.plan, to: newPlan, type: 'upgrade' },
+        details: {
+          from: subscription.plan,
+          to: newPlan,
+          type: 'upgrade',
+          cycle: billingCycle,
+        },
       })
 
       return {
@@ -239,9 +262,7 @@ export async function changePlan(storeId: string, newPlan: Plan) {
     }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-    }
+    return { success: false }
   }
 }
 

@@ -43,6 +43,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
+import { StoreCreditCard } from '../credits/_components/StoreCreditCard'
+
 function pctChange(current: number, previous: number): string {
   if (previous === 0 && current === 0) {
     return '0% จากเดือนที่แล้ว'
@@ -157,6 +159,7 @@ export default function MerchantDashboardPage() {
               />
             ))}
           </div>
+          <StoreCreditCard />
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             <Card>
               <CardHeader>

@@ -92,20 +92,12 @@ export function StoreTable() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge>
+                      <Badge variant="outline">
                         {PLAN_DETAILS[store.plan]?.name || store.plan}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          isActive
-                            ? 'default'
-                            : isMaintenance
-                              ? 'outline'
-                              : 'destructive'
-                        }
-                      >
+                      <Badge variant="outline">
                         {isActive
                           ? 'เปิดใช้งานอยู่'
                           : isMaintenance

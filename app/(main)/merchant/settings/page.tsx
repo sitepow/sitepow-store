@@ -54,7 +54,7 @@ export default function MerchantSettingsPage() {
             <IconReceiptTax size={14} /> ภาษีและใบกำกับ
           </TabsTrigger>
           <TabsTrigger value="settings-shipping">
-            <IconTruck size={14} /> ระบบขนส่ง
+            <IconTruck size={14} /> ระบบขนส่งสินค้า
           </TabsTrigger>
           <TabsTrigger value="settings-payment">
             <IconCreditCard size={14} /> ช่องทางรับชำระเงิน
