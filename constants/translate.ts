@@ -4,6 +4,7 @@ import {
   CustomerType,
   DeliveryStatus,
   DiscountType,
+  InvoiceStatus,
   LogAction,
   OrderStatus,
   PaymentMethod,
@@ -147,6 +148,13 @@ export const PRODUCT_TYPE_OPTIONS = Object.entries(PRODUCT_TYPE_TH).map(
   }),
 )
 
+export const INVOICE_STATUS_TH: Record<InvoiceStatus, string> = {
+  [InvoiceStatus.PAID]: 'ชำระแล้ว',
+  [InvoiceStatus.UNPAID]: 'รอชำระ',
+  [InvoiceStatus.FAILED]: 'ล้มเหลว',
+  [InvoiceStatus.CANCELLED]: 'ยกเลิก',
+}
+
 export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
@@ -162,4 +170,5 @@ export const getLabel = {
   subStatus: (v: SubStatus) => SUB_STATUS_TH[v] || v,
   transferStatus: (v: TransferStatus) => TRANSFER_STATUS_TH[v] || v,
   productType: (v: ProductType) => PRODUCT_TYPE_TH[v] || v,
+  invoiceStatus: (v: InvoiceStatus) => INVOICE_STATUS_TH[v] || v,
 }

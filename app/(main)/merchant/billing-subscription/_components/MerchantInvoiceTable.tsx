@@ -7,6 +7,7 @@ import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
 import { GetSubscriptionInvoiceItemSerialized } from '@/actions/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
+import { getLabel } from '@/constants/translate'
 import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -67,6 +68,7 @@ export function MerchantInvoiceTable() {
               <TableHead>สำหรับร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>รอบบริการ</TableHead>
+              <TableHead>สิทธิ์การใช้งาน</TableHead>
               <TableHead>ยอด</TableHead>
               <TableHead>สถานะ</TableHead>
               <TableHead className="text-right"></TableHead>
@@ -91,10 +93,13 @@ export function MerchantInvoiceTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-sm">
                       {formatDate(inv.periodStart)} –{' '}
                       {formatDate(inv.periodEnd)}
                     </span>
+                  </TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    {PLAN_DETAILS[inv.plan].features.join(', ')}
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
@@ -109,13 +114,10 @@ export function MerchantInvoiceTable() {
                           : 'outline'
                       }
                     >
-                      {inv.status === InvoiceStatus.PAID
-                        ? 'ชำระแล้ว'
-                        : inv.status === InvoiceStatus.FAILED
-                          ? 'ล้มเหลว'
-                          : 'รอชำระ'}
+                      {getLabel.invoiceStatus(inv.status)}
                     </Badge>
                   </TableCell>
+                  <TableCell></TableCell>
                   <TableCell className="text-right">
                     {inv.status === InvoiceStatus.UNPAID ? (
                       <Button

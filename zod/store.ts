@@ -43,7 +43,7 @@ export const createStoreSchema = z
       .number()
       .min(0, { message: 'อัตราภาษีต้องไม่ต่ำกว่า 0%' })
       .default(7.0),
-    isPointsEnabled: z.boolean().default(false),
+    isPointsEnabled: z.boolean().default(true),
     pointEarningRate: z
       .number()
       .min(0, { message: 'อัตราแต้มที่ได้รับต้องมากกว่าหรือเท่ากับ 0' })
@@ -51,7 +51,8 @@ export const createStoreSchema = z
     pointRedeemRate: z
       .number()
       .min(0, { message: 'มูลค่าของแต้มต้องมากกว่าหรือเท่ากับ 0' })
-      .optional(),
+      .optional()
+      .default(0.35),
     plan: z.enum(Plan).default(Plan.STARTER),
   })
   .superRefine((data, ctx) => {

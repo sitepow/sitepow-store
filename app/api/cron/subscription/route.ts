@@ -51,12 +51,14 @@ export async function GET(request: Request) {
     })
 
     for (const sub of expiringSubscriptions) {
-      const monthsInCycle = Math.max(
-        1,
-        Math.round(
-          differenceInMonths(new Date(sub.endDate), new Date(sub.startDate)),
-        ),
-      )
+      const billingCycle =
+        sub.pendingPlanCycle ||
+        differenceInMonths(
+          new Date(sub.endDate),
+          new Date(sub.startDate),
+        ).toString()
+
+      const monthsInCycle = parseInt(billingCycle) || 1
 
       const nextPlan = sub.pendingPlan || sub.plan
       const nextEndDate = addMonths(new Date(sub.endDate), monthsInCycle)
@@ -85,6 +87,7 @@ export async function GET(request: Request) {
             endDate: nextEndDate,
             pendingPlan: null,
             pendingPlanAt: null,
+            pendingPlanCycle: null,
           },
         }),
         prisma.store.update({

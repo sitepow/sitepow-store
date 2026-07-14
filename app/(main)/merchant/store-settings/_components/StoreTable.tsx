@@ -10,7 +10,9 @@ import { PLAN_DETAILS } from '@/constants/plan'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
+import { getSubscriptionStatusInfo } from '@/utils/pricing'
 import {
+  IconAlertTriangle,
   IconCreditCard,
   IconExternalLink,
   IconHierarchy2,
@@ -23,6 +25,7 @@ import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import {
   Table,
   TableBody,
@@ -52,6 +55,8 @@ export function StoreTable() {
               <TableHead>ร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>สถานะ</TableHead>
+              <TableHead>สถานะและระยะเวลาคงเหลือ</TableHead>
+              <TableHead>สิทธิ์การใช้งาน (ปัจจุบัน)</TableHead>
               <TableHead>วันที่สร้างร้านค้า</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
@@ -71,6 +76,9 @@ export function StoreTable() {
                 const formattedDate = store.createdAt
                   ? formatDateTime(store.createdAt)
                   : '-'
+
+                const { isPastDue, isCanceled, daysRemaining, progressValue } =
+                  getSubscriptionStatusInfo(store.subscription)
 
                 return (
                   <TableRow key={store.id}>
@@ -104,6 +112,29 @@ export function StoreTable() {
                             ? 'ปิดปรับปรุงชั่วคราว'
                             : 'ถูกระงับการใช้งาน'}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="max-w-75">
+                      {isPastDue ? (
+                        <div className="flex flex-col space-y-1.5">
+                          <div className="text-destructive flex items-center gap-1 text-sm">
+                            <IconAlertTriangle size={16} />
+                            <span>เกินกำหนดชำระ ({daysRemaining} วัน)</span>
+                          </div>
+                          <Progress value={progressValue} className="h-1" />
+                        </div>
+                      ) : (
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            คงเหลือ {daysRemaining} วัน
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                      {PLAN_DETAILS[store.plan].features.join(', ')}
                     </TableCell>
                     <TableCell>{formattedDate}</TableCell>
                     <TableCell className="space-x-2 text-right">

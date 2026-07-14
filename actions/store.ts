@@ -15,7 +15,7 @@ import {
 } from '@/generated/prisma/enums'
 import { queryKeyToRedisKey } from '@/utils/cache'
 import { formatDate } from '@/utils/date'
-import { serializeDecimal } from '@/utils/decimal'
+import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { createStoreSchema } from '@/zod/store'
 
@@ -78,6 +78,16 @@ const storeSelect = {
   status: true,
   logo: true,
   createdAt: true,
+  subscription: {
+    select: {
+      id: true,
+      status: true,
+      startDate: true,
+      endDate: true,
+      pendingPlan: true,
+      pendingPlanAt: true,
+    },
+  },
 } satisfies Prisma.StoreSelect
 
 export type GetStoresItem = Prisma.StoreGetPayload<{
@@ -89,7 +99,7 @@ export type GetStoreOptionsItem = Prisma.StoreGetPayload<{
 }>
 
 export interface GetStoresResponse {
-  data: GetStoresItem[]
+  data: DecimalToNumber<GetStoresItem[]>
   meta: {
     currentPage: number
     limit: number
@@ -254,7 +264,7 @@ export async function getStores({
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: stores,
+      data: serializeDecimal(stores),
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,

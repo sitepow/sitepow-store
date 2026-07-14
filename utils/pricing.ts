@@ -42,20 +42,32 @@ export const formatNumber = (num: number) => {
   return num.toLocaleString()
 }
 
+export interface SubscriptionStatusInfo {
+  status: SubStatus
+  startDate: Date | string
+  endDate: Date | string
+}
+
 export const getSubscriptionStatusInfo = (
-  sub: GetSubscriptionItemSerialized,
+  sub: SubscriptionStatusInfo | null | undefined,
 ) => {
+  if (!sub) {
+    return {
+      isPastDue: false,
+      isCanceled: false,
+      daysRemaining: 0,
+      progressValue: 0,
+    }
+  }
+
   const isPastDue = sub.status === SubStatus.PAST_DUE
   const isCanceled = sub.status === SubStatus.CANCELED
 
-  const totalDays = differenceInDays(
-    new Date(sub.endDate),
-    new Date(sub.startDate),
-  )
-  const daysRemaining = Math.max(
-    0,
-    differenceInDays(new Date(sub.endDate), new Date()),
-  )
+  const startDate = new Date(sub.startDate)
+  const endDate = new Date(sub.endDate)
+
+  const totalDays = differenceInDays(endDate, startDate)
+  const daysRemaining = Math.max(0, differenceInDays(endDate, new Date()))
   const progressValue = totalDays > 0 ? (daysRemaining / totalDays) * 100 : 0
 
   return { isPastDue, isCanceled, daysRemaining, progressValue }

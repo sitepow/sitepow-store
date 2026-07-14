@@ -9,6 +9,7 @@ import {
 import { subscriptionKeys } from '../query-keys/subscription'
 import {
   calculateUpgradeCost,
+  cancelPendingPlanChange,
   changePlan,
   getStoreSubscriptions,
   getSubscriptionInvoices,
@@ -26,6 +27,8 @@ export function useStoreSubscriptions(ownerId: string) {
 }
 
 export function useInitiatePlanUpgrade() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async ({
       storeId,
@@ -36,6 +39,9 @@ export function useInitiatePlanUpgrade() {
       newPlan: Plan
       billingCycle: string
     }) => await initiatePlanUpgrade(storeId, newPlan, billingCycle),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.all })
+    },
   })
 }
 
@@ -46,11 +52,13 @@ export function useChangePlan() {
     mutationFn: async ({
       storeId,
       plan,
+      billingCycle,
     }: {
       storeId: string
       plan: Plan
       billingCycle?: string
-    }) => await changePlan(storeId, plan),
+    }) => await changePlan(storeId, plan, billingCycle),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: subscriptionKeys.all })
     },
@@ -101,4 +109,15 @@ export function useUpgradeCost({
       enabled: !!storeId && !!newPlan && !!billingCycle,
     }),
   )
+}
+
+export const useCancelPendingPlanChange = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (storeId: string) => cancelPendingPlanChange(storeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.all })
+    },
+  })
 }

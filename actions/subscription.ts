@@ -8,6 +8,7 @@ import {
   LogAction,
   Plan,
   Prisma,
+  StoreStatus,
   SubStatus,
 } from '@/generated/prisma/client'
 import { CheckoutType, UpgradeType } from '@/types/checkout'
@@ -27,6 +28,7 @@ const subscriptionSelect = {
   endDate: true,
   pendingPlan: true,
   pendingPlanAt: true,
+  pendingPlanCycle: true,
   createdAt: true,
   store: {
     select: {
@@ -137,6 +139,15 @@ export async function changePlan(
       return { success: false, message: 'ไม่พบข้อมูล Subscription' }
     }
 
+    if (subscription.plan === newPlan) {
+      return { success: false, message: 'คุณกำลังใช้งานแพลนนี้อยู่แล้ว' }
+    }
+
+    const isFreePlan = newPlan === Plan.FREE
+    const { finalPrice: newPlanPrice } = isFreePlan
+      ? { finalPrice: 0 }
+      : calculatePlanPrice(PLAN_DETAILS[newPlan].price.toString(), billingCycle)
+
     const months =
       billingCycle === PRICING_VALUE.TWELVE_MONTHS
         ? 12
@@ -149,19 +160,24 @@ export async function changePlan(
     const nextEndDate = new Date()
     nextEndDate.setMonth(nextEndDate.getMonth() + months)
 
+    const unpaidInvoice = await prisma.subscriptionInvoice.findFirst({
+      where: { storeId, status: InvoiceStatus.UNPAID },
+      orderBy: { createdAt: 'desc' },
+    })
+
     const isUpgrade = PLAN_RANK[newPlan] > PLAN_RANK[subscription.plan]
-    const isSamePlan = newPlan === subscription.plan
-    const isCanceled = subscription.status === SubStatus.CANCELED
 
-    if (isSamePlan && !isCanceled) {
-      return { success: false, message: 'คุณใช้แพลนนี้อยู่แล้ว' }
-    }
+    const canChangeImmediately =
+      (!!unpaidInvoice ||
+        isUpgrade ||
+        subscription.status === SubStatus.CANCELED) &&
+      !isFreePlan
 
-    if (isUpgrade || isCanceled) {
-      await prisma.$transaction([
+    if (canChangeImmediately) {
+      const transactionOps = [
         prisma.store.update({
           where: { id: storeId },
-          data: { plan: newPlan },
+          data: { plan: newPlan, status: StoreStatus.ACTIVE },
         }),
         prisma.subscription.update({
           where: { storeId },
@@ -171,9 +187,34 @@ export async function changePlan(
             endDate: nextEndDate,
             pendingPlan: null,
             pendingPlanAt: null,
+            pendingPlanCycle: null,
           },
         }),
-      ])
+        prisma.subscriptionInvoice.create({
+          data: {
+            storeId,
+            plan: newPlan,
+            amount: newPlanPrice,
+            status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
+            paidAt: isFreePlan ? new Date() : null,
+            periodStart: new Date(),
+            periodEnd: nextEndDate,
+            description: isFreePlan
+              ? 'แพลนเริ่มต้นใช้งานฟรี'
+              : `ค่าบริการแพลน ${newPlan}`,
+          },
+        }),
+      ]
+
+      if (unpaidInvoice) {
+        transactionOps.unshift(
+          prisma.subscriptionInvoice.delete({
+            where: { id: unpaidInvoice.id },
+          }),
+        )
+      }
+
+      await prisma.$transaction(transactionOps)
 
       await createLog({
         action: LogAction.CHANGE_PLAN,
@@ -184,7 +225,7 @@ export async function changePlan(
         details: {
           from: subscription.plan,
           to: newPlan,
-          type: 'upgrade',
+          type: 'immediate',
           cycle: billingCycle,
         },
       })
@@ -199,6 +240,7 @@ export async function changePlan(
         data: {
           pendingPlan: newPlan,
           pendingPlanAt: subscription.endDate,
+          pendingPlanCycle: billingCycle,
         },
       })
 
@@ -217,7 +259,7 @@ export async function changePlan(
 
       return {
         success: true,
-        message: `ตั้งค่าลดแพลนเป็น ${newPlan} เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
+        message: `ตั้งค่าเปลี่ยนแพลนเป็น ${newPlan} เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
       }
     }
   } catch (error) {
@@ -397,4 +439,37 @@ export async function calculateUpgradeCost(
   )
 
   return { amountToPay: Math.max(0, amountToPay) }
+}
+
+export async function cancelPendingPlanChange(storeId: string) {
+  try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    await prisma.subscription.update({
+      where: { storeId },
+      data: {
+        pendingPlan: null,
+        pendingPlanAt: null,
+        pendingPlanCycle: null,
+      },
+    })
+
+    await createLog({
+      action: LogAction.CHANGE_PLAN,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Subscription',
+      entityId: storeId,
+      details: {
+        message: 'ยกเลิกการรอเปลี่ยนแพลนแล้ว',
+      },
+    })
+
+    return { success: true, message: 'ยกเลิกการรอเปลี่ยนแพลนเรียบร้อยแล้ว' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
 }

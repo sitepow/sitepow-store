@@ -50,9 +50,9 @@ export function StoreCreateDialog() {
       taxId: '',
       isVatRegistered: false,
       vatRate: 7.0,
-      isPointsEnabled: false,
+      isPointsEnabled: true,
       pointEarningRate: 100,
-      pointRedeemRate: 1,
+      pointRedeemRate: 0.35,
       plan: Plan.STARTER,
     },
   })

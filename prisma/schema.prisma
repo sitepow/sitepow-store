@@ -468,9 +468,9 @@ model Store {
   platformPoints Int           @default(0)
   subscription   Subscription?
 
-  isPointsEnabled  Boolean  @default(false)
+  isPointsEnabled  Boolean  @default(true)
   pointEarningRate Decimal? @db.Decimal(10, 2)
-  pointRedeemRate  Decimal? @db.Decimal(10, 2)
+  pointRedeemRate  Decimal? @default(0.35) @db.Decimal(10, 2)
 
   notifyLowStock     Boolean @default(true)
   notifyDailySummary Boolean @default(true)
@@ -532,6 +532,7 @@ enum InvoiceStatus {
   PAID
   UNPAID
   FAILED
+  CANCELLED
 }
 
 model SubscriptionInvoice {
@@ -557,12 +558,13 @@ model Subscription {
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  plan          Plan
-  status        SubStatus @default(ACTIVE)
-  startDate     DateTime  @default(now())
-  endDate       DateTime
-  pendingPlan   Plan?
-  pendingPlanAt DateTime?
+  plan             Plan
+  status           SubStatus @default(ACTIVE)
+  startDate        DateTime  @default(now())
+  endDate          DateTime
+  pendingPlan      Plan?
+  pendingPlanAt    DateTime?
+  pendingPlanCycle String?
 
   externalId String?
   createdAt  DateTime @default(now())

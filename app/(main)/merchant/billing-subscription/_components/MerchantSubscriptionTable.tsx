@@ -1,11 +1,10 @@
 'use client'
 
 import {
-  // useCancelSubscription,
+  useCancelPendingPlanChange,
   useStoreSubscriptions,
 } from '@/actions/hooks/subscription'
 import { PLAN_DETAILS } from '@/constants/plan'
-// import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDate } from '@/utils/date'
 import {
@@ -13,12 +12,13 @@ import {
   formatCurrency,
   getSubscriptionStatusInfo,
 } from '@/utils/pricing'
-import { IconAlertTriangle } from '@tabler/icons-react'
+import { IconAlertTriangle, IconX } from '@tabler/icons-react'
+import { differenceInDays } from 'date-fns'
 
-// import { CancelSubscriptionButton } from '@/components/CancelSubscriptionButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import {
   Table,
@@ -36,7 +36,7 @@ export function MerchantSubscriptionTable() {
   const { data: subscriptions = [], isLoading } = useStoreSubscriptions(
     user?.id ?? '',
   )
-  // const cancelSubscriptionMutation = useCancelSubscription()
+  const cancelPendingMutation = useCancelPendingPlanChange()
 
   return (
     <div className="overflow-hidden rounded-xl border">
@@ -65,6 +65,12 @@ export function MerchantSubscriptionTable() {
               const { isPastDue, isCanceled, daysRemaining, progressValue } =
                 getSubscriptionStatusInfo(sub)
               const monthlyAverage = calculateMonthlyAverage(sub, plan.price)
+              const daysUntilChange = sub.pendingPlanAt
+                ? Math.max(
+                    0,
+                    differenceInDays(new Date(sub.pendingPlanAt), new Date()),
+                  )
+                : 0
 
               return (
                 <TableRow key={sub.id}>
@@ -79,9 +85,30 @@ export function MerchantSubscriptionTable() {
                           <Badge variant="secondary">ยกเลิกแล้ว</Badge>
                         )}
                         {sub.pendingPlan && !isCanceled && (
-                          <Badge variant="outline">
-                            รอลดแพลน → {PLAN_DETAILS[sub.pendingPlan].name}
-                          </Badge>
+                          <div className="flex flex-col gap-2">
+                            <Badge variant="outline">
+                              รอลดแพลนเป็น →{' '}
+                              {PLAN_DETAILS[sub.pendingPlan].name}
+                              {sub.pendingPlanCycle &&
+                                ` (${sub.pendingPlanCycle})`}
+                            </Badge>
+                            <span className="text-muted-foreground text-xs">
+                              มีผลในอีก {daysUntilChange} วัน (วันที่{' '}
+                              {formatDate(sub.pendingPlanAt!)})
+                            </span>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="w-fit"
+                              onClick={() =>
+                                cancelPendingMutation.mutate(sub.store.id)
+                              }
+                              disabled={cancelPendingMutation.isPending}
+                            >
+                              <IconX size={14} className="mr-1" />{' '}
+                              ยกเลิกการเปลี่ยนแพลน
+                            </Button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -124,11 +151,18 @@ export function MerchantSubscriptionTable() {
                         </span>
                       </div>
                     ) : isCanceled ? (
-                      <span className="text-muted-foreground text-sm">
+                      <span className="text-sm">
                         ใช้งานได้ถึง {formatDate(sub.endDate)}
                       </span>
                     ) : (
-                      <span className="text-sm opacity-60">ปกติ</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          คงเหลือ {daysRemaining} วัน
+                        </span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -141,20 +175,10 @@ export function MerchantSubscriptionTable() {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {/* {sub.store.plan !== Plan.FREE && !isCanceled && (
-                        <CancelSubscriptionButton
-                          isPending={cancelSubscriptionMutation.isPending}
-                          onCancel={() =>
-                            cancelSubscriptionMutation.mutate(sub.store.id)
-                          }
-                        />
-                      )} */}
-                      <ChangePlanDialog
-                        storeId={sub.store.id}
-                        currentPlan={sub.store.plan}
-                      />
-                    </div>
+                    <ChangePlanDialog
+                      storeId={sub.store.id}
+                      currentPlan={sub.store.plan}
+                    />
                   </TableCell>
                 </TableRow>
               )
