@@ -8,6 +8,7 @@ import {
 
 import { subscriptionKeys } from '../query-keys/subscription'
 import {
+  calculateUpgradeCost,
   changePlan,
   getStoreSubscriptions,
   getSubscriptionInvoices,
@@ -75,6 +76,29 @@ export function useSubscriptionInvoices({
       queryFn: async () => await getSubscriptionInvoices(filters),
       enabled: !!ownerId,
       placeholderData: (previousData) => previousData,
+    }),
+  )
+}
+
+export function useUpgradeCost({
+  storeId,
+  newPlan,
+  billingCycle,
+}: {
+  storeId: string
+  newPlan: Plan
+  billingCycle: string
+}) {
+  return useQuery(
+    queryOptions({
+      queryKey: subscriptionKeys.upgradeCost({
+        storeId,
+        newPlan,
+        billingCycle,
+      }),
+      queryFn: async () =>
+        await calculateUpgradeCost(storeId, newPlan, billingCycle),
+      enabled: !!storeId && !!newPlan && !!billingCycle,
     }),
   )
 }

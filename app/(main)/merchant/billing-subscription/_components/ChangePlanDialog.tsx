@@ -8,11 +8,13 @@ import { useRouter } from 'next/navigation'
 import {
   useChangePlan,
   useInitiatePlanUpgrade,
+  useUpgradeCost,
 } from '@/actions/hooks/subscription'
 import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { UpgradeType } from '@/types/checkout'
+import { formatCurrency } from '@/utils/pricing'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
@@ -27,7 +29,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Spinner } from '@/components/ui/spinner'
 
 import { PlanSelector } from '../../store-settings/_components/PlanSelector'
 
@@ -54,7 +55,16 @@ export function ChangePlanDialog({
     },
   })
 
-  const { handleSubmit, reset } = methods
+  const { handleSubmit, reset, watch } = methods
+  const selectedPlan = watch('plan')
+
+  const { data: costData } = useUpgradeCost({
+    storeId,
+    newPlan: selectedPlan,
+    billingCycle: selectedTab,
+  })
+
+  const upgradeCost = costData?.amountToPay ?? 0
 
   const handleClose = () => {
     reset()
@@ -117,17 +127,8 @@ export function ChangePlanDialog({
           >
             ยกเลิก
           </Button>
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            disabled={changePlanMutation.isPending}
-          >
-            {changePlanMutation.isPending ? (
-              <>
-                <Spinner /> กำลังบันทึก...
-              </>
-            ) : (
-              'ยืนยันการเปลี่ยนแพลน'
-            )}
+          <Button onClick={handleSubmit(onSubmit)}>
+            {`ยืนยันการเปลี่ยนแพลน ${upgradeCost > 0 ? `(ชำระเพิ่ม ${formatCurrency(upgradeCost)})` : ''}`}
           </Button>
         </DialogFooter>
       </DialogContent>

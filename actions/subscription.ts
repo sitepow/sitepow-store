@@ -358,3 +358,43 @@ export async function initiatePlanUpgrade(
     return { success: false }
   }
 }
+
+export async function calculateUpgradeCost(
+  storeId: string,
+  newPlan: Plan,
+  billingCycle: string,
+) {
+  const sub = await prisma.subscription.findUnique({
+    where: { storeId },
+    select: { startDate: true, endDate: true, plan: true },
+  })
+
+  if (!sub || sub.plan === newPlan) {
+    return { amountToPay: 0 }
+  }
+
+  const lastInvoice = await prisma.subscriptionInvoice.findFirst({
+    where: { storeId, status: InvoiceStatus.PAID },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  if (!lastInvoice) {
+    return { amountToPay: 0 }
+  }
+
+  const { finalPrice: newPlanPrice } = calculatePlanPrice(
+    PLAN_DETAILS[newPlan].price.toString(),
+    billingCycle,
+  )
+
+  const { amountToPay } = calculateProration(
+    {
+      startDate: sub.startDate,
+      endDate: sub.endDate,
+      amountPaid: Number(lastInvoice.amount),
+    },
+    newPlanPrice,
+  )
+
+  return { amountToPay: Math.max(0, amountToPay) }
+}
