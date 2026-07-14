@@ -1,18 +1,23 @@
 'use server'
 
-import { PLAN_RANK } from '@/constants/plan'
+import { PLAN_DETAILS, PLAN_RANK } from '@/constants/plan'
 import { PRICING_VALUE } from '@/constants/pricing'
 import {
   ActorType,
+  InvoiceStatus,
   LogAction,
   Plan,
   Prisma,
   SubStatus,
 } from '@/generated/prisma/client'
+import { CheckoutType, UpgradeType } from '@/types/checkout'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { calculatePlanPrice, calculateProration } from '@/utils/pricing'
 
 import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
+
+import { createCheckoutSession } from './stripe/checkout'
 
 const subscriptionSelect = {
   id: true,
@@ -111,55 +116,6 @@ export async function getStoreSubscription(
       select: subscriptionSelect,
     }),
   )
-}
-
-export async function cancelSubscription(storeId: string) {
-  if (!storeId) {
-    return { success: false, message: 'ไม่พบ Store ID' }
-  }
-
-  const subscription = await prisma.subscription.findUnique({
-    where: { storeId },
-    select: { id: true, plan: true, status: true, endDate: true },
-  })
-
-  if (!subscription) {
-    return { success: false, message: 'ไม่พบข้อมูล Subscription' }
-  }
-
-  if (subscription.plan === Plan.FREE) {
-    return { success: false, message: 'ไม่สามารถยกเลิกแพลนฟรีได้' }
-  }
-
-  if (subscription.status === SubStatus.CANCELED) {
-    return { success: false, message: 'Subscription ถูกยกเลิกไปแล้ว' }
-  }
-
-  await prisma.$transaction([
-    prisma.store.update({
-      where: { id: storeId },
-      data: { plan: Plan.FREE },
-    }),
-    prisma.subscription.update({
-      where: { storeId },
-      data: {
-        status: SubStatus.CANCELED,
-        pendingPlan: Plan.FREE,
-        pendingPlanAt: subscription.endDate ?? new Date(),
-      },
-    }),
-  ])
-
-  await createLog({
-    action: LogAction.CHANGE_PLAN,
-    actorType: ActorType.MERCHANT,
-    storeId,
-    entity: 'Subscription',
-    entityId: storeId,
-    details: { from: subscription.plan, to: Plan.FREE, reason: 'canceled' },
-  })
-
-  return { success: true, message: 'ยกเลิก Subscription สำเร็จแล้ว' }
 }
 
 export async function changePlan(
@@ -327,5 +283,78 @@ export async function getSubscriptionInvoices({
         hasPreviousPage: false,
       },
     }
+  }
+}
+
+export async function initiatePlanUpgrade(
+  storeId: string,
+  newPlan: Plan,
+  billingCycle: string,
+) {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { storeId },
+      select: { plan: true, startDate: true, endDate: true },
+    })
+
+    const isUpgrade = PLAN_RANK[newPlan] > PLAN_RANK[subscription!.plan]
+
+    if (!isUpgrade) {
+      return { success: true, url: null, type: UpgradeType.NORMAL }
+    }
+
+    const sub = await prisma.subscription.findUnique({
+      where: { storeId },
+      select: { startDate: true, endDate: true },
+    })
+
+    const lastInvoice = await prisma.subscriptionInvoice.findFirst({
+      where: { storeId, status: InvoiceStatus.PAID },
+      orderBy: { createdAt: 'desc' },
+      select: { amount: true },
+      take: 1,
+    })
+
+    if (!sub || !lastInvoice) {
+      return { success: false, message: 'ไม่พบข้อมูลการชำระเงินเดิม' }
+    }
+
+    const { finalPrice: newPlanPrice } = calculatePlanPrice(
+      PLAN_DETAILS[newPlan].price.toString(),
+      billingCycle,
+    )
+
+    const { amountToPay } = calculateProration(
+      {
+        startDate: sub.startDate,
+        endDate: sub.endDate,
+        amountPaid: Number(lastInvoice.amount),
+      },
+      newPlanPrice,
+    )
+
+    if (amountToPay > 0) {
+      const session = await createCheckoutSession({
+        amount: Number(amountToPay),
+        description: `ชำระส่วนต่างสำหรับ Upgrade ไปยังแพลน ${PLAN_DETAILS[newPlan].name}`,
+        successUrl: `${process.env.APP_URL}/merchant/billing-subscription`,
+        cancelUrl: `${process.env.APP_URL}/merchant/billing-subscription`,
+        metadata: {
+          type: CheckoutType.UPGRADE,
+          storeId,
+          newPlan,
+          billingCycle,
+        },
+      })
+
+      if (session?.success) {
+        return { success: true, url: session.url, type: UpgradeType.UPGRADE }
+      }
+    }
+
+    return { success: true, url: null }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }

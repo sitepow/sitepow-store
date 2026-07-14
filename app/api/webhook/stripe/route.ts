@@ -2,8 +2,15 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 import { purchaseCredit } from '@/actions/credit'
-import { InvoiceStatus, StoreStatus, SubStatus } from '@/generated/prisma/enums'
-import { CheckoutType } from '@/types/checkout'
+import { Prisma } from '@/generated/prisma/client'
+import {
+  InvoiceStatus,
+  Plan,
+  StoreStatus,
+  SubStatus,
+} from '@/generated/prisma/enums'
+import { CheckoutParams, CheckoutType } from '@/types/checkout'
+import { addMonths } from 'date-fns'
 import Stripe from 'stripe'
 
 import { prisma } from '@/lib/prisma'
@@ -30,13 +37,9 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
-    const metadata = session.metadata as {
-      type?: CheckoutType
-      relatedId?: string
-      storeId?: string
-    }
+    const metadata = session.metadata as CheckoutParams['metadata']
 
-    const { type, relatedId, storeId } = metadata
+    const { type, relatedId, storeId, newPlan, billingCycle } = metadata
 
     if (
       !type ||
@@ -46,6 +49,37 @@ export async function POST(req: Request) {
     }
 
     try {
+      if (type === CheckoutType.UPGRADE && storeId && newPlan) {
+        const months = parseInt(billingCycle || '1')
+        const targetPlan = newPlan as Plan
+
+        await prisma.$transaction([
+          prisma.subscription.update({
+            where: { storeId },
+            data: {
+              plan: targetPlan,
+              status: SubStatus.ACTIVE,
+              endDate: addMonths(new Date(), months),
+              pendingPlan: null,
+            },
+          }),
+          prisma.store.update({
+            where: { id: storeId },
+            data: { plan: targetPlan },
+          }),
+          prisma.subscriptionInvoice.create({
+            data: {
+              storeId,
+              plan: targetPlan,
+              amount: new Prisma.Decimal(session.amount_total! / 100),
+              status: InvoiceStatus.PAID,
+              periodStart: new Date(),
+              periodEnd: addMonths(new Date(), months),
+              description: `ชำระส่วนต่าง Upgrade เป็นแพลน ${targetPlan}`,
+            },
+          }),
+        ])
+      }
       if (type === CheckoutType.SUBSCRIPTION && storeId) {
         await prisma.$transaction([
           prisma.subscriptionInvoice.update({

@@ -79,3 +79,22 @@ export const calculateMonthlyAverage = (
 
   return totalPaidAmount / monthsInCycle
 }
+
+export const calculateProration = (
+  currentSub: { startDate: Date; endDate: Date; amountPaid: number },
+  newPlanPrice: number,
+) => {
+  const now = new Date()
+  const totalDays = differenceInDays(currentSub.endDate, currentSub.startDate)
+  const remainingDays = Math.max(0, differenceInDays(currentSub.endDate, now))
+
+  const dailyRate = currentSub.amountPaid / (totalDays || 1)
+  const remainingValue = dailyRate * remainingDays
+
+  const amountToPay = Math.max(0, newPlanPrice - remainingValue)
+
+  return {
+    remainingValue: Number(remainingValue.toFixed(2)),
+    amountToPay: Number(amountToPay.toFixed(2)),
+  }
+}

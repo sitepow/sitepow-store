@@ -8,10 +8,10 @@ import {
 
 import { subscriptionKeys } from '../query-keys/subscription'
 import {
-  cancelSubscription,
   changePlan,
   getStoreSubscriptions,
   getSubscriptionInvoices,
+  initiatePlanUpgrade,
 } from '../subscription'
 
 export function useStoreSubscriptions(ownerId: string) {
@@ -24,14 +24,17 @@ export function useStoreSubscriptions(ownerId: string) {
   )
 }
 
-export function useCancelSubscription() {
-  const queryClient = useQueryClient()
-
+export function useInitiatePlanUpgrade() {
   return useMutation({
-    mutationFn: async (storeId: string) => await cancelSubscription(storeId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: subscriptionKeys.all })
-    },
+    mutationFn: async ({
+      storeId,
+      newPlan,
+      billingCycle,
+    }: {
+      storeId: string
+      newPlan: Plan
+      billingCycle: string
+    }) => await initiatePlanUpgrade(storeId, newPlan, billingCycle),
   })
 }
 

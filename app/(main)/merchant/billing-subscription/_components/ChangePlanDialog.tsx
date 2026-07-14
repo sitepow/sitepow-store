@@ -3,10 +3,16 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useChangePlan } from '@/actions/hooks/subscription'
+import { useRouter } from 'next/navigation'
+
+import {
+  useChangePlan,
+  useInitiatePlanUpgrade,
+} from '@/actions/hooks/subscription'
 import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
+import { UpgradeType } from '@/types/checkout'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
@@ -34,7 +40,9 @@ export function ChangePlanDialog({
   storeId,
   currentPlan,
 }: ChangePlanDialogProps) {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+  const initiateUpgradeMutation = useInitiatePlanUpgrade()
   const changePlanMutation = useChangePlan()
 
   const { selectedTab } = usePricingStore()
@@ -53,15 +61,23 @@ export function ChangePlanDialog({
     setOpen(false)
   }
 
-  const onSubmit = (values: ChangePlanFormValues) => {
-    changePlanMutation.mutate(
-      { storeId, plan: values.plan, billingCycle: selectedTab },
-      {
-        onSuccess: () => {
-          handleClose()
-        },
-      },
-    )
+  const onSubmit = async (values: ChangePlanFormValues) => {
+    const result = await initiateUpgradeMutation.mutateAsync({
+      storeId,
+      newPlan: values.plan,
+      billingCycle: selectedTab,
+    })
+
+    if (result.type === UpgradeType.UPGRADE && result.url) {
+      router.push(result.url)
+    } else {
+      await changePlanMutation.mutateAsync({
+        storeId,
+        plan: values.plan,
+        billingCycle: selectedTab,
+      })
+      handleClose()
+    }
   }
 
   return (
