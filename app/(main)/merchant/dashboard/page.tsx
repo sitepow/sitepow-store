@@ -7,7 +7,7 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconAlertCircle, IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink } from '@tabler/icons-react'
 import {
   ArrowRight,
   CreditCard,
@@ -22,7 +22,6 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -215,11 +214,10 @@ export default function MerchantDashboardPage() {
               </CardHeader>
               <CardContent>
                 {(data?.recentSales ?? []).length === 0 ? (
-                  <Alert>
-                    <AlertDescription className="flex items-center gap-2">
-                      <IconAlertCircle /> ยังไม่มียอดขายล่าสุด
-                    </AlertDescription>
-                  </Alert>
+                  <ActionRequiredAlert
+                    title="แจ้งเตือน"
+                    description="ขณะนี้ยังไม่มียอดขายล่าสุด"
+                  />
                 ) : (
                   <div className="space-y-8">
                     {(data?.recentSales ?? []).map((sale) => (
@@ -252,12 +250,10 @@ export default function MerchantDashboardPage() {
               </CardHeader>
               <CardContent>
                 {(data?.lowStock ?? []).length === 0 ? (
-                  <Alert>
-                    <AlertDescription className="flex items-center gap-2">
-                      <IconAlertCircle />
-                      ไม่มีสินค้าใกล้หมด
-                    </AlertDescription>
-                  </Alert>
+                  <ActionRequiredAlert
+                    title="แจ้งเตือน"
+                    description="ขณะนี้ยังไม่มีสินค้าที่ใกล้หมด"
+                  />
                 ) : (
                   <Table>
                     <TableBody>

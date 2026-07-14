@@ -1,18 +1,21 @@
 'use client'
 
 import {
-  useCancelSubscription,
+  // useCancelSubscription,
   useStoreSubscriptions,
 } from '@/actions/hooks/subscription'
 import { PLAN_DETAILS } from '@/constants/plan'
-import { Plan, SubStatus } from '@/generated/prisma/enums'
+// import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDate } from '@/utils/date'
-import { formatCurrency } from '@/utils/pricing'
+import {
+  calculateMonthlyAverage,
+  formatCurrency,
+  getSubscriptionStatusInfo,
+} from '@/utils/pricing'
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { differenceInDays } from 'date-fns'
 
-import { CancelSubscriptionButton } from '@/components/CancelSubscriptionButton'
+// import { CancelSubscriptionButton } from '@/components/CancelSubscriptionButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -33,7 +36,7 @@ export function MerchantSubscriptionTable() {
   const { data: subscriptions = [], isLoading } = useStoreSubscriptions(
     user?.id ?? '',
   )
-  const cancelSubscriptionMutation = useCancelSubscription()
+  // const cancelSubscriptionMutation = useCancelSubscription()
 
   return (
     <div className="overflow-hidden rounded-xl border">
@@ -59,19 +62,9 @@ export function MerchantSubscriptionTable() {
           ) : (
             subscriptions.map((sub) => {
               const plan = PLAN_DETAILS[sub.store.plan]
-              const isPastDue = sub.status === SubStatus.PAST_DUE
-              const isCanceled = sub.status === SubStatus.CANCELED
-
-              const totalDays = differenceInDays(
-                new Date(sub.endDate),
-                new Date(sub.startDate),
-              )
-              const daysRemaining = Math.max(
-                0,
-                differenceInDays(new Date(sub.endDate), new Date()),
-              )
-              const progressValue =
-                totalDays > 0 ? (daysRemaining / totalDays) * 100 : 0
+              const { isPastDue, isCanceled, daysRemaining, progressValue } =
+                getSubscriptionStatusInfo(sub)
+              const monthlyAverage = calculateMonthlyAverage(sub, plan.price)
 
               return (
                 <TableRow key={sub.id}>
@@ -98,7 +91,10 @@ export function MerchantSubscriptionTable() {
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
-                      {formatCurrency(plan.price)}
+                      {formatCurrency(monthlyAverage)}{' '}
+                      <span className="text-muted-foreground text-xs">
+                        / เดือน
+                      </span>
                     </span>
                   </TableCell>
                   <TableCell className="max-w-75">
@@ -146,14 +142,14 @@ export function MerchantSubscriptionTable() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {sub.store.plan !== Plan.FREE && !isCanceled && (
+                      {/* {sub.store.plan !== Plan.FREE && !isCanceled && (
                         <CancelSubscriptionButton
                           isPending={cancelSubscriptionMutation.isPending}
                           onCancel={() =>
                             cancelSubscriptionMutation.mutate(sub.store.id)
                           }
                         />
-                      )}
+                      )} */}
                       <ChangePlanDialog
                         storeId={sub.store.id}
                         currentPlan={sub.store.plan}

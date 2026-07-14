@@ -42,8 +42,9 @@ export function Navbar() {
   const { isAuthenticated, user, userRole } = useSession()
   const isMounted = useIsMounted()
 
-  const navbarItems =
-    user?.role === UserRole.SUPPORT ? SUPPORT_NAVIGATION : MERCHANT_NAVIGATION
+  const navbarItems = [UserRole.SUPPORT, UserRole.CUSTOMER].includes(userRole)
+    ? SUPPORT_NAVIGATION
+    : MERCHANT_NAVIGATION
 
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.MERCHANT })

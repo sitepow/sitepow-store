@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 import { purchaseCredit } from '@/actions/credit'
-import { InvoiceStatus, SubStatus } from '@/generated/prisma/enums'
+import { InvoiceStatus, StoreStatus, SubStatus } from '@/generated/prisma/enums'
 import { CheckoutType } from '@/types/checkout'
 import Stripe from 'stripe'
 
@@ -58,6 +58,10 @@ export async function POST(req: Request) {
           prisma.subscription.update({
             where: { storeId: storeId },
             data: { status: SubStatus.ACTIVE },
+          }),
+          prisma.store.update({
+            where: { id: storeId },
+            data: { status: StoreStatus.ACTIVE },
           }),
         ])
       } else if (type === CheckoutType.CREDIT && storeId) {

@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { useCheckout } from '@/actions/hooks/checkout'
 import { useCreateStore } from '@/actions/hooks/store'
 import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
+import { CheckoutType } from '@/types/checkout'
 import { formatSlug } from '@/utils/slug'
 import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -34,6 +36,7 @@ export function StoreCreateDialog() {
   const { user } = useSession()
   const [open, setOpen] = useState(false)
   const createStoreMutation = useCreateStore()
+  const checkoutMutation = useCheckout()
 
   const methods = useForm<CreateStoreFormValues>({
     resolver: zodResolver(createStoreSchema),
@@ -70,8 +73,22 @@ export function StoreCreateDialog() {
         ownerId: user?.id ?? '',
       },
       {
-        onSuccess: () => {
-          handleClose()
+        onSuccess: (data) => {
+          if (data.success && data.invoice) {
+            checkoutMutation.mutate({
+              amount: Number(data.invoice.amount),
+              description: data.invoice.description!,
+              successUrl: `${window.location.origin}/merchant/billing-subscription`,
+              cancelUrl: `${window.location.origin}/merchant/billing-subscription`,
+              metadata: {
+                type: CheckoutType.SUBSCRIPTION,
+                relatedId: data.invoice.id,
+                storeId: data.data.id,
+              },
+            })
+          } else {
+            handleClose()
+          }
         },
       },
     )

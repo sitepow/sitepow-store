@@ -15,10 +15,12 @@ import {
 } from '@/generated/prisma/enums'
 import { queryKeyToRedisKey } from '@/utils/cache'
 import { formatDate } from '@/utils/date'
+import { serializeDecimal } from '@/utils/decimal'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
@@ -215,8 +217,11 @@ export async function getStores({
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
+    const session = await auth()
 
-    const whereClause: Prisma.StoreWhereInput = {}
+    const whereClause: Prisma.StoreWhereInput = {
+      ownerId: session?.user?.id,
+    }
 
     if (search) {
       whereClause.OR = [
@@ -279,7 +284,10 @@ export async function getStoreOptions(filters?: {
   status?: StoreStatus
 }): Promise<GetStoreOptionsItem[]> {
   try {
-    const whereClause: Prisma.StoreWhereInput = {}
+    const session = await auth()
+    const whereClause: Prisma.StoreWhereInput = {
+      ownerId: session?.user?.id,
+    }
 
     if (filters?.search) {
       whereClause.name = { contains: filters.search, mode: 'insensitive' }
@@ -303,8 +311,16 @@ export async function getStoreOptions(filters?: {
 
 export async function createStore(input: CreateStoreInput) {
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    }
+
     const { billingCycle, ...storeData } = input
-    const validatedInput = createStoreSchema.safeParse(input)
+    const validatedInput = createStoreSchema.safeParse({
+      ...input,
+      ownerId: session.user.id,
+    })
 
     if (!validatedInput.success) {
       const errorMessage = validatedInput.error.issues[0].message
@@ -328,6 +344,9 @@ export async function createStore(input: CreateStoreInput) {
 
     const selectedPlan = input.plan ?? Plan.STARTER
     const isFreePlan = selectedPlan === Plan.FREE
+    const initialStatus = isFreePlan
+      ? StoreStatus.ACTIVE
+      : StoreStatus.MAINTENANCE
 
     const { finalPrice } = calculatePlanPrice(
       PLAN_DETAILS[input.plan ?? Plan.STARTER].price.toString(),
@@ -354,40 +373,47 @@ export async function createStore(input: CreateStoreInput) {
       }
     }
 
-    const store = await prisma.store.create({
-      data: {
-        ...storeData,
-        subscription: {
-          create: {
-            plan: input.plan ?? Plan.STARTER,
-            status: SubStatus.ACTIVE,
-            startDate,
-            endDate,
+    const store = serializeDecimal(
+      await prisma.store.create({
+        data: {
+          ...storeData,
+          status: initialStatus,
+          subscription: {
+            create: {
+              plan: input.plan ?? Plan.STARTER,
+              status: SubStatus.ACTIVE,
+              startDate,
+              endDate,
+            },
+          },
+          subscriptionInvoices: {
+            create: {
+              plan: input.plan ?? Plan.STARTER,
+              amount: new Prisma.Decimal(finalPrice),
+              status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
+              paidAt: isFreePlan ? new Date() : undefined,
+              periodStart: startDate,
+              periodEnd: endDate,
+              description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
+            },
           },
         },
-        subscriptionInvoices: {
-          create: {
-            plan: input.plan ?? Plan.STARTER,
-            amount: new Prisma.Decimal(finalPrice),
-            status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
-            paidAt: isFreePlan ? new Date() : undefined,
-            periodStart: startDate,
-            periodEnd: endDate,
-            description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
+        select: {
+          ...storeSelect,
+          subscriptionInvoices: {
+            select: {
+              id: true,
+              amount: true,
+              description: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
           },
         },
-      },
-      select: {
-        ...storeSelect,
-        subscriptionInvoices: {
-          select: { id: true },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
-      },
-    })
+      }),
+    )
 
-    const invoiceId = store.subscriptionInvoices[0]?.id
+    const invoice = store.subscriptionInvoices[0]
 
     await createLog({
       action: LogAction.CREATE_STORE,
@@ -404,7 +430,7 @@ export async function createStore(input: CreateStoreInput) {
       success: true,
       message: 'สร้างร้านค้าสำเร็จแล้ว',
       data: store,
-      invoiceId,
+      invoice,
     }
   } catch (error) {
     console.error(error)
@@ -414,6 +440,12 @@ export async function createStore(input: CreateStoreInput) {
 
 export async function updateStore(id: string, input: UpdateStoreInput) {
   try {
+    const session = await auth()
+
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    }
+
     if (!id) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
@@ -429,7 +461,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     }
 
     const store = await prisma.store.update({
-      where: { id },
+      where: { id, ownerId: session.user.id },
       data: input,
       select: storeSelect,
     })
@@ -458,12 +490,17 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
 
 export async function deleteStore(id: string) {
   try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    }
+
     if (!id) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const store = await prisma.store.delete({
-      where: { id },
+      where: { id, ownerId: session.user.id },
       select: { slug: true },
     })
 

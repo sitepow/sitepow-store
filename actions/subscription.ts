@@ -28,6 +28,10 @@ const subscriptionSelect = {
       id: true,
       name: true,
       plan: true,
+      subscriptionInvoices: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
     },
   },
 } satisfies Prisma.SubscriptionSelect
