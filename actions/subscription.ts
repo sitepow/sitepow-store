@@ -14,6 +14,7 @@ import {
 import { CheckoutType, UpgradeType } from '@/types/checkout'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { calculatePlanPrice, calculateProration } from '@/utils/pricing'
+import { differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
@@ -132,15 +133,42 @@ export async function changePlan(
 
     const subscription = await prisma.subscription.findUnique({
       where: { storeId },
-      select: { id: true, plan: true, endDate: true, status: true },
+      select: {
+        id: true,
+        plan: true,
+        endDate: true,
+        startDate: true,
+        status: true,
+      },
     })
 
     if (!subscription) {
       return { success: false, message: 'ไม่พบข้อมูล Subscription' }
     }
 
-    if (subscription.plan === newPlan) {
-      return { success: false, message: 'คุณกำลังใช้งานแพลนนี้อยู่แล้ว' }
+    const monthsDiff = Math.max(
+      1,
+      Math.round(
+        differenceInMonths(
+          new Date(subscription.endDate),
+          new Date(subscription.startDate),
+        ),
+      ),
+    )
+    const currentBillingCycle =
+      monthsDiff >= 12
+        ? PRICING_VALUE.TWELVE_MONTHS
+        : monthsDiff >= 6
+          ? PRICING_VALUE.SIX_MONTHS
+          : monthsDiff >= 3
+            ? PRICING_VALUE.THREE_MONTHS
+            : PRICING_VALUE.ONE_MONTH
+
+    if (subscription.plan === newPlan && currentBillingCycle === billingCycle) {
+      return {
+        success: false,
+        message: 'คุณกำลังใช้งานแพลนและรอบบิลนี้อยู่แล้ว',
+      }
     }
 
     const isFreePlan = newPlan === Plan.FREE
@@ -148,15 +176,7 @@ export async function changePlan(
       ? { finalPrice: 0 }
       : calculatePlanPrice(PLAN_DETAILS[newPlan].price.toString(), billingCycle)
 
-    const months =
-      billingCycle === PRICING_VALUE.TWELVE_MONTHS
-        ? 12
-        : billingCycle === PRICING_VALUE.SIX_MONTHS
-          ? 6
-          : billingCycle === PRICING_VALUE.THREE_MONTHS
-            ? 3
-            : 1
-
+    const months = parseInt(billingCycle) || 1
     const nextEndDate = new Date()
     nextEndDate.setMonth(nextEndDate.getMonth() + months)
 
@@ -201,7 +221,7 @@ export async function changePlan(
             periodEnd: nextEndDate,
             description: isFreePlan
               ? 'แพลนเริ่มต้นใช้งานฟรี'
-              : `ค่าบริการแพลน ${newPlan}`,
+              : `ค่าบริการแพลน ${newPlan} (${billingCycle})`,
           },
         }),
       ]
@@ -254,12 +274,13 @@ export async function changePlan(
           from: subscription.plan,
           to: newPlan,
           type: 'downgrade_pending',
+          cycle: billingCycle,
         },
       })
 
       return {
         success: true,
-        message: `ตั้งค่าเปลี่ยนแพลนเป็น ${newPlan} เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
+        message: `ตั้งค่าเปลี่ยนแพลนเป็น ${newPlan} (${billingCycle}) เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
       }
     }
   } catch (error) {
