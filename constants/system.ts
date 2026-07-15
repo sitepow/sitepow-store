@@ -183,3 +183,6 @@ export const THAI_MONTHS = [
   'พ.ย.',
   'ธ.ค.',
 ]
+export const RESPONSIVE_DEVICE = {
+  desktop: '600px',
+}

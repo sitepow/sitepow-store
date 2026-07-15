@@ -5,7 +5,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import { useCheckout } from '@/actions/hooks/checkout'
 import { useCreateStore } from '@/actions/hooks/store'
-import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -15,6 +14,7 @@ import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 
+import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -124,7 +124,7 @@ export function StoreCreateDialog() {
               1. เลือกแพลนการใช้งานของคุณ
             </div>
             <div className="flex flex-col items-center gap-5 sm:col-span-2">
-              <PricingTabs />
+              <MerchantPricingTabs />
               <PlanSelector isPending={createStoreMutation.isPending} />
             </div>
             <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">

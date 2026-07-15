@@ -10,7 +10,6 @@ import {
   useInitiatePlanUpgrade,
   useUpgradeCost,
 } from '@/actions/hooks/subscription'
-import { PricingTabs } from '@/app/(main)/pricing/_components/PricingTabs'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { UpgradeType } from '@/types/checkout'
@@ -19,6 +18,7 @@ import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
+import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -115,7 +115,7 @@ export function ChangePlanDialog({
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="flex flex-col items-center gap-5">
-            <PricingTabs />
+            <MerchantPricingTabs />
             <PlanSelector isPending={changePlanMutation.isPending} />
           </div>
         </FormProvider>
