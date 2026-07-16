@@ -4,10 +4,14 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
-import { useDeleteProduct, useProducts } from '@/actions/hooks/product'
+import {
+  useDeleteProduct,
+  useProductQuota,
+  useProducts,
+} from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEdit, IconPackage } from '@tabler/icons-react'
 
@@ -16,6 +20,15 @@ import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -30,6 +43,14 @@ export function ProductsTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { data: quota, isLoading: isQuotaLoading } =
+    useProductQuota(selectedStoreId)
+
+  const isLimitReached =
+    quota && quota.maxProducts !== null
+      ? quota.productCount >= quota.maxProducts
+      : false
+
   const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct()
   const { data: { data: products = [], meta } = {}, isLoading } = useProducts({
     storeId: selectedStoreId,
@@ -38,11 +59,47 @@ export function ProductsTable() {
   })
 
   if (!isMounted) {
-    return
+    return null
   }
+
+  const progress = quota?.maxProducts
+    ? (quota.productCount / quota.maxProducts) * 100
+    : 0
 
   return (
     <>
+      {selectedStoreId !== ALL_STORES && (
+        <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
+          <CardHeader className="pb-2">
+            <CardDescription className="text-primary text-xs font-bold">
+              คลังสินค้าทั้งหมด
+            </CardDescription>
+            <CardTitle className="text-foreground flex items-baseline gap-1 pt-1 text-4xl font-extrabold">
+              {isQuotaLoading ? (
+                <Skeleton className="h-9 w-40" />
+              ) : (
+                (quota?.productCount ?? 0)
+              )}
+              <span className="text-muted-foreground text-xs font-normal">
+                /{' '}
+                {quota?.maxProducts
+                  ? `${quota?.maxProducts} สินค้า`
+                  : 'ไม่จำกัดจำนวนสินค้า'}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          {quota?.maxProducts && (
+            <CardContent className="text-muted-foreground max-w-96 pb-4 text-[11px] leading-relaxed">
+              <Progress value={progress} className="h-2" />
+              <p className="mt-2">
+                {isLimitReached
+                  ? 'คุณใช้โควตาสินค้าเต็มแล้ว กรุณาอัปเกรดแพลนเพื่อเพิ่มสินค้า'
+                  : `คุณใช้โควตาไปแล้ว ${progress.toFixed(0)}% ของแพลนปัจจุบัน`}
+              </p>
+            </CardContent>
+          )}
+        </Card>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

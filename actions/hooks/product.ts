@@ -12,6 +12,7 @@ import {
   createProduct,
   deleteProduct,
   getProductOptions,
+  getProductQuota,
   getProducts,
   updateProduct,
 } from '../product'
@@ -91,6 +92,16 @@ export const useProductOptions = (storeId: string) => {
     queryOptions({
       queryKey: productKeys.options(storeId),
       queryFn: () => getProductOptions(storeId),
+      enabled: !!storeId && storeId !== ALL_STORES,
+    }),
+  )
+}
+
+export function useProductQuota(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: productKeys.quota(storeId),
+      queryFn: () => getProductQuota(storeId),
       enabled: !!storeId && storeId !== ALL_STORES,
     }),
   )

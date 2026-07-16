@@ -1,6 +1,7 @@
 'use server'
 
 import { invalidateStorefrontProductCache } from '@/actions/query-keys/storefront/invalidation/product'
+import { PLAN_DETAILS } from '@/constants/plan'
 import {
   ActorType,
   LogAction,
@@ -9,6 +10,7 @@ import {
 } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
+import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -199,6 +201,12 @@ export async function getProducts({
 
 export async function createProduct(input: CreateProductInput) {
   try {
+    const { canCreate, message } = await checkCanCreateProduct(input.storeId)
+
+    if (!canCreate) {
+      return { success: false, message }
+    }
+
     const {
       variants,
       addons,
@@ -221,57 +229,64 @@ export async function createProduct(input: CreateProductInput) {
       ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
       : undefined
 
-    const product = await prisma.product.create({
-      data: {
-        ...rest,
-        storeId,
-        categoryId,
-        details,
-        tags: {
-          create: tagsArray.map((name) => ({ name })),
+    const [product] = await prisma.$transaction([
+      prisma.product.create({
+        data: {
+          ...rest,
+          storeId,
+          categoryId,
+          details,
+          tags: {
+            create: tagsArray.map((name) => ({ name })),
+          },
+          images: {
+            create:
+              images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+          },
+          variants: {
+            create: variants.map((v) => ({
+              title: v.title,
+              price: v.price,
+              sku: v.sku ?? '',
+              digitalUrl: v.digitalUrl ?? '',
+              discountActive: v.discount.active,
+              discountType: v.discount.active ? v.discount.type : null,
+              discountAmount: v.discount.active ? v.discount.amount : null,
+              pointsActive: v.rewardPoints.isActive,
+              pointsAmount: v.rewardPoints.amount,
+              digitalItems: {
+                create:
+                  v.digitalItems?.map((item) => ({
+                    content: item.content,
+                    isUsed: item.isUsed,
+                  })) ?? [],
+              },
+              stocks: {
+                create: v.stocks.map((s) => ({
+                  branchId: s.branchId,
+                  quantity: s.quantity,
+                  minStock: s.minStock,
+                })),
+              },
+              isAvailable: v.isAvailable ?? false,
+            })),
+          },
+          addons: {
+            create:
+              addons?.map((a) => ({
+                title: a.title,
+                price: a.price,
+                isAvailable: a.isAvailable,
+              })) ?? [],
+          },
         },
-        images: {
-          create: images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
-        },
-        variants: {
-          create: variants.map((v) => ({
-            title: v.title,
-            price: v.price,
-            sku: v.sku ?? '',
-            digitalUrl: v.digitalUrl ?? '',
-            discountActive: v.discount.active,
-            discountType: v.discount.active ? v.discount.type : null,
-            discountAmount: v.discount.active ? v.discount.amount : null,
-            pointsActive: v.rewardPoints.isActive,
-            pointsAmount: v.rewardPoints.amount,
-            digitalItems: {
-              create:
-                v.digitalItems?.map((item) => ({
-                  content: item.content,
-                  isUsed: item.isUsed,
-                })) ?? [],
-            },
-            stocks: {
-              create: v.stocks.map((s) => ({
-                branchId: s.branchId,
-                quantity: s.quantity,
-                minStock: s.minStock,
-              })),
-            },
-            isAvailable: v.isAvailable ?? false,
-          })),
-        },
-        addons: {
-          create:
-            addons?.map((a) => ({
-              title: a.title,
-              price: a.price,
-              isAvailable: a.isAvailable,
-            })) ?? [],
-        },
-      },
-      select: productSelect,
-    })
+        select: productSelect,
+      }),
+      prisma.store.update({
+        where: { id: storeId },
+        data: { productCount: { increment: 1 } },
+      }),
+    ])
 
     const store = await prisma.store.findUnique({
       where: { id: input.storeId },
@@ -346,7 +361,13 @@ export async function deleteProduct(id: string) {
       )
     }
 
-    await prisma.product.delete({ where: { id } })
+    await prisma.$transaction([
+      prisma.product.delete({ where: { id } }),
+      prisma.store.update({
+        where: { id: product.storeId },
+        data: { productCount: { decrement: 1 } },
+      }),
+    ])
 
     await Promise.all([
       invalidateStorefrontProductCache(product.store.slug),
@@ -535,5 +556,30 @@ export async function getProductOptions(storeId: string) {
   } catch (error) {
     console.error(error)
     return []
+  }
+}
+
+export async function getProductQuota(storeId: string) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return null
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { id: storeId, ownerId: session.user.id },
+    select: {
+      plan: true,
+      productCount: true,
+    },
+  })
+
+  if (!store) {
+    return null
+  }
+
+  return {
+    plan: store.plan,
+    productCount: store.productCount,
+    maxProducts: PLAN_DETAILS[store.plan].maxProducts,
   }
 }

@@ -11,4 +11,5 @@ export const productKeys = {
   detail: (id: string) => [...productKeys.all, 'detail', id] as const,
   options: (storeId: string) =>
     [...productKeys.all, 'options', storeId] as const,
+  quota: (storeId: string) => [...productKeys.all, 'quota', storeId] as const,
 }

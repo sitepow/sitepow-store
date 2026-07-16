@@ -454,6 +454,7 @@ model Store {
   lineId       String?
   facebookPage String?
 
+  productCount         Int                   @default(0)
   shippingSetting      ShippingSetting?
   storeCourierServices StoreCourierService[]
 
