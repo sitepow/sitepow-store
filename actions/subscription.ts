@@ -214,7 +214,7 @@ export async function changePlan(
           data: {
             storeId,
             plan: newPlan,
-            amount: newPlanPrice,
+            amount: new Prisma.Decimal(newPlanPrice),
             status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
             paidAt: isFreePlan ? new Date() : null,
             periodStart: new Date(),
@@ -355,6 +355,10 @@ export async function initiatePlanUpgrade(
   billingCycle: string,
 ) {
   try {
+    if (newPlan === Plan.FREE) {
+      return { success: true, url: null, type: UpgradeType.NORMAL }
+    }
+
     const subscription = await prisma.subscription.findUnique({
       where: { storeId },
       select: { plan: true, startDate: true, endDate: true },

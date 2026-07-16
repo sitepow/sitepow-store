@@ -53,7 +53,7 @@ export function StoreCreateDialog() {
       isPointsEnabled: true,
       pointEarningRate: 100,
       pointRedeemRate: 0.35,
-      plan: Plan.STARTER,
+      plan: Plan.FREE,
     },
   })
 

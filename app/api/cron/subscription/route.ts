@@ -90,13 +90,16 @@ export async function GET(request: Request) {
         billingCycle,
       )
 
+      const isFree = nextPlan === Plan.FREE
+
       await prisma.$transaction([
         prisma.subscriptionInvoice.create({
           data: {
             storeId: sub.storeId,
             plan: nextPlan,
             amount: new Prisma.Decimal(finalPrice),
-            status: InvoiceStatus.UNPAID,
+            status: isFree ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
+            paidAt: isFree ? new Date() : null,
             periodStart: sub.endDate,
             periodEnd: nextEndDate,
             description: `ค่าบริการแพลน ${PLAN_DETAILS[nextPlan].name} (${billingCycle} เดือน) (รอบ ${formatDate(sub.endDate)} ถึง ${formatDate(nextEndDate)})`,

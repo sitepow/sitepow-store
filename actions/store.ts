@@ -402,7 +402,7 @@ export async function createStore(input: CreateStoreInput) {
               plan: input.plan ?? Plan.STARTER,
               amount: new Prisma.Decimal(finalPrice),
               status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
-              paidAt: isFreePlan ? new Date() : undefined,
+              paidAt: isFreePlan ? new Date() : null,
               periodStart: startDate,
               periodEnd: endDate,
               description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
