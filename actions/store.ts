@@ -394,6 +394,7 @@ export async function createStore(input: CreateStoreInput) {
               status: SubStatus.ACTIVE,
               startDate,
               endDate,
+              pendingPlanCycle: cycle,
             },
           },
           subscriptionInvoices: {
