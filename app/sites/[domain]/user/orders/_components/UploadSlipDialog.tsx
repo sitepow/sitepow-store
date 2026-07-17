@@ -162,7 +162,7 @@ export function UploadSlipDialog({
         <DialogFooter className="gap-2 sm:justify-end">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => setIsOpen(false)}
             disabled={isSubmitting}
           >
