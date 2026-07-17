@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   Controller,
   FormProvider,
@@ -28,17 +28,20 @@ import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IconArrowForward,
-  IconImageGeneration,
-  IconTrash,
-  IconX,
-} from '@tabler/icons-react'
+import { IconDatabase, IconTrash, IconWand, IconX } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Field,
   FieldGroup,
@@ -77,8 +80,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
   const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/products`)
   const deleteMutation = useR2DeleteImage()
-
-  const [showPresets, setShowPresets] = useState(false)
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -303,40 +304,30 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     <FormProvider {...form}>
       <Card>
         <CardContent className="flex flex-wrap items-center gap-2.5">
-          <Button
-            type="button"
-            disabled={isPending}
-            onClick={() => handleAiGen()}
-            variant="outline"
-          >
-            {isPendingAiGen ? (
-              <Spinner />
-            ) : (
-              <IconImageGeneration className="mr-2 size-4" />
-            )}
-            {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิดเนื้อหาทั้งหมด'}
-          </Button>{' '}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowPresets(!showPresets)}
-          >
-            {showPresets ? <IconX /> : <IconArrowForward />}
-            {showPresets ? 'ปิดตัวอย่างสินค้า' : 'โหลดข้อมูลสินค้าตัวอย่าง'}
-          </Button>
-          {showPresets &&
-            PRODUCT_PRESETS_MASTER.map((preset) => (
-              <Button
-                key={preset.id}
-                type="button"
-                variant="outline"
-                disabled={isPending}
-                onClick={() => handleApplyPreset(preset.id)}
-              >
-                <IconArrowForward /> {preset.label}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <IconWand className="mr-2 size-4" /> เครื่องมือช่วยเหลือ
               </Button>
-            ))}
-          {<CopyProductDataPicker storeId={selectedStoreId!} />}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>สร้างเนื้อหา</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleAiGen()}>
+                <IconWand className="mr-2 size-4" /> ให้ AI ช่วยคิด
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>โหลดตัวอย่าง</DropdownMenuLabel>
+              {PRODUCT_PRESETS_MASTER.map((preset) => (
+                <DropdownMenuItem
+                  key={preset.id}
+                  onClick={() => handleApplyPreset(preset.id)}
+                >
+                  <IconDatabase className="mr-2 size-4" /> {preset.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <CopyProductDataPicker storeId={selectedStoreId!} />
           {isDirty && (
             <Button
               type="button"
@@ -413,7 +404,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
             </Button>
           </div>
-
           <FieldGroup className="space-y-4">
             {variantFields.map((item, index) => (
               <VariantItem
@@ -442,7 +432,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   {isPendingAiGen ? (
                     <Spinner />
                   ) : (
-                    <IconImageGeneration className="mr-2 size-4" />
+                    <IconWand className="mr-2 size-4" />
                   )}
                   {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Metadata'}
                 </Button>
@@ -491,23 +481,24 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </div>
             <Field className="mt-4">
               <FieldLabel>Tags (คั่นด้วยเครื่องหมายคอมม่า)</FieldLabel>
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex gap-2">
                 <Input
                   placeholder="เสื้อผ้า, แฟชั่น, cotton"
                   {...register('tags')}
+                  disabled={isPending}
                 />
                 <Button
                   type="button"
-                  size="sm"
                   variant="outline"
-                  disabled={isPending}
+                  size="icon"
+                  disabled={isPending || isPendingAiGen}
+                  title="ให้ AI ช่วยคิด Tags"
                 >
                   {isPendingAiGen ? (
-                    <Spinner />
+                    <Spinner className="size-4" />
                   ) : (
-                    <IconImageGeneration className="mr-2 size-4" />
+                    <IconWand className="size-4" />
                   )}
-                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Tags'}
                 </Button>
               </div>
             </Field>
@@ -530,7 +521,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   {isPendingAiGen ? (
                     <Spinner />
                   ) : (
-                    <IconImageGeneration className="mr-2 size-4" />
+                    <IconWand className="mr-2 size-4" />
                   )}
                   {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Addons'}
                 </Button>

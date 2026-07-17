@@ -10,7 +10,7 @@ import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
-import { IconArrowDown } from '@tabler/icons-react'
+import { IconDatabaseImport } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -155,7 +155,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconArrowDown className="mr-2 size-4" />{' '}
+          <IconDatabaseImport className="mr-2 size-4" />{' '}
           คัดลอกข้อมูลสินค้าในฐานข้อมูล
         </Button>
       </DialogTrigger>
@@ -163,7 +163,6 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
         <DialogHeader>
           <DialogTitle>คัดลอกข้อมูลสินค้าจาก</DialogTitle>
         </DialogHeader>
-
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button
@@ -214,7 +213,6 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
             </Command>
           </PopoverContent>
         </Popover>
-
         {previewData && (
           <div className="grid gap-3 py-4">
             {['basic', 'metadata', 'variants', 'addons', 'tags'].map(
@@ -232,7 +230,6 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
                       [คัดลอก] {FIELD_LABELS[field] || field}
                     </span>
                   </label>
-
                   {field === 'metadata' &&
                     selectedFields.includes('metadata') &&
                     previewData.details && (
@@ -269,7 +266,6 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
             )}
           </div>
         )}
-
         <Button onClick={handleCopy} disabled={selectedFields.length === 0}>
           ยืนยันการคัดลอก
         </Button>

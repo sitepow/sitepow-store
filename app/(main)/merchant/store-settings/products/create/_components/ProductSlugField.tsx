@@ -5,7 +5,9 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { ProductFormValues } from '@/zod/product'
+import { IconWand } from '@tabler/icons-react'
 
+import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
@@ -34,14 +36,33 @@ export function ProductSlugField({ isPending }: { isPending: boolean }) {
     }
   }, [debouncedTitle, setValue, getValues])
 
+  const handleGenerateSlug = () => {
+    const currentTitle = getValues('title')
+    if (currentTitle) {
+      setValue('slug', toSlug(currentTitle), { shouldValidate: true })
+    }
+  }
+
   return (
     <Field>
       <FieldLabel>URL Slug</FieldLabel>
-      <Input
-        placeholder="t-shirt-limited"
-        {...register('slug')}
-        disabled={isPending}
-      />
+      <div className="flex gap-2">
+        <Input
+          placeholder="t-shirt-limited"
+          {...register('slug')}
+          disabled={isPending}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleGenerateSlug}
+          disabled={isPending}
+          title="สร้าง Slug จากชื่อสินค้า"
+        >
+          <IconWand className="size-4" />
+        </Button>
+      </div>
       <FieldError>{errors?.slug?.message}</FieldError>
     </Field>
   )
