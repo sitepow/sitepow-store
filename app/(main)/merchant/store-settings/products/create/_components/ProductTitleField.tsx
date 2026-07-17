@@ -5,6 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
 import { ProductFormValues } from '@/zod/product'
 import { IconWand } from '@tabler/icons-react'
@@ -21,7 +22,14 @@ function toSlug(str: string) {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-export function ProductTitleField({ isPending }: { isPending: boolean }) {
+export function ProductTitleField({
+  isPending,
+  onAiTrigger,
+}: {
+  isPending: boolean
+  onAiTrigger: (action: () => void) => void
+}) {
+  const { selectedStoreId } = useStoreFilter()
   const {
     register,
     setValue,
@@ -43,6 +51,7 @@ export function ProductTitleField({ isPending }: { isPending: boolean }) {
   const { mutate: genTitle, isPending: isGenTitle } = useProductAi(
     form,
     AiGenTask.TITLE,
+    selectedStoreId,
   )
 
   return (
@@ -58,7 +67,7 @@ export function ProductTitleField({ isPending }: { isPending: boolean }) {
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => genTitle()}
+          onClick={() => onAiTrigger(() => genTitle())}
           disabled={isGenTitle}
           title="สร้าง Title จากชื่อสินค้า"
         >

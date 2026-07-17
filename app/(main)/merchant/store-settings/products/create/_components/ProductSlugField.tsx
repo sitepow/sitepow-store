@@ -5,6 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
 import { ProductFormValues } from '@/zod/product'
 import { IconWand } from '@tabler/icons-react'
@@ -21,7 +22,14 @@ function toSlug(str: string) {
     .replace(/[^a-z0-9-]/g, '')
 }
 
-export function ProductSlugField({ isPending }: { isPending: boolean }) {
+export function ProductSlugField({
+  isPending,
+  onAiTrigger,
+}: {
+  isPending: boolean
+  onAiTrigger: (action: () => void) => void
+}) {
+  const { selectedStoreId } = useStoreFilter()
   const {
     register,
     setValue,
@@ -43,6 +51,7 @@ export function ProductSlugField({ isPending }: { isPending: boolean }) {
   const { mutate: genSlug, isPending: isGenSlug } = useProductAi(
     form,
     AiGenTask.SLUG,
+    selectedStoreId,
   )
 
   return (
@@ -58,7 +67,7 @@ export function ProductSlugField({ isPending }: { isPending: boolean }) {
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => genSlug()}
+          onClick={() => onAiTrigger(() => genSlug())}
           disabled={isGenSlug}
           title="สร้าง Slug จากชื่อสินค้า"
         >

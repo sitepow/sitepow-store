@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 
 import { useRouter } from 'next/navigation'
 
+import { handleUserPrompt } from '@/actions/ai'
 import { useProductAi } from '@/actions/hooks/ai'
 import {
   useCreateProduct,
@@ -21,9 +22,11 @@ import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { CreateProductInput } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_TYPE_OPTIONS } from '@/constants/translate'
-import { DiscountType, ProductType } from '@/generated/prisma/enums'
+import { DiscountType, Plan, ProductType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
+import { buildProductPrompt } from '@/utils/ai'
 import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
@@ -31,6 +34,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDatabase, IconTrash, IconWand, IconX } from '@tabler/icons-react'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -68,6 +81,27 @@ import { ProductTitleField } from './ProductTitleField'
 import { VariantItem } from './VariantItem'
 
 export function CreateProductForm({ productId }: { productId?: string }) {
+  const { store } = useStoreData()
+  const [aiTaskConfirm, setAiTaskConfirm] = useState<{
+    task: AiGenTask
+    cost: number
+    action: () => void
+  } | null>(null)
+
+  const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
+    const storePlan = store?.plan || Plan.FREE
+    const currentTitle = getValues('title')
+    const prompt = buildProductPrompt(task, currentTitle)
+
+    const costEstimate = await handleUserPrompt(prompt, storePlan)
+
+    setAiTaskConfirm({
+      task,
+      cost: costEstimate.credits,
+      action,
+    })
+  }
+
   const router = useRouter()
   const { selectedStoreId } = useStoreFilter()
   const { data: product, isLoading: isProductLoading } = useProduct(
@@ -112,26 +146,32 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   const { mutate: genAll, isPending: isGenAll } = useProductAi(
     form,
     AiGenTask.ALL,
+    selectedStoreId,
   )
   const { mutate: genSlug, isPending: isGenSlug } = useProductAi(
     form,
     AiGenTask.SLUG,
+    selectedStoreId,
   )
   const { mutate: genMeta, isPending: isGenMeta } = useProductAi(
     form,
     AiGenTask.METADATA,
+    selectedStoreId,
   )
   const { mutate: genTags, isPending: isGenTags } = useProductAi(
     form,
     AiGenTask.TAGS,
+    selectedStoreId,
   )
   const { mutate: genAddons, isPending: isGenAddons } = useProductAi(
     form,
     AiGenTask.ADDONS,
+    selectedStoreId,
   )
   const { mutate: genVariants, isPending: isGenVariants } = useProductAi(
     form,
     AiGenTask.VARIANTS,
+    selectedStoreId,
   )
 
   const isPending =
@@ -315,10 +355,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>สร้างเนื้อหา</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => genAll()}>
-                ให้ AI คิดให้ทั้งหมด (อาจจะใช้เวลานาน ~1-2 นาที)
+              <DropdownMenuItem
+                onClick={() => handleAiTrigger(AiGenTask.ALL, () => genAll())}
+              >
+                ให้ AI คิดให้ทั้งหมด
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => genSlug()}>
+              <DropdownMenuItem
+                onClick={() => handleAiTrigger(AiGenTask.SLUG, () => genSlug())}
+              >
                 ให้ AI คิดให้เฉพาะ Slug
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -356,9 +400,19 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         <div className="space-y-10">
           <FieldSet disabled={isPending}>
             <FieldGroup className="mt-4 grid gap-6">
-              <ProductTitleField isPending={isPending} />
+              <ProductTitleField
+                isPending={isPending}
+                onAiTrigger={(action) =>
+                  handleAiTrigger(AiGenTask.TITLE, action)
+                }
+              />
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <ProductSlugField isPending={isPending} />
+                <ProductSlugField
+                  isPending={isPending}
+                  onAiTrigger={(action) =>
+                    handleAiTrigger(AiGenTask.SLUG, action)
+                  }
+                />
                 <CategoryField isPending={isPending} />
               </div>
             </FieldGroup>
@@ -394,14 +448,16 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 type="button"
                 size="sm"
                 variant="outline"
-                onClick={() => genVariants()}
+                onClick={() =>
+                  handleAiTrigger(AiGenTask.VARIANTS, () => genVariants())
+                }
                 disabled={isGenVariants}
               >
                 {isGenVariants ? (
                   <Spinner />
                 ) : (
                   <IconWand className="mr-2 size-4" />
-                )}{' '}
+                )}
                 ให้ AI ช่วยคิด Variants
               </Button>
               <Button
@@ -449,14 +505,16 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={() => genMeta()}
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.METADATA, () => genMeta())
+                  }
                   disabled={isGenMeta}
                 >
                   {isGenMeta ? (
                     <Spinner />
                   ) : (
                     <IconWand className="mr-2 size-4" />
-                  )}{' '}
+                  )}
                   ให้ AI ช่วยคิด Metadata
                 </Button>
                 <Button
@@ -514,7 +572,9 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   variant="outline"
                   size="icon"
-                  onClick={() => genTags()}
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.TAGS, () => genTags())
+                  }
                   disabled={isGenTags}
                 >
                   {isGenTags ? <Spinner /> : <IconWand />}
@@ -535,14 +595,16 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   size="sm"
                   variant="outline"
-                  onClick={() => genAddons()}
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.ADDONS, () => genAddons())
+                  }
                   disabled={isGenAddons}
                 >
                   {isGenAddons ? (
                     <Spinner />
                   ) : (
                     <IconWand className="mr-2 size-4" />
-                  )}{' '}
+                  )}
                   ให้ AI ช่วยคิด Addons
                 </Button>
                 <Button
@@ -600,6 +662,35 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           <ProductPreviewContent />
         </div>
       </div>
+      <AlertDialog
+        open={!!aiTaskConfirm}
+        onOpenChange={() => setAiTaskConfirm(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ยืนยันการใช้ AI</AlertDialogTitle>
+            <AlertDialogDescription>
+              การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
+              <span className="text-primary">{aiTaskConfirm?.cost} เครดิต</span>{' '}
+              จากแพลน {store?.plan || Plan.FREE} ของคุณ
+              คุณต้องการดำเนินการต่อหรือไม่?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (aiTaskConfirm) {
+                  aiTaskConfirm.action()
+                  setAiTaskConfirm(null)
+                }
+              }}
+            >
+              ยืนยัน
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </FormProvider>
   )
 }

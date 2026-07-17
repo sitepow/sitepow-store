@@ -8,8 +8,9 @@ import {
   USD_TO_THB_RATE,
 } from '@/constants/ai'
 import { PLAN_DETAILS } from '@/constants/plan'
+import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { Plan } from '@/generated/prisma/enums'
-import { CreditUsageType } from '@/types/ai'
+import { AiGenTask, CreditUsageType } from '@/types/ai'
 
 export function calculateAiCost(
   model: string,
@@ -18,6 +19,7 @@ export function calculateAiCost(
   planMultiplier: number,
 ): number {
   const pricing = GEMINI_PRICING_USD_PER_1M[model]
+
   if (!pricing) {
     return 0
   }
@@ -58,4 +60,15 @@ export function estimateCost(
     credits: Number(credits.toFixed(2)),
     baht: Number(totalChargeBaht.toFixed(2)),
   }
+}
+
+export const buildProductPrompt = (task: AiGenTask, title: string) => {
+  return `คุณคือผู้เชี่ยวชาญด้านการตลาด "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
+    ช่วยคิดข้อมูลสินค้า: "${title}"
+    ${task === AiGenTask.TITLE || task === AiGenTask.ALL ? '- ปรับชื่อสินค้าให้ดูน่าสนใจ' : ''}
+    ${task === AiGenTask.SLUG || task === AiGenTask.ALL ? '- สร้าง slug (kebab-case)' : ''}
+    ${task === AiGenTask.METADATA || task === AiGenTask.ALL ? `- สร้าง metadata จาก key: ${JSON.stringify(PRODUCT_METADATA_MASTER.flatMap((g) => g.fields).map((f) => f.key))}` : ''}
+    ${task === AiGenTask.TAGS || task === AiGenTask.ALL ? '- สร้าง tags (string คั่นด้วยคอมม่า)' : ''}
+    ${task === AiGenTask.ADDONS || task === AiGenTask.ALL ? '- สร้างข้อมูล addons' : ''}
+    ${task === AiGenTask.VARIANTS || task === AiGenTask.ALL ? '- สร้าง variants พร้อมราคาและ SKU' : ''}`
 }
