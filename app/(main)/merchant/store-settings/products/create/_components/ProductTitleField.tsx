@@ -3,9 +3,13 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { AiGenTask } from '@/types/ai'
 import { ProductFormValues } from '@/zod/product'
+import { IconWand } from '@tabler/icons-react'
 
+import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -25,6 +29,8 @@ export function ProductTitleField({ isPending }: { isPending: boolean }) {
     formState: { errors },
   } = useFormContext<ProductFormValues>()
 
+  const form = useFormContext<ProductFormValues>()
+
   const title = useWatch<ProductFormValues, 'title'>({ name: 'title' })
   const debouncedTitle = useDebouncedValue(title ?? '')
 
@@ -34,14 +40,31 @@ export function ProductTitleField({ isPending }: { isPending: boolean }) {
     }
   }, [debouncedTitle, setValue, getValues])
 
+  const { mutate: genTitle, isPending: isGenTitle } = useProductAi(
+    form,
+    AiGenTask.TITLE,
+  )
+
   return (
     <Field>
       <FieldLabel>ชื่อสินค้า</FieldLabel>
-      <Textarea
-        placeholder="เช่น เสื้อยืดลายพิเศษ"
-        {...register('title')}
-        disabled={isPending}
-      />
+      <div className="flex items-center gap-2">
+        <Textarea
+          placeholder="เช่น เสื้อยืดลายพิเศษ"
+          {...register('title')}
+          disabled={isPending}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => genTitle()}
+          disabled={isGenTitle}
+          title="สร้าง Title จากชื่อสินค้า"
+        >
+          <IconWand className="size-4" />
+        </Button>
+      </div>
       <FieldError>{errors?.title?.message}</FieldError>
     </Field>
   )

@@ -3,7 +3,9 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
+import { AiGenTask } from '@/types/ai'
 import { ProductFormValues } from '@/zod/product'
 import { IconWand } from '@tabler/icons-react'
 
@@ -30,23 +32,23 @@ export function ProductSlugField({ isPending }: { isPending: boolean }) {
   const title = useWatch<ProductFormValues, 'title'>({ name: 'title' })
   const debouncedTitle = useDebouncedValue(title ?? '')
 
+  const form = useFormContext<ProductFormValues>()
+
   useEffect(() => {
     if (debouncedTitle && !getValues('slug')) {
       setValue('slug', toSlug(debouncedTitle), { shouldValidate: true })
     }
   }, [debouncedTitle, setValue, getValues])
 
-  const handleGenerateSlug = () => {
-    const currentTitle = getValues('title')
-    if (currentTitle) {
-      setValue('slug', toSlug(currentTitle), { shouldValidate: true })
-    }
-  }
+  const { mutate: genSlug, isPending: isGenSlug } = useProductAi(
+    form,
+    AiGenTask.SLUG,
+  )
 
   return (
     <Field>
       <FieldLabel>URL Slug</FieldLabel>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <Input
           placeholder="t-shirt-limited"
           {...register('slug')}
@@ -56,8 +58,8 @@ export function ProductSlugField({ isPending }: { isPending: boolean }) {
           type="button"
           variant="outline"
           size="icon"
-          onClick={handleGenerateSlug}
-          disabled={isPending}
+          onClick={() => genSlug()}
+          disabled={isGenSlug}
           title="สร้าง Slug จากชื่อสินค้า"
         >
           <IconWand className="size-4" />

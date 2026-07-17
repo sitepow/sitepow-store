@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useEffect } from 'react'
@@ -12,7 +11,7 @@ import toast from 'react-hot-toast'
 
 import { useRouter } from 'next/navigation'
 
-import { generateProductAiAction } from '@/actions/ai'
+import { useProductAi } from '@/actions/hooks/ai'
 import {
   useCreateProduct,
   useProduct,
@@ -24,12 +23,12 @@ import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_TYPE_OPTIONS } from '@/constants/translate'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { AiGenTask } from '@/types/ai'
 import { getPathR2FromUrl } from '@/utils/image'
 import { transformProductToFormValues } from '@/utils/product'
 import { ProductFormValues, productFormSchema } from '@/zod/product'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDatabase, IconTrash, IconWand, IconX } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
 import { CirclePlus, PlusCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -109,6 +108,43 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       productType: ProductType.PHYSICAL,
     },
   })
+
+  const { mutate: genAll, isPending: isGenAll } = useProductAi(
+    form,
+    AiGenTask.ALL,
+  )
+  const { mutate: genSlug, isPending: isGenSlug } = useProductAi(
+    form,
+    AiGenTask.SLUG,
+  )
+  const { mutate: genMeta, isPending: isGenMeta } = useProductAi(
+    form,
+    AiGenTask.METADATA,
+  )
+  const { mutate: genTags, isPending: isGenTags } = useProductAi(
+    form,
+    AiGenTask.TAGS,
+  )
+  const { mutate: genAddons, isPending: isGenAddons } = useProductAi(
+    form,
+    AiGenTask.ADDONS,
+  )
+  const { mutate: genVariants, isPending: isGenVariants } = useProductAi(
+    form,
+    AiGenTask.VARIANTS,
+  )
+
+  const isPending =
+    isCreating ||
+    isUpdating ||
+    isProductLoading ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending ||
+    isGenAll ||
+    isGenSlug ||
+    isGenMeta ||
+    isGenTags ||
+    isGenAddons
 
   const {
     register,
@@ -262,58 +298,28 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     }
   }
 
-  const { mutate: handleAiGen, isPending: isPendingAiGen } = useMutation({
-    mutationFn: async () => {
-      const title = getValues('title')
-      return await generateProductAiAction(title)
-    },
-    onSuccess: (result) => {
-      if (!result.success || !result.data) {
-        return
-      }
-
-      const productData = result.data
-
-      const {
-        variants: _variants,
-        metadata: _metadata,
-        addons: _addons,
-        ...restData
-      } = productData
-
-      reset({
-        ...getValues(),
-        ...restData,
-        addons: productData.addons || [],
-        tags: productData.metadata?.tags
-          ? productData.metadata.tags.join(', ')
-          : '',
-      })
-    },
-  })
-
-  const isPending =
-    isPendingAiGen ||
-    isCreating ||
-    isUpdating ||
-    isProductLoading ||
-    uploadMutation.isPending ||
-    deleteMutation.isPending
-
   return (
     <FormProvider {...form}>
       <Card>
         <CardContent className="flex flex-wrap items-center gap-2.5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <IconWand className="mr-2 size-4" /> เครื่องมือช่วยเหลือ
+              <Button variant="outline" disabled={isGenAll}>
+                {isGenAll ? (
+                  <Spinner className="mr-2" />
+                ) : (
+                  <IconWand className="mr-2 size-4" />
+                )}{' '}
+                เครื่องมือ AI
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>สร้างเนื้อหา</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleAiGen()}>
-                <IconWand className="mr-2 size-4" /> ให้ AI ช่วยคิด
+              <DropdownMenuItem onClick={() => genAll()}>
+                ให้ AI คิดให้ทั้งหมด (อาจจะใช้เวลานาน ~1-2 นาที)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => genSlug()}>
+                ให้ AI คิดให้เฉพาะ Slug
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>โหลดตัวอย่าง</DropdownMenuLabel>
@@ -348,12 +354,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       </Card>
       <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <div className="space-y-10">
-          <FieldSet disabled={isPendingAiGen}>
+          <FieldSet disabled={isPending}>
             <FieldGroup className="mt-4 grid gap-6">
-              <ProductTitleField isPending={isPendingAiGen} />
+              <ProductTitleField isPending={isPending} />
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <ProductSlugField isPending={isPendingAiGen} />
-                <CategoryField isPending={isPendingAiGen} />
+                <ProductSlugField isPending={isPending} />
+                <CategoryField isPending={isPending} />
               </div>
             </FieldGroup>
           </FieldSet>
@@ -383,26 +389,42 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             <FieldLegend variant="label" className="text-lg font-bold">
               ตัวเลือกสินค้า
             </FieldLegend>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() =>
-                appendVariant({
-                  title: '',
-                  price: 0,
-                  sku: '',
-                  stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-                  discount: {
-                    active: false,
-                    type: DiscountType.PERCENTAGE,
-                    amount: 0,
-                  },
-                  rewardPoints: { isActive: false, amount: 0 },
-                })
-              }
-            >
-              <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
-            </Button>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => genVariants()}
+                disabled={isGenVariants}
+              >
+                {isGenVariants ? (
+                  <Spinner />
+                ) : (
+                  <IconWand className="mr-2 size-4" />
+                )}{' '}
+                ให้ AI ช่วยคิด Variants
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() =>
+                  appendVariant({
+                    title: '',
+                    price: 0,
+                    sku: '',
+                    stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
+                    discount: {
+                      active: false,
+                      type: DiscountType.PERCENTAGE,
+                      amount: 0,
+                    },
+                    rewardPoints: { isActive: false, amount: 0 },
+                  })
+                }
+              >
+                <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
+              </Button>
+            </div>
           </div>
           <FieldGroup className="space-y-4">
             {variantFields.map((item, index) => (
@@ -427,14 +449,15 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   size="sm"
                   variant="outline"
-                  disabled={isPending}
+                  onClick={() => genMeta()}
+                  disabled={isGenMeta}
                 >
-                  {isPendingAiGen ? (
+                  {isGenMeta ? (
                     <Spinner />
                   ) : (
                     <IconWand className="mr-2 size-4" />
-                  )}
-                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Metadata'}
+                  )}{' '}
+                  ให้ AI ช่วยคิด Metadata
                 </Button>
                 <Button
                   type="button"
@@ -491,14 +514,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   variant="outline"
                   size="icon"
-                  disabled={isPending || isPendingAiGen}
-                  title="ให้ AI ช่วยคิด Tags"
+                  onClick={() => genTags()}
+                  disabled={isGenTags}
                 >
-                  {isPendingAiGen ? (
-                    <Spinner className="size-4" />
-                  ) : (
-                    <IconWand className="size-4" />
-                  )}
+                  {isGenTags ? <Spinner /> : <IconWand />}
                 </Button>
               </div>
             </Field>
@@ -516,14 +535,15 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   type="button"
                   size="sm"
                   variant="outline"
-                  disabled={isPending}
+                  onClick={() => genAddons()}
+                  disabled={isGenAddons}
                 >
-                  {isPendingAiGen ? (
+                  {isGenAddons ? (
                     <Spinner />
                   ) : (
                     <IconWand className="mr-2 size-4" />
-                  )}
-                  {isPending ? 'กำลังประมวลผล...' : 'ให้ AI ช่วยคิด Addons'}
+                  )}{' '}
+                  ให้ AI ช่วยคิด Addons
                 </Button>
                 <Button
                   type="button"

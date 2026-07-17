@@ -3,123 +3,216 @@
 import { GEMINI_MODEL } from '@/constants/ai'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { Plan } from '@/generated/prisma/enums'
-import { CreditUsageType } from '@/types/ai'
+import { AiGenTask, CreditUsageType } from '@/types/ai'
 import { estimateCost } from '@/utils/ai'
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
+import { ProductFormValues } from '@/zod/product'
+import { GoogleGenerativeAI, Schema, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-const model = genAI.getGenerativeModel({ model: GEMINI_MODEL })
 
-export async function generateProductAiAction(title: string) {
+const SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: { type: SchemaType.STRING },
+    slug: { type: SchemaType.STRING },
+    variants: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          title: { type: SchemaType.STRING },
+          price: { type: SchemaType.NUMBER },
+          stock: { type: SchemaType.NUMBER },
+          sku: { type: SchemaType.STRING },
+          discount: {
+            type: SchemaType.OBJECT,
+            properties: {
+              active: { type: SchemaType.BOOLEAN },
+              type: { type: SchemaType.STRING },
+              amount: { type: SchemaType.NUMBER },
+            },
+            required: ['active', 'type', 'amount'],
+          },
+          rewardPoints: {
+            type: SchemaType.OBJECT,
+            properties: {
+              isActive: { type: SchemaType.BOOLEAN },
+              amount: { type: SchemaType.NUMBER },
+            },
+            required: ['isActive', 'amount'],
+          },
+        },
+      },
+    },
+    addons: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          title: { type: SchemaType.STRING },
+          price: { type: SchemaType.NUMBER },
+          isAvailable: { type: SchemaType.BOOLEAN },
+        },
+        required: ['title', 'price', 'isAvailable'],
+      },
+    },
+    metadata: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          key: { type: SchemaType.STRING },
+          value: { type: SchemaType.STRING },
+        },
+        required: ['key', 'value'],
+      },
+    },
+    tags: { type: SchemaType.STRING },
+  },
+  required: ['title', 'slug', 'variants', 'metadata'],
+} as const
+
+const SCHEMA_PARTS: Record<AiGenTask, Schema> = {
+  [AiGenTask.TITLE]: {
+    type: SchemaType.OBJECT,
+    properties: { title: { type: SchemaType.STRING } },
+    required: ['title'],
+  },
+  [AiGenTask.SLUG]: {
+    type: SchemaType.OBJECT,
+    properties: { slug: { type: SchemaType.STRING } },
+    required: ['slug'],
+  },
+  [AiGenTask.METADATA]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      metadata: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            key: { type: SchemaType.STRING },
+            value: { type: SchemaType.STRING },
+          },
+          required: ['key', 'value'],
+        },
+      },
+    },
+    required: ['metadata'],
+  },
+  [AiGenTask.ADDONS]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      addons: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            title: { type: SchemaType.STRING },
+            price: { type: SchemaType.NUMBER },
+            isAvailable: { type: SchemaType.BOOLEAN },
+          },
+          required: ['title', 'price', 'isAvailable'],
+        },
+      },
+    },
+    required: ['addons'],
+  },
+  [AiGenTask.VARIANTS]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      variants: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            title: { type: SchemaType.STRING },
+            price: { type: SchemaType.NUMBER },
+            sku: { type: SchemaType.STRING },
+          },
+          required: ['title', 'price'],
+        },
+      },
+    },
+    required: ['variants'],
+  },
+  [AiGenTask.TAGS]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      tags: { type: SchemaType.STRING },
+    },
+    required: ['tags'],
+  },
+  [AiGenTask.ALL]: SCHEMA,
+} as const
+
+export async function generateProductAiAction(
+  currentData: Partial<ProductFormValues>,
+  task: AiGenTask,
+) {
   try {
+    const { title, images } = currentData
+    const imageUrls =
+      images
+        ?.map((img) => img.url)
+        .filter(
+          (url): url is string =>
+            typeof url === 'string' && url.startsWith('http'),
+        ) || []
+    const imageParts = imageUrls.map((url) => ({
+      fileData: { fileUri: url, mimeType: 'image/jpeg' },
+    }))
+
+    const responseSchema = task === AiGenTask.ALL ? SCHEMA : SCHEMA_PARTS[task]
+
     const model = genAI.getGenerativeModel({
       model: GEMINI_MODEL,
       generationConfig: {
         responseMimeType: 'application/json',
-        responseSchema: {
-          type: SchemaType.OBJECT,
-          properties: {
-            title: { type: SchemaType.STRING },
-            slug: { type: SchemaType.STRING },
-            variants: {
-              type: SchemaType.ARRAY,
-              items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  title: { type: SchemaType.STRING },
-                  price: { type: SchemaType.NUMBER },
-                  stock: { type: SchemaType.NUMBER },
-                  sku: { type: SchemaType.STRING },
-                  discount: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      active: { type: SchemaType.BOOLEAN },
-                      type: { type: SchemaType.STRING },
-                      amount: { type: SchemaType.NUMBER },
-                    },
-                    required: ['active', 'type', 'amount'],
-                  },
-                  rewardPoints: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      isActive: { type: SchemaType.BOOLEAN },
-                      amount: { type: SchemaType.NUMBER },
-                    },
-                    required: ['isActive', 'amount'],
-                  },
-                },
-              },
-            },
-            addons: {
-              type: SchemaType.ARRAY,
-              items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  title: { type: SchemaType.STRING },
-                  price: { type: SchemaType.NUMBER },
-                  isAvailable: { type: SchemaType.BOOLEAN },
-                },
-              },
-            },
-            metadata: {
-              type: SchemaType.OBJECT,
-              properties: {
-                tags: {
-                  type: SchemaType.ARRAY,
-                  items: { type: SchemaType.STRING },
-                },
-                details: {
-                  type: SchemaType.ARRAY,
-                  items: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      key: { type: SchemaType.STRING },
-                      value: { type: SchemaType.STRING },
-                    },
-                    required: ['key', 'value'],
-                  },
-                },
-              },
-              required: ['tags', 'details'],
-            },
-          },
-          required: ['title', 'slug', 'variants', 'metadata'],
-        },
+        responseSchema: responseSchema,
       },
     })
 
-    const availableKeys = PRODUCT_METADATA_MASTER.flatMap((group) =>
-      group.fields.map((field) => field.key),
+    const availableKeys = PRODUCT_METADATA_MASTER.flatMap((g) => g.fields).map(
+      (f) => `${f.key} (${f.label})`,
     )
 
-    const prompt = `ช่วยคิดข้อมูลสินค้า: "${title}". 
-    - ในส่วน "metadata.details": ให้เลือกคุณสมบัติเชิงลึกที่เกี่ยวข้องกับตัวสินค้าที่สุดจำนวน 3-5 อย่าง
-    - ข้อบังคับสำคัญ: ฟิลด์ "key" จะต้องเลือกมาจากรายการที่กำหนดให้ต่อไปนี้เท่านั้น ห้ามคิดคีย์ใหม่เองเด็ดขาด!
-      รายการคีย์ที่เลือกใช้ได้: ${JSON.stringify(availableKeys)}
-    - ส่วน "value" ให้เติมค่าที่เหมาะสมเป็นภาษาไทย เช่น ถ้าเลือก key "battery_life" ให้ใส่ value เป็น "ใช้งานได้สูงสุด 40 ชั่วโมง"
-    - metadata.tags: keywords 3-5 คำ (ภาษาไทย)
-    - ข้อมูลที่เป็นภาษาไทย: title, variants.title, addons.title, และค่า (value) ใน metadata
-    - ข้อมูลที่เป็นภาษาอังกฤษ: slug, variants.sku
-    - variants[].discount: active: false, type: "PERCENTAGE", amount: 0 เสมอ
-    - variants[].rewardPoints: isActive: false, amount: 0 เสมอ`
+    const prompt = `คุณคือผู้เชี่ยวชาญด้านการตลาด "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
+    ช่วยคิดข้อมูลสินค้า: "${title}"
+    ${task === AiGenTask.TITLE || task === AiGenTask.ALL ? '- ปรับชื่อสินค้าให้ดูน่าสนใจ ดึงดูดลูกค้ามากขึ้น' : ''}
+    ${task === AiGenTask.SLUG || task === AiGenTask.ALL ? '- สร้าง slug (kebab-case) จากชื่อสินค้า' : ''}
+    ${
+      task === AiGenTask.METADATA || task === AiGenTask.ALL
+        ? `- สร้าง metadata (array ของ object ที่มี key และ value) โดยใช้ key จาก: ${JSON.stringify(availableKeys)}`
+        : ''
+    }
+    ${task === AiGenTask.TAGS || task === AiGenTask.ALL ? '- สร้าง tags (string คั่นด้วยคอมม่า)' : ''}
+    ${task === AiGenTask.ADDONS || task === AiGenTask.ALL ? '- สร้างข้อมูล addons ที่เหมาะสมกับสินค้า' : ''}
+    ${
+      task === AiGenTask.VARIANTS || task === AiGenTask.ALL
+        ? `- สร้างข้อมูลตัวเลือกสินค้า (variants) อย่างน้อย 3 รูปแบบ พร้อมราคา (price) และ SKU ที่เหมาะสม`
+        : ''
+    }`
 
-    const result = await model.generateContent(prompt)
-    const responseText = result.response.text()
-
-    return { success: true, data: JSON.parse(responseText) }
+    const result = await model.generateContent([prompt, ...imageParts])
+    return {
+      success: true,
+      message: 'ระบบให้ AI คิดเนื้อหาให้คุณสำเร็จแล้ว',
+      data: JSON.parse(result.response.text()),
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
   }
 }
 
+const mainModel = genAI.getGenerativeModel({ model: GEMINI_MODEL })
 async function getPreciseTokenCount(prompt: string) {
-  const result = await model.countTokens(prompt)
+  const result = await mainModel.countTokens(prompt)
   return result.totalTokens
 }
 
 export async function handleUserPrompt(prompt: string, plan: Plan) {
   const inputTokens = await getPreciseTokenCount(prompt)
-  const outputTokens = 150
-  return estimateCost(CreditUsageType.AI, plan, inputTokens, outputTokens)
+  return estimateCost(CreditUsageType.AI, plan, inputTokens, 150)
 }
