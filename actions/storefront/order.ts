@@ -370,7 +370,6 @@ export async function createOrder(input: CreateOrderInput) {
           deliveryStatus: DeliveryStatus.PENDING,
           storeId: store.id,
           customerId: customer.id,
-          branchId: branch.id,
           couponId: input.couponId,
           paymentMethod: input.paymentMethod,
           shippingMethod: input.shippingMethod,

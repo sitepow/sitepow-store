@@ -672,7 +672,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             <AlertDialogDescription>
               การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
               <span className="text-primary">{aiTaskConfirm?.cost} เครดิต</span>{' '}
-              จากแพลน {store?.plan || Plan.FREE} ของคุณ
               คุณต้องการดำเนินการต่อหรือไม่?
             </AlertDialogDescription>
           </AlertDialogHeader>

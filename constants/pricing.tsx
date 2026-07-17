@@ -148,7 +148,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.67 เครดิต/สลิป',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.00 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -244,7 +244,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.60 เครดิต/สลิป',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.20 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
@@ -339,7 +339,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.07 เครดิต/สลิป',
+        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 0.8 เครดิต/สลิป',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {

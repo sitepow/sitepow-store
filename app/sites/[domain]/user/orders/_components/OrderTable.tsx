@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
+import { OrderStatus } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEye } from '@tabler/icons-react'
@@ -25,6 +26,7 @@ import {
 
 import { StorePagination } from '../../../_components/Pagination'
 import { OrderDetailView } from './OrderDetailView'
+import { UploadSlipDialog } from './UploadSlipDialog'
 
 interface OrderTableProps {
   search?: string
@@ -78,7 +80,19 @@ export function OrderTable({ search }: OrderTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="flex flex-wrap items-center gap-2.5 text-right">
+                    {order.status === OrderStatus.PENDING && (
+                      <UploadSlipDialog
+                        orderId={order.id}
+                        storeId={order.store?.id}
+                        orderNumber={order.orderNumber}
+                        bankAccount={{
+                          bankName: 'กสิกรไทย',
+                          accountName: 'นายสมชาย ใจดี',
+                          accountNumber: '123-4-56789-0',
+                        }}
+                      />
+                    )}
                     <Button
                       variant="outline"
                       size="icon-lg"

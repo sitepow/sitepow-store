@@ -18,9 +18,9 @@ export const BASE_CREDIT_VALUE_THB = 0.8
 
 export const SLIP_CREDIT_COST: Record<Plan, number> = {
   FREE: 4.0,
-  STARTER: 2.67,
-  PRO: 1.6,
-  ULTIMATE: 1.07,
+  STARTER: 2.0,
+  PRO: 1.2,
+  ULTIMATE: 0.8,
 }
 
 export const AVG_INPUT_TOKENS = 500
