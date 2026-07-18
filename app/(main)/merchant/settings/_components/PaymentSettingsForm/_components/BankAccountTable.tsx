@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 
 import { useDeleteBankAccount } from '@/actions/hooks/payment'
 import { PaymentSettingPayload } from '@/actions/payment'
+import { BankAccountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 
 import { DeleteButton } from '@/components/DeleteButton'
@@ -48,8 +49,9 @@ export function BankAccountTable({ accounts }: BankAccountTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ธนาคาร</TableHead>
-            <TableHead>เลขบัญชี</TableHead>
+            <TableHead>ประเภท</TableHead>
+            <TableHead>ธนาคาร/ผู้ให้บริการ</TableHead>
+            <TableHead>ข้อมูลบัญชี</TableHead>
             <TableHead>ชื่อบัญชี</TableHead>
             <TableHead>สถานะ</TableHead>
             <TableHead className="w-24" />
@@ -58,15 +60,24 @@ export function BankAccountTable({ accounts }: BankAccountTableProps) {
         <TableBody>
           {accounts.map((account) => (
             <TableRow key={account.id}>
+              <TableCell>
+                <Badge variant="outline">
+                  {account.type === BankAccountType.PROMPTPAY
+                    ? 'PromptPay'
+                    : 'โอนผ่านธนาคาร'}
+                </Badge>
+              </TableCell>
               <TableCell className="font-medium">{account.bankName}</TableCell>
-              <TableCell>{account.accountNumber}</TableCell>
+              <TableCell>
+                {account.type === BankAccountType.PROMPTPAY
+                  ? account.promptPayId
+                  : account.accountNumber}
+              </TableCell>
               <TableCell>{account.accountName}</TableCell>
               <TableCell>
-                {account.isDefault ? (
-                  <Badge>บัญชีหลัก</Badge>
-                ) : (
-                  <Badge variant="outline">บัญชีรอง</Badge>
-                )}
+                <Badge variant="outline">
+                  {account.isDefault ? 'บัญชีหลัก' : 'บัญชีรอง'}
+                </Badge>
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-end gap-1">

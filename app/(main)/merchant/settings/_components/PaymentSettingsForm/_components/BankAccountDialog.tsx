@@ -6,6 +6,7 @@ import {
   useUpdateBankAccount,
 } from '@/actions/hooks/payment'
 import { THAI_BANKS } from '@/constants/bank'
+import { BankAccountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { BankAccountFormValues, bankAccountSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -51,7 +52,7 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
   } = useForm<BankAccountFormValues>({
     resolver: zodResolver(bankAccountSchema),
     defaultValues: defaultValues ?? {
-      type: 'STANDARD_TRANSFER',
+      type: BankAccountType.STANDARD_TRANSFER,
       isDefault: false,
     },
   })
@@ -100,14 +101,12 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
           <IconPlus size={14} /> เพิ่มบัญชีธนาคาร
         </Button>
       </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}
           </DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Field>
             <FieldLabel>ประเภทบัญชี</FieldLabel>
@@ -120,10 +119,10 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
                     <SelectValue placeholder="เลือกประเภท..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="STANDARD_TRANSFER">
+                    <SelectItem value={BankAccountType.STANDARD_TRANSFER}>
                       โอนผ่านธนาคาร
                     </SelectItem>
-                    <SelectItem value="PROMPTPAY">
+                    <SelectItem value={BankAccountType.PROMPTPAY}>
                       พร้อมเพย์ (PromptPay)
                     </SelectItem>
                   </SelectContent>
@@ -131,7 +130,6 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
               )}
             />
           </Field>
-
           <Field>
             <FieldLabel>ธนาคาร/ผู้ให้บริการ</FieldLabel>
             <Controller
@@ -154,7 +152,7 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
             />
             <FieldError>{errors.bankName?.message}</FieldError>
           </Field>
-          {accountType === 'PROMPTPAY' ? (
+          {accountType === BankAccountType.PROMPTPAY ? (
             <Field>
               <FieldLabel>หมายเลขพร้อมเพย์</FieldLabel>
               <Input

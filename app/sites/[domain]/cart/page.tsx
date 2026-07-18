@@ -14,7 +14,12 @@ import {
   useShippingCalculation,
   useStorefrontShippingOptions,
 } from '@/actions/hooks/storefront/shipping'
-import { PaymentMethod, ProductType, UserRole } from '@/generated/prisma/enums'
+import {
+  BankAccountType,
+  PaymentMethod,
+  ProductType,
+  UserRole,
+} from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -129,8 +134,14 @@ export default function StoreCartPage() {
       ...(paymentOptions?.isBankTransferEnabled
         ? paymentOptions.bankAccounts.map((acc) => ({
             id: acc.id,
-            title: 'โอนเงินบัญชีธนาคาร',
-            description: `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
+            title:
+              acc.type === BankAccountType.PROMPTPAY
+                ? 'พร้อมเพย์ (PromptPay)'
+                : 'โอนเงินบัญชีธนาคาร',
+            description:
+              acc.type === BankAccountType.PROMPTPAY
+                ? `หมายเลขพร้อมเพย์ ${acc.promptPayId} (${acc.accountName})`
+                : `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
           }))
         : []),
       ...(paymentOptions?.isStripeEnabled
@@ -215,6 +226,15 @@ export default function StoreCartPage() {
     if (paymentId === 'stripe') {
       return PaymentMethod.CREDIT_CARD
     }
+
+    const selectedAcc = paymentOptions?.bankAccounts.find(
+      (a) => a.id === paymentId,
+    )
+
+    if (selectedAcc?.type === BankAccountType.PROMPTPAY) {
+      return PaymentMethod.QR_PROMPTPAY
+    }
+
     return PaymentMethod.TRANSFER
   }
 
@@ -465,7 +485,6 @@ export default function StoreCartPage() {
                   )}
                   <Button
                     className="w-full"
-
                     disabled={!selectedAddressData}
                     onClick={goToNextIncompleteStep}
                   >

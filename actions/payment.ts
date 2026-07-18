@@ -19,6 +19,8 @@ const paymentSettingSelect = {
       accountName: true,
       qrImage: true,
       isDefault: true,
+      type: true,
+      promptPayId: true,
     },
     orderBy: { isDefault: 'desc' } as const,
   },
@@ -93,7 +95,12 @@ export async function createBankAccount(
     }
 
     const account = await prisma.bankAccount.create({
-      data: { ...data, paymentSettingId: setting.id },
+      data: {
+        ...data,
+        paymentSettingId: setting.id,
+        accountNumber: data.accountNumber ?? '',
+        promptPayId: data.promptPayId ?? '',
+      },
     })
 
     await createLog({
@@ -133,7 +140,11 @@ export async function updateBankAccount(
       },
     })
 
-    if (data.isDefault && account) {
+    if (!account) {
+      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+    }
+
+    if (data.isDefault) {
       await prisma.bankAccount.updateMany({
         where: { paymentSettingId: account.paymentSettingId },
         data: { isDefault: false },
@@ -148,7 +159,7 @@ export async function updateBankAccount(
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
-      storeId: account?.paymentSetting.storeId,
+      storeId: account.paymentSetting.storeId,
       entity: 'BankAccount',
       entityId: id,
       details: { setting: 'bank_account', type: 'updated' },

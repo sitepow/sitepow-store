@@ -83,7 +83,6 @@ export function PaymentSettingsForm() {
             endContent={<StoreSelectField />}
           />
         </CardHeader>
-
         {selectedStoreId !== ALL_STORES && (
           <>
             <CardContent className="divide-border divide-y">
@@ -109,7 +108,6 @@ export function PaymentSettingsForm() {
                     )}
                   />
                 </div>
-
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-5">
                     <span className="text-sm font-medium">
@@ -122,7 +120,6 @@ export function PaymentSettingsForm() {
                   />
                 </div>
               </div>
-
               <div className="flex flex-wrap items-center justify-between gap-5 py-5">
                 <div>
                   <span className="block text-sm font-semibold">
@@ -144,7 +141,6 @@ export function PaymentSettingsForm() {
                   )}
                 />
               </div>
-
               {isStripeEnabled && (
                 <div className="grid gap-4 pt-5 lg:grid-cols-2">
                   <div className="grid gap-2">
@@ -166,7 +162,6 @@ export function PaymentSettingsForm() {
                 </div>
               )}
             </CardContent>
-
             <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
               {isDirty && (
                 <Button type="button" variant="outline" onClick={resetForm}>
@@ -187,7 +182,6 @@ export function PaymentSettingsForm() {
             </CardFooter>
           </>
         )}
-
         {selectedStoreId === ALL_STORES && (
           <CardContent>
             <ActionRequiredAlert />

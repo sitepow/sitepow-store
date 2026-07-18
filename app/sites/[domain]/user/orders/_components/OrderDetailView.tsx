@@ -35,7 +35,6 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
-
       <div className="space-y-4">
         <div className="space-y-2 rounded-lg border p-4">
           <div className="text-sm font-semibold">รายการสินค้า</div>
@@ -53,13 +52,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             <span>{formatCurrency(order.totalAmount)}</span>
           </div>
         </div>
-
         <div className="space-y-2">
           <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
           <div className="mb-2 flex items-center gap-2">
             <Badge variant="outline">{ORDER_STATUS_TH[order.status]}</Badge>
           </div>
-
           {order.trackingNumber ? (
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div>

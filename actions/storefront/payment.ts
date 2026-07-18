@@ -16,6 +16,7 @@ const storefrontPaymentSelect = {
       accountName: true,
       qrImage: true,
       isDefault: true,
+      promptPayId: true,
       type: true,
     },
     orderBy: { isDefault: 'desc' } as const,

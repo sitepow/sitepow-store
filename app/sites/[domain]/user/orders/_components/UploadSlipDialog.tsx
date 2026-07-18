@@ -12,6 +12,7 @@ import { IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
 import generatePayload from 'promptpay-qr'
 import QRCode from 'qrcode'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -28,7 +29,18 @@ interface UploadSlipDialogProps {
   storeId: string
   orderNumber: string
   customerId: string
-  bankAccounts: BankAccount[]
+  bankAccounts: (Pick<
+    BankAccount,
+    | 'id'
+    | 'bankName'
+    | 'accountNumber'
+    | 'accountName'
+    | 'type'
+    | 'promptPayId'
+    | 'qrImage'
+    | 'isDefault'
+  > &
+    Partial<BankAccount>)[]
 }
 
 export function UploadSlipDialog({
@@ -129,9 +141,14 @@ export function UploadSlipDialog({
               }`}
             >
               <div>
-                <div className="font-semibold">{acc.bankName}</div>
+                <div className="font-semibold">
+                  {acc.bankName}{' '}
+                  {acc.type === BankAccountType.PROMPTPAY && '(พร้อมเพย์)'}
+                </div>
                 <div className="text-muted-foreground text-xs">
-                  {acc.accountNumber}
+                  {acc.type === BankAccountType.PROMPTPAY
+                    ? acc.promptPayId
+                    : acc.accountNumber}
                 </div>
               </div>
             </button>
@@ -144,18 +161,26 @@ export function UploadSlipDialog({
               alt="PromptPay QR"
               width={180}
               height={180}
-              className="rounded-lg border"
+              className="border"
             />
           </div>
         )}
         <div className="bg-muted/50 space-y-2 rounded-lg border p-4 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">ชื่อบัญชี:</span>
+            <span className="text-muted-foreground">ชื่อบัญชี</span>
             <span className="font-medium">{selectedAccount.accountName}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">เลขบัญชี:</span>
-            <span className="font-bold">{selectedAccount.accountNumber}</span>
+            <span className="text-muted-foreground">
+              {selectedAccount.type === BankAccountType.PROMPTPAY
+                ? 'หมายเลขพร้อมเพย์'
+                : 'เลขบัญชี'}
+            </span>
+            <span className="font-bold">
+              {selectedAccount.type === BankAccountType.PROMPTPAY
+                ? selectedAccount.promptPayId
+                : selectedAccount.accountNumber}
+            </span>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center pt-2">
@@ -192,6 +217,12 @@ export function UploadSlipDialog({
             </label>
           )}
         </div>
+        <ActionRequiredAlert
+          title="คำเตือน"
+          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
+          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
+          บัญชีของคุณจะถูกแบนถาวร"
+        />
         <DialogFooter>
           <Button
             type="button"
