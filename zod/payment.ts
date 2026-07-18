@@ -1,9 +1,12 @@
+import { BankAccountType } from '@/generated/prisma/enums'
 import * as z from 'zod'
 
 export const bankAccountSchema = z.object({
+  type: z.enum(BankAccountType).default(BankAccountType.STANDARD_TRANSFER),
   bankName: z.string().min(1, { message: 'กรุณาระบุชื่อธนาคาร' }),
   accountNumber: z.string().min(1, { message: 'กรุณาระบุเลขบัญชี' }),
   accountName: z.string().min(1, { message: 'กรุณาระบุชื่อบัญชี' }),
+  promptPayId: z.string().optional(),
   qrImage: z.string().optional(),
   isDefault: z.boolean().default(false),
 })

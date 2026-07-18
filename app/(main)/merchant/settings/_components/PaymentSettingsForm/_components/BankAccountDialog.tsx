@@ -46,11 +46,17 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
     handleSubmit,
     reset,
     control,
+    watch,
     formState: { errors },
   } = useForm<BankAccountFormValues>({
     resolver: zodResolver(bankAccountSchema),
-    defaultValues: defaultValues ?? { isDefault: false },
+    defaultValues: defaultValues ?? {
+      type: 'STANDARD_TRANSFER',
+      isDefault: false,
+    },
   })
+
+  const accountType = watch('type')
 
   const { mutate: createAccount, isPending: isCreating } =
     useCreateBankAccount()
@@ -71,20 +77,12 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
     if (isEdit) {
       updateAccount(
         { id: defaultValues.id, storeId: selectedStoreId, data },
-        {
-          onSuccess: () => {
-            handleClose()
-          },
-        },
+        { onSuccess: () => handleClose() },
       )
     } else {
       createAccount(
         { storeId: selectedStoreId, data },
-        {
-          onSuccess: () => {
-            handleClose()
-          },
-        },
+        { onSuccess: () => handleClose() },
       )
     }
   }
@@ -93,10 +91,7 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
     <Dialog
       open={open}
       onOpenChange={(v) => {
-        if (!v) {
-          handleClose()
-        }
-
+        if (!v) handleClose()
         setOpen(v)
       }}
     >
@@ -115,15 +110,35 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel>ธนาคาร</FieldLabel>
+            <FieldLabel>ประเภทบัญชี</FieldLabel>
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกประเภท..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="STANDARD_TRANSFER">
+                      โอนผ่านธนาคาร
+                    </SelectItem>
+                    <SelectItem value="PROMPTPAY">
+                      พร้อมเพย์ (PromptPay)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel>ธนาคาร/ผู้ให้บริการ</FieldLabel>
             <Controller
               control={control}
               name="bankName"
               render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(v) => field.onChange(v)}
-                >
+                <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="เลือกธนาคาร..." />
                   </SelectTrigger>
@@ -139,26 +154,34 @@ export function BankAccountDialog({ defaultValues }: BankAccountDialogProps) {
             />
             <FieldError>{errors.bankName?.message}</FieldError>
           </Field>
-
-          <Field>
-            <FieldLabel>เลขบัญชี</FieldLabel>
-            <Input
-              {...register('accountNumber')}
-              placeholder="เลขบัญชีธนาคาร"
-              inputMode="numeric"
-            />
-            <FieldError>{errors.accountNumber?.message}</FieldError>
-          </Field>
-
+          {accountType === 'PROMPTPAY' ? (
+            <Field>
+              <FieldLabel>หมายเลขพร้อมเพย์</FieldLabel>
+              <Input
+                {...register('promptPayId')}
+                placeholder="เบอร์โทรศัพท์ หรือ เลขบัตรประชาชน"
+              />
+              <FieldError>{errors.promptPayId?.message}</FieldError>
+            </Field>
+          ) : (
+            <Field>
+              <FieldLabel>เลขบัญชี</FieldLabel>
+              <Input
+                {...register('accountNumber')}
+                placeholder="เลขบัญชีธนาคาร"
+                inputMode="numeric"
+              />
+              <FieldError>{errors.accountNumber?.message}</FieldError>
+            </Field>
+          )}
           <Field>
             <FieldLabel>ชื่อบัญชี</FieldLabel>
             <Input
               {...register('accountName')}
-              placeholder="ชื่อ-นามสกุลเจ้าของบัญชี หรือชื่อบริษัท"
+              placeholder="ชื่อ-นามสกุล หรือชื่อบริษัท"
             />
             <FieldError>{errors.accountName?.message}</FieldError>
           </Field>
-
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose}>
               ยกเลิก

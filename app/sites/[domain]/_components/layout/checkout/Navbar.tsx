@@ -4,6 +4,7 @@ import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { LockKeyholeIcon } from 'lucide-react'
 
+import { LogoBrand } from '@/components/LogoBrand'
 import { StoreLogo } from '@/components/StoreLogo'
 import { Button } from '@/components/ui/button'
 
@@ -17,7 +18,7 @@ export function StoreNavbarCheckout() {
       <nav className="border-border container mx-auto flex flex-col gap-5 border-b px-10 py-5">
         <div className="flex items-center justify-between">
           {store?.logo && <StoreLogo image={store?.logo} />}
-          {!store?.logo && <StoreLogo />}
+          {!store?.logo && <LogoBrand />}
 
           {!isAuthenticated && (
             <Link href={'/login'}>

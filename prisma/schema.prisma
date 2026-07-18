@@ -114,19 +114,38 @@ model Customer {
   avatar    String?
   deletedAt DateTime?
 
-  userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isBlocked     Boolean   @default(false)
+  fakeSlipCount Int       @default(0)
+  blockedUntil  DateTime?
+  userId        String?   @unique
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   customerType CustomerType @default(INDIVIDUAL)
 
-  stores    CustomerStore[]
-  reviews   Review[]
-  orders    Order[]
-  cart      Cart?
-  addresses Address[]
+  stores        CustomerStore[]
+  reviews       Review[]
+  orders        Order[]
+  cart          Cart?
+  addresses     Address[]
+  slipHistories SlipVerificationHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SlipVerificationHistory {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  orderId  String
+  imageUrl String
+  isValid  Boolean
+  message  String?
+
+  checkedAt DateTime @default(now())
+
+  @@index([customerId])
 }
 
 model CustomerStore {
@@ -397,16 +416,24 @@ model PaymentSetting {
   updatedAt DateTime @updatedAt
 }
 
+enum BankAccountType {
+  PROMPTPAY
+  STANDARD_TRANSFER
+}
+
 model BankAccount {
   id               String         @id @default(cuid())
   paymentSettingId String
   paymentSetting   PaymentSetting @relation(fields: [paymentSettingId], references: [id], onDelete: Cascade)
 
   bankName      String
-  accountNumber String
   accountName   String
-  qrImage       String?
-  isDefault     Boolean @default(false)
+  accountNumber String
+
+  type        BankAccountType @default(STANDARD_TRANSFER)
+  promptPayId String?
+  qrImage     String?
+  isDefault   Boolean         @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -985,6 +1012,8 @@ enum LogAction {
   UPDATE_STORE_SETTING
   MANAGE_STAFF
   TRANSFER_STORE
+  BLOCK_CUSTOMER
+  UNBLOCK_CUSTOMER
   LOGIN
   LOGOUT
 }

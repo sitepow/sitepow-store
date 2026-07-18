@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
+import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
@@ -39,6 +40,7 @@ export function OrderTable({ search }: OrderTableProps) {
 
   const { data: { data: orders = [], meta } = {}, isLoading } =
     useStorefrontOrders({ page, limit: 10, search })
+  const { data: paymentOptions } = useStorefrontPaymentOptions('example')
 
   const getItemsSummary = (items: GetStorefrontOrderItemSerialized['items']) =>
     items.map((item) => `${item.title} x ${item.quantity}`).join(', ')
@@ -84,13 +86,14 @@ export function OrderTable({ search }: OrderTableProps) {
                     {order.status === OrderStatus.PENDING && (
                       <UploadSlipDialog
                         orderId={order.id}
-                        storeId={order.store?.id}
+                        storeId={order.store.id}
                         orderNumber={order.orderNumber}
-                        bankAccount={{
-                          bankName: 'กสิกรไทย',
-                          accountName: 'นายสมชาย ใจดี',
-                          accountNumber: '123-4-56789-0',
-                        }}
+                        customerId={order.customerId!}
+                        bankAccounts={
+                          paymentOptions?.bankAccounts.map((acc) => ({
+                            ...acc,
+                          })) || []
+                        }
                       />
                     )}
                     <Button

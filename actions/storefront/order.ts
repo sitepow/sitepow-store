@@ -65,6 +65,7 @@ const storefrontOrderSelect = {
   trackingNumber: true,
   deliveryStatus: true,
   createdAt: true,
+  customerId: true,
   store: {
     select: {
       id: true,
