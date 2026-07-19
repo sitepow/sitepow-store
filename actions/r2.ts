@@ -32,7 +32,6 @@ export async function r2UploadImage(formData: FormData, folder: string) {
 
     return {
       success: true,
-      message: 'อัพโหลดรูปภาพสำเร็จแล้ว',
       url: `${process.env.R2_PUBLIC_DOMAIN}/${fileName}`,
     }
   } catch {
@@ -48,7 +47,7 @@ export async function r2DeleteImage(fileName: string) {
         Key: fileName,
       }),
     )
-    return { success: true, message: 'ลบรูปภาพสำเร็จแล้ว' }
+    return { success: true }
   } catch {
     return { success: false }
   }

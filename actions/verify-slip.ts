@@ -2,7 +2,8 @@
 
 import { SLIP_CREDIT_COST } from '@/constants/ai'
 import { SLIP2GO_API } from '@/constants/slip'
-import { TransactionType } from '@/generated/prisma/enums'
+import { OrderStatus, TransactionType } from '@/generated/prisma/enums'
+import axios from 'axios'
 
 import { prisma } from '@/lib/prisma'
 
@@ -43,19 +44,34 @@ export async function verifySlip(
     return { success: false, message: 'ยอดเครดิตร้านค้าไม่เพียงพอ' }
   }
 
-  const response = await fetch(SLIP2GO_API, {
-    method: 'POST',
-    body: JSON.stringify({ image_url: slipImageUrl }),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.SLIP2GO_API_KEY}`,
-    },
-  })
-
-  if (!response.ok) {
-    return { success: false, message: 'API ตรวจสอบสลิปขัดข้อง' }
+  let result
+  try {
+    const response = await axios.post(
+      SLIP2GO_API,
+      {
+        payload: {
+          imageUrl: slipImageUrl,
+        },
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.SLIP2GO_API_KEY}`,
+        },
+      },
+    )
+    result = response.data
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        message: 'สลิปไม่ถูกต้อง หรือตรวจสอบไม่ได้',
+      }
+    }
+    return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' }
   }
-  const result = await response.json()
+
+  const isSlipValid = result.code === '200000'
 
   await prisma.$transaction(async (tx) => {
     await tx.slipVerificationHistory.create({
@@ -63,13 +79,13 @@ export async function verifySlip(
         customerId,
         orderId,
         imageUrl: slipImageUrl,
-        isValid: result.success,
+        isValid: isSlipValid,
         message:
-          result.message || (result.success ? 'สลิปถูกต้อง' : 'สลิปไม่ถูกต้อง'),
+          result.message || (isSlipValid ? 'สลิปถูกต้อง' : 'สลิปไม่ถูกต้อง'),
       },
     })
 
-    if (!result.success) {
+    if (!isSlipValid) {
       const updatedCustomer = await tx.customer.update({
         where: { id: customerId },
         data: { fakeSlipCount: { increment: 1 } },
@@ -109,6 +125,13 @@ export async function verifySlip(
         })
       }
     } else {
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.PAID,
+          paidAt: new Date(),
+        },
+      })
       await tx.store.update({
         where: { id: storeId },
         data: { balance: { decrement: cost } },
@@ -118,12 +141,16 @@ export async function verifySlip(
           storeId,
           amount: cost,
           type: TransactionType.SLIP_VERIFY,
-          description: `ตรวจสอบสลิปสำหรับออเดอร์: ${orderId}`,
+          description: `ตรวจสอบสลิปสำหรับออเดอร์ ${orderId}`,
           orderId,
         },
       })
     }
   })
 
-  return result
+  return {
+    success: isSlipValid,
+    message:
+      result.message || (isSlipValid ? 'ตรวจสอบสลิปสำเร็จ' : 'สลิปไม่ถูกต้อง'),
+  }
 }

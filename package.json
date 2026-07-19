@@ -23,7 +23,7 @@
     "@teispace/next-themes": "^2.0.2",
     "@thesvg/react": "^3.0.19",
     "@types/qrcode": "^1.5.6",
-    "axios": "^1.16.1",
+    "axios": "^1.18.1",
     "bad-words": "^4.0.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

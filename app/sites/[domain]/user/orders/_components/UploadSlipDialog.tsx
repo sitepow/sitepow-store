@@ -2,12 +2,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 
 import Image from 'next/image'
 
-import { verifySlip } from '@/actions/verify-slip'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
+import { useVerifySlip } from '@/actions/hooks/verify-slip'
 import { BankAccount, BankAccountType } from '@/generated/prisma/browser'
+import { useSession } from '@/hooks/use-session'
+import { getPathR2FromUrl } from '@/utils/image'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
 import generatePayload from 'promptpay-qr'
@@ -54,31 +56,18 @@ export function UploadSlipDialog({
   customerId,
   bankAccounts,
 }: UploadSlipDialogProps) {
+  const { userId } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>()
 
-  function useCountdown(initialSeconds: number) {
-    const [seconds, setSeconds] = useState(initialSeconds)
-
-    useEffect(() => {
-      if (seconds <= 0) {
-        return
-      }
-      const timer = setInterval(() => setSeconds((prev) => prev - 1), 1000)
-      return () => clearInterval(timer)
-    }, [seconds])
-
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
-
-  const timeLeft = useCountdown(600)
+  const { mutate: verify, isPending: isVerifying } = useVerifySlip()
+  const { mutate: deleteImage } = useR2DeleteImage()
+  const { mutateAsync: uploadImage, isPending: isUploading } = useR2UploadImage(
+    `store/${storeId}/orders/${orderId}/${userId}`,
+  )
 
   const selectedAccount =
     bankAccounts.find((a) => a.id === selectedId) || bankAccounts[0]
@@ -118,22 +107,34 @@ export function UploadSlipDialog({
     if (!file) {
       return
     }
-    setIsSubmitting(true)
-    try {
-      const imageUrl = 'URL_ที่ได้จากการอัปโหลด'
-      const result = await verifySlip(orderId, imageUrl, storeId, customerId)
-      if (result.success !== false) {
-        toast.success('ระบบได้รับสลิปและกำลังตรวจสอบแล้ว')
-        setIsOpen(false)
-        handleRemoveFile()
-      } else {
-        toast.error(result.message || 'เกิดข้อผิดพลาด')
-      }
-    } catch {
-      toast.error('อัปโหลดไม่สำเร็จ')
-    } finally {
-      setIsSubmitting(false)
+
+    const formData = new FormData()
+    formData.append('file', file)
+    const uploadResult = await uploadImage(formData)
+
+    if (!uploadResult.success || !uploadResult.url) {
+      return
     }
+
+    verify(
+      {
+        orderId,
+        slipImageUrl: uploadResult.url,
+        storeId,
+        customerId,
+      },
+      {
+        onSuccess: async (result) => {
+          if (result.success) {
+            setIsOpen(false)
+            handleRemoveFile()
+          } else {
+            const oldKey = getPathR2FromUrl(uploadResult.url!)
+            await deleteImage(oldKey)
+          }
+        },
+      },
+    )
   }
 
   if (!selectedAccount) {
@@ -151,10 +152,13 @@ export function UploadSlipDialog({
         <DialogHeader>
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
-          <DialogDescription className="text-primary">
-            โปรดโอนเงินและอัปโหลดสลิปภายใน {timeLeft} นาที
-          </DialogDescription>
         </DialogHeader>
+        <ActionRequiredAlert
+          title="คำเตือน"
+          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
+          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
+          บัญชีของคุณจะถูกแบนถาวร"
+        />
         <RadioGroup
           value={selectedId || ''}
           onValueChange={setSelectedId}
@@ -242,12 +246,6 @@ export function UploadSlipDialog({
             </label>
           )}
         </div>
-        <ActionRequiredAlert
-          title="คำเตือน"
-          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
-          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
-          บัญชีของคุณจะถูกแบนถาวร"
-        />
         <DialogFooter>
           <Button
             type="button"
@@ -259,9 +257,9 @@ export function UploadSlipDialog({
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!file || isSubmitting}
+            disabled={!file || isVerifying || isUploading}
           >
-            {isSubmitting ? 'กำลังส่ง...' : 'ยืนยันการชำระเงิน'}
+            {isVerifying ? 'กำลังส่ง...' : 'ยืนยันการชำระเงิน'}
           </Button>
         </DialogFooter>
       </DialogContent>
