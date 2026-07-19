@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { SECOND } from '@/constants/system'
-import { getLandingImages } from '@/utils/LandingImages'
+import { getLandingImages } from '@/utils/landing-images'
 
 interface LandingImages {
   intervalTime?: number

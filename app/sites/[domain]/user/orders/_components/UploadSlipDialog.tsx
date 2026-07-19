@@ -8,6 +8,7 @@ import Image from 'next/image'
 
 import { verifySlip } from '@/actions/verify-slip'
 import { BankAccount, BankAccountType } from '@/generated/prisma/browser'
+import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
 import generatePayload from 'promptpay-qr'
 import QRCode from 'qrcode'
@@ -23,6 +24,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { RadioGroup } from '@/components/ui/radio-group'
+
+import { RadioCard } from '../../../cart/_components/RadioCard'
 
 interface UploadSlipDialogProps {
   orderId: string
@@ -56,6 +60,25 @@ export function UploadSlipDialog({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>()
+
+  function useCountdown(initialSeconds: number) {
+    const [seconds, setSeconds] = useState(initialSeconds)
+
+    useEffect(() => {
+      if (seconds <= 0) {
+        return
+      }
+      const timer = setInterval(() => setSeconds((prev) => prev - 1), 1000)
+      return () => clearInterval(timer)
+    }, [seconds])
+
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  const timeLeft = useCountdown(600)
 
   const selectedAccount =
     bankAccounts.find((a) => a.id === selectedId) || bankAccounts[0]
@@ -128,32 +151,34 @@ export function UploadSlipDialog({
         <DialogHeader>
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
+          <DialogDescription className="text-primary">
+            โปรดโอนเงินและอัปโหลดสลิปภายใน {timeLeft} นาที
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2 py-2">
+        <RadioGroup
+          value={selectedId || ''}
+          onValueChange={setSelectedId}
+          className="grid gap-2 py-2"
+        >
           {bankAccounts.map((acc) => (
-            <button
+            <RadioCard
               key={acc.id}
-              onClick={() => setSelectedId(acc.id)}
-              className={`flex items-center justify-between rounded-lg border p-3 text-left transition-all ${
-                selectedAccount.id === acc.id
-                  ? 'border-primary bg-primary/5'
-                  : 'border-input'
-              }`}
-            >
-              <div>
-                <div className="font-semibold">
+              id={acc.id}
+              value={acc.id}
+              title={
+                <>
                   {acc.bankName}{' '}
                   {acc.type === BankAccountType.PROMPTPAY && '(พร้อมเพย์)'}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  {acc.type === BankAccountType.PROMPTPAY
-                    ? acc.promptPayId
-                    : acc.accountNumber}
-                </div>
-              </div>
-            </button>
+                </>
+              }
+              description={
+                acc.type === BankAccountType.PROMPTPAY
+                  ? formatPromptPay(acc.promptPayId)
+                  : formatBankAccount(acc.accountNumber)
+              }
+            />
           ))}
-        </div>
+        </RadioGroup>
         {selectedAccount.type === BankAccountType.PROMPTPAY && qrCodeUrl && (
           <div className="flex justify-center p-2">
             <Image
@@ -178,8 +203,8 @@ export function UploadSlipDialog({
             </span>
             <span className="font-bold">
               {selectedAccount.type === BankAccountType.PROMPTPAY
-                ? selectedAccount.promptPayId
-                : selectedAccount.accountNumber}
+                ? formatPromptPay(selectedAccount.promptPayId)
+                : formatBankAccount(selectedAccount.accountNumber)}
             </span>
           </div>
         </div>
