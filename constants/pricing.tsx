@@ -41,89 +41,88 @@ export const PRICING_OPTIONS: PricingOption[] = [
   },
 ]
 
-export const PRICING_PLANS: PricingPlanProps[] = [
+export const COMMON_FEATURES = [
+  {
+    text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
+    icon: <IconBuildingStore size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay)',
+    icon: <IconCreditCard size={18} stroke={1.5} />,
+  },
+  {
+    text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
+    icon: <IconCreditCard size={18} stroke={1.5} />,
+  },
+  {
+    text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
+    icon: <IconBolt size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
+    icon: <IconChartBar size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
+    icon: <IconPrinter size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
+    icon: <IconDatabaseExport size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
+    icon: <IconTrophy size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
+    icon: <IconShieldCheck size={18} stroke={1.5} />,
+  },
+  {
+    text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
+    icon: <IconBoxSeam size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time',
+    icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
+  },
+  {
+    text: 'โครงสร้างพื้นฐานระดับ Enterprise (เซิร์ฟเวอร์ไทย)',
+    icon: <IconCpu size={18} stroke={1.5} />,
+  },
+  {
+    text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
+    icon: <IconTicket size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix)',
+    icon: <IconTruckDelivery size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ (สี, มัลติมีเดีย, Header)',
+    icon: <IconPalette size={18} stroke={1.5} />,
+  },
+]
+
+export const PRICING_PLANS = [
   {
     title: 'Free',
     description: 'เปิดร้านออนไลน์วันนี้ ฟรีตลอดชีพ ไม่ต้องใส่บัตร ไม่มีหมดอายุ',
     price: '0',
     currency: 'THB',
     seed: 'newcomer',
-    features: [
+    uniqueFeatures: [
       {
         text: 'ลงสินค้าได้สูงสุด 5 ชิ้น',
         icon: <IconLayersIntersect size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.35 บาท/เครดิต)',
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ (1.35 บาท/เครดิต)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 4.00 เครดิต/สลิป',
+        text: 'เช็คสลิปอัตโนมัติ (4.00 เครดิต/สลิป)',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
-        icon: <IconBuildingStore size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
-        icon: <IconBolt size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
-        icon: <IconChartBar size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
-        icon: <IconPrinter size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-        icon: <IconDatabaseExport size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
-        icon: <IconTrophy size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
-        icon: <IconShieldCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
-        icon: <IconBoxSeam size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
-        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
-        icon: <IconCpu size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
-        icon: <IconTicket size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
-        icon: <IconPalette size={18} stroke={1.5} />,
       },
     ],
     buttonText: 'เริ่มฟรีเลย ไม่ต้องใส่บัตร',
@@ -134,7 +133,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     price: '490',
     currency: 'THB',
     seed: 'tester',
-    features: [
+    uniqueFeatures: [
       {
         text: 'ลงสินค้าได้สูงสุด 50 ชิ้น',
         icon: <IconLayersIntersect size={18} stroke={1.5} />,
@@ -144,79 +143,15 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconWorld size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.15 บาท/เครดิต)',
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ (1.15 บาท/เครดิต)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 2.00 เครดิต/สลิป',
+        text: 'เช็คสลิปอัตโนมัติ (2.50 เครดิต/สลิป)',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
-        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
-        icon: <IconBuildingStore size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
-        icon: <IconBolt size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
-        icon: <IconChartBar size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
-        icon: <IconPrinter size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-        icon: <IconDatabaseExport size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
-        icon: <IconTrophy size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
-        icon: <IconShieldCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
-        icon: <IconBoxSeam size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
-        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
-        icon: <IconCpu size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
-        icon: <IconTicket size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
-        icon: <IconPalette size={18} stroke={1.5} />,
-      },
-      {
-        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store',
         icon: <IconBrandNextjs size={18} stroke={1.5} />,
       },
     ],
@@ -230,7 +165,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     currency: 'THB',
     isPopular: true,
     seed: 'expert',
-    features: [
+    uniqueFeatures: [
       {
         text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
         icon: <IconInfinity size={18} stroke={1.5} />,
@@ -240,79 +175,15 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconWorld size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 1.00 บาท/เครดิต)',
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ (1.00 บาท/เครดิต)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 1.20 เครดิต/สลิป',
+        text: 'เช็คสลิปอัตโนมัติ (1.80 เครดิต/สลิป)',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
-        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
-        icon: <IconBuildingStore size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
-        icon: <IconBolt size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
-        icon: <IconChartBar size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
-        icon: <IconPrinter size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-        icon: <IconDatabaseExport size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
-        icon: <IconTrophy size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
-        icon: <IconShieldCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
-        icon: <IconBoxSeam size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
-        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
-        icon: <IconCpu size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
-        icon: <IconTicket size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
-        icon: <IconPalette size={18} stroke={1.5} />,
-      },
-      {
-        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store',
         icon: <IconBrandNextjs size={18} stroke={1.5} />,
       },
     ],
@@ -325,7 +196,7 @@ export const PRICING_PLANS: PricingPlanProps[] = [
     price: '1,990',
     currency: 'THB',
     seed: 'legend',
-    features: [
+    uniqueFeatures: [
       {
         text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
         icon: <IconInfinity size={18} stroke={1.5} />,
@@ -335,79 +206,15 @@ export const PRICING_PLANS: PricingPlanProps[] = [
         icon: <IconWorld size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ แชทตอบลูกค้า, ช่วยค้นหาสินค้า, และร่างรายละเอียดสินค้า (ใช้ราคา 0.85 บาท/เครดิต)',
+        text: 'สิทธิ์ใช้งาน AI อัจฉริยะ (0.85 บาท/เครดิต)',
         icon: <IconSparkles size={18} stroke={1.5} />,
       },
       {
-        text: 'สิทธิ์ใช้งานเช็คสลิปอัตโนมัติ ราคา 0.8 เครดิต/สลิป',
+        text: 'เช็คสลิปอัตโนมัติ (1.50 เครดิต/สลิป)',
         icon: <IconCircleCheck size={18} stroke={1.5} />,
       },
       {
-        text: 'หน้าร้านออนไลน์ส่วนตัว (ปรับแต่งได้ตามสไตล์ร้านค้าตัวเอง)',
-        icon: <IconBuildingStore size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay) (มีค่าธรรมเนียมจากผู้ให้บริการ)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
-        icon: <IconCreditCard size={18} stroke={1.5} />,
-      },
-      {
-        text: '0% ค่าคอมมิชชั่นทุกออเดอร์',
-        icon: <IconBolt size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบวิเคราะห์กำไร-ขาดทุนรายวัน',
-        icon: <IconChartBar size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบจัดการขนส่งและพิมพ์ใบปะหน้ามาตรฐาน',
-        icon: <IconPrinter size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ส่งออกข้อมูลสินค้าไป Lazada/Shopee (CSV/JSON)',
-        icon: <IconDatabaseExport size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบสมาชิก & สะสมแต้ม (CRM)',
-        icon: <IconTrophy size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบปลอดภัยมาตรฐานธนาคาร, Cloud-Native, และสำรองข้อมูลอัตโนมัติ',
-        icon: <IconShieldCheck size={18} stroke={1.5} />,
-      },
-      {
-        text: 'รองรับสินค้าครบวงจร สินค้าทั่วไป, คีย์ดิจิทัล, ลิงก์ดาวน์โหลด และงานบริการ',
-        icon: <IconBoxSeam size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบ POS ครบวงจร ขายหน้าร้าน, ตัดสต็อก Real-time, ตรวจสลิป, และออกใบเสร็จ',
-        icon: <IconDeviceDesktopAnalytics size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบขนส่งครบวงจร คำนวณค่าส่งอัจฉริยะ, พิมพ์ใบปะหน้า, และอัปเดต Tracking อัตโนมัติ',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'โครงสร้างพื้นฐานระดับ Enterprise รวดเร็ว, เสถียร, ปลอดภัย และเซิร์ฟเวอร์ในไทย',
-        icon: <IconCpu size={18} stroke={1.5} />,
-      },
-      {
-        text: 'เครื่องมือสร้างโปรโมชั่น/คูปองเร่งยอดขาย',
-        icon: <IconTicket size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ระบบคำนวณค่าส่งอัจฉริยะ (Rate Matrix) ตั้งราคาสมดุลไม่ขาดทุน ลดปัญหาลูกค้าบ่นค่าส่งแพง',
-        icon: <IconTruckDelivery size={18} stroke={1.5} />,
-      },
-      {
-        text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ เลือกธีมสี, ใส่สื่อมัลติมีเดีย, และออกแบบ Header ให้เข้ากับแบรนด์',
-        icon: <IconPalette size={18} stroke={1.5} />,
-      },
-      {
-        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store เพื่อสร้างแบรนด์ของคุณเองได้อย่างเต็มที่',
+        text: 'สิทธิ์ลบ Footer ลายน้ำ Sitepow Store',
         icon: <IconBrandNextjs size={18} stroke={1.5} />,
       },
       {

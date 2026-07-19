@@ -17,7 +17,7 @@ export interface PricingPlanProps {
   description: string
   price: string
   currency: string
-  features: FeatureItem[]
+  uniqueFeatures?: FeatureItem[]
   buttonText: string
   isPopular?: boolean
 }

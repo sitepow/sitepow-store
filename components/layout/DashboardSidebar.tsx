@@ -33,6 +33,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
+import { CreditBadge } from '../CreditBadge'
 import { LanguageSwitcher } from '../LanguageSwitcher'
 import { ModeToggle } from '../ModeToggle'
 import { ChatWidget } from '../chat/ChatWidget'
@@ -139,6 +140,7 @@ export function DashboardSidebar({
             <IconHome />
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
+          <CreditBadge />
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

@@ -19,7 +19,6 @@ export function PricingTables() {
   return (
     <SectionContainer>
       <SectionHeader title="เปรียบเทียบ ความสามารถของแต่ละ Package" />
-
       <Table className="border">
         <TableHeader>
           <TableRow>
@@ -40,7 +39,6 @@ export function PricingTables() {
                   {category.name}
                 </TableCell>
               </TableRow>
-
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="text-foreground text-start">

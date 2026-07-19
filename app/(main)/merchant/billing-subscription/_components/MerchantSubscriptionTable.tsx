@@ -43,6 +43,7 @@ export function MerchantSubscriptionTable() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>รหัสร้านค้า</TableHead>
             <TableHead>ข้อมูลร้านค้า</TableHead>
             <TableHead>แพลนปัจจุบัน</TableHead>
             <TableHead>ค่าบริการ / เดือน</TableHead>
@@ -56,7 +57,7 @@ export function MerchantSubscriptionTable() {
             <TableLoadingRow colSpan={6} />
           ) : subscriptions.length === 0 ? (
             <TableEmptyRow
-              colSpan={6}
+              colSpan={7}
               title="ไม่พบข้อมูลแพลนบริการของร้านค้า"
             />
           ) : (
@@ -71,9 +72,9 @@ export function MerchantSubscriptionTable() {
                     differenceInDays(new Date(sub.pendingPlanAt), new Date()),
                   )
                 : 0
-
               return (
                 <TableRow key={sub.id}>
+                  <TableCell>{sub.store?.id}</TableCell>
                   <TableCell>
                     <div className="flex flex-col space-y-1.5">
                       <span className="font-medium">{sub.store.name}</span>
@@ -82,7 +83,7 @@ export function MerchantSubscriptionTable() {
                           <Badge variant="destructive">เกินกำหนดชำระ</Badge>
                         )}
                         {isCanceled && (
-                          <Badge variant="secondary">ยกเลิกแล้ว</Badge>
+                          <Badge variant="outline">ยกเลิกแล้ว</Badge>
                         )}
                         {sub.pendingPlan && !isCanceled && (
                           <div className="flex flex-col gap-2">
@@ -114,7 +115,7 @@ export function MerchantSubscriptionTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{plan.name}</Badge>
+                    <Badge>{plan.name}</Badge>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">

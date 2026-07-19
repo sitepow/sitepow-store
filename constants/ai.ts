@@ -12,15 +12,15 @@ export const GEMINI_PRICING_USD_PER_1M: Record<
 }
 
 export const AI_MARGIN_MULTIPLIER = 1.8
-export const USD_TO_THB_RATE = 33.29
+export const USD_TO_THB_RATE = 33.63
 export const TOKENS_PER_UNIT = 1_000_000
-export const BASE_CREDIT_VALUE_THB = 0.8
+export const BASE_CREDIT_VALUE_THB = 0.85
 
 export const SLIP_CREDIT_COST: Record<Plan, number> = {
   FREE: 4.0,
-  STARTER: 2.0,
-  PRO: 1.2,
-  ULTIMATE: 0.8,
+  STARTER: 2.5,
+  PRO: 1.8,
+  ULTIMATE: 1.5,
 }
 
 export const AVG_INPUT_TOKENS = 500

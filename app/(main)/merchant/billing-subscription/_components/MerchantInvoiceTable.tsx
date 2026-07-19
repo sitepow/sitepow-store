@@ -65,7 +65,6 @@ export function MerchantInvoiceTable() {
           <TableHeader>
             <TableRow>
               <TableHead>รหัสใบแจ้งหนี้</TableHead>
-              <TableHead>สำหรับร้านค้า</TableHead>
               <TableHead>แพลน</TableHead>
               <TableHead>รอบบริการ</TableHead>
               <TableHead>สิทธิ์การใช้งาน</TableHead>
@@ -86,7 +85,6 @@ export function MerchantInvoiceTable() {
               invoices.map((inv) => (
                 <TableRow key={inv.id}>
                   <TableCell>{inv.id}</TableCell>
-                  <TableCell>{inv.store.name}</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       {PLAN_DETAILS[inv.plan].name}
@@ -111,7 +109,9 @@ export function MerchantInvoiceTable() {
                       variant={
                         inv.status === InvoiceStatus.FAILED
                           ? 'destructive'
-                          : 'outline'
+                          : inv.status === InvoiceStatus.PAID
+                            ? 'default'
+                            : 'outline'
                       }
                     >
                       {getLabel.invoiceStatus(inv.status)}
