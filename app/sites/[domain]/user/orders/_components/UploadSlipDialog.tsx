@@ -160,12 +160,6 @@ export function UploadSlipDialog({
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
         </DialogHeader>
-        <ActionRequiredAlert
-          title="คำเตือน"
-          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
-          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
-          บัญชีของคุณจะถูกแบนถาวร"
-        />
         <RadioGroup
           value={selectedId || ''}
           onValueChange={setSelectedId}
@@ -176,12 +170,7 @@ export function UploadSlipDialog({
               key={acc.id}
               id={acc.id}
               value={acc.id}
-              title={
-                <>
-                  {acc.bankName}{' '}
-                  {acc.type === BankAccountType.PROMPTPAY && '(พร้อมเพย์)'}
-                </>
-              }
+              title={acc.bankName}
               description={
                 acc.type === BankAccountType.PROMPTPAY
                   ? formatPromptPay(acc.promptPayId)
@@ -191,13 +180,12 @@ export function UploadSlipDialog({
           ))}
         </RadioGroup>
         {selectedAccount.type === BankAccountType.PROMPTPAY && qrCodeUrl && (
-          <div className="flex justify-center p-2">
+          <div className="relative h-52 w-full">
             <Image
               src={qrCodeUrl}
               alt="PromptPay QR"
-              width={180}
-              height={180}
-              className="border"
+              fill
+              className="object-contain"
             />
           </div>
         )}
@@ -219,9 +207,15 @@ export function UploadSlipDialog({
             </span>
           </div>
         </div>
+        <ActionRequiredAlert
+          title="คำเตือน"
+          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
+          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
+          บัญชีของคุณจะถูกแบนถาวร"
+        />
         <div className="flex flex-col items-center justify-center pt-2">
           {previewUrl ? (
-            <div className="relative h-40 w-full rounded-md border p-1">
+            <div className="border-primary relative h-96 w-full border border-dashed">
               <Image
                 src={previewUrl}
                 alt="Slip"
@@ -232,7 +226,7 @@ export function UploadSlipDialog({
                 type="button"
                 variant="destructive"
                 size="icon"
-                className="absolute -top-2 -right-2 h-8 w-8 rounded-full"
+                className="absolute -top-2 -right-2 size-8 rounded-full"
                 onClick={handleRemoveFile}
               >
                 <IconTrash size={16} />
@@ -241,7 +235,7 @@ export function UploadSlipDialog({
           ) : (
             <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <IconPhoto className="text-muted-foreground mb-2 h-8 w-8" />
+                <IconPhoto className="text-muted-foreground mb-2 size-8" />
                 <p className="text-sm">คลิกเพื่ออัปโหลดสลิป</p>
               </div>
               <input
@@ -253,7 +247,7 @@ export function UploadSlipDialog({
             </label>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="border-t pt-2.5">
           <Button
             type="button"
             variant="outline"

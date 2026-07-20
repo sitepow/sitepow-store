@@ -84,7 +84,7 @@ export function VerifySlipMerchantDialog({
         </DialogHeader>
         <div className="flex flex-col items-center justify-center py-4">
           {order.paymentProof ? (
-            <div className="bg-muted/20 relative h-96 w-full rounded-md border">
+            <div className="border-primary relative h-96 w-full border border-dashed">
               <Image
                 src={order.paymentProof}
                 alt={`Slip for order ${order.orderNumber}`}

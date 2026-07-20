@@ -104,14 +104,12 @@ export async function verifySlip(
         payload: {
           imageUrl: slipImageUrl,
           checkCondition: {
-            checkDuplicate: true,
+            checkDuplicate: false,
             checkReceiver: paymentSetting.bankAccounts.map((account) => ({
-              accountType: mapBankCodeToSlip2Go(account.bankName),
-              accountNameTH: account.accountName,
-              accountNumber: account.accountNumber.replace(/\D/g, ''),
+              accountType: mapBankCodeToSlip2Go(account.bankName, account.type),
+              accountNumber: account.accountNumber,
             })),
             checkAmount: {
-              type: 'eq',
               amount: order.totalAmount.toString(),
             },
           },
@@ -124,6 +122,7 @@ export async function verifySlip(
         },
       },
     )
+
     result = response.data
   } catch (error) {
     if (axios.isAxiosError(error) || error) {

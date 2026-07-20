@@ -8,14 +8,23 @@ import {
   useCreateBankAccount,
   useUpdateBankAccount,
 } from '@/actions/hooks/payment'
-import { THAI_BANKS } from '@/constants/bank'
+import { OTHER_PAYMENT_METHODS, THAI_BANKS } from '@/constants/bank'
 import { BankAccountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { BankAccountFormValues, bankAccountSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Check, ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
@@ -27,6 +36,11 @@ import {
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -35,6 +49,8 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
+
+import { cn } from '@/lib/utils'
 
 const DEFAULT_VALUES: BankAccountFormValues = {
   type: BankAccountType.STANDARD_TRANSFER,
@@ -68,6 +84,7 @@ export function BankAccountDialog({
     reset,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BankAccountFormValues>({
     resolver: zodResolver(bankAccountSchema),
@@ -75,6 +92,11 @@ export function BankAccountDialog({
   })
 
   const accountType = watch('type')
+
+  const bankOptions =
+    accountType === BankAccountType.PROMPTPAY
+      ? OTHER_PAYMENT_METHODS
+      : THAI_BANKS
 
   useEffect(() => {
     if (bankAccountData) {
@@ -115,7 +137,7 @@ export function BankAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="overflow-hidden sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {bankAccountId ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}
@@ -129,7 +151,7 @@ export function BankAccountDialog({
             <Spinner /> กำลังโหลดข้อมูล...
           </div>
         ) : (
-          <div className="grid gap-4 py-2">
+          <div className="grid min-w-0 gap-4 py-2">
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
                 <span className="text-sm font-medium">ตั้งเป็นบัญชีหลัก</span>
@@ -148,14 +170,20 @@ export function BankAccountDialog({
                 )}
               />
             </div>
-            <Field>
+            <Field className="min-w-0">
               <FieldLabel>ประเภทบัญชี *</FieldLabel>
               <Controller
                 control={control}
                 name="type"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
+                  <Select
+                    value={field.value}
+                    onValueChange={(val) => {
+                      field.onChange(val)
+                      setValue('bankName', '')
+                    }}
+                  >
+                    <SelectTrigger className="w-full truncate">
                       <SelectValue placeholder="เลือกประเภท..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -170,30 +198,73 @@ export function BankAccountDialog({
                 )}
               />
             </Field>
-            <Field>
+            <Field className="min-w-0">
               <FieldLabel>ธนาคาร/ผู้ให้บริการ *</FieldLabel>
               <Controller
                 control={control}
                 name="bankName"
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="เลือกธนาคาร..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {THAI_BANKS.map((bank) => (
-                        <SelectItem key={bank.code} value={bank.name}>
-                          {bank.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                render={({ field }) => {
+                  return (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className={cn(
+                            'border-input bg-input/30 flex h-fit w-full min-w-0 items-center justify-between gap-1.5 rounded-2xl border px-3 py-2 text-sm transition-colors outline-none',
+                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                            !field.value && 'text-muted-foreground',
+                            'hover:bg-input/50',
+                          )}
+                        >
+                          <span className="min-w-0 flex-1 truncate text-left whitespace-pre-line">
+                            {field.value
+                              ? bankOptions.find((b) => b.name === field.value)
+                                  ?.name || field.value
+                              : 'เลือกธนาคาร...'}
+                          </span>
+                          <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"
+                        align="start"
+                      >
+                        <Command>
+                          <CommandInput placeholder="ค้นหาธนาคารหรือผู้ให้บริการ..." />
+                          <CommandList>
+                            <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
+                            <CommandGroup>
+                              {bankOptions.map((bank) => (
+                                <CommandItem
+                                  key={bank.code}
+                                  value={bank.name}
+                                  onSelect={() => {
+                                    field.onChange(bank.name)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 size-4 shrink-0',
+                                      field.value === bank.name
+                                        ? 'opacity-100'
+                                        : 'opacity-0',
+                                    )}
+                                  />
+                                  <span className="truncate">{bank.name}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  )
+                }}
               />
               <FieldError>{errors.bankName?.message}</FieldError>
             </Field>
             {accountType === BankAccountType.PROMPTPAY ? (
-              <Field>
+              <Field className="min-w-0">
                 <FieldLabel>หมายเลขพร้อมเพย์ *</FieldLabel>
                 <Controller
                   control={control}
@@ -213,7 +284,7 @@ export function BankAccountDialog({
                 <FieldError>{errors.promptPayId?.message}</FieldError>
               </Field>
             ) : (
-              <Field>
+              <Field className="min-w-0">
                 <FieldLabel>เลขบัญชี *</FieldLabel>
                 <Controller
                   control={control}
@@ -233,7 +304,7 @@ export function BankAccountDialog({
                 <FieldError>{errors.accountNumber?.message}</FieldError>
               </Field>
             )}
-            <Field>
+            <Field className="min-w-0">
               <FieldLabel>
                 ชื่อบัญชี *สำคัญชื่อต้องตรงและพิมพ์ให้ถูกต้องเท่านั้น
                 ไม่เช่นนั้นตรวจสลิปอัตโนมัติอาจจะไม่ผ่าน
