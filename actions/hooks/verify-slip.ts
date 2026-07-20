@@ -1,7 +1,9 @@
+import { SlipVerificationAction } from '@/types/slip'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { orderKeys } from '../query-keys/order'
 import { storefrontOrderKeys } from '../query-keys/storefront/order'
-import { verifySlip } from '../verify-slip'
+import { approveSlipManual, verifySlip } from '../verify-slip'
 
 export function useVerifySlip() {
   const queryClient = useQueryClient()
@@ -19,10 +21,40 @@ export function useVerifySlip() {
       customerId: string
     }) => await verifySlip(orderId, slipImageUrl, storeId, customerId),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: storefrontOrderKeys.all,
-      })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: storefrontOrderKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: orderKeys.all,
+        }),
+      ])
+    },
+  })
+}
+
+export function useApproveSlipManual() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      orderId,
+      action,
+    }: {
+      orderId: string
+      action: SlipVerificationAction
+    }) => approveSlipManual(orderId, action),
+
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: storefrontOrderKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: orderKeys.all,
+        }),
+      ])
     },
   })
 }

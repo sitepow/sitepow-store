@@ -140,7 +140,9 @@ export function DashboardSidebar({
             <IconHome />
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
-          <CreditBadge />
+          {userRole === UserRole.MERCHANT && redirectPath === 'merchant' && (
+            <CreditBadge />
+          )}
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

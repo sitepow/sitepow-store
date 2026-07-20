@@ -1,11 +1,22 @@
 'use server'
 
 import { SLIP_CREDIT_COST } from '@/constants/ai'
+import { mapBankCodeToSlip2Go } from '@/constants/bank'
 import { SLIP2GO_API } from '@/constants/slip'
-import { OrderStatus, TransactionType } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  LogAction,
+  OrderStatus,
+  TransactionType,
+} from '@/generated/prisma/enums'
+import { SlipVerificationAction } from '@/types/slip'
+import { getPathR2FromUrl } from '@/utils/image'
 import axios from 'axios'
 
+import { createLog } from '@/lib/activity-log'
 import { prisma } from '@/lib/prisma'
+
+import { r2DeleteImage } from './r2'
 
 export async function verifySlip(
   orderId: string,
@@ -14,6 +25,7 @@ export async function verifySlip(
   customerId: string,
 ) {
   const store = await prisma.store.findUnique({ where: { id: storeId } })
+
   if (!store) {
     return {
       success: false,
@@ -25,10 +37,37 @@ export async function verifySlip(
   const customer = await prisma.customer.findUnique({
     where: { id: customerId },
   })
+
   if (!customer) {
     return {
       success: false,
       message: 'ไม่พบข้อมูลลูกค้า',
+      shouldDeleteImage: false,
+    }
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { totalAmount: true },
+  })
+
+  if (!order) {
+    return {
+      success: false,
+      message: 'ไม่พบข้อมูลออเดอร์',
+      shouldDeleteImage: false,
+    }
+  }
+
+  const paymentSetting = await prisma.paymentSetting.findUnique({
+    where: { storeId },
+    include: { bankAccounts: true },
+  })
+
+  if (!paymentSetting || !paymentSetting.bankAccounts.length) {
+    return {
+      success: false,
+      message: 'ร้านค้ายังไม่ได้ตั้งค่าบัญชีธนาคารสำหรับรับเงิน',
       shouldDeleteImage: false,
     }
   }
@@ -64,6 +103,18 @@ export async function verifySlip(
       {
         payload: {
           imageUrl: slipImageUrl,
+          checkCondition: {
+            checkDuplicate: true,
+            checkReceiver: paymentSetting.bankAccounts.map((account) => ({
+              accountType: mapBankCodeToSlip2Go(account.bankName),
+              accountNameTH: account.accountName,
+              accountNumber: account.accountNumber.replace(/\D/g, ''),
+            })),
+            checkAmount: {
+              type: 'eq',
+              amount: order.totalAmount.toString(),
+            },
+          },
         },
       },
       {
@@ -85,11 +136,11 @@ export async function verifySlip(
       })
 
       return {
-        success: false,
+        success: true,
         requiresManualCheck: true,
         shouldDeleteImage: false,
         message:
-          'ระบบตรวจสอบสลิปขัดข้อง บันทึกสลิปเพื่อให้แอดมินตรวจสอบด้วยตนเองแล้ว',
+          'ระบบตรวจสอบสลิปขัดข้อง เราได้บันทึกสลิปนี้เพื่อให้แอดมินตรวจสอบด้วยตนเองแล้ว',
       }
     }
     return {
@@ -182,5 +233,85 @@ export async function verifySlip(
     shouldDeleteImage: !isSlipValid,
     message:
       result.message || (isSlipValid ? 'ตรวจสอบสลิปสำเร็จ' : 'สลิปไม่ถูกต้อง'),
+  }
+}
+
+export async function approveSlipManual(
+  orderId: string,
+  action: SlipVerificationAction,
+) {
+  try {
+    if (!orderId) {
+      return { success: false, message: 'ไม่พบรหัสออเดอร์' }
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        storeId: true,
+        orderNumber: true,
+        status: true,
+        paymentProof: true,
+      },
+    })
+
+    if (!order) {
+      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    let updatedData = {}
+    let logActionText = ''
+
+    if (action === SlipVerificationAction.APPROVE) {
+      updatedData = { status: OrderStatus.PAID }
+      logActionText = 'approve_slip_manual'
+    } else {
+      if (order.paymentProof) {
+        try {
+          const oldKey = getPathR2FromUrl(order.paymentProof)
+
+          if (oldKey) {
+            await r2DeleteImage(oldKey)
+          }
+        } catch (deleteError) {
+          console.error(deleteError)
+        }
+      }
+
+      updatedData = {
+        paymentProof: null,
+        status: OrderStatus.PENDING,
+      }
+      logActionText = 'reject_slip_manual'
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: updatedData,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_ORDER_STATUS,
+      actorType: ActorType.MERCHANT,
+      storeId: order.storeId,
+      entity: 'Order',
+      entityId: orderId,
+      details: {
+        orderNumber: order.orderNumber,
+        action: logActionText,
+      },
+    })
+
+    return {
+      success: true,
+      message:
+        action === SlipVerificationAction.APPROVE
+          ? 'อนุมัติสลิปสำเร็จ'
+          : 'ปฏิเสธและลบรูปสลิป รีเซ็ตออเดอร์สำเร็จ',
+      data: updatedOrder,
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false, message: 'เกิดข้อผิดพลาดในการทำรายการ' }
   }
 }

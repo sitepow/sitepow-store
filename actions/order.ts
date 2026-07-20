@@ -24,7 +24,15 @@ const orderSelect = {
   paymentMethod: true,
   shippingMethod: true,
   trackingNumber: true,
+  paymentProof: true,
   createdAt: true,
+  bankAccount: {
+    select: {
+      bankName: true,
+      accountNumber: true,
+      accountName: true,
+    },
+  },
   customer: {
     select: {
       id: true,

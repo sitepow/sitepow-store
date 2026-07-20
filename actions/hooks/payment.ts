@@ -10,6 +10,7 @@ import {
 import {
   createBankAccount,
   deleteBankAccount,
+  getBankAccount,
   getPaymentSetting,
   updateBankAccount,
   upsertPaymentSetting,
@@ -97,4 +98,14 @@ export function useDeleteBankAccount() {
       })
     },
   })
+}
+
+export function useBankAccount(id?: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: paymentKeys.bankAccount(id ?? ''),
+      queryFn: async () => await getBankAccount(id!),
+      enabled: !!id,
+    }),
+  )
 }

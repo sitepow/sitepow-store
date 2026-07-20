@@ -6,9 +6,12 @@ import { useDeleteBankAccount } from '@/actions/hooks/payment'
 import { PaymentSettingPayload } from '@/actions/payment'
 import { BankAccountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { formatBankAccount, formatPromptPay } from '@/utils/slip'
+import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -20,9 +23,10 @@ import {
 
 interface BankAccountTableProps {
   accounts: PaymentSettingPayload['bankAccounts']
+  onEdit: (id: string) => void
 }
 
-export function BankAccountTable({ accounts }: BankAccountTableProps) {
+export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const { mutate: deleteAccount, isPending } = useDeleteBankAccount()
 
@@ -54,7 +58,7 @@ export function BankAccountTable({ accounts }: BankAccountTableProps) {
             <TableHead>ข้อมูลบัญชี</TableHead>
             <TableHead>ชื่อบัญชี</TableHead>
             <TableHead>สถานะ</TableHead>
-            <TableHead className="w-24" />
+            <TableHead className="w-28 text-right">จัดการ</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,25 +71,31 @@ export function BankAccountTable({ accounts }: BankAccountTableProps) {
                     : 'โอนผ่านธนาคาร'}
                 </Badge>
               </TableCell>
-              <TableCell className="font-medium">{account.bankName}</TableCell>
+              <TableCell>{account.bankName}</TableCell>
               <TableCell>
                 {account.type === BankAccountType.PROMPTPAY
-                  ? account.promptPayId
-                  : account.accountNumber}
+                  ? formatPromptPay(account.promptPayId)
+                  : formatBankAccount(account.accountNumber)}
               </TableCell>
               <TableCell>{account.accountName}</TableCell>
               <TableCell>
-                <Badge variant="outline">
+                <Badge variant={account.isDefault ? 'default' : 'outline'}>
                   {account.isDefault ? 'บัญชีหลัก' : 'บัญชีรอง'}
                 </Badge>
               </TableCell>
-              <TableCell>
-                <div className="flex items-center justify-end gap-1">
-                  <DeleteButton
-                    isPending={isPending}
-                    onDelete={() => handleDelete(account.id)}
-                  />
-                </div>
+              <TableCell className="space-x-1 text-right">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon-lg"
+                  onClick={() => onEdit(account.id)}
+                >
+                  <IconEdit />
+                </Button>
+                <DeleteButton
+                  isPending={isPending}
+                  onDelete={() => handleDelete(account.id)}
+                />
               </TableCell>
             </TableRow>
           ))}

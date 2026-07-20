@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { RadioGroup } from '@/components/ui/radio-group'
+import { Spinner } from '@/components/ui/spinner'
 
 import { RadioCard } from '../../../cart/_components/RadioCard'
 
@@ -265,6 +266,7 @@ export function UploadSlipDialog({
             onClick={handleSubmit}
             disabled={!file || isVerifying || isUploading}
           >
+            {isVerifying && <Spinner />}
             {isVerifying ? 'กำลังส่ง...' : 'ยืนยันการชำระเงิน'}
           </Button>
         </DialogFooter>

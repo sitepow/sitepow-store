@@ -87,20 +87,22 @@ export async function createBankAccount(
       select: { id: true },
     })
 
-    if (data.isDefault) {
-      await prisma.bankAccount.updateMany({
-        where: { paymentSettingId: setting.id },
-        data: { isDefault: false },
-      })
-    }
+    const account = await prisma.$transaction(async (tx) => {
+      if (data.isDefault) {
+        await tx.bankAccount.updateMany({
+          where: { paymentSettingId: setting.id },
+          data: { isDefault: false },
+        })
+      }
 
-    const account = await prisma.bankAccount.create({
-      data: {
-        ...data,
-        paymentSettingId: setting.id,
-        accountNumber: data.accountNumber ?? '',
-        promptPayId: data.promptPayId ?? '',
-      },
+      return await tx.bankAccount.create({
+        data: {
+          ...data,
+          paymentSettingId: setting.id,
+          accountNumber: data.accountNumber ?? '',
+          promptPayId: data.promptPayId ?? '',
+        },
+      })
     })
 
     await createLog({
@@ -144,16 +146,21 @@ export async function updateBankAccount(
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
-    if (data.isDefault) {
-      await prisma.bankAccount.updateMany({
-        where: { paymentSettingId: account.paymentSettingId },
-        data: { isDefault: false },
-      })
-    }
+    const updatedAccount = await prisma.$transaction(async (tx) => {
+      if (data.isDefault) {
+        await tx.bankAccount.updateMany({
+          where: {
+            paymentSettingId: account.paymentSettingId,
+            id: { not: id },
+          },
+          data: { isDefault: false },
+        })
+      }
 
-    const updatedAccount = await prisma.bankAccount.update({
-      where: { id },
-      data,
+      return await tx.bankAccount.update({
+        where: { id },
+        data,
+      })
     })
 
     await createLog({
@@ -202,5 +209,30 @@ export async function deleteBankAccount(id: string) {
   } catch (error) {
     console.error(error)
     return { success: false }
+  }
+}
+
+export async function getBankAccount(id: string) {
+  try {
+    if (!id) {
+      return null
+    }
+
+    return await prisma.bankAccount.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        type: true,
+        bankName: true,
+        accountNumber: true,
+        accountName: true,
+        promptPayId: true,
+        qrImage: true,
+        isDefault: true,
+      },
+    })
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import {
@@ -10,7 +10,7 @@ import {
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconCreditCard, IconDeviceFloppy } from '@tabler/icons-react'
+import { IconCreditCard, IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -27,8 +27,23 @@ import { BankAccountTable } from './_components/BankAccountTable'
 
 export function PaymentSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
-
   const { data: paymentSetting } = usePaymentSetting(selectedStoreId)
+
+  const [selectedBankAccountId, setSelectedBankAccountId] = useState<
+    string | undefined
+  >()
+  const [open, setOpen] = useState(false)
+
+  const handleEdit = (id: string) => {
+    setSelectedBankAccountId(id)
+    setOpen(true)
+  }
+
+  const handleAdd = () => {
+    setSelectedBankAccountId(undefined)
+    setOpen(true)
+  }
+
   const { mutate: upsertSetting, isPending: isSaving } =
     useUpsertPaymentSetting()
 
@@ -93,8 +108,8 @@ export function PaymentSettingsForm() {
                       โอนเงินผ่านบัญชีธนาคาร
                     </span>
                     <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                      ลูกค้าโอนเงินแล้วแนบสลิปหลักฐานในระบบ
-                      พ่อค้าตรวจสอบและอนุมัติเองด้วยตนเอง
+                      เปิดใช้งานการชำระเงินด้วยการโอนผ่านบัญชีธนาคาร
+                      พร้อมระบบตรวจสอบสลิปอัตโนมัติหรือตรวจสอบด้วยตนเอง
                     </span>
                   </div>
                   <Controller
@@ -113,21 +128,34 @@ export function PaymentSettingsForm() {
                     <span className="text-sm font-medium">
                       บัญชีธนาคารที่รับเงิน
                     </span>
-                    <BankAccountDialog />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAdd}
+                    >
+                      <IconPlus size={14} className="mr-1" /> เพิ่มบัญชีธนาคาร
+                    </Button>
+                    <BankAccountDialog
+                      bankAccountId={selectedBankAccountId}
+                      open={open}
+                      setOpen={setOpen}
+                    />
                   </div>
                   <BankAccountTable
                     accounts={paymentSetting?.bankAccounts ?? []}
+                    onEdit={handleEdit}
                   />
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-5 py-5">
                 <div>
                   <span className="block text-sm font-semibold">
-                    Stripe Payment Gateway
+                    เชื่อมบัญชี Stripe
                   </span>
                   <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                    รับชำระเงินผ่าน QR PromptPay แบบ Dynamic
-                    ยืนยันการชำระเงินอัตโนมัติผ่าน Webhook
+                    เปิดช่องทางรับชำระเงินออนไลน์ผ่านบัตรเครดิต บัตรเดบิต และ QR
+                    PromptPay ได้อย่างสะดวกรวดเร็ว
                   </span>
                 </div>
                 <Controller
@@ -148,7 +176,9 @@ export function PaymentSettingsForm() {
                     <Controller
                       control={control}
                       name="stripePublicKey"
-                      render={({ field }) => <Input {...field} />}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="pk_test_..." />
+                      )}
                     />
                   </div>
                   <div className="grid gap-2">
@@ -156,7 +186,9 @@ export function PaymentSettingsForm() {
                     <Controller
                       control={control}
                       name="stripeSecretKey"
-                      render={({ field }) => <Input {...field} />}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="sk_test_..." />
+                      )}
                     />
                   </div>
                 </div>

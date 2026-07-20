@@ -26,6 +26,7 @@ import { useStoreData } from '@/stores/sites/use-store-data'
 import { getClientAuthUrl } from '@/utils/auth'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
+import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import {
   IconAlertCircle,
   IconCreditCard,
@@ -140,8 +141,8 @@ export default function StoreCartPage() {
                 : 'โอนเงินบัญชีธนาคาร',
             description:
               acc.type === BankAccountType.PROMPTPAY
-                ? `หมายเลขพร้อมเพย์ ${acc.promptPayId} (${acc.accountName})`
-                : `บัญชี ${acc.bankName} เลขที่ ${acc.accountNumber} (${acc.accountName})`,
+                ? `${formatPromptPay(acc.promptPayId)} (${acc.accountName})`
+                : `บัญชี ${acc.bankName} เลขที่ ${formatBankAccount(acc.accountNumber)} (${acc.accountName})`,
           }))
         : []),
       ...(paymentOptions?.isStripeEnabled
@@ -257,9 +258,14 @@ export default function StoreCartPage() {
     if (hasPhysical && (!selectedAddressData || !selectedShippingData)) {
       return
     }
+
     if (!selectedPaymentData) {
       return
     }
+
+    const selectedBankAcc = paymentOptions?.bankAccounts.find(
+      (acc) => acc.id === selectedPayment,
+    )
 
     createOrderMutation.mutate(
       {
@@ -269,6 +275,7 @@ export default function StoreCartPage() {
         storeCourierServiceId: selectedShippingData?.id ?? '',
         shippingFee: shippingFee,
         paymentMethod: getPaymentMethod(selectedPaymentData.id),
+        bankAccountId: selectedBankAcc?.id,
         couponId: appliedCoupon?.id,
         usedPoints,
         earnedPoints: summary.totalPoints,
@@ -458,7 +465,6 @@ export default function StoreCartPage() {
                     </span>
                     <CustomerAddressCreateDialog />
                   </div>
-
                   {addressOptions?.length === 0 && (
                     <ActionRequiredAlert
                       title="พบข้อผิดพลาด"
