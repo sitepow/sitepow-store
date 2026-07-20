@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
+import { DeliveryStatus, OrderStatus } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/table'
 
 import { OrderDetailDialog } from './OrderDetailDialog'
+import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
 
 export function OrderTable() {
   const { selectedStoreId } = useStoreFilter()
@@ -98,17 +100,43 @@ export function OrderTable() {
                       {formatCurrency(Number(order.totalAmount))}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge
+                        variant={
+                          (
+                            [
+                              OrderStatus.COMPLETED,
+                              OrderStatus.PAID,
+                              OrderStatus.SHIPPED,
+                            ] as OrderStatus[]
+                          ).includes(order.status)
+                            ? 'default'
+                            : 'outline'
+                        }
+                      >
                         {ORDER_STATUS_TH[order.status]}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge
+                        variant={
+                          (
+                            [
+                              DeliveryStatus.DELIVERED,
+                              DeliveryStatus.IN_TRANSIT,
+                            ] as DeliveryStatus[]
+                          ).includes(order.deliveryStatus)
+                            ? 'default'
+                            : 'outline'
+                        }
+                      >
                         {DELIVERY_STATUS_TH[order.deliveryStatus]}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="flex gap-2.5 text-right">
+                      {order.status === OrderStatus.MANUAL_CHECK && (
+                        <VerifySlipMerchantDialog order={order} />
+                      )}
                       <OrderDetailDialog order={order} />
                     </TableCell>
                   </TableRow>

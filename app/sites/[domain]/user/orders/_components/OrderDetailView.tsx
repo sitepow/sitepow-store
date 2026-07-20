@@ -55,7 +55,21 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         <div className="space-y-2">
           <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
           <div className="mb-2 flex items-center gap-2">
-            <Badge variant="outline">{ORDER_STATUS_TH[order.status]}</Badge>
+            <Badge
+              variant={
+                (
+                  [
+                    OrderStatus.COMPLETED,
+                    OrderStatus.PAID,
+                    OrderStatus.SHIPPED,
+                  ] as OrderStatus[]
+                ).includes(order.status)
+                  ? 'default'
+                  : 'outline'
+              }
+            >
+              {ORDER_STATUS_TH[order.status]}
+            </Badge>
           </div>
           {order.trackingNumber ? (
             <div className="flex items-center justify-between rounded-lg border p-3">

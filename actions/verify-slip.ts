@@ -15,14 +15,22 @@ export async function verifySlip(
 ) {
   const store = await prisma.store.findUnique({ where: { id: storeId } })
   if (!store) {
-    return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    return {
+      success: false,
+      message: 'ไม่พบข้อมูลร้านค้า',
+      shouldDeleteImage: false,
+    }
   }
 
   const customer = await prisma.customer.findUnique({
     where: { id: customerId },
   })
   if (!customer) {
-    return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+    return {
+      success: false,
+      message: 'ไม่พบข้อมูลลูกค้า',
+      shouldDeleteImage: false,
+    }
   }
 
   if (customer.isBlocked) {
@@ -35,13 +43,18 @@ export async function verifySlip(
       return {
         success: false,
         message: 'บัญชีของคุณถูกระงับการสั่งซื้อเนื่องจากพบความผิดปกติ',
+        shouldDeleteImage: true,
       }
     }
   }
 
   const cost = SLIP_CREDIT_COST[store.plan]
   if (store.balance.toNumber() < cost) {
-    return { success: false, message: 'ยอดเครดิตร้านค้าไม่เพียงพอ' }
+    return {
+      success: false,
+      message: 'ยอดเครดิตร้านค้าไม่เพียงพอ',
+      shouldDeleteImage: true,
+    }
   }
 
   let result
@@ -62,13 +75,28 @@ export async function verifySlip(
     )
     result = response.data
   } catch (error) {
-    if (axios.isAxiosError(error)) {
+    if (axios.isAxiosError(error) || error) {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          status: OrderStatus.MANUAL_CHECK,
+          paymentProof: slipImageUrl,
+        },
+      })
+
       return {
         success: false,
-        message: 'สลิปไม่ถูกต้อง หรือตรวจสอบไม่ได้',
+        requiresManualCheck: true,
+        shouldDeleteImage: false,
+        message:
+          'ระบบตรวจสอบสลิปขัดข้อง บันทึกสลิปเพื่อให้แอดมินตรวจสอบด้วยตนเองแล้ว',
       }
     }
-    return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' }
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+      shouldDeleteImage: false,
+    }
   }
 
   const isSlipValid = result.code === '200000'
@@ -130,6 +158,7 @@ export async function verifySlip(
         data: {
           status: OrderStatus.PAID,
           paidAt: new Date(),
+          paymentProof: slipImageUrl,
         },
       })
       await tx.store.update({
@@ -150,6 +179,7 @@ export async function verifySlip(
 
   return {
     success: isSlipValid,
+    shouldDeleteImage: !isSlipValid,
     message:
       result.message || (isSlipValid ? 'ตรวจสอบสลิปสำเร็จ' : 'สลิปไม่ถูกต้อง'),
   }

@@ -9,7 +9,7 @@ import {
   ORDER_STATUS_TH,
   PAYMENT_METHOD_TH,
 } from '@/constants/translate'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { DeliveryStatus, OrderStatus } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { IconEye } from '@tabler/icons-react'
 import { User2 } from 'lucide-react'
@@ -58,7 +58,6 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
         <DialogHeader>
           <DialogTitle>ออเดอร์ #{order.orderNumber}</DialogTitle>
         </DialogHeader>
-
         <div className="space-y-4">
           <div className="space-y-1">
             <div className="flex items-center">
@@ -77,25 +76,45 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               </div>
             </div>
           </div>
-
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">{ORDER_STATUS_TH[order.status]}</Badge>
-            <Badge variant="outline">
+            <Badge
+              variant={
+                (
+                  [
+                    OrderStatus.COMPLETED,
+                    OrderStatus.PAID,
+                    OrderStatus.SHIPPED,
+                  ] as OrderStatus[]
+                ).includes(order.status)
+                  ? 'default'
+                  : 'outline'
+              }
+            >
+              {ORDER_STATUS_TH[order.status]}
+            </Badge>
+            <Badge
+              variant={
+                (
+                  [
+                    DeliveryStatus.DELIVERED,
+                    DeliveryStatus.IN_TRANSIT,
+                  ] as DeliveryStatus[]
+                ).includes(order.deliveryStatus)
+                  ? 'default'
+                  : 'outline'
+              }
+            >
               {DELIVERY_STATUS_TH[order.deliveryStatus]}
             </Badge>
             {order.paymentMethod && (
-              <Badge variant="secondary">
-                {PAYMENT_METHOD_TH[order.paymentMethod]}
-              </Badge>
+              <Badge>{PAYMENT_METHOD_TH[order.paymentMethod]}</Badge>
             )}
           </div>
-
           {order.trackingNumber && (
             <p className="text-muted-foreground text-xs">
               Tracking: {order.trackingNumber}
             </p>
           )}
-
           <div className="rounded-lg border">
             {order.items.map((item) => (
               <div
@@ -114,14 +133,12 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               </div>
             ))}
           </div>
-
           <div className="flex justify-between border-t pt-3">
             <span className="font-medium">ยอดรวม</span>
             <span className="font-semibold">
               {formatCurrency(Number(order.totalAmount))}
             </span>
           </div>
-
           <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
             <span className="text-sm font-medium">อัปเดตสถานะ</span>
             <Select

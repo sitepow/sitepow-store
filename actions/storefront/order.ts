@@ -34,6 +34,7 @@ export interface CreateOrderInput {
   shippingFee: number
   storeCourierServiceId?: string
   paymentMethod: PaymentMethod
+  bankAccountId?: string
   couponId?: string
   couponDiscount?: number
   usedPoints?: number
@@ -66,6 +67,19 @@ const storefrontOrderSelect = {
   deliveryStatus: true,
   createdAt: true,
   customerId: true,
+  bankAccountId: true,
+  bankAccount: {
+    select: {
+      id: true,
+      bankName: true,
+      accountNumber: true,
+      accountName: true,
+      type: true,
+      promptPayId: true,
+      qrImage: true,
+      isDefault: true,
+    },
+  },
   store: {
     select: {
       id: true,
@@ -373,6 +387,7 @@ export async function createOrder(input: CreateOrderInput) {
           customerId: customer.id,
           couponId: input.couponId,
           paymentMethod: input.paymentMethod,
+          bankAccountId: input.bankAccountId,
           shippingMethod: input.shippingMethod,
           shippingFee,
           usedPoints: input.usedPoints ?? 0,

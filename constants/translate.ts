@@ -32,6 +32,7 @@ export const STOCK_ADJUSTMENT_REASON_OPTIONS = Object.entries(
 
 export const ORDER_STATUS_TH: Record<OrderStatus, string> = {
   [OrderStatus.PENDING]: 'รอชำระเงิน',
+  [OrderStatus.MANUAL_CHECK]: 'รอตรวจสอบสลิป (ด้วยตนเอง)',
   [OrderStatus.PAID]: 'ชำระเงินแล้ว',
   [OrderStatus.SHIPPED]: 'จัดส่งแล้ว',
   [OrderStatus.COMPLETED]: 'สำเร็จ',

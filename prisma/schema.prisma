@@ -431,6 +431,7 @@ model BankAccount {
   accountNumber String
 
   type        BankAccountType @default(STANDARD_TRANSFER)
+  order       Order[]
   promptPayId String?
   qrImage     String?
   isDefault   Boolean         @default(false)
@@ -807,6 +808,7 @@ model ReviewCategory {
 
 enum OrderStatus {
   PENDING
+  MANUAL_CHECK
   PAID
   SHIPPED
   COMPLETED
@@ -897,6 +899,9 @@ model Order {
   taxAddress            String?
   taxBranchCode         String?
 
+  bankAccountId String?
+  bankAccount   BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
   usedPoints     Int?     @default(0)
   pointsDiscount Decimal? @default(0) @db.Decimal(10, 2)
   earnedPoints   Int?     @default(0)
@@ -934,6 +939,7 @@ model Order {
 
   @@index([storeId])
   @@index([customerId])
+  @@index([bankAccountId])
 }
 
 model OrderItem {

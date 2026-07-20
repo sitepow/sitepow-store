@@ -58,7 +58,9 @@ export function UploadSlipDialog({
 }: UploadSlipDialogProps) {
   const { userId } = useSession()
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(
+    bankAccounts[0]?.id || null,
+  )
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>()
@@ -125,10 +127,10 @@ export function UploadSlipDialog({
       },
       {
         onSuccess: async (result) => {
-          if (result.success) {
+          if (result.success || result.requiresManualCheck) {
             setIsOpen(false)
             handleRemoveFile()
-          } else {
+          } else if (result.shouldDeleteImage) {
             const oldKey = getPathR2FromUrl(uploadResult.url!)
             await deleteImage(oldKey)
           }
@@ -137,8 +139,12 @@ export function UploadSlipDialog({
     )
   }
 
-  if (!selectedAccount) {
-    return null
+  if (!bankAccounts || bankAccounts.length === 0) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        <IconUpload size={16} className="mr-2" /> ไม่พบบัญชีรับเงิน
+      </Button>
+    )
   }
 
   return (

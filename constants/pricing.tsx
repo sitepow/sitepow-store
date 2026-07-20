@@ -47,10 +47,6 @@ export const COMMON_FEATURES = [
     icon: <IconBuildingStore size={18} stroke={1.5} />,
   },
   {
-    text: 'ใช้งานฟรีเชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay)',
-    icon: <IconCreditCard size={18} stroke={1.5} />,
-  },
-  {
     text: 'รองรับการรับเงินโอน (ตรวจสอบสลิปด้วยตัวเอง)',
     icon: <IconCreditCard size={18} stroke={1.5} />,
   },
@@ -139,6 +135,10 @@ export const PRICING_PLANS = [
         icon: <IconLayersIntersect size={18} stroke={1.5} />,
       },
       {
+        text: 'เชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
         text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
         icon: <IconWorld size={18} stroke={1.5} />,
       },
@@ -171,6 +171,10 @@ export const PRICING_PLANS = [
         icon: <IconInfinity size={18} stroke={1.5} />,
       },
       {
+        text: 'เชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
+      },
+      {
         text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
         icon: <IconWorld size={18} stroke={1.5} />,
       },
@@ -200,6 +204,10 @@ export const PRICING_PLANS = [
       {
         text: 'ลงสินค้าได้ไม่จำกัดจำนวน',
         icon: <IconInfinity size={18} stroke={1.5} />,
+      },
+      {
+        text: 'เชื่อมต่อ Stripe (ตัดบัตรเครดิต/PromptPay)',
+        icon: <IconCreditCard size={18} stroke={1.5} />,
       },
       {
         text: 'เชื่อมโดเมนที่ต้องการได้ (.com, .net, .co, และอื่นๆ)',
@@ -252,7 +260,7 @@ export const PRICING_TABLES: PricingTables = {
       features: [
         {
           label: 'เชื่อมต่อ Stripe (บัตร/PromptPay)',
-          access: [true, true, true, true],
+          access: [false, true, true, true],
         },
         {
           label: 'ระบบตรวจสอบสลิปอัตโนมัติ',

@@ -40,7 +40,6 @@ export function OrderTable({ search }: OrderTableProps) {
 
   const { data: { data: orders = [], meta } = {}, isLoading } =
     useStorefrontOrders({ page, limit: 10, search })
-  const { data: paymentOptions } = useStorefrontPaymentOptions('example')
 
   const getItemsSummary = (items: GetStorefrontOrderItemSerialized['items']) =>
     items.map((item) => `${item.title} x ${item.quantity}`).join(', ')
@@ -70,14 +69,26 @@ export function OrderTable({ search }: OrderTableProps) {
                 <TableRow key={order.id}>
                   <TableCell>#{order.orderNumber}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{order.store.name}</Badge>
+                    <Badge>{order.store.name}</Badge>
                   </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {getItemsSummary(order.items)}
                   </TableCell>
                   <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">
+                    <Badge
+                      variant={
+                        (
+                          [
+                            OrderStatus.COMPLETED,
+                            OrderStatus.PAID,
+                            OrderStatus.SHIPPED,
+                          ] as OrderStatus[]
+                        ).includes(order.status)
+                          ? 'default'
+                          : 'outline'
+                      }
+                    >
                       {ORDER_STATUS_TH[order.status]}
                     </Badge>
                   </TableCell>
@@ -90,9 +101,7 @@ export function OrderTable({ search }: OrderTableProps) {
                         orderNumber={order.orderNumber}
                         customerId={order.customerId!}
                         bankAccounts={
-                          paymentOptions?.bankAccounts.map((acc) => ({
-                            ...acc,
-                          })) || []
+                          order.bankAccount ? [order.bankAccount] : []
                         }
                       />
                     )}
