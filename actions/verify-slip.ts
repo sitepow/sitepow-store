@@ -5,6 +5,7 @@ import { mapBankCodeToSlip2Go } from '@/constants/bank'
 import { SLIP2GO_API } from '@/constants/slip'
 import {
   ActorType,
+  BankAccountType,
   LogAction,
   OrderStatus,
   TransactionType,
@@ -107,7 +108,10 @@ export async function verifySlip(
             checkDuplicate: false,
             checkReceiver: paymentSetting.bankAccounts.map((account) => ({
               accountType: mapBankCodeToSlip2Go(account.bankName, account.type),
-              accountNumber: account.accountNumber,
+              accountNumber:
+                account.type === BankAccountType.PROMPTPAY
+                  ? account.promptPayId
+                  : account.accountNumber,
             })),
             checkAmount: {
               amount: order.totalAmount.toString(),
@@ -135,7 +139,7 @@ export async function verifySlip(
       })
 
       return {
-        success: true,
+        success: false,
         requiresManualCheck: true,
         shouldDeleteImage: false,
         message:
