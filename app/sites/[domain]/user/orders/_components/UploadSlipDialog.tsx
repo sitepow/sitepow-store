@@ -119,10 +119,12 @@ export function UploadSlipDialog({
       return
     }
 
+    const uploadedImageUrl = uploadResult.url
+
     verify(
       {
         orderId,
-        slipImageUrl: uploadResult.url,
+        slipImageUrl: uploadedImageUrl,
         storeId,
         customerId,
       },
@@ -131,9 +133,21 @@ export function UploadSlipDialog({
           if (result.success || result.requiresManualCheck) {
             setIsOpen(false)
             handleRemoveFile()
-          } else if (result.shouldDeleteImage) {
-            const oldKey = getPathR2FromUrl(uploadResult.url!)
-            await deleteImage(oldKey)
+          }
+
+          if (result.shouldDeleteImage) {
+            const oldKey = getPathR2FromUrl(uploadedImageUrl)
+            if (oldKey) {
+              await deleteImage(oldKey)
+            }
+          }
+        },
+        onError: async () => {
+          if (uploadedImageUrl) {
+            const oldKey = getPathR2FromUrl(uploadedImageUrl)
+            if (oldKey) {
+              await deleteImage(oldKey)
+            }
           }
         },
       },
