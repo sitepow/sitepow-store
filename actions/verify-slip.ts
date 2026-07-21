@@ -2,7 +2,7 @@
 
 import { SLIP_CREDIT_COST } from '@/constants/ai'
 import { mapBankCodeToSlip2Go } from '@/constants/bank'
-import { SLIP2GO_API } from '@/constants/slip'
+import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/slip'
 import {
   ActorType,
   BankAccountType,
@@ -11,6 +11,7 @@ import {
   TransactionType,
 } from '@/generated/prisma/enums'
 import { SlipVerificationAction } from '@/types/slip'
+import { getBlockMessage } from '@/utils/date'
 import { getPathR2FromUrl } from '@/utils/image'
 import axios from 'axios'
 
@@ -82,7 +83,7 @@ export async function verifySlip(
     } else {
       return {
         success: false,
-        message: 'บัญชีของคุณถูกระงับการสั่งซื้อเนื่องจากพบความผิดปกติ',
+        message: getBlockMessage(customer.blockedUntil),
         shouldDeleteImage: true,
       }
     }
@@ -105,7 +106,7 @@ export async function verifySlip(
         payload: {
           imageUrl: slipImageUrl,
           checkCondition: {
-            checkDuplicate: false,
+            checkDuplicate: true,
             checkReceiver: paymentSetting.bankAccounts.map((account) => ({
               accountType: mapBankCodeToSlip2Go(account.bankName, account.type),
               accountNumber:
@@ -114,6 +115,7 @@ export async function verifySlip(
                   : account.accountNumber,
             })),
             checkAmount: {
+              type: 'eq',
               amount: order.totalAmount.toString(),
             },
           },
@@ -128,32 +130,34 @@ export async function verifySlip(
     )
 
     result = response.data
-  } catch (error) {
-    if (axios.isAxiosError(error) || error) {
-      await prisma.order.update({
-        where: { id: orderId },
-        data: {
-          status: OrderStatus.MANUAL_CHECK,
-          paymentProof: slipImageUrl,
-        },
-      })
 
-      return {
-        success: false,
-        requiresManualCheck: true,
-        shouldDeleteImage: false,
-        message:
-          'ระบบตรวจสอบสลิปขัดข้อง เราได้บันทึกสลิปนี้เพื่อให้แอดมินตรวจสอบด้วยตนเองแล้ว',
-      }
+    if (response.status !== 200) {
+      throw new Error()
     }
+  } catch {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: OrderStatus.MANUAL_CHECK,
+        paymentProof: slipImageUrl,
+      },
+    })
+
     return {
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+      success: true,
+      requiresManualCheck: true,
       shouldDeleteImage: false,
+      message:
+        'อัพโหลดสลิปเรียบร้อย เราได้บันทึกสลิปนี้เพื่อให้แอดมินตรวจสอบยอดด้วยตนเอง',
     }
   }
 
-  const isSlipValid = result.code === '200000'
+  const isSlipValid =
+    result.code === SLIP_CODE.FOUND || result.code === SLIP_CODE.VALID
+
+  const responseMessage = isSlipValid
+    ? 'ตรวจสอบสลิปสำเร็จ'
+    : getSlipErrorMessage(result.code, result.message)
 
   await prisma.$transaction(async (tx) => {
     await tx.slipVerificationHistory.create({
@@ -162,8 +166,7 @@ export async function verifySlip(
         orderId,
         imageUrl: slipImageUrl,
         isValid: isSlipValid,
-        message:
-          result.message || (isSlipValid ? 'สลิปถูกต้อง' : 'สลิปไม่ถูกต้อง'),
+        message: responseMessage,
       },
     })
 
@@ -234,8 +237,7 @@ export async function verifySlip(
   return {
     success: isSlipValid,
     shouldDeleteImage: !isSlipValid,
-    message:
-      result.message || (isSlipValid ? 'ตรวจสอบสลิปสำเร็จ' : 'สลิปไม่ถูกต้อง'),
+    message: responseMessage,
   }
 }
 
@@ -315,6 +317,6 @@ export async function approveSlipManual(
     }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการทำรายการ' }
+    return { success: false }
   }
 }
