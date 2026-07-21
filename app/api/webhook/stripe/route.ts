@@ -26,12 +26,8 @@ export async function POST(req: Request) {
 
   try {
     event = stripe.webhooks.constructEvent(body, sig, endpointSecret)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json(
-      { error: `Webhook Error: ${message}` },
-      { status: 400 },
-    )
+  } catch {
+    return NextResponse.json({ status: 400 })
   }
 
   if (event.type === 'checkout.session.completed') {
@@ -45,7 +41,7 @@ export async function POST(req: Request) {
       !type ||
       (type === CheckoutType.SUBSCRIPTION && (!relatedId || !storeId))
     ) {
-      return NextResponse.json({ error: 'Missing metadata' }, { status: 400 })
+      return NextResponse.json({ status: 400 })
     }
 
     try {
@@ -109,18 +105,12 @@ export async function POST(req: Request) {
 
         if (!result.success) {
           console.error(result.message)
-          return NextResponse.json(
-            { error: 'Credit purchase failed' },
-            { status: 500 },
-          )
+          return NextResponse.json({ status: 500 })
         }
       }
     } catch (error) {
       console.error(error)
-      return NextResponse.json(
-        { error: 'Database update failed' },
-        { status: 500 },
-      )
+      return NextResponse.json({ status: 500 })
     }
   }
 

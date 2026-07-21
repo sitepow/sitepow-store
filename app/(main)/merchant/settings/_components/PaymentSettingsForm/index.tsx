@@ -10,7 +10,12 @@ import {
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconCreditCard, IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
+import {
+  IconCopy,
+  IconCreditCard,
+  IconDeviceFloppy,
+  IconPlus,
+} from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -33,6 +38,33 @@ export function PaymentSettingsForm() {
     string | undefined
   >()
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const centralWebhookUrl =
+    selectedStoreId && selectedStoreId !== ALL_STORES
+      ? `${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhook/stripe/store/${selectedStoreId}`
+      : ''
+
+  const handleCopyWebhookUrl = async () => {
+    if (!centralWebhookUrl) {
+      return
+    }
+
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(centralWebhookUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } else {
+      const textArea = document.createElement('textarea')
+      textArea.value = centralWebhookUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   const handleEdit = (id: string) => {
     setSelectedBankAccountId(id)
@@ -68,13 +100,15 @@ export function PaymentSettingsForm() {
       reset({
         ...paymentSetting,
         stripeSecretKey: paymentSetting.stripeSecretKey ?? '',
-        stripePublicKey: paymentSetting.stripePublicKey ?? '',
+        stripeWebhookSecret: paymentSetting.stripeWebhookSecret ?? '',
       })
     }
   }, [paymentSetting, reset])
 
   useEffect(() => {
-    if (!selectedStoreId || selectedStoreId === ALL_STORES) return
+    if (!selectedStoreId || selectedStoreId === ALL_STORES) {
+      return
+    }
     resetForm()
   }, [selectedStoreId, resetForm])
 
@@ -170,26 +204,63 @@ export function PaymentSettingsForm() {
                 />
               </div>
               {isStripeEnabled && (
-                <div className="grid gap-4 pt-5 lg:grid-cols-2">
-                  <div className="grid gap-2">
-                    <Label htmlFor="stripePublicKey">คีย์ที่เผยแพร่ได้</Label>
-                    <Controller
-                      control={control}
-                      name="stripePublicKey"
-                      render={({ field }) => (
-                        <Input {...field} placeholder="pk_test_..." />
-                      )}
-                    />
+                <div className="mt-5 space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="stripeSecretKey">Stripe Secret Key</Label>
+                      <Controller
+                        control={control}
+                        name="stripeSecretKey"
+                        render={({ field }) => (
+                          <Input placeholder="sk_live_..." {...field} />
+                        )}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="stripeWebhookSecret">
+                        Stripe Webhook Signing Secret
+                      </Label>
+                      <Controller
+                        control={control}
+                        name="stripeWebhookSecret"
+                        render={({ field }) => (
+                          <Input placeholder="whsec_..." {...field} />
+                        )}
+                      />
+                      <span className="text-muted-foreground text-xs">
+                        กรอกรหัส Webhook Secret ที่ได้จากการตั้งค่าใน Stripe
+                        Dashboard ของคุณ
+                      </span>
+                    </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="stripeSecretKey">คีย์ลับ</Label>
-                    <Controller
-                      control={control}
-                      name="stripeSecretKey"
-                      render={({ field }) => (
-                        <Input {...field} placeholder="sk_test_..." />
-                      )}
-                    />
+                  <div className="bg-muted/55 space-y-2 rounded-lg border p-4">
+                    <span className="block text-xs font-semibold">
+                      คำแนะนำการตั้งค่า Webhook ใน Stripe ของร้านค้า
+                    </span>
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                      โปรดนำ URL ด้านล่างนี้ไปเพิ่มใน Stripe Dashboard ของคุณ
+                      (ที่เมนู Developers &gt; Webhooks) และเลือกรับอีเวนต์{' '}
+                      <code className="bg-background rounded px-1 py-0.5 text-xs">
+                        checkout.session.completed
+                      </code>
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Input
+                        readOnly
+                        value={centralWebhookUrl}
+                        className="h-8 text-xs"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 shrink-0 text-xs"
+                        onClick={handleCopyWebhookUrl}
+                      >
+                        <IconCopy size={14} className="mr-1" />
+                        {copied ? 'คัดลอกแล้ว' : 'คัดลอก URL'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}

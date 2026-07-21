@@ -10,7 +10,7 @@ const paymentSettingSelect = {
   isBankTransferEnabled: true,
   isStripeEnabled: true,
   stripeSecretKey: true,
-  stripePublicKey: true,
+  stripeWebhookSecret: true,
   bankAccounts: {
     select: {
       id: true,

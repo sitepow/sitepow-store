@@ -198,7 +198,7 @@ export function StoreProfileForm() {
               <Field>
                 <FieldLabel>โลโก้ประจำแบรนด์ร้านค้า</FieldLabel>
                 <div className="flex flex-wrap items-center gap-5">
-                  <div className="flex h-16.25 w-50 shrink-0 items-center justify-center">
+                  <div className="border-primary flex h-16.25 shrink-0 items-center justify-center border border-dashed p-1">
                     {logo && <StoreLogo image={previewLogoUrl ?? logo} />}
                     {!logo && <StoreLogo />}
                   </div>
@@ -219,6 +219,7 @@ export function StoreProfileForm() {
                     <Button
                       variant="outline"
                       type="button"
+                      className="w-full"
                       onClick={() => logoInputRef.current?.click()}
                     >
                       อัปโหลดรูปภาพใหม่
@@ -234,16 +235,16 @@ export function StoreProfileForm() {
                 <FieldLabel>รูปภาพแบนเนอร์หน้าร้าน</FieldLabel>
                 <div className="flex flex-col gap-3">
                   {coverImage && (
-                    <div>
+                    <div className="border-primary border border-dashed p-1">
                       {isVideo ? (
                         <video
                           src={previewBannerUrl ?? coverImage}
-                          className="h-32 w-full rounded-xl object-cover object-center"
+                          className="h-32 w-full object-cover object-center"
                         />
                       ) : (
                         <img
                           src={previewBannerUrl ?? coverImage}
-                          className="h-32 w-full rounded-xl object-cover object-center"
+                          className="h-32 w-full object-cover object-center"
                         />
                       )}
                     </div>

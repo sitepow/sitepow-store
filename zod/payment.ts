@@ -103,7 +103,7 @@ export const paymentSettingSchema = z.object({
   isBankTransferEnabled: z.boolean().default(true),
   isStripeEnabled: z.boolean().default(false),
   stripeSecretKey: z.string().optional(),
-  stripePublicKey: z.string().optional(),
+  stripeWebhookSecret: z.string().optional(),
 })
 
 export type BankAccountFormValues = z.input<typeof bankAccountSchema>

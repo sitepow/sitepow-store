@@ -407,8 +407,8 @@ model PaymentSetting {
   isBankTransferEnabled Boolean @default(true)
   isStripeEnabled       Boolean @default(false)
 
-  stripeSecretKey String?
-  stripePublicKey String?
+  stripeSecretKey     String?
+  stripeWebhookSecret String?
 
   bankAccounts BankAccount[]
 
