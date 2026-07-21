@@ -152,8 +152,7 @@ export async function verifySlip(
     }
   }
 
-  const isSlipValid =
-    result.code === SLIP_CODE.FOUND || result.code === SLIP_CODE.VALID
+  const isSlipValid = result.code === SLIP_CODE.VALID
 
   const responseMessage = isSlipValid
     ? 'ตรวจสอบสลิปสำเร็จ'
