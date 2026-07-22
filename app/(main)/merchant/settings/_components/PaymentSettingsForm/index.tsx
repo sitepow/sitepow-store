@@ -16,6 +16,8 @@ import {
   IconCopy,
   IconCreditCard,
   IconDeviceFloppy,
+  IconEye,
+  IconEyeOff,
   IconPlus,
 } from '@tabler/icons-react'
 
@@ -36,6 +38,8 @@ export function PaymentSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
   const { data: paymentSetting } = usePaymentSetting(selectedStoreId)
 
+  const [showSecretKey, setShowSecretKey] = useState(false)
+  const [showWebhookSecret, setShowWebhookSecret] = useState(false)
   const { copied, copy } = useCopyToClipboard()
 
   const [selectedBankAccountId, setSelectedBankAccountId] = useState<
@@ -188,27 +192,64 @@ export function PaymentSettingsForm() {
               {isStripeEnabled && (
                 <div className="mt-5 space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="grid gap-2">
-                      <Label htmlFor="stripeSecretKey">Stripe Secret Key</Label>
+                    <div className="flex gap-2">
                       <Controller
                         control={control}
                         name="stripeSecretKey"
                         render={({ field }) => (
-                          <Input placeholder="sk_live_..." {...field} />
+                          <Input
+                            type={showSecretKey ? 'text' : 'password'}
+                            placeholder="sk_live_..."
+                            {...field}
+                          />
                         )}
                       />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowSecretKey(!showSecretKey)}
+                        className="shrink-0"
+                      >
+                        {showSecretKey ? (
+                          <IconEyeOff size={16} />
+                        ) : (
+                          <IconEye size={16} />
+                        )}
+                      </Button>
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="stripeWebhookSecret">
                         Stripe Webhook Signing Secret
                       </Label>
-                      <Controller
-                        control={control}
-                        name="stripeWebhookSecret"
-                        render={({ field }) => (
-                          <Input placeholder="whsec_..." {...field} />
-                        )}
-                      />
+                      <div className="flex gap-2">
+                        <Controller
+                          control={control}
+                          name="stripeWebhookSecret"
+                          render={({ field }) => (
+                            <Input
+                              type={showWebhookSecret ? 'text' : 'password'}
+                              placeholder="whsec_..."
+                              {...field}
+                            />
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            setShowWebhookSecret(!showWebhookSecret)
+                          }
+                          className="shrink-0"
+                        >
+                          {showWebhookSecret ? (
+                            <IconEyeOff size={16} />
+                          ) : (
+                            <IconEye size={16} />
+                          )}
+                        </Button>
+                      </div>
                       <span className="text-muted-foreground text-xs">
                         กรอกรหัส Webhook Secret ที่ได้จากการตั้งค่าใน Stripe
                         Dashboard ของคุณ
