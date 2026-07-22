@@ -36,6 +36,7 @@ import { Address } from '@/lib/address/logic'
 const InputThaiAddress = CreateInput()
 
 const DEFAULT_VALUES = {
+  isMain: false,
   name: '',
   address: '',
   subDistrict: '',
@@ -100,6 +101,7 @@ export function BranchDialog({
         branchData.openingHours as unknown as OpeningHours[]
 
       reset({
+        isMain: branchData.isMain ?? false,
         name: branchData.name ?? '',
         address: branchData.address ?? '',
         province: branchData.province ?? '',
@@ -154,12 +156,33 @@ export function BranchDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>เพิ่มสาขาใหม่</DialogTitle>
+          <DialogTitle>
+            {branchId ? 'แก้ไขข้อมูลสาขา' : 'เพิ่มสาขาใหม่'}
+          </DialogTitle>
           <DialogDescription>
             กรอกรายละเอียดสาขาเพื่อใช้ในการคำนวณค่าจัดส่งและตัดสต็อก
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="space-y-0.5">
+              <FieldLabel className="text-base">ตั้งเป็นสาขาหลัก</FieldLabel>
+              <p className="text-muted-foreground text-xs">
+                สาขานี้จะถูกใช้เป็นจุดตั้งต้นหลักของร้านค้า
+              </p>
+            </div>
+            <Controller
+              control={control}
+              name="isMain"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </div>
+
           <Field>
             <FieldLabel>ชื่อสาขา *</FieldLabel>
             <Input
