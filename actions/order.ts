@@ -177,3 +177,78 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     return { success: false }
   }
 }
+
+export async function cancelOrder(id: string) {
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Order ID' }
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: {
+        storeId: true,
+        orderNumber: true,
+        status: true,
+        items: {
+          select: {
+            quantity: true,
+            variantId: true,
+            branchId: true,
+          },
+        },
+      },
+    })
+
+    if (!order) {
+      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    if (order.status === OrderStatus.CANCELLED) {
+      return { success: false, message: 'ออเดอร์นี้ถูกยกเลิกไปแล้ว' }
+    }
+
+    await prisma.$transaction(async (tx) => {
+      for (const item of order.items) {
+        if (item.variantId && item.branchId) {
+          await tx.productStock.update({
+            where: {
+              branchId_variantId: {
+                branchId: item.branchId,
+                variantId: item.variantId,
+              },
+            },
+            data: {
+              quantity: {
+                increment: item.quantity,
+              },
+            },
+          })
+        }
+      }
+
+      await tx.order.update({
+        where: { id },
+        data: { status: OrderStatus.CANCELLED },
+      })
+    })
+
+    await createLog({
+      action: LogAction.CANCEL_ORDER,
+      actorType: ActorType.MERCHANT,
+      storeId: order.storeId,
+      entity: 'Order',
+      entityId: id,
+      details: {
+        orderNumber: order.orderNumber,
+        from: order.status,
+        to: OrderStatus.CANCELLED,
+      },
+    })
+
+    return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}

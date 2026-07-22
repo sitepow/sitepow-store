@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { getOrders, updateOrderStatus } from '../order'
+import { cancelOrder, getOrders, updateOrderStatus } from '../order'
 import { orderKeys } from '../query-keys/order'
 
 interface UseOrdersParams {
@@ -42,6 +42,17 @@ export function useUpdateOrderStatus() {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: OrderStatus }) =>
       await updateOrderStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+    },
+  })
+}
+
+export function useCancelOrder() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => await cancelOrder(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orderKeys.all })
     },
