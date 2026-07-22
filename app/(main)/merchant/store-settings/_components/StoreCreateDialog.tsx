@@ -76,6 +76,7 @@ export function StoreCreateDialog() {
         onSuccess: (data) => {
           if (data.success && data.invoice) {
             checkoutMutation.mutate({
+              customerEmail: user?.email ?? '',
               amount: Number(data.invoice.amount),
               description: data.invoice.description!,
               successUrl: `${window.location.origin}/merchant/billing-subscription`,

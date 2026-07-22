@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 import { purchaseCredit } from '@/actions/credit'
+import { invalidateStoreCache } from '@/actions/query-keys/invalidation/store'
 import { Prisma } from '@/generated/prisma/client'
 import {
   InvoiceStatus,
@@ -15,6 +16,17 @@ import Stripe from 'stripe'
 
 import { prisma } from '@/lib/prisma'
 import { stripe } from '@/lib/stripe'
+
+async function clearStoreCache(storeId: string) {
+  const store = await prisma.store.findUnique({
+    where: { id: storeId },
+    select: { slug: true },
+  })
+
+  if (store?.slug) {
+    await invalidateStoreCache(store?.slug)
+  }
+}
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -75,6 +87,8 @@ export async function POST(req: Request) {
             },
           }),
         ])
+
+        await clearStoreCache(storeId)
       }
       if (type === CheckoutType.SUBSCRIPTION && storeId) {
         await prisma.$transaction([
@@ -94,6 +108,8 @@ export async function POST(req: Request) {
             data: { status: StoreStatus.ACTIVE },
           }),
         ])
+
+        await clearStoreCache(storeId)
       } else if (type === CheckoutType.CREDIT && storeId) {
         const amountInBaht = session.amount_total! / 100
 
@@ -107,6 +123,8 @@ export async function POST(req: Request) {
           console.error(result.message)
           return NextResponse.json({ status: 500 })
         }
+
+        await clearStoreCache(storeId)
       }
     } catch (error) {
       console.error(error)

@@ -7,6 +7,7 @@ import { stripe } from '@/lib/stripe'
 export async function createCheckoutSession(params: CheckoutParams) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: [PaymentMethod.CARD, PaymentMethod.PROMPTPAY],
+    customer_email: params.customerEmail!,
     line_items: [
       {
         price_data: {

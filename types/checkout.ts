@@ -16,6 +16,7 @@ export enum UpgradeType {
 }
 
 export interface CheckoutParams {
+  customerEmail: string
   amount: number
   description: string
   successUrl: string

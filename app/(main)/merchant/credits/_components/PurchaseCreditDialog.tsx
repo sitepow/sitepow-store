@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils'
 export function PurchaseCreditDialog() {
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
-  const { userId } = useSession()
+  const { userId, user } = useSession()
 
   const getBonusCredits = (amount: number) => {
     const credits = getCredits(amount)
@@ -72,6 +72,7 @@ export function PurchaseCreditDialog() {
     const ratePerBaht = (totalCredits / data.amount).toFixed(2)
 
     checkout({
+      customerEmail: user?.email ?? '',
       amount: data.amount,
       description: `เติมเครดิต AI จำนวน ${formatNumber(getCredits(amount))} เครดิต (${ratePerBaht} เครดิต/บาท)`,
       successUrl: `${window.location.origin}/merchant/credits`,

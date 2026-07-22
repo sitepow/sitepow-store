@@ -46,6 +46,7 @@ export function MerchantInvoiceTable() {
 
   const handleCheckout = (inv: GetSubscriptionInvoiceItemSerialized) => {
     checkout({
+      customerEmail: user?.email ?? '',
       amount: Number(inv.amount),
       description: inv.description!,
       successUrl: `${window.location.origin}/merchant/billing-subscription`,
