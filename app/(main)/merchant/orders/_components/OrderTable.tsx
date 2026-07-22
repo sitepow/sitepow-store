@@ -1,8 +1,6 @@
-'use client'
-
 import { useState } from 'react'
 
-import { useOrders } from '@/actions/hooks/order'
+import { useCancelOrder, useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
 import { DeliveryStatus, OrderStatus } from '@/generated/prisma/enums'
@@ -12,6 +10,7 @@ import { formatCurrency } from '@/utils/pricing'
 import { User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -38,6 +37,8 @@ export function OrderTable() {
     limit: 10,
   })
 
+  const cancelOrderMutation = useCancelOrder()
+
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
   }
@@ -60,9 +61,9 @@ export function OrderTable() {
           </TableHeader>
           <TableBody>
             {isLoading && orders.length === 0 ? (
-              <TableLoadingRow colSpan={7} />
+              <TableLoadingRow colSpan={8} />
             ) : orders.length === 0 ? (
-              <TableEmptyRow colSpan={7} title="ยังไม่มีออเดอร์" />
+              <TableEmptyRow colSpan={8} title="ยังไม่มีออเดอร์" />
             ) : (
               orders.map((order) => {
                 const customerName = order.customer
@@ -133,10 +134,20 @@ export function OrderTable() {
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-                    <TableCell className="flex gap-2.5 text-right">
+                    <TableCell className="flex items-center justify-end gap-2.5 text-right">
                       {order.status === OrderStatus.MANUAL_CHECK && (
                         <VerifySlipMerchantDialog order={order} />
                       )}
+                      {order.status !== OrderStatus.CANCELLED &&
+                        order.status !== OrderStatus.COMPLETED && (
+                          <DeleteButton
+                            isPending={cancelOrderMutation.isPending}
+                            onDelete={() =>
+                              cancelOrderMutation.mutate(order.id)
+                            }
+                          />
+                        )}
+
                       <OrderDetailDialog order={order} />
                     </TableCell>
                   </TableRow>

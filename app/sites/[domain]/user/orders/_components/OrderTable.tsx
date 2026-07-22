@@ -1,8 +1,8 @@
 'use client'
-
 import { useState } from 'react'
 
 import { useStoreCheckout } from '@/actions/hooks/checkout'
+import { useCancelOrder } from '@/actions/hooks/order'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
@@ -12,6 +12,7 @@ import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconCreditCard, IconEye } from '@tabler/icons-react'
 
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +45,7 @@ export function OrderTable({ search }: OrderTableProps) {
     useStorefrontOrders({ page, limit: 10, search })
 
   const storeCheckoutMutation = useStoreCheckout()
+  const cancelOrderMutation = useCancelOrder()
 
   const getItemsSummary = (items: GetStorefrontOrderItemSerialized['items']) =>
     items.map((item) => `${item.title} x ${item.quantity}`).join(', ')
@@ -138,6 +140,12 @@ export function OrderTable({ search }: OrderTableProps) {
                               }
                             />
                           )}
+                          <DeleteButton
+                            isPending={cancelOrderMutation.isPending}
+                            onDelete={() =>
+                              cancelOrderMutation.mutate(order.id)
+                            }
+                          />
                         </>
                       )}
                       <Button

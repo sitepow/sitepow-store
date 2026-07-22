@@ -8,6 +8,7 @@ import {
 
 import { cancelOrder, getOrders, updateOrderStatus } from '../order'
 import { orderKeys } from '../query-keys/order'
+import { storefrontOrderKeys } from '../query-keys/storefront/order'
 
 interface UseOrdersParams {
   storeId: string
@@ -53,8 +54,11 @@ export function useCancelOrder() {
 
   return useMutation({
     mutationFn: async (id: string) => await cancelOrder(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: orderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: storefrontOrderKeys.all }),
+      ])
     },
   })
 }
