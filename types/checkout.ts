@@ -29,3 +29,14 @@ export interface CheckoutParams {
     billingCycle?: string
   }
 }
+
+export interface CreateStoreCheckoutParams {
+  storeId: string
+  orderId: string
+  description: string
+  amount: number
+  customerEmail?: string
+  successUrl: string
+  cancelUrl: string
+  metadata?: Record<string, string>
+}
