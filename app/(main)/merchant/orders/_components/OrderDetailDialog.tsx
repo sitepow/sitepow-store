@@ -10,11 +10,13 @@ import {
   PAYMENT_METHOD_TH,
 } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatDateTime } from '@/utils/date'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency } from '@/utils/pricing'
 import {
   IconAlertCircle,
+  IconCheck,
   IconCopy,
   IconEye,
   IconTicket,
@@ -32,6 +34,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -42,24 +46,39 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 interface OrderDetailDialogProps {
-  order: GetOrdersItem & {
-    coupon?: { code: string; description: string | null } | null
-    shippingFee?: number | null
-    pointsDiscount?: number | null
-    codFee?: number | null
-    usedPoints?: number | null
-    shippingMethod?: string | null
-  }
+  order: GetOrdersItem
 }
 
 export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
   const [open, setOpen] = useState(false)
-  const updateStatusMutation = useUpdateOrderStatus()
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(
+    order.status,
+  )
+  const [trackingNumber, setTrackingNumber] = useState(
+    order.trackingNumber || '',
+  )
 
-  const handleCopyTracking = () => {
-    if (order.trackingNumber) {
-      navigator.clipboard.writeText(order.trackingNumber)
+  const updateStatusMutation = useUpdateOrderStatus()
+  const { copied, copy } = useCopyToClipboard()
+
+  const handleStatusChange = (v: string) => {
+    const newStatus = v as OrderStatus
+    setSelectedStatus(newStatus)
+
+    if (newStatus !== OrderStatus.SHIPPED || order.trackingNumber) {
+      updateStatusMutation.mutate({
+        id: order.id,
+        status: newStatus,
+      })
     }
+  }
+
+  const handleSaveTrackingAndStatus = () => {
+    updateStatusMutation.mutate({
+      id: order.id,
+      status: selectedStatus,
+      trackingNumber,
+    })
   }
 
   const summary = calculateOrderSummary(order)
@@ -79,6 +98,28 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+            <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
+            <Select
+              value={selectedStatus}
+              disabled={
+                order.status === OrderStatus.CANCELLED ||
+                updateStatusMutation.isPending
+              }
+              onValueChange={handleStatusChange}
+            >
+              <SelectTrigger className="w-44">
+                {updateStatusMutation.isPending ? <Spinner /> : <SelectValue />}
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(OrderStatus).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {ORDER_STATUS_TH[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="bg-muted/20 space-y-1 rounded-lg border p-3">
             <div className="flex items-center">
               <Avatar className="size-8 border">
@@ -177,9 +218,9 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               )}
             </div>
             {order.trackingNumber ? (
-              <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="from-primary/10 via-primary/2 to-background border-primary/25 flex items-center justify-between rounded-lg border bg-linear-to-br p-3">
                 <div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-muted-foreground mb-1 text-xs">
                     เลขพัสดุ (Tracking Number)
                   </div>
                   <div className="font-bold">{order.trackingNumber}</div>
@@ -187,9 +228,17 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleCopyTracking}
+                  onClick={() => copy(order.trackingNumber!)}
                 >
-                  <IconCopy size={16} className="mr-1" /> คัดลอก
+                  {copied ? (
+                    <>
+                      <IconCheck size={16} className="mr-1" /> คัดลอกแล้ว
+                    </>
+                  ) : (
+                    <>
+                      <IconCopy size={16} className="mr-1" /> คัดลอก
+                    </>
+                  )}
                 </Button>
               </div>
             ) : (
@@ -197,37 +246,39 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
                 <IconAlertCircle className="shrink-0" />
                 {order.status === OrderStatus.PENDING
                   ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
-                  : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ และจะแสดงสถานะอัปเดตในระบบสำหรับออเดอร์นี้ทันที'}
+                  : 'ยังไม่ได้ระบุเลขติดตามพัสดุในระบบ'}
               </div>
             )}
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-            <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
-            <Select
-              value={order.status}
-              disabled={
-                order.status === OrderStatus.CANCELLED ||
-                updateStatusMutation.isPending
-              }
-              onValueChange={(v) =>
-                updateStatusMutation.mutate({
-                  id: order.id,
-                  status: v as OrderStatus,
-                })
-              }
-            >
-              <SelectTrigger className="w-44">
-                {updateStatusMutation.isPending ? <Spinner /> : <SelectValue />}
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(OrderStatus).map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {ORDER_STATUS_TH[s]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {selectedStatus === OrderStatus.SHIPPED && !order.trackingNumber && (
+            <div className="space-y-3 rounded-lg border p-4">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium">
+                  กรุณากรอกเลขพัสดุสำหรับการจัดส่ง
+                </Label>
+                <p className="text-muted-foreground text-xs">
+                  จำเป็นต้องระบุเลข Tracking Number
+                  ก่อนเปลี่ยนสถานะเป็นกำลังจัดส่ง
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="ระบุเลข Tracking Number เช่น TH123456789..."
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                />
+                <Button
+                  onClick={handleSaveTrackingAndStatus}
+                  disabled={
+                    updateStatusMutation.isPending || !trackingNumber.trim()
+                  }
+                  className="shrink-0"
+                >
+                  {updateStatusMutation.isPending ? <Spinner /> : 'บันทึก'}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

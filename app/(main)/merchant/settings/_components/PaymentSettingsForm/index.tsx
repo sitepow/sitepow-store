@@ -7,10 +7,12 @@ import {
   usePaymentSetting,
   useUpsertPaymentSetting,
 } from '@/actions/hooks/payment'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  IconCheck,
   IconCopy,
   IconCreditCard,
   IconDeviceFloppy,
@@ -34,37 +36,17 @@ export function PaymentSettingsForm() {
   const { selectedStoreId } = useStoreFilter()
   const { data: paymentSetting } = usePaymentSetting(selectedStoreId)
 
+  const { copied, copy } = useCopyToClipboard()
+
   const [selectedBankAccountId, setSelectedBankAccountId] = useState<
     string | undefined
   >()
   const [open, setOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
 
   const centralWebhookUrl =
     selectedStoreId && selectedStoreId !== ALL_STORES
       ? `${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhook/stripe/store/${selectedStoreId}`
       : ''
-
-  const handleCopyWebhookUrl = async () => {
-    if (!centralWebhookUrl) {
-      return
-    }
-
-    if (navigator?.clipboard?.writeText) {
-      await navigator.clipboard.writeText(centralWebhookUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } else {
-      const textArea = document.createElement('textarea')
-      textArea.value = centralWebhookUrl
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
 
   const handleEdit = (id: string) => {
     setSelectedBankAccountId(id)
@@ -255,10 +237,17 @@ export function PaymentSettingsForm() {
                         variant="outline"
                         size="sm"
                         className="h-8 shrink-0 text-xs"
-                        onClick={handleCopyWebhookUrl}
+                        onClick={() => copy(centralWebhookUrl)}
                       >
-                        <IconCopy size={14} className="mr-1" />
-                        {copied ? 'คัดลอกแล้ว' : 'คัดลอก URL'}
+                        {copied ? (
+                          <>
+                            <IconCheck size={16} className="mr-1" /> คัดลอกแล้ว
+                          </>
+                        ) : (
+                          <>
+                            <IconCopy size={16} className="mr-1" /> คัดลอก
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>

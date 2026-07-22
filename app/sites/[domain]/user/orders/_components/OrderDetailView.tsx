@@ -5,10 +5,16 @@ import {
   PAYMENT_METHOD_TH,
 } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatDateTime } from '@/utils/date'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency } from '@/utils/pricing'
-import { IconAlertCircle, IconCopy, IconTicket } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconCopy,
+  IconTicket,
+} from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,12 +29,7 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
-  const handleCopyTracking = () => {
-    if (order.trackingNumber) {
-      navigator.clipboard.writeText(order.trackingNumber)
-    }
-  }
-
+  const { copied, copy } = useCopyToClipboard()
   const summary = calculateOrderSummary(order)
 
   return (
@@ -93,7 +94,6 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                 <span>{formatCurrency(summary?.codFee)}</span>
               </div>
             )}
-
             <div className="text-foreground flex justify-between border-t pt-2 text-base font-bold">
               <span>ยอดชำระทั้งสิ้น</span>
               <span>{formatCurrency(order.totalAmount)}</span>
@@ -128,15 +128,27 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             )}
           </div>
           {order.trackingNumber ? (
-            <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="from-primary/10 via-primary/2 to-background border-primary/25 flex items-center justify-between rounded-lg border bg-linear-to-br p-3">
               <div>
-                <div className="text-muted-foreground text-xs">
+                <div className="text-muted-foreground mb-1 text-xs">
                   เลขพัสดุ (Tracking Number)
                 </div>
                 <div className="font-bold">{order.trackingNumber}</div>
               </div>
-              <Button variant="outline" size="sm" onClick={handleCopyTracking}>
-                <IconCopy size={16} className="mr-1" /> คัดลอก
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => copy(order.trackingNumber!)}
+              >
+                {copied ? (
+                  <>
+                    <IconCheck size={16} className="mr-1" /> คัดลอกแล้ว
+                  </>
+                ) : (
+                  <>
+                    <IconCopy size={16} className="mr-1" /> คัดลอก
+                  </>
+                )}
               </Button>
             </div>
           ) : (

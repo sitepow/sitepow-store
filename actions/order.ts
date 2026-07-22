@@ -1,7 +1,12 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  DeliveryStatus,
+  LogAction,
+  OrderStatus,
+} from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
@@ -148,7 +153,11 @@ export async function getOrders({
   }
 }
 
-export async function updateOrderStatus(id: string, status: OrderStatus) {
+export async function updateOrderStatus(
+  id: string,
+  status: OrderStatus,
+  trackingNumber?: string,
+) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Order ID' }
@@ -169,7 +178,13 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
 
     await prisma.order.update({
       where: { id },
-      data: { status },
+      data: {
+        status,
+        ...(trackingNumber ? { trackingNumber } : {}),
+        ...(status === OrderStatus.SHIPPED
+          ? { deliveryStatus: DeliveryStatus.IN_TRANSIT }
+          : {}),
+      },
     })
 
     await createLog({
@@ -182,6 +197,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
         orderNumber: order.orderNumber,
         from: order.status,
         to: status,
+        trackingNumber: trackingNumber || null,
       },
     })
 
