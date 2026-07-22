@@ -5,12 +5,8 @@ import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useCancelOrder } from '@/actions/hooks/order'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
-import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
-import {
-  DeliveryStatus,
-  OrderStatus,
-  PaymentMethod,
-} from '@/generated/prisma/enums'
+import { ORDER_STATUS_TH } from '@/constants/translate'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
@@ -65,7 +61,6 @@ export function OrderTable({ search }: OrderTableProps) {
               <TableHead>รายการสินค้า</TableHead>
               <TableHead>ยอดสุทธิ</TableHead>
               <TableHead>สถานะ</TableHead>
-              <TableHead>จัดส่ง</TableHead>
               <TableHead>วันที่สั่งซื้อ</TableHead>
               <TableHead className="text-right">ดูข้อมูล</TableHead>
             </TableRow>
@@ -96,7 +91,6 @@ export function OrderTable({ search }: OrderTableProps) {
                         variant={
                           (
                             [
-                              OrderStatus.COMPLETED,
                               OrderStatus.PAID,
                               OrderStatus.SHIPPED,
                             ] as OrderStatus[]
@@ -106,22 +100,6 @@ export function OrderTable({ search }: OrderTableProps) {
                         }
                       >
                         {ORDER_STATUS_TH[order.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          (
-                            [
-                              DeliveryStatus.DELIVERED,
-                              DeliveryStatus.IN_TRANSIT,
-                            ] as DeliveryStatus[]
-                          ).includes(order.deliveryStatus)
-                            ? 'default'
-                            : 'outline'
-                        }
-                      >
-                        {DELIVERY_STATUS_TH[order.deliveryStatus]}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>

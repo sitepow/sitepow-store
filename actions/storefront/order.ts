@@ -3,7 +3,6 @@
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
-  DeliveryStatus,
   LogAction,
   OrderStatus,
   PaymentMethod,
@@ -64,7 +63,6 @@ const storefrontOrderSelect = {
   status: true,
   paymentMethod: true,
   trackingNumber: true,
-  deliveryStatus: true,
   createdAt: true,
   customerId: true,
   bankAccountId: true,
@@ -393,7 +391,6 @@ export async function createOrder(input: CreateOrderInput) {
           orderNumber,
           totalAmount,
           status: OrderStatus.PENDING,
-          deliveryStatus: DeliveryStatus.PENDING,
           storeId: store.id,
           customerId: customer.id,
           couponId: input.couponId,

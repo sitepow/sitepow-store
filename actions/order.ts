@@ -1,12 +1,7 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import {
-  ActorType,
-  DeliveryStatus,
-  LogAction,
-  OrderStatus,
-} from '@/generated/prisma/enums'
+import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
@@ -25,7 +20,6 @@ const orderSelect = {
   orderNumber: true,
   totalAmount: true,
   status: true,
-  deliveryStatus: true,
   paymentMethod: true,
   shippingMethod: true,
   trackingNumber: true,
@@ -181,9 +175,6 @@ export async function updateOrderStatus(
       data: {
         status,
         ...(trackingNumber ? { trackingNumber } : {}),
-        ...(status === OrderStatus.SHIPPED
-          ? { deliveryStatus: DeliveryStatus.IN_TRANSIT }
-          : {}),
       },
     })
 

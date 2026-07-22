@@ -4,11 +4,7 @@ import { useState } from 'react'
 
 import { useUpdateOrderStatus } from '@/actions/hooks/order'
 import { GetOrdersItem } from '@/actions/order'
-import {
-  DELIVERY_STATUS_TH,
-  ORDER_STATUS_TH,
-  PAYMENT_METHOD_TH,
-} from '@/constants/translate'
+import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatDateTime } from '@/utils/date'
@@ -196,20 +192,13 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               <Badge
                 variant={
                   (
-                    [
-                      OrderStatus.COMPLETED,
-                      OrderStatus.PAID,
-                      OrderStatus.SHIPPED,
-                    ] as OrderStatus[]
+                    [OrderStatus.PAID, OrderStatus.SHIPPED] as OrderStatus[]
                   ).includes(order.status)
                     ? 'default'
                     : 'outline'
                 }
               >
                 ออเดอร์: {ORDER_STATUS_TH[order.status]}
-              </Badge>
-              <Badge variant="outline">
-                จัดส่ง: {DELIVERY_STATUS_TH[order.deliveryStatus]}
               </Badge>
               {order.paymentMethod && (
                 <Badge variant="outline">

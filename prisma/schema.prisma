@@ -811,7 +811,6 @@ enum OrderStatus {
   MANUAL_CHECK
   PAID
   SHIPPED
-  COMPLETED
   CANCELLED
 }
 
@@ -821,16 +820,6 @@ enum PaymentMethod {
   STRIPE_QR_PROMPTPAY
   STRIPE_CREDIT_CARD
   CASH_ON_DELIVERY
-}
-
-enum DeliveryStatus {
-  PENDING
-  BOOKED
-  PICKING_UP
-  IN_TRANSIT
-  DELIVERED
-  RETURNED
-  FAILED
 }
 
 enum TransactionType {
@@ -912,9 +901,8 @@ model Order {
   pointEarningRateSnapshot Decimal? @db.Decimal(10, 2)
 
   shippingMethod String?
-  shippingFee    Decimal?       @db.Decimal(10, 2)
+  shippingFee    Decimal? @db.Decimal(10, 2)
   trackingNumber String?
-  deliveryStatus DeliveryStatus @default(PENDING)
 
   paymentMethod PaymentMethod?
   paymentProof  String?

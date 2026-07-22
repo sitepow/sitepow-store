@@ -2,7 +2,6 @@ import {
   ActorType,
   AddressType,
   CustomerType,
-  DeliveryStatus,
   DiscountType,
   InvoiceStatus,
   LogAction,
@@ -35,7 +34,6 @@ export const ORDER_STATUS_TH: Record<OrderStatus, string> = {
   [OrderStatus.MANUAL_CHECK]: 'รอตรวจสอบสลิป',
   [OrderStatus.PAID]: 'ชำระเงินแล้ว',
   [OrderStatus.SHIPPED]: 'จัดส่งแล้ว',
-  [OrderStatus.COMPLETED]: 'สำเร็จ',
   [OrderStatus.CANCELLED]: 'ยกเลิก',
 }
 
@@ -67,16 +65,6 @@ export const STAFF_ROLE_TH: Record<StaffRole, string> = {
   [StaffRole.ADMIN]: 'ผู้ดูแลระบบร้าน',
   [StaffRole.MANAGER]: 'ผู้จัดการ',
   [StaffRole.CASHIER]: 'พนักงานขายหน้าร้าน',
-}
-
-export const DELIVERY_STATUS_TH: Record<DeliveryStatus, string> = {
-  [DeliveryStatus.PENDING]: 'เตรียมพัสดุ',
-  [DeliveryStatus.BOOKED]: 'ออกเลขพัสดุแล้ว',
-  [DeliveryStatus.PICKING_UP]: 'รอขนส่งเข้ารับ',
-  [DeliveryStatus.IN_TRANSIT]: 'กำลังจัดส่ง',
-  [DeliveryStatus.DELIVERED]: 'ส่งถึงบ้านแล้ว',
-  [DeliveryStatus.RETURNED]: 'พัสดุถูกตีกลับ',
-  [DeliveryStatus.FAILED]: 'การจัดส่งล้มเหลว',
 }
 
 export const ADDRESS_TYPE_TH: Record<AddressType, string> = {
@@ -166,7 +154,6 @@ export const getLabel = {
   customerType: (v: CustomerType) => CUSTOMER_TYPE_TH[v] || v,
   actorType: (v: ActorType) => ACTOR_TYPE_TH[v] || v,
   staffRole: (v: StaffRole) => STAFF_ROLE_TH[v] || v,
-  deliveryStatus: (v: DeliveryStatus) => DELIVERY_STATUS_TH[v] || v,
   addressType: (v: AddressType) => ADDRESS_TYPE_TH[v] || v,
   plan: (v: Plan) => PLAN_TH[v] || v,
   logAction: (v: LogAction) => LOG_ACTION_TH[v] || v,
