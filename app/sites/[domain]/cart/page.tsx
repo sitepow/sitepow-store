@@ -30,6 +30,7 @@ import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import {
   IconAlertCircle,
+  IconArrowRight,
   IconCreditCard,
   IconLock,
   IconMapPin,
@@ -98,7 +99,7 @@ export default function StoreCartPage() {
     originProvince: 'กรุงเทพมหานคร',
     destinationProvince: 'อุบลราชธานี',
     destinationPostcode: '34000',
-    weight: physicalTotalWeight || 780,
+    weight: physicalTotalWeight || 740,
   })
 
   const [selectedAddress, setSelectedAddress] = useState<string>('')
@@ -135,30 +136,44 @@ export default function StoreCartPage() {
   const paymentMethods = useMemo(() => {
     return [
       ...(paymentOptions?.isBankTransferEnabled
-        ? paymentOptions.bankAccounts.map((acc) => ({
-            id: acc.id,
-            title:
-              acc.type === BankAccountType.PROMPTPAY
-                ? 'พร้อมเพย์ (PromptPay)'
-                : 'โอนเงินบัญชีธนาคาร',
-            description:
+        ? paymentOptions.bankAccounts.map((acc) => {
+            const baseDescription =
               acc.type === BankAccountType.PROMPTPAY
                 ? `${formatPromptPay(acc.promptPayId)} (${acc.accountName})`
-                : `บัญชี ${acc.bankName} เลขที่ ${formatBankAccount(acc.accountNumber)} (${acc.accountName})`,
-          }))
+                : `บัญชี ${acc.bankName} เลขที่ ${formatBankAccount(acc.accountNumber)} (${acc.accountName})`
+
+            return {
+              id: acc.id,
+              title:
+                acc.type === BankAccountType.PROMPTPAY
+                  ? 'พร้อมเพย์ (PromptPay)'
+                  : 'โอนเงินบัญชีธนาคาร',
+              description: `${baseDescription} (ต้องอัพโหลดสลิปด้วยตนเอง)`,
+            }
+          })
         : []),
       ...(paymentOptions?.isStripeEnabled
         ? [
             {
-              id: 'STRIPE_QR_PROMPTPAY',
+              id: PaymentMethod.STRIPE_QR_PROMPTPAY,
               title: '(Stripe) QR พร้อมเพย์',
               description:
                 'รองรับธนาคารไทยทุกแห่ง (BBL, KBank, KTB, TTB, SCB, Krungsri, UOB, GSB, TISCO และอื่นๆ)',
             },
             {
-              id: 'STRIPE_CREDIT_CARD',
+              id: PaymentMethod.STRIPE_CREDIT_CARD,
               title: '(Stripe) บัตรเครดิต / เดบิต',
               description: 'ชำระผ่าน Visa หรือ Mastercard',
+            },
+            {
+              id: PaymentMethod.STRIPE_GOOGLE_PAY,
+              title: '(Stripe) Google Pay',
+              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay ของคุณ',
+            },
+            {
+              id: PaymentMethod.STRIPE_APPLE_PAY,
+              title: '(Stripe) Apple Pay',
+              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay ของคุณ',
             },
           ]
         : []),
@@ -227,8 +242,17 @@ export default function StoreCartPage() {
     if (paymentId === PaymentMethod.STRIPE_QR_PROMPTPAY) {
       return PaymentMethod.STRIPE_QR_PROMPTPAY
     }
+
     if (paymentId === PaymentMethod.STRIPE_CREDIT_CARD) {
       return PaymentMethod.STRIPE_CREDIT_CARD
+    }
+
+    if (paymentId === PaymentMethod.STRIPE_GOOGLE_PAY) {
+      return PaymentMethod.STRIPE_GOOGLE_PAY
+    }
+
+    if (paymentId === PaymentMethod.STRIPE_APPLE_PAY) {
+      return PaymentMethod.STRIPE_APPLE_PAY
     }
 
     const selectedAcc = paymentOptions?.bankAccounts.find(
@@ -415,7 +439,7 @@ export default function StoreCartPage() {
                 </Button>
               </Link>
             </div>
-            <div className="border-border flex flex-col rounded-xl border">
+            <div className="border-border dark:bg-foreground/5 bg-foreground/1 flex flex-col rounded-xl border">
               <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>ตะกร้าสินค้า</h2>
               </div>
@@ -458,7 +482,7 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="dark:bg-muted border-primary flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
+            <div className="dark:bg-foreground/5 border-primary/35 flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
               <CircularProgress
                 size={60}
                 value={progressValue}
@@ -515,10 +539,11 @@ export default function StoreCartPage() {
                   )}
                   <Button
                     className="w-full"
+                    variant="outline"
                     disabled={!selectedAddressData}
                     onClick={goToNextIncompleteStep}
                   >
-                    ดำเนินการต่อ
+                    ดำเนินการต่อ <IconArrowRight />
                   </Button>
                 </div>
                 {selectedAddressData && (
@@ -554,28 +579,33 @@ export default function StoreCartPage() {
                       onValueChange={setSelectedShipping}
                     >
                       <div className="grid gap-2">
-                        {shippingOptionsWithFees.map((method) => (
-                          <RadioCard
-                            key={method.id}
-                            id={`ship-${method.id}`}
-                            value={method.id}
-                            title={`${method.courierService.name} (${method.fee ? formatCurrency(method.fee) : 'ไม่รองรับน้ำหนักนี้'})`}
-                            description={
-                              method.courierService.estimatedDays
-                                ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
-                                : method.courierService.courier.name
-                            }
-                          />
-                        ))}
+                        {shippingOptionsWithFees.map((method) => {
+                          const isSupported = method.fee !== null
+                          return (
+                            <RadioCard
+                              key={method.id}
+                              id={`ship-${method.id}`}
+                              value={method.id}
+                              title={`${method.courierService.name} (${isSupported ? formatCurrency(method.fee!) : 'ไม่รองรับน้ำหนักนี้'})`}
+                              description={
+                                method.courierService.estimatedDays
+                                  ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
+                                  : method.courierService.courier.name
+                              }
+                              disabled={!isSupported}
+                            />
+                          )
+                        })}
                       </div>
                     </RadioGroup>
                   )}
                   <Button
                     className="w-full"
+                    variant="outline"
                     disabled={!selectedShippingData}
                     onClick={goToNextIncompleteStep}
                   >
-                    ดำเนินการต่อ
+                    ดำเนินการต่อ <IconArrowRight />
                   </Button>
                 </div>
                 {selectedShippingData && (
@@ -632,10 +662,11 @@ export default function StoreCartPage() {
                 )}
                 <Button
                   className="mt-2 h-11 w-full"
+                  variant="outline"
                   disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
-                  ดำเนินการต่อ
+                  ดำเนินการต่อ <IconArrowRight />
                 </Button>
               </div>
               {selectedPaymentData && (
@@ -649,8 +680,9 @@ export default function StoreCartPage() {
                 </RadioGroup>
               )}
             </CheckoutSection>
-            <div className="bg-foreground/5 border-border rounded-xl border p-5">
+            <div className="dark:bg-foreground/5 bg-foreground/1 border-border rounded-xl border p-5">
               <SummaryRow
+                className="mb-5"
                 label="ส่วนลด"
                 value={<DiscountForm subtotal={summary.finalPrice} />}
               />

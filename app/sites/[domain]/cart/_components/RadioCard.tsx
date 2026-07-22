@@ -12,6 +12,7 @@ interface RadioCardProps extends Omit<ComponentProps<'div'>, 'title'> {
   description?: React.ReactNode
   trailing?: React.ReactNode
   children?: React.ReactNode
+  disabled?: boolean
 }
 
 export function RadioCard({
@@ -22,6 +23,7 @@ export function RadioCard({
   trailing,
   children,
   className,
+  disabled,
   ...props
 }: RadioCardProps) {
   return (
@@ -29,11 +31,12 @@ export function RadioCard({
       <Label
         htmlFor={id}
         className={cn(
-          'dark:bg-foreground/5 border-border flex cursor-pointer justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
-          'has-data-[state=checked]:border-primary',
+          'dark:bg-foreground/5 border-border flex justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
+          'has-data-[state=checked]:border-primary/35',
+          disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
         )}
       >
-        <RadioGroupItem value={value} id={id} />
+        <RadioGroupItem value={value} id={id} disabled={disabled} />
         <div className="flex w-full flex-col">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
