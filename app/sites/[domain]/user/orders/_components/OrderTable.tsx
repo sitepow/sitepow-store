@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 
+import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
-import { IconEye } from '@tabler/icons-react'
+import { IconCreditCard, IconEye } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
@@ -40,6 +41,8 @@ export function OrderTable({ search }: OrderTableProps) {
   const { data: { data: orders = [], meta } = {}, isLoading } =
     useStorefrontOrders({ page, limit: 10, search })
 
+  const storeCheckoutMutation = useStoreCheckout()
+
   const getItemsSummary = (items: GetStorefrontOrderItemSerialized['items']) =>
     items.map((item) => `${item.title} x ${item.quantity}`).join(', ')
 
@@ -64,56 +67,87 @@ export function OrderTable({ search }: OrderTableProps) {
             ) : orders.length === 0 ? (
               <TableEmptyRow colSpan={7} title="ไม่พบประวัติคำสั่งซื้อของคุณ" />
             ) : (
-              orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>#{order.orderNumber}</TableCell>
-                  <TableCell>
-                    <Badge>{order.store.name}</Badge>
-                  </TableCell>
-                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                    {getItemsSummary(order.items)}
-                  </TableCell>
-                  <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        (
-                          [
-                            OrderStatus.COMPLETED,
-                            OrderStatus.PAID,
-                            OrderStatus.SHIPPED,
-                          ] as OrderStatus[]
-                        ).includes(order.status)
-                          ? 'default'
-                          : 'outline'
-                      }
-                    >
-                      {ORDER_STATUS_TH[order.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-                  <TableCell className="flex flex-wrap items-center gap-2.5 text-right">
-                    {order.status === OrderStatus.PENDING && (
-                      <UploadSlipDialog
-                        orderId={order.id}
-                        storeId={order.store.id}
-                        orderNumber={order.orderNumber}
-                        customerId={order.customerId!}
-                        bankAccounts={
-                          order.bankAccount ? [order.bankAccount] : []
+              orders.map((order) => {
+                const isStripePayment =
+                  order.paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY ||
+                  order.paymentMethod === PaymentMethod.STRIPE_CREDIT_CARD
+
+                return (
+                  <TableRow key={order.id}>
+                    <TableCell>#{order.orderNumber}</TableCell>
+                    <TableCell>
+                      <Badge>{order.store.name}</Badge>
+                    </TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                      {getItemsSummary(order.items)}
+                    </TableCell>
+                    <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          (
+                            [
+                              OrderStatus.COMPLETED,
+                              OrderStatus.PAID,
+                              OrderStatus.SHIPPED,
+                            ] as OrderStatus[]
+                          ).includes(order.status)
+                            ? 'default'
+                            : 'outline'
                         }
-                      />
-                    )}
-                    <Button
-                      variant="outline"
-                      size="icon-lg"
-                      onClick={() => setSelectedOrder(order)}
-                    >
-                      <IconEye />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+                      >
+                        {ORDER_STATUS_TH[order.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatDateTime(order.createdAt)}</TableCell>
+                    <TableCell className="flex flex-wrap items-center justify-end gap-2.5 text-right">
+                      {order.status === OrderStatus.PENDING && (
+                        <>
+                          {isStripePayment ? (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              disabled={storeCheckoutMutation.isPending}
+                              onClick={() => {
+                                storeCheckoutMutation.mutate({
+                                  storeId: order.store.id,
+                                  orderId: order.id,
+                                  description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,
+                                  amount: order.totalAmount,
+                                  successUrl: `${window.location.origin}/user/orders`,
+                                  cancelUrl: `${window.location.origin}/user/orders`,
+                                })
+                              }}
+                            >
+                              <IconCreditCard className="mr-1 size-4" />
+                              {storeCheckoutMutation.isPending
+                                ? 'กำลังเชื่อมต่อ...'
+                                : 'ชำระเงินผ่าน Stripe'}
+                            </Button>
+                          ) : (
+                            <UploadSlipDialog
+                              orderId={order.id}
+                              storeId={order.store.id}
+                              orderNumber={order.orderNumber}
+                              customerId={order.customerId!}
+                              bankAccounts={
+                                order.bankAccount ? [order.bankAccount] : []
+                              }
+                            />
+                          )}
+                        </>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <IconEye />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

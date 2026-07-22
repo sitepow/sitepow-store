@@ -150,13 +150,13 @@ export default function StoreCartPage() {
       ...(paymentOptions?.isStripeEnabled
         ? [
             {
-              id: 'promptpay',
+              id: 'STRIPE_QR_PROMPTPAY',
               title: '(Stripe) QR พร้อมเพย์',
               description:
                 'รองรับธนาคารไทยทุกแห่ง (BBL, KBank, KTB, TTB, SCB, Krungsri, UOB, GSB, TISCO และอื่นๆ)',
             },
             {
-              id: 'stripe',
+              id: 'STRIPE_CREDIT_CARD',
               title: '(Stripe) บัตรเครดิต / เดบิต',
               description: 'ชำระผ่าน Visa หรือ Mastercard',
             },
@@ -310,8 +310,8 @@ export default function StoreCartPage() {
                 orderId: orderId,
                 description: `ชำระเงินคำสั่งซื้อ #${orderNumber}`,
                 amount: grandTotal,
-                successUrl: `${window.location.origin}/user/orders?success=true`,
-                cancelUrl: `${window.location.origin}/checkout?canceled=true`,
+                successUrl: `${window.location.origin}/user/orders`,
+                cancelUrl: `${window.location.origin}/user/orders`,
               })
             } else {
               router.push('/user/orders')
