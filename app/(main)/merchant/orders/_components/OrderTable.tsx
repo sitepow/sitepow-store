@@ -114,10 +114,10 @@ export function OrderTable() {
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="flex items-center justify-end gap-2.5 text-right">
+                      <OrderDetailDialog order={order} />
                       {order.status === OrderStatus.MANUAL_CHECK && (
                         <VerifySlipMerchantDialog order={order} />
                       )}
-                      <OrderDetailDialog order={order} />
                     </TableCell>
                   </TableRow>
                 )

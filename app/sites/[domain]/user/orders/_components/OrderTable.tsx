@@ -10,7 +10,7 @@ import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
-import { IconCreditCard, IconEye } from '@tabler/icons-react'
+import { IconCreditCard, IconEye, IconX } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -104,6 +104,25 @@ export function OrderTable({ search }: OrderTableProps) {
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="flex items-center justify-end gap-2.5 text-right">
+                      {(
+                        [
+                          OrderStatus.MANUAL_CHECK,
+                          OrderStatus.PENDING,
+                        ] as OrderStatus[]
+                      ).includes(order.status) && (
+                        <DeleteButton
+                          icon={<IconX />}
+                          isPending={cancelOrderMutation.isPending}
+                          onDelete={() => cancelOrderMutation.mutate(order.id)}
+                        />
+                      )}
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <IconEye />
+                      </Button>
                       {order.status === OrderStatus.PENDING && (
                         <>
                           {isStripePayment ? (
@@ -139,21 +158,8 @@ export function OrderTable({ search }: OrderTableProps) {
                               }
                             />
                           )}
-                          <DeleteButton
-                            isPending={cancelOrderMutation.isPending}
-                            onDelete={() =>
-                              cancelOrderMutation.mutate(order.id)
-                            }
-                          />
                         </>
                       )}
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <IconEye />
-                      </Button>
                     </TableCell>
                   </TableRow>
                 )

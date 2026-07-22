@@ -1,3 +1,7 @@
+'use client'
+
+import React from 'react'
+
 import { IconTrash } from '@tabler/icons-react'
 
 import {
@@ -16,14 +20,19 @@ import { Button } from '@/components/ui/button'
 interface DeleteButtonProps {
   isPending: boolean
   onDelete: () => void
+  icon?: React.ReactNode
 }
 
-export function DeleteButton({ isPending, onDelete }: DeleteButtonProps) {
+export function DeleteButton({
+  isPending,
+  onDelete,
+  icon = <IconTrash />,
+}: DeleteButtonProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="outline" size="icon-lg" disabled={isPending}>
-          <IconTrash />
+          {icon}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
