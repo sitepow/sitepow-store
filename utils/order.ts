@@ -1,3 +1,16 @@
+import crypto from 'crypto'
+
+interface CalculateGroupShareParams {
+  groupSubtotal: number
+  totalGrandSubtotal: number
+  totalShippingFee: number
+  branchCount: number
+  couponDiscount: number
+  pointsDiscount: number
+  usedPoints: number
+  earnedPoints: number
+}
+
 export interface OrderCoupon {
   code: string
   description?: string | null
@@ -50,5 +63,34 @@ export function calculateOrderSummary(order: OrderCalculationsInput) {
     couponDiscount,
     totalAmount,
     customerName,
+  }
+}
+
+export function generateOrderNumber() {
+  const date = new Date()
+  const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`
+  const randomPart = crypto.randomInt(1000, 9999)
+  return `SP${datePart}${randomPart}`
+}
+
+export const calculateGroupShare = ({
+  groupSubtotal,
+  totalGrandSubtotal,
+  totalShippingFee,
+  branchCount,
+  couponDiscount,
+  pointsDiscount,
+  usedPoints,
+  earnedPoints,
+}: CalculateGroupShareParams) => {
+  const ratio = totalGrandSubtotal > 0 ? groupSubtotal / totalGrandSubtotal : 0
+  return {
+    ratio,
+    shippingFee:
+      branchCount === 1 ? totalShippingFee : totalShippingFee * ratio,
+    couponDiscount: couponDiscount * ratio,
+    pointsDiscount: pointsDiscount * ratio,
+    usedPoints: Math.round(usedPoints * ratio),
+    earnedPoints: Math.round(earnedPoints * ratio),
   }
 }
