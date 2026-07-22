@@ -46,7 +46,7 @@ export function RadioCard({
                 </div>
               )}
               {description && (
-                <div className="mt-0.5 text-xs opacity-60">{description}</div>
+                <div className="text-primary mt-0.5 text-xs">{description}</div>
               )}
             </div>
           </div>

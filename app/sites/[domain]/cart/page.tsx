@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
+import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useAddressOptions } from '@/actions/hooks/storefront/address'
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { useCreateOrder } from '@/actions/hooks/storefront/order'
@@ -122,6 +123,7 @@ export default function StoreCartPage() {
   }, [shippingOptions, shippingFees])
 
   const createOrderMutation = useCreateOrder()
+  const storeCheckoutMutation = useStoreCheckout()
 
   const stepIcons = {
     address: IconMapPin,
@@ -149,12 +151,13 @@ export default function StoreCartPage() {
         ? [
             {
               id: 'promptpay',
-              title: 'QR พร้อมเพย์',
-              description: 'รองรับแอปธนาคารทุกแห่ง',
+              title: '(Stripe) QR พร้อมเพย์',
+              description:
+                'รองรับธนาคารไทยทุกแห่ง (BBL, KBank, KTB, TTB, SCB, Krungsri, UOB, GSB, TISCO และอื่นๆ)',
             },
             {
               id: 'stripe',
-              title: 'บัตรเครดิต / เดบิต',
+              title: '(Stripe) บัตรเครดิต / เดบิต',
               description: 'ชำระผ่าน Visa หรือ Mastercard',
             },
           ]
@@ -267,6 +270,10 @@ export default function StoreCartPage() {
       (acc) => acc.id === selectedPayment,
     )
 
+    const paymentMethodEnum = getPaymentMethod(selectedPaymentData.id)
+    const isStripePayment =
+      selectedPayment === 'promptpay' || selectedPayment === 'stripe'
+
     createOrderMutation.mutate(
       {
         storeSlug,
@@ -274,7 +281,7 @@ export default function StoreCartPage() {
         shippingMethod: selectedShippingData?.courierService.name ?? '',
         storeCourierServiceId: selectedShippingData?.id ?? '',
         shippingFee: shippingFee,
-        paymentMethod: getPaymentMethod(selectedPaymentData.id),
+        paymentMethod: paymentMethodEnum,
         bankAccountId: selectedBankAcc?.id,
         couponId: appliedCoupon?.id,
         usedPoints,
@@ -292,8 +299,23 @@ export default function StoreCartPage() {
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
+            const orderId = res.data.id
+            const orderNumber = res.data.orderNumber
+
             clearCart()
-            router.push('/user/orders')
+
+            if (isStripePayment && store?.id) {
+              storeCheckoutMutation.mutate({
+                storeId: store.id,
+                orderId: orderId,
+                description: `ชำระเงินคำสั่งซื้อ #${orderNumber}`,
+                amount: grandTotal,
+                successUrl: `${window.location.origin}/user/orders?success=true`,
+                cancelUrl: `${window.location.origin}/checkout?canceled=true`,
+              })
+            } else {
+              router.push('/user/orders')
+            }
           }
         },
       },
@@ -548,7 +570,6 @@ export default function StoreCartPage() {
                   )}
                   <Button
                     className="w-full"
-
                     disabled={!selectedShippingData}
                     onClick={goToNextIncompleteStep}
                   >
@@ -609,7 +630,6 @@ export default function StoreCartPage() {
                 )}
                 <Button
                   className="mt-2 h-11 w-full"
-
                   disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
@@ -661,23 +681,23 @@ export default function StoreCartPage() {
                 <Button
                   className="mt-6 h-12 w-full text-lg"
                   size="lg"
-
                   disabled={
                     activeSection !== 'review' ||
                     createOrderMutation.isPending ||
+                    storeCheckoutMutation.isPending ||
                     items?.length === 0
                   }
                   onClick={handleCreateOrder}
                 >
-                  {createOrderMutation.isPending
-                    ? 'กำลังสั่งซื้อ...'
+                  {createOrderMutation.isPending ||
+                  storeCheckoutMutation.isPending
+                    ? 'กำลังดำเนินการ...'
                     : 'สั่งสินค้า'}
                 </Button>
               )}
               {!isAuthenticated && (
                 <Button
                   className="mt-6 h-12 w-full text-lg"
-
                   onClick={() => {
                     router.push(loginHref)
                   }}

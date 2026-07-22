@@ -67,7 +67,7 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
                     <Badge variant="outline">{branch.name}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">
+                    <Badge variant={branch.isMain ? 'default' : 'outline'}>
                       {branch.isMain ? 'สาขาหลัก' : 'สาขาย่อย'}
                     </Badge>
                   </TableCell>

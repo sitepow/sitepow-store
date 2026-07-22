@@ -7,7 +7,6 @@ import { prisma } from '@/lib/prisma'
 const storefrontPaymentSelect = {
   isBankTransferEnabled: true,
   isStripeEnabled: true,
-  stripePublicKey: true,
   bankAccounts: {
     select: {
       id: true,
