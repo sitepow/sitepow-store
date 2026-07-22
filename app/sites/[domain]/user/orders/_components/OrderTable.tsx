@@ -7,6 +7,7 @@ import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconCreditCard, IconEye } from '@tabler/icons-react'
@@ -34,6 +35,7 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ search }: OrderTableProps) {
+  const { user } = useSession()
   const [page, setPage] = useState(1)
   const [selectedOrder, setSelectedOrder] =
     useState<GetStorefrontOrderItemSerialized | null>(null)
@@ -110,6 +112,7 @@ export function OrderTable({ search }: OrderTableProps) {
                               disabled={storeCheckoutMutation.isPending}
                               onClick={() => {
                                 storeCheckoutMutation.mutate({
+                                  customerEmail: user?.email ?? ' ',
                                   storeId: order.store.id,
                                   orderId: order.id,
                                   description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,

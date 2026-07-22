@@ -64,7 +64,7 @@ export default function StoreCartPage() {
   const router = useRouter()
   const params = useParams()
   const storeSlug = params.domain as string
-  const { isAuthenticated } = useSession()
+  const { isAuthenticated, user } = useSession()
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
@@ -224,11 +224,11 @@ export default function StoreCartPage() {
     }) + shippingFee
 
   const getPaymentMethod = (paymentId: string): PaymentMethod => {
-    if (paymentId === 'promptpay') {
-      return PaymentMethod.QR_PROMPTPAY
+    if (paymentId === PaymentMethod.STRIPE_QR_PROMPTPAY) {
+      return PaymentMethod.STRIPE_QR_PROMPTPAY
     }
-    if (paymentId === 'stripe') {
-      return PaymentMethod.CREDIT_CARD
+    if (paymentId === PaymentMethod.STRIPE_CREDIT_CARD) {
+      return PaymentMethod.STRIPE_CREDIT_CARD
     }
 
     const selectedAcc = paymentOptions?.bankAccounts.find(
@@ -236,10 +236,10 @@ export default function StoreCartPage() {
     )
 
     if (selectedAcc?.type === BankAccountType.PROMPTPAY) {
-      return PaymentMethod.QR_PROMPTPAY
+      return PaymentMethod.MANUAL_QR_PROMPTPAY
     }
 
-    return PaymentMethod.TRANSFER
+    return PaymentMethod.BANK_TRANSFER
   }
 
   const sectionDescription = useMemo(() => {
@@ -272,7 +272,8 @@ export default function StoreCartPage() {
 
     const paymentMethodEnum = getPaymentMethod(selectedPaymentData.id)
     const isStripePayment =
-      selectedPayment === 'promptpay' || selectedPayment === 'stripe'
+      paymentMethodEnum === PaymentMethod.STRIPE_QR_PROMPTPAY ||
+      paymentMethodEnum === PaymentMethod.STRIPE_CREDIT_CARD
 
     createOrderMutation.mutate(
       {
@@ -306,6 +307,7 @@ export default function StoreCartPage() {
 
             if (isStripePayment && store?.id) {
               storeCheckoutMutation.mutate({
+                customerEmail: user?.email ?? '',
                 storeId: store.id,
                 orderId: orderId,
                 description: `ชำระเงินคำสั่งซื้อ #${orderNumber}`,
