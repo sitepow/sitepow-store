@@ -42,6 +42,8 @@ export const PAYMENT_METHOD_TH: Record<PaymentMethod, string> = {
   [PaymentMethod.MANUAL_QR_PROMPTPAY]: 'พร้อมเพย์ร้านค้า (แนบสลิป)',
   [PaymentMethod.STRIPE_QR_PROMPTPAY]: 'พร้อมเพย์ (QR ผ่าน Stripe)',
   [PaymentMethod.STRIPE_CREDIT_CARD]: 'บัตรเครดิต/เดบิต (ผ่าน Stripe)',
+  [PaymentMethod.STRIPE_GOOGLE_PAY]: 'Google Pay (ผ่าน Stripe)',
+  [PaymentMethod.STRIPE_APPLE_PAY]: 'Apple Pay (ผ่าน Stripe)',
   [PaymentMethod.CASH_ON_DELIVERY]: 'เก็บเงินปลายทาง',
 }
 

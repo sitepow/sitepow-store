@@ -17,6 +17,7 @@ import { calculatePlanPrice, calculateProration } from '@/utils/pricing'
 import { differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 import { createCheckoutSession } from './stripe/checkout'
@@ -354,6 +355,8 @@ export async function initiatePlanUpgrade(
   newPlan: Plan,
   billingCycle: string,
 ) {
+  const userSession = await auth()
+
   try {
     if (newPlan === Plan.FREE) {
       return { success: true, url: null, type: UpgradeType.NORMAL }
@@ -402,6 +405,7 @@ export async function initiatePlanUpgrade(
 
     if (amountToPay > 0) {
       const session = await createCheckoutSession({
+        customerEmail: userSession?.user?.email ?? '',
         amount: Number(amountToPay),
         description: `ชำระส่วนต่างสำหรับ Upgrade ไปยังแพลน ${PLAN_DETAILS[newPlan].name}`,
         successUrl: `${process.env.APP_URL}/merchant/billing-subscription`,

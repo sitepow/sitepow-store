@@ -104,7 +104,7 @@ export async function getStorefrontDashboard(
           where: {
             customerId: customer.id,
             storeId: store.id,
-            status: { notIn: [OrderStatus.COMPLETED, OrderStatus.CANCELLED] },
+            status: { notIn: [OrderStatus.SHIPPED, OrderStatus.CANCELLED] },
           },
         }),
         prisma.coupon.findMany({

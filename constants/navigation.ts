@@ -129,7 +129,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
       {
         value: 'orders-completed',
         label: 'สำเร็จ',
-        url: `/merchant/orders?status=${OrderStatus.COMPLETED}`,
+        url: `/merchant/orders?status=${OrderStatus.SHIPPED}`,
       },
       {
         value: 'orders-cancelled',
