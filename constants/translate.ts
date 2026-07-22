@@ -40,9 +40,10 @@ export const ORDER_STATUS_TH: Record<OrderStatus, string> = {
 }
 
 export const PAYMENT_METHOD_TH: Record<PaymentMethod, string> = {
-  [PaymentMethod.TRANSFER]: 'โอนเงินผ่านธนาคาร',
-  [PaymentMethod.QR_PROMPTPAY]: 'พร้อมเพย์ (QR)',
-  [PaymentMethod.CREDIT_CARD]: 'บัตรเครดิต/เดบิต',
+  [PaymentMethod.BANK_TRANSFER]: 'โอนเงินผ่านบัญชีธนาคาร',
+  [PaymentMethod.MANUAL_QR_PROMPTPAY]: 'พร้อมเพย์ร้านค้า (แนบสลิป)',
+  [PaymentMethod.STRIPE_QR_PROMPTPAY]: 'พร้อมเพย์ (QR ผ่าน Stripe)',
+  [PaymentMethod.STRIPE_CREDIT_CARD]: 'บัตรเครดิต/เดบิต (ผ่าน Stripe)',
   [PaymentMethod.CASH_ON_DELIVERY]: 'เก็บเงินปลายทาง',
 }
 
