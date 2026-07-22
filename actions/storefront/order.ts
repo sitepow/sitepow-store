@@ -68,6 +68,17 @@ const storefrontOrderSelect = {
   createdAt: true,
   customerId: true,
   bankAccountId: true,
+  shippingMethod: true,
+  shippingFee: true,
+  pointsDiscount: true,
+  usedPoints: true,
+  codFee: true,
+  coupon: {
+    select: {
+      code: true,
+      description: true,
+    },
+  },
   bankAccount: {
     select: {
       id: true,

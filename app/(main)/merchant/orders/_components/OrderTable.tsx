@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { useCancelOrder, useOrders } from '@/actions/hooks/order'
+import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DELIVERY_STATUS_TH, ORDER_STATUS_TH } from '@/constants/translate'
 import { DeliveryStatus, OrderStatus } from '@/generated/prisma/enums'
@@ -10,7 +10,6 @@ import { formatCurrency } from '@/utils/pricing'
 import { User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -36,8 +35,6 @@ export function OrderTable() {
     page,
     limit: 10,
   })
-
-  const cancelOrderMutation = useCancelOrder()
 
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
@@ -138,16 +135,6 @@ export function OrderTable() {
                       {order.status === OrderStatus.MANUAL_CHECK && (
                         <VerifySlipMerchantDialog order={order} />
                       )}
-                      {order.status !== OrderStatus.CANCELLED &&
-                        order.status !== OrderStatus.COMPLETED && (
-                          <DeleteButton
-                            isPending={cancelOrderMutation.isPending}
-                            onDelete={() =>
-                              cancelOrderMutation.mutate(order.id)
-                            }
-                          />
-                        )}
-
                       <OrderDetailDialog order={order} />
                     </TableCell>
                   </TableRow>

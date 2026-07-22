@@ -1,11 +1,14 @@
-'use client'
-
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
-import { ORDER_STATUS_TH } from '@/constants/translate'
+import {
+  DELIVERY_STATUS_TH,
+  ORDER_STATUS_TH,
+  PAYMENT_METHOD_TH,
+} from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
+import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency } from '@/utils/pricing'
-import { IconAlertCircle, IconCopy } from '@tabler/icons-react'
+import { IconAlertCircle, IconCopy, IconTicket } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,6 +29,8 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
     }
   }
 
+  const summary = calculateOrderSummary(order)
+
   return (
     <>
       <DialogHeader>
@@ -35,7 +40,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
-      <div className="space-y-4">
+      <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
         <div className="space-y-2 rounded-lg border p-4">
           <div className="text-sm font-semibold">รายการสินค้า</div>
           {order.items.map((item, idx) => (
@@ -47,14 +52,57 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               <span>{formatCurrency(Number(item.price) * item.quantity)}</span>
             </div>
           ))}
-          <div className="flex justify-between border-t pt-2 font-bold">
-            <span>ยอดชำระทั้งสิ้น</span>
-            <span>{formatCurrency(order.totalAmount)}</span>
+          <div className="mt-3 space-y-1.5 border-t pt-3 text-sm">
+            <div className="text-muted-foreground flex justify-between">
+              <span>รวมราคาสินค้า</span>
+              <span>{formatCurrency(summary?.itemsSubtotal)}</span>
+            </div>
+            {summary?.shippingFee > 0 && (
+              <div className="text-muted-foreground flex justify-between">
+                <span>
+                  ค่าจัดส่ง{' '}
+                  {order.shippingMethod ? `(${order.shippingMethod})` : ''}
+                </span>
+                <span>{formatCurrency(summary?.shippingFee)}</span>
+              </div>
+            )}
+            {order.coupon && (
+              <div className="flex items-center justify-between text-emerald-600">
+                <span className="flex items-center gap-1">
+                  <IconTicket size={14} /> ส่วนลดคูปอง ({order.coupon.code})
+                </span>
+                <span>
+                  -
+                  {formatCurrency(
+                    summary?.itemsSubtotal +
+                      summary?.shippingFee -
+                      Number(order.totalAmount),
+                  )}
+                </span>
+              </div>
+            )}
+            {summary?.pointsDiscount > 0 && (
+              <div className="flex justify-between text-emerald-600">
+                <span>ส่วนลดจากแต้มสะสม ({order.usedPoints} แต้ม)</span>
+                <span>-{formatCurrency(summary?.pointsDiscount)}</span>
+              </div>
+            )}
+            {summary?.codFee > 0 && (
+              <div className="text-muted-foreground flex justify-between">
+                <span>ค่าธรรมเนียมเก็บเงินปลายทาง (COD)</span>
+                <span>{formatCurrency(summary?.codFee)}</span>
+              </div>
+            )}
+
+            <div className="text-foreground flex justify-between border-t pt-2 text-base font-bold">
+              <span>ยอดชำระทั้งสิ้น</span>
+              <span>{formatCurrency(order.totalAmount)}</span>
+            </div>
           </div>
         </div>
         <div className="space-y-2">
           <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-5 flex flex-wrap gap-2">
             <Badge
               variant={
                 (
@@ -68,8 +116,16 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                   : 'outline'
               }
             >
-              {ORDER_STATUS_TH[order.status]}
+              ออเดอร์: {ORDER_STATUS_TH[order.status]}
             </Badge>
+            <Badge variant="outline">
+              จัดส่ง: {DELIVERY_STATUS_TH[order.deliveryStatus]}
+            </Badge>
+            {order.paymentMethod && (
+              <Badge variant="outline">
+                รูปแบบชำระเงิน: {PAYMENT_METHOD_TH[order.paymentMethod]}
+              </Badge>
+            )}
           </div>
           {order.trackingNumber ? (
             <div className="flex items-center justify-between rounded-lg border p-3">

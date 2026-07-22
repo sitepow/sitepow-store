@@ -9,9 +9,16 @@ import {
   ORDER_STATUS_TH,
   PAYMENT_METHOD_TH,
 } from '@/constants/translate'
-import { DeliveryStatus, OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus } from '@/generated/prisma/enums'
+import { formatDateTime } from '@/utils/date'
+import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency } from '@/utils/pricing'
-import { IconEye } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconCopy,
+  IconEye,
+  IconTicket,
+} from '@tabler/icons-react'
 import { User2 } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -20,6 +27,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,18 +42,27 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 interface OrderDetailDialogProps {
-  order: GetOrdersItem
+  order: GetOrdersItem & {
+    coupon?: { code: string; description: string | null } | null
+    shippingFee?: number | null
+    pointsDiscount?: number | null
+    codFee?: number | null
+    usedPoints?: number | null
+    shippingMethod?: string | null
+  }
 }
 
 export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
   const [open, setOpen] = useState(false)
   const updateStatusMutation = useUpdateOrderStatus()
 
-  const customerName = order.customer
-    ? [order.customer.firstName, order.customer.lastName]
-        .filter(Boolean)
-        .join(' ')
-    : '-'
+  const handleCopyTracking = () => {
+    if (order.trackingNumber) {
+      navigator.clipboard.writeText(order.trackingNumber)
+    }
+  }
+
+  const summary = calculateOrderSummary(order)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -54,96 +71,144 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>ออเดอร์ #{order.orderNumber}</DialogTitle>
+          <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
+          <DialogDescription>
+            วันที่สั่งซื้อ: {formatDateTime(order.createdAt)}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="space-y-1">
+          <div className="bg-muted/20 space-y-1 rounded-lg border p-3">
             <div className="flex items-center">
               <Avatar className="size-8 border">
                 <AvatarFallback>
                   <User2 size={16} />
                 </AvatarFallback>
               </Avatar>
-              <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
+              <div className="ml-3 max-w-72 space-y-0.5">
                 <p className="text-sm leading-none font-medium">
-                  {customerName || 'ลูกค้า'}
+                  {summary?.customerName || 'คุณลูกค้า'}
                 </p>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-xs">
                   {order.customer?.email ?? '-'}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={
-                (
-                  [
-                    OrderStatus.COMPLETED,
-                    OrderStatus.PAID,
-                    OrderStatus.SHIPPED,
-                  ] as OrderStatus[]
-                ).includes(order.status)
-                  ? 'default'
-                  : 'outline'
-              }
-            >
-              {ORDER_STATUS_TH[order.status]}
-            </Badge>
-            <Badge
-              variant={
-                (
-                  [
-                    DeliveryStatus.DELIVERED,
-                    DeliveryStatus.IN_TRANSIT,
-                  ] as DeliveryStatus[]
-                ).includes(order.deliveryStatus)
-                  ? 'default'
-                  : 'outline'
-              }
-            >
-              {DELIVERY_STATUS_TH[order.deliveryStatus]}
-            </Badge>
-            {order.paymentMethod && (
-              <Badge>{PAYMENT_METHOD_TH[order.paymentMethod]}</Badge>
-            )}
-          </div>
-          {order.trackingNumber && (
-            <p className="text-muted-foreground text-xs">
-              Tracking: {order.trackingNumber}
-            </p>
-          )}
-          <div className="rounded-lg border">
-            {order.items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between border-b px-3 py-2.5 last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium">{item.title}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {item.variantTitle} · x{item.quantity}
-                  </p>
-                </div>
-                <p className="text-sm font-medium">
-                  {formatCurrency(Number(item.price))}
-                </p>
+          <div className="space-y-2 rounded-lg border p-4">
+            <div className="text-sm font-semibold">รายการสินค้า</div>
+            {order.items.map((item, idx) => (
+              <div key={idx} className="flex justify-between text-sm">
+                <span>
+                  {item.title} {item.variantTitle && `(${item.variantTitle})`} x
+                  {item.quantity}
+                </span>
+                <span>
+                  {formatCurrency(Number(item.price) * item.quantity)}
+                </span>
               </div>
             ))}
+            <div className="mt-3 space-y-1.5 border-t pt-3 text-sm">
+              <div className="text-muted-foreground flex justify-between">
+                <span>รวมราคาสินค้า</span>
+                <span>{formatCurrency(summary?.itemsSubtotal)}</span>
+              </div>
+              {summary?.shippingFee > 0 && (
+                <div className="text-muted-foreground flex justify-between">
+                  <span>
+                    ค่าจัดส่ง{' '}
+                    {order.shippingMethod ? `(${order.shippingMethod})` : ''}
+                  </span>
+                  <span>{formatCurrency(summary?.shippingFee)}</span>
+                </div>
+              )}
+              {order.coupon && summary?.couponDiscount > 0 && (
+                <div className="flex items-center justify-between text-emerald-600">
+                  <span className="flex items-center gap-1">
+                    <IconTicket size={14} /> ส่วนลดคูปอง ({order.coupon.code})
+                  </span>
+                  <span>-{formatCurrency(summary?.couponDiscount)}</span>
+                </div>
+              )}
+              {summary?.pointsDiscount > 0 && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>ส่วนลดจากแต้มสะสม ({order.usedPoints} แต้ม)</span>
+                  <span>-{formatCurrency(summary?.pointsDiscount)}</span>
+                </div>
+              )}
+              {summary?.codFee > 0 && (
+                <div className="text-muted-foreground flex justify-between">
+                  <span>ค่าธรรมเนียมเก็บเงินปลายทาง (COD)</span>
+                  <span>{formatCurrency(summary?.codFee)}</span>
+                </div>
+              )}
+              <div className="text-foreground flex justify-between border-t pt-2 text-base font-bold">
+                <span>ยอดชำระทั้งสิ้น</span>
+                <span>{formatCurrency(order.totalAmount)}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between border-t pt-3">
-            <span className="font-medium">ยอดรวม</span>
-            <span className="font-semibold">
-              {formatCurrency(Number(order.totalAmount))}
-            </span>
+          <div className="space-y-2">
+            <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
+            <div className="mb-5 flex flex-wrap gap-2">
+              <Badge
+                variant={
+                  (
+                    [
+                      OrderStatus.COMPLETED,
+                      OrderStatus.PAID,
+                      OrderStatus.SHIPPED,
+                    ] as OrderStatus[]
+                  ).includes(order.status)
+                    ? 'default'
+                    : 'outline'
+                }
+              >
+                ออเดอร์: {ORDER_STATUS_TH[order.status]}
+              </Badge>
+              <Badge variant="outline">
+                จัดส่ง: {DELIVERY_STATUS_TH[order.deliveryStatus]}
+              </Badge>
+              {order.paymentMethod && (
+                <Badge variant="outline">
+                  รูปแบบชำระเงิน: {PAYMENT_METHOD_TH[order.paymentMethod]}
+                </Badge>
+              )}
+            </div>
+            {order.trackingNumber ? (
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <div>
+                  <div className="text-muted-foreground text-xs">
+                    เลขพัสดุ (Tracking Number)
+                  </div>
+                  <div className="font-bold">{order.trackingNumber}</div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyTracking}
+                >
+                  <IconCopy size={16} className="mr-1" /> คัดลอก
+                </Button>
+              </div>
+            ) : (
+              <div className="text-muted-foreground flex flex-wrap items-center gap-2 rounded-lg border border-dashed p-4 text-sm">
+                <IconAlertCircle className="shrink-0" />
+                {order.status === OrderStatus.PENDING
+                  ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
+                  : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ และจะแสดงสถานะอัปเดตในระบบสำหรับออเดอร์นี้ทันที'}
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-            <span className="text-sm font-medium">อัปเดตสถานะ</span>
+            <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
             <Select
               value={order.status}
-              disabled={updateStatusMutation.isPending}
+              disabled={
+                order.status === OrderStatus.CANCELLED ||
+                updateStatusMutation.isPending
+              }
               onValueChange={(v) =>
                 updateStatusMutation.mutate({
                   id: order.id,

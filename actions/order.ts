@@ -26,6 +26,16 @@ const orderSelect = {
   trackingNumber: true,
   paymentProof: true,
   createdAt: true,
+  shippingFee: true,
+  pointsDiscount: true,
+  usedPoints: true,
+  codFee: true,
+  coupon: {
+    select: {
+      code: true,
+      description: true,
+    },
+  },
   bankAccount: {
     select: {
       bankName: true,
@@ -142,6 +152,10 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Order ID' }
+    }
+
+    if (status === OrderStatus.CANCELLED) {
+      return await cancelOrder(id)
     }
 
     const order = await prisma.order.findUnique({
