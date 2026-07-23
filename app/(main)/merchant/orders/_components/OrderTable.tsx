@@ -4,6 +4,7 @@ import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
@@ -28,10 +29,12 @@ import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
 
 export function OrderTable() {
   const { selectedStoreId } = useStoreFilter()
+  const { selectedBranchId } = useBranchFilter()
   const [page, setPage] = useState(1)
 
   const { data: { data: orders = [], meta } = {}, isLoading } = useOrders({
     storeId: selectedStoreId,
+    branchId: selectedBranchId,
     page,
     limit: 10,
   })

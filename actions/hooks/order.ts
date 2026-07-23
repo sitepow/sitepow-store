@@ -12,6 +12,7 @@ import { storefrontOrderKeys } from '../query-keys/storefront/order'
 
 interface UseOrdersParams {
   storeId: string
+  branchId?: string
   page?: number
   limit?: number
   search?: string
@@ -20,12 +21,13 @@ interface UseOrdersParams {
 
 export function useOrders({
   storeId,
+  branchId,
   page = 1,
   limit = 10,
   search,
   status,
 }: UseOrdersParams) {
-  const filters = { storeId, page, limit, search, status }
+  const filters = { storeId, branchId, page, limit, search, status }
 
   return useQuery(
     queryOptions({

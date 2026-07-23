@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useDashboard } from '@/actions/hooks/dashboard'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconExternalLink } from '@tabler/icons-react'
@@ -20,6 +21,7 @@ import {
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -40,7 +42,13 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import { StoreCreditCard } from '../credits/_components/StoreCreditCard'
 
@@ -61,7 +69,12 @@ const chartConfig = {
 
 export default function MerchantDashboardPage() {
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
-  const { data, isLoading } = useDashboard(selectedStoreId as string)
+  const { selectedBranchId } = useBranchFilter()
+
+  const { data, isLoading } = useDashboard(
+    selectedStoreId as string,
+    selectedBranchId,
+  )
 
   const stats = data?.stats
   const statsData = stats
@@ -102,7 +115,10 @@ export default function MerchantDashboardPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <div className="flex flex-wrap items-end justify-between gap-5">
-        <StoreSelectField />
+        <div className="flex flex-wrap items-center gap-2">
+          <StoreSelectField />
+          <BranchSelectField />
+        </div>
         {selectedStoreId !== ALL_STORES && (
           <div className="flex flex-wrap gap-2.5">
             <Button variant="outline" asChild>
@@ -210,13 +226,13 @@ export default function MerchantDashboardPage() {
             <Card>
               <CardHeader>
                 <CardTitle>รายการขายล่าสุด</CardTitle>
-                <CardDescription>5 ออเดอร์ล่าสุดของร้านค้า</CardDescription>
+                <CardDescription>5 ออเดอร์ล่าสุดของสาขานี้</CardDescription>
               </CardHeader>
               <CardContent>
                 {(data?.recentSales ?? []).length === 0 ? (
                   <ActionRequiredAlert
                     title="แจ้งเตือน"
-                    description="ขณะนี้ยังไม่มียอดขายล่าสุด"
+                    description="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
                   />
                 ) : (
                   <div className="space-y-8">
@@ -247,6 +263,9 @@ export default function MerchantDashboardPage() {
             <Card className="h-fit">
               <CardHeader>
                 <CardTitle>สินค้าใกล้หมด</CardTitle>
+                <CardDescription>
+                  รายการสินค้าที่ต้องเติมสต็อกด่วน
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {(data?.lowStock ?? []).length === 0 ? (
@@ -256,36 +275,56 @@ export default function MerchantDashboardPage() {
                   />
                 ) : (
                   <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableCell className="font-medium">
+                          สินค้า / รหัสตัวเลือก / ชื่อตัวเลือก
+                        </TableCell>
+                        <TableCell className="font-medium">สาขา</TableCell>
+                        <TableCell className="text-right font-medium">
+                          คงเหลือ
+                        </TableCell>
+                      </TableRow>
+                    </TableHeader>
                     <TableBody>
-                      {(data?.lowStock ?? []).map((product) => (
-                        <TableRow
-                          key={product.id}
-                          className="hover:bg-transparent"
-                        >
-                          <TableCell className="px-0 py-4">
-                            <div className="flex items-center gap-2.5">
-                              <p className="text-sm leading-none font-medium">
-                                {product.name}
+                      {(data?.lowStock ?? []).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="max-w-72 min-w-72 py-3 wrap-break-word whitespace-pre-line">
+                            <div className="space-y-0.5">
+                              <p className="text-sm font-medium">
+                                {item.productName}
                               </p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {product.inventory.map((inv, idx) => (
-                                  <Badge key={idx} variant="outline">
-                                    <span className="text-muted-foreground mr-1.5 border-r pr-1.5">
-                                      {inv.branchName}
-                                    </span>
-                                    <span
-                                      className={
-                                        inv.stock === 0
-                                          ? 'text-destructive'
-                                          : 'text-foreground'
-                                      }
-                                    >
-                                      {formatNumber(inv.stock)}
-                                    </span>
-                                  </Badge>
-                                ))}
-                              </div>
+                              {item.variantId && (
+                                <span className="text-muted-foreground text-xs">
+                                  ({item.variantId})
+                                  <br />
+                                </span>
+                              )}
+                              {item.variantTitle && (
+                                <span className="text-muted-foreground text-xs">
+                                  ({item.variantTitle})
+                                </span>
+                              )}
                             </div>
+                          </TableCell>
+                          <TableCell className="py-3">
+                            <Badge
+                              variant="outline"
+                              className="text-muted-foreground"
+                            >
+                              {item.branchName}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <span
+                              className={`font-bold ${
+                                item.stock === 0
+                                  ? 'text-destructive'
+                                  : 'text-amber-500'
+                              }`}
+                            >
+                              {formatNumber(item.stock)}
+                            </span>
                           </TableCell>
                         </TableRow>
                       ))}

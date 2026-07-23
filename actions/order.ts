@@ -7,6 +7,7 @@ import {
   OrderStatus,
   ProductType,
 } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
@@ -14,6 +15,7 @@ import { prisma } from '@/lib/prisma'
 
 interface GetOrdersParams {
   storeId: string
+  branchId?: string
   page?: number
   limit?: number
   search?: string
@@ -63,6 +65,7 @@ const orderSelect = {
       quantity: true,
       price: true,
       branch: true,
+      productType: true,
     },
   },
 } satisfies Prisma.OrderSelect
@@ -87,6 +90,7 @@ export interface GetOrdersResponse {
 
 export async function getOrders({
   storeId,
+  branchId,
   page = 1,
   limit = 10,
   search,
@@ -113,6 +117,14 @@ export async function getOrders({
 
     if (status) {
       whereClause.status = status
+    }
+
+    if (branchId && branchId !== ALL_STORES) {
+      whereClause.items = {
+        some: {
+          branchId,
+        },
+      }
     }
 
     if (search) {

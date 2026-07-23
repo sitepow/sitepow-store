@@ -2,6 +2,7 @@
 
 import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { prisma } from '@/lib/prisma'
 
@@ -30,8 +31,12 @@ export interface RecentSaleItem {
 
 export interface LowStockItem {
   id: string
-  name: string
-  inventory: { branchName: string; stock: number }[]
+  productName: string
+  variantId: string
+  variantTitle: string | null
+  branchName: string
+  stock: number
+  minStock: number
 }
 
 export interface GetDashboardResult {
@@ -43,6 +48,7 @@ export interface GetDashboardResult {
 
 export async function getDashboard(
   storeId: string,
+  branchId?: string,
 ): Promise<GetDashboardResult> {
   const now = new Date()
 
@@ -78,6 +84,12 @@ export async function getDashboard(
 
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
 
+  const orderBranchFilter =
+    branchId && branchId !== ALL_STORES ? { items: { some: { branchId } } } : {}
+
+  const stockBranchFilter =
+    branchId && branchId !== ALL_STORES ? { branchId } : {}
+
   const [
     revenueThisMonth,
     revenueLastMonth,
@@ -96,6 +108,7 @@ export async function getDashboard(
         storeId,
         createdAt: { gte: startOfThisMonth },
         status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
       },
       _sum: { totalAmount: true },
     }),
@@ -104,16 +117,22 @@ export async function getDashboard(
         storeId,
         createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
         status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
       },
       _sum: { totalAmount: true },
     }),
     prisma.order.count({
-      where: { storeId, createdAt: { gte: startOfThisMonth } },
+      where: {
+        storeId,
+        createdAt: { gte: startOfThisMonth },
+        ...orderBranchFilter,
+      },
     }),
     prisma.order.count({
       where: {
         storeId,
         createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+        ...orderBranchFilter,
       },
     }),
     prisma.order.aggregate({
@@ -121,6 +140,7 @@ export async function getDashboard(
         storeId,
         createdAt: { gte: startOfToday },
         status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
       },
       _sum: { totalAmount: true },
     }),
@@ -129,6 +149,7 @@ export async function getDashboard(
         storeId,
         createdAt: { gte: startOfYesterday, lte: endOfYesterday },
         status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
       },
       _sum: { totalAmount: true },
     }),
@@ -146,11 +167,16 @@ export async function getDashboard(
         storeId,
         createdAt: { gte: sixMonthsAgo },
         status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
       },
       select: { totalAmount: true, createdAt: true },
     }),
     prisma.order.findMany({
-      where: { storeId, status: { not: OrderStatus.CANCELLED } },
+      where: {
+        storeId,
+        status: { not: OrderStatus.CANCELLED },
+        ...orderBranchFilter,
+      },
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: {
@@ -163,12 +189,19 @@ export async function getDashboard(
       where: {
         variant: { product: { storeId } },
         quantity: { lte: prisma.productStock.fields.minStock },
+        ...stockBranchFilter,
       },
       select: {
         quantity: true,
         minStock: true,
         branch: { select: { name: true } },
-        variant: { select: { product: { select: { id: true, title: true } } } },
+        variant: {
+          select: {
+            id: true,
+            title: true,
+            product: { select: { id: true, title: true } },
+          },
+        },
       },
       take: 10,
     }),
@@ -202,21 +235,15 @@ export async function getDashboard(
     amount: Number(o.totalAmount),
   }))
 
-  const lowStockMap: Record<string, LowStockItem> = {}
-  for (const stock of lowStockRaw) {
-    const productId = stock.variant.product.id
-    if (!lowStockMap[productId]) {
-      lowStockMap[productId] = {
-        id: productId,
-        name: stock.variant.product.title,
-        inventory: [],
-      }
-    }
-    lowStockMap[productId].inventory.push({
-      branchName: stock.branch.name,
-      stock: stock.quantity,
-    })
-  }
+  const lowStockList: LowStockItem[] = lowStockRaw.map((stock) => ({
+    id: `${stock.variant.product.id}-${stock.variant.title ?? 'default'}-${stock.branch.name}`,
+    productName: stock.variant.product.title,
+    variantId: stock.variant.id,
+    variantTitle: stock.variant.title,
+    branchName: stock.branch.name,
+    stock: stock.quantity,
+    minStock: stock.minStock,
+  }))
 
   return {
     stats: {
@@ -231,6 +258,6 @@ export async function getDashboard(
     },
     salesTrend,
     recentSales,
-    lowStock: Object.values(lowStockMap),
+    lowStock: lowStockList,
   }
 }
