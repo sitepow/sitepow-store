@@ -44,7 +44,7 @@ export function CheckoutSection({
             className={cn(
               'text-sm font-bold',
               !isActive && !isCompleted && !isDisabled && 'opacity-40',
-              !isActive && !isCompleted && !isDisabled && 'text-foreground',
+              !isActive && !isCompleted && !isDisabled && 'text-white',
             )}
           >
             {title}
