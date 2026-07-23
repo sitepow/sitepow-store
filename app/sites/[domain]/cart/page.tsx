@@ -352,9 +352,18 @@ export default function StoreCartPage() {
       },
       {
         onSuccess: (res) => {
-          if (res.success && res.data) {
-            const orderId = res.data.id
-            const orderNumber = res.data.orderNumber
+          if (res.success && res.allOrders) {
+            const orderIdsString = res.allOrders
+              .map((order) => order.id)
+              .join(',')
+            const orderNumbersString = res.allOrders
+              .map((order) => order.orderNumber)
+              .join(', ')
+
+            const grandTotal = res.allOrders.reduce(
+              (sum: number, order) => sum + Number(order.totalAmount),
+              0,
+            )
 
             clearCart()
 
@@ -362,8 +371,8 @@ export default function StoreCartPage() {
               storeCheckoutMutation.mutate({
                 customerEmail: user?.email ?? '',
                 storeId: store.id,
-                orderId: orderId,
-                description: `ชำระเงินคำสั่งซื้อ #${orderNumber}`,
+                orderIds: orderIdsString,
+                description: `ชำระเงินคำสั่งซื้อ #${orderNumbersString}`,
                 amount: grandTotal,
                 successUrl: `${window.location.origin}/user/orders`,
                 cancelUrl: `${window.location.origin}/user/orders`,

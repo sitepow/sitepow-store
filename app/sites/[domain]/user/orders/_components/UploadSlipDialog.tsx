@@ -7,11 +7,19 @@ import Image from 'next/image'
 
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useVerifySlip } from '@/actions/hooks/verify-slip'
+import { ORDER_EXPIRY_MINUTES } from '@/constants/system'
 import { BankAccount, BankAccountType } from '@/generated/prisma/browser'
+import { useOrderCountdown } from '@/hooks/use-order-countdown'
 import { useSession } from '@/hooks/use-session'
 import { getPathR2FromUrl } from '@/utils/image'
+import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
-import { IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
+import {
+  IconClock,
+  IconPhoto,
+  IconTrash,
+  IconUpload,
+} from '@tabler/icons-react'
 import generatePayload from 'promptpay-qr'
 import QRCode from 'qrcode'
 
@@ -36,6 +44,8 @@ interface UploadSlipDialogProps {
   storeId: string
   orderNumber: string
   customerId: string
+  totalAmount: number
+  createdAt: string | Date
   bankAccounts: (Pick<
     BankAccount,
     | 'id'
@@ -55,6 +65,8 @@ export function UploadSlipDialog({
   storeId,
   orderNumber,
   customerId,
+  totalAmount,
+  createdAt,
   bankAccounts,
 }: UploadSlipDialogProps) {
   const { userId } = useSession()
@@ -65,6 +77,11 @@ export function UploadSlipDialog({
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>()
+
+  const { timeLeft, isExpired } = useOrderCountdown(
+    createdAt,
+    ORDER_EXPIRY_MINUTES,
+  )
 
   const { mutate: verify, isPending: isVerifying } = useVerifySlip()
   const { mutate: deleteImage } = useR2DeleteImage()
@@ -81,7 +98,9 @@ export function UploadSlipDialog({
       selectedAccount?.type === BankAccountType.PROMPTPAY &&
       selectedAccount?.promptPayId
     ) {
-      const payload = generatePayload(selectedAccount.promptPayId, {})
+      const payload = generatePayload(selectedAccount.promptPayId, {
+        amount: totalAmount,
+      })
       QRCode.toDataURL(payload, { width: 300, margin: 1 }, (err, url) => {
         if (!err) {
           setQrCodeUrl(url)
@@ -90,7 +109,7 @@ export function UploadSlipDialog({
     } else {
       setQrCodeUrl(undefined)
     }
-  }, [isOpen, selectedAccount])
+  }, [isOpen, selectedAccount, totalAmount])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -107,7 +126,7 @@ export function UploadSlipDialog({
   }
 
   const handleSubmit = async () => {
-    if (!file) {
+    if (!file || isExpired) {
       return
     }
 
@@ -174,8 +193,25 @@ export function UploadSlipDialog({
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
         </DialogHeader>
+        <div
+          className={`flex items-center justify-between rounded-lg p-3 text-sm font-semibold ${
+            isExpired
+              ? 'bg-destructive/10 text-destructive'
+              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <IconClock size={18} />
+            <span>{isExpired ? 'หมดเวลาชำระเงิน' : 'กรุณาชำระเงินภายใน'}</span>
+          </div>
+          <span className="font-bold">{timeLeft} นาที</span>
+        </div>
+        <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3 text-sm">
+          <span className="text-muted-foreground">ยอดเงินที่ต้องชำระ</span>
+          <span className="font-bold">{formatCurrency(totalAmount ?? 0)}</span>
+        </div>
         <RadioGroup
-          value={selectedId || ''}
+          value={selectedId}
           onValueChange={setSelectedId}
           className="grid gap-2 py-2"
         >
@@ -222,10 +258,8 @@ export function UploadSlipDialog({
           </div>
         </div>
         <ActionRequiredAlert
-          title="คำเตือน"
-          description="ระบบจะตรวจสอบสลิปอัตโนมัติ หากตรวจพบการอัปโหลดสลิปปลอมหรือสลิปซ้ำ
-          ระบบจะบันทึกข้อมูลของคุณไว้ และหากตรวจพบซ้ำหลายครั้ง
-          บัญชีของคุณจะถูกแบนถาวร"
+          title="คำเตือนสำคัญ"
+          description={`กรุณาโอนเงินให้ตรงกับยอดรวม (${formatCurrency(totalAmount ?? 0)}) และอัปโหลดสลิปให้ตรงกับคำสั่งซื้อ #${orderNumber} นี้เท่านั้น หากยอดเงินไม่ตรงหรือสลิปไม่ถูกต้อง ระบบจะตีตกสถานะเป็นไม่ผ่านอัตโนมัติ`}
         />
         <div className="flex flex-col items-center justify-center pt-2">
           {previewUrl ? (
@@ -242,21 +276,29 @@ export function UploadSlipDialog({
                 size="icon"
                 className="absolute -top-2 -right-2 size-8 rounded-full"
                 onClick={handleRemoveFile}
+                disabled={isExpired}
               >
                 <IconTrash size={16} />
               </Button>
             </div>
           ) : (
-            <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed">
+            <label
+              className={`flex h-32 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed ${
+                isExpired ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              }`}
+            >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <IconPhoto className="text-muted-foreground mb-2 size-8" />
-                <p className="text-sm">คลิกเพื่ออัปโหลดสลิป</p>
+                <p className="text-sm">
+                  {isExpired ? 'หมดเวลาอัปโหลดสลิป' : 'คลิกเพื่ออัปโหลดสลิป'}
+                </p>
               </div>
               <input
                 type="file"
                 className="hidden"
                 accept="image/*"
                 onChange={handleFileChange}
+                disabled={isExpired}
               />
             </label>
           )}
@@ -272,10 +314,14 @@ export function UploadSlipDialog({
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!file || isVerifying || isUploading}
+            disabled={!file || isVerifying || isUploading || isExpired}
           >
             {isVerifying && <Spinner />}
-            {isVerifying ? 'กำลังส่ง...' : 'ยืนยันการชำระเงิน'}
+            {isVerifying
+              ? 'กำลังส่ง...'
+              : isExpired
+                ? 'หมดเวลาชำระเงิน'
+                : 'ยืนยันการชำระเงิน'}
           </Button>
         </DialogFooter>
       </DialogContent>

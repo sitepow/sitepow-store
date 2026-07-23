@@ -49,22 +49,26 @@ export async function POST(req: Request, props: RouteParams) {
       const session = event.data.object as Stripe.Checkout.Session
 
       const orderId = session.metadata?.orderId
+      const orderIdsString = session.metadata?.orderIds
 
-      if (orderId) {
-        const order = await prisma.order.findUnique({
-          where: { id: orderId },
-          select: { status: true },
+      let targetOrderIds: string[] = []
+      if (orderIdsString) {
+        targetOrderIds = orderIdsString.split(',').filter(Boolean)
+      } else if (orderId) {
+        targetOrderIds = [orderId]
+      }
+
+      if (targetOrderIds.length > 0) {
+        await prisma.order.updateMany({
+          where: {
+            id: { in: targetOrderIds },
+            status: { not: OrderStatus.PAID },
+          },
+          data: {
+            status: OrderStatus.PAID,
+            paidAt: new Date(),
+          },
         })
-
-        if (order && order.status !== OrderStatus.PAID) {
-          await prisma.order.update({
-            where: { id: orderId },
-            data: {
-              status: OrderStatus.PAID,
-              paidAt: new Date(),
-            },
-          })
-        }
       }
     }
 

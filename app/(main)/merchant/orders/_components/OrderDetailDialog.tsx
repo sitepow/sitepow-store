@@ -94,7 +94,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
             <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
             <Select
               value={selectedStatus}

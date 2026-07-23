@@ -285,6 +285,7 @@ export async function approveSlipManual(
       updatedData = {
         paymentProof: null,
         status: OrderStatus.PENDING,
+        createdAt: new Date(),
       }
       logActionText = 'reject_slip_manual'
     }

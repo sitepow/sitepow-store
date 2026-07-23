@@ -51,7 +51,7 @@ export async function createCheckoutSession(params: CheckoutParams) {
 }
 
 export async function createStoreCheckoutSession(
-  params: CreateStoreCheckoutParams,
+  params: CreateStoreCheckoutParams & { orderIds?: string },
 ) {
   try {
     const paymentSetting = await prisma.paymentSetting.findUnique({
@@ -84,7 +84,8 @@ export async function createStoreCheckoutSession(
       ],
       mode: 'payment',
       metadata: {
-        orderId: params.orderId,
+        ...(params.orderId ? { orderId: params.orderId } : {}),
+        ...(params.orderIds ? { orderIds: params.orderIds } : {}),
         storeId: params.storeId,
         ...params.metadata,
       },

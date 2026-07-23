@@ -149,10 +149,12 @@ export function OrderTable({ search }: OrderTableProps) {
                             </Button>
                           ) : (
                             <UploadSlipDialog
+                              createdAt={order.createdAt}
                               orderId={order.id}
                               storeId={order.store.id}
                               orderNumber={order.orderNumber}
                               customerId={order.customerId!}
+                              totalAmount={order.totalAmount}
                               bankAccounts={
                                 order.bankAccount ? [order.bankAccount] : []
                               }

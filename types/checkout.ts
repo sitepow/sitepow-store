@@ -32,7 +32,8 @@ export interface CheckoutParams {
 
 export interface CreateStoreCheckoutParams {
   storeId: string
-  orderId: string
+  orderId?: string | null
+  orderIds?: string
   description: string
   amount: number
   customerEmail?: string
