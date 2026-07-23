@@ -472,9 +472,14 @@ export default function StoreCartPage() {
               <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>
                   ตะกร้าสินค้า{' '}
-                  {physicalGroups.length > 1 && (
+                  {physicalGroups.length > 0 && (
                     <span className="text-primary text-xs font-normal">
-                      (สินค้าจัดส่งจาก {physicalGroups.length} สาขา)
+                      (สินค้าจัดส่งจาก{' '}
+                      {physicalGroups
+                        .map((g) => g.branchName)
+                        .filter(Boolean)
+                        .join(', ')}
+                      )
                     </span>
                   )}
                 </h2>
