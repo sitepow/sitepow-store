@@ -24,6 +24,7 @@ export interface CreateOrderItemInput {
   quantity: number
   price: number
   productType: ProductType
+  branchId?: string
 }
 
 export interface CreateOrderInput {
@@ -249,10 +250,6 @@ export async function createOrder(input: CreateOrderInput) {
       return { success: false, message: 'ไม่พบร้านค้า' }
     }
 
-    interface CartItemWithBranch extends CreateOrderItemInput {
-      branchId?: string
-    }
-
     const physicalGroups: Record<string, CreateOrderItemInput[]> = {}
     const digitalItems: CreateOrderItemInput[] = []
     const digitalServices: CreateOrderItemInput[] = []
@@ -268,14 +265,15 @@ export async function createOrder(input: CreateOrderInput) {
       }
 
       if (item.productType === ProductType.PHYSICAL) {
-        const itemBranchId =
-          (item as CartItemWithBranch).branchId || mainBranch?.id
+        const itemBranchId = item.branchId
+
         if (!itemBranchId) {
           return {
             success: false,
-            message: `ไม่พบสาขาสำหรับสินค้า ${item.title}`,
+            message: `ไม่พบข้อมูลสาขาสำหรับสินค้า ${item.title} กรุณาเลือกสาขาที่ต้องการรับสินค้า`,
           }
         }
+
         if (!physicalGroups[itemBranchId]) {
           physicalGroups[itemBranchId] = []
         }

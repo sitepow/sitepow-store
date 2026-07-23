@@ -4,9 +4,8 @@ export const storefrontShippingKeys = {
     [...storefrontShippingKeys.all, 'options', storeSlug] as const,
   calculation: (params: {
     storeId: string
-    originProvince: string
     destinationProvince: string
     destinationPostcode: string
-    weight: number
+    groups: Array<{ branchId: string; province: string; weight: number }>
   }) => [...storefrontShippingKeys.all, 'calc', params] as const,
 }

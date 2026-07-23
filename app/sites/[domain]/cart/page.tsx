@@ -89,18 +89,6 @@ export default function StoreCartPage() {
     (item) => item.productType === ProductType.PHYSICAL,
   )
   const hasPhysical = physicalItems.length > 0
-  const physicalTotalWeight = physicalItems.reduce(
-    (sum, item) => sum + (item.weight || 0) * item.quantity,
-    0,
-  )
-
-  const { data: shippingFees } = useShippingCalculation({
-    storeId: store?.id ?? '',
-    originProvince: 'กรุงเทพมหานคร',
-    destinationProvince: 'อุบลราชธานี',
-    destinationPostcode: '34000',
-    weight: physicalTotalWeight || 740,
-  })
 
   const [selectedAddress, setSelectedAddress] = useState<string>('')
   const [selectedShipping, setSelectedShipping] = useState<string>('')
@@ -112,16 +100,6 @@ export default function StoreCartPage() {
   const { data: addressOptions = [] } = useAddressOptions()
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
   const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
-
-  const shippingOptionsWithFees = useMemo(() => {
-    return shippingOptions.map((option) => {
-      const feeData = shippingFees?.find((f) => f.serviceId === option.id)
-      return {
-        ...option,
-        fee: feeData?.fee ?? null,
-      }
-    })
-  }, [shippingOptions, shippingFees])
 
   const createOrderMutation = useCreateOrder()
   const storeCheckoutMutation = useStoreCheckout()
@@ -157,8 +135,7 @@ export default function StoreCartPage() {
             {
               id: PaymentMethod.STRIPE_QR_PROMPTPAY,
               title: '(Stripe) QR พร้อมเพย์',
-              description:
-                'รองรับธนาคารไทยทุกแห่ง (BBL, KBank, KTB, TTB, SCB, Krungsri, UOB, GSB, TISCO และอื่นๆ)',
+              description: 'รองรับธนาคารไทยทุกแห่ง',
             },
             {
               id: PaymentMethod.STRIPE_CREDIT_CARD,
@@ -168,12 +145,12 @@ export default function StoreCartPage() {
             {
               id: PaymentMethod.STRIPE_GOOGLE_PAY,
               title: '(Stripe) Google Pay',
-              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay ของคุณ',
+              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay',
             },
             {
               id: PaymentMethod.STRIPE_APPLE_PAY,
               title: '(Stripe) Apple Pay',
-              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay ของคุณ',
+              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay',
             },
           ]
         : []),
@@ -183,11 +160,71 @@ export default function StoreCartPage() {
   const selectedAddressData = addressOptions.find(
     (a) => a.id === selectedAddress,
   )
-  const selectedShippingData = shippingOptionsWithFees.find(
-    (s) => s.id === selectedShipping,
-  )
+
   const selectedPaymentData = paymentMethods.find(
     (p) => p.id === selectedPayment,
+  )
+
+  const destinationProvince = selectedAddressData?.province ?? ''
+  const destinationPostcode = selectedAddressData?.postalCode ?? ''
+
+  const physicalGroups = useMemo(() => {
+    const groups: Record<
+      string,
+      {
+        branchId: string
+        branchName?: string
+        province: string
+        totalWeight: number
+        items: typeof physicalItems
+      }
+    > = {}
+
+    for (const item of physicalItems) {
+      const branchId = item.branchId
+      const branchProvince = item.branchName
+
+      if (!groups[branchId]) {
+        groups[branchId] = {
+          branchId,
+          branchName: item.branchName,
+          province: branchProvince,
+          totalWeight: 0,
+          items: [],
+        }
+      }
+      groups[branchId].totalWeight += (item.weight || 0) * item.quantity
+      groups[branchId].items.push(item)
+    }
+
+    return Object.values(groups)
+  }, [physicalItems])
+
+  const { data: shippingCalculationData } = useShippingCalculation({
+    storeId: store?.id ?? '',
+    destinationProvince: destinationProvince,
+    destinationPostcode: destinationPostcode,
+    groups: physicalGroups.map((g) => ({
+      branchId: g.branchId,
+      province: g.province,
+      weight: g.totalWeight,
+    })),
+  })
+
+  const shippingOptionsWithFees = useMemo(() => {
+    return shippingOptions.map((option) => {
+      const feeData = shippingCalculationData?.find(
+        (f) => f.serviceId === option.id,
+      )
+      return {
+        ...option,
+        fee: feeData ? feeData.fee : null,
+      }
+    })
+  }, [shippingOptions, shippingCalculationData])
+
+  const selectedShippingData = shippingOptionsWithFees.find(
+    (s) => s.id === selectedShipping,
   )
 
   const stepsOrder = useMemo(() => {
@@ -239,30 +276,21 @@ export default function StoreCartPage() {
     }) + shippingFee
 
   const getPaymentMethod = (paymentId: string): PaymentMethod => {
-    if (paymentId === PaymentMethod.STRIPE_QR_PROMPTPAY) {
+    if (paymentId === PaymentMethod.STRIPE_QR_PROMPTPAY)
       return PaymentMethod.STRIPE_QR_PROMPTPAY
-    }
-
-    if (paymentId === PaymentMethod.STRIPE_CREDIT_CARD) {
+    if (paymentId === PaymentMethod.STRIPE_CREDIT_CARD)
       return PaymentMethod.STRIPE_CREDIT_CARD
-    }
-
-    if (paymentId === PaymentMethod.STRIPE_GOOGLE_PAY) {
+    if (paymentId === PaymentMethod.STRIPE_GOOGLE_PAY)
       return PaymentMethod.STRIPE_GOOGLE_PAY
-    }
-
-    if (paymentId === PaymentMethod.STRIPE_APPLE_PAY) {
+    if (paymentId === PaymentMethod.STRIPE_APPLE_PAY)
       return PaymentMethod.STRIPE_APPLE_PAY
-    }
 
     const selectedAcc = paymentOptions?.bankAccounts.find(
       (a) => a.id === paymentId,
     )
-
     if (selectedAcc?.type === BankAccountType.PROMPTPAY) {
       return PaymentMethod.MANUAL_QR_PROMPTPAY
     }
-
     return PaymentMethod.BANK_TRANSFER
   }
 
@@ -271,7 +299,7 @@ export default function StoreCartPage() {
       case 'address':
         return 'เลือกที่อยู่การจัดส่ง'
       case 'shipping':
-        return 'เลือกช่องทางจัดส่งสินค้า'
+        return 'เลือกช่องทางจัดส่งสินค้า (รวมทุกสาขา)'
       case 'payment':
         return 'เลือกวิธีชำระเงิน'
       case 'review':
@@ -319,6 +347,7 @@ export default function StoreCartPage() {
           quantity: item.quantity,
           price: item.unitPrice,
           productType: item.productType,
+          branchId: item.branchId,
         })),
       },
       {
@@ -441,13 +470,20 @@ export default function StoreCartPage() {
             </div>
             <div className="border-border dark:bg-foreground/5 bg-foreground/1 flex flex-col rounded-xl border">
               <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
-                <h2>ตะกร้าสินค้า</h2>
+                <h2>
+                  ตะกร้าสินค้า{' '}
+                  {physicalGroups.length > 1 && (
+                    <span className="text-primary text-xs font-normal">
+                      (สินค้าจัดส่งจาก {physicalGroups.length} สาขา)
+                    </span>
+                  )}
+                </h2>
               </div>
               {items?.length === 0 && (
                 <div className="p-5">
                   <Alert>
                     <AlertDescription className="flex items-center gap-2">
-                      <IconAlertCircle /> ยังไม่มีสินค้าในตระกร้า
+                      <IconAlertCircle /> ยังไม่มีสินค้าในตะกร้า
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -687,7 +723,7 @@ export default function StoreCartPage() {
                 value={<DiscountForm subtotal={summary.finalPrice} />}
               />
               <SummaryRow
-                label="ค่าจัดส่ง"
+                label="ค่าจัดส่งรวม"
                 value={formatCurrency(shippingFee)}
               />
               <CartSummary summary={summary} />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
@@ -35,21 +35,35 @@ export function ProductVariantSelector() {
   const isPhysical = product?.productType === ProductType.PHYSICAL
   const hasVariant = product?.variants?.length !== 0
 
+  const allBranches = useMemo(() => {
+    const branchMap = new Map()
+    product?.variants?.forEach((variant) => {
+      variant.stocks?.forEach((stock) => {
+        if (stock.branchId && !branchMap.has(stock.branchId)) {
+          branchMap.set(
+            stock.branchId,
+            stock.branch?.name || `สาขา ${stock.branchId}`,
+          )
+        }
+      })
+    })
+    return Array.from(branchMap.entries()).map(([branchId, branchName]) => ({
+      branchId,
+      branchName,
+    }))
+  }, [product])
+
   useEffect(() => {
     if (!isPhysical) {
       return
     }
 
-    const firstVariant = product?.variants?.[0]
-    const firstStock = firstVariant?.stocks?.[0]
+    const firstBranch = allBranches[0]
 
-    if (!selectedBranchId && firstStock) {
-      setSelectedBranch(
-        firstStock.branchId,
-        firstStock.branch?.name || `สาขา ${firstStock.branchId}`,
-      )
+    if (!selectedBranchId && firstBranch) {
+      setSelectedBranch(firstBranch.branchId, firstBranch.branchName)
     }
-  }, [product, selectedBranchId, setSelectedBranch, isPhysical])
+  }, [allBranches, selectedBranchId, setSelectedBranch, isPhysical])
 
   return (
     <>
@@ -70,20 +84,22 @@ export function ProductVariantSelector() {
                 <Select
                   value={selectedBranchId || ''}
                   onValueChange={(val) => {
-                    const selectedBranchName =
-                      product?.variants[0]?.stocks.find(
-                        (s) => s.branchId === val,
-                      )?.branch?.name
-                    setSelectedBranch(val, selectedBranchName || `สาขา ${val}`)
+                    const foundBranch = allBranches.find(
+                      (b) => b.branchId === val,
+                    )
+                    setSelectedBranch(
+                      val,
+                      foundBranch?.branchName || `สาขา ${val}`,
+                    )
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="กรุณาเลือกสาขา" />
                   </SelectTrigger>
                   <SelectContent>
-                    {product?.variants[0]?.stocks.map((stock) => (
-                      <SelectItem key={stock.branchId} value={stock.branchId}>
-                        {stock?.branch?.name || `สาขา ${stock.branchId}`}
+                    {allBranches.map((branch) => (
+                      <SelectItem key={branch.branchId} value={branch.branchId}>
+                        {branch.branchName}
                       </SelectItem>
                     ))}
                   </SelectContent>

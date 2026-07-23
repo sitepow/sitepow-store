@@ -1,5 +1,5 @@
 import { storefrontShippingKeys } from '@/actions/query-keys/storefront/shipping'
-import { calculateShippingFee } from '@/actions/shipping'
+import { calculateMultiBranchShippingFee } from '@/actions/shipping'
 import { getStorefrontShippingOptions } from '@/actions/storefront/shipping'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -15,17 +15,18 @@ export function useStorefrontShippingOptions(storeSlug: string) {
 
 export function useShippingCalculation(params: {
   storeId: string
-  originProvince: string
   destinationProvince: string
   destinationPostcode: string
-  weight: number
+  groups: Array<{ branchId: string; province: string; weight: number }>
 }) {
   return useQuery(
     queryOptions({
       queryKey: storefrontShippingKeys.calculation(params),
-      queryFn: () => calculateShippingFee(params),
+      queryFn: () => calculateMultiBranchShippingFee(params),
       enabled:
-        !!params.storeId && !!params.destinationPostcode && params.weight > 0,
+        !!params.storeId &&
+        !!params.destinationPostcode &&
+        params.groups.length > 0,
     }),
   )
 }

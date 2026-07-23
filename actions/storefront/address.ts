@@ -14,6 +14,7 @@ const addressOptionSelect = {
   province: true,
   district: true,
   subDistrict: true,
+  postalCode: true,
   isDefault: true,
 } satisfies Prisma.AddressSelect
 

@@ -139,49 +139,63 @@ export async function updateStoreShippingSettings(
   }
 }
 
-export async function calculateShippingFee({
-  storeId,
-  originProvince,
-  destinationProvince,
-  destinationPostcode,
-  weight,
-}: {
+export async function calculateMultiBranchShippingFee(params: {
   storeId: string
-  originProvince: string
   destinationProvince: string
   destinationPostcode: string
-  weight: number
+  groups: Array<{ branchId: string; province: string; weight: number }>
 }) {
+  const { storeId, destinationProvince, destinationPostcode, groups } = params
+
   const isRemote = REMOTE_AREAS.some(
     (area) => area.postcode === destinationPostcode,
   )
-
-  let zoneType: ShippingZoneType = ShippingZoneType.CROSS_REGION
-  if (isRemote) {
-    zoneType = ShippingZoneType.REMOTE_AREA
-  } else if (originProvince === destinationProvince) {
-    zoneType = ShippingZoneType.SAME_PROVINCE
-  } else if (
-    getRegionKey(originProvince) === getRegionKey(destinationProvince)
-  ) {
-    zoneType = ShippingZoneType.SAME_REGION
-  }
 
   const courierServices = await prisma.storeCourierService.findMany({
     where: { storeId, isEnabled: true },
     include: { weightRates: true },
   })
 
-  return courierServices.map((cs) => {
-    const rate = cs.weightRates.find(
-      (r) =>
-        r.zoneType === zoneType &&
-        weight >= Number(r.minWeight) &&
-        weight <= Number(r.maxWeight),
-    )
-    return {
-      serviceId: cs.id,
-      fee: rate ? Number(rate.fee) : null,
+  const serviceFeesMap: Record<string, number | null> = {}
+
+  for (const cs of courierServices) {
+    serviceFeesMap[cs.id] = 0
+  }
+
+  for (const group of groups) {
+    let zoneType: ShippingZoneType = ShippingZoneType.CROSS_REGION
+    if (isRemote) {
+      zoneType = ShippingZoneType.REMOTE_AREA
+    } else if (group.province === destinationProvince) {
+      zoneType = ShippingZoneType.SAME_PROVINCE
+    } else if (
+      getRegionKey(group.province) === getRegionKey(destinationProvince)
+    ) {
+      zoneType = ShippingZoneType.SAME_REGION
     }
-  })
+
+    for (const cs of courierServices) {
+      if (serviceFeesMap[cs.id] === null) {
+        continue
+      }
+
+      const rate = cs.weightRates.find(
+        (r) =>
+          r.zoneType === zoneType &&
+          group.weight >= Number(r.minWeight) &&
+          group.weight <= Number(r.maxWeight),
+      )
+
+      if (rate) {
+        serviceFeesMap[cs.id] = (serviceFeesMap[cs.id] ?? 0) + Number(rate.fee)
+      } else {
+        serviceFeesMap[cs.id] = null
+      }
+    }
+  }
+
+  return courierServices.map((cs) => ({
+    serviceId: cs.id,
+    fee: serviceFeesMap[cs.id],
+  }))
 }
