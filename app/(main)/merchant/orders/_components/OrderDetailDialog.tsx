@@ -136,14 +136,24 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           <div className="space-y-2 rounded-lg border p-4">
             <div className="text-sm font-semibold">รายการสินค้า</div>
             {order.items.map((item, idx) => (
-              <div key={idx} className="flex justify-between text-sm">
-                <span>
-                  {item.title} {item.variantTitle && `(${item.variantTitle})`} x
-                  {item.quantity}
-                </span>
-                <span>
-                  {formatCurrency(Number(item.price) * item.quantity)}
-                </span>
+              <div
+                key={idx}
+                className="flex flex-col gap-0.5 border-b pb-2 text-sm last:border-b-0 last:pb-0"
+              >
+                <div className="flex justify-between">
+                  <span>
+                    {item.title} {item.variantTitle && `(${item.variantTitle})`}{' '}
+                    x{item.quantity}
+                  </span>
+                  <span>
+                    {formatCurrency(Number(item.price) * item.quantity)}
+                  </span>
+                </div>
+                {item.branch?.name && (
+                  <span className="text-muted-foreground text-xs">
+                    จัดส่งจากสาขา {item.branch.name}
+                  </span>
+                )}
               </div>
             ))}
             <div className="mt-3 space-y-1.5 border-t pt-3 text-sm">

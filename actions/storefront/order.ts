@@ -90,6 +90,7 @@ const storefrontOrderSelect = {
       variantTitle: true,
       quantity: true,
       price: true,
+      branch: true,
     },
   },
 } satisfies Prisma.OrderSelect
