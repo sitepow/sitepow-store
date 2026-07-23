@@ -1,7 +1,12 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  LogAction,
+  OrderStatus,
+  ProductType,
+} from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
@@ -217,6 +222,7 @@ export async function cancelOrder(id: string) {
             quantity: true,
             variantId: true,
             branchId: true,
+            productType: true,
           },
         },
       },
@@ -232,7 +238,11 @@ export async function cancelOrder(id: string) {
 
     await prisma.$transaction(async (tx) => {
       for (const item of order.items) {
-        if (item.variantId && item.branchId) {
+        if (
+          item.productType === ProductType.PHYSICAL &&
+          item.variantId &&
+          item.branchId
+        ) {
           await tx.productStock.update({
             where: {
               branchId_variantId: {
@@ -248,6 +258,14 @@ export async function cancelOrder(id: string) {
           })
         }
       }
+
+      await tx.digitalItem.updateMany({
+        where: { orderId: id },
+        data: {
+          orderId: null,
+          isUsed: false,
+        },
+      })
 
       await tx.order.update({
         where: { id },

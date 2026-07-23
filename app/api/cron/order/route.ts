@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { cancelOrder } from '@/actions/order'
 import {
   MILLISECONDS_PER_MINUTE,
   ORDER_EXPIRY_MINUTES,
@@ -29,20 +30,18 @@ export async function GET(request: Request) {
       select: { id: true, storeId: true },
     })
 
-    if (expiredOrders.length > 0) {
-      await prisma.order.updateMany({
-        where: {
-          id: { in: expiredOrders.map((order) => order.id) },
-        },
-        data: {
-          status: OrderStatus.CANCELLED,
-        },
-      })
+    let processedCount = 0
+
+    for (const order of expiredOrders) {
+      const result = await cancelOrder(order.id)
+      if (result.success) {
+        processedCount++
+      }
     }
 
     return NextResponse.json({
       success: true,
-      processedExpiredOrders: expiredOrders.length,
+      processedExpiredOrders: processedCount,
     })
   } catch (error) {
     console.error(error)
