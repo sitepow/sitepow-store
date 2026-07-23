@@ -3,6 +3,7 @@
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconUsers } from '@tabler/icons-react'
 
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -20,6 +21,7 @@ export default function StaffPage() {
         endContent={
           <div className="flex items-end gap-2.5">
             <StoreSelectField />
+            <BranchSelectField />
             <StaffCreateDialog />
           </div>
         }

@@ -1,4 +1,3 @@
-import { OrderStatus, TransactionType } from '@/generated/prisma/enums'
 import {
   IconBox,
   IconBuildingStore,
@@ -109,34 +108,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'จัดการออเดอร์',
     tab: 'orders',
     icon: IconShoppingCart,
-    items: [
-      { value: 'orders-all', label: 'ทั้งหมด', url: '/merchant/orders' },
-      {
-        value: 'orders-pending',
-        label: 'รอชำระ',
-        url: `/merchant/orders?status=${OrderStatus.PENDING}`,
-      },
-      {
-        value: 'orders-paid',
-        label: 'ชำระแล้ว',
-        url: `/merchant/orders?status=${OrderStatus.PAID}`,
-      },
-      {
-        value: 'orders-shipped',
-        label: 'จัดส่งแล้ว',
-        url: `/merchant/orders?status=${OrderStatus.SHIPPED}`,
-      },
-      {
-        value: 'orders-completed',
-        label: 'สำเร็จ',
-        url: `/merchant/orders?status=${OrderStatus.SHIPPED}`,
-      },
-      {
-        value: 'orders-cancelled',
-        label: 'ยกเลิก',
-        url: `/merchant/orders?status=${OrderStatus.CANCELLED}`,
-      },
-    ],
   },
   {
     value: 'inventory',
@@ -180,28 +151,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'การจัดการเครดิต',
     tab: 'credits',
     icon: IconWallet,
-    items: [
-      {
-        value: 'credits-all',
-        label: 'ประวัติทั้งหมด',
-        url: '/merchant/credits',
-      },
-      {
-        value: 'credits-purchase',
-        label: 'ประวัติการซื้อเครดิต',
-        url: `/merchant/credits?type=${TransactionType.CREDIT_PURCHASE}`,
-      },
-      {
-        value: 'credits-usage',
-        label: 'ประวัติการใช้งาน AI',
-        url: `/merchant/credits?type=${TransactionType.AI_USAGE}`,
-      },
-      {
-        value: 'credits-refund',
-        label: 'รายการคืนเครดิต',
-        url: `/merchant/credits?type=${TransactionType.REFUND}`,
-      },
-    ],
   },
   {
     value: 'blog',
