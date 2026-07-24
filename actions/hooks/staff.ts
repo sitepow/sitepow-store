@@ -1,4 +1,5 @@
 import { StaffRole } from '@/generated/prisma/enums'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   queryOptions,
   useMutation,
@@ -12,6 +13,7 @@ import {
   UpdateStaffInput,
   createStaff,
   deleteStaff,
+  getCurrentStaffInfo,
   getStaffs,
   updateStaff,
 } from '../staff'
@@ -80,4 +82,36 @@ export function useDeleteStaff() {
       queryClient.invalidateQueries({ queryKey: staffKeys.all })
     },
   })
+}
+
+export function useStaffPermission() {
+  const { selectedStoreId } = useStoreFilter()
+
+  const {
+    data: staffInfo,
+    isLoading,
+    error,
+  } = useQuery(
+    queryOptions({
+      queryKey: staffKeys.currentStore(selectedStoreId),
+      queryFn: () => getCurrentStaffInfo(selectedStoreId),
+      enabled: !!selectedStoreId && selectedStoreId !== ALL_STORES,
+    }),
+  )
+
+  const role = staffInfo?.role
+
+  const isAdmin = role === StaffRole.ADMIN
+  const isManager = role === StaffRole.MANAGER
+  const isCashier = role === StaffRole.CASHIER
+
+  return {
+    staffInfo,
+    isLoading,
+    error,
+    isAdmin,
+    isManager,
+    isCashier,
+    ...staffInfo?.permissions,
+  }
 }

@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 
-import { useDeleteStaff, useStaffs } from '@/actions/hooks/staff'
+import {
+  useDeleteStaff,
+  useStaffPermission,
+  useStaffs,
+} from '@/actions/hooks/staff'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { STAFF_ROLE_TH } from '@/constants/translate'
-import { useStaffPermission } from '@/hooks/use-permission'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

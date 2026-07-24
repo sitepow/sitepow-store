@@ -7,6 +7,8 @@ import {
   StaffRole,
   UserRole,
 } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
+import { PermissionKey, checkPermission } from '@/types/permission'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -34,6 +36,14 @@ interface GetStaffsParams {
   limit?: number
   search?: string
   role?: StaffRole
+}
+
+export interface CurrentStaffInfo {
+  id: string
+  name: string
+  email: string
+  role: StaffRole
+  permissions: Record<PermissionKey, boolean>
 }
 
 const staffStoreSelect = {
@@ -381,5 +391,67 @@ export async function deleteStaff(id: string) {
   } catch (error) {
     console.error(error)
     return { success: false }
+  }
+}
+
+export async function getCurrentStaffInfo(
+  storeId: string,
+): Promise<CurrentStaffInfo | null> {
+  try {
+    if (!storeId || storeId === ALL_STORES) {
+      return null
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const currentStaffStore = await prisma.staffStore.findFirst({
+      where: {
+        storeId,
+        staff: {
+          userId,
+        },
+      },
+      include: {
+        staff: true,
+      },
+    })
+
+    if (!currentStaffStore || !currentStaffStore.staff) {
+      return null
+    }
+
+    const staffProfile = currentStaffStore.staff
+    const role = currentStaffStore.role
+
+    const permissions: Record<PermissionKey, boolean> = {
+      canManageStaff: checkPermission(role, 'canManageStaff'),
+      canManageProducts: checkPermission(role, 'canManageProducts'),
+      canManageInventory: checkPermission(role, 'canManageInventory'),
+      canManageStock: checkPermission(role, 'canManageStock'),
+      canCreateOrder: true,
+      canManageOrders: checkPermission(role, 'canManageOrders'),
+      canCancelOrder: checkPermission(role, 'canCancelOrder'),
+      canManageCoupons: checkPermission(role, 'canManageCoupons'),
+      canManageCustomers: checkPermission(role, 'canManageCustomers'),
+      canManageStoreSettings: checkPermission(role, 'canManageStoreSettings'),
+      canViewFinance: checkPermission(role, 'canViewFinance'),
+      canViewActivityLogs: checkPermission(role, 'canViewActivityLogs'),
+    }
+
+    return {
+      id: staffProfile.id,
+      name: staffProfile.name,
+      email: staffProfile.email,
+      role,
+      permissions,
+    }
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
+import { useStaffPermission } from '@/actions/hooks/staff'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { useStaffPermission } from '@/hooks/use-permission'
 import { IconUserCog } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
