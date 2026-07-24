@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useDeleteStaff, useStaffs } from '@/actions/hooks/staff'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { STAFF_ROLE_TH } from '@/constants/translate'
+import { useStaffPermission } from '@/hooks/use-permission'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -25,6 +26,7 @@ export function StaffTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { canManageStoreSettings } = useStaffPermission()
   const deleteStaffMutation = useDeleteStaff()
 
   const { data: { data: staffs = [], meta } = {}, isLoading } = useStaffs({
@@ -48,14 +50,19 @@ export function StaffTable() {
               <TableHead>อีเมล</TableHead>
               <TableHead>บทบาท</TableHead>
               <TableHead>สาขา</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              {canManageStoreSettings && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && staffs.length === 0 ? (
-              <TableLoadingRow colSpan={5} />
+              <TableLoadingRow colSpan={canManageStoreSettings ? 6 : 5} />
             ) : staffs.length === 0 ? (
-              <TableEmptyRow colSpan={5} title="ยังไม่มีพนักงานในร้านนี้" />
+              <TableEmptyRow
+                colSpan={canManageStoreSettings ? 6 : 5}
+                title="ยังไม่มีพนักงานในร้านนี้"
+              />
             ) : (
               staffs.map((staff) => (
                 <TableRow key={staff.id}>
@@ -78,12 +85,14 @@ export function StaffTable() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="space-x-2 text-right">
-                    <DeleteButton
-                      isPending={deleteStaffMutation.isPending}
-                      onDelete={() => deleteStaffMutation.mutate(staff.id)}
-                    />
-                  </TableCell>
+                  {canManageStoreSettings && (
+                    <TableCell className="space-x-2 text-right">
+                      <DeleteButton
+                        isPending={deleteStaffMutation.isPending}
+                        onDelete={() => deleteStaffMutation.mutate(staff.id)}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

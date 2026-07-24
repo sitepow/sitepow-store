@@ -1,14 +1,14 @@
 'use client'
 
+import { useSession as useNextAuthSession } from 'next-auth/react'
+
 import { StaffRole } from '@/generated/prisma/enums'
 import { checkPermission } from '@/types/permission'
 
-interface UseStaffPermissionProps {
-  role?: StaffRole | null
-  branchIds?: string[]
-}
+export function useStaffPermission() {
+  const { data: session } = useNextAuthSession()
+  const role = session?.user?.role
 
-export function useStaffPermission({ role }: UseStaffPermissionProps) {
   const isAdmin = role === StaffRole.ADMIN
   const isManager = role === StaffRole.MANAGER
   const isCashier = role === StaffRole.CASHIER

@@ -1,6 +1,7 @@
 'use client'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useStaffPermission } from '@/hooks/use-permission'
 import { IconUsers } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -12,6 +13,8 @@ import { StaffCreateDialog } from './_components/StaffCreateDialog'
 import { StaffTable } from './_components/StaffTable'
 
 export default function StaffPage() {
+  const { canManageStoreSettings } = useStaffPermission()
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -22,7 +25,7 @@ export default function StaffPage() {
           <div className="flex items-end gap-2.5">
             <StoreSelectField />
             <BranchSelectField />
-            <StaffCreateDialog />
+            {canManageStoreSettings && <StaffCreateDialog />}
           </div>
         }
       />
