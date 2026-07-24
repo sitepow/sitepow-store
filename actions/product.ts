@@ -14,6 +14,7 @@ import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
@@ -134,6 +135,28 @@ export async function getProducts({
   }
 
   try {
+    if (storeId && storeId !== 'all' && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageProducts',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return {
+          data: [],
+          meta: {
+            currentPage: page,
+            limit,
+            totalItems: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        }
+      }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(50, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -142,9 +165,19 @@ export async function getProducts({
 
     if (storeId && storeId !== 'all' && storeId !== '') {
       whereClause.storeId = storeId
-      whereClause.store = { ownerId: userId }
     } else {
-      whereClause.store = { ownerId: userId }
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
     if (search) {
@@ -201,6 +234,26 @@ export async function getProducts({
 
 export async function createProduct(input: CreateProductInput) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const { canCreate, message } = await checkCanCreateProduct(input.storeId)
 
     if (!canCreate) {
@@ -335,8 +388,12 @@ export async function deleteProduct(id: string) {
     const session = await auth()
     const userId = session?.user?.id
 
-    const product = await prisma.product.findFirst({
-      where: { id, store: { ownerId: userId } },
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id },
       select: {
         id: true,
         title: true,
@@ -347,7 +404,20 @@ export async function deleteProduct(id: string) {
     })
 
     if (!product) {
-      return { success: false, message: 'ไม่พบสินค้า หรือคุณไม่มีสิทธิ์ลบ' }
+      return { success: false, message: 'ไม่พบสินค้า' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: product.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     if (product.images && product.images.length > 0) {
@@ -399,12 +469,10 @@ export async function getProductById(id: string) {
   }
 
   try {
-    const product = await prisma.product.findFirst({
-      where: {
-        id,
-        store: { ownerId: userId },
-      },
+    const product = await prisma.product.findUnique({
+      where: { id },
       include: {
+        store: { select: { id: true } },
         images: true,
         tags: true,
         variants: {
@@ -421,6 +489,16 @@ export async function getProductById(id: string) {
       return null
     }
 
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: product.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
     return serializeDecimal(product)
   } catch (error) {
     console.error(error)
@@ -433,10 +511,32 @@ export async function updateProduct(id: string, input: CreateProductInput) {
   const userId = session?.user?.id
 
   if (!userId) {
-    return { success: false }
+    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
   }
 
   try {
+    const existingProduct = await prisma.product.findUnique({
+      where: { id },
+      select: { storeId: true },
+    })
+
+    if (!existingProduct) {
+      return { success: false, message: 'ไม่พบสินค้า' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: existingProduct.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const { variants, addons, metadata, tags, images, categoryId, ...rest } =
       input
 
@@ -537,10 +637,19 @@ export async function getProductOptions(storeId: string) {
   }
 
   try {
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return []
+    }
+
     return await prisma.product.findMany({
       where: {
         storeId,
-        store: { ownerId: userId },
       },
       select: {
         id: true,
@@ -561,25 +670,42 @@ export async function getProductOptions(storeId: string) {
 
 export async function getProductQuota(storeId: string) {
   const session = await auth()
-  if (!session?.user?.id) {
+  const userId = session?.user?.id
+
+  if (!userId) {
     return null
   }
 
-  const store = await prisma.store.findUnique({
-    where: { id: storeId, ownerId: session.user.id },
-    select: {
-      plan: true,
-      productCount: true,
-    },
-  })
+  try {
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageProducts',
+    })
 
-  if (!store) {
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: {
+        plan: true,
+        productCount: true,
+      },
+    })
+
+    if (!store) {
+      return null
+    }
+
+    return {
+      plan: store.plan,
+      productCount: store.productCount,
+      maxProducts: PLAN_DETAILS[store.plan].maxProducts,
+    }
+  } catch (error) {
+    console.error(error)
     return null
-  }
-
-  return {
-    plan: store.plan,
-    productCount: store.productCount,
-    maxProducts: PLAN_DETAILS[store.plan].maxProducts,
   }
 }

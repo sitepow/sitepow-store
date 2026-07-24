@@ -5,6 +5,7 @@ import { ChangePasswordFormValues } from '@/zod/security-settings'
 import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 const securitySettingsSelect = {
@@ -24,6 +25,13 @@ export async function getSecuritySettings(
   }
 
   try {
+    const session = await auth()
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId || currentUserId !== userId) {
+      return null
+    }
+
     return await prisma.user.findUnique({
       where: { id: userId },
       select: securitySettingsSelect,
@@ -40,6 +48,13 @@ export async function updateSecuritySettings(
   try {
     if (!userId) {
       return { success: false, message: 'ไม่พบ User ID' }
+    }
+
+    const session = await auth()
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId || currentUserId !== userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบด้วยบัญชีที่ถูกต้อง' }
     }
 
     const user = await prisma.user.findUnique({
@@ -87,6 +102,13 @@ export async function updateTwoFactor(
   try {
     if (!userId) {
       return { success: false, message: 'ไม่พบ User ID' }
+    }
+
+    const session = await auth()
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId || currentUserId !== userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบด้วยบัญชีที่ถูกต้อง' }
     }
 
     await prisma.user.update({

@@ -4,6 +4,8 @@ import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { BankAccountFormValues, PaymentSettingFormValues } from '@/zod/payment'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const paymentSettingSelect = {
@@ -37,10 +39,31 @@ export async function getPaymentSetting(
     return null
   }
 
-  return await prisma.paymentSetting.findUnique({
-    where: { storeId },
-    select: paymentSettingSelect,
-  })
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return await prisma.paymentSetting.findUnique({
+      where: { storeId },
+      select: paymentSettingSelect,
+    })
+  } catch {
+    return null
+  }
 }
 
 export async function upsertPaymentSetting(
@@ -48,6 +71,26 @@ export async function upsertPaymentSetting(
   data: PaymentSettingFormValues,
 ) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const setting = await prisma.paymentSetting.upsert({
       where: { storeId },
       create: { storeId, ...data },
@@ -80,6 +123,26 @@ export async function createBankAccount(
   data: BankAccountFormValues,
 ) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const setting = await prisma.paymentSetting.upsert({
       where: { storeId },
       create: { storeId },
@@ -134,6 +197,13 @@ export async function updateBankAccount(
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const account = await prisma.bankAccount.findUnique({
       where: { id },
       select: {
@@ -144,6 +214,19 @@ export async function updateBankAccount(
 
     if (!account) {
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: account.paymentSetting.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     const updatedAccount = await prisma.$transaction(async (tx) => {
@@ -189,17 +272,41 @@ export async function deleteBankAccount(id: string) {
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const account = await prisma.bankAccount.findUnique({
       where: { id },
       select: { paymentSetting: { select: { storeId: true } } },
     })
+
+    if (!account) {
+      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: account.paymentSetting.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
 
     await prisma.bankAccount.delete({ where: { id } })
 
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
-      storeId: account?.paymentSetting.storeId,
+      storeId: account.paymentSetting.storeId,
       entity: 'BankAccount',
       entityId: id,
       details: { setting: 'bank_account', type: 'deleted' },
@@ -218,7 +325,14 @@ export async function getBankAccount(id: string) {
       return null
     }
 
-    return await prisma.bankAccount.findUnique({
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const account = await prisma.bankAccount.findUnique({
       where: { id },
       select: {
         id: true,
@@ -229,8 +343,25 @@ export async function getBankAccount(id: string) {
         promptPayId: true,
         qrImage: true,
         isDefault: true,
+        paymentSetting: { select: { storeId: true } },
       },
     })
+
+    if (!account) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: account.paymentSetting.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return account
   } catch (error) {
     console.error(error)
     return null

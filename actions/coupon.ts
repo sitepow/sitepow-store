@@ -6,9 +6,12 @@ import {
   LogAction,
   Prisma,
 } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetCouponsParams {
@@ -78,12 +81,58 @@ export async function getCoupons({
   limit = 10,
   search,
 }: GetCouponsParams): Promise<GetCouponsResponse> {
+  const emptyResponse: GetCouponsResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
+    const whereClause: Prisma.CouponWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageCoupons',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.CouponWhereInput = { storeId }
 
     if (search) {
       whereClause.OR = [
@@ -118,22 +167,32 @@ export async function getCoupons({
     }
   } catch (error) {
     console.error(error)
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+    return emptyResponse
   }
 }
 
 export async function createCoupon(input: CreateCouponInput) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canManageCoupons',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const existing = await prisma.coupon.findUnique({
       where: { code: input.code },
       select: { id: true },
@@ -182,6 +241,35 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       return { success: false, message: 'ไม่พบ Coupon ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const existingCoupon = await prisma.coupon.findUnique({
+      where: { id },
+      select: { storeId: true },
+    })
+
+    if (!existingCoupon) {
+      return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: existingCoupon.storeId,
+      permission: 'canManageCoupons',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const updated = await prisma.coupon.update({
       where: { id },
       data: {
@@ -218,20 +306,44 @@ export async function deleteCoupon(id: string) {
       return { success: false, message: 'ไม่พบ Coupon ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const coupon = await prisma.coupon.findUnique({
       where: { id },
       select: { storeId: true, code: true },
     })
+
+    if (!coupon || !coupon.storeId) {
+      return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: coupon.storeId,
+      permission: 'canManageCoupons',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
 
     await prisma.coupon.delete({ where: { id } })
 
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
-      storeId: coupon?.storeId,
+      storeId: coupon.storeId,
       entity: 'Coupon',
       entityId: id,
-      details: { code: coupon?.code, type: 'deleted' },
+      details: { code: coupon.code, type: 'deleted' },
     })
 
     return { success: true, message: 'ลบคูปองสำเร็จ' }

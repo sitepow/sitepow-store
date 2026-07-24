@@ -5,15 +5,38 @@ import { serializeDecimal } from '@/utils/decimal'
 import { TaxSettingFormValues } from '@/zod/tax'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 export async function getTaxSetting(storeId: string) {
-  return serializeDecimal(
-    await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { isVatRegistered: true, taxId: true, vatRate: true },
-    }),
-  )
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return serializeDecimal(
+      await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { isVatRegistered: true, taxId: true, vatRate: true },
+      }),
+    )
+  } catch {
+    return null
+  }
 }
 
 export async function updateTaxSetting(
@@ -21,6 +44,26 @@ export async function updateTaxSetting(
   data: TaxSettingFormValues,
 ) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const result = await prisma.store.update({
       where: { id: storeId },
       data: {

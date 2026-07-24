@@ -69,10 +69,7 @@ export function MultiSelect({
           <IconChevronDown size={16} className="text-muted-foreground ml-2" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-[--radix-popover-trigger-width] p-0"
-        align="start"
-      >
+      <PopoverContent className="p-0" align="start">
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>

@@ -3,6 +3,8 @@
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetStockTransfersParams {
@@ -80,6 +82,43 @@ export async function getStockTransfers({
   search,
 }: GetStockTransfersParams): Promise<GetStockTransfersResponse> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageInventory',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -151,6 +190,26 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
   try {
     const { storeId, variantId, fromBranchId, toBranchId, quantity, note } =
       input
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageInventory',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
 
     if (fromBranchId === toBranchId) {
       return {

@@ -1,9 +1,12 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
@@ -65,12 +68,34 @@ export async function getCategory(id: string) {
       return null
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
     const category = await prisma.category.findUnique({
       where: { id },
-      select: categorySelect,
+      select: { ...categorySelect, storeId: true },
     })
 
-    return category
+    if (!category) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: category.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    const { storeId: _, ...categoryData } = category
+    return categoryData
   } catch (error) {
     console.error(error)
     return null
@@ -83,16 +108,58 @@ export async function getCategories({
   search,
   storeId,
 }: GetCategoriesParams = {}): Promise<GetCategoriesResponse> {
+  const emptyResponse: GetCategoriesResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
+    const whereClause: Prisma.CategoryWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageProducts',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.CategoryWhereInput = {}
-
-    if (storeId) {
-      whereClause.storeId = storeId
-    }
 
     if (search) {
       whereClause.title = { contains: search, mode: 'insensitive' }
@@ -122,17 +189,7 @@ export async function getCategories({
       },
     }
   } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+    return emptyResponse
   }
 }
 
@@ -141,10 +198,44 @@ export async function getCategoryOptions(filters?: {
   search?: string
 }): Promise<GetCategoryOptionsItem[]> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return []
+    }
+
     const whereClause: Prisma.CategoryWhereInput = {}
 
-    if (filters?.storeId) {
+    if (
+      filters?.storeId &&
+      filters.storeId !== ALL_STORES &&
+      filters.storeId !== ''
+    ) {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId: filters.storeId,
+        permission: 'canManageProducts',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return []
+      }
+
       whereClause.storeId = filters.storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
     if (filters?.search) {
@@ -162,32 +253,86 @@ export async function getCategoryOptions(filters?: {
 }
 
 export async function createCategory(input: CreateCategoryInput) {
-  const existing = await prisma.category.findUnique({
-    where: { storeId_slug: { storeId: input.storeId, slug: input.slug } },
-  })
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
 
-  if (existing) {
-    return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้' }
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const existing = await prisma.category.findUnique({
+      where: { storeId_slug: { storeId: input.storeId, slug: input.slug } },
+    })
+
+    if (existing) {
+      return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้' }
+    }
+
+    const category = await prisma.category.create({ data: input })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: input.storeId,
+      entity: 'Category',
+      entityId: category.id,
+      details: { title: input.title, slug: input.slug, type: 'created' },
+    })
+
+    return { success: true, data: category }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
-
-  const category = await prisma.category.create({ data: input })
-
-  await createLog({
-    action: LogAction.UPDATE_STORE_SETTING,
-    actorType: ActorType.MERCHANT,
-    storeId: input.storeId,
-    entity: 'Category',
-    entityId: category.id,
-    details: { title: input.title, slug: input.slug, type: 'created' },
-  })
-
-  return { success: true, data: category }
 }
 
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Category ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const targetCategory = await prisma.category.findUnique({
+      where: { id },
+      select: { storeId: true },
+    })
+
+    if (!targetCategory) {
+      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: targetCategory.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     const category = await prisma.category.update({
@@ -229,6 +374,13 @@ export async function deleteCategory(id: string) {
       return { success: false, message: 'ไม่พบ Category ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const category = await prisma.category.findUnique({
       where: { id },
       select: {
@@ -241,6 +393,19 @@ export async function deleteCategory(id: string) {
 
     if (!category) {
       return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: category.storeId,
+      permission: 'canManageProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     if (category.image) {

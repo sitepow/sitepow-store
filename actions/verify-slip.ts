@@ -16,6 +16,8 @@ import { getPathR2FromUrl } from '@/utils/image'
 import axios from 'axios'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { r2DeleteImage } from './r2'
@@ -249,6 +251,13 @@ export async function approveSlipManual(
       return { success: false, message: 'ไม่พบรหัสออเดอร์' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       select: {
@@ -261,6 +270,19 @@ export async function approveSlipManual(
 
     if (!order) {
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: order.storeId,
+      permission: 'canManageOrders',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     let updatedData = {}

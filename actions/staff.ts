@@ -9,6 +9,8 @@ import {
 } from '@/generated/prisma/enums'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateStaffInput {
@@ -20,6 +22,7 @@ export interface CreateStaffInput {
 }
 
 export interface UpdateStaffInput {
+  storeId: string
   name?: string
   role?: StaffRole
   branchIds: string[]
@@ -80,6 +83,43 @@ export async function getStaffs({
   role,
 }: GetStaffsParams): Promise<GetStaffsResponse> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStaff',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -139,6 +179,26 @@ export async function getStaffs({
 
 export async function createStaff(input: CreateStaffInput) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canManageStaff',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     let staff = await prisma.staff.findUnique({
       where: { email: input.email },
       select: { id: true },
@@ -208,7 +268,7 @@ export async function createStaff(input: CreateStaffInput) {
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' }
   }
 }
 
@@ -216,6 +276,26 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Staff ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canManageStaff',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     const updated = await prisma.staffStore.update({
@@ -247,7 +327,7 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
     return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return { success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }
   }
 }
 
@@ -262,14 +342,38 @@ export async function deleteStaff(id: string) {
       select: { storeId: true, staffId: true },
     })
 
+    if (!staffStore) {
+      return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: staffStore.storeId,
+      permission: 'canManageStaff',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     await prisma.staffStore.delete({ where: { id } })
 
     await createLog({
       action: LogAction.MANAGE_STAFF,
       actorType: ActorType.MERCHANT,
-      storeId: staffStore?.storeId,
+      storeId: staffStore.storeId,
       entity: 'Staff',
-      entityId: staffStore?.staffId,
+      entityId: staffStore.staffId,
       details: { type: 'deleted' },
     })
 

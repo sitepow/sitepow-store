@@ -5,6 +5,8 @@ import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const transferRequestSelect = {
@@ -23,6 +25,23 @@ export async function getTransferRequests(
   storeId: string,
 ): Promise<GetTransferRequestItem[]> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return []
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return []
+    }
+
     return await prisma.storeTransferRequest.findMany({
       where: { storeId },
       orderBy: { createdAt: 'desc' },
@@ -46,6 +65,26 @@ export async function createTransferRequest(
       return { success: false, message: 'กรุณาระบุอีเมลผู้รับ' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const store = await prisma.store.findUnique({
       where: { id: storeId },
       select: { ownerId: true },
@@ -54,7 +93,7 @@ export async function createTransferRequest(
     if (!store) {
       return { success: false, message: 'ไม่พบร้านค้า' }
     }
-    if (store.ownerId !== fromOwnerId) {
+    if (store.ownerId !== fromOwnerId || store.ownerId !== userId) {
       return { success: false, message: 'คุณไม่ใช่เจ้าของร้านค้านี้' }
     }
 
@@ -115,6 +154,13 @@ export async function cancelTransferRequest(
       return { success: false, message: 'ไม่พบ Request ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const request = await prisma.storeTransferRequest.findUnique({
       where: { id: requestId },
       select: { storeId: true, fromOwnerId: true, status: true },
@@ -123,7 +169,21 @@ export async function cancelTransferRequest(
     if (!request) {
       return { success: false, message: 'ไม่พบคำขอโอนนี้' }
     }
-    if (request.fromOwnerId !== ownerId) {
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: request.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    if (request.fromOwnerId !== ownerId || request.fromOwnerId !== userId) {
       return { success: false, message: 'คุณไม่มีสิทธิ์ยกเลิกคำขอนี้' }
     }
 
@@ -154,6 +214,16 @@ export async function cancelTransferRequest(
 
 export async function acceptTransferRequest(token: string, userId: string) {
   try {
+    const session = await auth()
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId || currentUserId !== userId) {
+      return {
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
+      }
+    }
+
     const request = await prisma.storeTransferRequest.findUnique({
       where: { token },
       select: {
@@ -211,6 +281,16 @@ export async function acceptTransferRequest(token: string, userId: string) {
 
 export async function declineTransferRequest(token: string, userId: string) {
   try {
+    const session = await auth()
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId || currentUserId !== userId) {
+      return {
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
+      }
+    }
+
     const request = await prisma.storeTransferRequest.findUnique({
       where: { token },
       select: { id: true, storeId: true, toUserId: true, status: true },

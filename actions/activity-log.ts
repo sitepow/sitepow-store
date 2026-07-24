@@ -1,7 +1,10 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const activityLogSelect = {
@@ -69,26 +72,63 @@ export async function getActivityLogs({
     },
   }
 
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
+    const whereClause: Prisma.ActivityLogWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageStoreSettings',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
+    if (action) {
+      whereClause.action = action
+    }
+
+    if (actorType) {
+      whereClause.actorType = actorType
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { entityId: { contains: search, mode: 'insensitive' } },
+        { entity: { contains: search, mode: 'insensitive' } },
+        { staff: { name: { contains: search, mode: 'insensitive' } } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+      ]
+    }
+
     const sanitizedPage = Math.max(1, page || 1)
     const sanitizedLimit = Math.max(1, Math.min(20, limit || 10))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.ActivityLogWhereInput = {
-      storeId,
-      ...(action ? { action } : {}),
-      ...(actorType ? { actorType } : {}),
-      ...(search
-        ? {
-            OR: [
-              { entityId: { contains: search, mode: 'insensitive' } },
-              { entity: { contains: search, mode: 'insensitive' } },
-              { staff: { name: { contains: search, mode: 'insensitive' } } },
-              { user: { name: { contains: search, mode: 'insensitive' } } },
-            ],
-          }
-        : {}),
-    }
 
     const [totalItems, logs] = await Promise.all([
       prisma.activityLog.count({ where: whereClause }),

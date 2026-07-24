@@ -21,6 +21,7 @@ import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
@@ -229,8 +230,22 @@ export async function getStores({
     const skip = (sanitizedPage - 1) * sanitizedLimit
     const session = await auth()
 
+    if (!session?.user?.id) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
     const whereClause: Prisma.StoreWhereInput = {
-      ownerId: session?.user?.id,
+      ownerId: session.user.id,
     }
 
     if (search) {
@@ -295,8 +310,12 @@ export async function getStoreOptions(filters?: {
 }): Promise<GetStoreOptionsItem[]> {
   try {
     const session = await auth()
+    if (!session?.user?.id) {
+      return []
+    }
+
     const whereClause: Prisma.StoreWhereInput = {
-      ownerId: session?.user?.id,
+      ownerId: session.user.id,
     }
 
     if (filters?.search) {
@@ -387,6 +406,7 @@ export async function createStore(input: CreateStoreInput) {
       await prisma.store.create({
         data: {
           ...storeData,
+          ownerId: session.user.id,
           status: initialStatus,
           subscription: {
             create: {
@@ -452,13 +472,27 @@ export async function createStore(input: CreateStoreInput) {
 export async function updateStore(id: string, input: UpdateStoreInput) {
   try {
     const session = await auth()
+    const userId = session?.user?.id
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     if (!id) {
       return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: id,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     if (input.slug) {
@@ -472,7 +506,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     }
 
     const store = await prisma.store.update({
-      where: { id, ownerId: session.user.id },
+      where: { id },
       data: input,
       select: storeSelect,
     })
@@ -502,7 +536,9 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
 export async function deleteStore(id: string) {
   try {
     const session = await auth()
-    if (!session?.user?.id) {
+    const userId = session?.user?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
@@ -510,8 +546,21 @@ export async function deleteStore(id: string) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: id,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const store = await prisma.store.delete({
-      where: { id, ownerId: session.user.id },
+      where: { id },
       select: { slug: true },
     })
 

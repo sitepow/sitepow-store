@@ -1,7 +1,10 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetBlogsParams {
@@ -18,6 +21,7 @@ const blogSelect = {
   image: true,
   tags: true,
   createdAt: true,
+  storeId: true,
 } satisfies Prisma.BlogSelect
 
 export type GetBlogsItem = Prisma.BlogGetPayload<{
@@ -42,12 +46,58 @@ export async function getBlogs({
   limit = 10,
   search,
 }: GetBlogsParams): Promise<GetBlogsResponse> {
+  const emptyResponse: GetBlogsResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
+    const whereClause: Prisma.BlogWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageStoreSettings',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.BlogWhereInput = { storeId }
 
     if (search) {
       whereClause.OR = [
@@ -81,16 +131,6 @@ export async function getBlogs({
       },
     }
   } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+    return emptyResponse
   }
 }

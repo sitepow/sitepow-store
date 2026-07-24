@@ -94,7 +94,6 @@ export function StaffCreateDialog() {
         <DialogHeader>
           <DialogTitle>เพิ่มพนักงานใหม่</DialogTitle>
         </DialogHeader>
-
         <div className="grid gap-4">
           <Field>
             <FieldLabel>ชื่อพนักงาน</FieldLabel>
@@ -105,7 +104,6 @@ export function StaffCreateDialog() {
             />
             <FieldError>{errors?.name?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>อีเมล</FieldLabel>
             <Input
@@ -116,7 +114,6 @@ export function StaffCreateDialog() {
             />
             <FieldError>{errors?.email?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>บทบาท</FieldLabel>
             <Select
@@ -139,7 +136,6 @@ export function StaffCreateDialog() {
             </Select>
             <FieldError>{errors?.role?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>สาขาที่ดูแล</FieldLabel>
             <MultiSelect
@@ -155,7 +151,6 @@ export function StaffCreateDialog() {
             <FieldError>{errors?.branchIds?.message}</FieldError>
           </Field>
         </div>
-
         <DialogFooter className="mt-2 flex gap-2 border-t pt-4">
           <Button
             variant="outline"

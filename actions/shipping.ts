@@ -16,6 +16,8 @@ import {
 import { ShippingFormValues } from '@/zod/shipping'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const branchShippingSelect = {
@@ -45,24 +47,45 @@ export async function getStoreShippingSettings(
   storeId: string,
   branchId: string,
 ): Promise<Partial<ShippingFormValues> | null> {
-  const [store, branch] = await Promise.all([
-    prisma.store.findUnique({
-      where: { id: storeId },
-      select: storeShippingSelect,
-    }),
-    prisma.branch.findUnique({
-      where: { id: branchId },
-      select: branchShippingSelect,
-    }),
-  ])
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
 
-  if (!store) {
+    if (!userId) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    const [store, branch] = await Promise.all([
+      prisma.store.findUnique({
+        where: { id: storeId },
+        select: storeShippingSelect,
+      }),
+      prisma.branch.findUnique({
+        where: { id: branchId },
+        select: branchShippingSelect,
+      }),
+    ])
+
+    if (!store) {
+      return null
+    }
+
+    const serialized = serializeDecimal({ ...store, branch })
+
+    return mapStoreToShippingForm(serialized)
+  } catch {
     return null
   }
-
-  const serialized = serializeDecimal({ ...store, branch })
-
-  return mapStoreToShippingForm(serialized)
 }
 
 export async function updateStoreShippingSettings(
@@ -71,6 +94,26 @@ export async function updateStoreShippingSettings(
   data: ShippingFormValues,
 ) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     await prisma.$transaction(async (tx) => {
       await tx.branch.update({
         where: { id: branchId },

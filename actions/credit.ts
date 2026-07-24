@@ -11,6 +11,7 @@ import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const transactionSelect = {
@@ -34,8 +35,9 @@ export async function purchaseCredit({
 }) {
   try {
     const session = userId ? { user: { id: userId } } : await auth()
+    const currentUserId = session?.user?.id
 
-    if (!session?.user?.id) {
+    if (!currentUserId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
@@ -44,12 +46,29 @@ export async function purchaseCredit({
     }
 
     const store = await prisma.store.findUnique({
-      where: { id: storeId, ownerId: session.user.id },
-      select: { id: true },
+      where: { id: storeId },
+      select: { id: true, ownerId: true },
     })
 
     if (!store) {
       return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    const isOwner = store.ownerId === currentUserId
+
+    if (!isOwner) {
+      const authCheck = await verifyStaffPermission({
+        userId: currentUserId,
+        storeId,
+        permission: 'canViewFinance',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return {
+          success: false,
+          message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอสำหรับการเติมเครดิต',
+        }
+      }
     }
 
     const creditAmount = getCredits(amount)
@@ -93,16 +112,36 @@ export async function purchaseCredit({
 export async function getStoreCredit(storeId: string) {
   try {
     const session = await auth()
-    if (!session?.user?.id) {
+    const currentUserId = session?.user?.id
+
+    if (!currentUserId) {
       return null
     }
 
     const store = await prisma.store.findUnique({
-      where: { id: storeId, ownerId: session.user.id },
-      select: { balance: true },
+      where: { id: storeId },
+      select: { id: true, ownerId: true, balance: true },
     })
 
-    return serializeDecimal(store)
+    if (!store) {
+      return null
+    }
+
+    const isOwner = store.ownerId === currentUserId
+
+    if (!isOwner) {
+      const authCheck = await verifyStaffPermission({
+        userId: currentUserId,
+        storeId,
+        permission: 'canViewFinance',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return null
+      }
+    }
+
+    return serializeDecimal({ balance: store.balance })
   } catch (error) {
     console.error(error)
     return null

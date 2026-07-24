@@ -4,6 +4,8 @@ import { Prisma } from '@/generated/prisma/client'
 import { TransactionType } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetTransactionsParams {
@@ -45,6 +47,43 @@ export async function getTransactions({
   type,
 }: GetTransactionsParams): Promise<GetTransactionsResponse> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canViewFinance',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit

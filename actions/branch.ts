@@ -1,8 +1,11 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateBranchInput {
@@ -68,9 +71,27 @@ export async function getBranchOptions(
   storeId: string,
 ): Promise<BranchOption[]> {
   try {
-    if (!storeId) {
+    if (!storeId || storeId === ALL_STORES) {
       return []
     }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return []
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return []
+    }
+
     return await prisma.branch.findMany({
       where: { storeId },
       orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],
@@ -88,12 +109,58 @@ export async function getBranches({
   limit = 10,
   search,
 }: GetBranchesParams): Promise<GetBranchesResponse> {
+  const emptyResponse: GetBranchesResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
+    const whereClause: Prisma.BranchWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageStoreSettings',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.BranchWhereInput = { storeId }
 
     if (search) {
       whereClause.name = { contains: search, mode: 'insensitive' }
@@ -125,17 +192,7 @@ export async function getBranches({
     }
   } catch (error) {
     console.error(error)
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+    return emptyResponse
   }
 }
 
@@ -144,10 +201,34 @@ export async function getBranch(id: string) {
     if (!id) {
       return null
     }
-    return await prisma.branch.findUnique({
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const branch = await prisma.branch.findUnique({
       where: { id },
       select: branchSelect,
     })
+
+    if (!branch) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: branch.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return branch
   } catch (error) {
     console.error(error)
     return null
@@ -156,7 +237,27 @@ export async function getBranch(id: string) {
 
 export async function createBranch(input: CreateBranchInput) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const { storeId, isMain = false } = input
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
 
     if (isMain) {
       await prisma.branch.updateMany({
@@ -196,6 +297,35 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       return { success: false, message: 'ไม่พบ Branch ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const existingBranch = await prisma.branch.findUnique({
+      where: { id },
+      select: { storeId: true },
+    })
+
+    if (!existingBranch) {
+      return { success: false, message: 'ไม่พบข้อมูลสาขา' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: existingBranch.storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const updatedBranch = await prisma.branch.update({
       where: { id },
       data: input,
@@ -222,6 +352,26 @@ export async function setMainBranch(id: string, storeId: string) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Branch ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     await prisma.branch.updateMany({
@@ -255,6 +405,26 @@ export async function deleteBranch(id: string, storeId: string) {
   try {
     if (!id) {
       return { success: false, message: 'ไม่พบ Branch ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     const branch = await prisma.branch.findUnique({

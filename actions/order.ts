@@ -11,6 +11,8 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetOrdersParams {
@@ -36,6 +38,7 @@ const orderSelect = {
   pointsDiscount: true,
   usedPoints: true,
   codFee: true,
+  storeId: true,
   coupon: {
     select: {
       code: true,
@@ -108,12 +111,46 @@ export async function getOrders({
     },
   }
 
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
   try {
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.OrderWhereInput = { storeId }
+    const whereClause: Prisma.OrderWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageOrders',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { StaffStore: { some: { staff: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
 
     if (status) {
       whereClause.status = status
@@ -175,6 +212,13 @@ export async function updateOrderStatus(
       return { success: false, message: 'ไม่พบ Order ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     if (status === OrderStatus.CANCELLED) {
       return await cancelOrder(id)
     }
@@ -186,6 +230,19 @@ export async function updateOrderStatus(
 
     if (!order) {
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: order.storeId,
+      permission: 'canManageOrders',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     await prisma.order.update({
@@ -223,6 +280,13 @@ export async function cancelOrder(id: string) {
       return { success: false, message: 'ไม่พบ Order ID' }
     }
 
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
     const order = await prisma.order.findUnique({
       where: { id },
       select: {
@@ -242,6 +306,19 @@ export async function cancelOrder(id: string) {
 
     if (!order) {
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: order.storeId,
+      permission: 'canManageOrders',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     if (order.status === OrderStatus.CANCELLED) {

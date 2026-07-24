@@ -18,6 +18,7 @@ import { differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { createCheckoutSession } from './stripe/checkout'
@@ -93,6 +94,13 @@ export async function getStoreSubscriptions(
   ownerId: string,
 ): Promise<GetSubscriptionItemSerialized[]> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return []
+    }
+
     return serializeDecimal(
       await prisma.subscription.findMany({
         where: {
@@ -114,12 +122,33 @@ export async function getStoreSubscription(
     return null
   }
 
-  return serializeDecimal(
-    await prisma.subscription.findUnique({
-      where: { storeId },
-      select: subscriptionSelect,
-    }),
-  )
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canViewFinance',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return serializeDecimal(
+      await prisma.subscription.findUnique({
+        where: { storeId },
+        select: subscriptionSelect,
+      }),
+    )
+  } catch {
+    return null
+  }
 }
 
 export async function changePlan(
@@ -130,6 +159,26 @@ export async function changePlan(
   try {
     if (!storeId) {
       return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     const subscription = await prisma.subscription.findUnique({
@@ -302,6 +351,45 @@ export async function getSubscriptionInvoices({
   limit?: number
 }): Promise<GetSubscriptionInvoicesResponse> {
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          limit,
+          totalItems: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      }
+    }
+
+    if (storeId) {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canViewFinance',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return {
+          data: [],
+          meta: {
+            currentPage: page,
+            limit,
+            totalItems: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        }
+      }
+    }
+
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
@@ -356,8 +444,26 @@ export async function initiatePlanUpgrade(
   billingCycle: string,
 ) {
   const userSession = await auth()
+  const userId = userSession?.user?.id
 
   try {
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     if (newPlan === Plan.FREE) {
       return { success: true, url: null, type: UpgradeType.NORMAL }
     }
@@ -435,45 +541,86 @@ export async function calculateUpgradeCost(
   newPlan: Plan,
   billingCycle: string,
 ) {
-  const sub = await prisma.subscription.findUnique({
-    where: { storeId },
-    select: { startDate: true, endDate: true, plan: true },
-  })
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
 
-  if (!sub || sub.plan === newPlan) {
+    if (!userId) {
+      return { amountToPay: 0 }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canViewFinance',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return { amountToPay: 0 }
+    }
+
+    const sub = await prisma.subscription.findUnique({
+      where: { storeId },
+      select: { startDate: true, endDate: true, plan: true },
+    })
+
+    if (!sub || sub.plan === newPlan) {
+      return { amountToPay: 0 }
+    }
+
+    const lastInvoice = await prisma.subscriptionInvoice.findFirst({
+      where: { storeId, status: InvoiceStatus.PAID },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    if (!lastInvoice) {
+      return { amountToPay: 0 }
+    }
+
+    const { finalPrice: newPlanPrice } = calculatePlanPrice(
+      PLAN_DETAILS[newPlan].price.toString(),
+      billingCycle,
+    )
+
+    const { amountToPay } = calculateProration(
+      {
+        startDate: sub.startDate,
+        endDate: sub.endDate,
+        amountPaid: Number(lastInvoice.amount),
+      },
+      newPlanPrice,
+    )
+
+    return { amountToPay: Math.max(0, amountToPay) }
+  } catch {
     return { amountToPay: 0 }
   }
-
-  const lastInvoice = await prisma.subscriptionInvoice.findFirst({
-    where: { storeId, status: InvoiceStatus.PAID },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  if (!lastInvoice) {
-    return { amountToPay: 0 }
-  }
-
-  const { finalPrice: newPlanPrice } = calculatePlanPrice(
-    PLAN_DETAILS[newPlan].price.toString(),
-    billingCycle,
-  )
-
-  const { amountToPay } = calculateProration(
-    {
-      startDate: sub.startDate,
-      endDate: sub.endDate,
-      amountPaid: Number(lastInvoice.amount),
-    },
-    newPlanPrice,
-  )
-
-  return { amountToPay: Math.max(0, amountToPay) }
 }
 
 export async function cancelPendingPlanChange(storeId: string) {
   try {
     if (!storeId) {
       return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     await prisma.subscription.update({

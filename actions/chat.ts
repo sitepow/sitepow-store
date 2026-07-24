@@ -23,6 +23,7 @@ import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
@@ -57,11 +58,27 @@ export async function getMerchantConversations(storeSlug: string) {
 
   return await withCache(cacheKey, async () => {
     const store = await prisma.store.findFirst({
-      where: { slug: storeSlug, ownerId: userId },
-      select: { id: true },
+      where: { slug: storeSlug },
+      select: { id: true, ownerId: true },
     })
-    if (!store)
-      return { success: false, message: 'ไม่พบร้านค้าหรือไม่มีสิทธิ์' }
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบร้านค้า' }
+    }
+
+    const isOwner = store.ownerId === userId
+
+    if (!isOwner) {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId: store.id,
+        permission: 'canManageOrders',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+      }
+    }
 
     const conversations = await prisma.conversation.findMany({
       where: { type: ConversationType.STORE, storeId: store.id },
@@ -246,13 +263,27 @@ export async function getSupportConversations(storeId?: string) {
       return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
     }
 
-    const store = await prisma.store.findFirst({
-      where: { id: storeId, ownerId: userId },
-      select: { id: true },
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { id: true, ownerId: true },
     })
 
     if (!store) {
-      return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+      return { success: false, message: 'ไม่พบร้านค้านี้' }
+    }
+
+    const isOwner = store.ownerId === userId
+
+    if (!isOwner) {
+      const authCheck = await verifyStaffPermission({
+        userId,
+        storeId,
+        permission: 'canManageOrders',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+      }
     }
   }
 

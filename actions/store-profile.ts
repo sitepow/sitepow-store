@@ -4,6 +4,8 @@ import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { StoreProfileFormValues } from '@/zod/store-profile'
 
 import { createLog } from '@/lib/activity-log'
+import { auth } from '@/lib/auth'
+import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStoreCache } from './query-keys/invalidation/store'
@@ -32,6 +34,23 @@ export async function getStoreProfile(
   }
 
   try {
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
     return await prisma.store.findUnique({
       where: { id: storeId },
       select: storeProfileSelect,
@@ -48,6 +67,26 @@ export async function updateStoreProfile(
   try {
     if (!storeId) {
       return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
     }
 
     if (input.slug) {
