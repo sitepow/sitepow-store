@@ -445,34 +445,7 @@ export async function createStore(input: CreateStoreInput) {
       }),
     )
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { name: true, email: true },
-    })
-
-    if (user) {
-      let staffProfile = await prisma.staff.findUnique({
-        where: { userId: session.user.id },
-      })
-
-      if (!staffProfile) {
-        staffProfile = await prisma.staff.create({
-          data: {
-            userId: session.user.id,
-            name: user.name!,
-            email: user.email!,
-          },
-        })
-      }
-
-      await prisma.staffStore.create({
-        data: {
-          staffId: staffProfile.id,
-          storeId: store.id,
-          role: StaffRole.ADMIN,
-        },
-      })
-    }
+    await assignUserAsStoreAdmin(session.user.id, store.id)
 
     const invoice = store.subscriptionInvoices[0]
 
@@ -589,9 +562,23 @@ export async function deleteStore(id: string) {
       }
     }
 
-    const store = await prisma.store.delete({
-      where: { id },
-      select: { slug: true },
+    const store = await prisma.$transaction(async (tx) => {
+      await tx.orderItem.deleteMany({ where: { order: { storeId: id } } })
+      await tx.order.deleteMany({ where: { storeId: id } })
+      await tx.staffStore.deleteMany({ where: { storeId: id } })
+      await tx.subscription.deleteMany({ where: { storeId: id } })
+      await tx.subscriptionInvoice.deleteMany({ where: { storeId: id } })
+      await tx.coupon.deleteMany({ where: { storeId: id } })
+      await tx.product.deleteMany({ where: { storeId: id } })
+      await tx.category.deleteMany({ where: { storeId: id } })
+      await tx.branch.deleteMany({ where: { storeId: id } })
+      await tx.customerStore.deleteMany({ where: { storeId: id } })
+      await tx.activityLog.deleteMany({ where: { storeId: id } })
+
+      return await tx.store.delete({
+        where: { id },
+        select: { slug: true },
+      })
     })
 
     await createLog({
@@ -604,7 +591,76 @@ export async function deleteStore(id: string) {
 
     await invalidateStoreCache(store.slug)
 
-    return { success: true, message: 'ลบร้านค้าสำเร็จ' }
+    return {
+      success: true,
+      message: 'ลบร้านค้าและข้อมูลทั้งหมดสำเร็จเรียบร้อย',
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+    }
+  }
+}
+
+export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    })
+
+    if (!user) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
+
+    let staffProfile = await prisma.staff.findUnique({
+      where: { userId: userId },
+    })
+
+    if (!staffProfile) {
+      staffProfile = await prisma.staff.create({
+        data: {
+          userId: userId,
+          name: user.name!,
+          email: user.email!,
+        },
+      })
+    }
+
+    const staffStore = await prisma.staffStore.upsert({
+      where: {
+        staffId_storeId: {
+          staffId: staffProfile.id,
+          storeId: storeId,
+        },
+      },
+      update: {
+        role: StaffRole.ADMIN,
+      },
+      create: {
+        staffId: staffProfile.id,
+        storeId: storeId,
+        role: StaffRole.ADMIN,
+      },
+    })
+
+    const storeBranches = await prisma.branch.findMany({
+      where: { storeId: storeId },
+      select: { id: true },
+    })
+
+    if (storeBranches.length > 0) {
+      await prisma.staffBranch.createMany({
+        data: storeBranches.map((branch) => ({
+          staffStoreId: staffStore.id,
+          branchId: branch.id,
+        })),
+        skipDuplicates: true,
+      })
+    }
+
+    return { success: true, staffStore }
   } catch (error) {
     console.error(error)
     return { success: false }
