@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconGitBranch } from '@tabler/icons-react'
+import { IconHierarchy2 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
@@ -29,8 +29,8 @@ export default function MerchantStoreSettingsBranchesPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconGitBranch}
-        title="รายการสาขาทั้งหมด"
+        icon={IconHierarchy2}
+        title="จัดการสาขา"
         description="จัดการสาขาของร้านค้า กำหนดสาขาหลัก และเพิ่มสาขาย่อย"
         endContent={
           <div className="flex flex-wrap items-end gap-5">

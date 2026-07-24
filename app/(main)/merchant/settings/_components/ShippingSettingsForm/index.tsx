@@ -107,7 +107,7 @@ export function ShippingSettingsForm() {
             <PageTabHeader
               variant="secondary"
               icon={IconTruck}
-              title="ช่องทางและตัวเลือกการจัดส่งพัสดุ"
+              title="ระบบขนส่งสินค้า"
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
                 <div className="flex flex-wrap items-end gap-2">

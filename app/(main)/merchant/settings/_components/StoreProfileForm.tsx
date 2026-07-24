@@ -182,7 +182,7 @@ export function StoreProfileForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconBuildingStore}
-          title="ข้อมูลโปรไฟล์แบรนด์และร้านค้าหลัก"
+          title="ตั้งค่าข้อมูลร้านค้า"
           description="แก้ไขข้อมูลสาขาหลัก, URL Slug หน้าระบบ และข้อมูลข้อความหมายเหตุที่จะปรากฏในกระดาษใบเสร็จ POS"
           endContent={<StoreSelectField />}
         />

@@ -20,7 +20,7 @@ export default function MerchantMarketingCouponsPage() {
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconTicket}
-        title="คูปองส่วนลดและการตลาด"
+        title="คูปองส่วนลด"
         description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
         endContent={
           <div className="flex flex-wrap items-end gap-5">

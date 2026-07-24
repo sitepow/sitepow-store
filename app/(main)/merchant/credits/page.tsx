@@ -2,7 +2,7 @@
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconCoins } from '@tabler/icons-react'
+import { IconWallet } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -18,8 +18,8 @@ export default function CreditPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconCoins}
-        title="จัดการเครดิต AI"
+        icon={IconWallet}
+        title="จัดการเครดิต"
         description="ตรวจสอบยอดเครดิตคงเหลือและประวัติการใช้บริการ AI และตรวจสลิปของคุณ"
         endContent={<StoreSelectField />}
       />

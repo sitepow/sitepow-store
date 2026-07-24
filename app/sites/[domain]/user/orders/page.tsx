@@ -1,7 +1,7 @@
 'use client'
 
 import { BUYER_NAVIGATION } from '@/constants/navigation'
-import { IconShoppingBag } from '@tabler/icons-react'
+import { IconPackage } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -12,8 +12,8 @@ export default function StoreUserOrderPage() {
   return (
     <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
-        icon={IconShoppingBag}
-        title="ประวัติการสั่งซื้อของคุณ"
+        icon={IconPackage}
+        title="การซื้อของฉัน"
         description="ติดตามสถานะคำสั่งซื้อ ตรวจสอบเลขพัสดุ และดูประวัติการช้อปปิ้งย้อนหลัง"
       />
       <OrderTable />

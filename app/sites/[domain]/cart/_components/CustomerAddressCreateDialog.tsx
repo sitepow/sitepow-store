@@ -204,7 +204,11 @@ export function CustomerAddressCreateDialog() {
             )}
             <Field className="col-span-2">
               <Label>หมายเลขโทรศัพท์ติดต่อ *</Label>
-              <Input {...register('phone')} type="tel" />
+              <Input
+                {...register('phone')}
+                type="tel"
+                placeholder="ระบุหมายเลขโทรศัพท์"
+              />
               <FieldError>{errors.phone?.message}</FieldError>
             </Field>
             <Field className="col-span-2">

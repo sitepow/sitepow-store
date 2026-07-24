@@ -14,7 +14,7 @@ export default function StoreUserAddressesPage() {
     <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconMapPin}
-        title="ที่อยู่จัดส่งของฉัน"
+        title="ที่อยู่จัดส่ง"
         description="บันทึกสมุดที่อยู่รับสินค้า เพื่อความสะดวกและรวดเร็วในการกรอกฟอร์มปลายทางตอนสั่งซื้อผ่านหน้า Sale Page"
         endContent={<CustomerAddressCreateDialog />}
       />

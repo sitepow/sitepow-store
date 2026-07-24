@@ -2,7 +2,7 @@
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useStaffPermission } from '@/hooks/use-permission'
-import { IconUsers } from '@tabler/icons-react'
+import { IconUserCog } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -18,8 +18,8 @@ export default function StaffPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconUsers}
-        title="พนักงาน"
+        icon={IconUserCog}
+        title="จัดการพนักงาน"
         description="จัดการพนักงานและบทบาทการเข้าถึงระบบของร้านค้า"
         endContent={
           <div className="flex items-end gap-2.5">

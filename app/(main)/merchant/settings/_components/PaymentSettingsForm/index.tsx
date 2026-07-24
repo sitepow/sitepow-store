@@ -113,7 +113,7 @@ export function PaymentSettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconCreditCard}
-            title="เกตเวย์และช่องทางรับชำระเงิน"
+            title="ช่องทางรับชำระเงิน"
             description="เปิด-ปิดช่องทางการรับเงินสำหรับลูกค้าหน้าร้านค้า พร้อมตั้งค่าบัญชีปลายทางในการรับรายได้"
             endContent={<StoreSelectField />}
           />

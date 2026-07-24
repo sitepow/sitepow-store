@@ -14,7 +14,7 @@ export default function MerchantStoreSettingsPage() {
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBuildingStore}
-        title="ร้านค้าของคุณ"
+        title="จัดการร้านค้า"
         description="จัดการข้อมูลหน้าร้าน สลับเข้าสู่ระบบหลังบ้าน หรือเปิดร้านค้าใหม่เพื่อเริ่มธุรกิจเพิ่ม"
         endContent={<StoreCreateDialog />}
       />

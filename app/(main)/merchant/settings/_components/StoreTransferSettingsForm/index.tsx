@@ -8,7 +8,6 @@ import { IconMail, IconReplace } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -29,7 +28,7 @@ export function StoreTransferSettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconReplace}
-            title="โอนย้ายความเป็นเจ้าของร้านค้า"
+            title="โอนย้ายความเป็นเจ้าของร้าน"
             description="ทำการส่งคำขอไปยังบัญชีผู้ใช้ท่านอื่นเพื่อโอนกรรมสิทธิ์ สิทธิ์ขาดในการตั้งค่า และสิทธิ์ความเป็น Owner ของร้านค้านี้"
             endContent={<StoreSelectField />}
           />
@@ -38,18 +37,13 @@ export function StoreTransferSettingsForm() {
         {selectedStoreId !== ALL_STORES && (
           <>
             <CardContent className="space-y-5">
-              <Alert variant="destructive">
-                <AlertTitle className="text-sm font-semibold">
-                  คำเตือนและข้อควรระวัง
-                </AlertTitle>
-                <AlertDescription className="mt-1 text-xs leading-relaxed">
-                  เมื่อผู้รับยืนยันการโอน
+              <ActionRequiredAlert
+                title="คำเตือนและข้อควรระวัง"
+                description="เมื่อผู้รับยืนยันการโอน
                   บัญชีปัจจุบันของคุณจะถูกลดระดับสิทธิ์ลงทันที
                   และไม่สามารถเข้าถึงการจัดการงบดุล รายได้
-                  หรือสิทธิ์การตั้งค่าระบบหลักของร้านค้านี้ได้อีกต่อไป
-                </AlertDescription>
-              </Alert>
-
+                  หรือสิทธิ์การตั้งค่าระบบหลักของร้านค้านี้ได้อีกต่อไป"
+              />
               <Field>
                 <FieldLabel>อีเมลของผู้รับโอนสิทธิ์</FieldLabel>
                 <Input
@@ -74,14 +68,12 @@ export function StoreTransferSettingsForm() {
             </CardFooter>
           </>
         )}
-
         {selectedStoreId === ALL_STORES && (
           <CardContent>
             <ActionRequiredAlert />
           </CardContent>
         )}
       </Card>
-
       {selectedStoreId !== ALL_STORES && (
         <>
           <StoreTransferHistoryTable />

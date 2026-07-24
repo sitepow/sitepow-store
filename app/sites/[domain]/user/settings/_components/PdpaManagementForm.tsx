@@ -51,7 +51,7 @@ export function PdpaManagementForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconShieldLock}
-          title="การจัดการข้อมูลส่วนบุคคล"
+          title="การจัดการข้อมูล (PDPA)"
           description="คุ้มครองความเป็นส่วนตัวและสิทธิ์ของข้อมูลคุณภายใต้พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล"
         />
       </CardHeader>

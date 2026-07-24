@@ -32,7 +32,7 @@ export default function MerchantStoreSettingsCategoriesPage() {
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCategory}
-        title="รายการหมวดหมู่ทั้งหมด"
+        title="หมวดหมู่สินค้า"
         description="จัดการหมวดหมู่สินค้า เพื่อจัดระเบียบสินค้าในร้านค้าของคุณ"
         endContent={
           <div className="flex flex-wrap items-end gap-5">

@@ -1,7 +1,6 @@
 import {
   IconBox,
   IconBuildingStore,
-  IconChartBar,
   IconCoin,
   IconCreditCard,
   IconHierarchy2,
@@ -14,7 +13,7 @@ import {
   IconShoppingCart,
   IconTicket,
   IconUser,
-  IconUsers,
+  IconUserCog,
   IconWallet,
   TablerIcon,
 } from '@tabler/icons-react'
@@ -119,13 +118,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     value: 'staff',
     label: 'จัดการพนักงาน',
     tab: 'staff',
-    icon: IconUsers,
+    icon: IconUserCog,
   },
   {
     value: 'customers',
-    label: 'ข้อมูลลูกค้า',
+    label: 'จัดการลูกค้า',
     tab: 'customers',
-    icon: IconChartBar,
+    icon: IconUserCog,
   },
   {
     value: 'billing-subscription',
@@ -148,13 +147,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
   },
   {
     value: 'credits',
-    label: 'การจัดการเครดิต',
+    label: 'จัดการเครดิต',
     tab: 'credits',
     icon: IconWallet,
   },
   {
     value: 'blog',
-    label: 'บทความ',
+    label: 'จัดการบทความ',
     tab: 'blog',
     icon: IconNews,
   },

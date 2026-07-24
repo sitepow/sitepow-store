@@ -63,7 +63,7 @@ export default function MerchantAuditLogsPage() {
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHistory}
-        title="ประวัติกิจกรรมระบบ"
+        title="ประวัติกิจกรรม"
         description="ตรวจสอบบันทึก Log การกระทำและเข้าถึงข้อมูลอย่างละเอียด เพื่อความโปร่งใสและการรักษาความปลอดภัยภายในองค์กร"
         endContent={<StoreSelectField />}
       />

@@ -1,7 +1,7 @@
 'use client'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { IconArticle } from '@tabler/icons-react'
+import { IconNews } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
@@ -13,7 +13,7 @@ export default function BlogPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconArticle}
+        icon={IconNews}
         title="บทความ"
         description="จัดการบทความและเนื้อหาของร้านค้า"
         endContent={<StoreSelectField />}

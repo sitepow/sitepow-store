@@ -21,7 +21,7 @@ export default function StoreUserSettingsPage() {
     <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
-        title="ตั้งค่าบัญชีและความเป็นส่วนตัว"
+        title="ตั้งค่าบัญชี"
         description="จัดการความปลอดภัยของรหัสผ่าน การรับข้อมูลแจ้งเตือน และรักษาสิทธิ์ของข้อมูลส่วนบุคคล (PDPA) ของคุณ"
       />
 

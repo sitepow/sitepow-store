@@ -1,7 +1,7 @@
 'use client'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { Receipt } from 'lucide-react'
+import { IconCreditCard } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
@@ -14,8 +14,8 @@ export default function MerchantBillingSubscriptionPage() {
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={Receipt}
-        title="การจัดการสมาชิกและค่าบริการ"
+        icon={IconCreditCard}
+        title="การสมัครสมาชิก"
         description="ตรวจสอบข้อมูลแพลนรายเดือนและประวัติใบเสร็จแยกตามรายร้านค้าของคุณ"
         endContent={<StoreSelectField />}
       />

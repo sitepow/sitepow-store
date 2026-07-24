@@ -73,7 +73,7 @@ export function TaxSettingsForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconReceiptTax}
-          title="ระบบภาษีมูลค่าเพิ่มและใบกำกับภาษี"
+          title="ภาษีและใบกำกับ"
           description="ตั้งค่าการคำนวณภาษีของร้านค้าเพื่อเปิดตัวเลือกให้ลูกค้าขอใบกำกับภาษีเต็มรูปแบบในขั้นตอนเช็คเอาท์ออเดอร์"
           endContent={<StoreSelectField />}
         />

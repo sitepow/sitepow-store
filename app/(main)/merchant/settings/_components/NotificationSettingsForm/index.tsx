@@ -72,7 +72,7 @@ export function NotificationSettingsForm() {
       <CardHeader>
         <PageTabHeader
           variant="secondary"
-          title="การตั้งค่าระบบกระจายการแจ้งเตือน"
+          title="ระบบแจ้งเตือนไลน์/อีเมล"
           description="กำหนดพฤติกรรมการรับส่งข้อมูลสำคัญและตัวแจ้งเตือนแบบเรียลไทม์ของระบบหลังบ้านไปยังพนักงานและผู้บริหาร"
           icon={IconBell}
           endContent={<StoreSelectField />}
