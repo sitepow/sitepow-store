@@ -10,6 +10,7 @@ import {
   InvoiceStatus,
   LogAction,
   Plan,
+  StaffRole,
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
@@ -443,6 +444,35 @@ export async function createStore(input: CreateStoreInput) {
         },
       }),
     )
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, email: true },
+    })
+
+    if (user) {
+      let staffProfile = await prisma.staff.findUnique({
+        where: { userId: session.user.id },
+      })
+
+      if (!staffProfile) {
+        staffProfile = await prisma.staff.create({
+          data: {
+            userId: session.user.id,
+            name: user.name!,
+            email: user.email!,
+          },
+        })
+      }
+
+      await prisma.staffStore.create({
+        data: {
+          staffId: staffProfile.id,
+          storeId: store.id,
+          role: StaffRole.ADMIN,
+        },
+      })
+    }
 
     const invoice = store.subscriptionInvoices[0]
 
