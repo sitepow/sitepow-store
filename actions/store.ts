@@ -409,6 +409,12 @@ export async function createStore(input: CreateStoreInput) {
           ...storeData,
           ownerId: session.user.id,
           status: initialStatus,
+          branches: {
+            create: {
+              name: 'สาขาออนไลน์ (ค่าเริ่มต้นระบบ)',
+              isMain: true,
+            },
+          },
           subscription: {
             create: {
               plan: input.plan ?? Plan.STARTER,
@@ -621,9 +627,11 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
     if (!staffProfile) {
       staffProfile = await prisma.staff.create({
         data: {
-          userId: userId,
-          name: user.name!,
+          name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
           email: user.email!,
+          user: {
+            connect: { id: userId },
+          },
         },
       })
     }

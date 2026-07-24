@@ -1,6 +1,11 @@
 'use server'
 
-import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import {
+  ActorType,
+  LogAction,
+  Prisma,
+  StaffRole,
+} from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
@@ -12,10 +17,12 @@ export interface CreateBranchInput {
   name: string
   storeId: string
   isMain?: boolean
+  address?: string
 }
 
 export interface UpdateBranchInput {
   name?: string
+  address?: string
 }
 
 interface GetBranchesParams {
@@ -259,16 +266,35 @@ export async function createBranch(input: CreateBranchInput) {
       }
     }
 
-    if (isMain) {
-      await prisma.branch.updateMany({
-        where: { storeId, isMain: true },
-        data: { isMain: false },
-      })
-    }
+    const branch = await prisma.$transaction(async (tx) => {
+      if (isMain) {
+        await tx.branch.updateMany({
+          where: { storeId, isMain: true },
+          data: { isMain: false },
+        })
+      }
 
-    const branch = await prisma.branch.create({
-      data: input,
-      select: branchSelect,
+      const newBranch = await tx.branch.create({
+        data: input,
+        select: branchSelect,
+      })
+
+      const adminStaffStores = await tx.staffStore.findMany({
+        where: { storeId, role: StaffRole.ADMIN },
+        select: { id: true },
+      })
+
+      if (adminStaffStores.length > 0) {
+        await tx.staffBranch.createMany({
+          data: adminStaffStores.map((staffStore) => ({
+            staffStoreId: staffStore.id,
+            branchId: newBranch.id,
+          })),
+          skipDuplicates: true,
+        })
+      }
+
+      return newBranch
     })
 
     await createLog({
@@ -374,14 +400,20 @@ export async function setMainBranch(id: string, storeId: string) {
       }
     }
 
-    await prisma.branch.updateMany({
-      where: { storeId, isMain: true },
-      data: { isMain: false },
+    await prisma.$transaction(async (tx) => {
+      await tx.branch.updateMany({
+        where: { storeId, isMain: true },
+        data: { isMain: false },
+      })
+
+      await tx.branch.update({
+        where: { id },
+        data: { isMain: true },
+      })
     })
 
-    const updatedBranch = await prisma.branch.update({
+    const updatedBranch = await prisma.branch.findUnique({
       where: { id },
-      data: { isMain: true },
       select: branchSelect,
     })
 
@@ -441,7 +473,10 @@ export async function deleteBranch(id: string, storeId: string) {
       return { success: false, message: 'ต้องมีสาขาอย่างน้อย 1 สาขา' }
     }
 
-    await prisma.branch.delete({ where: { id } })
+    await prisma.$transaction(async (tx) => {
+      await tx.staffBranch.deleteMany({ where: { branchId: id } })
+      await tx.branch.delete({ where: { id } })
+    })
 
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
