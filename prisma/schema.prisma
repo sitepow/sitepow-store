@@ -170,7 +170,7 @@ model Branch {
   mapUrl       String? @db.Text
   openingHours Json?
 
-  staffs           StaffBranch[]
+  employeeBranches EmployeeBranch[]
   orderItem        OrderItem[]
   stocks           ProductStock[]
   coupons          Coupon[]
@@ -228,8 +228,8 @@ model User {
   orderNotify     Boolean @default(true)
   marketingNotify Boolean @default(false)
 
-  staffProfile    Staff?
-  customerProfile Customer?
+  employee Employee?
+  customer Customer?
 
   accounts           Account[]
   activityLogs       ActivityLog[]
@@ -238,7 +238,7 @@ model User {
   ownedStores        Store[]              @relation("StoreOwner")
 }
 
-model Staff {
+model Employee {
   id    String @id @default(cuid())
   name  String
   email String @unique
@@ -246,38 +246,110 @@ model Staff {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stores       StaffStore[]
+  stores       EmployeeStore[]
   activityLogs ActivityLog[]
   orders       Order[]
 }
 
-model StaffBranch {
-  id           String     @id @default(cuid())
-  staffStoreId String
-  staffStore   StaffStore @relation(fields: [staffStoreId], references: [id], onDelete: Cascade)
-  branchId     String
-  branch       Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  @@unique([staffStoreId, branchId])
-}
-
-model StaffStore {
-  id      String    @id @default(cuid())
-  role    StaffRole @default(CASHIER)
-  staffId String
-  staff   Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  storeId String
-  store   Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  branches StaffBranch[]
-
-  @@unique([staffId, storeId])
-}
-
-enum StaffRole {
+enum PermissionRole {
+  OWNER
   ADMIN
   MANAGER
   CASHIER
+  STAFF
+}
+
+model Role {
+  id          String         @id @default(uuid())
+  storeId     String
+  store       Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        PermissionRole @default(STAFF)
+  description String?
+
+  permissions    RolePermission[]
+  employeeStores EmployeeStore[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, name])
+}
+
+enum PermissionDomain {
+  PRODUCT
+  ORDER
+  INVENTORY
+  CUSTOMER
+  COUPON
+  STAFF
+  SETTING
+  REPORT
+  BRANCH
+  BLOG
+  SHIPPING
+  PAYMENT
+  SUBSCRIPTION
+  TRANSACTION
+  CONVERSATION
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  EXPORT
+  IMPORT
+  APPROVE
+  CANCEL
+  VOID
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  domain      PermissionDomain
+  action      PermissionAction
+  description String?          @db.Text
+
+  roles RolePermission[]
+
+  @@unique([domain, action])
+}
+
+model RolePermission {
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model EmployeeStore {
+  id         String   @id @default(uuid())
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  branches EmployeeBranch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, employeeId])
+}
+
+model EmployeeBranch {
+  employeeStoreId String
+  employeeStore   EmployeeStore @relation(fields: [employeeStoreId], references: [id], onDelete: Cascade)
+  branchId        String
+  branch          Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@id([employeeStoreId, branchId])
 }
 
 enum StoreStatus {
@@ -514,10 +586,11 @@ model Store {
   stockTransfers       StockTransfer[]
   stockAdjustments     StockAdjustment[]
   PaymentSetting       PaymentSetting[]
-  StaffStore           StaffStore[]
+  employeeStores       EmployeeStore[]
   subscriptionInvoices SubscriptionInvoice[]
   conversations        Conversation[]
   StoreDomain          StoreDomain[]
+  role                 Role[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -915,8 +988,8 @@ model Order {
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
 
-  staffId String?
-  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  employeeId String?
+  employee   Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
 
   shippingAddrSnapshot Json?
   storeSnapshot        Json?
@@ -928,7 +1001,7 @@ model Order {
   @@index([storeId])
   @@index([customerId])
   @@index([bankAccountId])
-  @@index([staffId])
+  @@index([employeeId])
 }
 
 model OrderItem {
@@ -1019,10 +1092,10 @@ model ActivityLog {
 
   actorType ActorType
 
-  userId  String?
-  user    User?   @relation(fields: [userId], references: [id])
-  staffId String?
-  staff   Staff?  @relation(fields: [staffId], references: [id])
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  employeeId String?
+  employee   Employee? @relation(fields: [employeeId], references: [id])
 
   storeId String?
   store   Store?  @relation(fields: [storeId], references: [id], onDelete: Cascade)

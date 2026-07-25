@@ -9,7 +9,7 @@ import {
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetStockAdjustmentsParams {
@@ -99,7 +99,7 @@ export async function getStockAdjustments({
       }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageInventory',
@@ -195,7 +195,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageInventory',

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 
 import { useDashboard } from '@/actions/hooks/dashboard'
-import { useStaffPermission } from '@/actions/hooks/staff'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
@@ -76,7 +76,7 @@ export default function MerchantDashboardPage() {
     canViewDashboard,
     canViewCreditCard,
     isLoading: isPermissionLoading,
-  } = useStaffPermission()
+  } = useEmployeePermission()
 
   const { data, isLoading } = useDashboard(selectedStoreId, selectedBranchId)
 

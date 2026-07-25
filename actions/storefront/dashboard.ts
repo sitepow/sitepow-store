@@ -1,5 +1,6 @@
 'use server'
 
+import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 
 import { auth } from '@/lib/auth'
@@ -29,21 +30,6 @@ export interface GetStorefrontDashboardResult {
   spendingTrend: SpendingTrendItem[]
   pointsHistory: PointsHistoryItem[]
 }
-
-const THAI_MONTHS = [
-  'ม.ค.',
-  'ก.พ.',
-  'มี.ค.',
-  'เม.ย.',
-  'พ.ค.',
-  'มิ.ย.',
-  'ก.ค.',
-  'ส.ค.',
-  'ก.ย.',
-  'ต.ค.',
-  'พ.ย.',
-  'ธ.ค.',
-]
 
 const EMPTY_RESULT: GetStorefrontDashboardResult = {
   stats: {
@@ -128,6 +114,7 @@ export async function getStorefrontDashboard(
             usedPoints: true,
             createdAt: true,
           },
+          orderBy: { createdAt: 'asc' },
         }),
       ])
 
@@ -135,42 +122,46 @@ export async function getStorefrontDashboard(
       (c) => c.usageLimit === null || c.usedCount < c.usageLimit,
     ).length
 
-    const spendingMap: Record<string, number> = {}
-    const pointsMap: Record<string, { earned: number; used: number }> = {}
+    const monthlyDataMap = new Map<
+      string,
+      { name: string; total: number; earned: number; used: number }
+    >()
 
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
       const key = `${d.getFullYear()}-${d.getMonth()}`
-      spendingMap[key] = 0
-      pointsMap[key] = { earned: 0, used: 0 }
+      monthlyDataMap.set(key, {
+        name: THAI_MONTHS[d.getMonth()],
+        total: 0,
+        earned: 0,
+        used: 0,
+      })
     }
 
     for (const order of ordersTrendRaw) {
       const key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth()}`
-      if (key in spendingMap) {
-        spendingMap[key] += Number(order.totalAmount)
-        pointsMap[key].earned += order.earnedPoints ?? 0
-        pointsMap[key].used += order.usedPoints ?? 0
+      const entry = monthlyDataMap.get(key)
+      if (entry) {
+        entry.total += Number(order.totalAmount)
+        entry.earned += order.earnedPoints ?? 0
+        entry.used += order.usedPoints ?? 0
       }
     }
 
-    const spendingTrend: SpendingTrendItem[] = Object.entries(spendingMap).map(
-      ([key, total]) => {
-        const month = Number(key.split('-')[1])
-        return { name: THAI_MONTHS[month], total: Math.round(total) }
-      },
-    )
+    const spendingTrend: SpendingTrendItem[] = []
+    const pointsHistory: PointsHistoryItem[] = []
 
-    const pointsHistory: PointsHistoryItem[] = Object.entries(pointsMap).map(
-      ([key, value]) => {
-        const month = Number(key.split('-')[1])
-        return {
-          name: THAI_MONTHS[month],
-          earned: value.earned,
-          used: value.used,
-        }
-      },
-    )
+    monthlyDataMap.forEach((value) => {
+      spendingTrend.push({
+        name: value.name,
+        total: Math.round(value.total),
+      })
+      pointsHistory.push({
+        name: value.name,
+        earned: value.earned,
+        used: value.used,
+      })
+    })
 
     return {
       stats: {

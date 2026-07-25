@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useStaffPermission } from '@/actions/hooks/staff'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconUserCog } from '@tabler/icons-react'
 
@@ -11,21 +11,23 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
-import { StaffDialog } from './_components/StaffDialog'
-import { StaffTable } from './_components/StaffTable'
+import { EmployeeDialog } from './_components/EmployeeDialog'
+import { EmployeeTable } from './_components/EmployeeTable'
 
-export default function StaffPage() {
-  const { canManageStoreSettings } = useStaffPermission()
-  const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>()
+export default function EmployeePage() {
+  const { canManageStoreSettings } = useEmployeePermission()
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<
+    string | undefined
+  >()
   const [open, setOpen] = useState(false)
 
   const handleEdit = (id: string) => {
-    setSelectedStaffId(id)
+    setSelectedEmployeeId(id)
     setOpen(true)
   }
 
   const handleAdd = () => {
-    setSelectedStaffId(undefined)
+    setSelectedEmployeeId(undefined)
     setOpen(true)
   }
 
@@ -40,8 +42,8 @@ export default function StaffPage() {
             <StoreSelectField />
             <BranchSelectField />
             {canManageStoreSettings && (
-              <StaffDialog
-                staffId={selectedStaffId}
+              <EmployeeDialog
+                employeeId={selectedEmployeeId}
                 open={open}
                 setOpen={setOpen}
                 onAdd={handleAdd}
@@ -50,7 +52,7 @@ export default function StaffPage() {
           </div>
         }
       />
-      <StaffTable onEdit={handleEdit} />
+      <EmployeeTable onEdit={handleEdit} />
     </DashboardSidebar>
   )
 }

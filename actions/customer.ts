@@ -6,7 +6,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetCustomersParams {
@@ -80,7 +80,7 @@ export async function getCustomers({
     const whereClause: Prisma.CustomerStoreWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageCustomers',
@@ -159,7 +159,7 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageCustomers',
@@ -201,7 +201,7 @@ export async function blockCustomer(customerId: string, storeId: string) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageCustomers',

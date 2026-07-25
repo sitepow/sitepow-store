@@ -5,7 +5,7 @@ import { StoreProfileFormValues } from '@/zod/store-profile'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStoreCache } from './query-keys/invalidation/store'
@@ -41,7 +41,7 @@ export async function getStoreProfile(
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -76,7 +76,7 @@ export async function updateStoreProfile(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',

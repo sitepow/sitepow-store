@@ -3,14 +3,14 @@
 import {
   ActorType,
   LogAction,
+  PermissionRole,
   Prisma,
-  StaffRole,
 } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateBranchInput {
@@ -89,7 +89,7 @@ export async function getBranchOptions(
       return []
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -139,7 +139,7 @@ export async function getBranches({
     const whereClause: Prisma.BranchWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageStoreSettings',
@@ -155,7 +155,7 @@ export async function getBranches({
         where: {
           OR: [
             { ownerId: userId },
-            { StaffStore: { some: { staff: { userId } } } },
+            { employeeStores: { some: { employee: { userId } } } },
           ],
         },
         select: { id: true },
@@ -225,7 +225,7 @@ export async function getBranch(id: string) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: branch.storeId,
       permission: 'canManageStoreSettings',
@@ -253,7 +253,7 @@ export async function createBranch(input: CreateBranchInput) {
 
     const { storeId, isMain = false } = input
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -279,15 +279,15 @@ export async function createBranch(input: CreateBranchInput) {
         select: branchSelect,
       })
 
-      const adminStaffStores = await tx.staffStore.findMany({
-        where: { storeId, role: StaffRole.ADMIN },
+      const adminEmployeeStores = await tx.employeeStore.findMany({
+        where: { storeId, role: { name: PermissionRole.ADMIN } },
         select: { id: true },
       })
 
-      if (adminStaffStores.length > 0) {
-        await tx.staffBranch.createMany({
-          data: adminStaffStores.map((staffStore) => ({
-            staffStoreId: staffStore.id,
+      if (adminEmployeeStores.length > 0) {
+        await tx.employeeBranch.createMany({
+          data: adminEmployeeStores.map((employeeStore) => ({
+            employeeStoreId: employeeStore.id,
             branchId: newBranch.id,
           })),
           skipDuplicates: true,
@@ -339,7 +339,7 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       return { success: false, message: 'ไม่พบข้อมูลสาขา' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingBranch.storeId,
       permission: 'canManageStoreSettings',
@@ -387,7 +387,7 @@ export async function setMainBranch(id: string, storeId: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -446,7 +446,7 @@ export async function deleteBranch(id: string, storeId: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -474,7 +474,7 @@ export async function deleteBranch(id: string, storeId: string) {
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.staffBranch.deleteMany({ where: { branchId: id } })
+      await tx.employeeBranch.deleteMany({ where: { branchId: id } })
       await tx.branch.delete({ where: { id } })
     })
 

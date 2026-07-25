@@ -7,7 +7,7 @@ import {
   useCustomers,
   useUnblockCustomer,
 } from '@/actions/hooks/customer'
-import { useStaffPermission } from '@/actions/hooks/staff'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
@@ -31,7 +31,7 @@ export function CustomerTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageCustomers } = useStaffPermission()
+  const { canManageCustomers } = useEmployeePermission()
   const unblockMutation = useUnblockCustomer()
   const blockMutation = useBlockCustomer()
 

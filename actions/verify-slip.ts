@@ -17,7 +17,7 @@ import axios from 'axios'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { r2DeleteImage } from './r2'
@@ -272,7 +272,7 @@ export async function approveSlipManual(
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
       permission: 'canManageOrders',

@@ -115,9 +115,9 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconBox,
   },
   {
-    value: 'staff',
+    value: 'employee',
     label: 'จัดการพนักงาน',
-    tab: 'staff',
+    tab: 'employee',
     icon: IconUserCog,
   },
   {

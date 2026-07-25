@@ -23,7 +23,7 @@ import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
@@ -69,7 +69,7 @@ export async function getMerchantConversations(storeSlug: string) {
     const isOwner = store.ownerId === userId
 
     if (!isOwner) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId: store.id,
         permission: 'canManageOrders',
@@ -275,7 +275,7 @@ export async function getSupportConversations(storeId?: string) {
     const isOwner = store.ownerId === userId
 
     if (!isOwner) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageOrders',

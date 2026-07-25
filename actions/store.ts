@@ -9,8 +9,8 @@ import {
   ActorType,
   InvoiceStatus,
   LogAction,
+  PermissionRole,
   Plan,
-  StaffRole,
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
@@ -22,7 +22,7 @@ import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { withCache } from '@/lib/cache'
 import { prisma } from '@/lib/prisma'
 
@@ -403,55 +403,128 @@ export async function createStore(input: CreateStoreInput) {
       }
     }
 
+    const userId = session.user.id
+
     const store = serializeDecimal(
-      await prisma.store.create({
-        data: {
-          ...storeData,
-          ownerId: session.user.id,
-          status: initialStatus,
-          branches: {
+      await prisma.$transaction(async (tx) => {
+        const newStore = await tx.store.create({
+          data: {
+            ...storeData,
+            ownerId: userId,
+            status: initialStatus,
+            branches: {
+              create: {
+                name: 'สาขาออนไลน์ (ค่าเริ่มต้นระบบ)',
+                isMain: true,
+              },
+            },
+            subscription: {
+              create: {
+                plan: input.plan ?? Plan.STARTER,
+                status: SubStatus.ACTIVE,
+                startDate,
+                endDate,
+                pendingPlanCycle: cycle,
+              },
+            },
+            subscriptionInvoices: {
+              create: {
+                plan: input.plan ?? Plan.STARTER,
+                amount: new Prisma.Decimal(finalPrice),
+                status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
+                paidAt: isFreePlan ? new Date() : null,
+                periodStart: startDate,
+                periodEnd: endDate,
+                description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
+              },
+            },
+          },
+          select: {
+            ...storeSelect,
+            subscriptionInvoices: {
+              select: {
+                id: true,
+                amount: true,
+                description: true,
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+            branches: {
+              select: { id: true },
+              take: 1,
+            },
+          },
+        })
+
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          select: { name: true, email: true },
+        })
+
+        if (user) {
+          let employee = await tx.employee.findUnique({
+            where: { userId: userId },
+          })
+
+          if (!employee) {
+            employee = await tx.employee.create({
+              data: {
+                name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
+                email: user.email!,
+                userId: userId,
+              },
+            })
+          }
+
+          let adminRole = await tx.role.findFirst({
+            where: {
+              storeId: newStore.id,
+              name: PermissionRole.ADMIN,
+            },
+          })
+
+          if (!adminRole) {
+            adminRole = await tx.role.create({
+              data: {
+                storeId: newStore.id,
+                name: PermissionRole.ADMIN,
+                description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
+              },
+            })
+          }
+
+          const employeeStore = await tx.employeeStore.upsert({
+            where: {
+              storeId_employeeId: {
+                employeeId: employee.id,
+                storeId: newStore.id,
+              },
+            },
+            update: {
+              roleId: adminRole.id,
+            },
             create: {
-              name: 'สาขาออนไลน์ (ค่าเริ่มต้นระบบ)',
-              isMain: true,
+              employeeId: employee.id,
+              storeId: newStore.id,
+              roleId: adminRole.id,
             },
-          },
-          subscription: {
-            create: {
-              plan: input.plan ?? Plan.STARTER,
-              status: SubStatus.ACTIVE,
-              startDate,
-              endDate,
-              pendingPlanCycle: cycle,
-            },
-          },
-          subscriptionInvoices: {
-            create: {
-              plan: input.plan ?? Plan.STARTER,
-              amount: new Prisma.Decimal(finalPrice),
-              status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
-              paidAt: isFreePlan ? new Date() : null,
-              periodStart: startDate,
-              periodEnd: endDate,
-              description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
-            },
-          },
-        },
-        select: {
-          ...storeSelect,
-          subscriptionInvoices: {
-            select: {
-              id: true,
-              amount: true,
-              description: true,
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 1,
-          },
-        },
+          })
+
+          if (newStore.branches.length > 0) {
+            await tx.employeeBranch.createMany({
+              data: newStore.branches.map((branch) => ({
+                employeeStoreId: employeeStore.id,
+                branchId: branch.id,
+              })),
+              skipDuplicates: true,
+            })
+          }
+        }
+
+        return newStore
       }),
     )
-
-    await assignUserAsStoreAdmin(session.user.id, store.id)
 
     const invoice = store.subscriptionInvoices[0]
 
@@ -491,7 +564,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: id,
       permission: 'canManageStoreSettings',
@@ -555,7 +628,7 @@ export async function deleteStore(id: string) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: id,
       permission: 'canManageStoreSettings',
@@ -571,7 +644,7 @@ export async function deleteStore(id: string) {
     const store = await prisma.$transaction(async (tx) => {
       await tx.orderItem.deleteMany({ where: { order: { storeId: id } } })
       await tx.order.deleteMany({ where: { storeId: id } })
-      await tx.staffStore.deleteMany({ where: { storeId: id } })
+      await tx.employeeStore.deleteMany({ where: { storeId: id } })
       await tx.subscription.deleteMany({ where: { storeId: id } })
       await tx.subscriptionInvoice.deleteMany({ where: { storeId: id } })
       await tx.coupon.deleteMany({ where: { storeId: id } })
@@ -620,36 +693,51 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    let staffProfile = await prisma.staff.findUnique({
+    let employee = await prisma.employee.findUnique({
       where: { userId: userId },
     })
 
-    if (!staffProfile) {
-      staffProfile = await prisma.staff.create({
+    if (!employee) {
+      employee = await prisma.employee.create({
         data: {
           name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
           email: user.email!,
-          user: {
-            connect: { id: userId },
-          },
+          userId: userId,
         },
       })
     }
 
-    const staffStore = await prisma.staffStore.upsert({
+    let adminRole = await prisma.role.findFirst({
       where: {
-        staffId_storeId: {
-          staffId: staffProfile.id,
+        storeId: storeId,
+        name: PermissionRole.ADMIN,
+      },
+    })
+
+    if (!adminRole) {
+      adminRole = await prisma.role.create({
+        data: {
+          storeId: storeId,
+          name: PermissionRole.ADMIN,
+          description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
+        },
+      })
+    }
+
+    const employeeStore = await prisma.employeeStore.upsert({
+      where: {
+        storeId_employeeId: {
+          employeeId: employee.id,
           storeId: storeId,
         },
       },
       update: {
-        role: StaffRole.ADMIN,
+        roleId: adminRole.id,
       },
       create: {
-        staffId: staffProfile.id,
+        employeeId: employee.id,
         storeId: storeId,
-        role: StaffRole.ADMIN,
+        roleId: adminRole.id,
       },
     })
 
@@ -659,16 +747,16 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
     })
 
     if (storeBranches.length > 0) {
-      await prisma.staffBranch.createMany({
+      await prisma.employeeBranch.createMany({
         data: storeBranches.map((branch) => ({
-          staffStoreId: staffStore.id,
+          employeeStoreId: employeeStore.id,
           branchId: branch.id,
         })),
         skipDuplicates: true,
       })
     }
 
-    return { success: true, staffStore }
+    return { success: true, employeeStore }
   } catch (error) {
     console.error(error)
     return { success: false }

@@ -4,11 +4,14 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useBranchOptions } from '@/actions/hooks/branch'
-import { useCreateStaff, useStaff, useUpdateStaff } from '@/actions/hooks/staff'
-import { STAFF_ROLE_TH } from '@/constants/translate'
-import { StaffRole } from '@/generated/prisma/enums'
+import {
+  useCreateEmployee,
+  useEmployee,
+  useUpdateEmployee,
+} from '@/actions/hooks/employee'
+import { useRoleOptions } from '@/actions/hooks/role'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { CreateStaffFormValues, createStaffSchema } from '@/zod/staff'
+import { CreateEmployeeFormValues, createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
@@ -33,30 +36,31 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
-const DEFAULT_VALUES: CreateStaffFormValues = {
+const DEFAULT_VALUES: CreateEmployeeFormValues = {
   name: '',
   email: '',
-  role: StaffRole.CASHIER,
+  roleId: '',
   branchIds: [],
 }
 
-export function StaffDialog({
-  staffId,
+export function EmployeeDialog({
+  employeeId,
   open,
   setOpen,
   onAdd,
 }: {
-  staffId?: string
+  employeeId?: string
   open: boolean
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
   const { selectedStoreId } = useStoreFilter()
-  const createStaffMutation = useCreateStaff()
-  const updateStaffMutation = useUpdateStaff()
+  const createEmployeeMutation = useCreateEmployee()
+  const updateEmployeeMutation = useUpdateEmployee()
   const { data: branches = [] } = useBranchOptions(selectedStoreId)
+  const { data: roles = [] } = useRoleOptions(selectedStoreId)
 
-  const { data: staffData } = useStaff(staffId!)
+  const { data: employeeData } = useEmployee(employeeId!)
 
   const {
     register,
@@ -65,23 +69,23 @@ export function StaffDialog({
     setValue,
     watch,
     formState: { errors, isDirty },
-  } = useForm<CreateStaffFormValues>({
-    resolver: zodResolver(createStaffSchema),
+  } = useForm<CreateEmployeeFormValues>({
+    resolver: zodResolver(createEmployeeSchema),
     defaultValues: DEFAULT_VALUES,
   })
 
   useEffect(() => {
-    if (staffData) {
+    if (employeeData) {
       reset({
-        name: staffData.staff.name ?? '',
-        email: staffData.staff.email ?? '',
-        role: staffData.role,
-        branchIds: staffData.branches.map((b) => b.branch.id) ?? [],
+        name: employeeData.employee?.name ?? '',
+        email: employeeData.employee?.email ?? '',
+        roleId: employeeData.role?.id ?? '',
+        branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
       })
     } else {
       reset(DEFAULT_VALUES)
     }
-  }, [staffData, reset])
+  }, [employeeData, reset])
 
   const handleClose = () => {
     reset()
@@ -89,26 +93,26 @@ export function StaffDialog({
   }
 
   const handleReset = () => {
-    if (staffData) {
+    if (employeeData) {
       reset({
-        name: staffData.staff.name ?? '',
-        email: staffData.staff.email ?? '',
-        role: staffData.role,
-        branchIds: staffData.branches.map((b) => b.branch.id) ?? [],
+        name: employeeData.employee?.name ?? '',
+        email: employeeData.employee?.email ?? '',
+        roleId: employeeData.role?.id ?? '',
+        branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
       })
     } else {
       reset(DEFAULT_VALUES)
     }
   }
 
-  const onSubmit = (values: CreateStaffFormValues) => {
-    if (staffId) {
-      updateStaffMutation.mutate(
+  const onSubmit = (values: CreateEmployeeFormValues) => {
+    if (employeeId) {
+      updateEmployeeMutation.mutate(
         {
-          id: staffId,
+          id: employeeId,
           input: {
             name: values.name,
-            role: values.role,
+            roleId: values.roleId,
             branchIds: values.branchIds ?? [],
             storeId: selectedStoreId,
           },
@@ -118,9 +122,11 @@ export function StaffDialog({
         },
       )
     } else {
-      createStaffMutation.mutate(
+      createEmployeeMutation.mutate(
         {
-          ...values,
+          name: values.name,
+          email: values.email,
+          roleId: values.roleId,
           storeId: selectedStoreId as string,
           branchIds: values.branchIds ?? [],
         },
@@ -133,7 +139,7 @@ export function StaffDialog({
 
   const selectedBranchIds = watch('branchIds') ?? []
   const isPending =
-    createStaffMutation.isPending || updateStaffMutation.isPending
+    createEmployeeMutation.isPending || updateEmployeeMutation.isPending
 
   return (
     <Dialog
@@ -152,7 +158,7 @@ export function StaffDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {staffId ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานใหม่'}
+            {employeeId ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานใหม่'}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4">
@@ -171,33 +177,33 @@ export function StaffDialog({
             <FieldLabel>อีเมล</FieldLabel>
             <Input
               type="email"
-              placeholder="เช่น staff@example.com"
+              placeholder="เช่น employee@example.com"
               {...register('email')}
-              disabled={isPending || !!staffId}
+              disabled={isPending || !!employeeId}
             />
             <FieldError>{errors?.email?.message}</FieldError>
           </Field>
           <Field>
             <FieldLabel>บทบาท</FieldLabel>
             <Select
-              value={watch('role')}
+              value={watch('roleId')}
               disabled={isPending}
               onValueChange={(v) =>
-                setValue('role', v as StaffRole, { shouldValidate: true })
+                setValue('roleId', v, { shouldValidate: true })
               }
             >
               <SelectTrigger>
                 <SelectValue placeholder="เลือกบทบาท" />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(StaffRole).map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {STAFF_ROLE_TH[role]}
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.id}>
+                    {role.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <FieldError>{errors?.role?.message}</FieldError>
+            <FieldError>{errors?.roleId?.message}</FieldError>
           </Field>
           <Field>
             <FieldLabel>สาขาที่ดูแล</FieldLabel>
@@ -241,7 +247,7 @@ export function StaffDialog({
                 <>
                   <Spinner /> กำลังบันทึก...
                 </>
-              ) : staffId ? (
+              ) : employeeId ? (
                 'บันทึกการแก้ไข'
               ) : (
                 'เพิ่มพนักงาน'

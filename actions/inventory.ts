@@ -6,7 +6,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetInventoryParams {
@@ -108,7 +108,7 @@ export async function getInventory({
     const whereClause: Prisma.ProductStockWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageStock',
@@ -201,7 +201,7 @@ export async function updateStock(id: string, input: UpdateStockInput) {
       return { success: false, message: 'ไม่พบข้อมูลสต็อก' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: stockItem.branch.storeId,
       permission: 'canManageStock',
@@ -265,7 +265,7 @@ export async function upsertStock(input: UpsertStockInput) {
       return { success: false, message: 'ไม่พบข้อมูลสาขา' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: branch.storeId,
       permission: 'canManageStock',

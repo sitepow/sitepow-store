@@ -6,7 +6,7 @@ import { TaxSettingFormValues } from '@/zod/tax'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 export async function getTaxSetting(storeId: string) {
@@ -18,7 +18,7 @@ export async function getTaxSetting(storeId: string) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -51,7 +51,7 @@ export async function updateTaxSetting(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',

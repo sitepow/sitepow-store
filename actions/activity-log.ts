@@ -4,7 +4,7 @@ import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const activityLogSelect = {
@@ -17,7 +17,7 @@ const activityLogSelect = {
   details: true,
   createdAt: true,
   storeId: true,
-  staff: {
+  employee: {
     select: {
       name: true,
     },
@@ -83,7 +83,7 @@ export async function getActivityLogs({
     const whereClause: Prisma.ActivityLogWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageStoreSettings',
@@ -121,7 +121,7 @@ export async function getActivityLogs({
       whereClause.OR = [
         { entityId: { contains: search, mode: 'insensitive' } },
         { entity: { contains: search, mode: 'insensitive' } },
-        { staff: { name: { contains: search, mode: 'insensitive' } } },
+        { employee: { name: { contains: search, mode: 'insensitive' } } },
         { user: { name: { contains: search, mode: 'insensitive' } } },
       ]
     }

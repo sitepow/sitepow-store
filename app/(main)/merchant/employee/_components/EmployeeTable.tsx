@@ -3,12 +3,11 @@
 import { useState } from 'react'
 
 import {
-  useDeleteStaff,
-  useStaffPermission,
-  useStaffs,
-} from '@/actions/hooks/staff'
+  useDeleteEmployee,
+  useEmployeePermission,
+  useEmployees,
+} from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { STAFF_ROLE_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
@@ -27,22 +26,24 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface StaffTableProps {
+interface EmployeeTableProps {
   onEdit: (id: string) => void
 }
 
-export function StaffTable({ onEdit }: StaffTableProps) {
+export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageStoreSettings } = useStaffPermission()
-  const deleteStaffMutation = useDeleteStaff()
+  const { canManageStoreSettings } = useEmployeePermission()
+  const deleteEmployeeMutation = useDeleteEmployee()
 
-  const { data: { data: staffs = [], meta } = {}, isLoading } = useStaffs({
-    storeId: selectedStoreId,
-    page,
-    limit: 10,
-  })
+  const { data: { data: employees = [], meta } = {}, isLoading } = useEmployees(
+    {
+      storeId: selectedStoreId,
+      page,
+      limit: 10,
+    },
+  )
 
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
@@ -65,28 +66,30 @@ export function StaffTable({ onEdit }: StaffTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && staffs.length === 0 ? (
+            {isLoading && employees.length === 0 ? (
               <TableLoadingRow colSpan={canManageStoreSettings ? 6 : 5} />
-            ) : staffs.length === 0 ? (
+            ) : employees.length === 0 ? (
               <TableEmptyRow
                 colSpan={canManageStoreSettings ? 6 : 5}
                 title="ยังไม่มีพนักงานในร้านนี้"
               />
             ) : (
-              staffs.map((staff) => (
-                <TableRow key={staff.id}>
-                  <TableCell>{staff.id}</TableCell>
-                  <TableCell>{staff.staff.name}</TableCell>
-                  <TableCell>{staff.staff.email}</TableCell>
+              employees.map((employee) => (
+                <TableRow key={employee.id}>
+                  <TableCell>{employee.id}</TableCell>
+                  <TableCell>{employee.employee?.name}</TableCell>
+                  <TableCell>{employee.employee?.email}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{STAFF_ROLE_TH[staff.role]}</Badge>
+                    <Badge variant="outline">
+                      {employee.role?.name ?? 'ไม่ระบุบทบาท'}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {staff.branches.length === 0 ? (
+                      {employee.branches.length === 0 ? (
                         <Badge variant="outline">ทุกสาขา</Badge>
                       ) : (
-                        staff.branches.map(({ branch }) => (
+                        employee.branches.map(({ branch }) => (
                           <Badge key={branch.id} variant="outline">
                             {branch.name}
                           </Badge>
@@ -99,13 +102,15 @@ export function StaffTable({ onEdit }: StaffTableProps) {
                       <Button
                         variant="outline"
                         size="icon-lg"
-                        onClick={() => onEdit(staff.id)}
+                        onClick={() => onEdit(employee.id)}
                       >
                         <IconEdit />
                       </Button>
                       <DeleteButton
-                        isPending={deleteStaffMutation.isPending}
-                        onDelete={() => deleteStaffMutation.mutate(staff.id)}
+                        isPending={deleteEmployeeMutation.isPending}
+                        onDelete={() =>
+                          deleteEmployeeMutation.mutate(employee.id)
+                        }
                       />
                     </TableCell>
                   )}

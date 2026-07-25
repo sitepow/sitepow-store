@@ -11,7 +11,7 @@ import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const transactionSelect = {
@@ -57,7 +57,7 @@ export async function purchaseCredit({
     const isOwner = store.ownerId === currentUserId
 
     if (!isOwner) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId: currentUserId,
         storeId,
         permission: 'canViewFinance',
@@ -130,7 +130,7 @@ export async function getStoreCredit(storeId: string) {
     const isOwner = store.ownerId === currentUserId
 
     if (!isOwner) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId: currentUserId,
         storeId,
         permission: 'canViewFinance',

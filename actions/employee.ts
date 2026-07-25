@@ -1,56 +1,59 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import {
-  ActorType,
-  LogAction,
-  StaffRole,
-  UserRole,
-} from '@/generated/prisma/enums'
-import { ALL_STORES } from '@/stores/use-store-filter'
-import { PermissionKey, checkPermission } from '@/types/permission'
+import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
+import { PermissionKey } from '@/types/permission'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
-export interface CreateStaffInput {
+export interface CreateEmployeeInput {
   storeId: string
   name: string
   email: string
-  role: StaffRole
+  roleId: string
   branchIds: string[]
 }
 
-export interface UpdateStaffInput {
+export interface UpdateEmployeeInput {
   storeId: string
   name?: string
-  role?: StaffRole
+  roleId?: string
   branchIds: string[]
 }
 
-interface GetStaffsParams {
+interface GetEmployeesParams {
   storeId: string
   branchId?: string
   page?: number
   limit?: number
   search?: string
-  role?: StaffRole
+  roleId?: string
 }
 
-export interface CurrentStaffInfo {
-  id: string
-  name: string
-  email: string
-  role: StaffRole
-  permissions: Record<PermissionKey, boolean>
-}
-
-const staffStoreSelect = {
+const employeeStoreSelect = {
   id: true,
-  role: true,
-  staff: {
+  role: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      permissions: {
+        select: {
+          permission: {
+            select: {
+              id: true,
+              domain: true,
+              action: true,
+            },
+          },
+        },
+      },
+    },
+  },
+  employee: {
     select: {
       id: true,
       name: true,
@@ -68,14 +71,14 @@ const staffStoreSelect = {
     },
   },
   store: { select: { id: true } },
-} satisfies Prisma.StaffStoreSelect
+} satisfies Prisma.EmployeeStoreSelect
 
-export type GetStaffsItem = Prisma.StaffStoreGetPayload<{
-  select: typeof staffStoreSelect
+export type GetEmployeesItem = Prisma.EmployeeStoreGetPayload<{
+  select: typeof employeeStoreSelect
 }>
 
-export interface GetStaffsResponse {
-  data: GetStaffsItem[]
+export interface GetEmployeesResponse {
+  data: GetEmployeesItem[]
   meta: {
     currentPage: number
     limit: number
@@ -86,13 +89,13 @@ export interface GetStaffsResponse {
   }
 }
 
-export async function getStaffs({
+export async function getEmployees({
   storeId,
   page = 1,
   limit = 10,
   search,
-  role,
-}: GetStaffsParams): Promise<GetStaffsResponse> {
+  roleId,
+}: GetEmployeesParams): Promise<GetEmployeesResponse> {
   try {
     const session = await auth()
     const userId = session?.user?.id
@@ -111,7 +114,7 @@ export async function getStaffs({
       }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStaff',
@@ -135,10 +138,10 @@ export async function getStaffs({
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.StaffStoreWhereInput = { storeId }
+    const whereClause: Prisma.EmployeeStoreWhereInput = { storeId }
 
     if (search) {
-      whereClause.staff = {
+      whereClause.employee = {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
@@ -146,24 +149,24 @@ export async function getStaffs({
       }
     }
 
-    if (role) {
-      whereClause.role = role
+    if (roleId) {
+      whereClause.roleId = roleId
     }
 
-    const [totalItems, staffs] = await Promise.all([
-      prisma.staffStore.count({ where: whereClause }),
-      prisma.staffStore.findMany({
+    const [totalItems, employees] = await Promise.all([
+      prisma.employeeStore.count({ where: whereClause }),
+      prisma.employeeStore.findMany({
         where: whereClause,
         skip,
         take: sanitizedLimit,
-        select: staffStoreSelect,
+        select: employeeStoreSelect,
       }),
     ])
 
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: staffs,
+      data: employees,
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,
@@ -188,7 +191,7 @@ export async function getStaffs({
   }
 }
 
-export async function createStaff(input: CreateStaffInput) {
+export async function createEmployee(input: CreateEmployeeInput) {
   try {
     const session = await auth()
     const userId = session?.user?.id
@@ -197,7 +200,7 @@ export async function createStaff(input: CreateStaffInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
       permission: 'canManageStaff',
@@ -210,15 +213,18 @@ export async function createStaff(input: CreateStaffInput) {
       }
     }
 
-    let staff = await prisma.staff.findUnique({
+    let employee = await prisma.employee.findUnique({
       where: { email: input.email },
       select: { id: true },
     })
 
-    if (staff) {
-      const alreadyInStore = await prisma.staffStore.findUnique({
+    if (employee) {
+      const alreadyInStore = await prisma.employeeStore.findUnique({
         where: {
-          staffId_storeId: { staffId: staff.id, storeId: input.storeId },
+          storeId_employeeId: {
+            employeeId: employee.id,
+            storeId: input.storeId,
+          },
         },
         select: { id: true },
       })
@@ -236,7 +242,7 @@ export async function createStaff(input: CreateStaffInput) {
         select: { id: true },
       })
 
-      staff = await prisma.staff.create({
+      employee = await prisma.employee.create({
         data: {
           name: input.name,
           email: input.email,
@@ -246,28 +252,28 @@ export async function createStaff(input: CreateStaffInput) {
       })
     }
 
-    const staffStore = await prisma.staffStore.create({
+    const employeeStore = await prisma.employeeStore.create({
       data: {
-        role: input.role,
-        staffId: staff.id,
+        roleId: input.roleId,
+        employeeId: employee.id,
         storeId: input.storeId,
         branches: {
           create: input.branchIds.map((branchId) => ({ branchId })),
         },
       },
-      select: staffStoreSelect,
+      select: employeeStoreSelect,
     })
 
     await createLog({
       action: LogAction.MANAGE_STAFF,
       actorType: ActorType.MERCHANT,
       storeId: input.storeId,
-      entity: 'Staff',
-      entityId: staffStore.staff.id,
+      entity: 'Employee',
+      entityId: employeeStore.employee.id,
       details: {
         name: input.name,
         email: input.email,
-        role: input.role,
+        roleId: input.roleId,
         type: 'created',
       },
     })
@@ -275,7 +281,7 @@ export async function createStaff(input: CreateStaffInput) {
     return {
       success: true,
       message: 'บันทึกข้อมูลสำเร็จแล้ว',
-      data: staffStore,
+      data: employeeStore,
     }
   } catch (error) {
     console.error(error)
@@ -283,10 +289,10 @@ export async function createStaff(input: CreateStaffInput) {
   }
 }
 
-export async function updateStaff(id: string, input: UpdateStaffInput) {
+export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Staff ID' }
+      return { success: false, message: 'ไม่พบ Employee ID' }
     }
 
     const session = await auth()
@@ -296,7 +302,7 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
       permission: 'canManageStaff',
@@ -309,29 +315,39 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
       }
     }
 
-    const updated = await prisma.staffStore.update({
+    const updateData: Prisma.EmployeeStoreUpdateInput = {}
+
+    if (input.roleId) {
+      updateData.role = {
+        connect: { id: input.roleId },
+      }
+    }
+
+    if (input.branchIds) {
+      updateData.branches = {
+        deleteMany: {},
+        create: input.branchIds.map((branchId) => ({ branchId })),
+      }
+    }
+
+    if (input.name) {
+      updateData.employee = {
+        update: { name: input.name },
+      }
+    }
+
+    const updated = await prisma.employeeStore.update({
       where: { id },
-      data: {
-        role: input.role,
-        ...(input.branchIds && {
-          branches: {
-            deleteMany: {},
-            create: input.branchIds.map((branchId) => ({ branchId })),
-          },
-        }),
-        ...(input.name && {
-          staff: { update: { name: input.name } },
-        }),
-      },
-      select: staffStoreSelect,
+      data: updateData,
+      select: employeeStoreSelect,
     })
 
     await createLog({
       action: LogAction.MANAGE_STAFF,
       actorType: ActorType.MERCHANT,
-      storeId: updated.store?.id,
-      entity: 'Staff',
-      entityId: updated.staff.id,
+      storeId: updated.store.id,
+      entity: 'Employee',
+      entityId: updated.employee?.id,
       details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
@@ -342,18 +358,18 @@ export async function updateStaff(id: string, input: UpdateStaffInput) {
   }
 }
 
-export async function deleteStaff(id: string) {
+export async function deleteEmployee(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Staff ID' }
+      return { success: false, message: 'ไม่พบ Employee ID' }
     }
 
-    const staffStore = await prisma.staffStore.findUnique({
+    const employeeStore = await prisma.employeeStore.findUnique({
       where: { id },
-      select: { storeId: true, staffId: true },
+      select: { storeId: true, employeeId: true },
     })
 
-    if (!staffStore) {
+    if (!employeeStore) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
     }
 
@@ -364,9 +380,9 @@ export async function deleteStaff(id: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
-      storeId: staffStore.storeId,
+      storeId: employeeStore.storeId,
       permission: 'canManageStaff',
     })
 
@@ -377,14 +393,14 @@ export async function deleteStaff(id: string) {
       }
     }
 
-    await prisma.staffStore.delete({ where: { id } })
+    await prisma.employeeStore.delete({ where: { id } })
 
     await createLog({
       action: LogAction.MANAGE_STAFF,
       actorType: ActorType.MERCHANT,
-      storeId: staffStore.storeId,
-      entity: 'Staff',
-      entityId: staffStore.staffId,
+      storeId: employeeStore.storeId,
+      entity: 'Employee',
+      entityId: employeeStore.employeeId,
       details: { type: 'deleted' },
     })
 
@@ -395,7 +411,9 @@ export async function deleteStaff(id: string) {
   }
 }
 
-export async function getStaff(id: string): Promise<GetStaffsItem | null> {
+export async function getEmployee(
+  id: string,
+): Promise<GetEmployeesItem | null> {
   try {
     if (!id) {
       return null
@@ -408,18 +426,18 @@ export async function getStaff(id: string): Promise<GetStaffsItem | null> {
       return null
     }
 
-    const staffStore = await prisma.staffStore.findUnique({
+    const employeeStore = await prisma.employeeStore.findUnique({
       where: { id },
-      select: staffStoreSelect,
+      select: employeeStoreSelect,
     })
 
-    if (!staffStore) {
+    if (!employeeStore) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
-      storeId: staffStore.store.id,
+      storeId: employeeStore.store.id,
       permission: 'canManageStaff',
     })
 
@@ -427,99 +445,83 @@ export async function getStaff(id: string): Promise<GetStaffsItem | null> {
       return null
     }
 
-    return staffStore
+    return employeeStore
   } catch (error) {
     console.error(error)
     return null
   }
 }
 
-export interface CurrentStaffPermission {
-  id: string
-  name: string
-  email: string
-  role: StaffRole
-  branches: { branchId: string; branch: { id: string; name: string } }[]
-  permissions: Record<PermissionKey, boolean>
+export interface EmployeePermissionResult {
+  employeeStore: GetEmployeesItem | null
+  role: { id: string; name: string } | null
+  isOwner: boolean
+  permissions: PermissionKey[]
 }
 
-export async function getStaffPermission(
+export async function getEmployeePermission(
   storeId: string,
-  branchId?: string,
-): Promise<CurrentStaffPermission | null> {
+): Promise<EmployeePermissionResult | null> {
   try {
-    if (!storeId || storeId === ALL_STORES) {
-      return null
-    }
-
     const session = await auth()
     const userId = session?.user?.id
 
-    if (!userId) {
+    if (!userId || !storeId) {
       return null
     }
 
-    const currentStaffStore = await prisma.staffStore.findFirst({
-      where: {
-        storeId,
-        staff: {
-          userId,
-        },
-      },
-      include: {
-        staff: true,
-        branches: {
-          include: {
-            branch: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
     })
 
-    if (!currentStaffStore || !currentStaffStore.staff) {
+    const isOwner = store?.ownerId === userId
+
+    const employee = await prisma.employee.findUnique({
+      where: { userId },
+      select: { id: true },
+    })
+
+    if (!employee) {
+      if (isOwner) {
+        return {
+          employeeStore: null,
+          role: null,
+          isOwner: true,
+          permissions: [],
+        }
+      }
       return null
     }
 
-    if (branchId) {
-      const hasBranchAccess = currentStaffStore.branches.some(
-        (b) => b.branchId === branchId,
-      )
-      if (!hasBranchAccess) {
-        return null
-      }
+    const employeeStore = await prisma.employeeStore.findUnique({
+      where: {
+        storeId_employeeId: {
+          employeeId: employee.id,
+          storeId,
+        },
+      },
+      select: employeeStoreSelect,
+    })
+
+    if (!employeeStore && !isOwner) {
+      return null
     }
 
-    const staffProfile = currentStaffStore.staff
-    const role = currentStaffStore.role
-
-    const permissions: Record<PermissionKey, boolean> = {
-      canViewCreditCard: checkPermission(role, 'canViewCreditCard'),
-      canViewDashboard: checkPermission(role, 'canViewDashboard'),
-      canManageStaff: checkPermission(role, 'canManageStaff'),
-      canManageProducts: checkPermission(role, 'canManageProducts'),
-      canManageInventory: checkPermission(role, 'canManageInventory'),
-      canManageStock: checkPermission(role, 'canManageStock'),
-      canCreateOrder: true,
-      canManageOrders: checkPermission(role, 'canManageOrders'),
-      canCancelOrder: checkPermission(role, 'canCancelOrder'),
-      canManageCoupons: checkPermission(role, 'canManageCoupons'),
-      canManageCustomers: checkPermission(role, 'canManageCustomers'),
-      canManageStoreSettings: checkPermission(role, 'canManageStoreSettings'),
-      canViewFinance: checkPermission(role, 'canViewFinance'),
-      canViewActivityLogs: checkPermission(role, 'canViewActivityLogs'),
-    }
+    const permissions: PermissionKey[] =
+      employeeStore?.role?.permissions
+        ?.map(
+          (p) =>
+            `${p.permission.domain}_${p.permission.action}` as PermissionKey,
+        )
+        .filter(Boolean) || []
 
     return {
-      id: staffProfile.id,
-      name: staffProfile.name,
-      email: staffProfile.email,
-      role,
-      branches: currentStaffStore.branches,
+      employeeStore,
+      role: employeeStore?.role
+        ? { id: employeeStore.role.id, name: employeeStore.role.name }
+        : null,
+      isOwner,
       permissions,
     }
   } catch (error) {

@@ -8,7 +8,6 @@ import {
   PaymentMethod,
   Plan,
   ProductType,
-  StaffRole,
   StockAdjustmentReason,
   SubStatus,
   TransactionType,
@@ -55,12 +54,6 @@ export const ACTOR_TYPE_TH: Record<ActorType, string> = {
   [ActorType.SYSTEM]: 'ระบบอัตโนมัติ',
   [ActorType.SUPER_ADMIN]: 'ผู้ดูแลระบบแพลตฟอร์ม',
   [ActorType.MERCHANT]: 'ร้านค้า/พนักงาน',
-}
-
-export const STAFF_ROLE_TH: Record<StaffRole, string> = {
-  [StaffRole.ADMIN]: 'ผู้ดูแลระบบร้าน',
-  [StaffRole.MANAGER]: 'ผู้จัดการ',
-  [StaffRole.CASHIER]: 'พนักงานขายหน้าร้าน',
 }
 
 export const ADDRESS_TYPE_TH: Record<AddressType, string> = {
@@ -148,7 +141,6 @@ export const getLabel = {
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
   discountType: (v: DiscountType) => DISCOUNT_TYPE_TH[v] || v,
   actorType: (v: ActorType) => ACTOR_TYPE_TH[v] || v,
-  staffRole: (v: StaffRole) => STAFF_ROLE_TH[v] || v,
   addressType: (v: AddressType) => ADDRESS_TYPE_TH[v] || v,
   plan: (v: Plan) => PLAN_TH[v] || v,
   logAction: (v: LogAction) => LOG_ACTION_TH[v] || v,

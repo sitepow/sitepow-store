@@ -4,7 +4,7 @@ import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetStockTransfersParams {
@@ -99,7 +99,7 @@ export async function getStockTransfers({
       }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageInventory',
@@ -198,7 +198,7 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageInventory',

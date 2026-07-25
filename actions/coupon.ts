@@ -11,7 +11,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetCouponsParams {
@@ -104,7 +104,7 @@ export async function getCoupons({
     const whereClause: Prisma.CouponWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageCoupons',
@@ -180,7 +180,7 @@ export async function createCoupon(input: CreateCouponInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
       permission: 'canManageCoupons',
@@ -257,7 +257,7 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingCoupon.storeId,
       permission: 'canManageCoupons',
@@ -322,7 +322,7 @@ export async function deleteCoupon(id: string) {
       return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: coupon.storeId,
       permission: 'canManageCoupons',

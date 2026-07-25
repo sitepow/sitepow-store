@@ -6,7 +6,7 @@ import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
@@ -84,7 +84,7 @@ export async function getCategory(id: string) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: category.storeId,
       permission: 'canManageProducts',
@@ -131,7 +131,7 @@ export async function getCategories({
     const whereClause: Prisma.CategoryWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageProducts',
@@ -212,7 +212,7 @@ export async function getCategoryOptions(filters?: {
       filters.storeId !== ALL_STORES &&
       filters.storeId !== ''
     ) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId: filters.storeId,
         permission: 'canManageProducts',
@@ -261,7 +261,7 @@ export async function createCategory(input: CreateCategoryInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
       permission: 'canManageProducts',
@@ -322,7 +322,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: targetCategory.storeId,
       permission: 'canManageProducts',
@@ -395,7 +395,7 @@ export async function deleteCategory(id: string) {
       return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: category.storeId,
       permission: 'canManageProducts',

@@ -18,7 +18,7 @@ import { differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { createCheckoutSession } from './stripe/checkout'
@@ -130,7 +130,7 @@ export async function getStoreSubscription(
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canViewFinance',
@@ -168,7 +168,7 @@ export async function changePlan(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -369,7 +369,7 @@ export async function getSubscriptionInvoices({
     }
 
     if (storeId) {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canViewFinance',
@@ -451,7 +451,7 @@ export async function initiatePlanUpgrade(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -549,7 +549,7 @@ export async function calculateUpgradeCost(
       return { amountToPay: 0 }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canViewFinance',
@@ -610,7 +610,7 @@ export async function cancelPendingPlanChange(storeId: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',

@@ -14,7 +14,7 @@ import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
@@ -136,7 +136,7 @@ export async function getProducts({
 
   try {
     if (storeId && storeId !== 'all' && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageProducts',
@@ -241,7 +241,7 @@ export async function createProduct(input: CreateProductInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
       permission: 'canManageProducts',
@@ -407,7 +407,7 @@ export async function deleteProduct(id: string) {
       return { success: false, message: 'ไม่พบสินค้า' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: product.storeId,
       permission: 'canManageProducts',
@@ -489,7 +489,7 @@ export async function getProductById(id: string) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: product.storeId,
       permission: 'canManageProducts',
@@ -524,7 +524,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       return { success: false, message: 'ไม่พบสินค้า' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingProduct.storeId,
       permission: 'canManageProducts',
@@ -637,7 +637,7 @@ export async function getProductOptions(storeId: string) {
   }
 
   try {
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageProducts',
@@ -677,7 +677,7 @@ export async function getProductQuota(storeId: string) {
   }
 
   try {
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageProducts',

@@ -1,52 +1,36 @@
 'use server'
 
 import { THAI_MONTHS } from '@/constants/system'
-import { OrderStatus, StaffRole } from '@/generated/prisma/enums'
+import { OrderStatus, PermissionRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
-export interface GetDashboardStatsResult {
-  totalRevenue: number
-  totalRevenueLastMonth: number
-  totalOrders: number
-  totalOrdersLastMonth: number
-  dailySales: number
-  dailySalesYesterday: number
-  newCustomers: number
-  newCustomersLastMonth: number
-}
-
-export interface SalesTrendItem {
-  name: string
-  total: number
-}
-
-export interface RecentSaleItem {
-  id: string
-  name: string
-  email: string
-  amount: number
-}
-
-export interface LowStockItem {
-  id: string
-  productName: string
-  variantId: string
-  variantTitle: string | null
-  branchName: string
-  stock: number
-  minStock: number
-}
-
 export interface GetDashboardResult {
-  stats: GetDashboardStatsResult
-  salesTrend: SalesTrendItem[]
-  recentSales: RecentSaleItem[]
-  lowStock: LowStockItem[]
+  stats: {
+    totalRevenue: number
+    totalRevenueLastMonth: number
+    totalOrders: number
+    totalOrdersLastMonth: number
+    dailySales: number
+    dailySalesYesterday: number
+    newCustomers: number
+    newCustomersLastMonth: number
+  }
+  salesTrend: { name: string; total: number }[]
+  recentSales: { id: string; name: string; email: string; amount: number }[]
+  lowStock: {
+    id: string
+    productName: string
+    variantId: string
+    variantTitle: string | null
+    branchName: string
+    stock: number
+    minStock: number
+  }[]
 }
 
 const emptyDashboardResult: GetDashboardResult = {
@@ -72,60 +56,36 @@ export async function getDashboard(
   const session = await auth()
   const userId = session?.user?.id
 
-  if (!userId) {
+  if (!userId || !storeId || storeId === ALL_STORES) {
     return emptyDashboardResult
   }
 
   try {
-    let targetStoreIds: string[] = []
+    const validBranchId =
+      branchId && branchId !== ALL_BRANCHES ? branchId : undefined
 
-    if (storeId && storeId !== ALL_STORES) {
-      const authCheck = await verifyStaffPermission({
-        userId,
-        storeId,
-        branchId,
-        permission: 'canViewDashboard',
-      })
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId,
+      permission: 'canViewDashboard',
+      branchId: validBranchId,
+    })
 
-      if (!authCheck.isAuthorized) {
-        return emptyDashboardResult
-      }
-
-      targetStoreIds = [storeId]
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { StaffStore: { some: { staff: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      targetStoreIds = userStores.map((s) => s.id)
-    }
-
-    if (targetStoreIds.length === 0) {
+    if (!authCheck.isAuthorized) {
       return emptyDashboardResult
     }
 
-    const staffStoreRecord = await prisma.staffStore.findFirst({
-      where: {
-        staff: { userId },
-        storeId:
-          storeId && storeId !== ALL_STORES ? storeId : { in: targetStoreIds },
-        role: StaffRole.CASHIER,
-      },
-      select: { staffId: true },
-    })
+    const employeeStore = authCheck.employeeStore
+    const isCashier = employeeStore?.role?.name === PermissionRole.CASHIER
+    const cashierOrderFilter = isCashier ? { staffId: employeeStore?.id } : {}
 
-    const cashierOrderFilter = staffStoreRecord
-      ? { staffId: staffStoreRecord.staffId }
+    const storeFilter = { storeId }
+    const orderBranchFilter = validBranchId
+      ? { items: { some: { branchId: validBranchId } } }
       : {}
+    const stockBranchFilter = validBranchId ? { branchId: validBranchId } : {}
 
     const now = new Date()
-
     const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
     const endOfLastMonth = new Date(
@@ -136,7 +96,6 @@ export async function getDashboard(
       59,
       59,
     )
-
     const startOfToday = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -155,20 +114,7 @@ export async function getDashboard(
       59,
       59,
     )
-
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
-
-    const storeFilter = { storeId: { in: targetStoreIds } }
-
-    const orderBranchFilter =
-      branchId && branchId !== ALL_STORES && branchId !== ALL_BRANCHES
-        ? { items: { some: { branchId } } }
-        : {}
-
-    const stockBranchFilter =
-      branchId && branchId !== ALL_STORES && branchId !== ALL_BRANCHES
-        ? { branchId }
-        : {}
 
     const [
       revenueThisMonth,
@@ -276,13 +222,13 @@ export async function getDashboard(
           id: true,
           totalAmount: true,
           customer: {
-            select: { firstName: true, lastName: true, email: true },
+            select: { name: true, email: true },
           },
         },
       }),
       prisma.productStock.findMany({
         where: {
-          variant: { product: { storeId: { in: targetStoreIds } } },
+          variant: { product: { storeId } },
           quantity: { lte: prisma.productStock.fields.minStock },
           ...stockBranchFilter,
         },
@@ -313,33 +259,10 @@ export async function getDashboard(
         trendMap[key] += Number(order.totalAmount)
       }
     }
-    const salesTrend: SalesTrendItem[] = Object.entries(trendMap).map(
-      ([key, total]) => {
-        const [year, month] = key.split('-').map(Number)
-        return { name: THAI_MONTHS[month], total: Math.round(total) }
-      },
-    )
-
-    const recentSales: RecentSaleItem[] = recentOrdersRaw.map((o) => ({
-      id: o.id,
-      name: o.customer
-        ? [o.customer.firstName, o.customer.lastName]
-            .filter(Boolean)
-            .join(' ') || 'ลูกค้า'
-        : 'ลูกค้า',
-      email: o.customer?.email ?? '-',
-      amount: Number(o.totalAmount),
-    }))
-
-    const lowStockList: LowStockItem[] = lowStockRaw.map((stock) => ({
-      id: `${stock.variant.product.id}-${stock.variant.title ?? 'default'}-${stock.branch.name}`,
-      productName: stock.variant.product.title,
-      variantId: stock.variant.id,
-      variantTitle: stock.variant.title,
-      branchName: stock.branch.name,
-      stock: stock.quantity,
-      minStock: stock.minStock,
-    }))
+    const salesTrend = Object.entries(trendMap).map(([key, total]) => {
+      const [, month] = key.split('-').map(Number)
+      return { name: THAI_MONTHS[month], total: Math.round(total) }
+    })
 
     return {
       stats: {
@@ -353,8 +276,21 @@ export async function getDashboard(
         newCustomersLastMonth: customersLastMonth,
       },
       salesTrend,
-      recentSales,
-      lowStock: lowStockList,
+      recentSales: recentOrdersRaw.map((o) => ({
+        id: o.id,
+        name: o.customer?.name || 'ลูกค้า',
+        email: o.customer?.email ?? '-',
+        amount: Number(o.totalAmount),
+      })),
+      lowStock: lowStockRaw.map((stock) => ({
+        id: `${stock.variant.product.id}-${stock.variant.title ?? 'default'}-${stock.branch.name}`,
+        productName: stock.variant.product.title,
+        variantId: stock.variant.id,
+        variantTitle: stock.variant.title,
+        branchName: stock.branch.name,
+        stock: stock.quantity,
+        minStock: stock.minStock,
+      })),
     }
   } catch (error) {
     console.error(error)

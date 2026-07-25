@@ -12,7 +12,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 interface GetOrdersParams {
@@ -126,7 +126,7 @@ export async function getOrders({
     const whereClause: Prisma.OrderWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyStaffPermission({
+      const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canManageOrders',
@@ -232,7 +232,7 @@ export async function updateOrderStatus(
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
       permission: 'canManageOrders',
@@ -308,7 +308,7 @@ export async function cancelOrder(id: string) {
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
       permission: 'canManageOrders',

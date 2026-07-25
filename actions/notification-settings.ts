@@ -5,7 +5,7 @@ import { NotificationSettingsFormValues } from '@/zod/notification-settings'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const notificationSettingsSelect = {
@@ -33,7 +33,7 @@ export async function getNotificationSettings(
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -68,7 +68,7 @@ export async function updateNotificationSettings(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',

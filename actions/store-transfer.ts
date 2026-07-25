@@ -6,7 +6,7 @@ import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const transferRequestSelect = {
@@ -32,7 +32,7 @@ export async function getTransferRequests(
       return []
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -72,7 +72,7 @@ export async function createTransferRequest(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -170,7 +170,7 @@ export async function cancelTransferRequest(
       return { success: false, message: 'ไม่พบคำขอโอนนี้' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: request.storeId,
       permission: 'canManageStoreSettings',

@@ -5,7 +5,7 @@ import { BankAccountFormValues, PaymentSettingFormValues } from '@/zod/payment'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyStaffPermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
 
 const paymentSettingSelect = {
@@ -47,7 +47,7 @@ export async function getPaymentSetting(
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -78,7 +78,7 @@ export async function upsertPaymentSetting(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -130,7 +130,7 @@ export async function createBankAccount(
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
       permission: 'canManageStoreSettings',
@@ -216,7 +216,7 @@ export async function updateBankAccount(
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
       permission: 'canManageStoreSettings',
@@ -288,7 +288,7 @@ export async function deleteBankAccount(id: string) {
       return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
       permission: 'canManageStoreSettings',
@@ -351,7 +351,7 @@ export async function getBankAccount(id: string) {
       return null
     }
 
-    const authCheck = await verifyStaffPermission({
+    const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
       permission: 'canManageStoreSettings',

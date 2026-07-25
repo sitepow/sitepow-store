@@ -2,14 +2,10 @@
 
 import { useState } from 'react'
 
-import {
-  useBranches,
-  useDeleteBranch,
-  useSetMainBranch,
-} from '@/actions/hooks/branch'
+import { useBranches, useDeleteBranch } from '@/actions/hooks/branch'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconEdit, IconStar } from '@tabler/icons-react'
+import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -40,7 +36,6 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
   })
 
   const deleteBranchMutation = useDeleteBranch()
-  const setMainBranchMutation = useSetMainBranch()
 
   return (
     <>
@@ -72,21 +67,6 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
-                    {!branch.isMain && (
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        disabled={setMainBranchMutation.isPending}
-                        onClick={() =>
-                          setMainBranchMutation.mutate({
-                            id: branch.id,
-                            storeId: selectedStoreId,
-                          })
-                        }
-                      >
-                        <IconStar />
-                      </Button>
-                    )}
                     <Button
                       variant="outline"
                       size="icon-lg"
