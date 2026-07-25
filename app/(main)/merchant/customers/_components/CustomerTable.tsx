@@ -2,13 +2,21 @@
 
 import { useState } from 'react'
 
-import { useCustomers } from '@/actions/hooks/customer'
+import {
+  useBlockCustomer,
+  useCustomers,
+  useUnblockCustomer,
+} from '@/actions/hooks/customer'
+import { useStaffPermission } from '@/actions/hooks/staff'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { CUSTOMER_TYPE_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDateTime, getBlockMessage } from '@/utils/date'
 import { formatNumber } from '@/utils/pricing'
+import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +33,10 @@ export function CustomerTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { canManageCustomers } = useStaffPermission()
+  const unblockMutation = useUnblockCustomer()
+  const blockMutation = useBlockCustomer()
+
   const { data: { data: customers = [], meta } = {}, isLoading } = useCustomers(
     {
       storeId: selectedStoreId,
@@ -37,6 +49,8 @@ export function CustomerTable() {
     return <ActionRequiredAlert />
   }
 
+  const totalColumns = canManageCustomers ? 9 : 8
+
   return (
     <>
       <div className="rounded-md border">
@@ -48,14 +62,22 @@ export function CustomerTable() {
               <TableHead>อีเมล</TableHead>
               <TableHead>เบอร์โทร</TableHead>
               <TableHead>ประเภท</TableHead>
+              <TableHead>สถานะบล็อกสลิป</TableHead>
+              <TableHead>กำหนดปลดล็อก</TableHead>
               <TableHead className="text-right">แต้มสะสม</TableHead>
+              {canManageCustomers && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && customers.length === 0 ? (
-              <TableLoadingRow colSpan={5} />
+              <TableLoadingRow colSpan={totalColumns} />
             ) : customers.length === 0 ? (
-              <TableEmptyRow colSpan={5} title="ยังไม่มีข้อมูลลูกค้า" />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ยังไม่มีข้อมูลลูกค้า"
+              />
             ) : (
               customers.map((item) => (
                 <TableRow key={item.customer.id}>
@@ -72,9 +94,55 @@ export function CustomerTable() {
                       {CUSTOMER_TYPE_TH[item.customer.customerType]}
                     </Badge>
                   </TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    {item.customer.isBlocked ? (
+                      <span className="text-destructive">
+                        `โดนบล็อก ($
+                        {getBlockMessage(item.customer.blockedUntil)})`
+                      </span>
+                    ) : (
+                      '-'
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {item.customer.blockedUntil
+                      ? formatDateTime(new Date(item.customer.blockedUntil))
+                      : '-'}
+                  </TableCell>
                   <TableCell className="text-primary text-right font-semibold">
                     {formatNumber(item.rewardPoints)}
                   </TableCell>
+                  {canManageCustomers && (
+                    <TableCell className="text-right">
+                      {item.customer.isBlocked ? (
+                        <DeleteButton
+                          isPending={unblockMutation.isPending}
+                          icon={<IconLockOpen />}
+                          title="ยืนยันการปลดล็อกลูกค้า?"
+                          description="คุณต้องการปลดล็อกการอัปโหลดสลิปให้กับลูกค้ารายนี้ใช่หรือไม่?"
+                          onDelete={() =>
+                            unblockMutation.mutate({
+                              customerId: item.customer.id,
+                              storeId: selectedStoreId,
+                            })
+                          }
+                        />
+                      ) : (
+                        <DeleteButton
+                          isPending={blockMutation.isPending}
+                          icon={<IconLock />}
+                          title="ยืนยันการบล็อกลูกค้า?"
+                          description="คุณต้องการบล็อกการอัปโหลดสลิปของลูกค้ารายนี้ใช่หรือไม่?"
+                          onDelete={() =>
+                            blockMutation.mutate({
+                              customerId: item.customer.id,
+                              storeId: selectedStoreId,
+                            })
+                          }
+                        />
+                      )}
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

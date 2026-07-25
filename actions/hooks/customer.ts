@@ -1,6 +1,11 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
-import { getCustomers } from '../customer'
+import { blockCustomer, getCustomers, unblockCustomer } from '../customer'
 import { customerKeys } from '../query-keys/customer'
 
 interface UseCustomersParams {
@@ -26,4 +31,38 @@ export function useCustomers({
       placeholderData: (prev) => prev,
     }),
   )
+}
+
+export function useUnblockCustomer() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      customerId,
+      storeId,
+    }: {
+      customerId: string
+      storeId: string
+    }) => unblockCustomer(customerId, storeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: customerKeys.all })
+    },
+  })
+}
+
+export function useBlockCustomer() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      customerId,
+      storeId,
+    }: {
+      customerId: string
+      storeId: string
+    }) => blockCustomer(customerId, storeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: customerKeys.all })
+    },
+  })
 }

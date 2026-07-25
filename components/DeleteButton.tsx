@@ -21,12 +21,16 @@ interface DeleteButtonProps {
   isPending: boolean
   onDelete: () => void
   icon?: React.ReactNode
+  title?: string
+  description?: string
 }
 
 export function DeleteButton({
   isPending,
   onDelete,
   icon = <IconTrash />,
+  title = 'ยืนยันการลบข้อมูล?',
+  description = 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลของคุณจะถูกลบออกจากระบบอย่างถาวร',
 }: DeleteButtonProps) {
   return (
     <AlertDialog>
@@ -37,11 +41,8 @@ export function DeleteButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>ยืนยันการลบข้อมูล?</AlertDialogTitle>
-          <AlertDialogDescription>
-            การดำเนินการนี้ไม่สามารถย้อนกลับได้
-            ข้อมูลของคุณจะถูกลบออกจากระบบอย่างถาวร
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>ยกเลิก</AlertDialogCancel>

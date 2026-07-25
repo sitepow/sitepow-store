@@ -1,9 +1,10 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
+import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { verifyStaffPermission } from '@/lib/auth-guard'
 import { prisma } from '@/lib/prisma'
@@ -16,6 +17,7 @@ interface GetCustomersParams {
 }
 
 const customerStoreSelect = {
+  id: true,
   rewardPoints: true,
   totalSpent: true,
   customer: {
@@ -26,6 +28,9 @@ const customerStoreSelect = {
       email: true,
       phone: true,
       customerType: true,
+      isBlocked: true,
+      blockedUntil: true,
+      fakeSlipCount: true,
       createdAt: true,
     },
   },
@@ -144,5 +149,88 @@ export async function getCustomers({
   } catch (error) {
     console.error(error)
     return emptyResponse
+  }
+}
+
+export async function unblockCustomer(customerId: string, storeId: string) {
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+    if (!userId) {
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageCustomers',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+    }
+
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: customerId },
+      data: {
+        isBlocked: false,
+        fakeSlipCount: 0,
+        blockedUntil: null,
+      },
+    })
+
+    await createLog({
+      action: LogAction.UNBLOCK_CUSTOMER,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Customer',
+      entityId: updatedCustomer.id,
+    })
+
+    return { success: true, message: 'ปลดล็อกลูกค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export async function blockCustomer(customerId: string, storeId: string) {
+  try {
+    const session = await auth()
+    const userId = session?.user?.id
+    if (!userId) {
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId,
+      permission: 'canManageCustomers',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+    }
+
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: customerId },
+      data: {
+        isBlocked: true,
+        blockedUntil: null,
+      },
+    })
+
+    await createLog({
+      action: LogAction.BLOCK_CUSTOMER,
+      actorType: ActorType.MERCHANT,
+      storeId,
+      entity: 'Customer',
+      entityId: updatedCustomer.id,
+    })
+
+    return { success: true, message: 'บล็อกลูกค้าสำเร็จ' }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }
