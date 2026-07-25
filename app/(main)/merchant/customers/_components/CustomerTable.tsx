@@ -97,8 +97,8 @@ export function CustomerTable() {
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.customer.isBlocked ? (
                       <span className="text-destructive">
-                        `โดนบล็อก ($
-                        {getBlockMessage(item.customer.blockedUntil)})`
+                        โดนบล็อก ({getBlockMessage(item.customer.blockedUntil)}
+                        )`
                       </span>
                     ) : (
                       '-'
