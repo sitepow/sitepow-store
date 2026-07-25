@@ -1,7 +1,6 @@
 import {
   ActorType,
   AddressType,
-  CustomerType,
   DiscountType,
   InvoiceStatus,
   LogAction,
@@ -50,11 +49,6 @@ export const PAYMENT_METHOD_TH: Record<PaymentMethod, string> = {
 export const DISCOUNT_TYPE_TH: Record<DiscountType, string> = {
   [DiscountType.PERCENTAGE]: 'เปอร์เซ็นต์ (%)',
   [DiscountType.FIXED]: 'จำนวนเงินคงที่ (บาท)',
-}
-
-export const CUSTOMER_TYPE_TH: Record<CustomerType, string> = {
-  [CustomerType.INDIVIDUAL]: 'บุคคลธรรมดา',
-  [CustomerType.CORPORATION]: 'นิติบุคคล/บริษัท',
 }
 
 export const ACTOR_TYPE_TH: Record<ActorType, string> = {
@@ -153,7 +147,6 @@ export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
   discountType: (v: DiscountType) => DISCOUNT_TYPE_TH[v] || v,
-  customerType: (v: CustomerType) => CUSTOMER_TYPE_TH[v] || v,
   actorType: (v: ActorType) => ACTOR_TYPE_TH[v] || v,
   staffRole: (v: StaffRole) => STAFF_ROLE_TH[v] || v,
   addressType: (v: AddressType) => ADDRESS_TYPE_TH[v] || v,

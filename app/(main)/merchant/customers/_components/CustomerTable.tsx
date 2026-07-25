@@ -9,7 +9,6 @@ import {
 } from '@/actions/hooks/customer'
 import { useStaffPermission } from '@/actions/hooks/staff'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { CUSTOMER_TYPE_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
 import { formatNumber } from '@/utils/pricing'
@@ -19,7 +18,6 @@ import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -61,7 +59,6 @@ export function CustomerTable() {
               <TableHead>ชื่อลูกค้า</TableHead>
               <TableHead>อีเมล</TableHead>
               <TableHead>เบอร์โทร</TableHead>
-              <TableHead>ประเภท</TableHead>
               <TableHead>สถานะบล็อกสลิป</TableHead>
               <TableHead>กำหนดปลดล็อก</TableHead>
               <TableHead className="text-right">แต้มสะสม</TableHead>
@@ -89,11 +86,6 @@ export function CustomerTable() {
                   </TableCell>
                   <TableCell>{item.customer.email}</TableCell>
                   <TableCell>{item.customer.phone ?? '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {CUSTOMER_TYPE_TH[item.customer.customerType]}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.customer.isBlocked ? (
                       <span className="text-destructive">

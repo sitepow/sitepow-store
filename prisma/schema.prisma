@@ -100,11 +100,6 @@ model Coupon {
   @@index([code])
 }
 
-enum CustomerType {
-  INDIVIDUAL
-  CORPORATION
-}
-
 model Customer {
   id        String    @id @default(cuid())
   email     String    @unique
@@ -119,8 +114,6 @@ model Customer {
   blockedUntil  DateTime?
   userId        String?   @unique
   user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  customerType CustomerType @default(INDIVIDUAL)
 
   stores        CustomerStore[]
   reviews       Review[]
@@ -255,6 +248,7 @@ model Staff {
 
   stores       StaffStore[]
   activityLogs ActivityLog[]
+  orders       Order[]
 }
 
 model StaffBranch {
@@ -921,6 +915,9 @@ model Order {
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
 
+  staffId String?
+  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: SetNull)
+
   shippingAddrSnapshot Json?
   storeSnapshot        Json?
 
@@ -931,6 +928,7 @@ model Order {
   @@index([storeId])
   @@index([customerId])
   @@index([bankAccountId])
+  @@index([staffId])
 }
 
 model OrderItem {

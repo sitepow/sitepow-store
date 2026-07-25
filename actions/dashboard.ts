@@ -1,7 +1,8 @@
 'use server'
 
 import { THAI_MONTHS } from '@/constants/system'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus, StaffRole } from '@/generated/prisma/enums'
+import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { auth } from '@/lib/auth'
@@ -78,11 +79,12 @@ export async function getDashboard(
   try {
     let targetStoreIds: string[] = []
 
-    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+    if (storeId && storeId !== ALL_STORES) {
       const authCheck = await verifyStaffPermission({
         userId,
         storeId,
-        permission: 'canManageOrders',
+        branchId,
+        permission: 'canViewDashboard',
       })
 
       if (!authCheck.isAuthorized) {
@@ -107,6 +109,20 @@ export async function getDashboard(
     if (targetStoreIds.length === 0) {
       return emptyDashboardResult
     }
+
+    const staffStoreRecord = await prisma.staffStore.findFirst({
+      where: {
+        staff: { userId },
+        storeId:
+          storeId && storeId !== ALL_STORES ? storeId : { in: targetStoreIds },
+        role: StaffRole.CASHIER,
+      },
+      select: { staffId: true },
+    })
+
+    const cashierOrderFilter = staffStoreRecord
+      ? { staffId: staffStoreRecord.staffId }
+      : {}
 
     const now = new Date()
 
@@ -145,12 +161,14 @@ export async function getDashboard(
     const storeFilter = { storeId: { in: targetStoreIds } }
 
     const orderBranchFilter =
-      branchId && branchId !== ALL_STORES
+      branchId && branchId !== ALL_STORES && branchId !== ALL_BRANCHES
         ? { items: { some: { branchId } } }
         : {}
 
     const stockBranchFilter =
-      branchId && branchId !== ALL_STORES ? { branchId } : {}
+      branchId && branchId !== ALL_STORES && branchId !== ALL_BRANCHES
+        ? { branchId }
+        : {}
 
     const [
       revenueThisMonth,
@@ -168,6 +186,7 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfThisMonth },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -177,6 +196,7 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -186,6 +206,7 @@ export async function getDashboard(
       prisma.order.count({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfThisMonth },
           ...orderBranchFilter,
         },
@@ -193,6 +214,7 @@ export async function getDashboard(
       prisma.order.count({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
           ...orderBranchFilter,
         },
@@ -200,6 +222,7 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfToday },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -209,6 +232,7 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: startOfYesterday, lte: endOfYesterday },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -232,6 +256,7 @@ export async function getDashboard(
       prisma.order.findMany({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           createdAt: { gte: sixMonthsAgo },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -241,6 +266,7 @@ export async function getDashboard(
       prisma.order.findMany({
         where: {
           ...storeFilter,
+          ...cashierOrderFilter,
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },

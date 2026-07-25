@@ -11,6 +11,6 @@ export const staffKeys = {
     role?: StaffRole
   }) => [...staffKeys.lists(), filters] as const,
   detail: (id: string) => [...staffKeys.all, 'detail', id] as const,
-  currentStore: (storeId: string) =>
-    [...staffKeys.all, 'store', storeId] as const,
+  currentStore: (storeId: string, branchId: string) =>
+    [...staffKeys.all, 'store', storeId, branchId] as const,
 }

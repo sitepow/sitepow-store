@@ -8,7 +8,7 @@ export function useDashboard(storeId: string, branchId: string) {
     queryOptions({
       queryKey: dashboardKeys.detail(storeId, branchId),
       queryFn: async () => await getDashboard(storeId, branchId),
-      enabled: !!storeId,
+      enabled: !!storeId || !!branchId,
     }),
   )
 }

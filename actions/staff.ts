@@ -32,6 +32,7 @@ export interface UpdateStaffInput {
 
 interface GetStaffsParams {
   storeId: string
+  branchId?: string
   page?: number
   limit?: number
   search?: string
@@ -394,9 +395,58 @@ export async function deleteStaff(id: string) {
   }
 }
 
-export async function getCurrentStaffInfo(
+export async function getStaff(id: string): Promise<GetStaffsItem | null> {
+  try {
+    if (!id) {
+      return null
+    }
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return null
+    }
+
+    const staffStore = await prisma.staffStore.findUnique({
+      where: { id },
+      select: staffStoreSelect,
+    })
+
+    if (!staffStore) {
+      return null
+    }
+
+    const authCheck = await verifyStaffPermission({
+      userId,
+      storeId: staffStore.store.id,
+      permission: 'canManageStaff',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return null
+    }
+
+    return staffStore
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export interface CurrentStaffPermission {
+  id: string
+  name: string
+  email: string
+  role: StaffRole
+  branches: { branchId: string; branch: { id: string; name: string } }[]
+  permissions: Record<PermissionKey, boolean>
+}
+
+export async function getStaffPermission(
   storeId: string,
-): Promise<CurrentStaffInfo | null> {
+  branchId?: string,
+): Promise<CurrentStaffPermission | null> {
   try {
     if (!storeId || storeId === ALL_STORES) {
       return null
@@ -418,6 +468,16 @@ export async function getCurrentStaffInfo(
       },
       include: {
         staff: true,
+        branches: {
+          include: {
+            branch: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     })
 
@@ -425,10 +485,21 @@ export async function getCurrentStaffInfo(
       return null
     }
 
+    if (branchId) {
+      const hasBranchAccess = currentStaffStore.branches.some(
+        (b) => b.branchId === branchId,
+      )
+      if (!hasBranchAccess) {
+        return null
+      }
+    }
+
     const staffProfile = currentStaffStore.staff
     const role = currentStaffStore.role
 
     const permissions: Record<PermissionKey, boolean> = {
+      canViewCreditCard: checkPermission(role, 'canViewCreditCard'),
+      canViewDashboard: checkPermission(role, 'canViewDashboard'),
       canManageStaff: checkPermission(role, 'canManageStaff'),
       canManageProducts: checkPermission(role, 'canManageProducts'),
       canManageInventory: checkPermission(role, 'canManageInventory'),
@@ -448,6 +519,7 @@ export async function getCurrentStaffInfo(
       name: staffProfile.name,
       email: staffProfile.email,
       role,
+      branches: currentStaffStore.branches,
       permissions,
     }
   } catch (error) {

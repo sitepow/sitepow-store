@@ -10,12 +10,14 @@ import {
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { STAFF_ROLE_TH } from '@/constants/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { IconEdit } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -25,7 +27,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function StaffTable() {
+interface StaffTableProps {
+  onEdit: (id: string) => void
+}
+
+export function StaffTable({ onEdit }: StaffTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -90,6 +96,13 @@ export function StaffTable() {
                   </TableCell>
                   {canManageStoreSettings && (
                     <TableCell className="space-x-2 text-right">
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        onClick={() => onEdit(staff.id)}
+                      >
+                        <IconEdit />
+                      </Button>
                       <DeleteButton
                         isPending={deleteStaffMutation.isPending}
                         onDelete={() => deleteStaffMutation.mutate(staff.id)}

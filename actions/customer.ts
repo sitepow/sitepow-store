@@ -27,7 +27,6 @@ const customerStoreSelect = {
       lastName: true,
       email: true,
       phone: true,
-      customerType: true,
       isBlocked: true,
       blockedUntil: true,
       fakeSlipCount: true,

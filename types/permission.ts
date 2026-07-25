@@ -1,6 +1,8 @@
 import { StaffRole } from '@/generated/prisma/enums'
 
 export type PermissionKey =
+  | 'canViewCreditCard'
+  | 'canViewDashboard'
   | 'canManageStaff'
   | 'canManageProducts'
   | 'canManageInventory'
@@ -23,6 +25,8 @@ export function checkPermission(
   const isCashier = role === StaffRole.CASHIER
 
   const permissionsMap: Record<PermissionKey, boolean> = {
+    canViewCreditCard: isAdmin || isManager,
+    canViewDashboard: isAdmin || isManager || isCashier,
     canManageStaff: isAdmin,
     canManageProducts: isAdmin || isManager,
     canManageInventory: isAdmin || isManager,

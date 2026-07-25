@@ -1,4 +1,5 @@
 import { StaffRole } from '@/generated/prisma/enums'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   queryOptions,
@@ -13,7 +14,8 @@ import {
   UpdateStaffInput,
   createStaff,
   deleteStaff,
-  getCurrentStaffInfo,
+  getStaff,
+  getStaffPermission,
   getStaffs,
   updateStaff,
 } from '../staff'
@@ -86,6 +88,7 @@ export function useDeleteStaff() {
 
 export function useStaffPermission() {
   const { selectedStoreId } = useStoreFilter()
+  const { selectedBranchId } = useBranchFilter()
 
   const {
     data: staffInfo,
@@ -93,9 +96,12 @@ export function useStaffPermission() {
     error,
   } = useQuery(
     queryOptions({
-      queryKey: staffKeys.currentStore(selectedStoreId),
-      queryFn: () => getCurrentStaffInfo(selectedStoreId),
-      enabled: !!selectedStoreId && selectedStoreId !== ALL_STORES,
+      queryKey: staffKeys.currentStore(selectedStoreId, selectedBranchId),
+      queryFn: () => getStaffPermission(selectedStoreId, selectedBranchId),
+      enabled:
+        !!selectedStoreId &&
+        selectedStoreId !== ALL_STORES &&
+        !!selectedBranchId,
     }),
   )
 
@@ -114,4 +120,14 @@ export function useStaffPermission() {
     isCashier,
     ...staffInfo?.permissions,
   }
+}
+
+export function useStaff(id: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: staffKeys.detail(id),
+      queryFn: async () => await getStaff(id),
+      enabled: !!id,
+    }),
+  )
 }

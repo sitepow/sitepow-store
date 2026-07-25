@@ -16,4 +16,3 @@ export const createStaffSchema = staffBaseSchema.extend({
 export const updateStaffSchema = staffBaseSchema
 
 export type CreateStaffFormValues = z.input<typeof createStaffSchema>
-export type UpdateStaffFormValues = z.input<typeof updateStaffSchema>
