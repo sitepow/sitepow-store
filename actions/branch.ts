@@ -279,15 +279,82 @@ export async function createBranch(input: CreateBranchInput) {
         select: branchSelect,
       })
 
-      const adminEmployeeStores = await tx.employeeStore.findMany({
-        where: { storeId, role: { name: PermissionRole.ADMIN } },
+      let employee = await tx.employee.findUnique({
+        where: { userId },
         select: { id: true },
       })
 
-      if (adminEmployeeStores.length > 0) {
+      if (!employee) {
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          select: { name: true, email: true },
+        })
+
+        if (user) {
+          employee = await tx.employee.create({
+            data: {
+              name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
+              email: user.email!,
+              userId: userId,
+            },
+            select: { id: true },
+          })
+        }
+      }
+
+      if (!employee) {
+        throw new Error('ไม่พบข้อมูลพนักงานสำหรับผู้ใช้งานนี้')
+      }
+
+      let adminRole = await tx.role.findFirst({
+        where: { storeId, name: PermissionRole.ADMIN },
+        select: { id: true },
+      })
+
+      if (!adminRole) {
+        adminRole = await tx.role.create({
+          data: {
+            storeId,
+            name: PermissionRole.ADMIN,
+            description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
+          },
+          select: { id: true },
+        })
+      }
+
+      const employeeStore = await tx.employeeStore.upsert({
+        where: {
+          storeId_employeeId: {
+            employeeId: employee.id,
+            storeId,
+          },
+        },
+        update: {
+          roleId: adminRole.id,
+        },
+        create: {
+          employeeId: employee.id,
+          storeId,
+          roleId: adminRole.id,
+        },
+        select: { id: true },
+      })
+
+      const adminEmployeeStores = await tx.employeeStore.findMany({
+        where: { storeId, roleId: adminRole.id },
+        select: { id: true },
+      })
+
+      const targetEmployeeStoreIds = adminEmployeeStores.map((es) => es.id)
+
+      if (!targetEmployeeStoreIds.includes(employeeStore.id)) {
+        targetEmployeeStoreIds.push(employeeStore.id)
+      }
+
+      if (targetEmployeeStoreIds.length > 0) {
         await tx.employeeBranch.createMany({
-          data: adminEmployeeStores.map((employeeStore) => ({
-            employeeStoreId: employeeStore.id,
+          data: targetEmployeeStoreIds.map((employeeStoreId) => ({
+            employeeStoreId,
             branchId: newBranch.id,
           })),
           skipDuplicates: true,

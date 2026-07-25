@@ -26,7 +26,7 @@ export async function createLog({
 
     const userId = session?.user?.id
     const staff = userId
-      ? await prisma.staff.findUnique({
+      ? await prisma.employee.findUnique({
           where: { userId },
           select: { id: true },
         })

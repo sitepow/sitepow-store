@@ -2,6 +2,7 @@
 
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
 
 import { createLog } from '@/lib/activity-log'
@@ -96,41 +97,42 @@ export async function getEmployees({
   search,
   roleId,
 }: GetEmployeesParams): Promise<GetEmployeesResponse> {
+  const emptyResponse: GetEmployeesResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   try {
     const session = await auth()
     const userId = session?.user?.id
 
-    if (!userId) {
-      return {
-        data: [],
-        meta: {
-          currentPage: page,
-          limit,
-          totalItems: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
-      }
+    if (!userId || !storeId || storeId === ALL_STORES) {
+      return emptyResponse
     }
 
-    const authCheck = await verifyEmployeePermission({
-      userId,
-      storeId,
-      permission: 'canManageStaff',
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
     })
 
-    if (!authCheck.isAuthorized) {
-      return {
-        data: [],
-        meta: {
-          currentPage: page,
-          limit,
-          totalItems: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
+    const isOwner = store?.ownerId === userId
+
+    if (!isOwner) {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId,
+        permission: 'canManageStaff',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
       }
     }
 
@@ -160,6 +162,7 @@ export async function getEmployees({
         skip,
         take: sanitizedLimit,
         select: employeeStoreSelect,
+        orderBy: { employee: { name: 'asc' } },
       }),
     ])
 
@@ -176,18 +179,9 @@ export async function getEmployees({
         hasPreviousPage: sanitizedPage > 1,
       },
     }
-  } catch {
-    return {
-      data: [],
-      meta: {
-        currentPage: page,
-        limit,
-        totalItems: 0,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      },
-    }
+  } catch (error) {
+    console.error(error)
+    return emptyResponse
   }
 }
 
