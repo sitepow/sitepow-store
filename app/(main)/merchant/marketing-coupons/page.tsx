@@ -34,7 +34,7 @@ export default function MerchantMarketingCouponsPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageCoupons === false ? (
+      ) : !isPermissionLoading && !canManageCoupons ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"

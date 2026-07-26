@@ -57,7 +57,7 @@ export default function MerchantStoreSettingsCategoriesPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageProducts === false ? (
+      ) : !isPermissionLoading && !canManageProducts ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการหมวดหมู่สินค้าและข้อมูลสินค้าของสาขาหรือร้านค้านี้"

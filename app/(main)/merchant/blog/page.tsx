@@ -27,7 +27,7 @@ export default function BlogPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageBlogs === false ? (
+      ) : !isPermissionLoading && !canManageBlogs ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"

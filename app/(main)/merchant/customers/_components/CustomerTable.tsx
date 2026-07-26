@@ -49,7 +49,7 @@ export function CustomerTable() {
     return <ActionRequiredAlert />
   }
 
-  if (!isPermissionLoading && canManageCustomers === false) {
+  if (!isPermissionLoading && !canManageCustomers) {
     return (
       <ActionRequiredAlert
         title="ไม่มีสิทธิ์เข้าถึง"

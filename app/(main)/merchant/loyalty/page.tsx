@@ -28,7 +28,7 @@ export default function MerchantLoyaltyPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageCustomers === false ? (
+      ) : !isPermissionLoading && !canManageCustomers ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลระบบแต้มสะสมและสมาชิกของสาขาหรือร้านค้านี้"

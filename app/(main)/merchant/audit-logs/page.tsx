@@ -76,7 +76,7 @@ export default function MerchantAuditLogsPage() {
 
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canViewActivityLogs === false ? (
+      ) : !isPermissionLoading && !canViewActivityLogs ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของสาขาหรือร้านค้านี้"

@@ -167,7 +167,7 @@ export default function MerchantDashboardPage() {
       )}
       {selectedStoreId !== ALL_STORES &&
         !isPermissionLoading &&
-        canViewDashboard === false && (
+        !canViewDashboard && (
           <ActionRequiredAlert
             title="ไม่มีสิทธิ์เข้าถึง"
             description="คุณไม่มีสิทธิ์ในการดูข้อมูลแดชบอร์ดของสาขาหรือร้านค้านี้"
@@ -175,7 +175,7 @@ export default function MerchantDashboardPage() {
         )}
       {selectedStoreId !== ALL_STORES &&
         !isPermissionLoading &&
-        canViewDashboard !== false &&
+        canViewDashboard &&
         !isLoading &&
         data && (
           <>

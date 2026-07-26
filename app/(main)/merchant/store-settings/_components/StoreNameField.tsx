@@ -30,7 +30,7 @@ export function StoreNameField({ isPending }: { isPending: boolean }) {
       return
     }
 
-    if (availability?.nameAvailable === false) {
+    if (!availability?.nameAvailable) {
       setError('name', { message: 'ชื่อร้านค้านี้ถูกใช้งานไปแล้ว' })
     } else {
       clearErrors('name')

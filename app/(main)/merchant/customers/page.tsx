@@ -27,7 +27,7 @@ export default function CustomerPage() {
       />
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      canManageCustomers === false ? (
+      !canManageCustomers ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลลูกค้าของสาขาหรือร้านค้านี้"

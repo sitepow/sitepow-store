@@ -58,44 +58,30 @@ export default function MerchantSettingsPage() {
           className="flex flex-col gap-6 xl:flex-row"
         >
           <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1 xl:sticky xl:top-5 xl:w-57.5 xl:flex-col">
-            {(canManageStoreProfile ?? true) && (
-              <TabsTrigger value="store-profile">
-                <IconBuildingStore size={14} /> ตั้งค่าข้อมูลร้านค้า
-              </TabsTrigger>
-            )}
-            {(canManageSecurity ?? true) && (
-              <TabsTrigger value="security">
-                <IconLock size={14} /> ความปลอดภัยบัญชี
-              </TabsTrigger>
-            )}
-            {(canManageNotifications ?? true) && (
-              <TabsTrigger value="notifications">
-                <IconBell size={14} /> ระบบแจ้งเตือนไลน์/อีเมล
-              </TabsTrigger>
-            )}
-            {(canTransferStore ?? true) && (
-              <TabsTrigger value="settings-transfer">
-                <IconReplace size={14} /> โอนความเป็นเจ้าของร้าน
-              </TabsTrigger>
-            )}
-            {(canManageTax ?? true) && (
-              <TabsTrigger value="settings-tax">
-                <IconReceiptTax size={14} /> ภาษีและใบกำกับ
-              </TabsTrigger>
-            )}
-            {(canManageShipping ?? true) && (
-              <TabsTrigger value="settings-shipping">
-                <IconTruck size={14} /> ระบบขนส่งสินค้า
-              </TabsTrigger>
-            )}
-            {(canManagePayment ?? true) && (
-              <TabsTrigger value="settings-payment">
-                <IconCreditCard size={14} /> ช่องทางรับชำระเงิน
-              </TabsTrigger>
-            )}
+            <TabsTrigger value="store-profile">
+              <IconBuildingStore size={14} /> ตั้งค่าข้อมูลร้านค้า
+            </TabsTrigger>
+            <TabsTrigger value="security">
+              <IconLock size={14} /> ความปลอดภัยบัญชี
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <IconBell size={14} /> ระบบแจ้งเตือนไลน์/อีเมล
+            </TabsTrigger>
+            <TabsTrigger value="settings-transfer">
+              <IconReplace size={14} /> โอนความเป็นเจ้าของร้าน
+            </TabsTrigger>
+            <TabsTrigger value="settings-tax">
+              <IconReceiptTax size={14} /> ภาษีและใบกำกับ
+            </TabsTrigger>
+            <TabsTrigger value="settings-shipping">
+              <IconTruck size={14} /> ระบบขนส่งสินค้า
+            </TabsTrigger>
+            <TabsTrigger value="settings-payment">
+              <IconCreditCard size={14} /> ช่องทางรับชำระเงิน
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="store-profile" className="flex-1">
-            {!isPermissionLoading && canManageStoreProfile === false ? (
+            {!isPermissionLoading && !canManageStoreProfile ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลร้านค้าของสาขาหรือร้านค้านี้"
@@ -105,7 +91,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="security" className="flex-1">
-            {!isPermissionLoading && canManageSecurity === false ? (
+            {!isPermissionLoading && !canManageSecurity ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการความปลอดภัยบัญชีของสาขาหรือร้านค้านี้"
@@ -115,7 +101,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="notifications" className="flex-1">
-            {!isPermissionLoading && canManageNotifications === false ? (
+            {!isPermissionLoading && !canManageNotifications ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการระบบแจ้งเตือนของสาขาหรือร้านค้านี้"
@@ -125,7 +111,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="settings-transfer" className="flex-1">
-            {!isPermissionLoading && canTransferStore === false ? (
+            {!isPermissionLoading && !canTransferStore ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการโอนความเป็นเจ้าของร้านของสาขาหรือร้านค้านี้"
@@ -135,7 +121,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="settings-tax" className="flex-1">
-            {!isPermissionLoading && canManageTax === false ? (
+            {!isPermissionLoading && !canManageTax ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการภาษีและใบกำกับของสาขาหรือร้านค้านี้"
@@ -145,7 +131,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="settings-shipping" className="flex-1">
-            {!isPermissionLoading && canManageShipping === false ? (
+            {!isPermissionLoading && !canManageShipping ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการระบบขนส่งสินค้าของสาขาหรือร้านค้านี้"
@@ -155,7 +141,7 @@ export default function MerchantSettingsPage() {
             )}
           </TabsContent>
           <TabsContent value="settings-payment" className="flex-1">
-            {!isPermissionLoading && canManagePayment === false ? (
+            {!isPermissionLoading && !canManagePayment ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการจัดการช่องทางรับชำระเงินของสาขาหรือร้านค้านี้"

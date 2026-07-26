@@ -28,7 +28,7 @@ export default function MerchantBillingSubscriptionPage() {
       />
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      canManageSubscription === false ? (
+      !canManageSubscription ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"

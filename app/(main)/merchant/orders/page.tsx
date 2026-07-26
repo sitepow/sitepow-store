@@ -33,7 +33,7 @@ export default function OrderPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageOrders === false ? (
+      ) : !isPermissionLoading && !canManageOrders ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการออเดอร์ของสาขาหรือร้านค้านี้"

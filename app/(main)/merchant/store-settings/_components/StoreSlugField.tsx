@@ -33,7 +33,7 @@ export function StoreSlugField({ isPending }: { isPending: boolean }) {
       return
     }
 
-    if (availability?.slugAvailable === false) {
+    if (!availability?.slugAvailable) {
       setError('slug', { message: 'Slug นี้ถูกใช้งานไปแล้ว' })
     } else {
       clearErrors('slug')

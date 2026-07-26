@@ -27,7 +27,7 @@ export default function MerchantInventoryPage() {
       />
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      canManageInventory === false ? (
+      !canManageInventory ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"

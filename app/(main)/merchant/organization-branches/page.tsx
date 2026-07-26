@@ -53,7 +53,7 @@ export default function MerchantStoreSettingsBranchesPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canManageBranches === false ? (
+      ) : !isPermissionLoading && !canManageBranches ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลสาขาของสาขาหรือร้านค้านี้"

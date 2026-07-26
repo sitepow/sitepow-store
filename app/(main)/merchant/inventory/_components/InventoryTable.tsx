@@ -43,7 +43,7 @@ export function InventoryTable() {
     return <ActionRequiredAlert />
   }
 
-  if (!isPermissionLoading && canManageInventory === false) {
+  if (!isPermissionLoading && !canManageInventory) {
     return (
       <ActionRequiredAlert
         title="ไม่มีสิทธิ์เข้าถึง"

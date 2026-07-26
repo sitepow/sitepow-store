@@ -28,7 +28,7 @@ export default function CreditPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && canViewCreditCard === false ? (
+      ) : !isPermissionLoading && !canViewCreditCard ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลเครดิตและการทำธุรกรรมของสาขาหรือร้านค้านี้"
