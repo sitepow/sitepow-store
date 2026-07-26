@@ -1,9 +1,10 @@
 'use client'
 
 import { ComponentProps, useCallback, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
+import { formatPromptPay } from '@/utils/slip'
 import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy } from '@tabler/icons-react'
@@ -33,6 +34,7 @@ export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { isDirty, errors },
   } = useForm<UpdateProfileSchema>({
     resolver: zodResolver(updateProfileSchema),
@@ -91,7 +93,21 @@ export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
         </Field>
         <Field className="sm:col-span-2">
           <FieldLabel>เบอร์โทรศัพท์ติดต่อหลัก</FieldLabel>
-          <Input {...register('phone')} placeholder="เช่น 0812345678" />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <Input
+                value={formatPromptPay(field.value)}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/\D/g, '')
+                  field.onChange(rawValue)
+                }}
+                placeholder="เช่น 0812345678"
+                inputMode="numeric"
+              />
+            )}
+          />
           <FieldError>{errors.phone?.message}</FieldError>
           <FieldDescription>
             เบอร์โทรศัพท์นี้ระบบจะใช้เชื่อมโยงกับฐานข้อมูลสมาชิกร้านค้า (Loyalty

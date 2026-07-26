@@ -49,6 +49,7 @@ export function BuyerProfileAvatar({
             <h2 className="mt-2 text-base font-bold">
               {firstName} {lastName}
             </h2>
+            <p className="text-muted-foreground text-xs">{profile?.id}</p>
             <p className="text-muted-foreground text-xs">{profile?.email}</p>
           </>
         )}
