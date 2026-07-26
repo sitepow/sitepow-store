@@ -489,7 +489,6 @@ export async function createStore(input: CreateStoreInput) {
               data: {
                 storeId: newStore.id,
                 name: PermissionRole.ADMIN,
-                description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
               },
             })
           }
@@ -719,7 +718,6 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
         data: {
           storeId: storeId,
           name: PermissionRole.ADMIN,
-          description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
         },
       })
     }
