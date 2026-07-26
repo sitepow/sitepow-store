@@ -111,7 +111,7 @@ export function useEmployeePermission() {
   } = useQuery(
     queryOptions({
       queryKey: employeeKeys.currentStore(selectedStoreId, selectedBranchId),
-      queryFn: () => getEmployeePermission(selectedStoreId),
+      queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId), // ส่ง selectedBranchId เข้าไป
       enabled:
         !!selectedStoreId &&
         selectedStoreId !== ALL_STORES &&
@@ -126,7 +126,13 @@ export function useEmployeePermission() {
   const isManager = roleName === PermissionRole.MANAGER
   const isCashier = roleName === PermissionRole.CASHIER
 
+  const hasBranchAccess = employeeInfo?.hasBranchAccess ?? false
+
   const hasPermission = (permissionKey: PermissionKey): boolean => {
+    if (!isOwner && !isAdmin && !hasBranchAccess) {
+      return false
+    }
+
     if (isOwner || isAdmin) {
       return true
     }
@@ -141,6 +147,7 @@ export function useEmployeePermission() {
     isAdmin,
     isManager,
     isCashier,
+    hasBranchAccess,
     hasPermission,
     canViewDashboard: hasPermission('canViewDashboard'),
     canViewCreditCard: hasPermission('canViewCreditCard'),

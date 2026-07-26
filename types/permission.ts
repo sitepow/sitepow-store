@@ -115,7 +115,9 @@ export async function checkPermission(
   permission: PermissionKey,
 ): Promise<boolean> {
   const target = permissionMapping[permission]
-  if (!target) return false
+  if (!target) {
+    return false
+  }
 
   const count = await prisma.rolePermission.count({
     where: {

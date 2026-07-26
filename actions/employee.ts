@@ -2,6 +2,7 @@
 
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
+import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
 
@@ -451,10 +452,12 @@ export interface EmployeePermissionResult {
   role: { id: string; name: string } | null
   isOwner: boolean
   permissions: PermissionKey[]
+  hasBranchAccess: boolean
 }
 
 export async function getEmployeePermission(
   storeId: string,
+  branchId?: string,
 ): Promise<EmployeePermissionResult | null> {
   try {
     const session = await auth()
@@ -483,6 +486,7 @@ export async function getEmployeePermission(
           role: null,
           isOwner: true,
           permissions: [],
+          hasBranchAccess: true,
         }
       }
       return null
@@ -502,6 +506,17 @@ export async function getEmployeePermission(
       return null
     }
 
+    let hasBranchAccess = true
+    if (branchId && branchId !== ALL_BRANCHES && !isOwner) {
+      const branchAccess = await prisma.employeeBranch.findFirst({
+        where: {
+          employeeId: employee.id,
+          branchId: branchId,
+        },
+      })
+      hasBranchAccess = !!branchAccess
+    }
+
     const permissions: PermissionKey[] =
       employeeStore?.role?.permissions
         ?.map(
@@ -517,6 +532,7 @@ export async function getEmployeePermission(
         : null,
       isOwner,
       permissions,
+      hasBranchAccess,
     }
   } catch (error) {
     console.error(error)

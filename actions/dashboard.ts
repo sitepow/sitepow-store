@@ -80,9 +80,11 @@ export async function getDashboard(
     const cashierOrderFilter = isCashier ? { staffId: employeeStore?.id } : {}
 
     const storeFilter = { storeId }
+
     const orderBranchFilter = validBranchId
       ? { items: { some: { branchId: validBranchId } } }
       : {}
+
     const stockBranchFilter = validBranchId ? { branchId: validBranchId } : {}
 
     const now = new Date()
