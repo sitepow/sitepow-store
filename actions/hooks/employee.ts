@@ -111,7 +111,7 @@ export function useEmployeePermission() {
   } = useQuery(
     queryOptions({
       queryKey: employeeKeys.currentStore(selectedStoreId, selectedBranchId),
-      queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId), // ส่ง selectedBranchId เข้าไป
+      queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId),
       enabled:
         !!selectedStoreId &&
         selectedStoreId !== ALL_STORES &&
@@ -151,7 +151,7 @@ export function useEmployeePermission() {
     hasPermission,
     canViewDashboard: hasPermission('canViewDashboard'),
     canViewCreditCard: hasPermission('canViewCreditCard'),
-    canManageStaff: hasPermission('canManageStaff'),
+    canManageEmployee: hasPermission('canManageEmployee'),
     canManageProducts: hasPermission('canManageProducts'),
     canManageInventory: hasPermission('canManageInventory'),
     canManageStock: hasPermission('canManageStock'),
@@ -163,5 +163,15 @@ export function useEmployeePermission() {
     canManageStoreSettings: hasPermission('canManageStoreSettings'),
     canViewFinance: hasPermission('canViewFinance'),
     canViewActivityLogs: hasPermission('canViewActivityLogs'),
+    canManageSubscription: hasPermission('canManageSubscription'),
+    canManageBlogs: hasPermission('canManageBlogs'),
+    canManageBranches: hasPermission('canManageBranches'),
+    canManageStoreProfile: hasPermission('canManageStoreProfile'),
+    canManageSecurity: hasPermission('canManageSecurity'),
+    canManageNotifications: hasPermission('canManageNotifications'),
+    canTransferStore: hasPermission('canTransferStore'),
+    canManageTax: hasPermission('canManageTax'),
+    canManageShipping: hasPermission('canManageShipping'),
+    canManagePayment: hasPermission('canManagePayment'),
   }
 }

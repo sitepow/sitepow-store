@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 export type PermissionKey =
   | 'canViewCreditCard'
   | 'canViewDashboard'
-  | 'canManageStaff'
+  | 'canManageEmployee'
   | 'canManageProducts'
   | 'canManageInventory'
   | 'canManageStock'
@@ -23,6 +23,11 @@ export type PermissionKey =
   | 'canManagePayment'
   | 'canManageSubscription'
   | 'canManageConversation'
+  | 'canManageStoreProfile'
+  | 'canManageSecurity'
+  | 'canManageNotifications'
+  | 'canTransferStore'
+  | 'canManageTax'
 
 export const permissionMapping: Record<
   PermissionKey,
@@ -36,7 +41,7 @@ export const permissionMapping: Record<
     domain: PermissionDomain.REPORT,
     action: PermissionAction.READ,
   },
-  canManageStaff: {
+  canManageEmployee: {
     domain: PermissionDomain.STAFF,
     action: PermissionAction.CREATE,
   },
@@ -107,6 +112,26 @@ export const permissionMapping: Record<
   canManageConversation: {
     domain: PermissionDomain.CONVERSATION,
     action: PermissionAction.READ,
+  },
+  canManageStoreProfile: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
+  },
+  canManageSecurity: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
+  },
+  canManageNotifications: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
+  },
+  canTransferStore: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
+  },
+  canManageTax: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
   },
 }
 

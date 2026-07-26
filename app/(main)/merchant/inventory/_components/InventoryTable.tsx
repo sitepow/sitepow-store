@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useInventory } from '@/actions/hooks/inventory'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -28,11 +30,29 @@ export function InventoryTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { canManageInventory, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const { data: { data: stocks = [], meta } = {}, isLoading } = useInventory({
     storeId: selectedStoreId,
     page,
     limit: 10,
   })
+
+  if (selectedStoreId === ALL_STORES) {
+    return <ActionRequiredAlert />
+  }
+
+  if (!isPermissionLoading && canManageInventory === false) {
+    return (
+      <ActionRequiredAlert
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
+      />
+    )
+  }
+
+  const totalColumns = canManageInventory ? 9 : 8
 
   return (
     <>
@@ -45,17 +65,22 @@ export function InventoryTable() {
               <TableHead>ตัวเลือก</TableHead>
               <TableHead>SKU</TableHead>
               <TableHead>สาขา</TableHead>
-              <TableHead>คงเหลือ</TableHead>
-              <TableHead>ขั้นต่ำ</TableHead>
+              <TableHead className="text-end">คงเหลือ</TableHead>
+              <TableHead className="text-end">ขั้นต่ำ</TableHead>
               <TableHead>สถานะ</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              {canManageInventory && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && stocks.length === 0 ? (
-              <TableLoadingRow colSpan={8} />
+            {(isLoading || isPermissionLoading) && stocks.length === 0 ? (
+              <TableLoadingRow colSpan={totalColumns} />
             ) : stocks.length === 0 ? (
-              <TableEmptyRow colSpan={8} title="ไม่พบข้อมูลสต็อกสินค้า" />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ไม่พบข้อมูลสต็อกสินค้า"
+              />
             ) : (
               stocks.map((stock) => {
                 const isLow =
@@ -119,21 +144,23 @@ export function InventoryTable() {
                         <Badge variant="outline">ปกติ</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <StockAdjustmentDialog
-                        variantId={stock.variant.id}
-                        variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
-                        branchId={stock.branch.id}
-                        branchName={stock.branch.name}
-                      />
-                      <StockTransferDialog
-                        variantId={stock.variant.id}
-                        variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
-                        fromBranchId={stock.branch.id}
-                        fromBranchName={stock.branch.name}
-                      />
-                      <StockEditDialog stock={stock} />
-                    </TableCell>
+                    {canManageInventory && (
+                      <TableCell className="space-x-2 text-right">
+                        <StockAdjustmentDialog
+                          variantId={stock.variant.id}
+                          variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
+                          branchId={stock.branch.id}
+                          branchName={stock.branch.name}
+                        />
+                        <StockTransferDialog
+                          variantId={stock.variant.id}
+                          variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
+                          fromBranchId={stock.branch.id}
+                          fromBranchName={stock.branch.name}
+                        />
+                        <StockEditDialog stock={stock} />
+                      </TableCell>
+                    )}
                   </TableRow>
                 )
               })

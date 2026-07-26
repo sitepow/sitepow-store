@@ -41,7 +41,6 @@ const employeeStoreSelect = {
     select: {
       id: true,
       name: true,
-      description: true,
       permissions: {
         select: {
           permission: {
@@ -129,7 +128,7 @@ export async function getEmployees({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageStaff',
+        permission: 'canManageEmployee',
       })
 
       if (!authCheck.isAuthorized) {
@@ -198,7 +197,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageStaff',
+      permission: 'canManageEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -300,7 +299,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageStaff',
+      permission: 'canManageEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -378,7 +377,7 @@ export async function deleteEmployee(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: employeeStore.storeId,
-      permission: 'canManageStaff',
+      permission: 'canManageEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -433,7 +432,7 @@ export async function getEmployee(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: employeeStore.store.id,
-      permission: 'canManageStaff',
+      permission: 'canManageEmployee',
     })
 
     if (!authCheck.isAuthorized) {

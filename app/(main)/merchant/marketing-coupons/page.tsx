@@ -1,5 +1,6 @@
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -15,6 +16,8 @@ import { CouponCreateDialog } from './_components/CreateCouponDialog'
 
 export default function MerchantMarketingCouponsPage() {
   const { selectedStoreId } = useStoreFilter()
+  const { canManageCoupons, isLoading: isPermissionLoading } =
+    useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -29,8 +32,16 @@ export default function MerchantMarketingCouponsPage() {
           </div>
         }
       />
-      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
-      {selectedStoreId !== ALL_STORES && <CouponListTable />}
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageCoupons === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <CouponListTable />
+      )}
     </DashboardSidebar>
   )
 }

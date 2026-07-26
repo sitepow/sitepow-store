@@ -18,7 +18,6 @@ export async function getRoleOptions(storeId: string) {
       select: {
         id: true,
         name: true,
-        description: true,
       },
       orderBy: { createdAt: 'asc' },
     })
@@ -39,7 +38,7 @@ export async function createRole(input: CreateRoleInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const { storeId, name, description } = input
+    const { storeId, name } = input
 
     const authCheck = await verifyEmployeePermission({
       userId,
@@ -51,22 +50,27 @@ export async function createRole(input: CreateRoleInput) {
       return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
     }
 
-    const newRole = await prisma.role.create({
-      data: {
+    const newRole = await prisma.role.upsert({
+      where: {
+        storeId_name: {
+          storeId,
+          name,
+        },
+      },
+      update: {},
+      create: {
         storeId,
         name,
-        description,
       },
       select: {
         id: true,
         name: true,
-        description: true,
       },
     })
 
     return { success: true, data: newRole }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึกบทบาท' }
   }
 }

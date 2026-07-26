@@ -34,7 +34,9 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageStoreSettings } = useEmployeePermission()
+  const { canManageEmployee, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const deleteEmployeeMutation = useDeleteEmployee()
 
   const { data: { data: employees = [], meta } = {}, isLoading } = useEmployees(
@@ -49,6 +51,15 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
     return <ActionRequiredAlert />
   }
 
+  if (!isPermissionLoading && !canManageEmployee) {
+    return (
+      <ActionRequiredAlert
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลพนักงานของสาขาหรือร้านค้านี้"
+      />
+    )
+  }
+
   return (
     <>
       <div className="rounded-md border">
@@ -60,17 +71,17 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
               <TableHead>อีเมล</TableHead>
               <TableHead>บทบาท</TableHead>
               <TableHead>สาขา</TableHead>
-              {canManageStoreSettings && (
+              {canManageEmployee && (
                 <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && employees.length === 0 ? (
-              <TableLoadingRow colSpan={canManageStoreSettings ? 6 : 5} />
+            {(isLoading || isPermissionLoading) && employees.length === 0 ? (
+              <TableLoadingRow colSpan={canManageEmployee ? 6 : 5} />
             ) : employees.length === 0 ? (
               <TableEmptyRow
-                colSpan={canManageStoreSettings ? 6 : 5}
+                colSpan={canManageEmployee ? 6 : 5}
                 title="ยังไม่มีพนักงานในร้านนี้"
               />
             ) : (
@@ -97,7 +108,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                       )}
                     </div>
                   </TableCell>
-                  {canManageStoreSettings && (
+                  {canManageEmployee && (
                     <TableCell className="space-x-2 text-right">
                       <Button
                         variant="outline"

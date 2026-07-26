@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { GetActivityLogItem } from '@/actions/activity-log'
 import { useActivityLogs } from '@/actions/hooks/activity-log'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
@@ -45,10 +46,15 @@ export default function MerchantAuditLogsPage() {
     null,
   )
 
+  const { canViewActivityLogs, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const { data: { data: logs = [], meta } = {}, isLoading } = useActivityLogs({
     storeId: selectedStoreId === ALL_STORES ? '' : selectedStoreId,
-    action: actionFilter !== 'all' ? (actionFilter as LogAction) : undefined,
-    actorType: actorFilter !== 'all' ? (actorFilter as ActorType) : undefined,
+    action:
+      actionFilter !== ALL_STORES ? (actionFilter as LogAction) : undefined,
+    actorType:
+      actorFilter !== ALL_STORES ? (actorFilter as ActorType) : undefined,
     search: searchQuery || undefined,
     page,
     limit: 10,
@@ -68,9 +74,14 @@ export default function MerchantAuditLogsPage() {
         endContent={<StoreSelectField />}
       />
 
-      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
-
-      {selectedStoreId !== ALL_STORES && (
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canViewActivityLogs === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของสาขาหรือร้านค้านี้"
+        />
+      ) : (
         <>
           <AuditLogFilters
             searchQuery={searchQuery}
@@ -103,7 +114,7 @@ export default function MerchantAuditLogsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading && logs.length === 0 ? (
+                {(isLoading || isPermissionLoading) && logs.length === 0 ? (
                   <TableLoadingRow colSpan={7} />
                 ) : logs.length === 0 ? (
                   <TableEmptyRow

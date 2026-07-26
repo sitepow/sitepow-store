@@ -1,8 +1,11 @@
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconNews } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -10,6 +13,10 @@ import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { BlogTable } from './_components/BlogTable'
 
 export default function BlogPage() {
+  const { selectedStoreId } = useStoreFilter()
+  const { canManageBlogs, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -18,7 +25,16 @@ export default function BlogPage() {
         description="จัดการบทความและเนื้อหาของร้านค้า"
         endContent={<StoreSelectField />}
       />
-      <BlogTable />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageBlogs === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <BlogTable />
+      )}
     </DashboardSidebar>
   )
 }

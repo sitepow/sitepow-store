@@ -31,7 +31,9 @@ export function CustomerTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageCustomers } = useEmployeePermission()
+  const { canManageCustomers, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const unblockMutation = useUnblockCustomer()
   const blockMutation = useBlockCustomer()
 
@@ -47,7 +49,16 @@ export function CustomerTable() {
     return <ActionRequiredAlert />
   }
 
-  const totalColumns = canManageCustomers ? 9 : 8
+  if (!isPermissionLoading && canManageCustomers === false) {
+    return (
+      <ActionRequiredAlert
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
+      />
+    )
+  }
+
+  const totalColumns = canManageCustomers ? 8 : 7
 
   return (
     <>
@@ -68,7 +79,7 @@ export function CustomerTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && customers.length === 0 ? (
+            {(isLoading || isPermissionLoading) && customers.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : customers.length === 0 ? (
               <TableEmptyRow
@@ -89,8 +100,7 @@ export function CustomerTable() {
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.customer.isBlocked ? (
                       <span className="text-destructive">
-                        โดนบล็อก ({getBlockMessage(item.customer.blockedUntil)}
-                        )`
+                        โดนบล็อก ({getBlockMessage(item.customer.blockedUntil)})
                       </span>
                     ) : (
                       '-'

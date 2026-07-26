@@ -1,5 +1,6 @@
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCoin } from '@tabler/icons-react'
@@ -14,6 +15,8 @@ import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
 
 export default function MerchantLoyaltyPage() {
   const { selectedStoreId } = useStoreFilter()
+  const { canManageCustomers, isLoading: isPermissionLoading } =
+    useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -23,8 +26,14 @@ export default function MerchantLoyaltyPage() {
         description="ตั้งค่าเงื่อนไขการแจกแต้ม และบริหารจัดการคะแนนสมาชิกของแต่ละร้านค้า"
         endContent={<StoreSelectField />}
       />
-      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
-      {selectedStoreId !== ALL_STORES && (
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageCustomers === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลระบบแต้มสะสมและสมาชิกของสาขาหรือร้านค้านี้"
+        />
+      ) : (
         <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
           <LoyaltySettingsCard className="xl:col-span-4" />
           <CustomerPointsTable className="xl:col-span-8" />

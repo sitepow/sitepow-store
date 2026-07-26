@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconBox, IconPlus } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -13,6 +16,10 @@ import { Button } from '@/components/ui/button'
 import { ProductsTable } from './_components/ProductsTable'
 
 export default function MerchantStoreSettingsProductsPage() {
+  const { selectedStoreId } = useStoreFilter()
+  const { canManageProducts, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -22,16 +29,27 @@ export default function MerchantStoreSettingsProductsPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <Button asChild variant="outline">
-              <Link href={'/merchant/store-settings/products/create'}>
-                <IconPlus />
-                เพิ่มสินค้าใหม่
-              </Link>
-            </Button>
+            {(canManageProducts ?? true) && (
+              <Button asChild variant="outline">
+                <Link href={'/merchant/store-settings/products/create'}>
+                  <IconPlus />
+                  เพิ่มสินค้าใหม่
+                </Link>
+              </Button>
+            )}
           </div>
         }
       />
-      <ProductsTable />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageProducts === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลสินค้าของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <ProductsTable />
+      )}
     </DashboardSidebar>
   )
 }

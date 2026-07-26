@@ -2,9 +2,12 @@
 
 import { useState } from 'react'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconHierarchy2 } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -13,6 +16,10 @@ import { BranchDialog } from './_components/BranchDialog'
 import { BranchesTable } from './_components/BranchesTable'
 
 export default function MerchantStoreSettingsBranchesPage() {
+  const { selectedStoreId } = useStoreFilter()
+  const { canManageBranches, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>()
   const [open, setOpen] = useState(false)
 
@@ -44,7 +51,16 @@ export default function MerchantStoreSettingsBranchesPage() {
           </div>
         }
       />
-      <BranchesTable onEdit={handleEdit} />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageBranches === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลสาขาของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <BranchesTable onEdit={handleEdit} />
+      )}
     </DashboardSidebar>
   )
 }

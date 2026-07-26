@@ -16,7 +16,7 @@ import { EmployeeTable } from './_components/EmployeeTable'
 import { RoleDialog } from './_components/RoleDialog'
 
 export default function EmployeePage() {
-  const { canManageStoreSettings } = useEmployeePermission()
+  const { canManageEmployee } = useEmployeePermission()
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<
     string | undefined
   >()
@@ -42,7 +42,7 @@ export default function EmployeePage() {
           <div className="flex items-end gap-2.5">
             <StoreSelectField />
             <BranchSelectField />
-            {canManageStoreSettings && (
+            {canManageEmployee && (
               <>
                 <EmployeeDialog
                   employeeId={selectedEmployeeId}

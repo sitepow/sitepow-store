@@ -1,8 +1,11 @@
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconShoppingCart } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
@@ -11,6 +14,10 @@ import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 import { OrderTable } from './_components/OrderTable'
 
 export default function OrderPage() {
+  const { selectedStoreId } = useStoreFilter()
+  const { canManageOrders, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -24,7 +31,16 @@ export default function OrderPage() {
           </div>
         }
       />
-      <OrderTable />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageOrders === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการออเดอร์ของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <OrderTable />
+      )}
     </DashboardSidebar>
   )
 }

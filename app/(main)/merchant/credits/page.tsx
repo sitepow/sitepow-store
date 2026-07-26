@@ -1,5 +1,6 @@
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconWallet } from '@tabler/icons-react'
@@ -14,6 +15,8 @@ import { StoreCreditCard } from './_components/StoreCreditCard'
 
 export default function CreditPage() {
   const { selectedStoreId } = useStoreFilter()
+  const { canViewCreditCard, isLoading: isPermissionLoading } =
+    useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -23,7 +26,14 @@ export default function CreditPage() {
         description="ตรวจสอบยอดเครดิตคงเหลือและประวัติการใช้บริการ AI และตรวจสลิปของคุณ"
         endContent={<StoreSelectField />}
       />
-      {selectedStoreId !== ALL_STORES && (
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canViewCreditCard === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลเครดิตและการทำธุรกรรมของสาขาหรือร้านค้านี้"
+        />
+      ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <StoreCreditCard />
           <div className="xl:col-span-2">
@@ -31,7 +41,6 @@ export default function CreditPage() {
           </div>
         </div>
       )}
-      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
     </DashboardSidebar>
   )
 }

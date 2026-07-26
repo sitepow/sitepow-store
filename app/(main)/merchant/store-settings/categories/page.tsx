@@ -2,9 +2,12 @@
 
 import { useState } from 'react'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCategory } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
@@ -13,6 +16,10 @@ import { CategoriesTable } from './_components/CategoriesTable'
 import { CategoryDialog } from './_components/CategoryDialog'
 
 export default function MerchantStoreSettingsCategoriesPage() {
+  const { selectedStoreId } = useStoreFilter()
+  const { canManageProducts, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<
     string | undefined
   >()
@@ -37,16 +44,27 @@ export default function MerchantStoreSettingsCategoriesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <CategoryDialog
-              categoryId={selectedCategoryId}
-              open={open}
-              setOpen={setOpen}
-              onAdd={handleAdd}
-            />
+            {(canManageProducts ?? true) && (
+              <CategoryDialog
+                categoryId={selectedCategoryId}
+                open={open}
+                setOpen={setOpen}
+                onAdd={handleAdd}
+              />
+            )}
           </div>
         }
       />
-      <CategoriesTable onEdit={handleEdit} />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && canManageProducts === false ? (
+        <ActionRequiredAlert
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการจัดการหมวดหมู่สินค้าและข้อมูลสินค้าของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <CategoriesTable onEdit={handleEdit} />
+      )}
     </DashboardSidebar>
   )
 }
