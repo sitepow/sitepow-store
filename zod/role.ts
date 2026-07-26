@@ -5,7 +5,6 @@ export const createRoleSchema = z.object({
   name: z.nativeEnum(PermissionRole, {
     message: 'กรุณาระบุชื่อบทบาท',
   }),
-  description: z.string().optional(),
 })
 
 export type CreateRoleFormValues = z.infer<typeof createRoleSchema>

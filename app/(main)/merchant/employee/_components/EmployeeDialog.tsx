@@ -169,7 +169,7 @@ export function EmployeeDialog({
             <Input
               placeholder="เช่น สมชาย ใจดี"
               {...register('name')}
-              disabled={isPending}
+              disabled={isPending || !!employeeId}
             />
             <FieldError>{errors?.name?.message}</FieldError>
           </Field>

@@ -260,11 +260,10 @@ enum PermissionRole {
 }
 
 model Role {
-  id          String         @id @default(uuid())
-  storeId     String
-  store       Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  name        PermissionRole @default(STAFF)
-  description String?
+  id      String         @id @default(uuid())
+  storeId String
+  store   Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name    PermissionRole @default(STAFF)
 
   permissions    RolePermission[]
   employeeStores EmployeeStore[]

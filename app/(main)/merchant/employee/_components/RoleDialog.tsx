@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 import { useCreateRole } from '@/actions/hooks/role'
 import { PermissionRole } from '@/generated/prisma/enums'
@@ -20,12 +20,17 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
 const DEFAULT_VALUES: CreateRoleFormValues = {
   name: PermissionRole.STAFF,
-  description: '',
 }
 
 interface RoleDialogProps {
@@ -38,7 +43,7 @@ export function RoleDialog({ onRoleCreated }: RoleDialogProps) {
   const createRoleMutation = useCreateRole()
 
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -52,7 +57,6 @@ export function RoleDialog({ onRoleCreated }: RoleDialogProps) {
       {
         storeId: selectedStoreId,
         name: values.name,
-        description: values.description,
       },
       {
         onSuccess: (res) => {
@@ -87,20 +91,29 @@ export function RoleDialog({ onRoleCreated }: RoleDialogProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <Field>
             <FieldLabel>ชื่อบทบาท</FieldLabel>
-            <Input
-              placeholder="เช่น ผู้จัดการสาขา, แคชเชียร์"
-              {...register('name')}
-              disabled={createRoleMutation.isPending}
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={createRoleMutation.isPending}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="เลือกบทบาท" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(PermissionRole).map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
             <FieldError>{errors?.name?.message}</FieldError>
-          </Field>
-          <Field>
-            <FieldLabel>คำอธิบาย (ถ้ามี)</FieldLabel>
-            <Input
-              placeholder="รายละเอียดหน้าที่ของบทบาทนี้"
-              {...register('description')}
-              disabled={createRoleMutation.isPending}
-            />
           </Field>
           <DialogFooter className="mt-2">
             <Button

@@ -316,7 +316,6 @@ export async function createBranch(input: CreateBranchInput) {
           data: {
             storeId,
             name: PermissionRole.ADMIN,
-            description: 'ผู้ดูแลระบบสูงสุดของร้านค้า',
           },
           select: { id: true },
         })
