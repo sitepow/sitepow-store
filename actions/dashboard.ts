@@ -1,7 +1,7 @@
 'use server'
 
 import { THAI_MONTHS } from '@/constants/system'
-import { OrderStatus, PermissionRole } from '@/generated/prisma/enums'
+import { DefaultRole, OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
@@ -76,7 +76,7 @@ export async function getDashboard(
     }
 
     const employeeStore = authCheck.employeeStore
-    const isCashier = employeeStore?.role?.name === PermissionRole.CASHIER
+    const isCashier = employeeStore?.role?.name === DefaultRole.CASHIER
     const cashierOrderFilter = isCashier ? { staffId: employeeStore?.id } : {}
 
     const storeFilter = { storeId }

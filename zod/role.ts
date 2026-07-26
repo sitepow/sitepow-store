@@ -1,8 +1,8 @@
-import { PermissionRole } from '@/generated/prisma/enums'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { z } from 'zod'
 
 export const createRoleSchema = z.object({
-  name: z.nativeEnum(PermissionRole, {
+  name: z.nativeEnum(DefaultRole, {
     message: 'กรุณาระบุชื่อบทบาท',
   }),
 })

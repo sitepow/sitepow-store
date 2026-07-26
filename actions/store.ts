@@ -7,9 +7,9 @@ import { PRICING_VALUE } from '@/constants/pricing'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
+  DefaultRole,
   InvoiceStatus,
   LogAction,
-  PermissionRole,
   Plan,
   StoreStatus,
   SubStatus,
@@ -480,7 +480,7 @@ export async function createStore(input: CreateStoreInput) {
           let adminRole = await tx.role.findFirst({
             where: {
               storeId: newStore.id,
-              name: PermissionRole.ADMIN,
+              name: DefaultRole.ADMIN,
             },
           })
 
@@ -488,7 +488,7 @@ export async function createStore(input: CreateStoreInput) {
             adminRole = await tx.role.create({
               data: {
                 storeId: newStore.id,
-                name: PermissionRole.ADMIN,
+                name: DefaultRole.ADMIN,
               },
             })
           }
@@ -709,7 +709,7 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
     let adminRole = await prisma.role.findFirst({
       where: {
         storeId: storeId,
-        name: PermissionRole.ADMIN,
+        name: DefaultRole.ADMIN,
       },
     })
 
@@ -717,7 +717,7 @@ export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
       adminRole = await prisma.role.create({
         data: {
           storeId: storeId,
-          name: PermissionRole.ADMIN,
+          name: DefaultRole.ADMIN,
         },
       })
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { PermissionRole } from '@/generated/prisma/enums'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
@@ -122,9 +122,9 @@ export function useEmployeePermission() {
   const roleName = employee?.role?.name
 
   const isOwner = employee?.isOwner ?? false
-  const isAdmin = roleName === PermissionRole.ADMIN
-  const isManager = roleName === PermissionRole.MANAGER
-  const isCashier = roleName === PermissionRole.CASHIER
+  const isAdmin = roleName === DefaultRole.ADMIN
+  const isManager = roleName === DefaultRole.MANAGER
+  const isCashier = roleName === DefaultRole.CASHIER
 
   const hasBranchAccess = employee?.hasBranchAccess ?? false
 

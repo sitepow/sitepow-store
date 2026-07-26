@@ -251,7 +251,7 @@ model Employee {
   orders       Order[]
 }
 
-enum PermissionRole {
+enum DefaultRole {
   OWNER
   ADMIN
   MANAGER
@@ -260,10 +260,10 @@ enum PermissionRole {
 }
 
 model Role {
-  id      String         @id @default(uuid())
+  id      String      @id @default(uuid())
   storeId String
-  store   Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  name    PermissionRole @default(STAFF)
+  store   Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name    DefaultRole @default(STAFF)
 
   permissions    RolePermission[]
   employeeStores EmployeeStore[]
@@ -305,10 +305,9 @@ enum PermissionAction {
 }
 
 model Permission {
-  id          String           @id @default(uuid())
-  domain      PermissionDomain
-  action      PermissionAction
-  description String?          @db.Text
+  id     String           @id @default(uuid())
+  domain PermissionDomain
+  action PermissionAction
 
   roles RolePermission[]
 

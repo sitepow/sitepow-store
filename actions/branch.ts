@@ -2,8 +2,8 @@
 
 import {
   ActorType,
+  DefaultRole,
   LogAction,
-  PermissionRole,
   Prisma,
 } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
@@ -307,7 +307,7 @@ export async function createBranch(input: CreateBranchInput) {
       }
 
       let adminRole = await tx.role.findFirst({
-        where: { storeId, name: PermissionRole.ADMIN },
+        where: { storeId, name: DefaultRole.ADMIN },
         select: { id: true },
       })
 
@@ -315,7 +315,7 @@ export async function createBranch(input: CreateBranchInput) {
         adminRole = await tx.role.create({
           data: {
             storeId,
-            name: PermissionRole.ADMIN,
+            name: DefaultRole.ADMIN,
           },
           select: { id: true },
         })

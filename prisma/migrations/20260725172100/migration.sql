@@ -9,7 +9,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "PermissionRole" AS ENUM ('OWNER', 'ADMIN', 'MANAGER', 'CASHIER', 'STAFF');
+CREATE TYPE "DefaultRole" AS ENUM ('OWNER', 'ADMIN', 'MANAGER', 'CASHIER', 'STAFF');
 
 -- CreateEnum
 CREATE TYPE "PermissionDomain" AS ENUM ('PRODUCT', 'ORDER', 'INVENTORY', 'CUSTOMER', 'COUPON', 'STAFF', 'SETTING', 'REPORT', 'BRANCH', 'BLOG', 'SHIPPING', 'PAYMENT', 'SUBSCRIPTION', 'TRANSACTION', 'CONVERSATION');
@@ -75,7 +75,7 @@ CREATE TABLE "Employee" (
 CREATE TABLE "Role" (
     "id" TEXT NOT NULL,
     "storeId" TEXT NOT NULL,
-    "name" "PermissionRole" NOT NULL DEFAULT 'STAFF',
+    "name" "DefaultRole" NOT NULL DEFAULT 'STAFF',
     "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

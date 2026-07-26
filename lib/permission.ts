@@ -1,6 +1,6 @@
 'use server'
 
-import { PermissionRole } from '@/generated/prisma/enums'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { PermissionKey, checkPermission } from '@/types/permission'
 
 import { prisma } from '@/lib/prisma'
@@ -48,7 +48,7 @@ export async function verifyEmployeePermission({
   }
 
   if (branchId && employeeStore) {
-    const isAdmin = employeeStore.role.name === PermissionRole.ADMIN
+    const isAdmin = employeeStore.role.name === DefaultRole.ADMIN
     if (!isAdmin) {
       const hasBranchAccess = employeeStore.branches.some(
         (b) => b.branchId === branchId,

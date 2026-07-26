@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { useCreateRole } from '@/actions/hooks/role'
-import { PermissionRole } from '@/generated/prisma/enums'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CreateRoleFormValues, createRoleSchema } from '@/zod/role'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,7 +30,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 const DEFAULT_VALUES: CreateRoleFormValues = {
-  name: PermissionRole.STAFF,
+  name: DefaultRole.STAFF,
 }
 
 interface RoleDialogProps {
@@ -104,7 +104,7 @@ export function RoleDialog({ onRoleCreated }: RoleDialogProps) {
                     <SelectValue placeholder="เลือกบทบาท" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(PermissionRole).map((role) => (
+                    {Object.values(DefaultRole).map((role) => (
                       <SelectItem key={role} value={role}>
                         {role}
                       </SelectItem>
