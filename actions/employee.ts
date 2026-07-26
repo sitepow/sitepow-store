@@ -4,7 +4,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey, permissionMapping } from '@/types/permission'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -516,13 +516,24 @@ export async function getEmployeePermission(
       hasBranchAccess = !!branchAccess
     }
 
-    const permissions: PermissionKey[] =
-      employeeStore?.role?.permissions
-        ?.map(
-          (p) =>
-            `${p.permission.domain}_${p.permission.action}` as PermissionKey,
-        )
-        .filter(Boolean) || []
+    const permissions: PermissionKey[] = []
+
+    if (employeeStore?.role?.permissions) {
+      for (const p of employeeStore.role.permissions) {
+        const { domain, action } = p.permission
+
+        const matchedKey = (
+          Object.keys(permissionMapping) as PermissionKey[]
+        ).find((key) => {
+          const map = permissionMapping[key]
+          return map.domain === domain && map.action === action
+        })
+
+        if (matchedKey) {
+          permissions.push(matchedKey)
+        }
+      }
+    }
 
     return {
       employeeStore,

@@ -1,17 +1,14 @@
 'use server'
 
-import {
-  ActorType,
-  DefaultRole,
-  LogAction,
-  Prisma,
-} from '@/generated/prisma/client'
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+
+import { initializeStoreRolesAndPermissions } from './permission'
 
 export interface CreateBranchInput {
   name: string
@@ -303,23 +300,16 @@ export async function createBranch(input: CreateBranchInput) {
       }
 
       if (!employee) {
-        throw new Error('ไม่พบข้อมูลพนักงานสำหรับผู้ใช้งานนี้')
+        return {
+          success: false,
+          message: 'ไม่พบข้อมูลพนักงานสำหรับผู้ใช้งานนี้',
+        }
       }
 
-      let adminRole = await tx.role.findFirst({
-        where: { storeId, name: DefaultRole.ADMIN },
-        select: { id: true },
-      })
-
-      if (!adminRole) {
-        adminRole = await tx.role.create({
-          data: {
-            storeId,
-            name: DefaultRole.ADMIN,
-          },
-          select: { id: true },
-        })
-      }
+      const { adminRoleId } = await initializeStoreRolesAndPermissions(
+        storeId,
+        tx,
+      )
 
       const employeeStore = await tx.employeeStore.upsert({
         where: {
@@ -329,18 +319,18 @@ export async function createBranch(input: CreateBranchInput) {
           },
         },
         update: {
-          roleId: adminRole.id,
+          roleId: adminRoleId,
         },
         create: {
           employeeId: employee.id,
           storeId,
-          roleId: adminRole.id,
+          roleId: adminRoleId,
         },
         select: { id: true },
       })
 
       const adminEmployeeStores = await tx.employeeStore.findMany({
-        where: { storeId, roleId: adminRole.id },
+        where: { storeId, roleId: adminRoleId },
         select: { id: true },
       })
 

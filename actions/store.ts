@@ -7,7 +7,6 @@ import { PRICING_VALUE } from '@/constants/pricing'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
-  DefaultRole,
   InvoiceStatus,
   LogAction,
   Plan,
@@ -26,6 +25,7 @@ import { withCache } from '@/lib/cache'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
+import { initializeStoreRolesAndPermissions } from './permission'
 import { invalidateStoreCache } from './query-keys/invalidation/store'
 import { storeKeys } from './query-keys/store'
 
@@ -477,21 +477,10 @@ export async function createStore(input: CreateStoreInput) {
             })
           }
 
-          let adminRole = await tx.role.findFirst({
-            where: {
-              storeId: newStore.id,
-              name: DefaultRole.ADMIN,
-            },
-          })
-
-          if (!adminRole) {
-            adminRole = await tx.role.create({
-              data: {
-                storeId: newStore.id,
-                name: DefaultRole.ADMIN,
-              },
-            })
-          }
+          const { adminRoleId } = await initializeStoreRolesAndPermissions(
+            newStore.id,
+            tx,
+          )
 
           const employeeStore = await tx.employeeStore.upsert({
             where: {
@@ -501,12 +490,12 @@ export async function createStore(input: CreateStoreInput) {
               },
             },
             update: {
-              roleId: adminRole.id,
+              roleId: adminRoleId,
             },
             create: {
               employeeId: employee.id,
               storeId: newStore.id,
-              roleId: adminRole.id,
+              roleId: adminRoleId,
             },
           })
 
@@ -678,85 +667,5 @@ export async function deleteStore(id: string) {
     return {
       success: false,
     }
-  }
-}
-
-export async function assignUserAsStoreAdmin(userId: string, storeId: string) {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true, email: true },
-    })
-
-    if (!user) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
-    }
-
-    let employee = await prisma.employee.findUnique({
-      where: { userId: userId },
-    })
-
-    if (!employee) {
-      employee = await prisma.employee.create({
-        data: {
-          name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
-          email: user.email!,
-          userId: userId,
-        },
-      })
-    }
-
-    let adminRole = await prisma.role.findFirst({
-      where: {
-        storeId: storeId,
-        name: DefaultRole.ADMIN,
-      },
-    })
-
-    if (!adminRole) {
-      adminRole = await prisma.role.create({
-        data: {
-          storeId: storeId,
-          name: DefaultRole.ADMIN,
-        },
-      })
-    }
-
-    const employeeStore = await prisma.employeeStore.upsert({
-      where: {
-        storeId_employeeId: {
-          employeeId: employee.id,
-          storeId: storeId,
-        },
-      },
-      update: {
-        roleId: adminRole.id,
-      },
-      create: {
-        employeeId: employee.id,
-        storeId: storeId,
-        roleId: adminRole.id,
-      },
-    })
-
-    const storeBranches = await prisma.branch.findMany({
-      where: { storeId: storeId },
-      select: { id: true },
-    })
-
-    if (storeBranches.length > 0) {
-      await prisma.employeeBranch.createMany({
-        data: storeBranches.map((branch) => ({
-          employeeStoreId: employeeStore.id,
-          branchId: branch.id,
-        })),
-        skipDuplicates: true,
-      })
-    }
-
-    return { success: true, employeeStore }
-  } catch (error) {
-    console.error(error)
-    return { success: false }
   }
 }
