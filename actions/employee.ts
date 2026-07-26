@@ -14,9 +14,10 @@ import { prisma } from '@/lib/prisma'
 export interface CreateEmployeeInput {
   storeId: string
   name: string
-  email: string
   roleId: string
+  email: string
   branchIds: string[]
+  permissionIds: string[]
 }
 
 export interface UpdateEmployeeInput {
@@ -24,6 +25,7 @@ export interface UpdateEmployeeInput {
   name?: string
   roleId?: string
   branchIds: string[]
+  permissionIds: string[]
 }
 
 interface GetEmployeesParams {
@@ -246,6 +248,21 @@ export async function createEmployee(input: CreateEmployeeInput) {
       })
     }
 
+    if (input.permissionIds && input.roleId) {
+      await prisma.rolePermission.deleteMany({
+        where: { roleId: input.roleId },
+      })
+
+      if (input.permissionIds.length > 0) {
+        await prisma.rolePermission.createMany({
+          data: input.permissionIds.map((permissionId) => ({
+            roleId: input.roleId,
+            permissionId,
+          })),
+        })
+      }
+    }
+
     const employeeStore = await prisma.employeeStore.create({
       data: {
         roleId: input.roleId,
@@ -268,6 +285,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
         name: input.name,
         email: input.email,
         roleId: input.roleId,
+        permissionIds: input.permissionIds,
         type: 'created',
       },
     })
@@ -279,7 +297,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
     }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' }
+    return { success: false }
   }
 }
 
@@ -306,6 +324,30 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return {
         success: false,
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const existingEmployeeStore = await prisma.employeeStore.findUnique({
+      where: { id },
+      select: { roleId: true },
+    })
+
+    if (!existingEmployeeStore) {
+      return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+    }
+
+    if (input.permissionIds && existingEmployeeStore.roleId) {
+      await prisma.rolePermission.deleteMany({
+        where: { roleId: existingEmployeeStore.roleId },
+      })
+
+      if (input.permissionIds.length > 0) {
+        await prisma.rolePermission.createMany({
+          data: input.permissionIds.map((permissionId) => ({
+            roleId: existingEmployeeStore.roleId,
+            permissionId,
+          })),
+        })
       }
     }
 

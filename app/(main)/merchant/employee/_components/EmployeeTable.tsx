@@ -9,7 +9,7 @@ import {
 } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconEdit } from '@tabler/icons-react'
+import { IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -47,6 +47,8 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
     },
   )
 
+  const totalColumns = canManageEmployee ? 7 : 6
+
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
   }
@@ -70,6 +72,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
               <TableHead>ชื่อพนักงาน</TableHead>
               <TableHead>อีเมล</TableHead>
               <TableHead>บทบาท</TableHead>
+              <TableHead>สิทธิ์การใช้งาน</TableHead>
               <TableHead>สาขา</TableHead>
               {canManageEmployee && (
                 <TableHead className="text-right">จัดการ</TableHead>
@@ -78,55 +81,78 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
           </TableHeader>
           <TableBody>
             {(isLoading || isPermissionLoading) && employees.length === 0 ? (
-              <TableLoadingRow colSpan={canManageEmployee ? 6 : 5} />
+              <TableLoadingRow colSpan={totalColumns} />
             ) : employees.length === 0 ? (
               <TableEmptyRow
-                colSpan={canManageEmployee ? 6 : 5}
+                colSpan={totalColumns}
                 title="ยังไม่มีพนักงานในร้านนี้"
               />
             ) : (
-              employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell>{employee.id}</TableCell>
-                  <TableCell>{employee.employee?.name}</TableCell>
-                  <TableCell>{employee.employee?.email}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {employee.role?.name ?? 'ไม่ระบุบทบาท'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {employee.branches.length === 0 ? (
-                        <Badge variant="outline">ทุกสาขา</Badge>
-                      ) : (
-                        employee.branches.map(({ branch }) => (
-                          <Badge key={branch.id} variant="outline">
-                            {branch.name}
-                          </Badge>
-                        ))
-                      )}
-                    </div>
-                  </TableCell>
-                  {canManageEmployee && (
-                    <TableCell className="space-x-2 text-right">
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => onEdit(employee.id)}
-                      >
-                        <IconEdit />
-                      </Button>
-                      <DeleteButton
-                        isPending={deleteEmployeeMutation.isPending}
-                        onDelete={() =>
-                          deleteEmployeeMutation.mutate(employee.id)
-                        }
-                      />
+              employees.map((employee) => {
+                const permissions = employee.role?.permissions ?? []
+
+                return (
+                  <TableRow key={employee.id}>
+                    <TableCell>{employee.id}</TableCell>
+                    <TableCell>{employee.employee?.name}</TableCell>
+                    <TableCell>{employee.employee?.email}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {employee.role?.name ?? 'ไม่ระบุบทบาท'}
+                      </Badge>
                     </TableCell>
-                  )}
-                </TableRow>
-              ))
+                    <TableCell>
+                      <div className="maw-w-72 flex max-w-xs min-w-72 flex-wrap gap-1 wrap-break-word whitespace-pre-line">
+                        {permissions.length === 0 ? (
+                          <span className="text-muted-foreground text-xs">
+                            ไม่มีสิทธิ์
+                          </span>
+                        ) : (
+                          permissions.map(({ permission }) => (
+                            <Badge
+                              key={permission.id}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {permission.domain}_{permission.action}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {employee.branches.length === 0 ? (
+                          <Badge variant="outline">ทุกสาขา</Badge>
+                        ) : (
+                          employee.branches.map(({ branch }) => (
+                            <Badge key={branch.id} variant="outline">
+                              {branch.name}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
+                    </TableCell>
+                    {canManageEmployee && (
+                      <TableCell className="space-x-2 text-right">
+                        <Button
+                          variant="outline"
+                          size="icon-lg"
+                          onClick={() => onEdit(employee.id)}
+                        >
+                          <IconSettings />
+                        </Button>
+                        <DeleteButton
+                          isPending={deleteEmployeeMutation.isPending}
+                          onDelete={() =>
+                            deleteEmployeeMutation.mutate(employee.id)
+                          }
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

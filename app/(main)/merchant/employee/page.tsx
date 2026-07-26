@@ -13,7 +13,6 @@ import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
 
 import { EmployeeDialog } from './_components/EmployeeDialog'
 import { EmployeeTable } from './_components/EmployeeTable'
-import { RoleDialog } from './_components/RoleDialog'
 
 export default function EmployeePage() {
   const { canManageEmployee } = useEmployeePermission()
@@ -43,15 +42,12 @@ export default function EmployeePage() {
             <StoreSelectField />
             <BranchSelectField />
             {canManageEmployee && (
-              <>
-                <EmployeeDialog
-                  employeeId={selectedEmployeeId}
-                  open={open}
-                  setOpen={setOpen}
-                  onAdd={handleAdd}
-                />
-                <RoleDialog />
-              </>
+              <EmployeeDialog
+                employeeId={selectedEmployeeId}
+                open={open}
+                setOpen={setOpen}
+                onAdd={handleAdd}
+              />
             )}
           </div>
         }

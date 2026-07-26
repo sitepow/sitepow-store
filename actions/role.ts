@@ -1,6 +1,6 @@
 'use server'
 
-import { CreateRoleInput } from '@/zod/role'
+import { DefaultRole } from '@/generated/prisma/enums'
 
 import { auth } from '@/lib/auth'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -29,7 +29,34 @@ export async function getRoleOptions(storeId: string) {
   }
 }
 
-export async function createRole(input: CreateRoleInput) {
+export async function getAllPermissions() {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return []
+    }
+
+    const permissions = await prisma.permission.findMany({
+      select: {
+        id: true,
+        domain: true,
+        action: true,
+      },
+      orderBy: [{ domain: 'asc' }, { action: 'asc' }],
+    })
+
+    return permissions
+  } catch (error) {
+    console.error(error)
+    return []
+  }
+}
+
+export async function createRoleWithPermissions(input: {
+  storeId: string
+  name: string
+  permissionIds: string[]
+}) {
   try {
     const session = await auth()
     const userId = session?.user?.id
@@ -38,7 +65,7 @@ export async function createRole(input: CreateRoleInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
-    const { storeId, name } = input
+    const { storeId, name, permissionIds } = input
 
     const authCheck = await verifyEmployeePermission({
       userId,
@@ -50,27 +77,31 @@ export async function createRole(input: CreateRoleInput) {
       return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
     }
 
-    const newRole = await prisma.role.upsert({
-      where: {
-        storeId_name: {
+    const newRole = await prisma.$transaction(async (tx) => {
+      const role = await tx.role.create({
+        data: {
           storeId,
-          name,
+          name: name as DefaultRole,
+          rolePermissions: {
+            create: permissionIds.map((permissionId) => ({
+              permissionId,
+            })),
+          },
         },
-      },
-      update: {},
-      create: {
-        storeId,
-        name,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+
+      return role
     })
 
     return { success: true, data: newRole }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึกบทบาท' }
+    return {
+      success: false,
+    }
   }
 }

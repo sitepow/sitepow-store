@@ -9,9 +9,9 @@ import {
   useEmployee,
   useUpdateEmployee,
 } from '@/actions/hooks/employee'
-import { useRoleOptions } from '@/actions/hooks/role'
+import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { CreateEmployeeFormValues, createEmployeeSchema } from '@/zod/employee'
+import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconX } from '@tabler/icons-react'
 
@@ -36,11 +36,12 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
-const DEFAULT_VALUES: CreateEmployeeFormValues = {
+const DEFAULT_VALUES = {
   name: '',
   email: '',
   roleId: '',
   branchIds: [],
+  permissionIds: [],
 }
 
 export function EmployeeDialog({
@@ -59,6 +60,7 @@ export function EmployeeDialog({
   const updateEmployeeMutation = useUpdateEmployee()
   const { data: branches = [] } = useBranchOptions(selectedStoreId)
   const { data: roles = [] } = useRoleOptions(selectedStoreId)
+  const { data: allPermissions = [] } = usePermissions()
 
   const { data: employeeData } = useEmployee(employeeId!)
 
@@ -69,18 +71,24 @@ export function EmployeeDialog({
     setValue,
     watch,
     formState: { errors, isDirty },
-  } = useForm<CreateEmployeeFormValues>({
+  } = useForm({
     resolver: zodResolver(createEmployeeSchema),
     defaultValues: DEFAULT_VALUES,
   })
 
   useEffect(() => {
     if (employeeData) {
+      const rolePermissions = employeeData.role?.permissions ?? []
+      const extractedPermissionIds = rolePermissions.map(
+        (rp: { permission: { id: string } }) => rp.permission.id,
+      )
+
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
         roleId: employeeData.role?.id ?? '',
         branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
+        permissionIds: extractedPermissionIds,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -94,18 +102,30 @@ export function EmployeeDialog({
 
   const handleReset = () => {
     if (employeeData) {
+      const rolePermissions = employeeData.role?.permissions ?? []
+      const extractedPermissionIds = rolePermissions.map(
+        (rp: { permission: { id: string } }) => rp.permission.id,
+      )
+
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
         roleId: employeeData.role?.id ?? '',
         branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
+        permissionIds: extractedPermissionIds,
       })
     } else {
       reset(DEFAULT_VALUES)
     }
   }
 
-  const onSubmit = (values: CreateEmployeeFormValues) => {
+  const onSubmit = (values: {
+    name: string
+    email?: string
+    roleId: string
+    branchIds: string[]
+    permissionIds: string[]
+  }) => {
     if (employeeId) {
       updateEmployeeMutation.mutate(
         {
@@ -114,6 +134,7 @@ export function EmployeeDialog({
             name: values.name,
             roleId: values.roleId,
             branchIds: values.branchIds ?? [],
+            permissionIds: values.permissionIds ?? [],
             storeId: selectedStoreId,
           },
         },
@@ -125,10 +146,11 @@ export function EmployeeDialog({
       createEmployeeMutation.mutate(
         {
           name: values.name,
-          email: values.email,
+          email: values.email ?? '',
           roleId: values.roleId,
           storeId: selectedStoreId as string,
           branchIds: values.branchIds ?? [],
+          permissionIds: values.permissionIds ?? [],
         },
         {
           onSuccess: () => handleClose(),
@@ -137,9 +159,17 @@ export function EmployeeDialog({
     }
   }
 
+  const currentRoleId = watch('roleId')
   const selectedBranchIds = watch('branchIds') ?? []
+  const selectedPermissionIds = watch('permissionIds') ?? []
+
   const isPending =
     createEmployeeMutation.isPending || updateEmployeeMutation.isPending
+
+  const permissionOptions = allPermissions.map((p) => ({
+    id: p.id,
+    name: `${p.domain}_${p.action}`,
+  }))
 
   return (
     <Dialog
@@ -155,7 +185,7 @@ export function EmployeeDialog({
           เพิ่มพนักงาน
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {employeeId ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานใหม่'}
@@ -163,9 +193,7 @@ export function EmployeeDialog({
         </DialogHeader>
         <div className="grid gap-4">
           <Field>
-            <div className="flex items-center justify-between">
-              <FieldLabel>ชื่อพนักงาน</FieldLabel>
-            </div>
+            <FieldLabel>ชื่อพนักงาน</FieldLabel>
             <Input
               placeholder="เช่น สมชาย ใจดี"
               {...register('name')}
@@ -186,7 +214,7 @@ export function EmployeeDialog({
           <Field>
             <FieldLabel>บทบาท</FieldLabel>
             <Select
-              value={watch('roleId')}
+              value={currentRoleId}
               disabled={isPending}
               onValueChange={(v) =>
                 setValue('roleId', v, { shouldValidate: true })
@@ -204,6 +232,20 @@ export function EmployeeDialog({
               </SelectContent>
             </Select>
             <FieldError>{errors?.roleId?.message}</FieldError>
+          </Field>
+          <Field>
+            <FieldLabel>กำหนดสิทธิ์การใช้งาน (Permissions)</FieldLabel>
+            <MultiSelect
+              options={permissionOptions}
+              value={selectedPermissionIds}
+              onChange={(v) =>
+                setValue('permissionIds', v, { shouldValidate: true })
+              }
+              disabled={isPending}
+              placeholder="เลือกสิทธิ์การใช้งาน"
+              allSelectedLabel="ทุกสิทธิ์"
+            />
+            <FieldError>{errors?.permissionIds?.message}</FieldError>
           </Field>
           <Field>
             <FieldLabel>สาขาที่ดูแล</FieldLabel>

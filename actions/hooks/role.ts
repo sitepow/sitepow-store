@@ -1,12 +1,7 @@
 'use client'
 
-import { createRole, getRoleOptions } from '@/actions/role'
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { getAllPermissions, getRoleOptions } from '@/actions/role'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { roleKeys } from '../query-keys/role'
 
@@ -24,15 +19,14 @@ export function useRoleOptions(storeId?: string) {
   )
 }
 
-export function useCreateRole() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: createRole,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: roleKeys.all,
-      })
-    },
-  })
+export function usePermissions() {
+  return useQuery(
+    queryOptions({
+      queryKey: roleKeys.permissions(),
+      queryFn: async () => {
+        const res = await getAllPermissions()
+        return res ?? []
+      },
+    }),
+  )
 }

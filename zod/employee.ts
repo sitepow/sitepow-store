@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from 'zod'
 
 const employeeBaseSchema = z.object({
   name: z
@@ -8,10 +8,11 @@ const employeeBaseSchema = z.object({
     .string({ message: 'กรุณาเลือกบทบาทพนักงาน' })
     .min(1, { message: 'กรุณาเลือกบทบาทพนักงาน' }),
   branchIds: z.array(z.string()).default([]),
+  permissionIds: z.array(z.string()).default([]),
 })
 
 export const createEmployeeSchema = employeeBaseSchema.extend({
-  email: z.string().email({ message: 'รูปแบบอีเมลไม่ถูกต้อง' }),
+  email: z.email({ message: 'รูปแบบอีเมลไม่ถูกต้อง' }),
 })
 
 export const updateEmployeeSchema = employeeBaseSchema
