@@ -12,13 +12,8 @@ import { StoreCreateDialog } from './_components/StoreCreateDialog'
 import { StoreTable } from './_components/StoreTable'
 
 export default function MerchantStoreSettingsPage() {
-  const {
-    isOwner,
-    isAdmin,
-    isLoading: isPermissionLoading,
-  } = useEmployeePermission()
-
-  const hasAccess = isOwner || isAdmin
+  const { canManageStoreSettings, isLoading: isPermissionLoading } =
+    useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -26,12 +21,12 @@ export default function MerchantStoreSettingsPage() {
         icon={IconBuildingStore}
         title="จัดการร้านค้า"
         description="จัดการข้อมูลหน้าร้าน สลับเข้าสู่ระบบหลังบ้าน หรือเปิดร้านค้าใหม่เพื่อเริ่มธุรกิจเพิ่ม"
-        endContent={hasAccess ? <StoreCreateDialog /> : null}
+        endContent={canManageStoreSettings && <StoreCreateDialog />}
       />
-      {!isPermissionLoading && !hasAccess ? (
+      {!isPermissionLoading && !canManageStoreSettings ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลร้านค้าหรือสร้างร้านค้าใหม่ หน้านี้สำหรับเจ้าของร้านและผู้ดูแลระบบเท่านั้น"
+          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลร้านค้าหรือสร้างร้านค้าใหม่"
         />
       ) : (
         <StoreTable />

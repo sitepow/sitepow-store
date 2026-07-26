@@ -10,7 +10,7 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateBranchInput {

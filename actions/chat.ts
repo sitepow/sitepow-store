@@ -23,9 +23,9 @@ import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/auth-guard'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
 

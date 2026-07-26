@@ -5,7 +5,7 @@ import { TransactionType } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 interface GetTransactionsParams {

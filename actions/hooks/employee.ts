@@ -105,7 +105,7 @@ export function useEmployeePermission() {
   const { selectedBranchId } = useBranchFilter()
 
   const {
-    data: employeeInfo,
+    data: employee,
     isLoading,
     error,
   } = useQuery(
@@ -119,28 +119,25 @@ export function useEmployeePermission() {
     }),
   )
 
-  const roleName = employeeInfo?.role?.name
+  const roleName = employee?.role?.name
 
-  const isOwner = employeeInfo?.isOwner ?? false
+  const isOwner = employee?.isOwner ?? false
   const isAdmin = roleName === PermissionRole.ADMIN
   const isManager = roleName === PermissionRole.MANAGER
   const isCashier = roleName === PermissionRole.CASHIER
 
-  const hasBranchAccess = employeeInfo?.hasBranchAccess ?? false
+  const hasBranchAccess = employee?.hasBranchAccess ?? false
 
   const hasPermission = (permissionKey: PermissionKey): boolean => {
     if (!isOwner && !isAdmin && !hasBranchAccess) {
       return false
     }
 
-    if (isOwner || isAdmin) {
-      return true
-    }
-    return employeeInfo?.permissions?.includes(permissionKey) ?? false
+    return employee?.permissions?.includes(permissionKey) ?? false
   }
 
   return {
-    employeeInfo,
+    employee,
     isLoading,
     error,
     isOwner,

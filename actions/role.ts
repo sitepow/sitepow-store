@@ -3,7 +3,7 @@
 import { CreateRoleInput } from '@/zod/role'
 
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/auth-guard'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 export async function getRoleOptions(storeId: string) {
