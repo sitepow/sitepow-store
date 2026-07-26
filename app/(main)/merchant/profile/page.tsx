@@ -31,7 +31,6 @@ export default function MerchantProfilePage() {
         title="โปรไฟล์ส่วนตัว"
         description="จัดการข้อมูลผู้ใช้งานหลักของคุณ"
       />
-
       <FormProvider {...methods}>
         <div className="grid gap-5 xl:grid-cols-12">
           <ProfileAvartar className="col-span-1 xl:col-span-4" />

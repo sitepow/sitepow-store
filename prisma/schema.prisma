@@ -70,7 +70,7 @@ model Message {
 }
 
 model Coupon {
-  id          String  @id @default(cuid())
+  id          String  @id @default(uuid())
   code        String  @unique
   description String?
 
@@ -101,7 +101,7 @@ model Coupon {
 }
 
 model Customer {
-  id        String    @id @default(cuid())
+  id        String    @id @default(uuid())
   email     String    @unique
   firstName String?
   lastName  String?
@@ -127,7 +127,7 @@ model Customer {
 }
 
 model SlipVerificationHistory {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id])
 
@@ -142,7 +142,7 @@ model SlipVerificationHistory {
 }
 
 model CustomerStore {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   customerId String
   storeId    String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -155,7 +155,7 @@ model CustomerStore {
 }
 
 model Branch {
-  id     String  @id @default(cuid())
+  id     String  @id @default(uuid())
   name   String
   isMain Boolean @default(false)
 
@@ -211,7 +211,7 @@ model Account {
 }
 
 model User {
-  id                 String    @id @default(cuid())
+  id                 String    @id @default(uuid())
   email              String?   @unique
   password           String?
   isTwoFactorEnabled Boolean   @default(false)
@@ -239,7 +239,7 @@ model User {
 }
 
 model Employee {
-  id    String @id @default(cuid())
+  id    String @id @default(uuid())
   name  String
   email String @unique
 
@@ -359,7 +359,7 @@ enum StoreStatus {
 }
 
 model Courier {
-  id          String  @id @default(cuid())
+  id          String  @id @default(uuid())
   code        String  @unique
   name        String
   description String?
@@ -373,7 +373,7 @@ model Courier {
 }
 
 model CourierService {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   courierId String
   courier   Courier @relation(fields: [courierId], references: [id], onDelete: Cascade)
 
@@ -398,7 +398,7 @@ enum ShippingZoneType {
 }
 
 model ShippingSetting {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -410,7 +410,7 @@ model ShippingSetting {
 }
 
 model StoreCourierService {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -434,7 +434,7 @@ model StoreCourierService {
 }
 
 model StoreServiceWeightRate {
-  id                    String              @id @default(cuid())
+  id                    String              @id @default(uuid())
   storeCourierServiceId String
   storeCourierService   StoreCourierService @relation(fields: [storeCourierServiceId], references: [id], onDelete: Cascade)
 
@@ -451,7 +451,7 @@ model StoreServiceWeightRate {
 }
 
 model StoreServiceZoneRate {
-  id                    String              @id @default(cuid())
+  id                    String              @id @default(uuid())
   storeCourierServiceId String
   storeCourierService   StoreCourierService @relation(fields: [storeCourierServiceId], references: [id], onDelete: Cascade)
 
@@ -466,7 +466,7 @@ model StoreServiceZoneRate {
 }
 
 model PaymentSetting {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -488,7 +488,7 @@ enum BankAccountType {
 }
 
 model BankAccount {
-  id               String         @id @default(cuid())
+  id               String         @id @default(uuid())
   paymentSettingId String
   paymentSetting   PaymentSetting @relation(fields: [paymentSettingId], references: [id], onDelete: Cascade)
 
@@ -515,7 +515,7 @@ enum DomainStatus {
 }
 
 model StoreDomain {
-  id     String @id @default(cuid())
+  id     String @id @default(uuid())
   domain String @unique
 
   storeId String
@@ -532,7 +532,7 @@ model StoreDomain {
 }
 
 model Store {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   name    String
   slug    String @unique
   ownerId String
@@ -605,7 +605,7 @@ enum TransferStatus {
 }
 
 model StoreTransferRequest {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -613,7 +613,7 @@ model StoreTransferRequest {
   toEmail     String
   toUserId    String?
 
-  token     String         @unique @default(cuid())
+  token     String         @unique @default(uuid())
   status    TransferStatus @default(PENDING)
   expiresAt DateTime
 
@@ -632,7 +632,7 @@ enum InvoiceStatus {
 }
 
 model SubscriptionInvoice {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -650,7 +650,7 @@ model SubscriptionInvoice {
 }
 
 model Subscription {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String @unique
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -682,7 +682,7 @@ enum Plan {
 }
 
 model Blog {
-  id      String   @id @default(cuid())
+  id      String   @id @default(uuid())
   title   String
   content String   @db.Text
   image   String
@@ -697,7 +697,7 @@ model Blog {
 }
 
 model Category {
-  id          String  @id @default(cuid())
+  id          String  @id @default(uuid())
   title       String
   slug        String
   description String?
@@ -718,7 +718,7 @@ enum ProductType {
 }
 
 model Product {
-  id    String @id @default(cuid())
+  id    String @id @default(uuid())
   title String
   slug  String
 
@@ -747,7 +747,7 @@ model Product {
 }
 
 model ProductTag {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   name      String
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -756,7 +756,7 @@ model ProductTag {
 }
 
 model ProductImage {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   url       String
   isPrimary Boolean @default(false)
 
@@ -767,7 +767,7 @@ model ProductImage {
 }
 
 model DigitalItem {
-  id      String  @id @default(cuid())
+  id      String  @id @default(uuid())
   content String  @db.Text
   isUsed  Boolean @default(false)
 
@@ -781,7 +781,7 @@ model DigitalItem {
 }
 
 model ProductVariant {
-  id          String  @id @default(cuid())
+  id          String  @id @default(uuid())
   title       String
   price       Decimal @db.Decimal(10, 2)
   sku         String
@@ -814,7 +814,7 @@ model ProductVariant {
 }
 
 model ProductOption {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   title     String
   maxSelect Int     @default(1)
   require   Boolean @default(false)
@@ -825,7 +825,7 @@ model ProductOption {
 }
 
 model ProductChoice {
-  id         String  @id @default(cuid())
+  id         String  @id @default(uuid())
   name       String
   extraPrice Decimal @default(0) @db.Decimal(10, 2)
 
@@ -834,7 +834,7 @@ model ProductChoice {
 }
 
 model ProductAddon {
-  id          String  @id @default(cuid())
+  id          String  @id @default(uuid())
   title       String
   price       Decimal @db.Decimal(10, 2)
   isAvailable Boolean @default(true)
@@ -844,7 +844,7 @@ model ProductAddon {
 }
 
 model Review {
-  id      String   @id @default(cuid())
+  id      String   @id @default(uuid())
   rating  Int
   comment String   @db.Text
   images  String[]
@@ -866,7 +866,7 @@ model Review {
 }
 
 model ReviewCategory {
-  id       String @id @default(cuid())
+  id       String @id @default(uuid())
   label    String
   rating   Int
   reviewId String
@@ -899,7 +899,7 @@ enum TransactionType {
 }
 
 model Transaction {
-  id          String          @id @default(cuid())
+  id          String          @id @default(uuid())
   storeId     String
   store       Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
   amount      Decimal         @db.Decimal(10, 2)
@@ -918,7 +918,7 @@ enum AddressType {
 }
 
 model Address {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
@@ -944,7 +944,7 @@ model Address {
 }
 
 model Order {
-  id          String      @id @default(cuid())
+  id          String      @id @default(uuid())
   orderNumber String      @unique
   totalAmount Decimal     @db.Decimal(10, 2)
   status      OrderStatus @default(PENDING)
@@ -1005,7 +1005,7 @@ model Order {
 }
 
 model OrderItem {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   orderId String
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -1025,7 +1025,7 @@ model OrderItem {
 }
 
 model Cart {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   customerId String   @unique
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
@@ -1039,7 +1039,7 @@ model Cart {
 }
 
 model CartItem {
-  id     String @id @default(cuid())
+  id     String @id @default(uuid())
   cartId String
   cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
@@ -1087,7 +1087,7 @@ enum LogAction {
 }
 
 model ActivityLog {
-  id     String    @id @default(cuid())
+  id     String    @id @default(uuid())
   action LogAction
 
   actorType ActorType
@@ -1113,7 +1113,7 @@ model ActivityLog {
 }
 
 model StockAdjustment {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -1144,7 +1144,7 @@ enum StockAdjustmentReason {
 }
 
 model GlobalShippingRateMatrix {
-  id           String @id @default(cuid())
+  id           String @id @default(uuid())
   fromProvince String @unique
 
   ratesMatrix Json
@@ -1153,7 +1153,7 @@ model GlobalShippingRateMatrix {
 }
 
 model StockTransfer {
-  id      String @id @default(cuid())
+  id      String @id @default(uuid())
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -1178,7 +1178,7 @@ model StockTransfer {
 }
 
 model ProductStock {
-  id       String @id @default(cuid())
+  id       String @id @default(uuid())
   quantity Int    @default(0)
   minStock Int    @default(0)
 

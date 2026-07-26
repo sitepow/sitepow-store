@@ -58,7 +58,6 @@ export function ProfileAvartar({
             src={previewUrl}
             className="border-background bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full object-cover"
           />
-
           <input
             type="file"
             ref={fileInputRef}
@@ -71,7 +70,6 @@ export function ProfileAvartar({
               }
             }}
           />
-
           <Button
             size="icon-lg"
             className="absolute right-0 bottom-0"
@@ -80,7 +78,6 @@ export function ProfileAvartar({
             <IconCamera size={14} />
           </Button>
         </div>
-
         {isLoading ? (
           <div className="mt-2 flex flex-col items-center gap-1">
             <Skeleton className="h-4 w-32" />
@@ -88,9 +85,8 @@ export function ProfileAvartar({
           </div>
         ) : (
           <div className="mt-2">
-            <h2 className="text-base font-bold">
-              {fullName || profile?.name || 'User'}
-            </h2>
+            <h2 className="text-base font-bold">{fullName || profile?.name}</h2>
+            <p className="text-muted-foreground text-xs">{profile?.id}</p>
             <p className="text-muted-foreground text-xs">{profile?.email}</p>
           </div>
         )}
