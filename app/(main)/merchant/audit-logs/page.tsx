@@ -122,7 +122,7 @@ export default function MerchantAuditLogsPage() {
                         <ActorBadge actorType={log.actorType} />
                       </TableCell>
                       <TableCell>
-                        {log.staff?.name ?? log.user?.name ?? '-'}
+                        {log.employee?.name ?? log.user?.name ?? '-'}
                       </TableCell>
                       <TableCell className="space-x-2">
                         <span>{log.entity}</span>

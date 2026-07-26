@@ -21,7 +21,7 @@ export async function exportUserData() {
         name: true,
         phone: true,
         createdAt: true,
-        customerProfile: {
+        customer: {
           select: {
             firstName: true,
             lastName: true,
@@ -86,7 +86,7 @@ export async function deleteUserAccount() {
       select: {
         role: true,
         staffProfile: { select: { id: true } },
-        customerProfile: { select: { id: true } },
+        customer: { select: { id: true } },
       },
     })
 
@@ -97,8 +97,8 @@ export async function deleteUserAccount() {
     const isMerchant = user.role === UserRole.MERCHANT || !!user.staffProfile
 
     await prisma.$transaction(async (tx) => {
-      if (user.customerProfile) {
-        const customerId = user.customerProfile.id
+      if (user.customer) {
+        const customerId = user.customer.id
 
         await tx.address.deleteMany({ where: { customerId } })
         await tx.cart.deleteMany({ where: { customerId } })

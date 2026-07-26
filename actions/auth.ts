@@ -24,8 +24,8 @@ export async function registerUser(values: RegisterFormInputs) {
     const existingUser = await prisma.user.findUnique({
       where: { email },
       include: {
-        customerProfile: true,
-        staffProfile: true,
+        customer: true,
+        employee: true,
       },
     })
 
@@ -54,7 +54,7 @@ export async function registerUser(values: RegisterFormInputs) {
         existingUser.role === UserRole.MERCHANT &&
         userRole === UserRole.CUSTOMER
       ) {
-        if (!existingUser.customerProfile) {
+        if (!existingUser.customer) {
           await prisma.customer.create({
             data: {
               email,
