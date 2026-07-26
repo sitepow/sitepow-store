@@ -1,10 +1,16 @@
 'use server'
 
+import { PERMISSION_MAPPING } from '@/constants/permission'
 import { Prisma } from '@/generated/prisma/client'
-import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
+import {
+  ActorType,
+  DefaultRole,
+  LogAction,
+  UserRole,
+} from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { PermissionKey, permissionMapping } from '@/types/permission'
+import { PermissionKey } from '@/types/permission'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -249,17 +255,27 @@ export async function createEmployee(input: CreateEmployeeInput) {
     }
 
     if (input.permissionIds && input.roleId) {
-      await prisma.rolePermission.deleteMany({
-        where: { roleId: input.roleId },
+      const roleRecord = await prisma.role.findUnique({
+        where: { id: input.roleId },
+        select: { name: true },
       })
+      const isOwnerRole =
+        roleRecord?.name?.toUpperCase() === DefaultRole.OWNER ||
+        roleRecord?.name?.toUpperCase() === DefaultRole.ADMIN
 
-      if (input.permissionIds.length > 0) {
-        await prisma.rolePermission.createMany({
-          data: input.permissionIds.map((permissionId) => ({
-            roleId: input.roleId,
-            permissionId,
-          })),
+      if (!isOwnerRole) {
+        await prisma.rolePermission.deleteMany({
+          where: { roleId: input.roleId },
         })
+
+        if (input.permissionIds.length > 0) {
+          await prisma.rolePermission.createMany({
+            data: input.permissionIds.map((permissionId) => ({
+              roleId: input.roleId,
+              permissionId,
+            })),
+          })
+        }
       }
     }
 
@@ -336,7 +352,15 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
     }
 
-    if (input.permissionIds && existingEmployeeStore.roleId) {
+    const roleRecord = await prisma.role.findUnique({
+      where: { id: existingEmployeeStore.roleId },
+      select: { name: true },
+    })
+    const isOwnerRole =
+      roleRecord?.name?.toUpperCase() === DefaultRole.OWNER ||
+      roleRecord?.name?.toUpperCase() === DefaultRole.ADMIN
+
+    if (input.permissionIds && existingEmployeeStore.roleId && !isOwnerRole) {
       await prisma.rolePermission.deleteMany({
         where: { roleId: existingEmployeeStore.roleId },
       })
@@ -522,11 +546,26 @@ export async function getEmployeePermission(
 
     if (!employee) {
       if (isOwner) {
+        const allPermissions = await prisma.permission.findMany()
+        const permissions: PermissionKey[] = []
+
+        for (const p of allPermissions) {
+          const matchedKey = (
+            Object.keys(PERMISSION_MAPPING) as PermissionKey[]
+          ).find((key) => {
+            const map = PERMISSION_MAPPING[key]
+            return map.domain === p.domain && map.action === p.action
+          })
+          if (matchedKey) {
+            permissions.push(matchedKey)
+          }
+        }
+
         return {
           employeeStore: null,
           role: null,
           isOwner: true,
-          permissions: [],
+          permissions,
           hasBranchAccess: true,
         }
       }
@@ -565,9 +604,9 @@ export async function getEmployeePermission(
         const { domain, action } = p.permission
 
         const matchedKey = (
-          Object.keys(permissionMapping) as PermissionKey[]
+          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
         ).find((key) => {
-          const map = permissionMapping[key]
+          const map = PERMISSION_MAPPING[key]
           return map.domain === domain && map.action === action
         })
 

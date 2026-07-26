@@ -1,7 +1,8 @@
 'use server'
 
 import { DefaultRole } from '@/generated/prisma/enums'
-import { PermissionKey, checkPermission } from '@/types/permission'
+import { PermissionKey } from '@/types/permission'
+import { checkPermission } from '@/utils/permission'
 
 import { prisma } from '@/lib/prisma'
 

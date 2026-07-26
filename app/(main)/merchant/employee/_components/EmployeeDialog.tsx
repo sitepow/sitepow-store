@@ -10,7 +10,12 @@ import {
   useUpdateEmployee,
 } from '@/actions/hooks/employee'
 import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
+import {
+  PERMISSION_MAPPING,
+  ROLE_PERMISSION_PRESETS,
+} from '@/constants/permission'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { PermissionKey } from '@/types/permission'
 import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconX } from '@tabler/icons-react'
@@ -35,125 +40,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-
-const permissionMapping: Record<string, { domain: string; action: string }> = {
-  canViewCreditCard: { domain: 'TRANSACTION', action: 'READ' },
-  canViewDashboard: { domain: 'REPORT', action: 'READ' },
-  canManageEmployee: { domain: 'STAFF', action: 'CREATE' },
-  canManageProducts: { domain: 'PRODUCT', action: 'UPDATE' },
-  canManageInventory: { domain: 'INVENTORY', action: 'UPDATE' },
-  canManageStock: { domain: 'INVENTORY', action: 'UPDATE' },
-  canCreateOrder: { domain: 'ORDER', action: 'CREATE' },
-  canManageOrders: { domain: 'ORDER', action: 'UPDATE' },
-  canCancelOrder: { domain: 'ORDER', action: 'CANCEL' },
-  canManageCoupons: { domain: 'COUPON', action: 'CREATE' },
-  canManageCustomers: { domain: 'CUSTOMER', action: 'UPDATE' },
-  canManageStoreSettings: { domain: 'SETTING', action: 'UPDATE' },
-  canViewFinance: { domain: 'REPORT', action: 'READ' },
-  canViewActivityLogs: { domain: 'REPORT', action: 'READ' },
-  canManageBranches: { domain: 'BRANCH', action: 'UPDATE' },
-  canManageBlogs: { domain: 'BLOG', action: 'CREATE' },
-  canManageShipping: { domain: 'SHIPPING', action: 'UPDATE' },
-  canManagePayment: { domain: 'PAYMENT', action: 'UPDATE' },
-  canManageSubscription: { domain: 'SUBSCRIPTION', action: 'UPDATE' },
-  canManageConversation: { domain: 'CONVERSATION', action: 'READ' },
-  canManageStoreProfile: { domain: 'SETTING', action: 'UPDATE' },
-  canManageSecurity: { domain: 'SETTING', action: 'UPDATE' },
-  canManageNotifications: { domain: 'SETTING', action: 'UPDATE' },
-  canTransferStore: { domain: 'SETTING', action: 'UPDATE' },
-  canManageTax: { domain: 'SETTING', action: 'UPDATE' },
-}
-
-const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
-  OWNER: [
-    'canViewCreditCard',
-    'canViewDashboard',
-    'canManageEmployee',
-    'canManageProducts',
-    'canManageInventory',
-    'canManageStock',
-    'canCreateOrder',
-    'canManageOrders',
-    'canCancelOrder',
-    'canManageCoupons',
-    'canManageCustomers',
-    'canManageStoreSettings',
-    'canViewFinance',
-    'canViewActivityLogs',
-    'canManageBranches',
-    'canManageBlogs',
-    'canManageShipping',
-    'canManagePayment',
-    'canManageSubscription',
-    'canManageConversation',
-    'canManageStoreProfile',
-    'canManageSecurity',
-    'canManageNotifications',
-    'canTransferStore',
-    'canManageTax',
-  ],
-  ADMIN: [
-    'canViewCreditCard',
-    'canViewDashboard',
-    'canManageEmployee',
-    'canManageProducts',
-    'canManageInventory',
-    'canManageStock',
-    'canCreateOrder',
-    'canManageOrders',
-    'canCancelOrder',
-    'canManageCoupons',
-    'canManageCustomers',
-    'canManageStoreSettings',
-    'canViewFinance',
-    'canViewActivityLogs',
-    'canManageBranches',
-    'canManageBlogs',
-    'canManageShipping',
-    'canManagePayment',
-    'canManageSubscription',
-    'canManageConversation',
-    'canManageStoreProfile',
-    'canManageSecurity',
-    'canManageNotifications',
-    'canTransferStore',
-    'canManageTax',
-  ],
-  MANAGER: [
-    'canViewDashboard',
-    'canManageProducts',
-    'canManageInventory',
-    'canManageStock',
-    'canCreateOrder',
-    'canManageOrders',
-    'canCancelOrder',
-    'canManageCoupons',
-    'canManageCustomers',
-    'canViewFinance',
-    'canViewActivityLogs',
-    'canManageBranches',
-    'canManageBlogs',
-    'canManageShipping',
-    'canManageConversation',
-    'canManageNotifications',
-  ],
-  CASHIER: [
-    'canViewDashboard',
-    'canCreateOrder',
-    'canManageOrders',
-    'canCancelOrder',
-    'canManageCustomers',
-    'canManagePayment',
-    'canManageConversation',
-  ],
-  STAFF: [
-    'canViewDashboard',
-    'canCreateOrder',
-    'canManageOrders',
-    'canManageCustomers',
-    'canManageConversation',
-  ],
-}
 
 const DEFAULT_VALUES = {
   name: '',
@@ -345,7 +231,7 @@ export function EmployeeDialog({
 
                   const mappedIds = presetKeys
                     .map((key) => {
-                      const target = permissionMapping[key]
+                      const target = PERMISSION_MAPPING[key as PermissionKey]
                       if (!target) {
                         return null
                       }

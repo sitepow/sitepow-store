@@ -1,5 +1,6 @@
+import { PERMISSION_MAPPING } from '@/constants/permission'
 import { DefaultRole } from '@/generated/prisma/enums'
-import { PermissionKey, permissionMapping } from '@/types/permission'
+import { PermissionKey } from '@/types/permission'
 
 import { prisma } from '@/lib/prisma'
 
@@ -14,10 +15,10 @@ export async function initializeStoreRolesAndPermissions(
 ) {
   const db = ts || prisma
 
-  const permissionKeys = Object.keys(permissionMapping) as PermissionKey[]
+  const permissionKeys = Object.keys(PERMISSION_MAPPING) as PermissionKey[]
 
   for (const key of permissionKeys) {
-    const { domain, action } = permissionMapping[key]
+    const { domain, action } = PERMISSION_MAPPING[key]
 
     await db.permission.upsert({
       where: {

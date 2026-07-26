@@ -42,12 +42,14 @@ export default function MerchantStoreSettingsBranchesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <BranchDialog
-              branchId={selectedBranchId}
-              open={open}
-              setOpen={setOpen}
-              onAdd={handleAdd}
-            />
+            {!isPermissionLoading && canManageBranches && (
+              <BranchDialog
+                branchId={selectedBranchId}
+                open={open}
+                setOpen={setOpen}
+                onAdd={handleAdd}
+              />
+            )}
           </div>
         }
       />
