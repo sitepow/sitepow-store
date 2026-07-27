@@ -322,9 +322,11 @@ enum PermissionAction {
 }
 
 model Permission {
-  id     String           @id @default(uuid())
-  domain PermissionDomain
-  action PermissionAction
+  id        String           @id @default(uuid())
+  domain    PermissionDomain
+  action    PermissionAction
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   roles     RolePermission[]
   employees EmployeePermission[]

@@ -118,7 +118,7 @@ export const PERMISSION_MAPPING: Record<
   },
   canManageStock: {
     domain: PermissionDomain.INVENTORY,
-    action: PermissionAction.UPDATE,
+    action: PermissionAction.DELETE,
   },
   canCreateOrder: {
     domain: PermissionDomain.ORDER,
@@ -145,11 +145,11 @@ export const PERMISSION_MAPPING: Record<
     action: PermissionAction.UPDATE,
   },
   canViewFinance: {
-    domain: PermissionDomain.REPORT,
+    domain: PermissionDomain.FINANCE,
     action: PermissionAction.READ,
   },
   canViewActivityLogs: {
-    domain: PermissionDomain.REPORT,
+    domain: PermissionDomain.LOG,
     action: PermissionAction.READ,
   },
   canManageBranches: {
@@ -177,23 +177,23 @@ export const PERMISSION_MAPPING: Record<
     action: PermissionAction.READ,
   },
   canManageStoreProfile: {
-    domain: PermissionDomain.SETTING,
+    domain: PermissionDomain.STORE_PROFILE,
     action: PermissionAction.UPDATE,
   },
   canManageSecurity: {
-    domain: PermissionDomain.SETTING,
+    domain: PermissionDomain.SECURITY,
     action: PermissionAction.UPDATE,
   },
   canManageNotifications: {
-    domain: PermissionDomain.SETTING,
+    domain: PermissionDomain.NOTIFICATION,
     action: PermissionAction.UPDATE,
   },
   canTransferStore: {
-    domain: PermissionDomain.SETTING,
+    domain: PermissionDomain.STORE_TRANSFER,
     action: PermissionAction.UPDATE,
   },
   canManageTax: {
-    domain: PermissionDomain.SETTING,
+    domain: PermissionDomain.TAX,
     action: PermissionAction.UPDATE,
   },
 }
