@@ -1,11 +1,13 @@
 'use server'
 
 import { PERMISSION_MAPPING } from '@/constants/permission'
+import { DEFAULT_PASSWORD_EMPLOYEE } from '@/constants/system'
 import { EmployeeStore, Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
+import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -242,14 +244,24 @@ export async function createEmployee(input: CreateEmployeeInput) {
         return { success: false, message: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว' }
       }
     } else {
-      const user = await prisma.user.create({
-        data: {
-          email: input.email,
-          name: input.name,
-          role: UserRole.MERCHANT,
-        },
+      let user = await prisma.user.findUnique({
+        where: { email: input.email },
         select: { id: true },
       })
+
+      if (!user) {
+        const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD_EMPLOYEE, 10)
+
+        user = await prisma.user.create({
+          data: {
+            email: input.email,
+            name: input.name,
+            role: UserRole.MERCHANT,
+            password: hashedPassword,
+          },
+          select: { id: true },
+        })
+      }
 
       employee = await prisma.employee.create({
         data: {
@@ -298,7 +310,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
 
     return {
       success: true,
-      message: 'บันทึกข้อมูลสำเร็จแล้ว',
+      message: `บันทึกข้อมูลสำเร็จแล้ว (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
       data: employeeStore,
     }
   } catch (error) {
@@ -429,7 +441,15 @@ export async function deleteEmployee(id: string) {
 
     const employeeStore = await prisma.employeeStore.findUnique({
       where: { id },
-      select: { storeId: true, employeeId: true },
+      select: {
+        storeId: true,
+        employeeId: true,
+        employee: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     })
 
     if (!employeeStore) {
@@ -456,18 +476,54 @@ export async function deleteEmployee(id: string) {
       }
     }
 
-    await prisma.employeeStore.delete({ where: { id } })
+    const targetEmployeeId = employeeStore.employeeId
+    const targetUserId = employeeStore.employee?.userId
+
+    await prisma.$transaction(async (tx) => {
+      await tx.employeeBranch.deleteMany({
+        where: { employeeStoreId: id },
+      })
+
+      await tx.employeePermission.deleteMany({
+        where: { employeeStoreId: id },
+      })
+
+      await tx.employeeStore.delete({
+        where: { id },
+      })
+
+      const remainingStores = await tx.employeeStore.count({
+        where: { employeeId: targetEmployeeId },
+      })
+
+      if (remainingStores === 0) {
+        await tx.employee.delete({
+          where: { id: targetEmployeeId },
+        })
+
+        if (targetUserId) {
+          await tx.user
+            .delete({
+              where: { id: targetUserId },
+            })
+            .catch(() => {})
+        }
+      }
+    })
 
     await createLog({
       action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
       storeId: employeeStore.storeId,
       entity: 'Employee',
-      entityId: employeeStore.employeeId,
+      entityId: targetEmployeeId,
       details: { type: 'deleted' },
     })
 
-    return { success: true, message: 'ลบพนักงานออกจากร้านสำเร็จ' }
+    return {
+      success: true,
+      message: 'ลบพนักงานและข้อมูลที่เกี่ยวข้องทั้งหมดสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

@@ -186,3 +186,4 @@ export const THAI_MONTHS = [
 export const RESPONSIVE_DEVICE = {
   desktop: '600px',
 }
+export const DEFAULT_PASSWORD_EMPLOYEE = '123456'
