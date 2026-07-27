@@ -86,16 +86,6 @@ export async function getBranchOptions(
       return []
     }
 
-    const authCheck = await verifyEmployeePermission({
-      userId,
-      storeId,
-      permission: 'canManageStoreSettings',
-    })
-
-    if (!authCheck.isAuthorized) {
-      return []
-    }
-
     return await prisma.branch.findMany({
       where: { storeId },
       orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],

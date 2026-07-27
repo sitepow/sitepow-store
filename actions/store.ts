@@ -315,8 +315,13 @@ export async function getStoreOptions(filters?: {
       return []
     }
 
+    const userId = session.user.id
+
     const whereClause: Prisma.StoreWhereInput = {
-      ownerId: session.user.id,
+      OR: [
+        { ownerId: userId },
+        { employeeStores: { some: { employee: { userId } } } },
+      ],
     }
 
     if (filters?.search) {
