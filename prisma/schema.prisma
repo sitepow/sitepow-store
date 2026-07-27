@@ -240,7 +240,6 @@ model User {
 
 enum DefaultRole {
   OWNER
-  ADMIN
   MANAGER
   CASHIER
   STAFF
@@ -273,7 +272,7 @@ model Role {
   id      String      @id @default(uuid())
   storeId String
   store   Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  name    DefaultRole @default(STAFF)
+  name    DefaultRole @default(OWNER)
 
   permissions    RolePermission[]
   employeeStores EmployeeStore[]

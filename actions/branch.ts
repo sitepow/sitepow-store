@@ -303,7 +303,7 @@ export async function createBranch(input: CreateBranchInput) {
         throw new Error()
       }
 
-      const { adminRoleId } = await initializeStoreRolesAndPermissions(
+      const { ownerRoleId } = await initializeStoreRolesAndPermissions(
         storeId,
         tx,
       )
@@ -316,22 +316,22 @@ export async function createBranch(input: CreateBranchInput) {
           },
         },
         update: {
-          roleId: adminRoleId,
+          roleId: ownerRoleId,
         },
         create: {
           employeeId: employee.id,
           storeId,
-          roleId: adminRoleId,
+          roleId: ownerRoleId,
         },
         select: { id: true },
       })
 
-      const adminEmployeeStores = await tx.employeeStore.findMany({
-        where: { storeId, roleId: adminRoleId },
+      const ownerEmployeeStores = await tx.employeeStore.findMany({
+        where: { storeId, roleId: ownerRoleId },
         select: { id: true },
       })
 
-      const targetEmployeeStoreIds = adminEmployeeStores.map((es) => es.id)
+      const targetEmployeeStoreIds = ownerEmployeeStores.map((es) => es.id)
 
       if (!targetEmployeeStoreIds.includes(employeeStore.id)) {
         targetEmployeeStoreIds.push(employeeStore.id)

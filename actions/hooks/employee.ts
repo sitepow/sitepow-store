@@ -119,14 +119,13 @@ export function useEmployeePermission() {
   const roleName = employee?.role?.name
 
   const isOwner = employee?.isOwner ?? false
-  const isAdmin = roleName === DefaultRole.ADMIN
   const isManager = roleName === DefaultRole.MANAGER
   const isCashier = roleName === DefaultRole.CASHIER
 
   const hasBranchAccess = employee?.hasBranchAccess ?? false
 
   const hasPermission = (permissionKey: PermissionKey): boolean => {
-    if (!isOwner && !isAdmin && !hasBranchAccess) {
+    if (!isOwner && !hasBranchAccess) {
       return false
     }
 
@@ -138,7 +137,6 @@ export function useEmployeePermission() {
     isLoading,
     error,
     isOwner,
-    isAdmin,
     isManager,
     isCashier,
     hasBranchAccess,

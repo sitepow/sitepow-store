@@ -1,7 +1,6 @@
 'use server'
 
 import { PERMISSION_MAPPING } from '@/constants/permission'
-import { DefaultRole } from '@/generated/prisma/enums'
 import { PermissionKey } from '@/types/permission'
 
 import { prisma } from '@/lib/prisma'
@@ -70,16 +69,13 @@ export async function verifyEmployeePermission({
   }
 
   if (branchId && !isOwner && employeeStore) {
-    const isAdmin = employeeStore.role?.name === DefaultRole.ADMIN
-    if (!isAdmin) {
-      const hasBranchAccess = employeeStore.branches.some(
-        (b) => b.branchId === branchId,
-      )
-      if (!hasBranchAccess) {
-        return {
-          isAuthorized: false,
-          message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
-        }
+    const hasBranchAccess = employeeStore.branches.some(
+      (b) => b.branchId === branchId,
+    )
+    if (!hasBranchAccess) {
+      return {
+        isAuthorized: false,
+        message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
       }
     }
   }

@@ -477,7 +477,7 @@ export async function createStore(input: CreateStoreInput) {
             })
           }
 
-          const { adminRoleId } = await initializeStoreRolesAndPermissions(
+          const { ownerRoleId } = await initializeStoreRolesAndPermissions(
             newStore.id,
             tx,
           )
@@ -494,7 +494,7 @@ export async function createStore(input: CreateStoreInput) {
               },
             },
             update: {
-              roleId: adminRoleId,
+              roleId: ownerRoleId,
               permissions: {
                 deleteMany: {},
                 create: allStorePermissions.map((p) => ({
@@ -505,7 +505,7 @@ export async function createStore(input: CreateStoreInput) {
             create: {
               employeeId: employee.id,
               storeId: newStore.id,
-              roleId: adminRoleId,
+              roleId: ownerRoleId,
               permissions: {
                 create: allStorePermissions.map((p) => ({
                   permissionId: p.id,

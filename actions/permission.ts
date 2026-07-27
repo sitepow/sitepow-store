@@ -41,7 +41,7 @@ export async function initializeStoreRolesAndPermissions(
   const permissionIds = allPermissions.map((p: { id: string }) => p.id)
 
   const defaultRolesToCreate = Object.values(DefaultRole)
-  let adminRoleId = ''
+  let ownerRoleId = ''
 
   for (const roleName of defaultRolesToCreate) {
     const role = await db.role.upsert({
@@ -68,10 +68,10 @@ export async function initializeStoreRolesAndPermissions(
       })
     }
 
-    if (roleName === DefaultRole.ADMIN) {
-      adminRoleId = role.id
+    if (roleName === DefaultRole.OWNER) {
+      ownerRoleId = role.id
     }
   }
 
-  return { adminRoleId }
+  return { ownerRoleId }
 }
