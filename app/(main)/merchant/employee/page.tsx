@@ -45,31 +45,33 @@ export default function EmployeePage() {
             <StoreSelectField />
             <BranchSelectField />
             {canManageEmployee && (
-              <EmployeeDialog
-                employeeId={selectedEmployeeId}
-                open={open}
-                setOpen={setOpen}
-                onAdd={handleAdd}
-              />
+              <>
+                <EmployeeDialog
+                  employeeId={selectedEmployeeId}
+                  open={open}
+                  setOpen={setOpen}
+                  onAdd={handleAdd}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPermissions((prev) => !prev)}
+                >
+                  {showPermissions ? (
+                    <IconEyeOff className="mr-1.5 size-4" />
+                  ) : (
+                    <IconEye className="mr-1.5 size-4" />
+                  )}
+                  {showPermissions
+                    ? 'ซ่อนตารางอ้างอิงสิทธิ์'
+                    : 'แสดงตารางอ้างอิงสิทธิ์'}
+                </Button>
+              </>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPermissions((prev) => !prev)}
-            >
-              {showPermissions ? (
-                <IconEyeOff className="mr-1.5 size-4" />
-              ) : (
-                <IconEye className="mr-1.5 size-4" />
-              )}
-              {showPermissions
-                ? 'ซ่อนตารางอ้างอิงสิทธิ์'
-                : 'แสดงตารางอ้างอิงสิทธิ์'}
-            </Button>
           </div>
         }
       />
-      {showPermissions && <PermissionLegendTable />}
+      {showPermissions && canManageEmployee && <PermissionLegendTable />}
       <EmployeeTable onEdit={handleEdit} />
     </DashboardSidebar>
   )

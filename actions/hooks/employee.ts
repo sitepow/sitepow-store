@@ -125,7 +125,7 @@ export function useEmployeePermission() {
   const hasBranchAccess = employee?.hasBranchAccess ?? false
 
   const hasPermission = (permissionKey: PermissionKey): boolean => {
-    if (!isOwner && !hasBranchAccess) {
+    if (!hasBranchAccess) {
       return false
     }
 

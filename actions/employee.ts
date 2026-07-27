@@ -539,7 +539,6 @@ export async function getEmployeePermission(
       where: { id: storeId },
       select: { ownerId: true },
     })
-
     const isOwner = store?.ownerId === userId
 
     const employee = await prisma.employee.findUnique({
@@ -548,30 +547,6 @@ export async function getEmployeePermission(
     })
 
     if (!employee) {
-      if (isOwner) {
-        const allPermissions = await prisma.permission.findMany()
-        const permissions: PermissionKey[] = []
-
-        for (const p of allPermissions) {
-          const matchedKey = (
-            Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-          ).find((key) => {
-            const map = PERMISSION_MAPPING[key]
-            return map.domain === p.domain && map.action === p.action
-          })
-          if (matchedKey) {
-            permissions.push(matchedKey)
-          }
-        }
-
-        return {
-          employeeStore: null,
-          role: null,
-          isOwner: true,
-          permissions,
-          hasBranchAccess: true,
-        }
-      }
       return null
     }
 
@@ -593,12 +568,12 @@ export async function getEmployeePermission(
       },
     })
 
-    if (!employeeStore && !isOwner) {
+    if (!employeeStore) {
       return null
     }
 
     let hasBranchAccess = true
-    if (branchId && branchId !== ALL_BRANCHES && !isOwner) {
+    if (branchId && branchId !== ALL_BRANCHES) {
       const branchAccess = employeeStore?.branches.some(
         (b) => b.branchId === branchId,
       )
@@ -607,20 +582,7 @@ export async function getEmployeePermission(
 
     const permissions: PermissionKey[] = []
 
-    if (isOwner) {
-      const allPermissions = await prisma.permission.findMany()
-      for (const p of allPermissions) {
-        const matchedKey = (
-          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-        ).find((key) => {
-          const map = PERMISSION_MAPPING[key]
-          return map.domain === p.domain && map.action === p.action
-        })
-        if (matchedKey && !permissions.includes(matchedKey)) {
-          permissions.push(matchedKey)
-        }
-      }
-    } else if (employeeStore?.permissions) {
+    if (employeeStore?.permissions) {
       for (const ep of employeeStore.permissions) {
         const { domain, action } = ep.permission
 

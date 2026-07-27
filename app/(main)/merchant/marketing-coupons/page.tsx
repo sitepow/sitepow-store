@@ -28,7 +28,7 @@ export default function MerchantMarketingCouponsPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            <CouponCreateDialog />
+            {selectedStoreId !== ALL_STORES && <CouponCreateDialog />}
           </div>
         }
       />

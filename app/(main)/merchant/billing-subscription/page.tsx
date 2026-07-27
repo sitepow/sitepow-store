@@ -26,9 +26,9 @@ export default function MerchantBillingSubscriptionPage() {
         description="ตรวจสอบข้อมูลแพลนรายเดือนและประวัติใบเสร็จแยกตามรายร้านค้าของคุณ"
         endContent={<StoreSelectField />}
       />
-      {selectedStoreId !== ALL_STORES &&
-      !isPermissionLoading &&
-      !canManageSubscription ? (
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && !canManageSubscription ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"

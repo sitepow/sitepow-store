@@ -77,7 +77,7 @@ export function MerchantSubscriptionTable() {
                   <TableCell>{sub.store?.id}</TableCell>
                   <TableCell>
                     <div className="flex flex-col space-y-1.5">
-                      <span className="font-medium">{sub.store.name}</span>
+                      <Badge variant="outline">{sub.store.name}</Badge>
                       <div className="flex items-center gap-1.5">
                         {isPastDue && (
                           <Badge variant="destructive">เกินกำหนดชำระ</Badge>
@@ -115,7 +115,7 @@ export function MerchantSubscriptionTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge>{plan.name}</Badge>
+                    <Badge variant="outline">{plan.name}</Badge>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">
