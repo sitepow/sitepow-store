@@ -83,9 +83,9 @@ export function EmployeeDialog({
 
   useEffect(() => {
     if (employeeData) {
-      const rolePermissions = employeeData.role?.permissions ?? []
-      const extractedPermissionIds = rolePermissions.map(
-        (rp: { permission: { id: string } }) => rp.permission.id,
+      const employeePermissions = employeeData.permissions ?? []
+      const extractedPermissionIds = employeePermissions.map(
+        (ep: { permissionId: string }) => ep.permissionId,
       )
 
       reset({
@@ -107,9 +107,9 @@ export function EmployeeDialog({
 
   const handleReset = () => {
     if (employeeData) {
-      const rolePermissions = employeeData.role?.permissions ?? []
-      const extractedPermissionIds = rolePermissions.map(
-        (rp: { permission: { id: string } }) => rp.permission.id,
+      const employeePermissions = employeeData.permissions ?? []
+      const extractedPermissionIds = employeePermissions.map(
+        (ep: { permissionId: string }) => ep.permissionId,
       )
 
       reset({
@@ -294,8 +294,8 @@ export function EmployeeDialog({
           </Field>
         </div>
         <DialogFooter className="mt-2 flex items-center justify-between border-t pt-4">
-          <div>
-            {isDirty && (
+          <div className="flex gap-2">
+            {isDirty ? (
               <Button
                 type="button"
                 variant="outline"
@@ -305,16 +305,15 @@ export function EmployeeDialog({
                 <IconX className="mr-1 size-4" />
                 ล้างการตั้งค่า
               </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                disabled={isPending}
+              >
+                ยกเลิก
+              </Button>
             )}
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              disabled={isPending}
-            >
-              ยกเลิก
-            </Button>
             <Button disabled={isPending} onClick={handleSubmit(onSubmit)}>
               {isPending ? (
                 <>

@@ -1,8 +1,8 @@
 'use server'
 
+import { PERMISSION_MAPPING } from '@/constants/permission'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { PermissionKey } from '@/types/permission'
-import { checkPermission } from '@/utils/permission'
 
 import { prisma } from '@/lib/prisma'
 
@@ -33,6 +33,11 @@ export async function verifyEmployeePermission({
     },
     include: {
       role: true,
+      permissions: {
+        include: {
+          permission: true,
+        },
+      },
       branches: true,
     },
   })
@@ -41,15 +46,31 @@ export async function verifyEmployeePermission({
     return { isAuthorized: false, message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้' }
   }
 
-  if (permission && employeeStore) {
-    const hasAccess = await checkPermission(employeeStore.roleId, permission)
-    if (!hasAccess) {
-      return { isAuthorized: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
+  if (permission && !isOwner && employeeStore) {
+    const targetMapping = PERMISSION_MAPPING[permission]
+    if (targetMapping) {
+      const hasPermission = employeeStore.permissions.some(
+        (ep) =>
+          ep.permission.domain === targetMapping.domain &&
+          ep.permission.action === targetMapping.action,
+      )
+
+      if (!hasPermission) {
+        return {
+          isAuthorized: false,
+          message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        }
+      }
+    } else {
+      return {
+        isAuthorized: false,
+        message: 'ไม่พบข้อมูลสิทธิ์การใช้งานนี้ในระบบ',
+      }
     }
   }
 
-  if (branchId && employeeStore) {
-    const isAdmin = employeeStore.role.name === DefaultRole.ADMIN
+  if (branchId && !isOwner && employeeStore) {
+    const isAdmin = employeeStore.role?.name === DefaultRole.ADMIN
     if (!isAdmin) {
       const hasBranchAccess = employeeStore.branches.some(
         (b) => b.branchId === branchId,

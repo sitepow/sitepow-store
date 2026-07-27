@@ -238,6 +238,14 @@ model User {
   ownedStores        Store[]              @relation("StoreOwner")
 }
 
+enum DefaultRole {
+  OWNER
+  ADMIN
+  MANAGER
+  CASHIER
+  STAFF
+}
+
 model Employee {
   id    String @id @default(uuid())
   name  String
@@ -251,12 +259,14 @@ model Employee {
   orders       Order[]
 }
 
-enum DefaultRole {
-  OWNER
-  ADMIN
-  MANAGER
-  CASHIER
-  STAFF
+model EmployeePermission {
+  employeeStoreId String
+  employeeStore   EmployeeStore @relation(fields: [employeeStoreId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([employeeStoreId, permissionId])
 }
 
 model Role {
@@ -290,6 +300,13 @@ enum PermissionDomain {
   SUBSCRIPTION
   TRANSACTION
   CONVERSATION
+  FINANCE
+  LOG
+  STORE_PROFILE
+  SECURITY
+  NOTIFICATION
+  STORE_TRANSFER
+  TAX
 }
 
 enum PermissionAction {
@@ -309,7 +326,8 @@ model Permission {
   domain PermissionDomain
   action PermissionAction
 
-  roles RolePermission[]
+  roles     RolePermission[]
+  employees EmployeePermission[]
 
   @@unique([domain, action])
 }
@@ -333,7 +351,8 @@ model EmployeeStore {
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
-  branches EmployeeBranch[]
+  branches    EmployeeBranch[]
+  permissions EmployeePermission[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

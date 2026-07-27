@@ -300,10 +300,7 @@ export async function createBranch(input: CreateBranchInput) {
       }
 
       if (!employee) {
-        return {
-          success: false,
-          message: 'ไม่พบข้อมูลพนักงานสำหรับผู้ใช้งานนี้',
-        }
+        throw new Error()
       }
 
       const { adminRoleId } = await initializeStoreRolesAndPermissions(
@@ -369,7 +366,9 @@ export async function createBranch(input: CreateBranchInput) {
     return { success: true, data: branch }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+    }
   }
 }
 

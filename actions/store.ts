@@ -482,6 +482,10 @@ export async function createStore(input: CreateStoreInput) {
             tx,
           )
 
+          const allStorePermissions = await tx.permission.findMany({
+            select: { id: true },
+          })
+
           const employeeStore = await tx.employeeStore.upsert({
             where: {
               storeId_employeeId: {
@@ -491,11 +495,22 @@ export async function createStore(input: CreateStoreInput) {
             },
             update: {
               roleId: adminRoleId,
+              permissions: {
+                deleteMany: {},
+                create: allStorePermissions.map((p) => ({
+                  permissionId: p.id,
+                })),
+              },
             },
             create: {
               employeeId: employee.id,
               storeId: newStore.id,
               roleId: adminRoleId,
+              permissions: {
+                create: allStorePermissions.map((p) => ({
+                  permissionId: p.id,
+                })),
+              },
             },
           })
 

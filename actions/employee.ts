@@ -1,13 +1,8 @@
 'use server'
 
 import { PERMISSION_MAPPING } from '@/constants/permission'
-import { Prisma } from '@/generated/prisma/client'
-import {
-  ActorType,
-  DefaultRole,
-  LogAction,
-  UserRole,
-} from '@/generated/prisma/enums'
+import { EmployeeStore, Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
@@ -58,6 +53,18 @@ const employeeStoreSelect = {
               action: true,
             },
           },
+        },
+      },
+    },
+  },
+  permissions: {
+    select: {
+      permissionId: true,
+      permission: {
+        select: {
+          id: true,
+          domain: true,
+          action: true,
         },
       },
     },
@@ -254,41 +261,24 @@ export async function createEmployee(input: CreateEmployeeInput) {
       })
     }
 
-    if (input.permissionIds && input.roleId) {
-      const roleRecord = await prisma.role.findUnique({
-        where: { id: input.roleId },
-        select: { name: true },
-      })
-      const isOwnerRole =
-        roleRecord?.name?.toUpperCase() === DefaultRole.OWNER ||
-        roleRecord?.name?.toUpperCase() === DefaultRole.ADMIN
-
-      if (!isOwnerRole) {
-        await prisma.rolePermission.deleteMany({
-          where: { roleId: input.roleId },
-        })
-
-        if (input.permissionIds.length > 0) {
-          await prisma.rolePermission.createMany({
-            data: input.permissionIds.map((permissionId) => ({
-              roleId: input.roleId,
-              permissionId,
-            })),
-          })
-        }
-      }
-    }
-
     const employeeStore = await prisma.employeeStore.create({
       data: {
         roleId: input.roleId,
         employeeId: employee.id,
         storeId: input.storeId,
+        permissions: {
+          create:
+            input.permissionIds?.map((permissionId) => ({ permissionId })) ||
+            [],
+        },
         branches: {
           create: input.branchIds.map((branchId) => ({ branchId })),
         },
       },
-      select: employeeStoreSelect,
+      select: {
+        ...employeeStoreSelect,
+        permissions: true,
+      },
     })
 
     await createLog({
@@ -352,55 +342,68 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
     }
 
-    const roleRecord = await prisma.role.findUnique({
-      where: { id: existingEmployeeStore.roleId },
-      select: { name: true },
-    })
-    const isOwnerRole =
-      roleRecord?.name?.toUpperCase() === DefaultRole.OWNER ||
-      roleRecord?.name?.toUpperCase() === DefaultRole.ADMIN
-
-    if (input.permissionIds && existingEmployeeStore.roleId && !isOwnerRole) {
-      await prisma.rolePermission.deleteMany({
-        where: { roleId: existingEmployeeStore.roleId },
+    const updated = await prisma.$transaction(async (tx) => {
+      await tx.employeeStore.update({
+        where: { id },
+        data: {
+          roleId: input.roleId,
+        },
       })
 
-      if (input.permissionIds.length > 0) {
-        await prisma.rolePermission.createMany({
-          data: input.permissionIds.map((permissionId) => ({
-            roleId: existingEmployeeStore.roleId,
-            permissionId,
-          })),
+      if (input.permissionIds) {
+        await tx.employeePermission.deleteMany({
+          where: { employeeStoreId: id },
         })
+
+        if (input.permissionIds.length > 0) {
+          await tx.employeePermission.createMany({
+            data: input.permissionIds.map((permissionId) => ({
+              employeeStoreId: id,
+              permissionId,
+            })),
+            skipDuplicates: true,
+          })
+        }
       }
-    }
 
-    const updateData: Prisma.EmployeeStoreUpdateInput = {}
+      if (input.branchIds) {
+        await tx.employeeBranch.deleteMany({
+          where: { employeeStoreId: id },
+        })
 
-    if (input.roleId) {
-      updateData.role = {
-        connect: { id: input.roleId },
+        if (input.branchIds.length > 0) {
+          await tx.employeeBranch.createMany({
+            data: input.branchIds.map((branchId) => ({
+              employeeStoreId: id,
+              branchId,
+            })),
+            skipDuplicates: true,
+          })
+        }
       }
-    }
 
-    if (input.branchIds) {
-      updateData.branches = {
-        deleteMany: {},
-        create: input.branchIds.map((branchId) => ({ branchId })),
+      if (input.name) {
+        const employeeStoreData = await tx.employeeStore.findUnique({
+          where: { id },
+          select: { employeeId: true },
+        })
+        if (employeeStoreData?.employeeId) {
+          await tx.employee.update({
+            where: { id: employeeStoreData.employeeId },
+            data: { name: input.name },
+          })
+        }
       }
-    }
 
-    if (input.name) {
-      updateData.employee = {
-        update: { name: input.name },
-      }
-    }
-
-    const updated = await prisma.employeeStore.update({
-      where: { id },
-      data: updateData,
-      select: employeeStoreSelect,
+      return await tx.employeeStore.findUnique({
+        where: { id },
+        select: employeeStoreSelect,
+      })
     })
+
+    if (!updated) {
+      return { success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }
+    }
 
     await createLog({
       action: LogAction.MANAGE_STAFF,
@@ -414,7 +417,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }
+    return { success: false }
   }
 }
 
@@ -513,7 +516,7 @@ export async function getEmployee(
 }
 
 export interface EmployeePermissionResult {
-  employeeStore: GetEmployeesItem | null
+  employeeStore: EmployeeStore | null
   role: { id: string; name: string } | null
   isOwner: boolean
   permissions: PermissionKey[]
@@ -579,7 +582,15 @@ export async function getEmployeePermission(
           storeId,
         },
       },
-      select: employeeStoreSelect,
+      include: {
+        role: true,
+        permissions: {
+          include: {
+            permission: true,
+          },
+        },
+        branches: true,
+      },
     })
 
     if (!employeeStore && !isOwner) {
@@ -588,20 +599,30 @@ export async function getEmployeePermission(
 
     let hasBranchAccess = true
     if (branchId && branchId !== ALL_BRANCHES && !isOwner) {
-      const branchAccess = await prisma.employeeBranch.findFirst({
-        where: {
-          employeeId: employee.id,
-          branchId: branchId,
-        },
-      })
+      const branchAccess = employeeStore?.branches.some(
+        (b) => b.branchId === branchId,
+      )
       hasBranchAccess = !!branchAccess
     }
 
     const permissions: PermissionKey[] = []
 
-    if (employeeStore?.role?.permissions) {
-      for (const p of employeeStore.role.permissions) {
-        const { domain, action } = p.permission
+    if (isOwner) {
+      const allPermissions = await prisma.permission.findMany()
+      for (const p of allPermissions) {
+        const matchedKey = (
+          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
+        ).find((key) => {
+          const map = PERMISSION_MAPPING[key]
+          return map.domain === p.domain && map.action === p.action
+        })
+        if (matchedKey && !permissions.includes(matchedKey)) {
+          permissions.push(matchedKey)
+        }
+      }
+    } else if (employeeStore?.permissions) {
+      for (const ep of employeeStore.permissions) {
+        const { domain, action } = ep.permission
 
         const matchedKey = (
           Object.keys(PERMISSION_MAPPING) as PermissionKey[]
@@ -610,7 +631,7 @@ export async function getEmployeePermission(
           return map.domain === domain && map.action === action
         })
 
-        if (matchedKey) {
+        if (matchedKey && !permissions.includes(matchedKey)) {
           permissions.push(matchedKey)
         }
       }

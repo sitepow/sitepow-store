@@ -112,10 +112,7 @@ export function useEmployeePermission() {
     queryOptions({
       queryKey: employeeKeys.currentStore(selectedStoreId, selectedBranchId),
       queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId),
-      enabled:
-        !!selectedStoreId &&
-        selectedStoreId !== ALL_STORES &&
-        !!selectedBranchId,
+      enabled: !!selectedStoreId && selectedStoreId !== ALL_STORES,
     }),
   )
 

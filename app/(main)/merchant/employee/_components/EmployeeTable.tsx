@@ -89,7 +89,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
               />
             ) : (
               employees.map((employee) => {
-                const permissions = employee.role?.permissions ?? []
+                const permissions = employee?.permissions ?? []
 
                 return (
                   <TableRow key={employee.id}>
