@@ -282,7 +282,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
     })
 
     await createLog({
-      action: LogAction.MANAGE_STAFF,
+      action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
       storeId: input.storeId,
       entity: 'Employee',
@@ -406,7 +406,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     }
 
     await createLog({
-      action: LogAction.MANAGE_STAFF,
+      action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
       storeId: updated.store.id,
       entity: 'Employee',
@@ -459,7 +459,7 @@ export async function deleteEmployee(id: string) {
     await prisma.employeeStore.delete({ where: { id } })
 
     await createLog({
-      action: LogAction.MANAGE_STAFF,
+      action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
       storeId: employeeStore.storeId,
       entity: 'Employee',

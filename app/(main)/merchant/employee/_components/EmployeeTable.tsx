@@ -111,7 +111,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                           permissions.map(({ permission }) => (
                             <Badge
                               key={permission.id}
-                              variant="secondary"
+                              variant="outline"
                               className="text-xs"
                             >
                               {permission.domain}_{permission.action}

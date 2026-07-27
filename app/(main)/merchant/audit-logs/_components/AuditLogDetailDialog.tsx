@@ -17,7 +17,7 @@ export interface ActivityLogItem {
   storeId: string
   action: LogAction
   actorType: ActorType
-  staffName: string
+  employeeName: string
   entity: string
   entityId: string
   ipAddress: string | null

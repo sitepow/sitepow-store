@@ -77,7 +77,9 @@ export async function getDashboard(
 
     const employeeStore = authCheck.employeeStore
     const isCashier = employeeStore?.role?.name === DefaultRole.CASHIER
-    const cashierOrderFilter = isCashier ? { staffId: employeeStore?.id } : {}
+    const cashierOrderFilter = isCashier
+      ? { employeeId: employeeStore?.id }
+      : {}
 
     const storeFilter = { storeId }
 

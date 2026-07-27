@@ -85,7 +85,7 @@ export async function deleteUserAccount() {
       where: { id: userId },
       select: {
         role: true,
-        staffProfile: { select: { id: true } },
+        employee: { select: { id: true } },
         customer: { select: { id: true } },
       },
     })
@@ -94,7 +94,7 @@ export async function deleteUserAccount() {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    const isMerchant = user.role === UserRole.MERCHANT || !!user.staffProfile
+    const isMerchant = user.role === UserRole.MERCHANT || !!user.employee
 
     await prisma.$transaction(async (tx) => {
       if (user.customer) {

@@ -85,7 +85,7 @@ export const LOG_ACTION_TH: Record<LogAction, string> = {
   [LogAction.CREATE_PRODUCT]: 'เพิ่มสินค้าใหม่',
   [LogAction.DELETE_PRODUCT]: 'ลบสินค้า',
   [LogAction.UPDATE_STORE_SETTING]: 'แก้ไขการตั้งค่าร้าน',
-  [LogAction.MANAGE_STAFF]: 'จัดการพนักงาน',
+  [LogAction.MANAGE_EMPLOYEE]: 'จัดการพนักงาน',
   [LogAction.TRANSFER_STORE]: 'โอนความเป็นเจ้าของร้านให้ผู้อื่น',
   [LogAction.BLOCK_CUSTOMER]: 'ระงับการใช้งานลูกค้า (Block)',
   [LogAction.UNBLOCK_CUSTOMER]: 'ปลดระงับการใช้งานลูกค้า (Unblock)',

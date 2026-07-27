@@ -142,7 +142,7 @@ export async function getOrders({
         where: {
           OR: [
             { ownerId: userId },
-            { StaffStore: { some: { staff: { userId } } } },
+            { employeeStores: { some: { employee: { userId } } } },
           ],
         },
         select: { id: true },

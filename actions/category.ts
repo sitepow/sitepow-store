@@ -147,7 +147,7 @@ export async function getCategories({
         where: {
           OR: [
             { ownerId: userId },
-            { StaffStore: { some: { staff: { userId } } } },
+            { employeeStores: { some: { employee: { userId } } } },
           ],
         },
         select: { id: true },
@@ -228,7 +228,7 @@ export async function getCategoryOptions(filters?: {
         where: {
           OR: [
             { ownerId: userId },
-            { StaffStore: { some: { staff: { userId } } } },
+            { employeeStores: { some: { employee: { userId } } } },
           ],
         },
         select: { id: true },

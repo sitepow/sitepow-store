@@ -25,13 +25,13 @@ export async function createLog({
     const [session, headersList] = await Promise.all([auth(), headers()])
 
     const userId = session?.user?.id
-    const staff = userId
+    const employee = userId
       ? await prisma.employee.findUnique({
           where: { userId },
           select: { id: true },
         })
       : null
-    const staffId = staff?.id ?? undefined
+    const employeeId = employee?.id ?? undefined
 
     const ip =
       headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
@@ -43,7 +43,7 @@ export async function createLog({
         action,
         actorType,
         storeId,
-        staffId,
+        employeeId,
         userId,
         entity,
         entityId,
