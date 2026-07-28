@@ -1,11 +1,13 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import {
   PERMISSION_DESCRIPTIONS,
   PERMISSION_MAPPING,
 } from '@/constants/permission'
 import { PermissionKey } from '@/types/permission'
-import { IconLock } from '@tabler/icons-react'
+import { IconKey } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import {
@@ -16,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function PermissionLegendTable() {
   const permissionEntries = Object.entries(PERMISSION_MAPPING) as [
@@ -23,33 +26,64 @@ export function PermissionLegendTable() {
     { domain: string; action: string },
   ][]
 
+  const groupedByDomain = useMemo(() => {
+    const groups: Record<string, typeof permissionEntries> = {}
+
+    permissionEntries.forEach((entry) => {
+      const [, value] = entry
+      const domain = value.domain
+      if (!groups[domain]) {
+        groups[domain] = []
+      }
+      groups[domain].push(entry)
+    })
+
+    return groups
+  }, [permissionEntries])
+
+  const domains = Object.keys(groupedByDomain)
+  const defaultDomain = domains[0] || ''
+
+  if (domains.length === 0) {
+    return null
+  }
+
   return (
-    <Table className="border">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-1/3">Permission Key</TableHead>
-          <TableHead className="w-1/3">Domain / Action</TableHead>
-          <TableHead className="w-1/3">คำอธิบาย</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {permissionEntries.map(([key, value]) => (
-          <TableRow key={key}>
-            <TableCell className="text-primary flex items-center gap-1">
-              <IconLock className="size-4" />
-              {key}
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline">
-                {value.domain}_{value.action}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-primary max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-              {PERMISSION_DESCRIPTIONS[key] || '-'}
-            </TableCell>
-          </TableRow>
+    <Tabs defaultValue={defaultDomain} className="w-full">
+      <TabsList className="mb-4 flex w-full justify-start overflow-x-auto whitespace-nowrap">
+        {domains.map((domain) => (
+          <TabsTrigger key={domain} value={domain}>
+            {domain}
+          </TabsTrigger>
         ))}
-      </TableBody>
-    </Table>
+      </TabsList>
+      {domains.map((domain) => (
+        <TabsContent key={domain} value={domain}>
+          <Table className="border">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Domain / Action</TableHead>
+                <TableHead>คำอธิบาย</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {groupedByDomain[domain].map(([key, value]) => (
+                <TableRow key={key}>
+                  <TableCell>
+                    <Badge variant="outline">
+                      <IconKey className="size-4" />
+                      {value.domain}_{value.action}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-primary max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    - {PERMISSION_DESCRIPTIONS[key] || '-'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TabsContent>
+      ))}
+    </Tabs>
   )
 }

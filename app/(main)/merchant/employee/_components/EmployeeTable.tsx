@@ -9,7 +9,7 @@ import {
 } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconSettings } from '@tabler/icons-react'
+import { IconKey, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -124,40 +124,68 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                 const uniquePermissions = Array.from(allPermissions.values())
                 const roleNames = Array.from(rolesSet)
 
+                const MAX_DISPLAY_ROLES = 2
+                const MAX_DISPLAY_PERMISSIONS = 3
+
+                const displayedRoles = roleNames.slice(0, MAX_DISPLAY_ROLES)
+                const remainingRolesCount = roleNames.length - MAX_DISPLAY_ROLES
+
+                const displayedPermissions = uniquePermissions.slice(
+                  0,
+                  MAX_DISPLAY_PERMISSIONS,
+                )
+                const remainingPermissionsCount =
+                  uniquePermissions.length - MAX_DISPLAY_PERMISSIONS
+
                 return (
                   <TableRow key={employeeStore.id}>
                     <TableCell>{employeeStore.id}</TableCell>
                     <TableCell>{employeeStore.employee?.name}</TableCell>
                     <TableCell>{employeeStore.employee?.email}</TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap items-center gap-1">
                         {roleNames.length === 0 ? (
                           <Badge variant="outline">ไม่ระบุบทบาท</Badge>
                         ) : (
-                          roleNames.map((roleName, idx) => (
-                            <Badge key={idx} variant="outline">
-                              {roleName}
-                            </Badge>
-                          ))
+                          <>
+                            {displayedRoles.map((roleName, idx) => (
+                              <Badge key={idx} variant="outline">
+                                {roleName}
+                              </Badge>
+                            ))}
+                            {remainingRolesCount > 0 && (
+                              <span className="text-muted-foreground text-xs">
+                                +{remainingRolesCount}
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="maw-w-72 flex max-w-xs min-w-72 flex-wrap gap-1 wrap-break-word whitespace-pre-line">
+                      <div className="flex max-w-72 min-w-72 flex-wrap items-center gap-1">
                         {uniquePermissions.length === 0 ? (
                           <span className="text-muted-foreground text-xs">
                             ไม่มีสิทธิ์
                           </span>
                         ) : (
-                          uniquePermissions.map((permission) => (
-                            <Badge
-                              key={permission.id}
-                              variant="outline"
-                              className="text-xs"
-                            >
-                              {permission.domain}_{permission.action}
-                            </Badge>
-                          ))
+                          <>
+                            {displayedPermissions.map((permission) => (
+                              <Badge
+                                key={permission.id}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <IconKey className="size-4" />
+                                {permission.domain}_{permission.action}
+                              </Badge>
+                            ))}
+                            {remainingPermissionsCount > 0 && (
+                              <span className="text-muted-foreground text-xs">
+                                +{remainingPermissionsCount}
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
                     </TableCell>
