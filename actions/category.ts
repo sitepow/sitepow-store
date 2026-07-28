@@ -87,7 +87,7 @@ export async function getCategory(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: category.storeId,
-      permission: 'canManageProducts',
+      permission: 'canViewCategory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -134,7 +134,7 @@ export async function getCategories({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageProducts',
+        permission: 'canViewCategory',
       })
 
       if (!authCheck.isAuthorized) {
@@ -215,7 +215,7 @@ export async function getCategoryOptions(filters?: {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId: filters.storeId,
-        permission: 'canManageProducts',
+        permission: 'canViewCategory',
       })
 
       if (!authCheck.isAuthorized) {
@@ -264,7 +264,7 @@ export async function createCategory(input: CreateCategoryInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageProducts',
+      permission: 'canCreateCategory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -325,7 +325,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: targetCategory.storeId,
-      permission: 'canManageProducts',
+      permission: 'canUpdateCategory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -398,7 +398,7 @@ export async function deleteCategory(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: category.storeId,
-      permission: 'canManageProducts',
+      permission: 'canDeleteCategory',
     })
 
     if (!authCheck.isAuthorized) {

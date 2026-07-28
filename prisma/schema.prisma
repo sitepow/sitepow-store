@@ -284,6 +284,8 @@ model Role {
 }
 
 enum PermissionDomain {
+  STORE
+  CATEGORY
   PRODUCT
   ORDER
   INVENTORY

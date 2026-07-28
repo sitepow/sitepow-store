@@ -171,7 +171,7 @@ export async function changePlan(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStore',
     })
 
     if (!authCheck.isAuthorized) {
@@ -454,7 +454,7 @@ export async function initiatePlanUpgrade(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStore',
     })
 
     if (!authCheck.isAuthorized) {
@@ -613,7 +613,7 @@ export async function cancelPendingPlanChange(storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStore',
     })
 
     if (!authCheck.isAuthorized) {

@@ -72,7 +72,7 @@ export async function getLoyaltySettings(storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewStoreSettings',
     })
 
     if (!authCheck.isAuthorized) {
@@ -110,7 +110,7 @@ export async function updateLoyaltySettings(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStoreSettings',
     })
 
     if (!authCheck.isAuthorized) {
@@ -184,7 +184,7 @@ export async function getCustomerPoints({
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewStoreSettings',
     })
 
     if (!authCheck.isAuthorized) {

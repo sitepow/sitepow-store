@@ -86,7 +86,7 @@ export async function getActivityLogs({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageStoreSettings',
+        permission: 'canViewActivityLogs',
       })
 
       if (!authCheck.isAuthorized) {

@@ -44,7 +44,7 @@ export async function getStoreProfile(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewStoreProfile',
     })
 
     if (!authCheck.isAuthorized) {
@@ -79,7 +79,7 @@ export async function updateStoreProfile(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStoreProfile',
     })
 
     if (!authCheck.isAuthorized) {

@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 const securitySettingsSelect = {
@@ -19,6 +20,7 @@ export type GetSecuritySettingsResult = Prisma.UserGetPayload<{
 
 export async function getSecuritySettings(
   userId: string,
+  storeId?: string,
 ): Promise<GetSecuritySettingsResult | null> {
   if (!userId) {
     return null
@@ -28,8 +30,22 @@ export async function getSecuritySettings(
     const session = await auth()
     const currentUserId = session?.user?.id
 
-    if (!currentUserId || currentUserId !== userId) {
+    if (!currentUserId) {
       return null
+    }
+
+    if (currentUserId !== userId) {
+      if (!storeId) {
+        return null
+      }
+      const authCheck = await verifyEmployeePermission({
+        userId: currentUserId,
+        storeId,
+        permission: 'canViewSecurity',
+      })
+      if (!authCheck.isAuthorized) {
+        return null
+      }
     }
 
     return await prisma.user.findUnique({
@@ -44,6 +60,7 @@ export async function getSecuritySettings(
 export async function updateSecuritySettings(
   userId: string,
   input: ChangePasswordFormValues,
+  storeId?: string,
 ) {
   try {
     if (!userId) {
@@ -53,8 +70,25 @@ export async function updateSecuritySettings(
     const session = await auth()
     const currentUserId = session?.user?.id
 
-    if (!currentUserId || currentUserId !== userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบด้วยบัญชีที่ถูกต้อง' }
+    if (!currentUserId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    if (currentUserId !== userId) {
+      if (!storeId) {
+        return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
+      }
+      const authCheck = await verifyEmployeePermission({
+        userId: currentUserId,
+        storeId,
+        permission: 'canUpdateSecurity',
+      })
+      if (!authCheck.isAuthorized) {
+        return {
+          success: false,
+          message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        }
+      }
     }
 
     const user = await prisma.user.findUnique({
@@ -66,7 +100,7 @@ export async function updateSecuritySettings(
       return { success: false, message: 'ไม่พบบัญชีผู้ใช้' }
     }
 
-    if (user.password) {
+    if (currentUserId === userId && user.password) {
       const isMatch = await bcrypt.compare(input.currentPassword, user.password)
       if (!isMatch) {
         return { success: false, message: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' }
@@ -98,6 +132,7 @@ export async function updateSecuritySettings(
 export async function updateTwoFactor(
   userId: string,
   isTwoFactorEnabled: boolean,
+  storeId?: string,
 ) {
   try {
     if (!userId) {
@@ -107,8 +142,25 @@ export async function updateTwoFactor(
     const session = await auth()
     const currentUserId = session?.user?.id
 
-    if (!currentUserId || currentUserId !== userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบด้วยบัญชีที่ถูกต้อง' }
+    if (!currentUserId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    if (currentUserId !== userId) {
+      if (!storeId) {
+        return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
+      }
+      const authCheck = await verifyEmployeePermission({
+        userId: currentUserId,
+        storeId,
+        permission: 'canUpdateSecurity',
+      })
+      if (!authCheck.isAuthorized) {
+        return {
+          success: false,
+          message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        }
+      }
     }
 
     await prisma.user.update({

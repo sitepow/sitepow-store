@@ -15,8 +15,11 @@ import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
 
 export default function MerchantLoyaltyPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageCustomers, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canManageStoreSettings,
+    canManageCustomers,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -35,8 +38,14 @@ export default function MerchantLoyaltyPage() {
         />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
-          <LoyaltySettingsCard className="xl:col-span-4" />
-          <CustomerPointsTable className="xl:col-span-8" />
+          {canManageStoreSettings && (
+            <LoyaltySettingsCard className="xl:col-span-4" />
+          )}
+          <CustomerPointsTable
+            className={
+              canManageStoreSettings ? 'xl:col-span-8' : 'xl:col-span-12'
+            }
+          />
         </div>
       )}
     </DashboardSidebar>

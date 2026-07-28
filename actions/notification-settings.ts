@@ -36,7 +36,7 @@ export async function getNotificationSettings(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewNotifications',
     })
 
     if (!authCheck.isAuthorized) {
@@ -71,7 +71,7 @@ export async function updateNotificationSettings(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateNotifications',
     })
 
     if (!authCheck.isAuthorized) {

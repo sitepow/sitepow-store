@@ -72,7 +72,7 @@ export async function getBlogs({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageStoreSettings',
+        permission: 'canViewBlogs',
       })
 
       if (!authCheck.isAuthorized) {

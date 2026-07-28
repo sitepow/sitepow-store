@@ -139,7 +139,7 @@ export async function getProducts({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageProducts',
+        permission: 'canViewProducts',
       })
 
       if (!authCheck.isAuthorized) {
@@ -244,7 +244,7 @@ export async function createProduct(input: CreateProductInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageProducts',
+      permission: 'canCreateProducts',
     })
 
     if (!authCheck.isAuthorized) {
@@ -410,7 +410,7 @@ export async function deleteProduct(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: product.storeId,
-      permission: 'canManageProducts',
+      permission: 'canDeleteProducts',
     })
 
     if (!authCheck.isAuthorized) {
@@ -492,7 +492,7 @@ export async function getProductById(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: product.storeId,
-      permission: 'canManageProducts',
+      permission: 'canViewProducts',
     })
 
     if (!authCheck.isAuthorized) {
@@ -527,7 +527,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingProduct.storeId,
-      permission: 'canManageProducts',
+      permission: 'canUpdateProducts',
     })
 
     if (!authCheck.isAuthorized) {
@@ -640,7 +640,7 @@ export async function getProductOptions(storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageProducts',
+      permission: 'canViewProducts',
     })
 
     if (!authCheck.isAuthorized) {
@@ -680,7 +680,7 @@ export async function getProductQuota(storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageProducts',
+      permission: 'canViewProducts',
     })
 
     if (!authCheck.isAuthorized) {

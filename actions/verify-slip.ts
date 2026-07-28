@@ -275,7 +275,7 @@ export async function approveSlipManual(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
-      permission: 'canManageOrders',
+      permission: 'canUpdateOrders',
     })
 
     if (!authCheck.isAuthorized) {

@@ -134,23 +134,14 @@ export async function getEmployees({
       return emptyResponse
     }
 
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { ownerId: true },
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId,
+      permission: 'canViewEmployee',
     })
 
-    const isOwner = store?.ownerId === userId
-
-    if (!isOwner) {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canManageEmployee',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return emptyResponse
-      }
+    if (!authCheck.isAuthorized) {
+      return emptyResponse
     }
 
     const sanitizedPage = Math.max(1, page)
@@ -214,7 +205,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageEmployee',
+      permission: 'canCreateEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -335,7 +326,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageEmployee',
+      permission: 'canUpdateEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -466,7 +457,7 @@ export async function deleteEmployee(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: employeeStore.storeId,
-      permission: 'canManageEmployee',
+      permission: 'canDeleteEmployee',
     })
 
     if (!authCheck.isAuthorized) {
@@ -557,7 +548,7 @@ export async function getEmployee(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: employeeStore.store.id,
-      permission: 'canManageEmployee',
+      permission: 'canViewEmployee',
     })
 
     if (!authCheck.isAuthorized) {

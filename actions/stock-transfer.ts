@@ -102,7 +102,7 @@ export async function getStockTransfers({
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageInventory',
+      permission: 'canViewInventory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -201,7 +201,7 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageInventory',
+      permission: 'canCreateInventory',
     })
 
     if (!authCheck.isAuthorized) {

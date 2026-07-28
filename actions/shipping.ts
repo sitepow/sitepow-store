@@ -58,7 +58,7 @@ export async function getStoreShippingSettings(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewShipping',
     })
 
     if (!authCheck.isAuthorized) {
@@ -104,7 +104,7 @@ export async function updateStoreShippingSettings(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateShipping',
     })
 
     if (!authCheck.isAuthorized) {

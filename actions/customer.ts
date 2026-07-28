@@ -83,7 +83,7 @@ export async function getCustomers({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageCustomers',
+        permission: 'canViewCustomers',
       })
 
       if (!authCheck.isAuthorized) {
@@ -162,7 +162,7 @@ export async function unblockCustomer(customerId: string, storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageCustomers',
+      permission: 'canUpdateCustomers',
     })
 
     if (!authCheck.isAuthorized) {
@@ -204,7 +204,7 @@ export async function blockCustomer(customerId: string, storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageCustomers',
+      permission: 'canUpdateCustomers',
     })
 
     if (!authCheck.isAuthorized) {

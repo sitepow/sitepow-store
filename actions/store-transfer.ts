@@ -35,7 +35,7 @@ export async function getTransferRequests(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewTransferStore',
     })
 
     if (!authCheck.isAuthorized) {
@@ -75,7 +75,7 @@ export async function createTransferRequest(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canCreateTransferStore',
     })
 
     if (!authCheck.isAuthorized) {
@@ -173,7 +173,7 @@ export async function cancelTransferRequest(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: request.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canDeleteTransferStore',
     })
 
     if (!authCheck.isAuthorized) {

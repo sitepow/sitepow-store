@@ -1,5 +1,7 @@
 'use client'
 
+import { useCallback, useMemo } from 'react'
+
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -124,14 +126,29 @@ export function useEmployeePermission() {
   const isCashier = roleName === DefaultRole.CASHIER
 
   const hasBranchAccess = employee?.hasBranchAccess ?? false
+  const employeePermissions = employee?.permissions
 
-  const hasPermission = (permissionKey: PermissionKey): boolean => {
-    if (!hasBranchAccess) {
-      return false
-    }
+  const hasPermission = useCallback(
+    (permissionKey: PermissionKey): boolean => {
+      if (!hasBranchAccess) {
+        return false
+      }
 
-    return employee?.permissions?.includes(permissionKey) ?? false
-  }
+      return employeePermissions?.includes(permissionKey) ?? false
+    },
+    [hasBranchAccess, employeePermissions],
+  )
+
+  const permissionsProxy = useMemo(() => {
+    return new Proxy({} as Record<PermissionKey, boolean>, {
+      get(_, prop: string) {
+        if (prop.startsWith('can')) {
+          return hasPermission(prop as PermissionKey)
+        }
+        return undefined
+      },
+    })
+  }, [hasPermission])
 
   return {
     employee,
@@ -143,29 +160,6 @@ export function useEmployeePermission() {
     isCashier,
     hasBranchAccess,
     hasPermission,
-    canViewDashboard: hasPermission('canViewDashboard'),
-    canViewCreditCard: hasPermission('canViewCreditCard'),
-    canManageEmployee: hasPermission('canManageEmployee'),
-    canManageProducts: hasPermission('canManageProducts'),
-    canManageInventory: hasPermission('canManageInventory'),
-    canManageStock: hasPermission('canManageStock'),
-    canCreateOrder: hasPermission('canCreateOrder'),
-    canManageOrders: hasPermission('canManageOrders'),
-    canCancelOrder: hasPermission('canCancelOrder'),
-    canManageCoupons: hasPermission('canManageCoupons'),
-    canManageCustomers: hasPermission('canManageCustomers'),
-    canManageStoreSettings: hasPermission('canManageStoreSettings'),
-    canViewFinance: hasPermission('canViewFinance'),
-    canViewActivityLogs: hasPermission('canViewActivityLogs'),
-    canManageSubscription: hasPermission('canManageSubscription'),
-    canManageBlogs: hasPermission('canManageBlogs'),
-    canManageBranches: hasPermission('canManageBranches'),
-    canManageStoreProfile: hasPermission('canManageStoreProfile'),
-    canManageSecurity: hasPermission('canManageSecurity'),
-    canManageNotifications: hasPermission('canManageNotifications'),
-    canTransferStore: hasPermission('canTransferStore'),
-    canManageTax: hasPermission('canManageTax'),
-    canManageShipping: hasPermission('canManageShipping'),
-    canManagePayment: hasPermission('canManagePayment'),
+    ...permissionsProxy,
   }
 }

@@ -102,7 +102,7 @@ export async function getStockAdjustments({
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageInventory',
+      permission: 'canViewInventory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -198,7 +198,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageInventory',
+      permission: 'canCreateInventory',
     })
 
     if (!authCheck.isAuthorized) {

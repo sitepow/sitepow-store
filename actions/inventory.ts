@@ -111,7 +111,7 @@ export async function getInventory({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageStock',
+        permission: 'canViewInventory',
       })
 
       if (!authCheck.isAuthorized) {
@@ -204,7 +204,7 @@ export async function updateStock(id: string, input: UpdateStockInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: stockItem.branch.storeId,
-      permission: 'canManageStock',
+      permission: 'canUpdateInventory',
     })
 
     if (!authCheck.isAuthorized) {
@@ -268,7 +268,7 @@ export async function upsertStock(input: UpsertStockInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: branch.storeId,
-      permission: 'canManageStock',
+      permission: 'canUpdateInventory',
     })
 
     if (!authCheck.isAuthorized) {

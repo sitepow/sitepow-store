@@ -21,7 +21,7 @@ export async function getTaxSetting(storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewTax',
     })
 
     if (!authCheck.isAuthorized) {
@@ -54,7 +54,7 @@ export async function updateTaxSetting(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateTax',
     })
 
     if (!authCheck.isAuthorized) {

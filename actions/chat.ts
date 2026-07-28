@@ -72,7 +72,7 @@ export async function getMerchantConversations(storeSlug: string) {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId: store.id,
-        permission: 'canManageOrders',
+        permission: 'canUpdateConversation',
       })
 
       if (!authCheck.isAuthorized) {
@@ -278,7 +278,7 @@ export async function getSupportConversations(storeId?: string) {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageOrders',
+        permission: 'canUpdateConversation',
       })
 
       if (!authCheck.isAuthorized) {

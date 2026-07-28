@@ -124,7 +124,6 @@ export function LoyaltySettingsCard({
             </p>
           )}
         </div>
-
         <div className="space-y-2">
           <Label className="text-xs font-semibold">
             มูลค่าส่วนลดต่อ 1 แต้ม

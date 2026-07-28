@@ -107,7 +107,7 @@ export async function getCoupons({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageCoupons',
+        permission: 'canViewCoupons',
       })
 
       if (!authCheck.isAuthorized) {
@@ -183,7 +183,7 @@ export async function createCoupon(input: CreateCouponInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: input.storeId,
-      permission: 'canManageCoupons',
+      permission: 'canCreateCoupons',
     })
 
     if (!authCheck.isAuthorized) {
@@ -260,7 +260,7 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingCoupon.storeId,
-      permission: 'canManageCoupons',
+      permission: 'canUpdateCoupons',
     })
 
     if (!authCheck.isAuthorized) {
@@ -325,7 +325,7 @@ export async function deleteCoupon(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: coupon.storeId,
-      permission: 'canManageCoupons',
+      permission: 'canDeleteCoupons',
     })
 
     if (!authCheck.isAuthorized) {

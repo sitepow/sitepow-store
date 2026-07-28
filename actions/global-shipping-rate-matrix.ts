@@ -102,7 +102,7 @@ export async function applyGlobalRatesToStore(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateShipping',
     })
 
     if (!authCheck.isAuthorized) {

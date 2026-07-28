@@ -50,7 +50,7 @@ export async function getPaymentSetting(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewPayment',
     })
 
     if (!authCheck.isAuthorized) {
@@ -81,7 +81,7 @@ export async function upsertPaymentSetting(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdatePayment',
     })
 
     if (!authCheck.isAuthorized) {
@@ -133,7 +133,7 @@ export async function createBankAccount(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canCreatePayment',
     })
 
     if (!authCheck.isAuthorized) {
@@ -219,7 +219,7 @@ export async function updateBankAccount(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdatePayment',
     })
 
     if (!authCheck.isAuthorized) {
@@ -291,7 +291,7 @@ export async function deleteBankAccount(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canDeletePayment',
     })
 
     if (!authCheck.isAuthorized) {
@@ -354,7 +354,7 @@ export async function getBankAccount(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: account.paymentSetting.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewPayment',
     })
 
     if (!authCheck.isAuthorized) {

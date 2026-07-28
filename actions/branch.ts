@@ -129,7 +129,7 @@ export async function getBranches({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageStoreSettings',
+        permission: 'canViewBranches',
       })
 
       if (!authCheck.isAuthorized) {
@@ -215,7 +215,7 @@ export async function getBranch(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: branch.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canViewBranches',
     })
 
     if (!authCheck.isAuthorized) {
@@ -243,7 +243,7 @@ export async function createBranch(input: CreateBranchInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canCreateBranches',
     })
 
     if (!authCheck.isAuthorized) {
@@ -387,7 +387,7 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existingBranch.storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateBranches',
     })
 
     if (!authCheck.isAuthorized) {
@@ -435,7 +435,7 @@ export async function setMainBranch(id: string, storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateBranches',
     })
 
     if (!authCheck.isAuthorized) {
@@ -494,7 +494,7 @@ export async function deleteBranch(id: string, storeId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canManageStoreSettings',
+      permission: 'canDeleteBranches',
     })
 
     if (!authCheck.isAuthorized) {

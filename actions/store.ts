@@ -575,7 +575,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: id,
-      permission: 'canManageStoreSettings',
+      permission: 'canUpdateStore',
     })
 
     if (!authCheck.isAuthorized) {
@@ -639,7 +639,7 @@ export async function deleteStore(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: id,
-      permission: 'canManageStoreSettings',
+      permission: 'canDeleteStore',
     })
 
     if (!authCheck.isAuthorized) {

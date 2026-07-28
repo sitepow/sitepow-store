@@ -47,27 +47,23 @@ export async function purchaseCredit({
 
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      select: { id: true, ownerId: true },
+      select: { id: true },
     })
 
     if (!store) {
       return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
     }
 
-    const isOwner = store.ownerId === currentUserId
+    const authCheck = await verifyEmployeePermission({
+      userId: currentUserId,
+      storeId,
+      permission: 'canCreateCreditCard',
+    })
 
-    if (!isOwner) {
-      const authCheck = await verifyEmployeePermission({
-        userId: currentUserId,
-        storeId,
-        permission: 'canViewFinance',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return {
-          success: false,
-          message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอสำหรับการเติมเครดิต',
-        }
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอสำหรับการเติมเครดิต',
       }
     }
 
@@ -120,25 +116,21 @@ export async function getStoreCredit(storeId: string) {
 
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      select: { id: true, ownerId: true, balance: true },
+      select: { id: true, balance: true },
     })
 
     if (!store) {
       return null
     }
 
-    const isOwner = store.ownerId === currentUserId
+    const authCheck = await verifyEmployeePermission({
+      userId: currentUserId,
+      storeId,
+      permission: 'canViewCreditCard',
+    })
 
-    if (!isOwner) {
-      const authCheck = await verifyEmployeePermission({
-        userId: currentUserId,
-        storeId,
-        permission: 'canViewFinance',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return null
-      }
+    if (!authCheck.isAuthorized) {
+      return null
     }
 
     return serializeDecimal({ balance: store.balance })

@@ -129,7 +129,7 @@ export async function getOrders({
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
-        permission: 'canManageOrders',
+        permission: 'canViewOrders',
       })
 
       if (!authCheck.isAuthorized) {
@@ -235,7 +235,7 @@ export async function updateOrderStatus(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
-      permission: 'canManageOrders',
+      permission: 'canUpdateOrders',
     })
 
     if (!authCheck.isAuthorized) {
@@ -311,7 +311,7 @@ export async function cancelOrder(id: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: order.storeId,
-      permission: 'canManageOrders',
+      permission: 'canDeleteOrders',
     })
 
     if (!authCheck.isAuthorized) {
