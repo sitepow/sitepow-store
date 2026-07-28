@@ -298,6 +298,10 @@ export async function createBranch(input: CreateBranchInput) {
         tx,
       )
 
+      const allStorePermissions = await tx.permission.findMany({
+        select: { id: true },
+      })
+
       const employeeStore = await tx.employeeStore.upsert({
         where: {
           storeId_employeeId: {
@@ -305,19 +309,30 @@ export async function createBranch(input: CreateBranchInput) {
             storeId,
           },
         },
-        update: {
-          roleId: ownerRoleId,
-        },
+        update: {},
         create: {
           employeeId: employee.id,
           storeId,
-          roleId: ownerRoleId,
         },
         select: { id: true },
       })
 
+      const storeDetails = await tx.store.findUnique({
+        where: { id: storeId },
+        select: { ownerId: true },
+      })
+
+      const ownerEmployees = await tx.employee.findMany({
+        where: { userId: storeDetails?.ownerId },
+        select: { id: true },
+      })
+      const ownerEmployeeIds = ownerEmployees.map((e) => e.id)
+
       const ownerEmployeeStores = await tx.employeeStore.findMany({
-        where: { storeId, roleId: ownerRoleId },
+        where: {
+          storeId,
+          employeeId: { in: ownerEmployeeIds },
+        },
         select: { id: true },
       })
 
@@ -328,13 +343,20 @@ export async function createBranch(input: CreateBranchInput) {
       }
 
       if (targetEmployeeStoreIds.length > 0) {
-        await tx.employeeBranch.createMany({
-          data: targetEmployeeStoreIds.map((employeeStoreId) => ({
-            employeeStoreId,
-            branchId: newBranch.id,
-          })),
-          skipDuplicates: true,
-        })
+        for (const employeeStoreId of targetEmployeeStoreIds) {
+          await tx.employeeBranch.create({
+            data: {
+              employeeStoreId,
+              branchId: newBranch.id,
+              roleId: ownerRoleId,
+              customPermissions: {
+                create: allStorePermissions.map((p) => ({
+                  permissionId: p.id,
+                })),
+              },
+            },
+          })
+        }
       }
 
       return newBranch
@@ -519,6 +541,17 @@ export async function deleteBranch(id: string, storeId: string) {
     }
 
     await prisma.$transaction(async (tx) => {
+      const employeeBranches = await tx.employeeBranch.findMany({
+        where: { branchId: id },
+        select: { id: true },
+      })
+
+      for (const eb of employeeBranches) {
+        await tx.employeeBranchPermission.deleteMany({
+          where: { employeeBranchId: eb.id },
+        })
+      }
+
       await tx.employeeBranch.deleteMany({ where: { branchId: id } })
       await tx.branch.delete({ where: { id } })
     })

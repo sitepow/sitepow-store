@@ -498,35 +498,28 @@ export async function createStore(input: CreateStoreInput) {
                 storeId: newStore.id,
               },
             },
-            update: {
-              roleId: ownerRoleId,
-              permissions: {
-                deleteMany: {},
-                create: allStorePermissions.map((p) => ({
-                  permissionId: p.id,
-                })),
-              },
-            },
+            update: {},
             create: {
               employeeId: employee.id,
               storeId: newStore.id,
-              roleId: ownerRoleId,
-              permissions: {
-                create: allStorePermissions.map((p) => ({
-                  permissionId: p.id,
-                })),
-              },
             },
           })
 
           if (newStore.branches.length > 0) {
-            await tx.employeeBranch.createMany({
-              data: newStore.branches.map((branch) => ({
-                employeeStoreId: employeeStore.id,
-                branchId: branch.id,
-              })),
-              skipDuplicates: true,
-            })
+            for (const branch of newStore.branches) {
+              await tx.employeeBranch.create({
+                data: {
+                  employeeStoreId: employeeStore.id,
+                  branchId: branch.id,
+                  roleId: ownerRoleId,
+                  customPermissions: {
+                    create: allStorePermissions.map((p) => ({
+                      permissionId: p.id,
+                    })),
+                  },
+                },
+              })
+            }
           }
         }
 

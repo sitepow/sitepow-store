@@ -2,7 +2,7 @@
 
 import { PERMISSION_MAPPING } from '@/constants/permission'
 import { DEFAULT_PASSWORD_EMPLOYEE } from '@/constants/system'
-import { EmployeeStore, Prisma } from '@/generated/prisma/client'
+import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
@@ -17,18 +17,22 @@ import { prisma } from '@/lib/prisma'
 export interface CreateEmployeeInput {
   storeId: string
   name: string
-  roleId: string
   email: string
-  branchIds: string[]
-  permissionIds: string[]
+  assignments: {
+    branchId: string
+    roleId: string
+    permissionIds?: string[]
+  }[]
 }
 
 export interface UpdateEmployeeInput {
   storeId: string
   name?: string
-  roleId?: string
-  branchIds: string[]
-  permissionIds: string[]
+  assignments: {
+    branchId: string
+    roleId: string
+    permissionIds?: string[]
+  }[]
 }
 
 interface GetEmployeesParams {
@@ -42,12 +46,44 @@ interface GetEmployeesParams {
 
 const employeeStoreSelect = {
   id: true,
-  role: {
+  store: { select: { id: true } },
+  employee: {
     select: {
       id: true,
       name: true,
-      permissions: {
+      email: true,
+    },
+  },
+  branches: {
+    select: {
+      id: true,
+      branchId: true,
+      branch: {
         select: {
+          id: true,
+          name: true,
+        },
+      },
+      role: {
+        select: {
+          id: true,
+          name: true,
+          permissions: {
+            select: {
+              permission: {
+                select: {
+                  id: true,
+                  domain: true,
+                  action: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      customPermissions: {
+        select: {
+          permissionId: true,
           permission: {
             select: {
               id: true,
@@ -59,36 +95,6 @@ const employeeStoreSelect = {
       },
     },
   },
-  permissions: {
-    select: {
-      permissionId: true,
-      permission: {
-        select: {
-          id: true,
-          domain: true,
-          action: true,
-        },
-      },
-    },
-  },
-  employee: {
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  },
-  branches: {
-    select: {
-      branch: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  },
-  store: { select: { id: true } },
 } satisfies Prisma.EmployeeStoreSelect
 
 export type GetEmployeesItem = Prisma.EmployeeStoreGetPayload<{
@@ -109,6 +115,7 @@ export interface GetEmployeesResponse {
 
 export async function getEmployees({
   storeId,
+  branchId,
   page = 1,
   limit = 10,
   search,
@@ -137,6 +144,7 @@ export async function getEmployees({
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
+      branchId,
       permission: 'canViewEmployee',
     })
 
@@ -148,19 +156,32 @@ export async function getEmployees({
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.EmployeeStoreWhereInput = { storeId }
-
-    if (search) {
-      whereClause.employee = {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-        ],
-      }
-    }
-
-    if (roleId) {
-      whereClause.roleId = roleId
+    const whereClause: Prisma.EmployeeStoreWhereInput = {
+      storeId,
+      ...(branchId && branchId !== ALL_BRANCHES
+        ? {
+            branches: {
+              some: { branchId },
+            },
+          }
+        : {}),
+      ...(search
+        ? {
+            employee: {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          }
+        : {}),
+      ...(roleId
+        ? {
+            branches: {
+              some: { roleId },
+            },
+          }
+        : {}),
     }
 
     const [totalItems, employees] = await Promise.all([
@@ -170,7 +191,7 @@ export async function getEmployees({
         skip,
         take: sanitizedLimit,
         select: employeeStoreSelect,
-        orderBy: { employee: { name: 'asc' } },
+        orderBy: { createdAt: 'desc' },
       }),
     ])
 
@@ -266,22 +287,22 @@ export async function createEmployee(input: CreateEmployeeInput) {
 
     const employeeStore = await prisma.employeeStore.create({
       data: {
-        roleId: input.roleId,
         employeeId: employee.id,
         storeId: input.storeId,
-        permissions: {
-          create:
-            input.permissionIds?.map((permissionId) => ({ permissionId })) ||
-            [],
-        },
         branches: {
-          create: input.branchIds.map((branchId) => ({ branchId })),
+          create: input.assignments.map((assignment) => ({
+            branchId: assignment.branchId,
+            roleId: assignment.roleId,
+            customPermissions: {
+              create:
+                assignment.permissionIds?.map((permissionId) => ({
+                  permissionId,
+                })) || [],
+            },
+          })),
         },
       },
-      select: {
-        ...employeeStoreSelect,
-        permissions: true,
-      },
+      select: employeeStoreSelect,
     })
 
     await createLog({
@@ -289,12 +310,11 @@ export async function createEmployee(input: CreateEmployeeInput) {
       actorType: ActorType.MERCHANT,
       storeId: input.storeId,
       entity: 'Employee',
-      entityId: employeeStore.employee.id,
+      entityId: employee.id,
       details: {
         name: input.name,
         email: input.email,
-        roleId: input.roleId,
-        permissionIds: input.permissionIds,
+        assignments: input.assignments,
         type: 'created',
       },
     })
@@ -338,7 +358,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
 
     const existingEmployeeStore = await prisma.employeeStore.findUnique({
       where: { id },
-      select: { roleId: true },
+      select: { employeeId: true },
     })
 
     if (!existingEmployeeStore) {
@@ -346,55 +366,34 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      await tx.employeeStore.update({
-        where: { id },
-        data: {
-          roleId: input.roleId,
-        },
-      })
-
-      if (input.permissionIds) {
-        await tx.employeePermission.deleteMany({
-          where: { employeeStoreId: id },
+      if (input.name) {
+        await tx.employee.update({
+          where: { id: existingEmployeeStore.employeeId },
+          data: { name: input.name },
         })
-
-        if (input.permissionIds.length > 0) {
-          await tx.employeePermission.createMany({
-            data: input.permissionIds.map((permissionId) => ({
-              employeeStoreId: id,
-              permissionId,
-            })),
-            skipDuplicates: true,
-          })
-        }
       }
 
-      if (input.branchIds) {
+      if (input.assignments) {
         await tx.employeeBranch.deleteMany({
           where: { employeeStoreId: id },
         })
 
-        if (input.branchIds.length > 0) {
-          await tx.employeeBranch.createMany({
-            data: input.branchIds.map((branchId) => ({
-              employeeStoreId: id,
-              branchId,
-            })),
-            skipDuplicates: true,
-          })
-        }
-      }
-
-      if (input.name) {
-        const employeeStoreData = await tx.employeeStore.findUnique({
-          where: { id },
-          select: { employeeId: true },
-        })
-        if (employeeStoreData?.employeeId) {
-          await tx.employee.update({
-            where: { id: employeeStoreData.employeeId },
-            data: { name: input.name },
-          })
+        if (input.assignments.length > 0) {
+          for (const assignment of input.assignments) {
+            await tx.employeeBranch.create({
+              data: {
+                employeeStoreId: id,
+                branchId: assignment.branchId,
+                roleId: assignment.roleId,
+                customPermissions: {
+                  create:
+                    assignment.permissionIds?.map((permissionId) => ({
+                      permissionId,
+                    })) || [],
+                },
+              },
+            })
+          }
         }
       }
 
@@ -411,9 +410,9 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     await createLog({
       action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
-      storeId: updated.store.id,
+      storeId: input.storeId,
       entity: 'Employee',
-      entityId: updated.employee?.id,
+      entityId: existingEmployeeStore.employeeId,
       details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
@@ -471,11 +470,18 @@ export async function deleteEmployee(id: string) {
     const targetUserId = employeeStore.employee?.userId
 
     await prisma.$transaction(async (tx) => {
-      await tx.employeeBranch.deleteMany({
+      const employeeBranches = await tx.employeeBranch.findMany({
         where: { employeeStoreId: id },
+        select: { id: true },
       })
 
-      await tx.employeePermission.deleteMany({
+      for (const eb of employeeBranches) {
+        await tx.employeeBranchPermission.deleteMany({
+          where: { employeeBranchId: eb.id },
+        })
+      }
+
+      await tx.employeeBranch.deleteMany({
         where: { employeeStoreId: id },
       })
 
@@ -563,7 +569,28 @@ export async function getEmployee(
 }
 
 export interface EmployeePermissionResult {
-  employeeStore: EmployeeStore | null
+  employeeStore: Prisma.EmployeeStoreGetPayload<{
+    include: {
+      branches: {
+        include: {
+          role: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true
+                }
+              }
+            }
+          }
+          customPermissions: {
+            include: {
+              permission: true
+            }
+          }
+        }
+      }
+    }
+  }> | null
   role: { id: string; name: string } | null
   isOwner: boolean
   permissions: PermissionKey[]
@@ -605,13 +632,24 @@ export async function getEmployeePermission(
         },
       },
       include: {
-        role: true,
-        permissions: {
+        branches: {
           include: {
-            permission: true,
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+            customPermissions: {
+              include: {
+                permission: true,
+              },
+            },
           },
         },
-        branches: true,
       },
     })
 
@@ -620,19 +658,39 @@ export async function getEmployeePermission(
     }
 
     let hasBranchAccess = true
+    let activeBranchAssignment = employeeStore.branches[0]
+
     if (branchId && branchId !== ALL_BRANCHES) {
-      const branchAccess = employeeStore?.branches.some(
-        (b) => b.branchId === branchId,
-      )
-      hasBranchAccess = !!branchAccess
+      const found = employeeStore.branches.find((b) => b.branchId === branchId)
+      if (found) {
+        hasBranchAccess = true
+        activeBranchAssignment = found
+      } else {
+        hasBranchAccess = false
+      }
     }
 
     const permissions: PermissionKey[] = []
 
-    if (employeeStore?.permissions) {
-      for (const ep of employeeStore.permissions) {
-        const { domain, action } = ep.permission
+    if (activeBranchAssignment) {
+      const rolePermissions = activeBranchAssignment.role?.permissions || []
+      for (const rp of rolePermissions) {
+        const { domain, action } = rp.permission
+        const matchedKey = (
+          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
+        ).find((key) => {
+          const map = PERMISSION_MAPPING[key]
+          return map.domain === domain && map.action === action
+        })
 
+        if (matchedKey && !permissions.includes(matchedKey)) {
+          permissions.push(matchedKey)
+        }
+      }
+
+      const customPermissions = activeBranchAssignment.customPermissions || []
+      for (const cp of customPermissions) {
+        const { domain, action } = cp.permission
         const matchedKey = (
           Object.keys(PERMISSION_MAPPING) as PermissionKey[]
         ).find((key) => {
@@ -648,8 +706,11 @@ export async function getEmployeePermission(
 
     return {
       employeeStore,
-      role: employeeStore?.role
-        ? { id: employeeStore.role.id, name: employeeStore.role.name }
+      role: activeBranchAssignment?.role
+        ? {
+            id: activeBranchAssignment.role.id,
+            name: activeBranchAssignment.role.name,
+          }
         : null,
       isOwner,
       permissions,

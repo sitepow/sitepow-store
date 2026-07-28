@@ -1,6 +1,7 @@
 'use server'
 
 import { PERMISSION_MAPPING } from '@/constants/permission'
+import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { PermissionKey } from '@/types/permission'
 
 import { prisma } from '@/lib/prisma'
@@ -18,41 +19,76 @@ export async function verifyEmployeePermission({
   permission,
   branchId,
 }: VerifyEmployeePermissionOptions) {
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-    select: { ownerId: true },
-  })
-
-  const isOwner = store?.ownerId === userId
-
-  const employeeStore = await prisma.employeeStore.findFirst({
-    where: {
-      storeId,
-      employee: { userId },
-    },
-    include: {
-      role: true,
-      permissions: {
-        include: {
-          permission: true,
+  try {
+    const employeeStore = await prisma.employeeStore.findFirst({
+      where: {
+        storeId,
+        employee: { userId },
+      },
+      include: {
+        branches: {
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+            customPermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
         },
       },
-      branches: true,
-    },
-  })
+    })
 
-  if (!isOwner && !employeeStore) {
-    return { isAuthorized: false, message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้' }
-  }
+    if (!employeeStore) {
+      return { isAuthorized: false, message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้' }
+    }
 
-  if (permission && !isOwner && employeeStore) {
-    const targetMapping = PERMISSION_MAPPING[permission]
-    if (targetMapping) {
-      const hasPermission = employeeStore.permissions.some(
-        (ep) =>
-          ep.permission.domain === targetMapping.domain &&
-          ep.permission.action === targetMapping.action,
-      )
+    let targetBranches = employeeStore.branches || []
+    if (branchId && branchId !== ALL_BRANCHES) {
+      targetBranches = targetBranches.filter((b) => b.branchId === branchId)
+      if (targetBranches.length === 0) {
+        return {
+          isAuthorized: false,
+          message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
+        }
+      }
+    }
+
+    if (permission) {
+      const targetMapping = PERMISSION_MAPPING[permission]
+      if (!targetMapping) {
+        return {
+          isAuthorized: false,
+          message: 'ไม่พบข้อมูลสิทธิ์การใช้งานนี้ในระบบ',
+        }
+      }
+
+      const hasPermission = targetBranches.some((branchAssignment) => {
+        const rolePermissions = branchAssignment.role?.permissions || []
+        const customPermissions = branchAssignment.customPermissions || []
+
+        const matchInRole = rolePermissions.some(
+          (rp) =>
+            rp.permission.domain === targetMapping.domain &&
+            rp.permission.action === targetMapping.action,
+        )
+
+        const matchInCustom = customPermissions.some(
+          (cp) =>
+            cp.permission.domain === targetMapping.domain &&
+            cp.permission.action === targetMapping.action,
+        )
+
+        return matchInRole || matchInCustom
+      })
 
       if (!hasPermission) {
         return {
@@ -60,28 +96,17 @@ export async function verifyEmployeePermission({
           message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
-    } else {
-      return {
-        isAuthorized: false,
-        message: 'ไม่พบข้อมูลสิทธิ์การใช้งานนี้ในระบบ',
-      }
     }
-  }
 
-  if (branchId && !isOwner && employeeStore) {
-    const hasBranchAccess = employeeStore.branches.some(
-      (b) => b.branchId === branchId,
-    )
-    if (!hasBranchAccess) {
-      return {
-        isAuthorized: false,
-        message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
-      }
+    return {
+      isAuthorized: true,
+      employeeStore,
     }
-  }
-
-  return {
-    isAuthorized: true,
-    employeeStore,
+  } catch (error) {
+    console.error(error)
+    return {
+      isAuthorized: false,
+      message: 'เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์',
+    }
   }
 }

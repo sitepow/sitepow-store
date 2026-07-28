@@ -85,6 +85,7 @@ export async function resetStoreRolePermissions(
   storeId: string,
   employeeId: string,
   roleName: DefaultRole,
+  branchId?: string,
 ) {
   try {
     if (!storeId || !roleName) {
@@ -168,23 +169,21 @@ export async function resetStoreRolePermissions(
             select: { id: true },
           })
 
-          const allStorePermissions = await tx.permission.findMany({
-            select: { id: true },
-          })
-
           if (employeeStore) {
-            await tx.employeeStore.update({
-              where: { id: employeeStore.id },
-              data: {
-                roleId: targetRole.id,
-                permissions: {
-                  deleteMany: {},
-                  create: allStorePermissions.map((p) => ({
-                    permissionId: p.id,
-                  })),
+            if (branchId) {
+              await tx.employeeBranch.update({
+                where: {
+                  employeeStoreId_branchId: {
+                    employeeStoreId: employeeStore.id,
+                    branchId,
+                  },
                 },
-              },
-            })
+                data: {
+                  roleId: targetRole.id,
+                  customPermissions: { deleteMany: {} },
+                },
+              })
+            }
           }
         }
       }
@@ -201,7 +200,7 @@ export async function resetStoreRolePermissions(
 
     return {
       success: true,
-      message: `รีเซ็ตสิทธิ์ของ ${roleName} และกู้คืนสิทธิ์พนักงานสำเร็จแล้ว`,
+      message: `รีเซ็ตสิทธิ์ของ ${roleName} สำเร็จแล้ว`,
     }
   } catch (error) {
     console.error(error)
