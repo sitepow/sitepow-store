@@ -258,24 +258,14 @@ model Employee {
   orders       Order[]
 }
 
-model EmployeePermission {
-  employeeStoreId String
-  employeeStore   EmployeeStore @relation(fields: [employeeStoreId], references: [id], onDelete: Cascade)
-
-  permissionId String
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([employeeStoreId, permissionId])
-}
-
 model Role {
   id      String      @id @default(uuid())
   storeId String
   store   Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
   name    DefaultRole @default(OWNER)
 
-  permissions    RolePermission[]
-  employeeStores EmployeeStore[]
+  permissions      RolePermission[]
+  employeeBranches EmployeeBranch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -329,8 +319,8 @@ model Permission {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
-  roles     RolePermission[]
-  employees EmployeePermission[]
+  roles                     RolePermission[]
+  employeeBranchPermissions EmployeeBranchPermission[]
 
   @@unique([domain, action])
 }
@@ -351,11 +341,7 @@ model EmployeeStore {
   employeeId String
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id])
-
-  branches    EmployeeBranch[]
-  permissions EmployeePermission[]
+  branches EmployeeBranch[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -363,13 +349,33 @@ model EmployeeStore {
   @@unique([storeId, employeeId])
 }
 
+model EmployeeBranchPermission {
+  employeeBranchId String
+  employeeBranch   EmployeeBranch @relation(fields: [employeeBranchId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([employeeBranchId, permissionId])
+}
+
 model EmployeeBranch {
+  id              String        @id @default(uuid())
   employeeStoreId String
   employeeStore   EmployeeStore @relation(fields: [employeeStoreId], references: [id], onDelete: Cascade)
-  branchId        String
-  branch          Branch        @relation(fields: [branchId], references: [id], onDelete: Cascade)
 
-  @@id([employeeStoreId, branchId])
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  customPermissions EmployeeBranchPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employeeStoreId, branchId])
 }
 
 enum StoreStatus {
