@@ -1,7 +1,7 @@
 'use server'
 
 import { THAI_MONTHS } from '@/constants/system'
-import { DefaultRole, OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
@@ -75,12 +75,6 @@ export async function getDashboard(
       return emptyDashboardResult
     }
 
-    const employeeStore = authCheck.employeeStore
-    const isCashier = employeeStore?.role?.name === DefaultRole.CASHIER
-    const cashierOrderFilter = isCashier
-      ? { employeeId: employeeStore?.id }
-      : {}
-
     const storeFilter = { storeId }
 
     const orderBranchFilter = validBranchId
@@ -136,7 +130,6 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfThisMonth },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -146,7 +139,6 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -156,7 +148,6 @@ export async function getDashboard(
       prisma.order.count({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfThisMonth },
           ...orderBranchFilter,
         },
@@ -164,7 +155,6 @@ export async function getDashboard(
       prisma.order.count({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
           ...orderBranchFilter,
         },
@@ -172,7 +162,6 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfToday },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -182,7 +171,6 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: startOfYesterday, lte: endOfYesterday },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -206,7 +194,6 @@ export async function getDashboard(
       prisma.order.findMany({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           createdAt: { gte: sixMonthsAgo },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
@@ -216,7 +203,6 @@ export async function getDashboard(
       prisma.order.findMany({
         where: {
           ...storeFilter,
-          ...cashierOrderFilter,
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },

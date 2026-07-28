@@ -31,8 +31,11 @@ export function CustomerTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageCustomers, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewCustomers,
+    canUpdateCustomers,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const unblockMutation = useUnblockCustomer()
   const blockMutation = useBlockCustomer()
@@ -49,16 +52,17 @@ export function CustomerTable() {
     return <ActionRequiredAlert />
   }
 
-  if (!isPermissionLoading && !canManageCustomers) {
+  if (!isPermissionLoading && !canViewCustomers) {
     return (
       <ActionRequiredAlert
         title="ไม่มีสิทธิ์เข้าถึง"
-        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
       />
     )
   }
 
-  const totalColumns = canManageCustomers ? 8 : 7
+  const showManageColumn = canUpdateCustomers
+  const totalColumns = showManageColumn ? 8 : 7
 
   return (
     <>
@@ -73,7 +77,7 @@ export function CustomerTable() {
               <TableHead>สถานะบล็อกสลิป</TableHead>
               <TableHead>กำหนดปลดล็อก</TableHead>
               <TableHead className="text-right">แต้มสะสม</TableHead>
-              {canManageCustomers && (
+              {showManageColumn && (
                 <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
@@ -114,7 +118,7 @@ export function CustomerTable() {
                   <TableCell className="text-primary text-right font-semibold">
                     {formatNumber(item.rewardPoints)}
                   </TableCell>
-                  {canManageCustomers && (
+                  {showManageColumn && (
                     <TableCell className="text-right">
                       {item.customer.isBlocked ? (
                         <DeleteButton
