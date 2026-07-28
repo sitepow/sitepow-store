@@ -16,8 +16,8 @@ import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
 export default function MerchantLoyaltyPage() {
   const { selectedStoreId } = useStoreFilter()
   const {
-    canManageStoreSettings,
-    canManageCustomers,
+    canViewStoreSettings,
+    canViewCustomers,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -31,19 +31,19 @@ export default function MerchantLoyaltyPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageCustomers ? (
+      ) : !isPermissionLoading && !canViewCustomers ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลระบบแต้มสะสมและสมาชิกของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบแต้มสะสมและสมาชิกของสาขาหรือร้านค้านี้"
         />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">
-          {canManageStoreSettings && (
+          {canViewStoreSettings && (
             <LoyaltySettingsCard className="xl:col-span-4" />
           )}
           <CustomerPointsTable
             className={
-              canManageStoreSettings ? 'xl:col-span-8' : 'xl:col-span-12'
+              canViewStoreSettings ? 'xl:col-span-8' : 'xl:col-span-12'
             }
           />
         </div>

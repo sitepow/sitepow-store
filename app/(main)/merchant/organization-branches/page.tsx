@@ -17,8 +17,11 @@ import { BranchesTable } from './_components/BranchesTable'
 
 export default function MerchantStoreSettingsBranchesPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageBranches, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewBranches,
+    canCreateBranches,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>()
   const [open, setOpen] = useState(false)
@@ -42,7 +45,7 @@ export default function MerchantStoreSettingsBranchesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            {!isPermissionLoading && canManageBranches && (
+            {!isPermissionLoading && canCreateBranches && (
               <BranchDialog
                 branchId={selectedBranchId}
                 open={open}
@@ -55,10 +58,10 @@ export default function MerchantStoreSettingsBranchesPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageBranches ? (
+      ) : !isPermissionLoading && !canViewBranches ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลสาขาของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลสาขาของสาขาหรือร้านค้านี้"
         />
       ) : (
         <BranchesTable onEdit={handleEdit} />

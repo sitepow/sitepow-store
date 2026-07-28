@@ -15,7 +15,7 @@ import { OrderTable } from './_components/OrderTable'
 
 export default function OrderPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageOrders, isLoading: isPermissionLoading } =
+  const { canViewOrders, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   return (
@@ -33,10 +33,10 @@ export default function OrderPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageOrders ? (
+      ) : !isPermissionLoading && !canViewOrders ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการออเดอร์ของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลออเดอร์ของสาขาหรือร้านค้านี้"
         />
       ) : (
         <OrderTable />

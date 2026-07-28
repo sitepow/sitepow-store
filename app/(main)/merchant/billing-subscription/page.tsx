@@ -15,7 +15,7 @@ import { MerchantSubscriptionTable } from './_components/MerchantSubscriptionTab
 
 export default function MerchantBillingSubscriptionPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageSubscription, isLoading: isPermissionLoading } =
+  const { canViewSubscription, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   return (
@@ -28,10 +28,10 @@ export default function MerchantBillingSubscriptionPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageSubscription ? (
+      ) : !isPermissionLoading && !canViewSubscription ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
         />
       ) : (
         <>

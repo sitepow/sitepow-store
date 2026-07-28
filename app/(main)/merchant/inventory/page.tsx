@@ -14,7 +14,7 @@ import { InventoryTable } from './_components/InventoryTable'
 
 export default function MerchantInventoryPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageInventory, isLoading: isPermissionLoading } =
+  const { canViewInventory, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   return (
@@ -27,10 +27,10 @@ export default function MerchantInventoryPage() {
       />
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      !canManageInventory ? (
+      !canViewInventory ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
         />
       ) : (
         <InventoryTable />

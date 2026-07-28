@@ -31,13 +31,13 @@ import { TaxSettingsForm } from './_components/TaxSettingsForm'
 export default function MerchantSettingsPage() {
   const { selectedStoreId } = useStoreFilter()
   const {
-    canManageStoreProfile,
-    canManageSecurity,
-    canManageNotifications,
-    canTransferStore,
-    canManageTax,
-    canManageShipping,
-    canManagePayment,
+    canViewStoreProfile,
+    canViewSecurity,
+    canViewNotifications,
+    canViewTransferStore,
+    canViewTax,
+    canViewShipping,
+    canViewPayment,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -81,70 +81,70 @@ export default function MerchantSettingsPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="store-profile" className="flex-1">
-            {!isPermissionLoading && !canManageStoreProfile ? (
+            {!isPermissionLoading && !canViewStoreProfile ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลร้านค้าของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลร้านค้าของสาขาหรือร้านค้านี้"
               />
             ) : (
               <StoreProfileForm />
             )}
           </TabsContent>
           <TabsContent value="security" className="flex-1">
-            {!isPermissionLoading && !canManageSecurity ? (
+            {!isPermissionLoading && !canViewSecurity ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการความปลอดภัยบัญชีของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลความปลอดภัยบัญชีของสาขาหรือร้านค้านี้"
               />
             ) : (
               <SecuritySettingsForm />
             )}
           </TabsContent>
           <TabsContent value="notifications" className="flex-1">
-            {!isPermissionLoading && !canManageNotifications ? (
+            {!isPermissionLoading && !canViewNotifications ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการระบบแจ้งเตือนของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบแจ้งเตือนของสาขาหรือร้านค้านี้"
               />
             ) : (
               <NotificationSettingsForm />
             )}
           </TabsContent>
           <TabsContent value="settings-transfer" className="flex-1">
-            {!isPermissionLoading && !canTransferStore ? (
+            {!isPermissionLoading && !canViewTransferStore ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการโอนความเป็นเจ้าของร้านของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลการโอนความเป็นเจ้าของร้านของสาขาหรือร้านค้านี้"
               />
             ) : (
               <StoreTransferSettingsForm />
             )}
           </TabsContent>
           <TabsContent value="settings-tax" className="flex-1">
-            {!isPermissionLoading && !canManageTax ? (
+            {!isPermissionLoading && !canViewTax ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการภาษีและใบกำกับของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลภาษีและใบกำกับของสาขาหรือร้านค้านี้"
               />
             ) : (
               <TaxSettingsForm />
             )}
           </TabsContent>
           <TabsContent value="settings-shipping" className="flex-1">
-            {!isPermissionLoading && !canManageShipping ? (
+            {!isPermissionLoading && !canViewShipping ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการระบบขนส่งสินค้าของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบขนส่งสินค้าของสาขาหรือร้านค้านี้"
               />
             ) : (
               <ShippingSettingsForm />
             )}
           </TabsContent>
           <TabsContent value="settings-payment" className="flex-1">
-            {!isPermissionLoading && !canManagePayment ? (
+            {!isPermissionLoading && !canViewPayment ? (
               <ActionRequiredAlert
                 title="ไม่มีสิทธิ์เข้าถึง"
-                description="คุณไม่มีสิทธิ์ในการจัดการช่องทางรับชำระเงินของสาขาหรือร้านค้านี้"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลช่องทางรับชำระเงินของสาขาหรือร้านค้านี้"
               />
             ) : (
               <PaymentSettingsForm />

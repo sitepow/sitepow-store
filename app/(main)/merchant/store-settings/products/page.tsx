@@ -17,8 +17,11 @@ import { ProductsTable } from './_components/ProductsTable'
 
 export default function MerchantStoreSettingsProductsPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageProducts, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewProducts,
+    canCreateProducts,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -29,7 +32,7 @@ export default function MerchantStoreSettingsProductsPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            {(canManageProducts ?? true) && (
+            {canCreateProducts && (
               <Button asChild variant="outline">
                 <Link href={'/merchant/store-settings/products/create'}>
                   <IconPlus />
@@ -42,10 +45,10 @@ export default function MerchantStoreSettingsProductsPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageProducts ? (
+      ) : !isPermissionLoading && !canViewProducts ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลสินค้าของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลสินค้าของสาขาหรือร้านค้านี้"
         />
       ) : (
         <ProductsTable />

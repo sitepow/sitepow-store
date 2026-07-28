@@ -15,8 +15,11 @@ import { CouponCreateDialog } from './_components/CreateCouponDialog'
 
 export default function MerchantMarketingCouponsPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageCoupons, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewCoupons,
+    canCreateCoupons,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -27,7 +30,7 @@ export default function MerchantMarketingCouponsPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            {selectedStoreId !== ALL_STORES && canManageCoupons && (
+            {selectedStoreId !== ALL_STORES && canCreateCoupons && (
               <CouponCreateDialog />
             )}
           </div>
@@ -35,10 +38,10 @@ export default function MerchantMarketingCouponsPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageCoupons ? (
+      ) : !isPermissionLoading && !canViewCoupons ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"
         />
       ) : (
         <CouponListTable />

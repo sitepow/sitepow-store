@@ -14,7 +14,7 @@ import { BlogTable } from './_components/BlogTable'
 
 export default function BlogPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageBlogs, isLoading: isPermissionLoading } =
+  const { canViewBlogs, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   return (
@@ -27,10 +27,10 @@ export default function BlogPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageBlogs ? (
+      ) : !isPermissionLoading && !canViewBlogs ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"
         />
       ) : (
         <BlogTable />

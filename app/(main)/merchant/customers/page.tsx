@@ -14,7 +14,7 @@ import { CustomerTable } from './_components/CustomerTable'
 
 export default function CustomerPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageCustomers, isLoading: isPermissionLoading } =
+  const { canViewCustomers, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   return (
@@ -27,10 +27,10 @@ export default function CustomerPage() {
       />
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      !canManageCustomers ? (
+      !canViewCustomers ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
         />
       ) : (
         <CustomerTable />

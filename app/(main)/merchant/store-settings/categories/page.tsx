@@ -17,8 +17,11 @@ import { CategoryDialog } from './_components/CategoryDialog'
 
 export default function MerchantStoreSettingsCategoriesPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canManageProducts, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewCategory,
+    canCreateCategory,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<
     string | undefined
@@ -44,7 +47,7 @@ export default function MerchantStoreSettingsCategoriesPage() {
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
-            {(canManageProducts ?? true) && (
+            {canCreateCategory && (
               <CategoryDialog
                 categoryId={selectedCategoryId}
                 open={open}
@@ -57,10 +60,10 @@ export default function MerchantStoreSettingsCategoriesPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canManageProducts ? (
+      ) : !isPermissionLoading && !canViewCategory ? (
         <ActionRequiredAlert
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการจัดการหมวดหมู่สินค้าและข้อมูลสินค้าของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลหมวดหมู่สินค้าของสาขาหรือร้านค้านี้"
         />
       ) : (
         <CategoriesTable onEdit={handleEdit} />
