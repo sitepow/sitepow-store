@@ -9,7 +9,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink, IconLock } from '@tabler/icons-react'
 import {
   ArrowRight,
   CreditCard,
@@ -169,6 +169,7 @@ export default function MerchantDashboardPage() {
         !isPermissionLoading &&
         !canViewDashboard && (
           <ActionRequiredAlert
+            icon={<IconLock />}
             title="ไม่มีสิทธิ์เข้าถึง"
             description="คุณไม่มีสิทธิ์ในการดูข้อมูลแดชบอร์ดของสาขาหรือร้านค้านี้"
           />

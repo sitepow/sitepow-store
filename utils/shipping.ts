@@ -95,7 +95,7 @@ export const mapStoreToShippingForm = (
     isFreeShipEnabled: store.shippingSetting?.isFreeShipEnabled ?? false,
     freeShipMin: store.shippingSetting?.freeShipMin
       ? Number(store.shippingSetting.freeShipMin)
-      : 0,
+      : 1,
 
     services: store.storeCourierServices.map((scs) => ({
       ...scs,

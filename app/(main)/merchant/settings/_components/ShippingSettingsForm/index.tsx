@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
@@ -89,14 +90,11 @@ export function ShippingSettingsForm() {
       return
     }
 
-    updateShipping(
-      { storeId: selectedStoreId, branchId: selectedBranchId, data },
-      {
-        onSuccess: () => {
-          toast.success('บันทึกการตั้งค่าการจัดส่งเรียบร้อยแล้ว')
-        },
-      },
-    )
+    updateShipping({
+      storeId: selectedStoreId,
+      branchId: selectedBranchId,
+      data,
+    })
   }
 
   return (
@@ -121,16 +119,15 @@ export function ShippingSettingsForm() {
               }
             />
           </CardHeader>
-
           {selectedStoreId !== ALL_STORES &&
             selectedBranchId !== ALL_BRANCHES && (
               <>
                 <CardContent className="divide-border divide-y">
                   <ShippingZoneTable originProvince={watch('storeProvince')} />
-
+                  <Separator className="bg-border/20 mt-5" />
                   <div className="space-y-5 py-5">
                     <div>
-                      <span className="block text-sm font-semibold text-neutral-900">
+                      <span className="block text-sm font-semibold">
                         ตัวเลือกผู้ให้บริการจัดส่งและบริการย่อย (Courier &
                         Services)
                       </span>
@@ -138,8 +135,7 @@ export function ShippingSettingsForm() {
                         เปิด-ปิด และระบุอัตราค่าบริการของแต่ละบริการย่อย
                       </span>
                     </div>
-
-                    <div className="space-y-6 pt-2">
+                    <div className="grid gap-4 space-y-6 pt-2 lg:grid-cols-2 2xl:grid-cols-3">
                       {COURIERS_LIST.map((courier) => (
                         <div
                           key={courier.id}
@@ -153,7 +149,6 @@ export function ShippingSettingsForm() {
                               {courier.description}
                             </p>
                           </div>
-
                           <div className="border-muted flex flex-col gap-2.5">
                             {courier.services.map((service) => {
                               const formFieldIndex = fields.findIndex(
@@ -166,7 +161,6 @@ export function ShippingSettingsForm() {
 
                               const isEnabled =
                                 watchedServices[formFieldIndex]?.isEnabled
-
                               return (
                                 <div
                                   key={service.id}
@@ -184,7 +178,6 @@ export function ShippingSettingsForm() {
                                       ระยะเวลาโดยประมาณ {service.estimatedDays}
                                     </span>
                                   </div>
-
                                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
                                     <ServiceConfigDialog
                                       isDisable={!isEnabled}
@@ -215,46 +208,46 @@ export function ShippingSettingsForm() {
                       ))}
                     </div>
                   </div>
-
                   <div className="space-y-4 py-5">
-                    <div className="flex flex-wrap gap-2">
-                      <Controller
-                        control={control}
-                        name="isFreeShipEnabled"
-                        render={({ field }) => (
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        )}
-                      />
-                      <span className="block text-sm font-semibold">
-                        เงื่อนไขโปรโมชันส่งฟรีของร้าน
-                      </span>
-                    </div>
-                    {watchedFreeShipEnabled && (
-                      <div className="grid lg:grid-cols-2">
-                        <Field>
-                          <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
-                          <div className="mt-1 flex items-center">
-                            <Input
-                              type="number"
-                              placeholder="1000"
-                              {...register('freeShipMin', {
-                                valueAsNumber: true,
-                              })}
-                              className="rounded-r-none"
+                    <span className="block text-sm font-semibold">
+                      เงื่อนไขโปรโมชันส่งฟรีของร้าน
+                    </span>
+                    <div className="flex flex-col items-start gap-2.5">
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {watchedFreeShipEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                        </span>
+                        <Controller
+                          control={control}
+                          name="isFreeShipEnabled"
+                          render={({ field }) => (
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
                             />
-                            <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                              บาท
-                            </span>
-                          </div>
-                        </Field>
+                          )}
+                        />
                       </div>
-                    )}
+                      <Field>
+                        <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
+                        <div className="mt-1 flex items-center">
+                          <Input
+                            type="number"
+                            min={1}
+                            disabled={!watchedFreeShipEnabled}
+                            {...register('freeShipMin', {
+                              valueAsNumber: true,
+                            })}
+                            className="rounded-r-none"
+                          />
+                          <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
+                            บาท
+                          </span>
+                        </div>
+                      </Field>
+                    </div>
                   </div>
                 </CardContent>
-
                 <CardFooter className="flex flex-wrap justify-end gap-2 border-t">
                   {isDirty && (
                     <Button
@@ -281,7 +274,6 @@ export function ShippingSettingsForm() {
                 </CardFooter>
               </>
             )}
-
           {(selectedStoreId === ALL_STORES ||
             selectedBranchId === ALL_BRANCHES) && (
             <CardContent>

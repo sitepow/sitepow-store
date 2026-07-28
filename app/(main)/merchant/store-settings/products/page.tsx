@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconBox, IconPlus } from '@tabler/icons-react'
+import { IconBox, IconLock, IconPlus } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -47,6 +47,7 @@ export default function MerchantStoreSettingsProductsPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewProducts ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลสินค้าของสาขาหรือร้านค้านี้"
         />

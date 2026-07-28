@@ -3,7 +3,7 @@
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconTicket } from '@tabler/icons-react'
+import { IconLock, IconTicket } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -40,6 +40,7 @@ export default function MerchantMarketingCouponsPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewCoupons ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"
         />

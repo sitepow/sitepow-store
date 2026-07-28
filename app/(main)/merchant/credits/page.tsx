@@ -3,7 +3,7 @@
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconWallet } from '@tabler/icons-react'
+import { IconLock, IconWallet } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -30,6 +30,7 @@ export default function CreditPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewCreditCard ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลเครดิตและการทำธุรกรรมของสาขาหรือร้านค้านี้"
         />

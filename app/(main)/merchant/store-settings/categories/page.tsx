@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconCategory } from '@tabler/icons-react'
+import { IconCategory, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -62,6 +62,7 @@ export default function MerchantStoreSettingsCategoriesPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewCategory ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลหมวดหมู่สินค้าของสาขาหรือร้านค้านี้"
         />

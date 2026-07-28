@@ -10,7 +10,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
-import { IconEye, IconHistory } from '@tabler/icons-react'
+import { IconEye, IconHistory, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -78,6 +78,7 @@ export default function MerchantAuditLogsPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewActivityLogs ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของสาขาหรือร้านค้านี้"
         />

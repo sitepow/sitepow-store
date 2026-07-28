@@ -129,11 +129,11 @@ export async function updateStoreShippingSettings(
         create: {
           storeId,
           isFreeShipEnabled: data.isFreeShipEnabled,
-          freeShipMin: data.isFreeShipEnabled ? data.freeShipMin : 0,
+          freeShipMin: data.isFreeShipEnabled ? data.freeShipMin : 1,
         },
         update: {
           isFreeShipEnabled: data.isFreeShipEnabled,
-          freeShipMin: data.isFreeShipEnabled ? data.freeShipMin : 0,
+          freeShipMin: data.isFreeShipEnabled ? data.freeShipMin : 1,
         },
       })
 

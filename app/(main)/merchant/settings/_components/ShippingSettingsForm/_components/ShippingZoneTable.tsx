@@ -39,7 +39,7 @@ export function ShippingZoneTable({
                 </div>
               </TableCell>
               <TableCell className="max-w-md min-w-md">
-                <div className="text-sm leading-relaxed wrap-break-word whitespace-normal opacity-60">
+                <div className="text-primary text-sm leading-relaxed wrap-break-word whitespace-normal">
                   {getProvincesForZone({
                     zoneType: key as ShippingZoneType,
                     originProvince,

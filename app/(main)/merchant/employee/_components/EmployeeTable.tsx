@@ -9,7 +9,7 @@ import {
 } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconKey, IconSettings } from '@tabler/icons-react'
+import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -62,6 +62,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   if (!isPermissionLoading && !canViewEmployee) {
     return (
       <ActionRequiredAlert
+        icon={<IconLock />}
         title="ไม่มีสิทธิ์เข้าถึง"
         description="คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้"
       />

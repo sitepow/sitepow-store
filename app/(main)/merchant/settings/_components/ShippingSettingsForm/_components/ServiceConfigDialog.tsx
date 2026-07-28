@@ -89,7 +89,6 @@ export function ServiceConfigDialog({
             (กวาดข้อมูลจากระบบอัตโนมัติแล้ว)
           </DialogDescription>
         </DialogHeader>
-
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -103,7 +102,6 @@ export function ServiceConfigDialog({
               </TabsTrigger>
             ))}
           </TabsList>
-
           {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => {
             const targetZone = zoneKey as ShippingZoneType
 
@@ -132,14 +130,12 @@ export function ServiceConfigDialog({
                     <IconPlus size={14} /> เพิ่มช่วงน้ำหนัก ({zoneMeta.title})
                   </Button>
                 </div>
-
                 <div className="w-0 min-w-full overflow-x-auto">
-                  <div className="min-w-125 space-y-2">
+                  <div className="space-y-2">
                     {allWeightRates.map((field, globalIndex) => {
                       if (field.zoneType !== targetZone) {
                         return null
                       }
-
                       return (
                         <div key={field.id} className="flex items-center gap-2">
                           <div className="flex shrink-0 items-center gap-1.5">
@@ -168,7 +164,6 @@ export function ServiceConfigDialog({
                               กรัม (g)
                             </span>
                           </div>
-
                           <div className="flex shrink-0 items-center">
                             <Input
                               type="number"
@@ -177,13 +172,12 @@ export function ServiceConfigDialog({
                                 `services.${serviceIndex}.weightRates.${globalIndex}.fee` as const,
                                 { valueAsNumber: true },
                               )}
-                              className="h-8 w-32 rounded-r-none text-right text-sm font-medium"
+                              className="h-8 w-24 rounded-r-none text-right text-sm font-medium"
                             />
                             <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
                               บาท
                             </span>
                           </div>
-
                           <Button
                             type="button"
                             variant="destructive"
@@ -202,7 +196,6 @@ export function ServiceConfigDialog({
             )
           })}
         </Tabs>
-
         <DialogFooter className="mt-2 border-t pt-3">
           <Button
             type="button"

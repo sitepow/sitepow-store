@@ -7,7 +7,11 @@ import { useInventory } from '@/actions/hooks/inventory'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconAlertCircle, IconAlertTriangle } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconLock,
+} from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -50,6 +54,7 @@ export function InventoryTable() {
   if (!isPermissionLoading && !canViewInventory) {
     return (
       <ActionRequiredAlert
+        icon={<IconLock />}
         title="ไม่มีสิทธิ์เข้าถึง"
         description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
       />

@@ -55,6 +55,7 @@ export function CustomerTable() {
   if (!isPermissionLoading && !canViewCustomers) {
     return (
       <ActionRequiredAlert
+        icon={<IconLock />}
         title="ไม่มีสิทธิ์เข้าถึง"
         description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
       />

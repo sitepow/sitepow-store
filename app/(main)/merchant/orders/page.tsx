@@ -3,7 +3,7 @@
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconShoppingCart } from '@tabler/icons-react'
+import { IconLock, IconShoppingCart } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -35,6 +35,7 @@ export default function OrderPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewOrders ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลออเดอร์ของสาขาหรือร้านค้านี้"
         />

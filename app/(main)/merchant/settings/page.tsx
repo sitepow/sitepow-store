@@ -83,6 +83,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="store-profile" className="flex-1">
             {!isPermissionLoading && !canViewStoreProfile ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลร้านค้าของสาขาหรือร้านค้านี้"
               />
@@ -93,6 +94,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="security" className="flex-1">
             {!isPermissionLoading && !canViewSecurity ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลความปลอดภัยบัญชีของสาขาหรือร้านค้านี้"
               />
@@ -103,6 +105,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="notifications" className="flex-1">
             {!isPermissionLoading && !canViewNotifications ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบแจ้งเตือนของสาขาหรือร้านค้านี้"
               />
@@ -113,6 +116,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="settings-transfer" className="flex-1">
             {!isPermissionLoading && !canViewTransferStore ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลการโอนความเป็นเจ้าของร้านของสาขาหรือร้านค้านี้"
               />
@@ -123,6 +127,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="settings-tax" className="flex-1">
             {!isPermissionLoading && !canViewTax ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลภาษีและใบกำกับของสาขาหรือร้านค้านี้"
               />
@@ -133,6 +138,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="settings-shipping" className="flex-1">
             {!isPermissionLoading && !canViewShipping ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบขนส่งสินค้าของสาขาหรือร้านค้านี้"
               />
@@ -143,6 +149,7 @@ export default function MerchantSettingsPage() {
           <TabsContent value="settings-payment" className="flex-1">
             {!isPermissionLoading && !canViewPayment ? (
               <ActionRequiredAlert
+                icon={<IconLock />}
                 title="ไม่มีสิทธิ์เข้าถึง"
                 description="คุณไม่มีสิทธิ์ในการดูข้อมูลช่องทางรับชำระเงินของสาขาหรือร้านค้านี้"
               />

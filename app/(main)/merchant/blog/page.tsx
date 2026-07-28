@@ -3,7 +3,7 @@
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconNews } from '@tabler/icons-react'
+import { IconLock, IconNews } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -29,6 +29,7 @@ export default function BlogPage() {
         <ActionRequiredAlert />
       ) : !isPermissionLoading && !canViewBlogs ? (
         <ActionRequiredAlert
+          icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"
         />
