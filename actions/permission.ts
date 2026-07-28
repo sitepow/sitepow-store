@@ -5,6 +5,7 @@ import {
   ROLE_PERMISSION_PRESETS,
 } from '@/constants/permission'
 import { DefaultRole } from '@/generated/prisma/enums'
+import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { PermissionKey } from '@/types/permission'
 
 import { prisma } from '@/lib/prisma'
@@ -166,23 +167,59 @@ export async function resetStoreRolePermissions(
                 employeeId: employee.id,
               },
             },
-            select: { id: true },
+            include: {
+              branches: { select: { branchId: true } },
+            },
           })
 
           if (employeeStore) {
-            if (branchId) {
-              await tx.employeeBranch.update({
-                where: {
-                  employeeStoreId_branchId: {
-                    employeeStoreId: employeeStore.id,
-                    branchId,
+            if (branchId && branchId !== ALL_BRANCHES) {
+              await tx.employeeBranch
+                .update({
+                  where: {
+                    employeeStoreId_branchId: {
+                      employeeStoreId: employeeStore.id,
+                      branchId,
+                    },
                   },
-                },
-                data: {
-                  roleId: targetRole.id,
-                  customPermissions: { deleteMany: {} },
-                },
+                  data: {
+                    roleId: targetRole.id,
+                    customPermissions: { deleteMany: {} },
+                  },
+                })
+                .catch(async () => {
+                  await tx.employeeBranch.create({
+                    data: {
+                      employeeStoreId: employeeStore.id,
+                      branchId,
+                      roleId: targetRole.id,
+                    },
+                  })
+                })
+            } else {
+              const allStoreBranches = await tx.branch.findMany({
+                where: { storeId },
+                select: { id: true },
               })
+
+              for (const branch of allStoreBranches) {
+                await tx.employeeBranch.upsert({
+                  where: {
+                    employeeStoreId_branchId: {
+                      employeeStoreId: employeeStore.id,
+                      branchId: branch.id,
+                    },
+                  },
+                  update: {
+                    roleId: targetRole.id,
+                  },
+                  create: {
+                    employeeStoreId: employeeStore.id,
+                    branchId: branch.id,
+                    roleId: targetRole.id,
+                  },
+                })
+              }
             }
           }
         }

@@ -7,6 +7,7 @@ import { useResetStoreRolePermissions } from '@/actions/hooks/permission'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   IconClockRecord,
@@ -28,7 +29,8 @@ import { PermissionLegendTable } from './_components/PermissionLegendTable'
 export default function EmployeePage() {
   const { userId } = useSession()
   const { selectedStoreId } = useStoreFilter()
-  const { canManageEmployee, isOwner, isRoleOwner } = useEmployeePermission()
+  const { selectedBranchId } = useBranchFilter()
+  const { canViewEmployee, isOwner, isRoleOwner } = useEmployeePermission()
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<
     string | undefined
   >()
@@ -57,7 +59,7 @@ export default function EmployeePage() {
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
             <BranchSelectField />
-            {canManageEmployee && (
+            {canViewEmployee && (
               <>
                 <EmployeeDialog
                   employeeId={selectedEmployeeId}
@@ -86,6 +88,7 @@ export default function EmployeePage() {
                     storeId: selectedStoreId,
                     employeeId: userId!,
                     roleName: DefaultRole.OWNER,
+                    branchId: selectedBranchId,
                   })
                 }}
               >
@@ -96,7 +99,7 @@ export default function EmployeePage() {
           </div>
         }
       />
-      {showPermissions && canManageEmployee && <PermissionLegendTable />}
+      {showPermissions && canViewEmployee && <PermissionLegendTable />}
       <EmployeeTable onEdit={handleEdit} />
     </DashboardSidebar>
   )

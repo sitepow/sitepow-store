@@ -13,12 +13,15 @@ export function useResetStoreRolePermissions() {
     mutationFn: async ({
       storeId,
       employeeId,
+      branchId,
       roleName,
     }: {
       storeId: string
       employeeId: string
+      branchId: string
       roleName: DefaultRole
-    }) => await resetStoreRolePermissions(storeId, employeeId, roleName),
+    }) =>
+      await resetStoreRolePermissions(storeId, employeeId, roleName, branchId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.all })
     },

@@ -658,22 +658,25 @@ export async function getEmployeePermission(
     }
 
     let hasBranchAccess = true
-    let activeBranchAssignment = employeeStore.branches[0]
+    let targetBranches = employeeStore.branches
 
     if (branchId && branchId !== ALL_BRANCHES) {
       const found = employeeStore.branches.find((b) => b.branchId === branchId)
       if (found) {
         hasBranchAccess = true
-        activeBranchAssignment = found
+        targetBranches = [found]
       } else {
         hasBranchAccess = false
+        targetBranches = []
       }
+    } else {
+      hasBranchAccess = employeeStore.branches.length > 0
     }
 
     const permissions: PermissionKey[] = []
 
-    if (activeBranchAssignment) {
-      const rolePermissions = activeBranchAssignment.role?.permissions || []
+    for (const branchAssignment of targetBranches) {
+      const rolePermissions = branchAssignment.role?.permissions || []
       for (const rp of rolePermissions) {
         const { domain, action } = rp.permission
         const matchedKey = (
@@ -688,7 +691,7 @@ export async function getEmployeePermission(
         }
       }
 
-      const customPermissions = activeBranchAssignment.customPermissions || []
+      const customPermissions = branchAssignment.customPermissions || []
       for (const cp of customPermissions) {
         const { domain, action } = cp.permission
         const matchedKey = (
@@ -703,6 +706,8 @@ export async function getEmployeePermission(
         }
       }
     }
+
+    const activeBranchAssignment = targetBranches[0]
 
     return {
       employeeStore,
