@@ -358,11 +358,26 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
 
     const existingEmployeeStore = await prisma.employeeStore.findUnique({
       where: { id },
-      select: { employeeId: true },
+      select: {
+        employeeId: true,
+        employee: { select: { userId: true } },
+        store: { select: { ownerId: true } },
+      },
     })
 
     if (!existingEmployeeStore) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+    }
+
+    const isTargetOwner =
+      existingEmployeeStore.employee.userId ===
+      existingEmployeeStore.store.ownerId
+
+    if (isTargetOwner && input.assignments) {
+      return {
+        success: false,
+        message: 'ไม่สามารถแก้ไขบทบาทหรือการเข้าถึงสาขาของเจ้าของร้านได้',
+      }
     }
 
     const updated = await prisma.$transaction(async (tx) => {
@@ -373,7 +388,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
         })
       }
 
-      if (input.assignments) {
+      if (input.assignments && !isTargetOwner) {
         await tx.employeeBranch.deleteMany({
           where: { employeeStoreId: id },
         })
@@ -439,11 +454,23 @@ export async function deleteEmployee(id: string) {
             userId: true,
           },
         },
+        store: {
+          select: {
+            ownerId: true,
+          },
+        },
       },
     })
 
     if (!employeeStore) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+    }
+
+    if (employeeStore.employee?.userId === employeeStore.store.ownerId) {
+      return {
+        success: false,
+        message: 'ไม่สามารถลบข้อมูลบัญชีเจ้าของร้านได้',
+      }
     }
 
     const session = await auth()
@@ -605,7 +632,7 @@ export async function getEmployeePermission(
     const session = await auth()
     const userId = session?.user?.id
 
-    if (!userId || !storeId) {
+    if (!userId || !storeId || storeId === ALL_STORES) {
       return null
     }
 
@@ -613,7 +640,12 @@ export async function getEmployeePermission(
       where: { id: storeId },
       select: { ownerId: true },
     })
-    const isOwner = store?.ownerId === userId
+
+    if (!store) {
+      return null
+    }
+
+    const isOwner = store.ownerId === userId
 
     const employee = await prisma.employee.findUnique({
       where: { userId },
@@ -637,43 +669,52 @@ export async function getEmployeePermission(
             role: {
               include: {
                 permissions: {
-                  include: {
-                    permission: true,
-                  },
+                  include: { permission: true },
                 },
               },
             },
             customPermissions: {
-              include: {
-                permission: true,
-              },
+              include: { permission: true },
             },
           },
         },
       },
     })
 
-    if (!employeeStore) {
+    if (!employeeStore || employeeStore.branches.length === 0) {
       return null
     }
 
-    let hasBranchAccess = true
     let targetBranches = employeeStore.branches
 
     if (branchId && branchId !== ALL_BRANCHES) {
-      const found = employeeStore.branches.find((b) => b.branchId === branchId)
-      if (found) {
-        hasBranchAccess = true
-        targetBranches = [found]
+      const matchedBranch = employeeStore.branches.find(
+        (b) => b.branchId === branchId,
+      )
+
+      if (matchedBranch) {
+        targetBranches = [matchedBranch]
       } else {
-        hasBranchAccess = false
-        targetBranches = []
+        const isBranchInStore = await prisma.branch.findFirst({
+          where: { id: branchId, storeId },
+          select: { id: true },
+        })
+
+        if (!isBranchInStore) {
+          targetBranches = employeeStore.branches
+        } else {
+          return {
+            employeeStore,
+            role: null,
+            isOwner,
+            permissions: [],
+            hasBranchAccess: false,
+          }
+        }
       }
-    } else {
-      hasBranchAccess = employeeStore.branches.length > 0
     }
 
-    const permissions: PermissionKey[] = []
+    const permissionsSet = new Set<PermissionKey>()
 
     for (const branchAssignment of targetBranches) {
       const rolePermissions = branchAssignment.role?.permissions || []
@@ -686,8 +727,8 @@ export async function getEmployeePermission(
           return map.domain === domain && map.action === action
         })
 
-        if (matchedKey && !permissions.includes(matchedKey)) {
-          permissions.push(matchedKey)
+        if (matchedKey) {
+          permissionsSet.add(matchedKey)
         }
       }
 
@@ -701,8 +742,8 @@ export async function getEmployeePermission(
           return map.domain === domain && map.action === action
         })
 
-        if (matchedKey && !permissions.includes(matchedKey)) {
-          permissions.push(matchedKey)
+        if (matchedKey) {
+          permissionsSet.add(matchedKey)
         }
       }
     }
@@ -718,8 +759,8 @@ export async function getEmployeePermission(
           }
         : null,
       isOwner,
-      permissions,
-      hasBranchAccess,
+      permissions: Array.from(permissionsSet),
+      hasBranchAccess: true,
     }
   } catch (error) {
     console.error(error)

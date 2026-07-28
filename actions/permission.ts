@@ -17,65 +17,69 @@ type TransactionClient = Omit<
 
 export async function initializeStoreRolesAndPermissions(
   storeId: string,
-  ts?: TransactionClient,
+  tx?: TransactionClient,
 ) {
-  const db = ts || prisma
-
+  const db = tx || prisma
   const permissionKeys = Object.keys(PERMISSION_MAPPING) as PermissionKey[]
+
+  const permMap = new Map<string, string>()
 
   for (const key of permissionKeys) {
     const { domain, action } = PERMISSION_MAPPING[key]
-
-    await db.permission.upsert({
+    const perm = await db.permission.upsert({
       where: {
-        domain_action: {
-          domain,
-          action,
-        },
+        domain_action: { domain, action },
       },
       update: {},
-      create: {
-        domain,
-        action,
-      },
+      create: { domain, action },
+      select: { id: true, domain: true, action: true },
     })
+    permMap.set(`${domain}_${action}`, perm.id)
   }
 
-  const allPermissions = await db.permission.findMany({
-    select: { id: true },
-  })
-  const permissionIds = allPermissions.map((p: { id: string }) => p.id)
-
-  const defaultRolesToCreate = Object.values(DefaultRole)
   let ownerRoleId = ''
 
-  for (const roleName of defaultRolesToCreate) {
+  for (const [roleName, presetKeys] of Object.entries(
+    ROLE_PERMISSION_PRESETS,
+  )) {
     const role = await db.role.upsert({
       where: {
         storeId_name: {
           storeId,
-          name: roleName,
+          name: roleName as DefaultRole,
         },
       },
       update: {},
       create: {
         storeId,
-        name: roleName,
+        name: roleName as DefaultRole,
       },
+      select: { id: true, name: true },
     })
-
-    if (permissionIds.length > 0) {
-      await db.rolePermission.createMany({
-        data: permissionIds.map((permissionId: string) => ({
-          roleId: role.id,
-          permissionId,
-        })),
-        skipDuplicates: true,
-      })
-    }
 
     if (roleName === DefaultRole.OWNER) {
       ownerRoleId = role.id
+    }
+
+    const rolePermData = presetKeys
+      .map((key) => {
+        const mapping = PERMISSION_MAPPING[key as PermissionKey]
+        if (!mapping) {
+          return null
+        }
+        const permId = permMap.get(`${mapping.domain}_${mapping.action}`)
+        return permId ? { roleId: role.id, permissionId: permId } : null
+      })
+      .filter(
+        (item): item is { roleId: string; permissionId: string } =>
+          item !== null,
+      )
+
+    if (rolePermData.length > 0) {
+      await db.rolePermission.createMany({
+        data: rolePermData,
+        skipDuplicates: true,
+      })
     }
   }
 

@@ -298,10 +298,6 @@ export async function createBranch(input: CreateBranchInput) {
         tx,
       )
 
-      const allStorePermissions = await tx.permission.findMany({
-        select: { id: true },
-      })
-
       const employeeStore = await tx.employeeStore.upsert({
         where: {
           storeId_employeeId: {
@@ -349,11 +345,6 @@ export async function createBranch(input: CreateBranchInput) {
               employeeStoreId,
               branchId: newBranch.id,
               roleId: ownerRoleId,
-              customPermissions: {
-                create: allStorePermissions.map((p) => ({
-                  permissionId: p.id,
-                })),
-              },
             },
           })
         }

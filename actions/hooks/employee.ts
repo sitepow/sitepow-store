@@ -125,7 +125,7 @@ export function useEmployeePermission() {
   const isManager = roleName === DefaultRole.MANAGER
   const isCashier = roleName === DefaultRole.CASHIER
 
-  const hasBranchAccess = employee?.hasBranchAccess ?? false
+  const hasBranchAccess = employee?.hasBranchAccess ?? true
   const employeePermissions = employee?.permissions
 
   const hasPermission = useCallback(
