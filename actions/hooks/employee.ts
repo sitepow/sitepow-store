@@ -139,18 +139,33 @@ export function useEmployeePermission() {
     [hasBranchAccess, employeePermissions],
   )
 
-  const permissionsProxy = useMemo(() => {
-    return new Proxy({} as Record<PermissionKey, boolean>, {
-      get(_, prop: string) {
+  return useMemo(() => {
+    const baseValues = {
+      employee,
+      isLoading,
+      error,
+      isOwner,
+      isRoleOwner,
+      isManager,
+      isCashier,
+      hasBranchAccess,
+      hasPermission,
+    }
+
+    return new Proxy(baseValues, {
+      get(target, prop: string) {
+        if (prop in target) {
+          return target[prop as keyof typeof target]
+        }
+
         if (prop.startsWith('can')) {
           return hasPermission(prop as PermissionKey)
         }
+
         return undefined
       },
-    })
-  }, [hasPermission])
-
-  return {
+    }) as typeof baseValues & Record<PermissionKey, boolean>
+  }, [
     employee,
     isLoading,
     error,
@@ -160,6 +175,5 @@ export function useEmployeePermission() {
     isCashier,
     hasBranchAccess,
     hasPermission,
-    ...permissionsProxy,
-  }
+  ])
 }

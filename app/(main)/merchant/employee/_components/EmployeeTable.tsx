@@ -34,8 +34,14 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageEmployee, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewEmployee,
+    canUpdateEmployee,
+    canDeleteEmployee,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
+
+  const canManageEmployee = canUpdateEmployee || canDeleteEmployee
 
   const deleteEmployeeMutation = useDeleteEmployee()
 
@@ -53,11 +59,11 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
     return <ActionRequiredAlert />
   }
 
-  if (!isPermissionLoading && !canManageEmployee) {
+  if (!isPermissionLoading && !canViewEmployee) {
     return (
       <ActionRequiredAlert
         title="ไม่มีสิทธิ์เข้าถึง"
-        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลพนักงานของสาขาหรือร้านค้านี้"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้"
       />
     )
   }
@@ -88,27 +94,62 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                 title="ยังไม่มีพนักงานในร้านนี้"
               />
             ) : (
-              employees.map((employee) => {
-                const permissions = employee?.permissions ?? []
+              employees.map((employeeStore) => {
+                const allPermissions = new Map<
+                  string,
+                  { id: string; domain: string; action: string }
+                >()
+                const rolesSet = new Set<string>()
+
+                employeeStore.branches.forEach((branchAssignment) => {
+                  if (branchAssignment.role?.name) {
+                    rolesSet.add(branchAssignment.role.name)
+                  }
+                  branchAssignment.role?.permissions?.forEach(
+                    ({ permission }) => {
+                      if (permission) {
+                        allPermissions.set(permission.id, permission)
+                      }
+                    },
+                  )
+                  branchAssignment.customPermissions?.forEach(
+                    ({ permission }) => {
+                      if (permission) {
+                        allPermissions.set(permission.id, permission)
+                      }
+                    },
+                  )
+                })
+
+                const uniquePermissions = Array.from(allPermissions.values())
+                const roleNames = Array.from(rolesSet)
 
                 return (
-                  <TableRow key={employee.id}>
-                    <TableCell>{employee.id}</TableCell>
-                    <TableCell>{employee.employee?.name}</TableCell>
-                    <TableCell>{employee.employee?.email}</TableCell>
+                  <TableRow key={employeeStore.id}>
+                    <TableCell>{employeeStore.id}</TableCell>
+                    <TableCell>{employeeStore.employee?.name}</TableCell>
+                    <TableCell>{employeeStore.employee?.email}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {employee.role?.name ?? 'ไม่ระบุบทบาท'}
-                      </Badge>
+                      <div className="flex flex-wrap gap-1">
+                        {roleNames.length === 0 ? (
+                          <Badge variant="outline">ไม่ระบุบทบาท</Badge>
+                        ) : (
+                          roleNames.map((roleName, idx) => (
+                            <Badge key={idx} variant="outline">
+                              {roleName}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="maw-w-72 flex max-w-xs min-w-72 flex-wrap gap-1 wrap-break-word whitespace-pre-line">
-                        {permissions.length === 0 ? (
+                        {uniquePermissions.length === 0 ? (
                           <span className="text-muted-foreground text-xs">
                             ไม่มีสิทธิ์
                           </span>
                         ) : (
-                          permissions.map(({ permission }) => (
+                          uniquePermissions.map((permission) => (
                             <Badge
                               key={permission.id}
                               variant="outline"
@@ -122,10 +163,10 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {employee.branches.length === 0 ? (
+                        {employeeStore.branches.length === 0 ? (
                           <Badge variant="outline">ทุกสาขา</Badge>
                         ) : (
-                          employee.branches.map(({ branch }) => (
+                          employeeStore.branches.map(({ branch }) => (
                             <Badge key={branch.id} variant="outline">
                               {branch.name}
                             </Badge>
@@ -135,19 +176,23 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     </TableCell>
                     {canManageEmployee && (
                       <TableCell className="space-x-2 text-right">
-                        <Button
-                          variant="outline"
-                          size="icon-lg"
-                          onClick={() => onEdit(employee.id)}
-                        >
-                          <IconSettings />
-                        </Button>
-                        <DeleteButton
-                          isPending={deleteEmployeeMutation.isPending}
-                          onDelete={() =>
-                            deleteEmployeeMutation.mutate(employee.id)
-                          }
-                        />
+                        {canUpdateEmployee && (
+                          <Button
+                            variant="outline"
+                            size="icon-lg"
+                            onClick={() => onEdit(employeeStore.id)}
+                          >
+                            <IconSettings />
+                          </Button>
+                        )}
+                        {canDeleteEmployee && (
+                          <DeleteButton
+                            isPending={deleteEmployeeMutation.isPending}
+                            onDelete={() =>
+                              deleteEmployeeMutation.mutate(employeeStore.id)
+                            }
+                          />
+                        )}
                       </TableCell>
                     )}
                   </TableRow>
