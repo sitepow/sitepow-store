@@ -45,8 +45,8 @@ const DEFAULT_VALUES = {
   name: '',
   email: '',
   roleId: '',
-  branchIds: [],
-  permissionIds: [],
+  branchIds: [] as string[],
+  permissionIds: [] as string[],
 }
 
 export function EmployeeDialog({
@@ -83,17 +83,24 @@ export function EmployeeDialog({
 
   useEffect(() => {
     if (employeeData) {
-      const employeePermissions = employeeData.permissions ?? []
-      const extractedPermissionIds = employeePermissions.map(
-        (ep: { permissionId: string }) => ep.permissionId,
-      )
+      const extractedPermissionIds: string[] = []
+      employeeData.branches?.forEach((b) => {
+        b.customPermissions?.forEach((cp) => {
+          if (cp.permissionId) extractedPermissionIds.push(cp.permissionId)
+        })
+        b.role?.permissions?.forEach((rp) => {
+          if (rp.permission?.id) extractedPermissionIds.push(rp.permission.id)
+        })
+      })
+
+      const uniquePermissionIds = Array.from(new Set(extractedPermissionIds))
 
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
-        roleId: employeeData.role?.id ?? '',
+        roleId: employeeData.branches?.[0]?.role?.id ?? '',
         branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
-        permissionIds: extractedPermissionIds,
+        permissionIds: uniquePermissionIds,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -101,23 +108,29 @@ export function EmployeeDialog({
   }, [employeeData, reset])
 
   const handleClose = () => {
-    reset()
+    reset(DEFAULT_VALUES)
     setOpen(false)
   }
 
   const handleReset = () => {
     if (employeeData) {
-      const employeePermissions = employeeData.permissions ?? []
-      const extractedPermissionIds = employeePermissions.map(
-        (ep: { permissionId: string }) => ep.permissionId,
-      )
+      const extractedPermissionIds: string[] = []
+      employeeData.branches?.forEach((b) => {
+        b.customPermissions?.forEach((cp) => {
+          if (cp.permissionId) extractedPermissionIds.push(cp.permissionId)
+        })
+        b.role?.permissions?.forEach((rp) => {
+          if (rp.permission?.id) extractedPermissionIds.push(rp.permission.id)
+        })
+      })
+      const uniquePermissionIds = Array.from(new Set(extractedPermissionIds))
 
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
-        roleId: employeeData.role?.id ?? '',
+        roleId: employeeData.branches?.[0]?.role?.id ?? '',
         branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
-        permissionIds: extractedPermissionIds,
+        permissionIds: uniquePermissionIds,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -131,16 +144,20 @@ export function EmployeeDialog({
     branchIds: string[]
     permissionIds: string[]
   }) => {
+    const assignments = values.branchIds.map((branchId) => ({
+      branchId,
+      roleId: values.roleId,
+      permissionIds: values.permissionIds ?? [],
+    }))
+
     if (employeeId) {
       updateEmployeeMutation.mutate(
         {
           id: employeeId,
           input: {
-            name: values.name,
-            roleId: values.roleId,
-            branchIds: values.branchIds ?? [],
-            permissionIds: values.permissionIds ?? [],
             storeId: selectedStoreId,
+            name: values.name,
+            assignments,
           },
         },
         {
@@ -150,12 +167,10 @@ export function EmployeeDialog({
     } else {
       createEmployeeMutation.mutate(
         {
+          storeId: selectedStoreId as string,
           name: values.name,
           email: values.email ?? '',
-          roleId: values.roleId,
-          storeId: selectedStoreId as string,
-          branchIds: values.branchIds ?? [],
-          permissionIds: values.permissionIds ?? [],
+          assignments,
         },
         {
           onSuccess: () => handleClose(),
@@ -204,7 +219,7 @@ export function EmployeeDialog({
               {...register('name')}
               disabled={isPending || !!employeeId}
             />
-            <FieldError>{errors?.name?.message}</FieldError>
+            <FieldError>{errors?.name?.message as string}</FieldError>
           </Field>
           <Field>
             <FieldLabel>อีเมล</FieldLabel>
@@ -226,7 +241,7 @@ export function EmployeeDialog({
 
                 const selectedRole = roles.find((r) => r.id === roleId)
                 if (selectedRole) {
-                  const roleName = selectedRole.name?.toUpperCase()
+                  const roleName = String(selectedRole.name ?? '').toUpperCase()
                   const presetKeys = ROLE_PERMISSION_PRESETS[roleName] ?? []
 
                   const mappedIds = presetKeys

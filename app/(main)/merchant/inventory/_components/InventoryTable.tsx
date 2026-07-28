@@ -30,8 +30,12 @@ export function InventoryTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
-  const { canManageInventory, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewInventory,
+    canDeleteInventory,
+    canUpdateInventory,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const { data: { data: stocks = [], meta } = {}, isLoading } = useInventory({
     storeId: selectedStoreId,
@@ -43,7 +47,7 @@ export function InventoryTable() {
     return <ActionRequiredAlert />
   }
 
-  if (!isPermissionLoading && !canManageInventory) {
+  if (!isPermissionLoading && !canViewInventory) {
     return (
       <ActionRequiredAlert
         title="ไม่มีสิทธิ์เข้าถึง"
@@ -52,7 +56,8 @@ export function InventoryTable() {
     )
   }
 
-  const totalColumns = canManageInventory ? 9 : 8
+  const totalColumns = canViewInventory ? 9 : 8
+  const canManageInventory = canDeleteInventory || canUpdateInventory
 
   return (
     <>
