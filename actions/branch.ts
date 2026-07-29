@@ -1,11 +1,15 @@
 'use server'
 
-import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { Prisma } from '@/generated/prisma/client'
+import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/permission'
+import {
+  findOrCreateEmployee,
+  verifyEmployeePermission,
+} from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 import { initializeStoreRolesAndPermissions } from './permission'
@@ -253,6 +257,15 @@ export async function createBranch(input: CreateBranchInput) {
       }
     }
 
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    })
+
+    if (!currentUser?.email) {
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    }
+
     const branch = await prisma.$transaction(async (tx) => {
       if (isMain) {
         await tx.branch.updateMany({
@@ -266,32 +279,10 @@ export async function createBranch(input: CreateBranchInput) {
         select: branchSelect,
       })
 
-      let employee = await tx.employee.findUnique({
-        where: { userId },
-        select: { id: true },
+      const { employee } = await findOrCreateEmployee({
+        email: currentUser.email!,
+        name: currentUser.name!,
       })
-
-      if (!employee) {
-        const user = await tx.user.findUnique({
-          where: { id: userId },
-          select: { name: true, email: true },
-        })
-
-        if (user) {
-          employee = await tx.employee.create({
-            data: {
-              name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
-              email: user.email!,
-              userId: userId,
-            },
-            select: { id: true },
-          })
-        }
-      }
-
-      if (!employee) {
-        throw new Error()
-      }
 
       const { ownerRoleId } = await initializeStoreRolesAndPermissions(
         storeId,
@@ -532,16 +523,9 @@ export async function deleteBranch(id: string, storeId: string) {
     }
 
     await prisma.$transaction(async (tx) => {
-      const employeeBranches = await tx.employeeBranch.findMany({
-        where: { branchId: id },
-        select: { id: true },
+      await tx.employeeBranchPermission.deleteMany({
+        where: { employeeBranch: { branchId: id } },
       })
-
-      for (const eb of employeeBranches) {
-        await tx.employeeBranchPermission.deleteMany({
-          where: { employeeBranchId: eb.id },
-        })
-      }
 
       await tx.employeeBranch.deleteMany({ where: { branchId: id } })
       await tx.branch.delete({ where: { id } })

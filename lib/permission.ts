@@ -608,7 +608,11 @@ export async function findOrCreateEmployee(
   tx?: TransactionClient,
 ) {
   const db = tx || prisma
-  const { email, name, defaultPassword = DEFAULT_PASSWORD_EMPLOYEE } = params
+  const {
+    email,
+    name = 'ไม่มีชื่อผู้ใช้งาน',
+    defaultPassword = DEFAULT_PASSWORD_EMPLOYEE,
+  } = params
 
   let employee = await db.employee.findUnique({
     where: { email },

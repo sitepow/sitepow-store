@@ -22,10 +22,12 @@ import { createStoreSchema } from '@/zod/store'
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { withCache } from '@/lib/cache'
-import { verifyEmployeePermission } from '@/lib/permission'
+import {
+  setupStoreOwnerPermissions,
+  verifyEmployeePermission,
+} from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
-import { initializeStoreRolesAndPermissions } from './permission'
 import { invalidateStoreCache } from './query-keys/invalidation/store'
 import { storeKeys } from './query-keys/store'
 
@@ -457,62 +459,19 @@ export async function createStore(input: CreateStoreInput) {
             },
             branches: {
               select: { id: true },
-              take: 1,
             },
           },
         })
 
-        const user = await tx.user.findUnique({
-          where: { id: userId },
-          select: { name: true, email: true },
-        })
-
-        if (user) {
-          let employee = await tx.employee.findUnique({
-            where: { userId: userId },
-          })
-
-          if (!employee) {
-            employee = await tx.employee.create({
-              data: {
-                name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
-                email: user.email!,
-                userId: userId,
-              },
-            })
-          }
-
-          const { ownerRoleId } = await initializeStoreRolesAndPermissions(
-            newStore.id,
-            tx,
-          )
-
-          const employeeStore = await tx.employeeStore.upsert({
-            where: {
-              storeId_employeeId: {
-                employeeId: employee.id,
-                storeId: newStore.id,
-              },
-            },
-            update: {},
-            create: {
-              employeeId: employee.id,
-              storeId: newStore.id,
-            },
-          })
-
-          if (newStore.branches.length > 0) {
-            for (const branch of newStore.branches) {
-              await tx.employeeBranch.create({
-                data: {
-                  employeeStoreId: employeeStore.id,
-                  branchId: branch.id,
-                  roleId: ownerRoleId,
-                },
-              })
-            }
-          }
-        }
+        const branchIds = newStore.branches.map((b) => b.id)
+        await setupStoreOwnerPermissions(
+          {
+            userId,
+            storeId: newStore.id,
+            branchIds,
+          },
+          tx,
+        )
 
         return newStore
       }),

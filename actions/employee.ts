@@ -1,17 +1,19 @@
 'use server'
 
-import { PERMISSION_MAPPING } from '@/constants/permission'
 import { DEFAULT_PASSWORD_EMPLOYEE } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
-import { ActorType, LogAction, UserRole } from '@/generated/prisma/enums'
+import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
-import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
-import { verifyEmployeePermission } from '@/lib/permission'
+import {
+  type EmployeePermissionResult,
+  findOrCreateEmployee,
+  getEmployeePermissions,
+  verifyEmployeePermission,
+} from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateEmployeeInput {
@@ -236,53 +238,23 @@ export async function createEmployee(input: CreateEmployeeInput) {
       }
     }
 
-    let employee = await prisma.employee.findUnique({
-      where: { email: input.email },
+    const { employee } = await findOrCreateEmployee({
+      email: input.email,
+      name: input.name,
+    })
+
+    const alreadyInStore = await prisma.employeeStore.findUnique({
+      where: {
+        storeId_employeeId: {
+          employeeId: employee.id,
+          storeId: input.storeId,
+        },
+      },
       select: { id: true },
     })
 
-    if (employee) {
-      const alreadyInStore = await prisma.employeeStore.findUnique({
-        where: {
-          storeId_employeeId: {
-            employeeId: employee.id,
-            storeId: input.storeId,
-          },
-        },
-        select: { id: true },
-      })
-
-      if (alreadyInStore) {
-        return { success: false, message: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว' }
-      }
-    } else {
-      let user = await prisma.user.findUnique({
-        where: { email: input.email },
-        select: { id: true },
-      })
-
-      if (!user) {
-        const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD_EMPLOYEE, 10)
-
-        user = await prisma.user.create({
-          data: {
-            email: input.email,
-            name: input.name,
-            role: UserRole.MERCHANT,
-            password: hashedPassword,
-          },
-          select: { id: true },
-        })
-      }
-
-      employee = await prisma.employee.create({
-        data: {
-          name: input.name,
-          email: input.email,
-          userId: user.id,
-        },
-        select: { id: true },
-      })
+    if (alreadyInStore) {
+      return { success: false, message: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว' }
     }
 
     const employeeStore = await prisma.employeeStore.create({
@@ -606,35 +578,6 @@ export async function getEmployee(
   }
 }
 
-export interface EmployeePermissionResult {
-  employeeStore: Prisma.EmployeeStoreGetPayload<{
-    include: {
-      branches: {
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true
-                }
-              }
-            }
-          }
-          customPermissions: {
-            include: {
-              permission: true
-            }
-          }
-        }
-      }
-    }
-  }> | null
-  role: { id: string; name: string } | null
-  isOwner: boolean
-  permissions: PermissionKey[]
-  hasBranchAccess: boolean
-}
-
 export async function getEmployeePermission(
   storeId: string,
   branchId?: string,
@@ -643,136 +586,11 @@ export async function getEmployeePermission(
     const session = await auth()
     const userId = session?.user?.id
 
-    if (!userId || !storeId || storeId === ALL_STORES) {
+    if (!userId) {
       return null
     }
 
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { ownerId: true },
-    })
-
-    if (!store) {
-      return null
-    }
-
-    const isOwner = store.ownerId === userId
-
-    const employee = await prisma.employee.findUnique({
-      where: { userId },
-      select: { id: true },
-    })
-
-    if (!employee) {
-      return null
-    }
-
-    const employeeStore = await prisma.employeeStore.findUnique({
-      where: {
-        storeId_employeeId: {
-          employeeId: employee.id,
-          storeId,
-        },
-      },
-      include: {
-        branches: {
-          include: {
-            role: {
-              include: {
-                permissions: {
-                  include: { permission: true },
-                },
-              },
-            },
-            customPermissions: {
-              include: { permission: true },
-            },
-          },
-        },
-      },
-    })
-
-    if (!employeeStore || employeeStore.branches.length === 0) {
-      return null
-    }
-
-    let targetBranches = employeeStore.branches
-
-    if (branchId && branchId !== ALL_BRANCHES) {
-      const matchedBranch = employeeStore.branches.find(
-        (b) => b.branchId === branchId,
-      )
-
-      if (matchedBranch) {
-        targetBranches = [matchedBranch]
-      } else {
-        const isBranchInStore = await prisma.branch.findFirst({
-          where: { id: branchId, storeId },
-          select: { id: true },
-        })
-
-        if (!isBranchInStore) {
-          targetBranches = employeeStore.branches
-        } else {
-          return {
-            employeeStore,
-            role: null,
-            isOwner,
-            permissions: [],
-            hasBranchAccess: false,
-          }
-        }
-      }
-    }
-
-    const permissionsSet = new Set<PermissionKey>()
-
-    for (const branchAssignment of targetBranches) {
-      const rolePermissions = branchAssignment.role?.permissions || []
-      for (const rp of rolePermissions) {
-        const { domain, action } = rp.permission
-        const matchedKey = (
-          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-        ).find((key) => {
-          const map = PERMISSION_MAPPING[key]
-          return map.domain === domain && map.action === action
-        })
-
-        if (matchedKey) {
-          permissionsSet.add(matchedKey)
-        }
-      }
-
-      const customPermissions = branchAssignment.customPermissions || []
-      for (const cp of customPermissions) {
-        const { domain, action } = cp.permission
-        const matchedKey = (
-          Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-        ).find((key) => {
-          const map = PERMISSION_MAPPING[key]
-          return map.domain === domain && map.action === action
-        })
-
-        if (matchedKey) {
-          permissionsSet.add(matchedKey)
-        }
-      }
-    }
-
-    const activeBranchAssignment = targetBranches[0]
-
-    return {
-      employeeStore,
-      role: activeBranchAssignment?.role
-        ? {
-            id: activeBranchAssignment.role.id,
-            name: activeBranchAssignment.role.name,
-          }
-        : null,
-      isOwner,
-      permissions: Array.from(permissionsSet),
-      hasBranchAccess: true,
-    }
+    return await getEmployeePermissions(userId, storeId, branchId)
   } catch (error) {
     console.error(error)
     return null
