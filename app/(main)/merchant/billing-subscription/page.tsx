@@ -3,7 +3,7 @@
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconCreditCard, IconLock } from '@tabler/icons-react'
+import { IconCreditCard, IconFileInvoice, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -35,10 +35,24 @@ export default function MerchantBillingSubscriptionPage() {
           description="คุณไม่มีสิทธิ์ในการดูข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
         />
       ) : (
-        <>
-          <MerchantSubscriptionTable />
-          <MerchantInvoiceTable />
-        </>
+        <MerchantSubscriptionTable />
+      )}
+      <PageTabHeader
+        icon={IconFileInvoice}
+        title="ใบแจ้งหนี้และบิล"
+        description="ตรวจสอบประวัติการชำระเงิน ดาวน์โหลดใบแจ้งหนี้ และใบเสร็จรับเงิน"
+        endContent={<StoreSelectField />}
+      />
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && !canViewSubscription ? (
+        <ActionRequiredAlert
+          icon={<IconLock />}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
+        />
+      ) : (
+        <MerchantInvoiceTable />
       )}
     </DashboardSidebar>
   )

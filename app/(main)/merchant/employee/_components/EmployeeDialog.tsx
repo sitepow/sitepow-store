@@ -261,14 +261,12 @@ export function EmployeeDialog({
                 <IconPlus className="mr-1 size-4" /> เพิ่มสาขาที่ดูแล
               </Button>
             </div>
-
             {fields.length === 0 && (
               <ActionRequiredAlert
                 title="แจ้งเตือน"
                 description="สาขานี้ยังไม่มีการตั้งค่า Permission กรุณากำหนดสิทธิ์ก่อนดำเนินการต่อ"
               />
             )}
-
             {fields.map((fieldItem, index) => {
               const currentBranchId = assignments[index]?.branchId
               const currentRoleId = assignments[index]?.roleId
@@ -286,7 +284,8 @@ export function EmployeeDialog({
                   key={fieldItem.id}
                   className="bg-card relative grid gap-3 space-y-2 rounded-md border p-3"
                 >
-                  <div className="flex items-center justify-end">
+                  <div className="flex items-center justify-between">
+                    <span>สาขาที่ {index + 1}</span>
                     <Button
                       type="button"
                       variant="destructive"
