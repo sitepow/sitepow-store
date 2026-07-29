@@ -1,16 +1,23 @@
+import { employeeKeys } from '@/actions/query-keys/employee'
 import {
   PERMISSION_MAPPING,
   ROLE_PERMISSION_PRESETS,
 } from '@/constants/permission'
-import { DEFAULT_PASSWORD_EMPLOYEE } from '@/constants/system'
+import {
+  DEFAULT_PASSWORD_EMPLOYEE,
+  PERMISSION_CACHE_TTL_SECONDS,
+} from '@/constants/system'
 import { EmployeeStore } from '@/generated/prisma/client'
 import { DefaultRole, UserRole } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
+import { queryKeyToRedisKey } from '@/utils/cache'
 import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/lib/prisma'
+
+import { withCache } from './cache'
 
 export type TransactionClient = Omit<
   typeof prisma,
@@ -31,75 +38,25 @@ export async function verifyEmployeePermission({
   branchId,
 }: VerifyEmployeePermissionOptions) {
   try {
-    const employeeStore = await prisma.employeeStore.findFirst({
-      where: {
-        storeId,
-        employee: { userId },
-      },
-      include: {
-        branches: {
-          include: {
-            role: {
-              include: {
-                permissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-            customPermissions: {
-              include: {
-                permission: true,
-              },
-            },
-          },
-        },
-      },
-    })
+    const result = await getEmployeePermissions(userId, storeId, branchId)
 
-    if (!employeeStore) {
+    if (!result) {
       return { isAuthorized: false, message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้' }
     }
 
-    let targetBranches = employeeStore.branches || []
-    if (branchId && branchId !== ALL_BRANCHES) {
-      targetBranches = targetBranches.filter((b) => b.branchId === branchId)
-      if (targetBranches.length === 0) {
-        return {
-          isAuthorized: false,
-          message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
-        }
+    if (!result.hasBranchAccess) {
+      return {
+        isAuthorized: false,
+        message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
       }
     }
 
+    if (result.isOwner) {
+      return { isAuthorized: true, employeeStore: result.employeeStore }
+    }
+
     if (permission) {
-      const targetMapping = PERMISSION_MAPPING[permission]
-      if (!targetMapping) {
-        return {
-          isAuthorized: false,
-          message: 'ไม่พบข้อมูลสิทธิ์การใช้งานนี้ในระบบ',
-        }
-      }
-
-      const hasPermission = targetBranches.some((branchAssignment) => {
-        const rolePermissions = branchAssignment.role?.permissions || []
-        const customPermissions = branchAssignment.customPermissions || []
-
-        const matchInRole = rolePermissions.some(
-          (rp) =>
-            rp.permission.domain === targetMapping.domain &&
-            rp.permission.action === targetMapping.action,
-        )
-
-        const matchInCustom = customPermissions.some(
-          (cp) =>
-            cp.permission.domain === targetMapping.domain &&
-            cp.permission.action === targetMapping.action,
-        )
-
-        return matchInRole || matchInCustom
-      })
+      const hasPermission = result.permissions.includes(permission)
 
       if (!hasPermission) {
         return {
@@ -109,10 +66,7 @@ export async function verifyEmployeePermission({
       }
     }
 
-    return {
-      isAuthorized: true,
-      employeeStore,
-    }
+    return { isAuthorized: true, employeeStore: result.employeeStore }
   } catch (error) {
     console.error(error)
     return {
@@ -394,120 +348,126 @@ export async function getEmployeePermissions(
     return null
   }
 
-  try {
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { ownerId: true },
-    })
+  const cacheKey = queryKeyToRedisKey([
+    userId,
+    ...employeeKeys.currentStore(storeId, branchId || ALL_BRANCHES),
+  ])
 
-    if (!store) {
-      return null
-    }
+  return await withCache(
+    cacheKey,
+    async () => {
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { ownerId: true },
+      })
 
-    const isOwner = store.ownerId === userId
+      if (!store) {
+        return null
+      }
 
-    const employee = await prisma.employee.findUnique({
-      where: { userId },
-      select: { id: true },
-    })
+      const isOwner = store.ownerId === userId
 
-    if (!employee) {
-      return null
-    }
+      const employee = await prisma.employee.findUnique({
+        where: { userId },
+        select: { id: true },
+      })
 
-    const employeeStore = await prisma.employeeStore.findUnique({
-      where: { storeId_employeeId: { employeeId: employee.id, storeId } },
-      include: {
-        branches: {
-          include: {
-            role: {
-              include: {
-                permissions: { include: { permission: true } },
+      if (!employee) {
+        return null
+      }
+
+      const employeeStore = await prisma.employeeStore.findUnique({
+        where: { storeId_employeeId: { employeeId: employee.id, storeId } },
+        include: {
+          branches: {
+            include: {
+              role: {
+                include: {
+                  permissions: { include: { permission: true } },
+                },
               },
+              customPermissions: { include: { permission: true } },
             },
-            customPermissions: { include: { permission: true } },
           },
         },
-      },
-    })
+      })
 
-    if (!employeeStore || employeeStore.branches.length === 0) {
-      return null
-    }
+      if (!employeeStore || employeeStore.branches.length === 0) {
+        return null
+      }
 
-    let targetBranches = employeeStore.branches
+      let targetBranches = employeeStore.branches
 
-    if (branchId && branchId !== ALL_BRANCHES) {
-      const matchedBranch = employeeStore.branches.find(
-        (b) => b.branchId === branchId,
-      )
+      if (branchId && branchId !== ALL_BRANCHES) {
+        const matchedBranch = employeeStore.branches.find(
+          (b) => b.branchId === branchId,
+        )
 
-      if (matchedBranch) {
-        targetBranches = [matchedBranch]
-      } else {
-        const isBranchInStore = await prisma.branch.findFirst({
-          where: { id: branchId, storeId },
-          select: { id: true },
-        })
-
-        if (!isBranchInStore) {
-          targetBranches = employeeStore.branches
+        if (matchedBranch) {
+          targetBranches = [matchedBranch]
         } else {
-          return {
-            employeeStore,
-            role: null,
-            isOwner,
-            permissions: [],
-            hasBranchAccess: false,
+          const isBranchInStore = await prisma.branch.findFirst({
+            where: { id: branchId, storeId },
+            select: { id: true },
+          })
+
+          if (!isBranchInStore) {
+            targetBranches = employeeStore.branches
+          } else {
+            return {
+              employeeStore,
+              role: null,
+              isOwner,
+              permissions: [],
+              hasBranchAccess: false,
+            }
           }
         }
       }
-    }
 
-    const permissionsSet = new Set<PermissionKey>()
-    const permissionEntries = Object.entries(PERMISSION_MAPPING) as [
-      PermissionKey,
-      { domain: string; action: string },
-    ][]
+      const permissionsSet = new Set<PermissionKey>()
+      const permissionEntries = Object.entries(PERMISSION_MAPPING) as [
+        PermissionKey,
+        { domain: string; action: string },
+      ][]
 
-    for (const branchAssignment of targetBranches) {
-      for (const rp of branchAssignment.role?.permissions || []) {
-        const found = permissionEntries.find(
-          ([_, map]) =>
-            map.domain === rp.permission.domain &&
-            map.action === rp.permission.action,
-        )
-        if (found) permissionsSet.add(found[0])
+      for (const branchAssignment of targetBranches) {
+        for (const rp of branchAssignment.role?.permissions || []) {
+          const found = permissionEntries.find(
+            ([_, map]) =>
+              map.domain === rp.permission.domain &&
+              map.action === rp.permission.action,
+          )
+          if (found) permissionsSet.add(found[0])
+        }
+
+        for (const cp of branchAssignment.customPermissions || []) {
+          const found = permissionEntries.find(
+            ([_, map]) =>
+              map.domain === cp.permission.domain &&
+              map.action === cp.permission.action,
+          )
+          if (found) permissionsSet.add(found[0])
+        }
       }
 
-      for (const cp of branchAssignment.customPermissions || []) {
-        const found = permissionEntries.find(
-          ([_, map]) =>
-            map.domain === cp.permission.domain &&
-            map.action === cp.permission.action,
-        )
-        if (found) permissionsSet.add(found[0])
+      const activeBranchAssignment = targetBranches[0]
+
+      return {
+        employeeStore,
+        role: activeBranchAssignment?.role
+          ? {
+              id: activeBranchAssignment.role.id,
+              name: activeBranchAssignment.role.name,
+            }
+          : null,
+        isOwner,
+        permissions: Array.from(permissionsSet),
+        hasBranchAccess: true,
       }
-    }
-
-    const activeBranchAssignment = targetBranches[0]
-
-    return {
-      employeeStore,
-      role: activeBranchAssignment?.role
-        ? {
-            id: activeBranchAssignment.role.id,
-            name: activeBranchAssignment.role.name,
-          }
-        : null,
-      isOwner,
-      permissions: Array.from(permissionsSet),
-      hasBranchAccess: true,
-    }
-  } catch (error) {
-    console.error(error)
-    return null
-  }
+    },
+    PERMISSION_CACHE_TTL_SECONDS,
+  )
 }
 
 export async function assignNewBranchToOwners(
