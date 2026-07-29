@@ -10,12 +10,11 @@ import {
   useUpdateEmployee,
 } from '@/actions/hooks/employee'
 import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
-import {
-  PERMISSION_MAPPING,
-  ROLE_PERMISSION_PRESETS,
-} from '@/constants/permission'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
+import {
+  getPresetPermissionIds,
+  mapEmployeeDataToFormValues,
+} from '@/utils/employee'
 import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
@@ -72,6 +71,11 @@ export function EmployeeDialog({
 
   const { data: employeeData } = useEmployee(employeeId!)
 
+  const form = useForm({
+    resolver: zodResolver(createEmployeeSchema),
+    defaultValues: DEFAULT_VALUES,
+  })
+
   const {
     register,
     handleSubmit,
@@ -80,10 +84,7 @@ export function EmployeeDialog({
     setValue,
     watch,
     formState: { errors, isDirty },
-  } = useForm({
-    resolver: zodResolver(createEmployeeSchema),
-    defaultValues: DEFAULT_VALUES,
-  })
+  } = form
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -91,32 +92,7 @@ export function EmployeeDialog({
   })
 
   useEffect(() => {
-    if (employeeData) {
-      const mappedAssignments =
-        employeeData.branches?.map((b) => {
-          const extractedIds: string[] = []
-          b.customPermissions?.forEach((cp) => {
-            if (cp.permissionId) extractedIds.push(cp.permissionId)
-          })
-          b.role?.permissions?.forEach((rp) => {
-            if (rp.permission?.id) extractedIds.push(rp.permission.id)
-          })
-
-          return {
-            branchId: b.branch.id,
-            roleId: b.role?.id ?? '',
-            permissionIds: Array.from(new Set(extractedIds)),
-          }
-        }) ?? []
-
-      reset({
-        name: employeeData.employee?.name ?? '',
-        email: employeeData.employee?.email ?? '',
-        assignments: mappedAssignments,
-      })
-    } else {
-      reset(DEFAULT_VALUES)
-    }
+    reset(mapEmployeeDataToFormValues(employeeData))
   }, [employeeData, reset])
 
   const handleClose = () => {
@@ -125,31 +101,25 @@ export function EmployeeDialog({
   }
 
   const handleReset = () => {
-    if (employeeData) {
-      const mappedAssignments =
-        employeeData.branches?.map((b) => {
-          const extractedIds: string[] = []
-          b.customPermissions?.forEach((cp) => {
-            if (cp.permissionId) extractedIds.push(cp.permissionId)
-          })
-          b.role?.permissions?.forEach((rp) => {
-            if (rp.permission?.id) extractedIds.push(rp.permission.id)
-          })
+    reset(mapEmployeeDataToFormValues(employeeData))
+  }
 
-          return {
-            branchId: b.branch.id,
-            roleId: b.role?.id ?? '',
-            permissionIds: Array.from(new Set(extractedIds)),
-          }
-        }) ?? []
+  const handleRoleChange = (index: number, roleId: string) => {
+    setValue(`assignments.${index}.roleId`, roleId, {
+      shouldValidate: true,
+    })
 
-      reset({
-        name: employeeData.employee?.name ?? '',
-        email: employeeData.employee?.email ?? '',
-        assignments: mappedAssignments,
+    const selectedRole = roles.find((r) => r.id === roleId)
+    if (selectedRole?.name) {
+      const presetPermissionIds = getPresetPermissionIds(
+        selectedRole.name,
+        allPermissions,
+      )
+
+      setValue(`assignments.${index}.permissionIds`, presetPermissionIds, {
+        shouldValidate: true,
+        shouldDirty: true,
       })
-    } else {
-      reset(DEFAULT_VALUES)
     }
   }
 
@@ -324,40 +294,9 @@ export function EmployeeDialog({
                     <Select
                       value={currentRoleId}
                       disabled={isPending}
-                      onValueChange={(roleId) => {
-                        setValue(`assignments.${index}.roleId`, roleId, {
-                          shouldValidate: true,
-                        })
-
-                        const selectedRole = roles.find((r) => r.id === roleId)
-                        if (selectedRole) {
-                          const roleName = String(
-                            selectedRole.name ?? '',
-                          ).toUpperCase()
-                          const presetKeys =
-                            ROLE_PERMISSION_PRESETS[roleName] ?? []
-
-                          const mappedIds = presetKeys
-                            .map((key) => {
-                              const target =
-                                PERMISSION_MAPPING[key as PermissionKey]
-                              if (!target) return null
-                              const found = allPermissions.find(
-                                (p) =>
-                                  p.domain === target.domain &&
-                                  p.action === target.action,
-                              )
-                              return found?.id
-                            })
-                            .filter(Boolean) as string[]
-
-                          setValue(
-                            `assignments.${index}.permissionIds`,
-                            mappedIds,
-                            { shouldValidate: true, shouldDirty: true },
-                          )
-                        }
-                      }}
+                      onValueChange={(roleId) =>
+                        handleRoleChange(index, roleId)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="เลือกบทบาท" />

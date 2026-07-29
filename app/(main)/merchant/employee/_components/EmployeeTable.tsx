@@ -9,6 +9,7 @@ import {
 } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { extractEmployeeStoreData } from '@/utils/employee'
 import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -96,47 +97,14 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
               />
             ) : (
               employees.map((employeeStore) => {
-                const allPermissions = new Map<
-                  string,
-                  { id: string; domain: string; action: string }
-                >()
-                const rolesSet = new Set<string>()
-
-                employeeStore.branches.forEach((branchAssignment) => {
-                  if (branchAssignment.role?.name) {
-                    rolesSet.add(branchAssignment.role.name)
-                  }
-                  branchAssignment.role?.permissions?.forEach(
-                    ({ permission }) => {
-                      if (permission) {
-                        allPermissions.set(permission.id, permission)
-                      }
-                    },
-                  )
-                  branchAssignment.customPermissions?.forEach(
-                    ({ permission }) => {
-                      if (permission) {
-                        allPermissions.set(permission.id, permission)
-                      }
-                    },
-                  )
-                })
-
-                const uniquePermissions = Array.from(allPermissions.values())
-                const roleNames = Array.from(rolesSet)
-
-                const MAX_DISPLAY_ROLES = 2
-                const MAX_DISPLAY_PERMISSIONS = 3
-
-                const displayedRoles = roleNames.slice(0, MAX_DISPLAY_ROLES)
-                const remainingRolesCount = roleNames.length - MAX_DISPLAY_ROLES
-
-                const displayedPermissions = uniquePermissions.slice(
-                  0,
-                  MAX_DISPLAY_PERMISSIONS,
-                )
-                const remainingPermissionsCount =
-                  uniquePermissions.length - MAX_DISPLAY_PERMISSIONS
+                const {
+                  roleNames,
+                  uniquePermissions,
+                  displayedRoles,
+                  remainingRolesCount,
+                  displayedPermissions,
+                  remainingPermissionsCount,
+                } = extractEmployeeStoreData(employeeStore.branches)
 
                 return (
                   <TableRow key={employeeStore.id}>
