@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 
 import { useBranchOptions } from '@/actions/hooks/branch'
 import {
@@ -18,8 +18,9 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { PermissionKey } from '@/types/permission'
 import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus, IconX } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Button } from '@/components/ui/button'
 import {
@@ -44,9 +45,11 @@ import { Spinner } from '@/components/ui/spinner'
 const DEFAULT_VALUES = {
   name: '',
   email: '',
-  roleId: '',
-  branchIds: [] as string[],
-  permissionIds: [] as string[],
+  assignments: [] as {
+    branchId: string
+    roleId: string
+    permissionIds: string[]
+  }[],
 }
 
 export function EmployeeDialog({
@@ -73,6 +76,7 @@ export function EmployeeDialog({
     register,
     handleSubmit,
     reset,
+    control,
     setValue,
     watch,
     formState: { errors, isDirty },
@@ -81,26 +85,34 @@ export function EmployeeDialog({
     defaultValues: DEFAULT_VALUES,
   })
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'assignments',
+  })
+
   useEffect(() => {
     if (employeeData) {
-      const extractedPermissionIds: string[] = []
-      employeeData.branches?.forEach((b) => {
-        b.customPermissions?.forEach((cp) => {
-          if (cp.permissionId) extractedPermissionIds.push(cp.permissionId)
-        })
-        b.role?.permissions?.forEach((rp) => {
-          if (rp.permission?.id) extractedPermissionIds.push(rp.permission.id)
-        })
-      })
+      const mappedAssignments =
+        employeeData.branches?.map((b) => {
+          const extractedIds: string[] = []
+          b.customPermissions?.forEach((cp) => {
+            if (cp.permissionId) extractedIds.push(cp.permissionId)
+          })
+          b.role?.permissions?.forEach((rp) => {
+            if (rp.permission?.id) extractedIds.push(rp.permission.id)
+          })
 
-      const uniquePermissionIds = Array.from(new Set(extractedPermissionIds))
+          return {
+            branchId: b.branch.id,
+            roleId: b.role?.id ?? '',
+            permissionIds: Array.from(new Set(extractedIds)),
+          }
+        }) ?? []
 
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
-        roleId: employeeData.branches?.[0]?.role?.id ?? '',
-        branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
-        permissionIds: uniquePermissionIds,
+        assignments: mappedAssignments,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -114,23 +126,27 @@ export function EmployeeDialog({
 
   const handleReset = () => {
     if (employeeData) {
-      const extractedPermissionIds: string[] = []
-      employeeData.branches?.forEach((b) => {
-        b.customPermissions?.forEach((cp) => {
-          if (cp.permissionId) extractedPermissionIds.push(cp.permissionId)
-        })
-        b.role?.permissions?.forEach((rp) => {
-          if (rp.permission?.id) extractedPermissionIds.push(rp.permission.id)
-        })
-      })
-      const uniquePermissionIds = Array.from(new Set(extractedPermissionIds))
+      const mappedAssignments =
+        employeeData.branches?.map((b) => {
+          const extractedIds: string[] = []
+          b.customPermissions?.forEach((cp) => {
+            if (cp.permissionId) extractedIds.push(cp.permissionId)
+          })
+          b.role?.permissions?.forEach((rp) => {
+            if (rp.permission?.id) extractedIds.push(rp.permission.id)
+          })
+
+          return {
+            branchId: b.branch.id,
+            roleId: b.role?.id ?? '',
+            permissionIds: Array.from(new Set(extractedIds)),
+          }
+        }) ?? []
 
       reset({
         name: employeeData.employee?.name ?? '',
         email: employeeData.employee?.email ?? '',
-        roleId: employeeData.branches?.[0]?.role?.id ?? '',
-        branchIds: employeeData.branches?.map((b) => b.branch.id) ?? [],
-        permissionIds: uniquePermissionIds,
+        assignments: mappedAssignments,
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -140,16 +156,12 @@ export function EmployeeDialog({
   const onSubmit = (values: {
     name: string
     email?: string
-    roleId: string
-    branchIds: string[]
-    permissionIds: string[]
+    assignments: {
+      branchId: string
+      roleId: string
+      permissionIds: string[]
+    }[]
   }) => {
-    const assignments = values.branchIds.map((branchId) => ({
-      branchId,
-      roleId: values.roleId,
-      permissionIds: values.permissionIds ?? [],
-    }))
-
     if (employeeId) {
       updateEmployeeMutation.mutate(
         {
@@ -157,7 +169,7 @@ export function EmployeeDialog({
           input: {
             storeId: selectedStoreId,
             name: values.name,
-            assignments,
+            assignments: values.assignments,
           },
         },
         {
@@ -170,7 +182,7 @@ export function EmployeeDialog({
           storeId: selectedStoreId as string,
           name: values.name,
           email: values.email ?? '',
-          assignments,
+          assignments: values.assignments,
         },
         {
           onSuccess: () => handleClose(),
@@ -179,10 +191,7 @@ export function EmployeeDialog({
     }
   }
 
-  const currentRoleId = watch('roleId')
-  const selectedBranchIds = watch('branchIds') ?? []
-  const selectedPermissionIds = watch('permissionIds') ?? []
-
+  const assignments = watch('assignments') ?? []
   const isPending =
     createEmployeeMutation.isPending || updateEmployeeMutation.isPending
 
@@ -190,6 +199,10 @@ export function EmployeeDialog({
     id: p.id,
     name: `${p.domain}_${p.action}`,
   }))
+
+  const availableBranches = branches.filter(
+    (b) => !assignments.some((a) => a.branchId === b.id),
+  )
 
   return (
     <Dialog
@@ -205,7 +218,7 @@ export function EmployeeDialog({
           เพิ่มพนักงาน
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
             {employeeId ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานใหม่'}
@@ -231,84 +244,157 @@ export function EmployeeDialog({
             />
             <FieldError>{errors?.email?.message}</FieldError>
           </Field>
-          <Field>
-            <FieldLabel>บทบาท</FieldLabel>
-            <Select
-              value={currentRoleId}
-              disabled={isPending}
-              onValueChange={(roleId) => {
-                setValue('roleId', roleId, { shouldValidate: true })
-
-                const selectedRole = roles.find((r) => r.id === roleId)
-                if (selectedRole) {
-                  const roleName = String(selectedRole.name ?? '').toUpperCase()
-                  const presetKeys = ROLE_PERMISSION_PRESETS[roleName] ?? []
-
-                  const mappedIds = presetKeys
-                    .map((key) => {
-                      const target = PERMISSION_MAPPING[key as PermissionKey]
-                      if (!target) {
-                        return null
-                      }
-                      const found = allPermissions.find(
-                        (p) =>
-                          p.domain === target.domain &&
-                          p.action === target.action,
-                      )
-                      return found?.id
-                    })
-                    .filter(Boolean) as string[]
-
-                  setValue('permissionIds', mappedIds, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
+          <div className="space-y-3 border-t pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <span className="text-sm font-semibold">
+                การกำหนดสาขา บทบาท และสิทธิ์
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isPending || availableBranches.length === 0}
+                onClick={() =>
+                  append({ branchId: '', roleId: '', permissionIds: [] })
                 }
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="เลือกบทบาท" />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id}>
-                    {role.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FieldError>{errors?.roleId?.message}</FieldError>
-          </Field>
-          <Field>
-            <FieldLabel>กำหนดสิทธิ์การใช้งาน (Permissions)</FieldLabel>
-            <MultiSelect
-              options={permissionOptions}
-              value={selectedPermissionIds}
-              onChange={(v) =>
-                setValue('permissionIds', v, { shouldValidate: true })
-              }
-              disabled={isPending}
-              placeholder="เลือกสิทธิ์การใช้งาน"
-              allSelectedLabel="ทุกสิทธิ์"
-            />
-            <FieldError>{errors?.permissionIds?.message}</FieldError>
-          </Field>
-          <Field>
-            <FieldLabel>สาขาที่ดูแล</FieldLabel>
-            <MultiSelect
-              options={branches}
-              value={selectedBranchIds}
-              onChange={(v) =>
-                setValue('branchIds', v, { shouldValidate: true })
-              }
-              disabled={isPending}
-              placeholder="เลือกสาขา"
-              allSelectedLabel="ทุกสิทธิ์"
-            />
-            <FieldError>{errors?.branchIds?.message}</FieldError>
-          </Field>
+              >
+                <IconPlus className="mr-1 size-4" /> เพิ่มสาขาที่ดูแล
+              </Button>
+            </div>
+
+            {fields.length === 0 && (
+              <ActionRequiredAlert
+                title="แจ้งเตือน"
+                description="สาขานี้ยังไม่มีการตั้งค่า Permission กรุณากำหนดสิทธิ์ก่อนดำเนินการต่อ"
+              />
+            )}
+
+            {fields.map((fieldItem, index) => {
+              const currentBranchId = assignments[index]?.branchId
+              const currentRoleId = assignments[index]?.roleId
+              const currentPermissionIds =
+                assignments[index]?.permissionIds ?? []
+
+              const selectableBranchesForThisRow = branches.filter(
+                (b) =>
+                  b.id === currentBranchId ||
+                  !assignments.some((a) => a.branchId === b.id),
+              )
+
+              return (
+                <div
+                  key={fieldItem.id}
+                  className="bg-card relative grid gap-3 space-y-2 rounded-md border p-3"
+                >
+                  <div className="flex items-center justify-end">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      disabled={isPending}
+                    >
+                      <IconTrash className="size-4" />
+                    </Button>
+                  </div>
+                  <Field>
+                    <FieldLabel className="text-xs">สาขา</FieldLabel>
+                    <Select
+                      value={currentBranchId}
+                      disabled={isPending}
+                      onValueChange={(branchId) =>
+                        setValue(`assignments.${index}.branchId`, branchId, {
+                          shouldValidate: true,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="เลือกสาขา" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectableBranchesForThisRow.map((branch) => (
+                          <SelectItem key={branch.id} value={branch.id}>
+                            {branch.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field>
+                    <FieldLabel className="text-xs">บทบาทประจำสาขา</FieldLabel>
+                    <Select
+                      value={currentRoleId}
+                      disabled={isPending}
+                      onValueChange={(roleId) => {
+                        setValue(`assignments.${index}.roleId`, roleId, {
+                          shouldValidate: true,
+                        })
+
+                        const selectedRole = roles.find((r) => r.id === roleId)
+                        if (selectedRole) {
+                          const roleName = String(
+                            selectedRole.name ?? '',
+                          ).toUpperCase()
+                          const presetKeys =
+                            ROLE_PERMISSION_PRESETS[roleName] ?? []
+
+                          const mappedIds = presetKeys
+                            .map((key) => {
+                              const target =
+                                PERMISSION_MAPPING[key as PermissionKey]
+                              if (!target) return null
+                              const found = allPermissions.find(
+                                (p) =>
+                                  p.domain === target.domain &&
+                                  p.action === target.action,
+                              )
+                              return found?.id
+                            })
+                            .filter(Boolean) as string[]
+
+                          setValue(
+                            `assignments.${index}.permissionIds`,
+                            mappedIds,
+                            { shouldValidate: true, shouldDirty: true },
+                          )
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="เลือกบทบาท" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles.map((role) => (
+                          <SelectItem key={role.id} value={role.id}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field>
+                    <FieldLabel className="text-xs">
+                      สิทธิ์การใช้งานเพิ่มเติม (Permissions)
+                    </FieldLabel>
+                    <MultiSelect
+                      options={permissionOptions}
+                      value={currentPermissionIds}
+                      onChange={(v) =>
+                        setValue(`assignments.${index}.permissionIds`, v, {
+                          shouldValidate: true,
+                        })
+                      }
+                      disabled={isPending}
+                      placeholder="เลือกสิทธิ์การใช้งาน"
+                      allSelectedLabel="ทุกสิทธิ์"
+                    />
+                  </Field>
+                </div>
+              )
+            })}
+          </div>
         </div>
-        <DialogFooter className="mt-2 flex items-center justify-between border-t pt-4">
+        <DialogFooter className="mt-2 flex items-end justify-between border-t pt-4">
           <div className="flex gap-2">
             {isDirty ? (
               <Button

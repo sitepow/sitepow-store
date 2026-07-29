@@ -389,6 +389,17 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       }
 
       if (input.assignments && !isTargetOwner) {
+        const existingBranches = await tx.employeeBranch.findMany({
+          where: { employeeStoreId: id },
+          select: { id: true },
+        })
+
+        for (const eb of existingBranches) {
+          await tx.employeeBranchPermission.deleteMany({
+            where: { employeeBranchId: eb.id },
+          })
+        }
+
         await tx.employeeBranch.deleteMany({
           where: { employeeStoreId: id },
         })
