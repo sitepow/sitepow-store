@@ -7,10 +7,14 @@ import {
   PRODUCT_SCHEMA_PARTS,
 } from '@/constants/ai'
 import { PLAN_DETAILS } from '@/constants/plan'
-import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { Plan, TransactionType } from '@/generated/prisma/enums'
 import { AiGenTask, CreditUsageType } from '@/types/ai'
-import { calculateAiCost, estimateCost } from '@/utils/ai'
+import {
+  buildCategoryPrompt,
+  buildProductPrompt,
+  calculateAiCost,
+  estimateCost,
+} from '@/utils/ai'
 import { CreateCategoryFormValues } from '@/zod/category'
 import { ProductFormValues } from '@/zod/product'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -69,14 +73,7 @@ export async function generateProductAi(
       fileData: { fileUri: url, mimeType: 'image/jpeg' },
     }))
 
-    const prompt = `คุณคือผู้เชี่ยวชาญด้านการตลาด "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
-    ช่วยคิดข้อมูลสินค้า: "${title}"
-    ${task === AiGenTask.TITLE || task === AiGenTask.ALL ? '- ปรับชื่อสินค้าให้ดูน่าสนใจ' : ''}
-    ${task === AiGenTask.SLUG || task === AiGenTask.ALL ? '- สร้าง slug (kebab-case)' : ''}
-    ${task === AiGenTask.METADATA || task === AiGenTask.ALL ? `- สร้าง metadata จาก key: ${JSON.stringify(PRODUCT_METADATA_MASTER.flatMap((g) => g.fields).map((f) => f.key))}` : ''}
-    ${task === AiGenTask.TAGS || task === AiGenTask.ALL ? '- สร้าง tags (string คั่นด้วยคอมม่า)' : ''}
-    ${task === AiGenTask.ADDONS || task === AiGenTask.ALL ? '- สร้างข้อมูล addons' : ''}
-    ${task === AiGenTask.VARIANTS || task === AiGenTask.ALL ? '- สร้าง variants พร้อมราคาและ SKU' : ''}`
+    const prompt = buildProductPrompt(task, title!)
 
     const costEstimate = await handleUserPrompt(prompt, store.plan)
     if (Number(store.balance) < costEstimate.credits) {
@@ -156,14 +153,7 @@ export async function generateCategoryAi(
       }
     }
 
-    const prompt = `คุณคือผู้เชี่ยวชาญด้าน SEO และ eCommerce "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
-    ช่วยคิดข้อมูลหมวดหมู่สินค้า:
-    - ชื่อหมวดหมู่: "${title}"
-    ${description ? `- คำอธิบายเพิ่มเติม: "${description}"` : ''}
-
-    สิ่งที่ต้องการ:
-    1. สร้าง URL slug ภาษาอังกฤษแบบ kebab-case ที่สั้น กุมความหมาย และถูกต้องตามหลัก SEO
-    2. สร้างคำอธิบายหมวดหมู่สินค้า (Description) สั้นๆ กระชับ น่าอ่าน และส่งเสริม SEO`
+    const prompt = buildCategoryPrompt(title, description)
 
     const costEstimate = await handleUserPrompt(prompt, store.plan)
     if (Number(store.balance) < costEstimate.credits) {
@@ -210,7 +200,11 @@ export async function generateCategoryAi(
     return {
       success: true,
       message: 'สร้างข้อมูลหมวดหมู่เรียบร้อย',
-      data: JSON.parse(responseText) as { slug: string; description?: string },
+      data: JSON.parse(responseText) as {
+        title: string
+        slug: string
+        description?: string
+      },
     }
   } catch (error) {
     console.error(error)

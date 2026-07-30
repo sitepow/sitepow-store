@@ -59,7 +59,7 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
                 <TableRow key={category.id}>
                   <TableCell>{category.id}</TableCell>
                   <TableCell>{category.title}</TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <span className="text-muted-foreground text-sm">
                       {category.description || '-'}
                     </span>

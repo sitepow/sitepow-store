@@ -80,6 +80,7 @@ export function useCategoryAi(
 
       form.reset({
         ...currentValues,
+        ...(aiData.title && { title: aiData.title }),
         ...(aiData.slug && { slug: aiData.slug }),
         ...(aiData.description && { description: aiData.description }),
       })

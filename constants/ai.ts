@@ -165,6 +165,10 @@ export const PRODUCT_SCHEMA_PARTS: Record<AiGenTask, Schema> = {
 export const CATEGORY_SCHEMA: Schema = {
   type: SchemaType.OBJECT,
   properties: {
+    title: {
+      type: SchemaType.STRING,
+      description: 'ชื่อหมวดหมู่สินค้าที่ปรับแต่งให้ดูน่าสนใจและส่งเสริม SEO',
+    },
     slug: {
       type: SchemaType.STRING,
       description:
@@ -175,5 +179,5 @@ export const CATEGORY_SCHEMA: Schema = {
       description: 'คำอธิบายหมวดหมู่สินค้าสั้นๆ น่าสนใจ สำหรับ SEO',
     },
   },
-  required: ['slug'],
+  required: ['title', 'slug'],
 }

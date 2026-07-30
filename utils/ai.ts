@@ -72,3 +72,15 @@ export const buildProductPrompt = (task: AiGenTask, title: string) => {
     ${task === AiGenTask.ADDONS || task === AiGenTask.ALL ? '- สร้างข้อมูล addons' : ''}
     ${task === AiGenTask.VARIANTS || task === AiGenTask.ALL ? '- สร้าง variants พร้อมราคาและ SKU' : ''}`
 }
+
+export function buildCategoryPrompt(title: string, description?: string) {
+  return `คุณคือผู้เชี่ยวชาญด้าน SEO และ eCommerce "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
+ช่วยคิดข้อมูลหมวดหมู่สินค้า:
+- ชื่อหมวดหมู่เดิม: "${title}"
+${description ? `- คำอธิบายเพิ่มเติม: "${description}"` : ''}
+
+สิ่งที่ต้องการ:
+1. ปรับปรุงชื่อหมวดหมู่ (title): ให้ดูดี ตรงประเด็น สั้น กระชับสำหรับเป็นชื่อหมวดหมู่สินค้าในเว็บไซต์ (ห้ามยาวเกิน 3-5 คำ หรือไม่เกิน 30 ตัวอักษร ไม่เอาชื่อยาวแบบชื่อบทความ)
+2. สร้าง URL slug ภาษาอังกฤษแบบ kebab-case ที่สั้น กุมความหมาย และถูกต้องตามหลัก SEO
+3. สร้างคำอธิบายหมวดหมู่สินค้า (Description) สั้นๆ กระชับ 1-2 ประโยค ส่งเสริม SEO`
+}
