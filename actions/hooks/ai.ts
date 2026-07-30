@@ -1,8 +1,9 @@
 import { UseFormReturn } from 'react-hook-form'
 
-import { generateProductAiAction } from '@/actions/ai'
+import { generateCategoryAi, generateProductAi } from '@/actions/ai'
 import { DiscountType } from '@/generated/prisma/enums'
 import { AiGenTask } from '@/types/ai'
+import { CreateCategoryFormValues } from '@/zod/category'
 import { ProductFormValues } from '@/zod/product'
 import { useMutation } from '@tanstack/react-query'
 
@@ -14,7 +15,7 @@ export function useProductAi(
   return useMutation({
     mutationFn: async () => {
       const currentData = form.getValues()
-      return await generateProductAiAction(currentData, task, storeId)
+      return await generateProductAi(currentData, task, storeId)
     },
     onSuccess: (result) => {
       if (!result.success || !result.data) {
@@ -53,6 +54,34 @@ export function useProductAi(
             }),
           ),
         }),
+      })
+    },
+  })
+}
+
+export function useCategoryAi(
+  form: UseFormReturn<CreateCategoryFormValues>,
+  storeId: string,
+) {
+  return useMutation({
+    mutationFn: async () => {
+      const title = form.getValues('title')
+      const description = form.getValues('description')
+
+      return await generateCategoryAi({ title, description }, storeId)
+    },
+    onSuccess: (result) => {
+      if (!result.success || !result.data) {
+        return
+      }
+
+      const aiData = result.data
+      const currentValues = form.getValues()
+
+      form.reset({
+        ...currentValues,
+        ...(aiData.slug && { slug: aiData.slug }),
+        ...(aiData.description && { description: aiData.description }),
       })
     },
   })

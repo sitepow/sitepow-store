@@ -161,3 +161,19 @@ export const PRODUCT_SCHEMA_PARTS: Record<AiGenTask, Schema> = {
   },
   [AiGenTask.ALL]: PRODUCT_SCHEMA,
 } as const
+
+export const CATEGORY_SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    slug: {
+      type: SchemaType.STRING,
+      description:
+        'URL slug ภาษาอังกฤษแบบ kebab-case เช่น fashion-and-clothing',
+    },
+    description: {
+      type: SchemaType.STRING,
+      description: 'คำอธิบายหมวดหมู่สินค้าสั้นๆ น่าสนใจ สำหรับ SEO',
+    },
+  },
+  required: ['slug'],
+}
