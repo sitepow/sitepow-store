@@ -22,43 +22,42 @@ export function BlogPreviewContent() {
   const displaySlug = slug || 'blog-post-slug-example'
   const formattedTags = arrayToString(stringToArray(tags))
 
-  const previewImageUrl = useMemo(() => {
+  const coverImage = useMemo(() => {
     if (!image) return FALLBACK_IMAGE
     if (image instanceof File) {
       return URL.createObjectURL(image)
     }
+    if (Array.isArray(image) && image.length > 0) {
+      return image[0]?.url || image[0] || FALLBACK_IMAGE
+    }
     return typeof image === 'string' && image !== '' ? image : FALLBACK_IMAGE
   }, [image])
 
-  const description = useMemo(() => {
-    if (!content) {
-      return 'อ่านบทความน่าสนใจ และอัปเดตสาระดีๆ ได้ที่บล็อกของเรา...'
-    }
-
-    const cleanText = content
+  const cleanContent = useMemo(() => {
+    if (!content) return ''
+    return content
       .replace(/<[^>]*>/g, '')
       .replace(/!\[.*?\]\(.*?\)/g, '')
       .replace(/\[(.*?)\]\(.*?\)/g, '$1')
       .replace(/[#*`_~>|\-[\]]/g, '')
       .replace(/\s+/g, ' ')
       .trim()
-
-    return (
-      cleanText.slice(0, 150) ||
-      'อ่านบทความน่าสนใจ และอัปเดตสาระดีๆ ได้ที่บล็อกของเรา...'
-    )
   }, [content])
+
+  const tagText = formattedTags ? `[${formattedTags}] ` : ''
+  const contentSnippet =
+    cleanContent || 'อ่านบทความน่าสนใจ และอัปเดตสาระดีๆ ได้ที่บล็อกของเรา...'
+  const description = `${tagText}${contentSnippet}`
 
   return (
     <div className="text-foreground space-y-6">
       <div className="dark:bg-foreground/5 rounded-lg border p-4">
         <p className="mb-2 text-xs font-semibold uppercase opacity-60">
-          Google Search (ตัวอย่างการแสดงผลบน Search Engine)
+          Google Search (ตัวอย่าง)
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
-            https://{selectedStoreSlug || 'your-store'}.sitepow.store › blogs ›{' '}
-            {displaySlug}
+            https://{selectedStoreSlug}.sitepow.store › blogs › {displaySlug}
           </p>
           <p className="cursor-pointer text-xl text-purple-600 hover:underline">
             {displayTitle}
@@ -68,29 +67,22 @@ export function BlogPreviewContent() {
       </div>
       <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
-          Social Share (ตัวอย่างการแชร์ลง Facebook / LINE / Twitter)
+          Social Share (ตัวอย่าง)
         </p>
-        <div className="bg-muted relative h-64 w-full">
-          <Image
-            src={previewImageUrl}
-            className="h-full w-full object-cover object-center"
-            width={800}
-            height={420}
-            alt="blog-cover-preview"
-            unoptimized={image instanceof File}
-          />
-        </div>
+        <Image
+          src={coverImage}
+          className="h-96 w-full object-cover object-center"
+          width={800}
+          height={800}
+          alt="preview-image"
+          unoptimized={image instanceof File}
+        />
         <div className="p-3">
           <p className="text-[12px] text-emerald-700 uppercase">
-            {selectedStoreSlug || 'your-store'}.sitepow.store
+            https://{selectedStoreSlug}.sitepow.store
           </p>
           <p className="font-bold">{displayTitle}</p>
-          <p className="line-clamp-2 text-sm opacity-60">{description}</p>
-          {formattedTags && (
-            <p className="text-muted-foreground mt-2 text-xs">
-              แท็ก: {formattedTags}
-            </p>
-          )}
+          <p className="line-clamp-1 text-sm opacity-60">{description}</p>
         </div>
       </div>
     </div>

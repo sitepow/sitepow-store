@@ -12,10 +12,9 @@ export const blogFormSchema = z.object({
     }),
   image: z
     .union([z.string(), z.instanceof(File)])
-    .refine((val) => val !== '', { message: 'กรุณาอัปโหลดรูปภาพปกบทความ' }),
-  content: z
-    .string()
-    .min(10, { message: 'เนื้อหาบทความต้องมีอย่างน้อย 10 ตัวอักษร' }),
+    .optional()
+    .or(z.literal('')),
+  content: z.string().optional().or(z.literal('')),
   tags: z.string().optional().or(z.literal('')),
 })
 

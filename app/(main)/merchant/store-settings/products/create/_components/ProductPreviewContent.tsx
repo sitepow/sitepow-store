@@ -56,7 +56,6 @@ export function ProductPreviewContent() {
           <p className="line-clamp-2 text-sm opacity-60">{description}</p>
         </div>
       </div>
-
       <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
           Social Share (ตัวอย่าง)

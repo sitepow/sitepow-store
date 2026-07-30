@@ -21,7 +21,6 @@ export function BlogsSection({ storeSlug }: { storeSlug: string }) {
   return (
     <SectionContainer>
       <SectionHeader title="บทความล่าสุด" />
-
       <div className="grid w-full grid-flow-row-dense grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {blogs.map((blog, index) => {
           const isFirst = index === 0
@@ -40,7 +39,6 @@ export function BlogsSection({ storeSlug }: { storeSlug: string }) {
           )
         })}
       </div>
-
       <SeeMoreButton href="/blogs" />
     </SectionContainer>
   )

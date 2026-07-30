@@ -7,11 +7,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import { handleUserPrompt } from '@/actions/ai'
+import { useBlog, useCreateBlog, useUpdateBlog } from '@/actions/hooks/blog'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
+import { getPathR2FromUrl } from '@/utils/image'
 import { BlogFormValues, blogFormSchema } from '@/zod/blog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconTrash, IconUpload, IconWand, IconX } from '@tabler/icons-react'
@@ -62,9 +64,11 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     action: () => void
   } | null>(null)
 
-  //   const { data: blog, isLoading: isBlogLoading } = useBlog(blogId ?? '')
-  //   const { mutate: create, isPending: isCreating } = useCreateBlog()
-  //   const { mutate: update, isPending: isUpdating } = useUpdateBlog()
+  const { data: blog, isLoading: isBlogLoading } = useBlog(blogId ?? '')
+  const { mutateAsync: createBlogAsync, isPending: isCreating } =
+    useCreateBlog()
+  const { mutateAsync: updateBlogAsync, isPending: isUpdating } =
+    useUpdateBlog()
 
   const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/blogs`)
   const deleteMutation = useR2DeleteImage()
@@ -84,7 +88,6 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     register,
     handleSubmit,
     reset,
-    // getValues,
     setValue,
     watch,
     control,
@@ -95,36 +98,35 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
   useEffect(() => {
     if (onDataChange) {
       onDataChange({
-        title: watchedValues[0],
-        content: watchedValues[1],
+        title: watchedValues[0] || '',
+        content: watchedValues[1] || '',
         coverImage:
           typeof watchedValues[2] === 'string' ? watchedValues[2] : '',
       })
     }
   }, [watchedValues, onDataChange])
 
-  //   useEffect(() => {
-  //     if (blog) {
-  //       reset({
-  //         title: blog.title,
-  //         slug: blog.slug,
-  //         image: blog.image,
-  //         content: blog.content,
-  //         tags: blog.tags?.join(', ') || '',
-  //       })
-  //     }
-  //   }, [blog, reset])
+  useEffect(() => {
+    if (blog) {
+      reset({
+        title: blog.title,
+        slug: blog.slug,
+        image: blog.image || '',
+        content: blog.content || '',
+        tags: blog.tags?.join(', ') || '',
+      })
+    }
+  }, [blog, reset])
 
   const isPending =
-    // isCreating ||
-    // isUpdating ||
-    // isBlogLoading ||
-    uploadMutation.isPending || deleteMutation.isPending
+    isCreating ||
+    isUpdating ||
+    isBlogLoading ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending
 
   const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
     const storePlan = store?.plan || Plan.FREE
-    // const currentTitle = getValues('title')
-    // const prompt = buildBlogPrompt(task, currentTitle)
     const costEstimate = await handleUserPrompt('prompt', storePlan)
 
     setAiTaskConfirm({
@@ -147,48 +149,54 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     }
 
     try {
-      //   let finalImageUrl = typeof data.image === 'string' ? data.image : ''
+      let finalImageUrl = typeof data.image === 'string' ? data.image : ''
 
       if (data.image instanceof File) {
         const formData = new FormData()
         formData.append('file', data.image)
         const res = await uploadMutation.mutateAsync(formData)
-        if (res.success) {
-          //   finalImageUrl = res.url
+        if (res.success && res.url) {
+          finalImageUrl = res.url
         }
       }
 
-      //   if (blog?.image && blog.image !== finalImageUrl) {
-      //     const path = getPathR2FromUrl(blog.image)
-      //     if (path) {
-      //       await deleteMutation.mutateAsync(path)
-      //     }
-      //   }
+      if (blog?.image && blog.image !== finalImageUrl) {
+        const oldImagePath = getPathR2FromUrl(blog.image)
+        if (oldImagePath) {
+          await deleteMutation.mutateAsync(oldImagePath)
+        }
+      }
 
-      //   const tagsArray = data.tags
-      //     ? data.tags
-      //         .split(',')
-      //         .map((t) => t.trim())
-      //         .filter(Boolean)
-      //     : []
+      const tagsArray = data.tags
+        ? data.tags
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : []
 
-      //   const payload = {
-      //     storeId: selectedStoreId,
-      //     title: data.title,
-      //     slug: data.slug,
-      //     image: 'finalImageUrl',
-      //     content: data.content,
-      //     tags: tagsArray,
-      //   }
+      const payload = {
+        storeId: selectedStoreId,
+        title: data.title,
+        slug: data.slug,
+        image: finalImageUrl,
+        content: data.content || '',
+        tags: tagsArray,
+      }
 
-      //   if (blogId) {
-      //     update({ id: blogId, data: payload })
-      //   } else {
-      //     create(payload)
-      //   }
-
-      router.push('/merchant/blogs')
-    } catch {}
+      if (blogId) {
+        const res = await updateBlogAsync({ id: blogId, data: payload })
+        if (res.success) {
+          router.push('/merchant/blog')
+        }
+      } else {
+        const res = await createBlogAsync(payload)
+        if (res.success) {
+          router.push('/merchant/blog')
+        }
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const coverImageValue = watch('image')
@@ -200,7 +208,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
   return (
     <FormProvider {...form}>
       <Card className="mb-6">
-        <CardContent className="flex flex-wrap items-center gap-2.5 pt-6">
+        <CardContent className="flex flex-wrap items-center gap-2.5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" disabled={isPending}>
@@ -271,7 +279,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 />
               </Field>
               <Field>
-                <FieldLabel className="required">รูปภาพปกบทความ</FieldLabel>
+                <FieldLabel>รูปภาพปกบทความ</FieldLabel>
                 <div className="space-y-3">
                   {previewImageUrl ? (
                     <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
@@ -287,7 +295,10 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                         size="icon"
                         className="absolute top-2 right-2"
                         onClick={() =>
-                          setValue('image', '', { shouldDirty: true })
+                          setValue('image', '', {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          })
                         }
                       >
                         <IconTrash className="size-4" />
@@ -315,12 +326,13 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 </div>
               </Field>
               <Field>
-                <FieldLabel className="required">เนื้อหาบทความ</FieldLabel>
+                <FieldLabel>เนื้อหาบทความ</FieldLabel>
                 <Controller
                   control={control}
                   name="content"
                   render={({ field }) => (
                     <BlogEditor
+                      value={field.value}
                       onChange={(markdown) => field.onChange(markdown)}
                     />
                   )}

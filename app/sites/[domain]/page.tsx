@@ -1,5 +1,5 @@
 import { StoreLayout } from './_components/layout/Layout'
-// import { BlogsSection } from './_components/section/Blogs'
+import { BlogsSection } from './_components/section/Blogs'
 import { CategoriesSection } from './_components/section/Categories'
 import { ProductsSection } from './_components/section/Products'
 
@@ -12,7 +12,7 @@ export default async function StoreHomePage({ params }: Props) {
 
   return (
     <StoreLayout>
-      {/* <BlogsSection storeSlug={domain} /> */}
+      <BlogsSection storeSlug={domain} />
       <CategoriesSection storeSlug={domain} />
       <ProductsSection storeSlug={domain} />
     </StoreLayout>

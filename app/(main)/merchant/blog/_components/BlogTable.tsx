@@ -2,14 +2,19 @@
 
 import { useState } from 'react'
 
-import { useBlogs } from '@/actions/hooks/blog'
+import Link from 'next/link'
+
+import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { IconEdit } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -29,6 +34,8 @@ export function BlogTable() {
     limit: 10,
   })
 
+  const { mutate: deleteBlog, isPending: isDeleting } = useDeleteBlog()
+
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
   }
@@ -43,23 +50,26 @@ export function BlogTable() {
               <TableHead>ชื่อบทความ</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>แท็ก</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && blogs.length === 0 ? (
-              <TableLoadingRow colSpan={3} />
+              <TableLoadingRow colSpan={5} />
             ) : blogs.length === 0 ? (
-              <TableEmptyRow colSpan={3} title="ยังไม่มีบทความ" />
+              <TableEmptyRow colSpan={5} title="ยังไม่มีบทความ" />
             ) : (
               blogs.map((blog) => (
                 <TableRow key={blog.id}>
                   <TableCell>{blog.id}</TableCell>
-                  <TableCell>{blog.title}</TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    {blog.title}
+                  </TableCell>
                   <TableCell>{blog.slug}</TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <div className="flex flex-wrap gap-1">
                       {blog.tags.length === 0 ? (
-                        <span className="text-muted-foreground text-sm">-</span>
+                        <span className="text-muted-foreground">-</span>
                       ) : (
                         blog.tags.map((tag) => (
                           <Badge key={tag} variant="outline">
@@ -67,6 +77,19 @@ export function BlogTable() {
                           </Badge>
                         ))
                       )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="outline" size="icon-lg" asChild>
+                        <Link href={`/merchant/blog/create/${blog.id}`}>
+                          <IconEdit className="size-4" />
+                        </Link>
+                      </Button>
+                      <DeleteButton
+                        isPending={isDeleting}
+                        onDelete={() => deleteBlog(blog.id)}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
