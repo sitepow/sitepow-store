@@ -358,10 +358,8 @@ export function EmployeeDialog({
                 <>
                   <Spinner /> กำลังบันทึก...
                 </>
-              ) : employeeId ? (
-                'บันทึกการแก้ไข'
               ) : (
-                'เพิ่มพนักงาน'
+                'บันทึกข้อมูล'
               )}
             </Button>
           </div>

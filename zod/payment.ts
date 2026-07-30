@@ -1,33 +1,6 @@
+import { FORBIDDEN_TITLES, THAI_NAME_REGEX } from '@/constants/system'
 import { BankAccountType } from '@/generated/prisma/enums'
 import * as z from 'zod'
-
-const FORBIDDEN_TITLES = [
-  'นาย',
-  'นาง',
-  'นางสาว',
-  'น.ส.',
-  'ด.ช.',
-  'ด.ญ.',
-  'เด็กชาย',
-  'เด็กหญิง',
-  'ร.ต.',
-  'ร.อ.',
-  'ร.ท.',
-  'พ.ต.',
-  'พ.อ.',
-  'พ.ท.',
-  'พล.ต.',
-  'พล.อ.',
-  'พล.ท.',
-  'นพ.',
-  'พญ.',
-  'ดร.',
-  'บริษัท',
-  'บมจ.',
-  'หจก.',
-]
-
-const THAI_NAME_REGEX = /^[ก-ฮะ-์\s]+$/
 
 export const bankAccountSchema = z
   .object({

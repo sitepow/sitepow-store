@@ -188,3 +188,29 @@ export const RESPONSIVE_DEVICE = {
   desktop: '600px',
 }
 export const DEFAULT_PASSWORD_EMPLOYEE = '123456'
+export const FORBIDDEN_TITLES = [
+  'นาย',
+  'นาง',
+  'นางสาว',
+  'น.ส.',
+  'ด.ช.',
+  'ด.ญ.',
+  'เด็กชาย',
+  'เด็กหญิง',
+  'ร.ต.',
+  'ร.อ.',
+  'ร.ท.',
+  'พ.ต.',
+  'พ.อ.',
+  'พ.ท.',
+  'พล.ต.',
+  'พล.อ.',
+  'พล.ท.',
+  'นพ.',
+  'พญ.',
+  'ดร.',
+  'บริษัท',
+  'บมจ.',
+  'หจก.',
+]
+export const THAI_NAME_REGEX = /^[ก-ฮะ-์\s]+$/
