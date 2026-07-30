@@ -4,19 +4,21 @@ import { invalidateCacheByPattern } from '@/lib/cache'
 
 import { employeeKeys } from '../employee'
 
-export const invalidateStorePermissionCache = async (
-  storeId: string,
+export const invalidateEmployeePermissionCache = async (
   userId?: string,
+  storeId?: string,
 ) => {
   if (!storeId) {
     return
   }
 
+  const baseKey = queryKeyToRedisKey(employeeKeys.all)
+
   if (userId) {
-    const userStorePattern = `*${userId}*${queryKeyToRedisKey(employeeKeys.all)}:store:${storeId}:*`
+    const userStorePattern = `${userId}:${baseKey}:store:${storeId}:*`
     await invalidateCacheByPattern(userStorePattern)
   } else {
-    const storePattern = `*${queryKeyToRedisKey(employeeKeys.all)}:store:${storeId}:*`
+    const storePattern = `*:${baseKey}:store:${storeId}:*`
     await invalidateCacheByPattern(storePattern)
   }
 }

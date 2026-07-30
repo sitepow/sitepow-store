@@ -13,6 +13,7 @@ import {
 import { prisma } from '@/lib/prisma'
 
 import { initializeStoreRolesAndPermissions } from './permission'
+import { invalidateEmployeePermissionCache } from './query-keys/invalidation/permission'
 
 export interface CreateBranchInput {
   name: string
@@ -357,6 +358,8 @@ export async function createBranch(input: CreateBranchInput) {
       },
     })
 
+    await invalidateEmployeePermissionCache(userId, storeId)
+
     return { success: true, data: branch }
   } catch (error) {
     console.error(error)
@@ -539,6 +542,8 @@ export async function deleteBranch(id: string, storeId: string) {
       entityId: id,
       details: { type: 'deleted' },
     })
+
+    await invalidateEmployeePermissionCache(userId, storeId)
 
     return { success: true, message: 'ลบสาขาสำเร็จ' }
   } catch (error) {

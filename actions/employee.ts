@@ -16,6 +16,8 @@ import {
 } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
+import { invalidateEmployeePermissionCache } from './query-keys/invalidation/permission'
+
 export interface CreateEmployeeInput {
   storeId: string
   name: string
@@ -291,6 +293,10 @@ export async function createEmployee(input: CreateEmployeeInput) {
       },
     })
 
+    if (employee.userId) {
+      await invalidateEmployeePermissionCache(employee.userId, input.storeId)
+    }
+
     return {
       success: true,
       message: `บันทึกข้อมูลสำเร็จแล้ว (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
@@ -405,6 +411,13 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return { success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }
     }
 
+    if (existingEmployeeStore.employee.userId) {
+      await invalidateEmployeePermissionCache(
+        existingEmployeeStore.employee.userId,
+        input.storeId,
+      )
+    }
+
     await createLog({
       action: LogAction.MANAGE_EMPLOYEE,
       actorType: ActorType.MERCHANT,
@@ -517,6 +530,13 @@ export async function deleteEmployee(id: string) {
         }
       }
     })
+
+    if (targetUserId) {
+      await invalidateEmployeePermissionCache(
+        targetUserId,
+        employeeStore.storeId,
+      )
+    }
 
     await createLog({
       action: LogAction.MANAGE_EMPLOYEE,
