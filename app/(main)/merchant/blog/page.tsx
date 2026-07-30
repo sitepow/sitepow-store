@@ -1,29 +1,47 @@
 'use client'
 
+import Link from 'next/link'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconLock, IconNews } from '@tabler/icons-react'
+import { IconLock, IconNews, IconPlus } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Button } from '@/components/ui/button'
 
 import { BlogTable } from './_components/BlogTable'
 
-export default function BlogPage() {
+export default function MerchantBlogsPage() {
   const { selectedStoreId } = useStoreFilter()
-  const { canViewBlogs, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canViewBlogs,
+    canCreateBlogs,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconNews}
-        title="บทความ"
-        description="จัดการบทความและเนื้อหาของร้านค้า"
-        endContent={<StoreSelectField />}
+        title="บทความทั้งหมด"
+        description="จัดการบทความ ข่าวสาร และเนื้อหาสำหรับเผยแพร่ในบล็อกของร้านค้าคุณ"
+        endContent={
+          <div className="flex flex-wrap items-end gap-5">
+            <StoreSelectField />
+            {canCreateBlogs && (
+              <Button asChild variant="outline">
+                <Link href={'/merchant/blog/create'}>
+                  <IconPlus />
+                  เพิ่มบทความใหม่
+                </Link>
+              </Button>
+            )}
+          </div>
+        }
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
@@ -31,7 +49,7 @@ export default function BlogPage() {
         <ActionRequiredAlert
           icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลบทความและเนื้อหาของสาขาหรือร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลบทความของสาขาหรือร้านค้านี้"
         />
       ) : (
         <BlogTable />
