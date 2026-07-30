@@ -89,6 +89,9 @@ export const LOG_ACTION_TH: Record<LogAction, string> = {
   [LogAction.TRANSFER_STORE]: 'โอนความเป็นเจ้าของร้านให้ผู้อื่น',
   [LogAction.BLOCK_CUSTOMER]: 'ระงับการใช้งานลูกค้า (Block)',
   [LogAction.UNBLOCK_CUSTOMER]: 'ปลดระงับการใช้งานลูกค้า (Unblock)',
+  [LogAction.CREATE_BLOG]: 'สร้างบทความใหม่',
+  [LogAction.UPDATE_BLOG]: 'แก้ไขบทความ',
+  [LogAction.DELETE_BLOG]: 'ลบบทความ',
   [LogAction.LOGIN]: 'เข้าสู่ระบบ',
   [LogAction.LOGOUT]: 'ออกจากระบบ',
 }
