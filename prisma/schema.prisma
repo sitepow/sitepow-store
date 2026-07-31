@@ -179,6 +179,8 @@ model Branch {
   transfersIn      StockTransfer[]   @relation("TransferTo")
   stockAdjustments StockAdjustment[]
 
+  translations Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -393,6 +395,8 @@ model Courier {
   name        String
   description String?
 
+  translations Json?
+
   services CourierService[]
 
   createdAt DateTime @default(now())
@@ -410,6 +414,8 @@ model CourierService {
   name          String
   estimatedDays String?
 
+  translations Json?
+
   storeServices StoreCourierService[]
 
   createdAt DateTime @default(now())
@@ -424,6 +430,7 @@ enum ShippingZoneType {
   SAME_REGION
   CROSS_REGION
   REMOTE_AREA
+  INTERNATIONAL
 }
 
 model ShippingSetting {
@@ -450,6 +457,8 @@ model StoreCourierService {
   isCodEnabled Boolean       @default(false)
   codFeeType   DiscountType? @default(PERCENTAGE)
   codFeeAmount Decimal?      @default(2.3) @db.Decimal(10, 2)
+
+  advancedRules Json?
 
   weightRates StoreServiceWeightRate[]
   zoneRates   StoreServiceZoneRate[]
@@ -600,6 +609,9 @@ model Store {
   notifyDailySummary Boolean @default(true)
   notifyBillingAlert Boolean @default(true)
 
+  isInternationalSetup Boolean      @default(false)
+  baseCurrency         CurrencyCode @default(THB)
+
   blogs                Blog[]
   categories           Category[]
   products             Product[]
@@ -622,6 +634,8 @@ model Store {
   role                 Role[]
   supplierAgreements   ResellerAgreement[]    @relation("SupplierAgreements")
   resellerAgreements   ResellerAgreement[]    @relation("ResellerAgreements")
+
+  translations Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -723,6 +737,8 @@ model Blog {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
+  translations Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -737,6 +753,8 @@ model Category {
   storeId  String
   store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
   products Product[]
+
+  translations Json?
 
   @@unique([storeId, slug])
 }
@@ -772,6 +790,8 @@ model Product {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  translations Json?
 
   @@unique([storeId, slug])
   @@index([categoryId])
@@ -839,6 +859,8 @@ model ProductVariant {
 
   supplierVariantId String?
 
+  translations Json?
+
   reviews          Review[]
   stocks           ProductStock[]
   stockTransfers   StockTransfer[]
@@ -854,8 +876,11 @@ model ProductOption {
   require   Boolean @default(false)
 
   productId String
-  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
-  choices   ProductChoice[]
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  translations Json?
+
+  choices ProductChoice[]
 }
 
 model ProductChoice {
@@ -865,6 +890,8 @@ model ProductChoice {
 
   optionId String
   option   ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  translations Json?
 }
 
 model ProductAddon {
@@ -875,6 +902,8 @@ model ProductAddon {
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  translations Json?
 }
 
 model Review {
@@ -966,6 +995,7 @@ model Address {
   district    String
   province    String
   postalCode  String
+  country     CountryCode @default(TH)
 
   type       AddressType @default(SHIPPING)
   taxId      String?
@@ -1034,6 +1064,9 @@ model Order {
 
   resellerAgreementId String?
   resellerAgreement   ResellerAgreement? @relation(fields: [resellerAgreementId], references: [id], onDelete: SetNull)
+
+  customerCurrency CurrencyCode @default(THB)
+  totalAmountBase  Decimal
 
   @@index([storeId])
   @@index([customerId])
@@ -1300,4 +1333,51 @@ model ResellerCustomPrice {
   specialPrice Decimal @db.Decimal(10, 2)
 
   @@unique([agreementId, variantId])
+}
+
+enum CountryCode {
+  TH // Thailand
+  SG // Singapore
+  MY // Malaysia
+  ID // Indonesia
+  JP // Japan
+  KR // South Korea
+  IN // India
+  HK // Hong Kong
+  TW // Taiwan
+  AU // Australia
+  US // United States
+  CN // China
+  GB // United Kingdom
+  DE // Germany
+  FR // France
+  CA // Canada
+}
+
+enum CurrencyCode {
+  THB // Thai Baht
+  USD // US Dollar
+  EUR // Euro
+  JPY // Japanese Yen
+  GBP // British Pound Sterling
+  AUD // Australian Dollar
+  CAD // Canadian Dollar
+  CHF // Swiss Franc
+  CNY // Chinese Yuan
+  HKD // Hong Kong Dollar
+  SGD // Singapore Dollar
+  KRW // South Korean Won
+  TWD // New Taiwan Dollar
+  INR // Indian Rupee
+  IDR // Indonesian Rupiah
+  MYR // Malaysian Ringgit
+  PHP // Philippine Peso
+  VND // Vietnamese Dong
+  MMK // Myanmar Kyat
+  KHR // Cambodian Riel
+  LAK // Lao Kip
+  BND // Brunei Dollar
+  AED // United Arab Emirates Dirham
+  SAR // Saudi Riyal
+  NZD // New Zealand Dollar
 }
