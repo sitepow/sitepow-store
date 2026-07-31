@@ -115,12 +115,13 @@ model Customer {
   userId        String?   @unique
   user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  stores        CustomerStore[]
-  reviews       Review[]
-  orders        Order[]
-  cart          Cart?
-  addresses     Address[]
-  slipHistories SlipVerificationHistory[]
+  stores             CustomerStore[]
+  reviews            Review[]
+  orders             Order[]
+  cart               Cart?
+  addresses          Address[]
+  slipHistories      SlipVerificationHistory[]
+  resellerAgreements ResellerAgreement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -243,6 +244,8 @@ enum DefaultRole {
   MANAGER
   CASHIER
   STAFF
+  POS_RESELLER
+  POS_CASHIER
 }
 
 model Employee {
@@ -617,6 +620,8 @@ model Store {
   conversations        Conversation[]
   StoreDomain          StoreDomain[]
   role                 Role[]
+  supplierAgreements   ResellerAgreement[]    @relation("SupplierAgreements")
+  resellerAgreements   ResellerAgreement[]    @relation("ResellerAgreements")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -832,11 +837,14 @@ model ProductVariant {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  supplierVariantId String?
+
   reviews          Review[]
   stocks           ProductStock[]
   stockTransfers   StockTransfer[]
   stockAdjustments StockAdjustment[]
   digitalItems     DigitalItem[]
+  resellerPrices   ResellerCustomPrice[]
 }
 
 model ProductOption {
@@ -1023,6 +1031,9 @@ model Order {
   items       OrderItem[]
   digitalItem DigitalItem[]
   createdAt   DateTime      @default(now())
+
+  resellerAgreementId String?
+  resellerAgreement   ResellerAgreement? @relation(fields: [resellerAgreementId], references: [id], onDelete: SetNull)
 
   @@index([storeId])
   @@index([customerId])
@@ -1233,4 +1244,60 @@ enum ActorType {
 enum DiscountType {
   PERCENTAGE
   FIXED
+}
+
+enum AgreementStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  TERMINATED
+}
+
+enum ResellerType {
+  INTERNAL_STORE
+  EXTERNAL
+}
+
+model ResellerAgreement {
+  id String @id @default(uuid())
+
+  supplierStoreId String
+  supplierStore   Store  @relation("SupplierAgreements", fields: [supplierStoreId], references: [id], onDelete: Cascade)
+
+  resellerType ResellerType
+
+  resellerStoreId String?
+  resellerStore   Store?  @relation("ResellerAgreements", fields: [resellerStoreId], references: [id], onDelete: Cascade)
+
+  resellerCustomerId String?
+  resellerCustomer   Customer? @relation(fields: [resellerCustomerId], references: [id], onDelete: Cascade)
+
+  status AgreementStatus @default(PENDING)
+
+  defaultDiscountType   DiscountType?
+  defaultDiscountAmount Decimal?      @db.Decimal(10, 2)
+
+  signedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  customPrices ResellerCustomPrice[]
+  orders       Order[]
+
+  @@unique([supplierStoreId, resellerStoreId])
+  @@unique([supplierStoreId, resellerCustomerId])
+  @@index([supplierStoreId])
+}
+
+model ResellerCustomPrice {
+  id          String            @id @default(uuid())
+  agreementId String
+  agreement   ResellerAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  specialPrice Decimal @db.Decimal(10, 2)
+
+  @@unique([agreementId, variantId])
 }

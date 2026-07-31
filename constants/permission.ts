@@ -178,6 +178,27 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateConversation',
     'canUpdateConversation',
   ],
+  POS_CASHIER: [
+    'canViewDashboard',
+    'canViewProducts',
+    'canViewInventory',
+    'canViewOrders',
+    'canCreateOrder',
+    'canUpdateOrders',
+    'canViewCoupons',
+    'canViewCustomers',
+    'canCreateCustomers',
+    'canUpdateCustomers',
+  ],
+  POS_RESELLER: [
+    'canViewProducts',
+    'canViewInventory',
+    'canViewOrders',
+    'canCreateOrder',
+    'canUpdateOrders',
+    'canViewCustomers',
+    'canCreateCustomers',
+  ],
 }
 
 export const PERMISSION_MAPPING: Record<
