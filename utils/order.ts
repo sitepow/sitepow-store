@@ -1,3 +1,5 @@
+import { ProductType } from '@/generated/prisma/enums'
+import { CreateOrderItemInput } from '@/types/order'
 import crypto from 'crypto'
 
 interface CalculateGroupShareParams {
@@ -93,4 +95,26 @@ export const calculateGroupShare = ({
     usedPoints: Math.round(usedPoints * ratio),
     earnedPoints: Math.round(earnedPoints * ratio),
   }
+}
+
+export function classifyOrderItems(items: CreateOrderItemInput[]) {
+  const physicalGroups: Record<string, CreateOrderItemInput[]> = {}
+  const digitalItems: CreateOrderItemInput[] = []
+  const digitalServices: CreateOrderItemInput[] = []
+
+  for (const item of items) {
+    if (item.productType === ProductType.PHYSICAL) {
+      const branchId = item.branchId || 'main'
+      if (!physicalGroups[branchId]) {
+        physicalGroups[branchId] = []
+      }
+      physicalGroups[branchId].push(item)
+    } else if (item.productType === ProductType.DIGITAL_SERVICE) {
+      digitalServices.push(item)
+    } else {
+      digitalItems.push(item)
+    }
+  }
+
+  return { physicalGroups, digitalItems, digitalServices }
 }

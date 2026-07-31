@@ -11,11 +11,10 @@ const storefrontCourierSelect = {
   courierService: {
     select: {
       id: true,
-      code: true,
       name: true,
       estimatedDays: true,
       courier: {
-        select: { name: true, code: true },
+        select: { name: true },
       },
     },
   },

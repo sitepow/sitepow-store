@@ -140,7 +140,7 @@ export async function applyGlobalRatesToStore(
       await prisma.courier.upsert({
         where: { id: courier.id },
         update: {},
-        create: { id: courier.id, code: courier.code, name: courier.name },
+        create: { id: courier.id, name: courier.name },
       })
 
       for (const service of courier.services) {
@@ -150,7 +150,6 @@ export async function applyGlobalRatesToStore(
           create: {
             id: service.id,
             courierId: courier.id,
-            code: service.code,
             name: service.name,
             estimatedDays: service.estimatedDays,
           },

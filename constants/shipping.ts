@@ -17,95 +17,95 @@ export const INITIAL_MIN_WEIGHT = 0
 
 export const COURIERS_LIST: CourierWithServices[] = [
   {
-    id: 'c-thaipost',
-    code: 'THAIPOST',
-    name: 'ไปรษณีย์ไทย (Thailand Post)',
+    id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    name: 'ไปรษณีย์ไทย',
     description:
       'ไปรษณีย์ไทย บริการที่คุ้นเคย มีสาขาครอบคลุมทั่วประเทศถึงหน้าบ้าน',
     services: [
       {
-        id: 'cs-ems',
-        courierId: 'c-thaipost',
-        code: 'THAIPOST_EMS',
-        name: 'EMS ไปรษณีย์ด่วนพิเศษ',
+        id: '3c893683-1259-42b7-a37a-4a51e687b1c2',
+        courierId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        name: 'ส่งแบบด่วน',
         estimatedDays: '1-3 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
   {
-    id: 'c-flash',
-    code: 'FLASH',
+    id: '8a1278de-50c1-4b72-9112-8e7c10c9d413',
     name: 'Flash Express',
     description: 'ขนส่งที่เข้ารับพัสดุถึงที่ เน้นความเร็วและครอบคลุมทั่วไทย',
     services: [
       {
-        id: 'cs-flash-std',
-        courierId: 'c-flash',
-        code: 'FLASH_STANDARD',
-        name: 'Flash ส่งด่วนปกติ',
+        id: '6f391a27-84bc-419b-b18c-3c58b182d011',
+        courierId: '8a1278de-50c1-4b72-9112-8e7c10c9d413',
+        name: 'ส่งแบบมาตรฐาน',
         estimatedDays: '1-3 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
   {
-    id: 'c-kerry',
-    code: 'KERRY',
+    id: '2b49c101-72f8-4e63-95c1-3d7118ef8124',
     name: 'Kerry Express (KEX)',
     description: 'แบรนด์ขนส่งยอดนิยม การันตีความรวดเร็วและปลอดภัย',
     services: [
       {
-        id: 'cs-kerry-std',
-        courierId: 'c-kerry',
-        code: 'KERRY_STANDARD',
-        name: 'Kerry ส่งด่วนทั่วไป',
+        id: '9d217281-2244-4011-8e99-5f2148b11128',
+        courierId: '2b49c101-72f8-4e63-95c1-3d7118ef8124',
+        name: 'ส่งแบบมาตรฐาน',
         estimatedDays: '1-2 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
   {
-    id: 'c-spx',
-    code: 'SPX',
+    id: '7b913122-3841-4569-b102-127c55aa8820',
     name: 'SPX Express',
     description: 'ขนส่งหลักของ Shopee เน้นจัดส่งรวดเร็วสำหรับขาช้อปออนไลน์',
     services: [
       {
-        id: 'cs-spx-std',
-        courierId: 'c-spx',
-        code: 'SPX_STANDARD',
-        name: 'SPX Standard Delivery',
+        id: '1e884112-9932-4752-a421-6c7102b44455',
+        courierId: '7b913122-3841-4569-b102-127c55aa8820',
+        name: 'ส่งแบบมาตรฐาน',
         estimatedDays: '1-3 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
   {
-    id: 'c-best',
-    code: 'BEST',
+    id: '4c728391-1142-4912-8d77-2f88a9113309',
     name: 'Best Express',
     description: 'ขนส่งราคาประหยัดที่มีเครือข่ายจุดรับ-ส่งสินค้าทั่วประเทศ',
     services: [
       {
-        id: 'cs-best-std',
-        courierId: 'c-best',
-        code: 'BEST_STANDARD',
-        name: 'Best Express ปกติ',
+        id: '5f812399-4412-4019-9122-7e1029c33342',
+        courierId: '4c728391-1142-4912-8d77-2f88a9113309',
+        name: 'ส่งแบบมาตรฐาน',
         estimatedDays: '1-4 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
   {
-    id: 'c-dhl',
-    code: 'DHL',
-    name: 'DHL Express (Domestic)',
+    id: '9e127384-5519-4821-b331-4c1182d00199',
+    name: 'DHL Express',
     description: 'ผู้นำด้านโลจิสติกส์ระดับโลก มั่นใจในมาตรฐานความปลอดภัย',
     services: [
       {
-        id: 'cs-dhl-std',
-        courierId: 'c-dhl',
-        code: 'DHL_STANDARD',
-        name: 'DHL Domestic Express',
+        id: '7a229104-6632-4119-8221-1b9044c22210',
+        courierId: '9e127384-5519-4821-b331-4c1182d00199',
+        name: 'ส่งแบบด่วน',
         estimatedDays: '1-2 วัน',
+        translations: null,
       },
     ],
+    translations: null,
   },
 ]
 
@@ -341,5 +341,9 @@ export const ZONE_LABELS: Record<
   REMOTE_AREA: {
     title: 'พื้นที่ห่างไกลพิเศษ',
     description: 'เกาะ ดอย สูง หรือ 3 จังหวัดชายแดนใต้',
+  },
+  INTERNATIONAL: {
+    title: 'ระหว่างประเทศ',
+    description: 'ส่งสินค้าข้ามพรมแดนหรือต่างประเทศ',
   },
 }

@@ -5,43 +5,20 @@ import {
   ActorType,
   LogAction,
   OrderStatus,
-  PaymentMethod,
   ProductType,
 } from '@/generated/prisma/enums'
+import { CreateOrderInput } from '@/types/order'
 import { calculateDiscounts } from '@/utils/cart'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
-import { calculateGroupShare, generateOrderNumber } from '@/utils/order'
+import {
+  calculateGroupShare,
+  classifyOrderItems,
+  generateOrderNumber,
+} from '@/utils/order'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-
-export interface CreateOrderItemInput {
-  productId: string
-  variantId: string
-  title: string
-  variantTitle: string
-  quantity: number
-  price: number
-  productType: ProductType
-  branchId?: string
-}
-
-export interface CreateOrderInput {
-  storeSlug: string
-  addressId: string
-  shippingMethod: string
-  shippingFee: number
-  storeCourierServiceId?: string
-  paymentMethod: PaymentMethod
-  bankAccountId?: string
-  couponId?: string
-  couponDiscount?: number
-  usedPoints?: number
-  pointsDiscount?: number
-  earnedPoints?: number
-  items: CreateOrderItemInput[]
-}
 
 const storefrontOrderSelect = {
   id: true,
@@ -251,10 +228,6 @@ export async function createOrder(input: CreateOrderInput) {
       return { success: false, message: 'ไม่พบร้านค้า' }
     }
 
-    const physicalGroups: Record<string, CreateOrderItemInput[]> = {}
-    const digitalItems: CreateOrderItemInput[] = []
-    const digitalServices: CreateOrderItemInput[] = []
-
     const mainBranch = await prisma.branch.findFirst({
       where: { storeId: store.id, isMain: true },
       select: { id: true },
@@ -264,36 +237,22 @@ export async function createOrder(input: CreateOrderInput) {
       if (item.quantity <= 0) {
         return { success: false, message: 'จำนวนสินค้าต้องมากกว่า 0' }
       }
-
-      if (item.productType === ProductType.PHYSICAL) {
-        const itemBranchId = item.branchId
-
-        if (!itemBranchId) {
-          return {
-            success: false,
-            message: `ไม่พบข้อมูลสาขาสำหรับสินค้า ${item.title} กรุณาเลือกสาขาที่ต้องการรับสินค้า`,
-          }
+      if (item.productType === ProductType.PHYSICAL && !item.branchId) {
+        return {
+          success: false,
+          message: `ไม่พบข้อมูลสาขาสำหรับสินค้า ${item.title} กรุณาเลือกสาขาที่ต้องการรับสินค้า`,
         }
-
-        if (!physicalGroups[itemBranchId]) {
-          physicalGroups[itemBranchId] = []
-        }
-        physicalGroups[itemBranchId].push(item)
-      } else if (item.productType === ProductType.DIGITAL_SERVICE) {
-        digitalServices.push(item)
-      } else {
-        digitalItems.push(item)
       }
     }
+
+    const { physicalGroups, digitalItems, digitalServices } =
+      classifyOrderItems(input.items)
 
     for (const [branchId, groupItems] of Object.entries(physicalGroups)) {
       for (const item of groupItems) {
         const stock = await prisma.productStock.findUnique({
           where: {
-            branchId_variantId: {
-              branchId,
-              variantId: item.variantId,
-            },
+            branchId_variantId: { branchId, variantId: item.variantId },
           },
           select: { quantity: true },
         })
@@ -311,6 +270,7 @@ export async function createOrder(input: CreateOrderInput) {
       (sum, i) => sum + i.price * i.quantity,
       0,
     )
+
     let couponData = undefined
 
     if (input.couponId) {
@@ -336,7 +296,7 @@ export async function createOrder(input: CreateOrderInput) {
       if (subtotalAll < Number(coupon.minOrderAmount ?? 0)) {
         return {
           success: false,
-          message: `ยอดสั่งซื้อขั้นต่ำ ${Number(coupon.minOrderAmount ?? 0).toLocaleString()} บาท สำหรับรหัสนี้`,
+          message: 'ยอดสั่งซื้อไม่ถึงขั้นต่ำสำหรับรหัสส่วนลดนี้',
         }
       }
 
@@ -354,13 +314,12 @@ export async function createOrder(input: CreateOrderInput) {
       pointRedeemRate: Number(store.pointRedeemRate ?? 0),
     })
 
+    const branchIds = Object.keys(physicalGroups)
+
     const createdOrders = await prisma.$transaction(async (tx) => {
       const orders = []
       const baseOrderNumber = generateOrderNumber()
       let orderCounter = 1
-
-      const branchIds = Object.keys(physicalGroups)
-      const totalGrandSubtotal = subtotalAll
 
       for (const branchId of branchIds) {
         const groupItems = physicalGroups[branchId]
@@ -371,7 +330,7 @@ export async function createOrder(input: CreateOrderInput) {
 
         const share = calculateGroupShare({
           groupSubtotal,
-          totalGrandSubtotal,
+          totalGrandSubtotal: subtotalAll,
           totalShippingFee: input.shippingFee ?? 0,
           branchCount: branchIds.length,
           couponDiscount,
@@ -391,10 +350,7 @@ export async function createOrder(input: CreateOrderInput) {
         for (const item of groupItems) {
           await tx.productStock.update({
             where: {
-              branchId_variantId: {
-                branchId,
-                variantId: item.variantId,
-              },
+              branchId_variantId: { branchId, variantId: item.variantId },
             },
             data: { quantity: { decrement: item.quantity } },
           })
@@ -411,6 +367,7 @@ export async function createOrder(input: CreateOrderInput) {
           data: {
             orderNumber: subOrderNumber,
             totalAmount: groupTotalAmount,
+            totalAmountBase: groupTotalAmount,
             status: OrderStatus.PENDING,
             storeId: store.id,
             customerId: customer.id,
@@ -433,7 +390,7 @@ export async function createOrder(input: CreateOrderInput) {
                 variantTitle: item.variantTitle,
                 quantity: item.quantity,
                 price: item.price,
-                branchId: branchId,
+                branchId,
                 productType: item.productType,
               })),
             },
@@ -450,7 +407,7 @@ export async function createOrder(input: CreateOrderInput) {
         )
         const share = calculateGroupShare({
           groupSubtotal: digitalSubtotal,
-          totalGrandSubtotal,
+          totalGrandSubtotal: subtotalAll,
           totalShippingFee: input.shippingFee ?? 0,
           branchCount: branchIds.length,
           couponDiscount,
@@ -469,6 +426,7 @@ export async function createOrder(input: CreateOrderInput) {
           data: {
             orderNumber: subOrderNumber,
             totalAmount: digitalTotalAmount,
+            totalAmountBase: digitalTotalAmount,
             status: OrderStatus.PENDING,
             storeId: store.id,
             customerId: customer.id,
@@ -509,7 +467,6 @@ export async function createOrder(input: CreateOrderInput) {
             })
           }
         }
-
         orders.push(newOrder)
       }
 
@@ -517,7 +474,7 @@ export async function createOrder(input: CreateOrderInput) {
         const serviceSubtotal = serviceItem.price * serviceItem.quantity
         const share = calculateGroupShare({
           groupSubtotal: serviceSubtotal,
-          totalGrandSubtotal,
+          totalGrandSubtotal: subtotalAll,
           totalShippingFee: input.shippingFee ?? 0,
           branchCount: branchIds.length,
           couponDiscount,
@@ -536,6 +493,7 @@ export async function createOrder(input: CreateOrderInput) {
           data: {
             orderNumber: subOrderNumber,
             totalAmount: serviceTotalAmount,
+            totalAmountBase: serviceTotalAmount,
             status: OrderStatus.PENDING,
             storeId: store.id,
             customerId: customer.id,
