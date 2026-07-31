@@ -49,7 +49,7 @@ export const COURIERS_LIST: CourierWithServices[] = [
   },
   {
     id: '2b49c101-72f8-4e63-95c1-3d7118ef8124',
-    name: 'Kerry Express (KEX)',
+    name: 'KEX Express',
     description: 'แบรนด์ขนส่งยอดนิยม การันตีความรวดเร็วและปลอดภัย',
     services: [
       {

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "DefaultRole" ADD VALUE 'CONTENT_CREATOR';

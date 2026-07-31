@@ -106,6 +106,8 @@ export function useEmployeePermission() {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
+  const isNoStoreContext = !selectedStoreId || selectedStoreId === ALL_STORES
+
   const {
     data: employee,
     isLoading,
@@ -114,7 +116,7 @@ export function useEmployeePermission() {
     queryOptions({
       queryKey: employeeKeys.currentStore(selectedStoreId, selectedBranchId),
       queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId),
-      enabled: !!selectedStoreId && selectedStoreId !== ALL_STORES,
+      enabled: !isNoStoreContext,
     }),
   )
 
@@ -130,19 +132,39 @@ export function useEmployeePermission() {
 
   const hasPermission = useCallback(
     (permissionKey: PermissionKey): boolean => {
+      if (isNoStoreContext) {
+        if (
+          permissionKey === 'canCreateStore' ||
+          permissionKey === 'canViewStore'
+        ) {
+          return true
+        }
+        return false
+      }
+
       if (!hasBranchAccess) {
         return false
       }
 
+      if (isOwner || isRoleOwner) {
+        return true
+      }
+
       return employeePermissions?.includes(permissionKey) ?? false
     },
-    [hasBranchAccess, employeePermissions],
+    [
+      isNoStoreContext,
+      hasBranchAccess,
+      isOwner,
+      isRoleOwner,
+      employeePermissions,
+    ],
   )
 
   return useMemo(() => {
     const baseValues = {
       employee,
-      isLoading,
+      isLoading: isNoStoreContext ? false : isLoading,
       error,
       isOwner,
       isRoleOwner,
@@ -166,6 +188,7 @@ export function useEmployeePermission() {
       },
     }) as typeof baseValues & Record<PermissionKey, boolean>
   }, [
+    isNoStoreContext,
     employee,
     isLoading,
     error,

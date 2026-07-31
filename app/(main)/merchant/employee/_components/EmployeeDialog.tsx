@@ -10,6 +10,8 @@ import {
   useUpdateEmployee,
 } from '@/actions/hooks/employee'
 import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
+import { DEFAULT_ROLE_TH } from '@/constants/translate'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   getPresetPermissionIds,
@@ -17,7 +19,7 @@ import {
 } from '@/utils/employee'
 import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
+import { IconKey, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { MultiSelect } from '@/components/MultiSelect'
@@ -255,7 +257,9 @@ export function EmployeeDialog({
                   className="bg-card relative grid gap-3 space-y-2 rounded-md border p-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span>สาขาที่ {index + 1}</span>
+                    <span className="bg-primary flex items-center gap-1 p-2.5 font-bold text-white">
+                      <IconKey /> สาขาที่ {index + 1}
+                    </span>
                     <Button
                       type="button"
                       variant="destructive"
@@ -302,11 +306,17 @@ export function EmployeeDialog({
                         <SelectValue placeholder="เลือกบทบาท" />
                       </SelectTrigger>
                       <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.id} value={role.id}>
-                            {role.name}
-                          </SelectItem>
-                        ))}
+                        {roles.map((role) => {
+                          const roleLabel =
+                            DEFAULT_ROLE_TH[role.name as DefaultRole] ||
+                            role.name
+
+                          return (
+                            <SelectItem key={role.id} value={role.id}>
+                              {roleLabel}
+                            </SelectItem>
+                          )
+                        })}
                       </SelectContent>
                     </Select>
                   </Field>

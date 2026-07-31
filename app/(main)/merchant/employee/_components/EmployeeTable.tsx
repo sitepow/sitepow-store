@@ -8,6 +8,8 @@ import {
   useEmployees,
 } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { DEFAULT_ROLE_TH } from '@/constants/translate'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { extractEmployeeStoreData } from '@/utils/employee'
 import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
@@ -114,14 +116,20 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     <TableCell>
                       <div className="flex flex-wrap items-center gap-1">
                         {roleNames.length === 0 ? (
-                          <Badge variant="outline">ไม่ระบุบทบาท</Badge>
+                          <Badge variant="outline">-</Badge>
                         ) : (
                           <>
-                            {displayedRoles.map((roleName, idx) => (
-                              <Badge key={idx} variant="outline">
-                                {roleName}
-                              </Badge>
-                            ))}
+                            {displayedRoles.map((roleName, idx) => {
+                              const roleLabel =
+                                DEFAULT_ROLE_TH[roleName as DefaultRole] ||
+                                roleName
+
+                              return (
+                                <Badge key={idx} variant="outline">
+                                  {roleLabel}
+                                </Badge>
+                              )
+                            })}
                             {remainingRolesCount > 0 && (
                               <span className="text-muted-foreground text-xs">
                                 +{remainingRolesCount}

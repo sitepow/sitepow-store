@@ -9,6 +9,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { IconEdit } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -42,9 +43,10 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
 
   if (accounts.length === 0) {
     return (
-      <div className="text-muted-foreground rounded-lg border border-dashed py-8 text-center text-sm">
-        ยังไม่มีบัญชีธนาคาร กดปุ่มเพิ่มบัญชีธนาคารด้านบน
-      </div>
+      <ActionRequiredAlert
+        title="แจ้งเตือน"
+        description="ยังไม่มีบัญชีธนาคาร กดปุ่มเพิ่มบัญชีธนาคารด้านบน"
+      />
     )
   }
 

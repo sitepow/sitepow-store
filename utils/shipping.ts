@@ -91,12 +91,10 @@ export const mapStoreToShippingForm = (
     storeProvince: store.branch?.province || '',
     storeDistrict: store.branch?.district || '',
     storePostcode: store.branch?.postcode ? Number(store.branch.postcode) : 0,
-
     isFreeShipEnabled: store.shippingSetting?.isFreeShipEnabled ?? false,
     freeShipMin: store.shippingSetting?.freeShipMin
       ? Number(store.shippingSetting.freeShipMin)
-      : 1,
-
+      : 150,
     services: store.storeCourierServices.map((scs) => ({
       ...scs,
       zoneRates: [],

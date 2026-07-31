@@ -1,6 +1,7 @@
 import {
   ActorType,
   AddressType,
+  DefaultRole,
   DiscountType,
   InvoiceStatus,
   LogAction,
@@ -139,6 +140,28 @@ export const INVOICE_STATUS_TH: Record<InvoiceStatus, string> = {
   [InvoiceStatus.CANCELLED]: 'ยกเลิก',
 }
 
+export const DEFAULT_ROLE_TH: Record<DefaultRole, string> = {
+  [DefaultRole.OWNER]: 'เจ้าของร้าน',
+  [DefaultRole.OWNER_VIEWER]: 'ผู้ตรวจสอบข้อมูล (อ่านได้อย่างเดียว)',
+  [DefaultRole.MANAGER]: 'ผู้จัดการ',
+  [DefaultRole.CASHIER]: 'แคชเชียร์ (POS)',
+  [DefaultRole.STAFF]: 'พนักงานทั่วไป',
+  [DefaultRole.POS_RESELLER]: 'ตัวแทนจำหน่าย',
+  [DefaultRole.POS_CASHIER]: 'ร้านค้าฝากขาย (Consignment)',
+  [DefaultRole.CONTENT_CREATOR]: 'ผู้สร้างคอนเทนต์',
+  [DefaultRole.AUDITOR]: 'ผู้ตรวจสอบบัญชี/ภายใน',
+  [DefaultRole.SUPPORT]: 'แอดมินดูแลลูกค้า',
+  [DefaultRole.MARKETING]: 'นักการตลาด',
+  [DefaultRole.FULFILLMENT]: 'พนักงานแพ็กของ/จัดส่ง',
+}
+
+export const DEFAULT_ROLE_OPTIONS = Object.entries(DEFAULT_ROLE_TH).map(
+  ([value, label]) => ({
+    value,
+    label,
+  }),
+)
+
 export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
@@ -152,4 +175,5 @@ export const getLabel = {
   transferStatus: (v: TransferStatus) => TRANSFER_STATUS_TH[v] || v,
   productType: (v: ProductType) => PRODUCT_TYPE_TH[v] || v,
   invoiceStatus: (v: InvoiceStatus) => INVOICE_STATUS_TH[v] || v,
+  defaultRole: (v: DefaultRole) => DEFAULT_ROLE_TH[v] || v,
 }

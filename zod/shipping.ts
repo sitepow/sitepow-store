@@ -8,11 +8,9 @@ const shippingZoneEnumValues = Object.values(ShippingZoneType) as [
 
 export const weightRateSchema = z.object({
   id: z.string().optional(),
-
   zoneType: z.enum(shippingZoneEnumValues, {
     message: 'กรุณาระบุประเภทโซนความสัมพันธ์เส้นทาง',
   }),
-
   minWeight: z.number({ message: 'กรุณาระบุน้ำหนักเริ่มต้น' }),
   maxWeight: z.number({ message: 'กรุณาระบุน้ำหนักสิ้นสุด' }),
   fee: z.number({ message: 'กรุณาระบุราคาค่าส่ง' }),
@@ -33,7 +31,6 @@ export const courierServiceFormSchema = z.object({
 export const shippingFormSchema = z.object({
   isFreeShipEnabled: z.boolean().default(false),
   freeShipMin: z.number({ message: 'กรุณาระบุยอดส่งฟรีขั้นต่ำ' }),
-
   storeProvince: z
     .string()
     .min(1, { message: 'กรุณาระบุจังหวัดต้นทางของร้านค้า' }),
@@ -41,7 +38,6 @@ export const shippingFormSchema = z.object({
     .string()
     .min(1, { message: 'กรุณาระบุอำเภอ/เขตต้นทางของร้านค้า' }),
   storePostcode: z.number({ message: 'กรุณาระบุรหัสไปรษณีย์ต้นทาง' }),
-
   services: z.array(courierServiceFormSchema),
 })
 

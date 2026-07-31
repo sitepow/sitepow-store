@@ -7,11 +7,7 @@ import { useTaxSetting, useUpdateTaxSetting } from '@/actions/hooks/tax'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { TaxSettingFormValues, taxSettingSchema } from '@/zod/tax'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IconDeviceFloppy,
-  IconLoader2,
-  IconReceiptTax,
-} from '@tabler/icons-react'
+import { IconDeviceFloppy, IconReceiptTax } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -20,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function TaxSettingsForm() {
@@ -78,7 +75,6 @@ export function TaxSettingsForm() {
           endContent={<StoreSelectField />}
         />
       </CardHeader>
-
       {selectedStoreId !== ALL_STORES && (
         <>
           <CardContent>
@@ -97,31 +93,26 @@ export function TaxSettingsForm() {
                   />
                   <FieldLabel>อัตราภาษีมูลค่าเพิ่มประจำร้าน (VAT %)</FieldLabel>
                 </div>
-
-                {isVatRegistered && (
-                  <>
-                    <div className="mt-1 flex items-center">
-                      <Input
-                        id="vat-rate"
-                        type="number"
-                        step="0.1"
-                        placeholder="7.0"
-                        {...form.register('vatRate')}
-                        className="rounded-r-none"
-                      />
-                      <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                        %
-                      </span>
-                    </div>
-                    <FieldDescription>
-                      เปิดเมื่อร้านค้าของคุณจดทะเบียนภาษีมูลค่าเพิ่มแล้ว
-                      ระบบจะทำการเก็บข้อมูลเลขผู้เสียภาษี 13 หลัก
-                      และรหัสสาขาของลูกค้าตอนสั่งซื้อสินค้า
-                    </FieldDescription>
-                  </>
-                )}
+                <div className="mt-1 flex items-center">
+                  <Input
+                    id="vat-rate"
+                    type="number"
+                    step="0.1"
+                    placeholder="7.0"
+                    disabled={!isVatRegistered}
+                    {...form.register('vatRate')}
+                    className="rounded-r-none"
+                  />
+                  <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
+                    %
+                  </span>
+                </div>
+                <FieldDescription>
+                  เปิดเมื่อร้านค้าของคุณจดทะเบียนภาษีมูลค่าเพิ่มแล้ว
+                  ระบบจะทำการเก็บข้อมูลเลขผู้เสียภาษี 13 หลัก
+                  และรหัสสาขาของลูกค้าตอนสั่งซื้อสินค้า
+                </FieldDescription>
               </Field>
-
               <Field>
                 <FieldLabel>เลขประจำตัวผู้เสียภาษี (13 หลัก)</FieldLabel>
                 <Input
@@ -132,7 +123,6 @@ export function TaxSettingsForm() {
               </Field>
             </div>
           </CardContent>
-
           <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
             {form.formState.isDirty && (
               <Button
@@ -143,7 +133,6 @@ export function TaxSettingsForm() {
                 ล้างค่าการตั้งค่า
               </Button>
             )}
-
             <Button
               size="sm"
               onClick={form.handleSubmit(onSubmit)}
@@ -151,8 +140,7 @@ export function TaxSettingsForm() {
             >
               {isSaving ? (
                 <>
-                  <IconLoader2 size={14} className="animate-spin" />{' '}
-                  กำลังอัปเดตระบบภาษี...
+                  <Spinner /> กำลังอัปเดตระบบภาษี...
                 </>
               ) : (
                 <>
@@ -163,7 +151,6 @@ export function TaxSettingsForm() {
           </CardFooter>
         </>
       )}
-
       {selectedStoreId === ALL_STORES && (
         <CardContent>
           <ActionRequiredAlert />
