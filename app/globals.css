@@ -244,3 +244,8 @@ article.prose li {
 .animate-ken-burns {
   animation: ken-burns-right 15s ease-in-out infinite alternate;
 }
+
+.bn-container,
+.bn-container * {
+  font-family: var(--font-sans), sans-serif !important;
+}

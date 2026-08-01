@@ -13,6 +13,7 @@ import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
+import { buildProductPrompt } from '@/utils/ai'
 import { getPathR2FromUrl } from '@/utils/image'
 import { BlogFormValues, blogFormSchema } from '@/zod/blog'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,6 +37,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
@@ -90,6 +92,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     reset,
     setValue,
     watch,
+    getValues,
     control,
     formState: { isDirty, errors },
   } = form
@@ -127,7 +130,10 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
 
   const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
     const storePlan = store?.plan || Plan.FREE
-    const costEstimate = await handleUserPrompt('prompt', storePlan)
+    const currentTitle = getValues('title')
+    const prompt = buildProductPrompt(task, currentTitle)
+
+    const costEstimate = await handleUserPrompt(prompt, storePlan)
 
     setAiTaskConfirm({
       task,
@@ -219,9 +225,25 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>สร้างเนื้อหาด้วย AI</DropdownMenuLabel>
               <DropdownMenuItem
+                onClick={() => handleAiTrigger(AiGenTask.ALL, () => {})}
+              >
+                ให้ AI คิดเนื้อหาบทความทั้งหมด
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => handleAiTrigger(AiGenTask.TITLE, () => {})}
+              >
+                สร้างชื่อบทความด้วย AI
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => handleAiTrigger(AiGenTask.SLUG, () => {})}
               >
                 สร้าง Slug จากชื่อบทความ
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleAiTrigger(AiGenTask.TAGS, () => {})}
+              >
+                ให้ AI ช่วยคิด แท็ก (Tags)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -249,10 +271,21 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
             <FieldGroup className="grid gap-6">
               <Field>
                 <FieldLabel className="required">ชื่อบทความ</FieldLabel>
-                <Input
-                  placeholder="เช่น 10 เทคนิคการดูแลสุขภาพในปี 2026"
-                  {...register('title')}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="เช่น 10 เทคนิคการดูแลสุขภาพในปี 2026"
+                    {...register('title')}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleAiTrigger(AiGenTask.TITLE, () => {})}
+                    disabled={isPending}
+                  >
+                    <IconWand className="size-4" />
+                  </Button>
+                </div>
                 {errors.title && (
                   <p className="text-destructive text-xs">
                     {errors.title.message}
@@ -261,22 +294,26 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
               </Field>
               <Field>
                 <FieldLabel className="required">Slug (URL)</FieldLabel>
-                <Input
-                  placeholder="10-health-tips-2026"
-                  {...register('slug')}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="10-health-tips-2026"
+                    {...register('slug')}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleAiTrigger(AiGenTask.SLUG, () => {})}
+                    disabled={isPending}
+                  >
+                    <IconWand className="size-4" />
+                  </Button>
+                </div>
                 {errors.slug && (
                   <p className="text-destructive text-xs">
                     {errors.slug.message}
                   </p>
                 )}
-              </Field>
-              <Field>
-                <FieldLabel>แท็ก (คั่นด้วยเครื่องหมายจุลภาค ,)</FieldLabel>
-                <Input
-                  placeholder="สุขภาพ, ไลฟ์สไตล์, ออกกำลังกาย"
-                  {...register('tags')}
-                />
               </Field>
               <Field>
                 <FieldLabel>รูปภาพปกบทความ</FieldLabel>
@@ -305,11 +342,18 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                       </Button>
                     </div>
                   ) : (
-                    <label className="border-muted-foreground/25 hover:bg-muted/50 flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors">
+                    <label className="border-muted-foreground/25 hover:bg-muted/50 flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors">
                       <IconUpload className="text-muted-foreground mb-2 size-8" />
-                      <span className="text-muted-foreground text-sm">
-                        คลิกเพื่ออัปโหลดรูปภาพปก (16:9)
-                      </span>
+                      <div className="text-sm">
+                        <span>คลิกเพื่ออัปโหลด หรือลากไฟล์มาวาง</span>
+                      </div>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        แนะนำสัดส่วน 16:9 (เช่น 1920x1080px หรือ 1280x720px
+                        ขึ้นไป)
+                      </p>
+                      <p className="text-muted-foreground/70 text-[11px]">
+                        รองรับไฟล์ PNG, JPG, WEBP
+                      </p>
                       <input
                         type="file"
                         accept="image/*"
@@ -326,7 +370,19 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 </div>
               </Field>
               <Field>
-                <FieldLabel>เนื้อหาบทความ</FieldLabel>
+                <div className="mb-2 flex items-center justify-between">
+                  <FieldLabel>เนื้อหาบทความ</FieldLabel>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAiTrigger(AiGenTask.ALL, () => {})}
+                    disabled={isPending}
+                  >
+                    <IconWand className="mr-2 size-4" />
+                    ให้ AI เขียนเนื้อหาให้
+                  </Button>
+                </div>
                 <Controller
                   control={control}
                   name="content"
@@ -342,6 +398,24 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     {errors.content.message}
                   </p>
                 )}
+              </Field>
+              <Field>
+                <FieldLabel>แท็ก (คั่นด้วยเครื่องหมายจุลภาค ,)</FieldLabel>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="สุขภาพ, ไลฟ์สไตล์, ออกกำลังกาย"
+                    {...register('tags')}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleAiTrigger(AiGenTask.TAGS, () => {})}
+                    disabled={isPending}
+                  >
+                    <IconWand className="size-4" />
+                  </Button>
+                </div>
               </Field>
             </FieldGroup>
           </FieldSet>

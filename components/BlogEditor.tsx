@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
+import { thDictionary } from '@/constants/blocknote'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/shadcn'
 import '@blocknote/shadcn/style.css'
@@ -14,28 +15,44 @@ interface BlogEditorProps {
 
 export default function BlogEditor({ value, onChange }: BlogEditorProps) {
   const { resolvedTheme } = useTheme()
-  const editor = useCreateBlockNote()
-  const isInitialRender = useRef(true)
+
+  const editor = useCreateBlockNote({
+    dictionary: thDictionary,
+  })
+
+  const lastMarkdownRef = useRef<string>('')
 
   useEffect(() => {
-    const loadInitialContent = async () => {
-      if (isInitialRender.current && value && editor) {
-        isInitialRender.current = false
-        const blocks = await editor.tryParseMarkdownToBlocks(value)
+    const syncValueToEditor = async () => {
+      if (!editor) {
+        return
+      }
+
+      const incomingValue = value || ''
+
+      if (incomingValue !== lastMarkdownRef.current) {
+        lastMarkdownRef.current = incomingValue
+
+        const blocks = await editor.tryParseMarkdownToBlocks(incomingValue)
         editor.replaceBlocks(editor.document, blocks)
       }
     }
 
-    loadInitialContent()
+    syncValueToEditor()
   }, [value, editor])
 
   const handleContentChange = async () => {
+    if (!editor) {
+      return
+    }
     const markdown = await editor.blocksToMarkdownLossy(editor.document)
+
+    lastMarkdownRef.current = markdown
     onChange?.(markdown)
   }
 
   return (
-    <div className="min-h-96 rounded-xl border p-5 dark:bg-[#1f1f1f]">
+    <div className="min-h-96 rounded-xl border p-5 font-sans dark:bg-[#1f1f1f] [&_.bn-container]:font-sans">
       <BlockNoteView
         editor={editor}
         onChange={handleContentChange}
