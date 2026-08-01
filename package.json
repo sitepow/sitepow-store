@@ -13,7 +13,8 @@
     "db:migrate": "npx prisma migrate dev",
     "db:reset": "npx prisma migrate reset",
     "db:push": "npx prisma db push",
-    "db:update": "npx prisma format && npx prisma migrate dev && npx prisma generate"
+    "db:update": "npx prisma format && npx prisma migrate dev && npx prisma generate",
+    "email": "email dev --dir emails"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -79,6 +80,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@react-email/ui": "6.9.1",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.97.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
@@ -94,6 +96,7 @@
     "prettier": "^3.8.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "prisma": "^7.7.0",
+    "react-email": "^6.9.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"

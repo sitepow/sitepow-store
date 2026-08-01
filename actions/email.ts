@@ -6,7 +6,7 @@ import {
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
 } from '@/constants/system'
-import OtpEmail from '@/emails/otp-email'
+import OtpEmail from '@/emails/OtpEmail'
 import crypto from 'crypto'
 
 import { auth } from '@/lib/auth'
