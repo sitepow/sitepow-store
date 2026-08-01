@@ -3,6 +3,7 @@
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useLandingImages } from '@/hooks/use-landing-images'
+import { isVideoUrl } from '@/utils/media'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,9 +29,6 @@ export function CategorySection({
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
   const { emblaRef } = useCarousel()
 
-  const isVideo =
-    image?.match(/\.(mp4|webm|ogg)$/i) ||
-    currentImage?.match(/\.(mp4|webm|ogg)$/i)
   const displayMedia = image || currentImage
 
   if (products.length === 0) {
@@ -45,7 +43,7 @@ export function CategorySection({
         ) : (
           <div className="border-border relative h-48 w-full shrink-0 overflow-hidden rounded-xl border bg-neutral-900 text-start sm:h-64 md:h-88.75 md:w-96">
             <div className="absolute inset-0 z-0">
-              {isVideo ? (
+              {isVideoUrl(currentImage) ? (
                 <video
                   src={displayMedia ?? ''}
                   autoPlay

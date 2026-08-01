@@ -52,7 +52,6 @@ export function PageTabHeader({
         )}
       >
         {Icon && <PageTabHeaderIcon icon={Icon} />}
-
         <div className="space-y-1">
           <h2
             className={cn(
@@ -69,7 +68,6 @@ export function PageTabHeader({
           )}
         </div>
       </div>
-
       {endContent && (
         <div className="flex items-center gap-2 self-start sm:self-center">
           {endContent}

@@ -16,7 +16,6 @@ export function ProductGalleryHeader() {
           <span>ย้อนกลับ</span>
         </Button>
       </Link>
-
       <div className="flex gap-2.5">
         <Button variant="outline" size="icon-lg">
           <HeartIcon className="size-4" />

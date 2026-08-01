@@ -5,6 +5,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconTag } from '@tabler/icons-react'
@@ -28,6 +29,8 @@ export function BlogTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
+  const { canUpdateBlogs, canDeleteBlogs } = useEmployeePermission()
+
   const { data: { data: blogs = [], meta } = {}, isLoading } = useBlogs({
     storeId: selectedStoreId,
     page,
@@ -50,7 +53,9 @@ export function BlogTable() {
               <TableHead>ชื่อบทความ</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>แท็ก</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              {(canUpdateBlogs || canDeleteBlogs) && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,15 +87,19 @@ export function BlogTable() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="outline" size="icon-lg" asChild>
-                        <Link href={`/merchant/blog/create/${blog.id}`}>
-                          <IconEdit className="size-4" />
-                        </Link>
-                      </Button>
-                      <DeleteButton
-                        isPending={isDeleting}
-                        onDelete={() => deleteBlog(blog.id)}
-                      />
+                      {canUpdateBlogs && (
+                        <Button variant="outline" size="icon-lg" asChild>
+                          <Link href={`/merchant/blog/create/${blog.id}`}>
+                            <IconEdit className="size-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {canDeleteBlogs && (
+                        <DeleteButton
+                          isPending={isDeleting}
+                          onDelete={() => deleteBlog(blog.id)}
+                        />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

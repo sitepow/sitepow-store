@@ -2,6 +2,7 @@
 import Link from 'next/link'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
+import { isVideoUrl } from '@/utils/media'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
 import { type VariantProps, cva } from 'class-variance-authority'
@@ -9,6 +10,8 @@ import { type VariantProps, cva } from 'class-variance-authority'
 import { Badge } from '@/components/ui/badge'
 
 import { cn } from '@/lib/utils'
+
+import { EmptyImage } from '../EmptyImage'
 
 const productCardVariants = cva(
   'h-full rounded-xl transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
@@ -32,7 +35,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
     calculateProduct(product)
 
   const primaryImage = product.images?.[0]
-  const isVideo = primaryImage?.url.match(/\.(mp4|webm|ogg)$/i)
+  const isVideo = isVideoUrl(primaryImage?.url)
 
   return (
     <Link href={`/products/${product.slug}`}>
@@ -57,9 +60,7 @@ export function ProductCard({ variant, className, product }: ProductCardProps) {
               )}
             </div>
           ) : (
-            <div className="bg-foreground/20 text-muted-foreground mb-2.5 flex h-32 w-full items-center justify-center rounded-t-xl">
-              ไม่มีรูปภาพ
-            </div>
+            <EmptyImage className="h-32" />
           )}
           {hasDiscount && (
             <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">

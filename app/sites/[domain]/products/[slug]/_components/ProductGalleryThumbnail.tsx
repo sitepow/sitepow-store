@@ -4,6 +4,7 @@
 import { useCarousel } from '@/hooks/use-carousel'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMediaQuery } from '@/hooks/use-media-query'
+import { isVideoUrl } from '@/utils/media'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -18,7 +19,6 @@ export function ProductGalleryThumbnail() {
   const isMounted = useIsMounted()
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
-  const isVideo = (url: string) => url.match(/\.(mp4|webm|ogg)$/i)
   const images = product?.images ?? []
 
   const { emblaRef } = useCarousel({
@@ -48,7 +48,10 @@ export function ProductGalleryThumbnail() {
     return (
       <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-muted size-16 rounded-lg md:size-20" />
+          <div
+            key={i}
+            className="bg-foreground/10 size-16 rounded-lg md:size-20"
+          />
         ))}
       </div>
     )
@@ -75,7 +78,7 @@ export function ProductGalleryThumbnail() {
                 : 'border-transparent',
             )}
           >
-            {isVideo(image.url) ? (
+            {isVideoUrl(image.url) ? (
               <video
                 src={image.url}
                 className="size-full object-cover object-center"
