@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/shadcn'
 import '@blocknote/shadcn/style.css'
+import { useTheme } from '@teispace/next-themes'
 
 interface BlogEditorProps {
   value?: string
@@ -12,6 +13,7 @@ interface BlogEditorProps {
 }
 
 export default function BlogEditor({ value, onChange }: BlogEditorProps) {
+  const { resolvedTheme } = useTheme()
   const editor = useCreateBlockNote()
   const isInitialRender = useRef(true)
 
@@ -32,5 +34,13 @@ export default function BlogEditor({ value, onChange }: BlogEditorProps) {
     onChange?.(markdown)
   }
 
-  return <BlockNoteView editor={editor} onChange={handleContentChange} />
+  return (
+    <div className="min-h-96 rounded-xl border p-5 dark:bg-[#1f1f1f]">
+      <BlockNoteView
+        editor={editor}
+        onChange={handleContentChange}
+        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+      />
+    </div>
+  )
 }

@@ -127,7 +127,7 @@ export function DashboardSidebar({
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
-      <main className="bg-background w-full min-w-0 space-y-5 p-5">
+      <main className="bg-background text-foreground w-full min-w-0 space-y-5 p-5">
         <div className="flex flex-wrap gap-2.5 border-b py-5">
           <SidebarTrigger />
           <ModeToggle />
