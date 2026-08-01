@@ -61,7 +61,6 @@ export function CategorySection({
                 />
               )}
             </div>
-
             <div className="absolute inset-0 rounded-xl bg-black/20" />
             <div className="p-5">
               <h2 className="relative z-10 line-clamp-2 text-2xl font-bold break-all whitespace-normal text-white drop-shadow-md md:text-4xl">
@@ -70,7 +69,6 @@ export function CategorySection({
             </div>
           </div>
         )}
-
         <div className="relative w-full overflow-hidden p-2.5" ref={emblaRef}>
           <div className="flex items-center gap-5">
             {isLoading
