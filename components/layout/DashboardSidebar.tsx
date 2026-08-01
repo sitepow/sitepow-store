@@ -55,6 +55,8 @@ export function DashboardSidebar({
   const userRole = user?.role
 
   const pathname = usePathname()
+  const isMerchant =
+    userRole === UserRole.MERCHANT && redirectPath === 'merchant'
 
   return (
     <SidebarProvider>
@@ -140,9 +142,7 @@ export function DashboardSidebar({
             <IconHome />
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
-          {userRole === UserRole.MERCHANT && redirectPath === 'merchant' && (
-            <CreditBadge />
-          )}
+          {isMerchant && <CreditBadge />}
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}
