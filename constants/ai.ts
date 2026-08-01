@@ -181,3 +181,59 @@ export const CATEGORY_SCHEMA: Schema = {
   },
   required: ['title', 'slug'],
 }
+
+export const BLOG_SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: {
+      type: SchemaType.STRING,
+      description: 'ชื่อบทความที่ดึงดูด น่าสนใจ และส่งเสริม SEO',
+    },
+    slug: {
+      type: SchemaType.STRING,
+      description: 'SEO slug ภาษาอังกฤษรูปแบบ kebab-case',
+    },
+    content: {
+      type: SchemaType.STRING,
+      description: 'เนื้อหาบทความแบบฉบับเต็ม รูปแบบ Markdown',
+    },
+    tags: {
+      type: SchemaType.STRING,
+      description: 'แท็กบทความ คั่นด้วยเครื่องหมายจุลภาค (,)',
+    },
+  },
+  required: ['title', 'slug', 'content', 'tags'],
+}
+
+export const BLOG_SCHEMA_PARTS: Record<string, Schema> = {
+  [AiGenTask.TITLE]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      title: {
+        type: SchemaType.STRING,
+        description: 'ชื่อบทความที่ดึงดูด น่าสนใจ และส่งเสริม SEO',
+      },
+    },
+    required: ['title'],
+  },
+  [AiGenTask.SLUG]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      slug: {
+        type: SchemaType.STRING,
+        description: 'SEO slug ภาษาอังกฤษรูปแบบ kebab-case',
+      },
+    },
+    required: ['slug'],
+  },
+  [AiGenTask.TAGS]: {
+    type: SchemaType.OBJECT,
+    properties: {
+      tags: {
+        type: SchemaType.STRING,
+        description: 'แท็กบทความ 3-5 คำ คั่นด้วยเครื่องหมายจุลภาค (,)',
+      },
+    },
+    required: ['tags'],
+  },
+}

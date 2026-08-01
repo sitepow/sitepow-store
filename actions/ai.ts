@@ -1,6 +1,8 @@
 'use server'
 
 import {
+  BLOG_SCHEMA,
+  BLOG_SCHEMA_PARTS,
   CATEGORY_SCHEMA,
   GEMINI_MODEL,
   PRODUCT_SCHEMA,
@@ -10,11 +12,13 @@ import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan, TransactionType } from '@/generated/prisma/enums'
 import { AiGenTask, CreditUsageType } from '@/types/ai'
 import {
+  buildBlogPrompt,
   buildCategoryPrompt,
   buildProductPrompt,
   calculateAiCost,
   estimateCost,
 } from '@/utils/ai'
+import { BlogFormValues } from '@/zod/blog'
 import { CreateCategoryFormValues } from '@/zod/category'
 import { ProductFormValues } from '@/zod/product'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -208,6 +212,88 @@ export async function generateCategoryAi(
     }
   } catch (error) {
     console.error(error)
+    return { success: false }
+  }
+}
+
+export async function generateBlogAi(
+  currentData: Partial<BlogFormValues>,
+  task: AiGenTask,
+  storeId: string,
+) {
+  try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { balance: true, plan: true },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    const { title, content } = currentData
+
+    if (task !== AiGenTask.ALL && !title?.trim()) {
+      return {
+        success: false,
+        message: 'โปรดระบุชื่อบทความเบื้องต้น เพื่อให้ AI นำไปประมวลผลครับ',
+      }
+    }
+
+    const prompt = buildBlogPrompt(task, title, content)
+
+    const costEstimate = await handleUserPrompt(prompt, store.plan)
+    if (Number(store.balance) < costEstimate.credits) {
+      return { success: false, message: 'เครดิตของคุณไม่เพียงพอ' }
+    }
+
+    const responseSchema =
+      task === AiGenTask.ALL ? BLOG_SCHEMA : BLOG_SCHEMA_PARTS[task]
+
+    const model = genAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema,
+      },
+    })
+
+    const result = await model.generateContent(prompt)
+    const responseText = result.response.text()
+
+    const usage = result.response.usageMetadata
+    const inputTokens = usage?.promptTokenCount || 0
+    const outputTokens = usage?.candidatesTokenCount || 0
+
+    const actualCost = calculateAiCost(
+      GEMINI_MODEL,
+      inputTokens,
+      outputTokens,
+      PLAN_DETAILS[store.plan].aiUsageMultiplier,
+    )
+
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: storeId },
+        data: { balance: { decrement: actualCost } },
+      }),
+      prisma.transaction.create({
+        data: {
+          storeId,
+          amount: actualCost,
+          type: TransactionType.AI_USAGE,
+          description: `AI ช่วยเขียนบทความสำหรับงาน ${task} (Tokens: ${inputTokens}+${outputTokens})`,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      message: 'สร้างเนื้อหาบทความเรียบร้อยแล้ว',
+      data: JSON.parse(responseText) as Partial<BlogFormValues>,
+    }
+  } catch (error) {
+    console.error('Error generating blog AI:', error)
     return { success: false }
   }
 }

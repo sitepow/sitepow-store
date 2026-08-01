@@ -7,13 +7,14 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import { handleUserPrompt } from '@/actions/ai'
+import { useBlogAi } from '@/actions/hooks/ai'
 import { useBlog, useCreateBlog, useUpdateBlog } from '@/actions/hooks/blog'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
-import { buildProductPrompt } from '@/utils/ai'
+import { buildBlogPrompt } from '@/utils/ai'
 import { getPathR2FromUrl } from '@/utils/image'
 import { BlogFormValues, blogFormSchema } from '@/zod/blog'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -97,6 +98,26 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     formState: { isDirty, errors },
   } = form
 
+  const { mutate: genAi, isPending: isGenAi } = useBlogAi(
+    form,
+    selectedStoreId!,
+  )
+
+  const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
+    const storePlan = store?.plan || Plan.FREE
+    const currentTitle = getValues('title')
+    const currentContent = getValues('content')
+
+    const prompt = buildBlogPrompt(task, currentTitle, currentContent)
+    const costEstimate = await handleUserPrompt(prompt, storePlan)
+
+    setAiTaskConfirm({
+      task,
+      cost: costEstimate.credits,
+      action,
+    })
+  }
+
   const watchedValues = watch(['title', 'content', 'image'])
   useEffect(() => {
     if (onDataChange) {
@@ -126,21 +147,8 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     isUpdating ||
     isBlogLoading ||
     uploadMutation.isPending ||
-    deleteMutation.isPending
-
-  const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
-    const storePlan = store?.plan || Plan.FREE
-    const currentTitle = getValues('title')
-    const prompt = buildProductPrompt(task, currentTitle)
-
-    const costEstimate = await handleUserPrompt(prompt, storePlan)
-
-    setAiTaskConfirm({
-      task,
-      cost: costEstimate.credits,
-      action,
-    })
-  }
+    deleteMutation.isPending ||
+    isGenAi
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -218,30 +226,42 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" disabled={isPending}>
-                <IconWand className="mr-2 size-4" />
+                {isGenAi ? (
+                  <Spinner className="mr-2" />
+                ) : (
+                  <IconWand className="mr-2 size-4" />
+                )}
                 เครื่องมือ AI ช่วยเขียน
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>สร้างเนื้อหาด้วย AI</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.ALL, () => {})}
+                onClick={() =>
+                  handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
+                }
               >
                 ให้ AI คิดเนื้อหาบทความทั้งหมด
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.TITLE, () => {})}
+                onClick={() =>
+                  handleAiTrigger(AiGenTask.TITLE, () => genAi(AiGenTask.TITLE))
+                }
               >
                 สร้างชื่อบทความด้วย AI
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.SLUG, () => {})}
+                onClick={() =>
+                  handleAiTrigger(AiGenTask.SLUG, () => genAi(AiGenTask.SLUG))
+                }
               >
                 สร้าง Slug จากชื่อบทความ
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.TAGS, () => {})}
+                onClick={() =>
+                  handleAiTrigger(AiGenTask.TAGS, () => genAi(AiGenTask.TAGS))
+                }
               >
                 ให้ AI ช่วยคิด แท็ก (Tags)
               </DropdownMenuItem>
@@ -280,10 +300,14 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => handleAiTrigger(AiGenTask.TITLE, () => {})}
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.TITLE, () =>
+                        genAi(AiGenTask.TITLE),
+                      )
+                    }
                     disabled={isPending}
                   >
-                    <IconWand className="size-4" />
+                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
                   </Button>
                 </div>
                 {errors.title && (
@@ -303,10 +327,14 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => handleAiTrigger(AiGenTask.SLUG, () => {})}
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.SLUG, () =>
+                        genAi(AiGenTask.SLUG),
+                      )
+                    }
                     disabled={isPending}
                   >
-                    <IconWand className="size-4" />
+                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
                   </Button>
                 </div>
                 {errors.slug && (
@@ -376,10 +404,16 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleAiTrigger(AiGenTask.ALL, () => {})}
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
+                    }
                     disabled={isPending}
                   >
-                    <IconWand className="mr-2 size-4" />
+                    {isGenAi ? (
+                      <Spinner className="mr-2" />
+                    ) : (
+                      <IconWand className="mr-2 size-4" />
+                    )}
                     ให้ AI เขียนเนื้อหาให้
                   </Button>
                 </div>
@@ -410,10 +444,14 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => handleAiTrigger(AiGenTask.TAGS, () => {})}
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.TAGS, () =>
+                        genAi(AiGenTask.TAGS),
+                      )
+                    }
                     disabled={isPending}
                   >
-                    <IconWand className="size-4" />
+                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
                   </Button>
                 </div>
               </Field>
@@ -433,7 +471,9 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
             <AlertDialogTitle>ยืนยันการใช้ AI</AlertDialogTitle>
             <AlertDialogDescription>
               การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
-              <span className="text-primary">{aiTaskConfirm?.cost} เครดิต</span>{' '}
+              <span className="text-primary font-bold">
+                {aiTaskConfirm?.cost} เครดิต
+              </span>{' '}
               คุณต้องการดำเนินการต่อหรือไม่?
             </AlertDialogDescription>
           </AlertDialogHeader>

@@ -84,3 +84,28 @@ ${description ? `- คำอธิบายเพิ่มเติม: "${descr
 2. สร้าง URL slug ภาษาอังกฤษแบบ kebab-case ที่สั้น กุมความหมาย และถูกต้องตามหลัก SEO
 3. สร้างคำอธิบายหมวดหมู่สินค้า (Description) สั้นๆ กระชับ 1-2 ประโยค ส่งเสริม SEO`
 }
+
+export const buildBlogPrompt = (
+  task: AiGenTask,
+  title?: string,
+  currentContent?: string,
+) => {
+  return `คุณคือผู้เชี่ยวชาญด้าน Copywriter, SEO Content Creator และการตลาดออนไลน์ "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
+    
+    ข้อมูลเบื้องต้น:
+    - หัวข้อ/คำค้นหาหลัก: "${title || 'บทความทั่วไป'}"
+    ${currentContent ? `- ร่างเนื้อหาเบื้องต้น: "${currentContent.slice(0, 300)}..."` : ''}
+
+    สิ่งที่ต้องการทำ (${task}):
+    ${task === AiGenTask.TITLE ? '- คิดชื่อบทความที่น่าสนใจ ดึงดูดให้คนคลิกอ่าน (Click-worthy) และตรงตามหลัก SEO' : ''}
+    ${task === AiGenTask.SLUG ? '- สร้าง URL slug ภาษาอังกฤษแบบ kebab-case ที่สั้น กระชับ กุมความหมาย' : ''}
+    ${task === AiGenTask.TAGS ? '- สร้างแท็ก (Tags) ที่เกี่ยวข้อง 3-5 คำ คั่นด้วยเครื่องหมายจุลภาค (,)' : ''}
+    ${
+      task === AiGenTask.ALL
+        ? `- เขียนบทความฉบับเต็มในรูปแบบ Markdown ที่มีการจัดโครงสร้างสวยงาม (ใช้ #, ##, Bullet points, Bolding)
+- คิดชื่อบทความ (title)
+- คิด URL slug (kebab-case)
+- คิดแท็กบทความ (tags คั่นด้วยคอมม่า)`
+        : ''
+    }`
+}

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconEdit } from '@tabler/icons-react'
+import { IconEdit, IconTag } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
@@ -73,6 +73,7 @@ export function BlogTable() {
                       ) : (
                         blog.tags.map((tag) => (
                           <Badge key={tag} variant="outline">
+                            <IconTag />
                             {tag}
                           </Badge>
                         ))
