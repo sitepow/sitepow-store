@@ -6,10 +6,12 @@ import {
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
 } from '@/constants/system'
+import OtpEmail from '@/emails/otp-email'
 import crypto from 'crypto'
 
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { resend } from '@/lib/resend'
 
 export async function verifyOtp({ otp }: { otp: string }) {
   try {
@@ -53,6 +55,19 @@ export async function verifyOtp({ otp }: { otp: string }) {
   }
 }
 
+async function sendOtpEmail(email: string, otp: string) {
+  const { error } = await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: [email],
+    subject: 'รหัสยืนยัน OTP สำหรับการเปิดใช้งานบัญชี',
+    react: OtpEmail({ otp, expiryMinutes: OTP_EXPIRY_MINUTES }),
+  })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
 export async function resendOtp() {
   try {
     const session = await auth()
@@ -90,7 +105,7 @@ export async function resendOtp() {
     })
 
     try {
-      // await sendOtpEmail(user.email, newOtp)
+      await sendOtpEmail(user.email!, newOtp)
     } catch {
       return {
         success: false,

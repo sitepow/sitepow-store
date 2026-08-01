@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
-import { resendOtp, verifyOtp } from '@/actions/otp'
+import { useResendOtp, useVerifyOtp } from '@/actions/hooks/email'
 import { useSession } from '@/hooks/use-session'
 import { maskEmail } from '@/utils/email'
-import { useMutation } from '@tanstack/react-query'
 import { AlertCircleIcon } from 'lucide-react'
 
 import { Alert, AlertAction, AlertDescription, AlertTitle } from './ui/alert'
@@ -28,10 +27,13 @@ import {
 import { Spinner } from './ui/spinner'
 
 export function EmailVerified() {
-  const { user, update } = useSession()
+  const { user } = useSession()
 
   const [otp, setOtp] = useState('')
   const [countdown, setCountdown] = useState(0)
+
+  const verifyMutation = useVerifyOtp()
+  const resendMutation = useResendOtp()
 
   useEffect(() => {
     if (countdown > 0) {
@@ -40,24 +42,15 @@ export function EmailVerified() {
     }
   }, [countdown])
 
-  const verify = useMutation({
-    mutationFn: verifyOtp,
-    onSuccess: async () => {
-      await update({
-        user: {
-          isEmailVerified: true,
-        },
-      })
-    },
-  })
-
-  const resend = useMutation({
-    mutationFn: resendOtp,
-  })
-
   const handleResend = async () => {
-    await resend.mutate()
-    setCountdown(60)
+    const res = await resendMutation.mutateAsync()
+    if (res.success) {
+      setCountdown(60)
+    }
+  }
+
+  const handleVerify = async () => {
+    await verifyMutation.mutateAsync({ otp })
   }
 
   return (
@@ -98,7 +91,7 @@ export function EmailVerified() {
                 maxLength={6}
                 value={otp}
                 onChange={(value) => setOtp(value)}
-                disabled={verify.isPending}
+                disabled={verifyMutation.isPending}
               >
                 <InputOTPGroup className="*:size-12 *:text-lg">
                   <InputOTPSlot index={0} />
@@ -122,9 +115,10 @@ export function EmailVerified() {
                   <button
                     type="button"
                     onClick={handleResend}
-                    className="text-primary font-semibold hover:underline"
+                    disabled={resendMutation.isPending}
+                    className="text-primary font-semibold hover:underline disabled:opacity-50"
                   >
-                    ส่งรหัสใหม่
+                    {resendMutation.isPending ? 'กำลังส่ง...' : 'ส่งรหัสใหม่'}
                   </button>
                 )}
               </div>
@@ -133,13 +127,11 @@ export function EmailVerified() {
               <Button
                 type="button"
                 className="w-full sm:w-auto"
-                disabled={otp.length !== 6 || verify.isPending}
-                onClick={async () => {
-                  await verify.mutate({ otp })
-                }}
+                disabled={otp.length !== 6 || verifyMutation.isPending}
+                onClick={handleVerify}
               >
-                {verify.isPending && <Spinner />}
-                {verify.isPending ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส'}
+                {verifyMutation.isPending && <Spinner />}
+                {verifyMutation.isPending ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส'}
               </Button>
             </DialogFooter>
           </DialogContent>
