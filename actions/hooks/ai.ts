@@ -14,10 +14,11 @@ import { useMutation } from '@tanstack/react-query'
 
 export function useProductAi(
   form: UseFormReturn<ProductFormValues>,
+  task: AiGenTask,
   storeId: string,
 ) {
   return useMutation({
-    mutationFn: async (task: AiGenTask) => {
+    mutationFn: async () => {
       const currentData = form.getValues()
       return await generateProductAi(currentData, task, storeId)
     },
