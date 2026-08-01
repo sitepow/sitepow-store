@@ -13,11 +13,8 @@ import { StoreCreateDialog } from './_components/StoreCreateDialog'
 import { StoreTable } from './_components/StoreTable'
 
 export default function MerchantStoreSettingsPage() {
-  const {
-    canViewStore,
-    canCreateStore,
-    isLoading: isPermissionLoading,
-  } = useEmployeePermission()
+  const { canViewStore, isLoading: isPermissionLoading } =
+    useEmployeePermission()
 
   return (
     <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -25,7 +22,7 @@ export default function MerchantStoreSettingsPage() {
         icon={IconBuildingStore}
         title="จัดการร้านค้า"
         description="จัดการข้อมูลหน้าร้าน สลับเข้าสู่ระบบหลังบ้าน หรือเปิดร้านค้าใหม่เพื่อเริ่มธุรกิจเพิ่ม"
-        endContent={canCreateStore && <StoreCreateDialog />}
+        endContent={<StoreCreateDialog />}
       />
       {isPermissionLoading ? (
         <div className="space-y-4">
