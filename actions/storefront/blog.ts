@@ -122,7 +122,7 @@ export async function getStorefrontBlogDetail(
   storeSlug: string,
   blogSlug: string,
 ): Promise<StorefrontBlogDetail | null> {
-  const cacheKey = queryKeyToRedisKey(blogKeys.detail(blogSlug))
+  const cacheKey = queryKeyToRedisKey(blogKeys.detail(storeSlug, blogSlug))
 
   return await withCache(cacheKey, async () => {
     return await prisma.blog.findFirst({

@@ -47,11 +47,11 @@ export function BlogCard({
         <div
           className={cn(
             'relative w-full overflow-hidden transition-all duration-300',
-            isFeatured ? 'h-52 lg:h-[82%]' : 'h-52',
+            isFeatured ? 'min-h-55 flex-1 lg:min-h-70' : 'h-52 shrink-0',
           )}
         >
           {blog.image ? (
-            <div className="relative size-full overflow-hidden">
+            <div className="absolute inset-0 size-full">
               {isVideo ? (
                 <video
                   src={blog.image}
@@ -74,21 +74,21 @@ export function BlogCard({
         </div>
         <div
           className={cn(
-            'flex flex-1 flex-col p-4',
-            isFeatured && 'lg:h-32 lg:shrink-0 lg:justify-center',
+            'flex shrink-0 flex-col p-4',
+            isFeatured ? 'lg:justify-center lg:p-6' : 'flex-1',
           )}
         >
           <h3
             className={cn(
               'group-hover:text-primary mb-2 line-clamp-2 text-lg leading-tight font-medium md:text-xl',
-              isFeatured && 'lg:mx-auto lg:w-sm lg:text-center',
+              isFeatured && 'lg:text-center lg:text-2xl',
             )}
           >
             {blog.title}
           </h3>
           <div
             className={cn(
-              'mt-auto flex justify-start',
+              'mt-auto flex justify-start pt-2',
               isFeatured && 'lg:justify-center',
             )}
           >
