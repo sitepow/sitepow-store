@@ -5,6 +5,8 @@ import {
   OTP_EXPIRY_MINUTES,
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
+  OTP_RESEND_COOLDOWN_SECONDS,
+  SECOND,
 } from '@/constants/system'
 import OtpEmail from '@/emails/OtpEmail'
 import crypto from 'crypto'
@@ -78,7 +80,7 @@ export async function resendOtp() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { email: true, isEmailVerified: true },
+      select: { email: true, isEmailVerified: true, otpExpires: true },
     })
 
     if (!user) {
@@ -89,6 +91,22 @@ export async function resendOtp() {
       return {
         success: false,
         message: 'บัญชีนี้ได้รับการยืนยันอีเมลเรียบร้อยแล้ว',
+      }
+    }
+
+    if (user.otpExpires) {
+      const cooldownInMs = OTP_RESEND_COOLDOWN_SECONDS * SECOND
+      const expiryDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+
+      const lastSentTime = user.otpExpires.getTime() - expiryDurationInMs
+      const timePassed = Date.now() - lastSentTime
+
+      if (timePassed < cooldownInMs) {
+        const remainingSeconds = Math.ceil((cooldownInMs - timePassed) / SECOND)
+        return {
+          success: false,
+          message: `กรุณารออีก ${remainingSeconds} วินาที ก่อนขอรหัส OTP ใหม่`,
+        }
       }
     }
 

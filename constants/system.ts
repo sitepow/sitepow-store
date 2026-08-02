@@ -15,6 +15,7 @@ export const AI_BOT_ID = 'cmqhnrqen0000u8ujmvh3d6as'
 export const REDIS_CACHE_TTL_SECONDS = 60 * 60
 export const PERMISSION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7
 export const LATEST_MESSAGES_CACHE_TTL_SECONDS = 300
+export const OTP_RESEND_COOLDOWN_SECONDS = 60
 export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'www',
   'api',

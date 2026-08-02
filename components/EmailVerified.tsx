@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { useResendOtp, useVerifyOtp } from '@/actions/hooks/email'
+import { OTP_RESEND_COOLDOWN_SECONDS, SECOND } from '@/constants/system'
 import { useSession } from '@/hooks/use-session'
 import { maskEmail } from '@/utils/email'
 import { AlertCircleIcon } from 'lucide-react'
@@ -37,7 +38,7 @@ export function EmailVerified() {
 
   useEffect(() => {
     if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      const timer = setTimeout(() => setCountdown(countdown - 1), SECOND)
       return () => clearTimeout(timer)
     }
   }, [countdown])
@@ -45,7 +46,7 @@ export function EmailVerified() {
   const handleResend = async () => {
     const res = await resendMutation.mutateAsync()
     if (res.success) {
-      setCountdown(60)
+      setCountdown(OTP_RESEND_COOLDOWN_SECONDS)
     }
   }
 
