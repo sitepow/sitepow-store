@@ -19,7 +19,7 @@ interface ResellerApprovedEmailProps {
   catalogUrl?: string
 }
 
-export function ResellerApprovedEmail({
+export default function ResellerApprovedEmail({
   supplierStoreName = 'My Awesome Supplier',
   resellerStoreName = 'ร้านค้าของคุณ',
   catalogUrl = '/',
@@ -69,5 +69,3 @@ export function ResellerApprovedEmail({
     </Html>
   )
 }
-
-export default ResellerApprovedEmail

@@ -26,7 +26,7 @@ interface DigitalProductDeliveredEmailProps {
   items?: DigitalItem[]
 }
 
-export function DigitalProductDeliveredEmail({
+export default function DigitalProductDeliveredEmail({
   orderNumber = 'SP2058-29583-92984',
   customerName = 'คุณลูกค้า',
   items = [
@@ -100,5 +100,3 @@ export function DigitalProductDeliveredEmail({
     </Html>
   )
 }
-
-export default DigitalProductDeliveredEmail

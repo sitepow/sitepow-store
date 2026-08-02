@@ -22,7 +22,7 @@ interface PaymentFailedEmailProps {
   gracePeriodDays?: number
 }
 
-export function PaymentFailedEmail({
+export default function PaymentFailedEmail({
   storeName = 'Sitepow Store',
   planName = 'Pro Plan',
   amount = '฿790.00',
@@ -86,5 +86,3 @@ export function PaymentFailedEmail({
     </Html>
   )
 }
-
-export default PaymentFailedEmail

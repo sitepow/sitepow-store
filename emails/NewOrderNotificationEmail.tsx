@@ -30,7 +30,7 @@ interface NewOrderNotificationEmailProps {
   dashboardUrl?: string
 }
 
-export function NewOrderNotificationEmail({
+export default function NewOrderNotificationEmail({
   orderNumber = 'SP2058-29583-92984',
   storeName = 'Sitepow Store',
   customerName = 'คุณลูกค้า',
@@ -113,5 +113,3 @@ export function NewOrderNotificationEmail({
     </Html>
   )
 }
-
-export default NewOrderNotificationEmail

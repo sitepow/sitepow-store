@@ -17,7 +17,10 @@ interface OtpEmailProps {
   expiryMinutes?: number
 }
 
-export function OtpEmail({ otp = '321045', expiryMinutes = 5 }: OtpEmailProps) {
+export default function OtpEmail({
+  otp = '321045',
+  expiryMinutes = 5,
+}: OtpEmailProps) {
   return (
     <Html>
       <Head />
@@ -54,5 +57,3 @@ export function OtpEmail({ otp = '321045', expiryMinutes = 5 }: OtpEmailProps) {
     </Html>
   )
 }
-
-export default OtpEmail

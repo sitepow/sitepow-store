@@ -19,7 +19,7 @@ interface ResellerInviteEmailProps {
   expiryDays?: number
 }
 
-export function ResellerInviteEmail({
+export default function ResellerInviteEmail({
   supplierStoreName = 'My Awesome Supplier',
   inviteLink = '/',
   expiryDays = 7,
@@ -74,5 +74,3 @@ export function ResellerInviteEmail({
     </Html>
   )
 }
-
-export default ResellerInviteEmail

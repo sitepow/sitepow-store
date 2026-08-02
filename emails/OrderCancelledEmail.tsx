@@ -20,7 +20,7 @@ interface OrderCancelledEmailProps {
   refundStatus?: string
 }
 
-export function OrderCancelledEmail({
+export default function OrderCancelledEmail({
   orderNumber = 'SP2058-29583-92984',
   customerName = 'คุณลูกค้า',
   reason = 'ยกเลิกตามคำขอของลูกค้า',
@@ -77,5 +77,3 @@ export function OrderCancelledEmail({
     </Html>
   )
 }
-
-export default OrderCancelledEmail

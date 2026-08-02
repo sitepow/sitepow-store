@@ -23,7 +23,7 @@ interface StoreInvoiceEmailProps {
   paymentUrl?: string
 }
 
-export function StoreInvoiceEmail({
+export default function StoreInvoiceEmail({
   invoiceNumber = 'INV-202608-001',
   storeName = 'Sitepow Store',
   billingPeriod = '1 ส.ค. 2026 - 31 ส.ค. 2026',
@@ -99,5 +99,3 @@ export function StoreInvoiceEmail({
     </Html>
   )
 }
-
-export default StoreInvoiceEmail

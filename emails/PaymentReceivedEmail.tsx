@@ -22,7 +22,7 @@ interface PaymentReceivedEmailProps {
   paidAt?: string
 }
 
-export function PaymentReceivedEmail({
+export default function PaymentReceivedEmail({
   receiptNumber = 'RCP-20260801-001',
   orderNumber = 'SP2058-29583-92984',
   customerName = 'คุณลูกค้า',
@@ -92,5 +92,3 @@ export function PaymentReceivedEmail({
     </Html>
   )
 }
-
-export default PaymentReceivedEmail

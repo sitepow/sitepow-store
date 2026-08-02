@@ -20,7 +20,7 @@ interface StoreOwnershipTransferEmailProps {
   expiryHours?: number
 }
 
-export function StoreOwnershipTransferEmail({
+export default function StoreOwnershipTransferEmail({
   storeName = 'Sitepow Store',
   fromOwnerName = 'สมชาย ใจดี',
   acceptLink = '/',
@@ -73,5 +73,3 @@ export function StoreOwnershipTransferEmail({
     </Html>
   )
 }
-
-export default StoreOwnershipTransferEmail

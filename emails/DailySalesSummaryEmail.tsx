@@ -29,7 +29,7 @@ interface DailySalesSummaryEmailProps {
   dashboardUrl?: string
 }
 
-export function DailySalesSummaryEmail({
+export default function DailySalesSummaryEmail({
   storeName = 'Sitepow Store',
   date = '1 ส.ค. 2026',
   totalRevenue = '฿12,450.00',
@@ -115,5 +115,3 @@ export function DailySalesSummaryEmail({
     </Html>
   )
 }
-
-export default DailySalesSummaryEmail

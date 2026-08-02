@@ -22,7 +22,7 @@ interface OrderShippedEmailProps {
   trackingUrl?: string
 }
 
-export function OrderShippedEmail({
+export default function OrderShippedEmail({
   orderNumber = 'SP2058-29583-92984',
   customerName = 'คุณลูกค้า',
   courierName = 'Flash Express',
@@ -87,5 +87,3 @@ export function OrderShippedEmail({
     </Html>
   )
 }
-
-export default OrderShippedEmail

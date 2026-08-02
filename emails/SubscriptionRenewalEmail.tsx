@@ -23,7 +23,7 @@ interface SubscriptionRenewalEmailProps {
   invoiceUrl?: string
 }
 
-export function SubscriptionRenewalEmail({
+export default function SubscriptionRenewalEmail({
   storeName = 'Sitepow Store',
   planName = 'Pro Plan',
   billingCycle = 'รายเดือน (Monthly)',
@@ -98,5 +98,3 @@ export function SubscriptionRenewalEmail({
     </Html>
   )
 }
-
-export default SubscriptionRenewalEmail

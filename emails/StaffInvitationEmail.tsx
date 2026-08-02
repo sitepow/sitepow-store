@@ -21,7 +21,7 @@ interface StaffInvitationEmailProps {
   expiryDays?: number
 }
 
-export function StaffInvitationEmail({
+export default function StaffInvitationEmail({
   storeName = 'Sitepow Store',
   inviterName = 'เจ้าของร้าน',
   roleName = 'ผู้จัดการร้าน (Manager)',
@@ -72,5 +72,3 @@ export function StaffInvitationEmail({
     </Html>
   )
 }
-
-export default StaffInvitationEmail

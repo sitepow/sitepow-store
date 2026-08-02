@@ -18,7 +18,7 @@ interface ResetPasswordEmailProps {
   expiryMinutes?: number
 }
 
-export function ResetPasswordEmail({
+export default function ResetPasswordEmail({
   resetLink = '/reset-password?token=example',
   expiryMinutes = 15,
 }: ResetPasswordEmailProps) {
@@ -64,5 +64,3 @@ export function ResetPasswordEmail({
     </Html>
   )
 }
-
-export default ResetPasswordEmail

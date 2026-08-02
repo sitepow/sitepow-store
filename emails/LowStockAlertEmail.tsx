@@ -28,7 +28,7 @@ interface LowStockAlertEmailProps {
   inventoryUrl?: string
 }
 
-export function LowStockAlertEmail({
+export default function LowStockAlertEmail({
   storeName = 'Sitepow Store',
   items = [
     {
@@ -109,5 +109,3 @@ export function LowStockAlertEmail({
     </Html>
   )
 }
-
-export default LowStockAlertEmail

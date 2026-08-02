@@ -17,7 +17,7 @@ interface TwoFactorEmailProps {
   expiryMinutes?: number
 }
 
-export function TwoFactorEmail({
+export default function TwoFactorEmail({
   code = '849201',
   expiryMinutes = 5,
 }: TwoFactorEmailProps) {
@@ -57,5 +57,3 @@ export function TwoFactorEmail({
     </Html>
   )
 }
-
-export default TwoFactorEmail

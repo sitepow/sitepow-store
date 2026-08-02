@@ -29,7 +29,7 @@ interface OrderConfirmationEmailProps {
   discountAmount?: string
 }
 
-export function OrderConfirmationEmail({
+export default function OrderConfirmationEmail({
   orderNumber = 'SP2058-29583-92984',
   customerName = 'คุณลูกค้า',
   items = [
@@ -122,5 +122,3 @@ export function OrderConfirmationEmail({
     </Html>
   )
 }
-
-export default OrderConfirmationEmail
