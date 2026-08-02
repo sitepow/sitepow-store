@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { ChangePasswordForm } from './_components/ChangePasswordForm'
@@ -18,7 +18,7 @@ import { PdpaManagementForm } from './_components/PdpaManagementForm'
 
 export default function StoreUserSettingsPage() {
   return (
-    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
+    <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
         title="ตั้งค่าบัญชี"
@@ -52,6 +52,6 @@ export default function StoreUserSettingsPage() {
           <PdpaManagementForm />
         </TabsContent>
       </Tabs>
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

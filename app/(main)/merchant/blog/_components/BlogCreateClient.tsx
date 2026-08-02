@@ -11,7 +11,7 @@ import { ArrowLeftIcon } from 'lucide-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 
 import { CreateBlogForm } from './CreateBlogForm'
@@ -31,7 +31,7 @@ export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
   const isEditMode = Boolean(blogId)
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={isEditMode ? IconEdit : IconPlus}
         title={isEditMode ? 'แก้ไขบทความ' : 'เพิ่มบทความใหม่'}
@@ -49,6 +49,6 @@ export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
       />
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
       {selectedStoreId !== ALL_STORES && <CreateBlogForm blogId={blogId} />}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

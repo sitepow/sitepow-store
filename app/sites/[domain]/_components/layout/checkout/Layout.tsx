@@ -1,6 +1,12 @@
+'use client'
+
 import { ComponentProps } from 'react'
 
+import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
+
+import { EmailVerified } from '@/components/EmailVerified'
+import { SectionContainer } from '@/components/SectionContainer'
 
 import { cn } from '@/lib/utils'
 
@@ -12,6 +18,9 @@ export function StoreLayoutCheckout({
   ...props
 }: ComponentProps<'main'>) {
   const { store } = useStoreData()
+  const { isAuthenticated, user } = useSession()
+
+  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   return (
     <div
@@ -20,6 +29,11 @@ export function StoreLayoutCheckout({
     >
       <StoreNavbarCheckout />
       <main className={cn(className, 'mt-24 sm:mt-20 lg:mt-24')} {...props}>
+        {isEmailUnverified && (
+          <SectionContainer className="py-0 sm:py-0">
+            <EmailVerified />
+          </SectionContainer>
+        )}
         {children}
       </main>
     </div>

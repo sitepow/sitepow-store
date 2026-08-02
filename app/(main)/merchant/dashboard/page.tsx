@@ -24,7 +24,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -117,7 +117,7 @@ export default function MerchantDashboardPage() {
     : []
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div className="flex flex-wrap items-center gap-2">
           <StoreSelectField />
@@ -360,6 +360,6 @@ export default function MerchantDashboardPage() {
             </div>
           </>
         )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

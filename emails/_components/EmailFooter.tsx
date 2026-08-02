@@ -1,6 +1,6 @@
 import { Hr, Link, Text } from '@react-email/components'
 
-export function Footer() {
+export function EmailFooter() {
   return (
     <>
       <Hr className="my-6" />

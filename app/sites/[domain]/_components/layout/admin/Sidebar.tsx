@@ -65,7 +65,6 @@ export function StoreAdminAppSidebar() {
       <SidebarHeader className="mx-auto py-5">
         <LogoBrand />
       </SidebarHeader>
-
       <SidebarContent>
         {SIDEBAR_ITEMS.map((group) => (
           <SidebarGroup key={group.category}>
@@ -91,7 +90,6 @@ export function StoreAdminAppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-
       <SidebarFooter />
     </Sidebar>
   )

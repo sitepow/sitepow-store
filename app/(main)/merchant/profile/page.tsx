@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconUser } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { ProfileAvartar } from './_components/ProfileAvartar'
 import { ProfileForm } from './_components/ProfileForm'
@@ -25,7 +25,7 @@ export default function MerchantProfilePage() {
   })
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
         title="โปรไฟล์ส่วนตัว"
@@ -37,6 +37,6 @@ export default function MerchantProfilePage() {
           <ProfileForm className="col-span-1 xl:col-span-8" />
         </div>
       </FormProvider>
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

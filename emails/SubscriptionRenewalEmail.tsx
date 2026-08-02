@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface SubscriptionRenewalEmailProps {
   storeName?: string
@@ -90,7 +90,7 @@ export default function SubscriptionRenewalEmail({
                 หากต้องการเปลี่ยนแปลงแพ็กเกจหรือสอบถามเกี่ยวกับใบเสร็จ
                 สามารถจัดการได้ผ่านหน้าการตั้งค่าร้านค้าได้ตลอดเวลา
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

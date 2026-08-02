@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface ResellerInviteEmailProps {
   supplierStoreName?: string
@@ -66,7 +66,7 @@ export default function ResellerInviteEmail({
                 หากคุณไม่ได้คาดว่าจะได้รับคำขอนี้
                 สามารถข้ามหรือลบอีเมลนี้ได้ทันที
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

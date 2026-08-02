@@ -4,14 +4,14 @@ import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconMapPin } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { CustomerAddressCreateDialog } from '../../cart/_components/CustomerAddressCreateDialog'
 import { AddressTable } from './_components/AddressTable'
 
 export default function StoreUserAddressesPage() {
   return (
-    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
+    <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconMapPin}
         title="ที่อยู่จัดส่ง"
@@ -19,6 +19,6 @@ export default function StoreUserAddressesPage() {
         endContent={<CustomerAddressCreateDialog />}
       />
       <AddressTable />
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

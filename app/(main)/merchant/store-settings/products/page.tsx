@@ -10,7 +10,7 @@ import { IconBox, IconLock, IconPlus } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 
 import { ProductsTable } from './_components/ProductsTable'
@@ -24,7 +24,7 @@ export default function MerchantStoreSettingsProductsPage() {
   } = useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBox}
         title="สินค้าทั้งหมด"
@@ -54,6 +54,6 @@ export default function MerchantStoreSettingsProductsPage() {
       ) : (
         <ProductsTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

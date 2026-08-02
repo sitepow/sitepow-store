@@ -8,7 +8,7 @@ import { IconCoin, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { CustomerPointsTable } from './_components/CustomerPointsTable'
 import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
@@ -22,7 +22,7 @@ export default function MerchantLoyaltyPage() {
   } = useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCoin}
         title="ระบบแต้มสะสม"
@@ -49,6 +49,6 @@ export default function MerchantLoyaltyPage() {
           />
         </div>
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

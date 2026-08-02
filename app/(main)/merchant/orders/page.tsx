@@ -9,7 +9,7 @@ import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { OrderTable } from './_components/OrderTable'
 
@@ -19,7 +19,7 @@ export default function OrderPage() {
     useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconShoppingCart}
         title="จัดการออเดอร์"
@@ -42,6 +42,6 @@ export default function OrderPage() {
       ) : (
         <OrderTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

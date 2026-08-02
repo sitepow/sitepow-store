@@ -4,14 +4,14 @@ import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconUser } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { BuyerProfileAvatar } from './_components/BuyerProfileAvatar'
 import { BuyerProfileForm } from './_components/BuyerProfileForm'
 
 export default function StoreUserProfilePage() {
   return (
-    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
+    <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
         title="โปรไฟล์ส่วนตัว"
@@ -21,6 +21,6 @@ export default function StoreUserProfilePage() {
         <BuyerProfileAvatar className="col-span-1 xl:col-span-4" />
         <BuyerProfileForm className="col-span-1 xl:col-span-8" />
       </div>
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

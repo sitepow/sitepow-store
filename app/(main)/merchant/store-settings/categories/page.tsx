@@ -10,7 +10,7 @@ import { IconCategory, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { CategoriesTable } from './_components/CategoriesTable'
 import { CategoryDialog } from './_components/CategoryDialog'
@@ -39,7 +39,7 @@ export default function MerchantStoreSettingsCategoriesPage() {
   }
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCategory}
         title="หมวดหมู่สินค้า"
@@ -69,6 +69,6 @@ export default function MerchantStoreSettingsCategoriesPage() {
       ) : (
         <CategoriesTable onEdit={handleEdit} />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

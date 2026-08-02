@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface ResetPasswordEmailProps {
   resetLink?: string
@@ -56,7 +56,7 @@ export default function ResetPasswordEmail({
                 สามารถข้ามหรือลบอีเมลนี้ได้อย่างปลอดภัย
                 รหัสผ่านของคุณจะยังคงเดิม
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

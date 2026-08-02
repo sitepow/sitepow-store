@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface OrderItem {
   title: string
@@ -105,7 +105,7 @@ export default function NewOrderNotificationEmail({
               <Text className="m-0 leading-5">
                 อีเมลนี้แจ้งเตือนไปยังเจ้าของร้านและพนักงานที่ได้รับสิทธิ์ดูแลคำสั่งซื้อ
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

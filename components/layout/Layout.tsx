@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { ChatWidget } from '../chat/ChatWidget'
 import { SupportWidget } from '../chat/SupportWidget'
 import { Footer } from './Footer'
-import { Navbar } from './Navbar'
+import { Navbar } from './navbar/Navbar'
 
 export function MainLayout({
   children,

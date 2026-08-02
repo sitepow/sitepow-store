@@ -66,6 +66,9 @@ export default function StoreCartPage() {
   const params = useParams()
   const storeSlug = params.domain as string
   const { isAuthenticated, user } = useSession()
+
+  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
+
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
@@ -769,7 +772,8 @@ export default function StoreCartPage() {
                     activeSection !== 'review' ||
                     createOrderMutation.isPending ||
                     storeCheckoutMutation.isPending ||
-                    items?.length === 0
+                    items?.length === 0 ||
+                    isEmailUnverified
                   }
                   onClick={handleCreateOrder}
                 >

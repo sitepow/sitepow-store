@@ -8,7 +8,7 @@ import { IconCreditCard, IconFileInvoice, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { MerchantInvoiceTable } from './_components/MerchantInvoiceTable'
 import { MerchantSubscriptionTable } from './_components/MerchantSubscriptionTable'
@@ -19,7 +19,7 @@ export default function MerchantBillingSubscriptionPage() {
     useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCreditCard}
         title="การสมัครสมาชิก"
@@ -54,6 +54,6 @@ export default function MerchantBillingSubscriptionPage() {
       ) : (
         <MerchantInvoiceTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

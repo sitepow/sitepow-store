@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface DigitalItem {
   title: string
@@ -92,7 +92,7 @@ export default function DigitalProductDeliveredEmail({
                 โปรดเก็บรักษาข้อมูลและรหัสเข้าใช้งานนี้ไว้เป็นความลับ
                 หากมีข้อสงสัยในการใช้งานสามารถติดต่อศูนย์ช่วยเหลือได้ตลอดเวลา
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

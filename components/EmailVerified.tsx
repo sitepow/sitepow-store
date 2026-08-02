@@ -5,10 +5,11 @@ import { useEffect, useState } from 'react'
 import { useResendOtp, useVerifyOtp } from '@/actions/hooks/email'
 import { OTP_RESEND_COOLDOWN_SECONDS, SECOND } from '@/constants/system'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { maskEmail } from '@/utils/email'
 import { AlertCircleIcon } from 'lucide-react'
 
-import { Alert, AlertAction, AlertDescription, AlertTitle } from './ui/alert'
+import { Alert, AlertTitle } from './ui/alert'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -28,6 +29,7 @@ import {
 import { Spinner } from './ui/spinner'
 
 export function EmailVerified() {
+  const { store } = useStoreData()
   const { user } = useSession()
 
   const [otp, setOtp] = useState('')
@@ -55,89 +57,95 @@ export function EmailVerified() {
   }
 
   return (
-    <Alert className="border-l-primary w-full rounded-none border-l-4 shadow-none">
-      <AlertCircleIcon className="text-primary h-5 w-5" />
+    <Alert
+      className="border-l-primary w-full rounded-none border-l-4 shadow-none"
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+    >
+      <AlertCircleIcon className="text-primary size-5" />
       <AlertTitle className="text-primary font-semibold">
         มีสิ่งที่ต้องดำเนินการตอนนี้
       </AlertTitle>
-      <AlertDescription className="text-muted-foreground mt-1">
-        โปรดกรอกรหัสยืนยันที่ส่งไปยังอีเมลของคุณเพื่อเปิดใช้งานบัญชี
-        <span className="mt-0.5 block text-xs opacity-50">
-          (หากไม่พบในกล่องขาเข้า โปรดตรวจสอบใน อีเมลขยะ หรือ ถังขยะ)
-        </span>
-      </AlertDescription>
-      <AlertAction className="mt-3 sm:mt-0">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="default" className="bg-primary text-white">
-              ยืนยันอีเมล
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader className="space-y-2">
-              <DialogTitle className="text-center text-xl font-bold tracking-tight sm:text-left">
-                ยืนยันรหัส OTP
-              </DialogTitle>
-              <DialogDescription className="text-center sm:text-left">
-                ระบบได้ส่งรหัสผ่านแบบใช้ครั้งเดียว (OTP) จำนวน 6 หลัก <br />
-                ไปยังอีเมล{' '}
-                <span className="text-foreground font-semibold">
-                  {maskEmail(user?.email)}
-                </span>{' '}
-                แล้ว
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col items-center justify-center space-y-4 py-2">
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={(value) => setOtp(value)}
-                disabled={verifyMutation.isPending}
-              >
-                <InputOTPGroup className="*:size-12 *:text-lg">
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                </InputOTPGroup>
-                <InputOTPSeparator />
-                <InputOTPGroup className="*:size-12 *:text-lg">
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-              <div className="text-muted-foreground text-sm">
-                ไม่ได้รับรหัสใช่หรือไม่?{' '}
-                {countdown > 0 ? (
-                  <span className="text-primary font-medium">
-                    ส่งรหัสอีกครั้งใน ({countdown} วินาที)
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    disabled={resendMutation.isPending}
-                    className="text-primary font-semibold hover:underline disabled:opacity-50"
-                  >
-                    {resendMutation.isPending ? 'กำลังส่ง...' : 'ส่งรหัสใหม่'}
-                  </button>
-                )}
-              </div>
-            </div>
-            <DialogFooter className="gap-2 sm:justify-end">
-              <Button
-                type="button"
-                className="w-full sm:w-auto"
-                disabled={otp.length !== 6 || verifyMutation.isPending}
-                onClick={handleVerify}
-              >
-                {verifyMutation.isPending && <Spinner />}
-                {verifyMutation.isPending ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส'}
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-5">
+        <div className="text-muted-foreground flex-1 shrink-0 text-sm">
+          โปรดกรอกรหัสยืนยันที่ส่งไปยังอีเมลของคุณเพื่อเปิดใช้งานบัญชี
+          <span className="mt-0.5 block text-xs opacity-50">
+            (หากไม่พบในกล่องขาเข้า โปรดตรวจสอบใน อีเมลขยะ หรือ ถังขยะ)
+          </span>
+        </div>
+        <div className="w-full shrink-0 sm:w-auto">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="default" className="bg-primary text-white">
+                ยืนยันอีเมล
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </AlertAction>
+            </DialogTrigger>
+            <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
+              <DialogHeader className="space-y-2">
+                <DialogTitle className="text-center text-xl font-bold tracking-tight sm:text-left">
+                  ยืนยันรหัส OTP
+                </DialogTitle>
+                <DialogDescription className="text-center sm:text-left">
+                  ระบบได้ส่งรหัสผ่านแบบใช้ครั้งเดียว (OTP) จำนวน 6 หลัก{' '}
+                  <br className="hidden sm:inline" />
+                  ไปยังอีเมล{' '}
+                  <span className="text-foreground font-semibold break-all">
+                    {maskEmail(user?.email)}
+                  </span>{' '}
+                  แล้ว
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-center justify-center space-y-4 py-2">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={(value) => setOtp(value)}
+                  disabled={verifyMutation.isPending}
+                >
+                  <InputOTPGroup className="xs:*:size-10 *:size-9 *:text-base sm:*:size-12 sm:*:text-lg">
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator className="mx-0.5 sm:mx-1" />
+                  <InputOTPGroup className="xs:*:size-10 *:size-9 *:text-base sm:*:size-12 sm:*:text-lg">
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+                <div className="text-muted-foreground text-center text-xs sm:text-sm">
+                  ไม่ได้รับรหัสใช่หรือไม่?{' '}
+                  {countdown > 0 ? (
+                    <span className="text-primary block font-medium sm:inline">
+                      ส่งรหัสอีกครั้งใน ({countdown} วินาที)
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={resendMutation.isPending}
+                      className="text-primary font-semibold hover:underline disabled:opacity-50"
+                    >
+                      {resendMutation.isPending ? 'กำลังส่ง...' : 'ส่งรหัสใหม่'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:justify-end">
+                <Button
+                  type="button"
+                  className="w-full sm:w-auto"
+                  disabled={otp.length !== 6 || verifyMutation.isPending}
+                  onClick={handleVerify}
+                >
+                  {verifyMutation.isPending && <Spinner />}
+                  {verifyMutation.isPending ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
     </Alert>
   )
 }

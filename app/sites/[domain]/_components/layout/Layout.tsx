@@ -12,7 +12,7 @@ import { SupportWidget } from '@/components/chat/SupportWidget'
 import { cn } from '@/lib/utils'
 
 import { StoreFooter } from './Footer'
-import { StoreNavbar } from './Navbar'
+import { StoreNavbar } from './navbar/StoreNavbar'
 
 export function StoreLayout({
   children,

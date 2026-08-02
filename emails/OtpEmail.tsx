@@ -10,7 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface OtpEmailProps {
   otp?: string
@@ -49,7 +49,7 @@ export default function OtpEmail({
                 หากคุณไม่ได้เป็นผู้ลงทะเบียนหรือขอรหัสนี้
                 สามารถข้ามหรือลบอีเมลนี้ได้ทันที
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

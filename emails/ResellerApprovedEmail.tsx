@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface ResellerApprovedEmailProps {
   supplierStoreName?: string
@@ -61,7 +61,7 @@ export default function ResellerApprovedEmail({
                 ตอนนี้คุณสามารถเลือกนำรายการสินค้าของซัพพลายเออร์ไปขายในร้านค้าของคุณ
                 และจัดการคำสั่งซื้อผ่านระบบตัวแทนได้ทันที
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

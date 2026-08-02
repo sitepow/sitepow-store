@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface StoreOwnershipTransferEmailProps {
   storeName?: string
@@ -65,7 +65,7 @@ export default function StoreOwnershipTransferEmail({
                 หากคุณไม่ได้คาดว่าจะได้รับคำขอนี้
                 สามารถข้ามหรือลบอีเมลนี้ได้อย่างปลอดภัย
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

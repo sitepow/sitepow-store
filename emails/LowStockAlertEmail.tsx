@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface LowStockItem {
   productTitle: string
@@ -101,7 +101,7 @@ export default function LowStockAlertEmail({
               <Text className="m-0 leading-5">
                 อีเมลนี้แจ้งเตือนอัตโนมัติเนื่องจากคุณเปิดใช้งานระบบแจ้งเตือนสินค้าใกล้หมดสต๊อก
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

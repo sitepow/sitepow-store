@@ -10,7 +10,7 @@ import { IconHierarchy2, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { BranchDialog } from './_components/BranchDialog'
 import { BranchesTable } from './_components/BranchesTable'
@@ -37,7 +37,7 @@ export default function MerchantStoreSettingsBranchesPage() {
   }
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHierarchy2}
         title="จัดการสาขา"
@@ -67,6 +67,6 @@ export default function MerchantStoreSettingsBranchesPage() {
       ) : (
         <BranchesTable onEdit={handleEdit} />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

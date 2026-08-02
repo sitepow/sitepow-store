@@ -2,6 +2,7 @@ import { ComponentProps } from 'react'
 
 import Link from 'next/link'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconPackageImport } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
@@ -9,6 +10,8 @@ import { cn } from '@/lib/utils'
 type LogoBrandProps = Omit<ComponentProps<typeof Link>, 'href'>
 
 export function LogoBrand({ className, ...props }: LogoBrandProps) {
+  const { store } = useStoreData()
+
   return (
     <Link
       href="/"
@@ -16,6 +19,7 @@ export function LogoBrand({ className, ...props }: LogoBrandProps) {
         'text-foreground flex items-center gap-2.5 text-2xl font-bold tracking-tight',
         className,
       )}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       {...props}
     >
       <IconPackageImport size={35} stroke={1.5} className="text-primary" />

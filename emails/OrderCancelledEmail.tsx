@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface OrderCancelledEmailProps {
   orderNumber?: string
@@ -69,7 +69,7 @@ export default function OrderCancelledEmail({
                 หรือมีข้อสงสัยเกี่ยวกับยอดเงินคืน
                 โปรดติดต่อศูนย์ช่วยเหลือได้ทันที
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

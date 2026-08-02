@@ -6,7 +6,7 @@ import { IconBuildingStore, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { StoreCreateDialog } from './_components/StoreCreateDialog'
@@ -17,7 +17,7 @@ export default function MerchantStoreSettingsPage() {
     useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBuildingStore}
         title="จัดการร้านค้า"
@@ -38,6 +38,6 @@ export default function MerchantStoreSettingsPage() {
       ) : (
         <StoreTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

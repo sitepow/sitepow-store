@@ -8,7 +8,7 @@ import { IconBox, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { InventoryTable } from './_components/InventoryTable'
 
@@ -18,7 +18,7 @@ export default function MerchantInventoryPage() {
     useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBox}
         title="คลังสินค้า"
@@ -36,6 +36,6 @@ export default function MerchantInventoryPage() {
       ) : (
         <InventoryTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

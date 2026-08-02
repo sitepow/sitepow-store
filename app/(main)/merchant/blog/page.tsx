@@ -10,7 +10,7 @@ import { IconLock, IconNews, IconPlus } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 
 import { BlogTable } from './_components/BlogTable'
@@ -24,7 +24,7 @@ export default function MerchantBlogsPage() {
   } = useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconNews}
         title="บทความทั้งหมด"
@@ -54,6 +54,6 @@ export default function MerchantBlogsPage() {
       ) : (
         <BlogTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

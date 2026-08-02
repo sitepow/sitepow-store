@@ -8,7 +8,7 @@ import { IconLock, IconWallet } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { CreditHistoryTable } from './_components/CreditHistoryTable'
 import { StoreCreditCard } from './_components/StoreCreditCard'
@@ -19,7 +19,7 @@ export default function CreditPage() {
     useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconWallet}
         title="จัดการเครดิต"
@@ -42,6 +42,6 @@ export default function CreditPage() {
           </div>
         </div>
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

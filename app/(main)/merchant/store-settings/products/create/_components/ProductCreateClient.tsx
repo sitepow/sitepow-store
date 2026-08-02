@@ -14,7 +14,7 @@ import { ArrowLeftIcon } from 'lucide-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 
 import { CategoryDialog } from '../../../categories/_components/CategoryDialog'
@@ -36,7 +36,7 @@ export function ProductCreateClient({ productId }: ProductCreateClientProps) {
   }
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconPlus}
         title="เพิ่มสินค้าใหม่"
@@ -62,6 +62,6 @@ export function ProductCreateClient({ productId }: ProductCreateClientProps) {
       {selectedStoreId !== ALL_STORES && (
         <CreateProductForm productId={productId} />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

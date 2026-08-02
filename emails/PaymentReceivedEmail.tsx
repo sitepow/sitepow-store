@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface PaymentReceivedEmailProps {
   receiptNumber?: string
@@ -84,7 +84,7 @@ export default function PaymentReceivedEmail({
                 อีเมลนี้ถือเป็นใบเสร็จรับเงินอิเล็กทรอนิกส์
                 ขอบคุณที่ไว้วางใจใช้บริการของเรา
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

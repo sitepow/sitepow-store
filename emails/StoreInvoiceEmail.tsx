@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface StoreInvoiceEmailProps {
   invoiceNumber?: string
@@ -91,7 +91,7 @@ export default function StoreInvoiceEmail({
                 หากมีข้อสงสัยเกี่ยวกับใบแจ้งหนี้ฉบับนี้
                 สามารถติดต่อฝ่ายบัญชีหรือศูนย์ช่วยเหลือได้ตลอดเวลา
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

@@ -10,7 +10,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface TwoFactorEmailProps {
   code?: string
@@ -49,7 +49,7 @@ export default function TwoFactorEmail({
                 หากคุณไม่ได้เป็นผู้พยายามเข้าสู่ระบบ
                 โปรดตรวจสอบความปลอดภัยของบัญชีและเปลี่ยนรหัสผ่านของคุณทันที
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

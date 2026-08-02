@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface PaymentFailedEmailProps {
   storeName?: string
@@ -78,7 +78,7 @@ export default function PaymentFailedEmail({
                 วัน
                 เพื่อหลีกเลี่ยงการถูกระงับการใช้งานฟีเจอร์ของแพ็กเกจเป็นการชั่วคราว
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

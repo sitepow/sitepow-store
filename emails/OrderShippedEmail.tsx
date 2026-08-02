@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface OrderShippedEmailProps {
   orderNumber?: string
@@ -79,7 +79,7 @@ export default function OrderShippedEmail({
                 ระยะเวลาในการจัดส่งอาจใช้เวลา 1-3 วันทำการ
                 หากมีข้อสงสัยเพิ่มเติมสามารถติดต่อศูนย์ช่วยเหลือได้ตลอดเวลา
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

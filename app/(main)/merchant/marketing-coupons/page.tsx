@@ -8,7 +8,7 @@ import { IconLock, IconTicket } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 import { CouponListTable } from './_components/CouponListTable'
 import { CouponCreateDialog } from './_components/CreateCouponDialog'
@@ -22,7 +22,7 @@ export default function MerchantMarketingCouponsPage() {
   } = useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconTicket}
         title="คูปองส่วนลด"
@@ -47,6 +47,6 @@ export default function MerchantMarketingCouponsPage() {
       ) : (
         <CouponListTable />
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

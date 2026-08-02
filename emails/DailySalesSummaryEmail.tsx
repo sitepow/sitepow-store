@@ -12,7 +12,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface TopSellingItem {
   title: string
@@ -107,7 +107,7 @@ export default function DailySalesSummaryEmail({
               <Text className="m-0 leading-5">
                 อีเมลนี้แจ้งเตือนอัตโนมัติประจำวันเนื่องจากคุณเปิดใช้งานระบบรายงานสรุปยอดขาย
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

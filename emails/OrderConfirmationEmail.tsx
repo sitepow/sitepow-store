@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { Footer } from './_components/Footer'
+import { EmailFooter } from './_components/EmailFooter'
 
 interface OrderItem {
   title: string
@@ -114,7 +114,7 @@ export default function OrderConfirmationEmail({
               <Text className="m-0 leading-5">
                 เราจะแจ้งให้คุณทราบอีกครั้งเมื่อสินค้าของคุณจัดส่งเรียบร้อยแล้ว
               </Text>
-              <Footer />
+              <EmailFooter />
             </Section>
           </Container>
         </Body>

@@ -19,7 +19,6 @@ export function StoreNavbarCheckout() {
         <div className="flex items-center justify-between">
           {store?.logo && <StoreLogo image={store?.logo} />}
           {!store?.logo && <LogoBrand />}
-
           {!isAuthenticated && (
             <Link href={'/login'}>
               <Button variant="outline" size="icon-lg">

@@ -17,7 +17,7 @@ import {
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
@@ -42,7 +42,7 @@ export default function MerchantSettingsPage() {
   } = useEmployeePermission()
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
         title="การตั้งค่าระบบ"
@@ -159,6 +159,6 @@ export default function MerchantSettingsPage() {
           </TabsContent>
         </Tabs>
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

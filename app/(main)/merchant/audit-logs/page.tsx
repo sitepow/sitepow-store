@@ -17,7 +17,7 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -66,7 +66,7 @@ export default function MerchantAuditLogsPage() {
   }
 
   return (
-    <DashboardSidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
+    <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHistory}
         title="ประวัติกิจกรรม"
@@ -174,6 +174,6 @@ export default function MerchantAuditLogsPage() {
           />
         </>
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

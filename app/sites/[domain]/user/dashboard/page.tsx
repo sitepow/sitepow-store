@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
-import { DashboardSidebar } from '@/components/layout/DashboardSidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 import {
   Card,
   CardContent,
@@ -96,7 +96,7 @@ export default function StoreUserDashboardPage() {
     : []
 
   return (
-    <DashboardSidebar redirectPath="user" items={BUYER_NAVIGATION}>
+    <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       {isLoading ? (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -272,6 +272,6 @@ export default function StoreUserDashboardPage() {
           </div>
         </>
       )}
-    </DashboardSidebar>
+    </Sidebar>
   )
 }

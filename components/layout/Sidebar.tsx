@@ -9,6 +9,7 @@ import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarD
 import { NavigationItem } from '@/constants/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
@@ -19,7 +20,7 @@ import {
 } from '@/components/ui/collapsible'
 import { Separator } from '@/components/ui/separator'
 import {
-  Sidebar,
+  Sidebar as RootSidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
@@ -34,35 +35,37 @@ import {
 } from '@/components/ui/sidebar'
 
 import { CreditBadge } from '../CreditBadge'
-import { LanguageSwitcher } from '../LanguageSwitcher'
+import { EmailVerified } from '../EmailVerified'
+// import { LanguageSwitcher } from '../LanguageSwitcher'
 import { ModeToggle } from '../ModeToggle'
+import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
 import { SupportWidget } from '../chat/SupportWidget'
 import { Button } from '../ui/button'
 
-interface DashboardSidebarProps extends PropsWithChildren {
+interface SidebarProps extends PropsWithChildren {
   items: NavigationItem[]
   redirectPath: 'merchant' | 'user'
 }
 
-export function DashboardSidebar({
-  items,
-  redirectPath,
-  children,
-}: DashboardSidebarProps) {
+export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const router = useRouter()
-  const { user } = useSession()
+  const { isAuthenticated, user } = useSession()
   const userRole = user?.role
+
+  const { store } = useStoreData()
 
   const pathname = usePathname()
   const isMerchant =
     userRole === UserRole.MERCHANT && redirectPath === 'merchant'
+  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
-          <LogoBrand />
+          {store?.logo && <StoreLogo image={store?.logo} />}
+          {!store?.logo && <LogoBrand />}
         </SidebarHeader>
         <SidebarContent className="px-2">
           <SidebarMenu>
@@ -128,12 +131,13 @@ export function DashboardSidebar({
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter />
-      </Sidebar>
+      </RootSidebar>
       <main className="bg-background text-foreground w-full min-w-0 space-y-5 p-5">
+        {isEmailUnverified && <EmailVerified />}
         <div className="flex flex-wrap gap-2.5 border-b py-5">
           <SidebarTrigger />
           <ModeToggle />
-          <LanguageSwitcher />
+          {/* <LanguageSwitcher /> */}
           <Button
             variant="outline"
             onClick={() => router.push('/')}
