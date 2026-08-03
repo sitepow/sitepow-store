@@ -11,7 +11,6 @@ import { CartItem } from '@/types/sites/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconCash, IconQrcode } from '@tabler/icons-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -134,9 +133,6 @@ export function PosCheckoutModal({
             >
               <IconCash className="size-7" />
               <span className="text-sm">เงินสด (Cash)</span>
-              {isCash && (
-                <Badge className="bg-primary absolute top-2 right-2 size-2 rounded-full p-0" />
-              )}
             </button>
             <button
               type="button"
@@ -152,9 +148,6 @@ export function PosCheckoutModal({
             >
               <IconQrcode className="size-7" />
               <span className="text-sm">พร้อมเพย์ / QR</span>
-              {!isCash && (
-                <Badge className="bg-primary absolute top-2 right-2 size-2 rounded-full p-0" />
-              )}
             </button>
           </div>
           {isCash && (
