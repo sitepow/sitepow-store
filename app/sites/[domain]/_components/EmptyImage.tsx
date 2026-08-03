@@ -6,7 +6,7 @@ export function EmptyImage({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'bg-foreground/10 text-muted-foreground mb-2.5 flex size-full items-center justify-center rounded-t-xl',
+        'bg-foreground/10 text-muted-foreground mb-2.5 flex size-full items-center justify-center rounded-t-xl text-center',
         className,
       )}
       {...props}

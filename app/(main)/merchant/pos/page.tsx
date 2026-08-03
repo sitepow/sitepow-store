@@ -1,15 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { usePOSProducts } from '@/actions/hooks/pos/product'
 import { POSProductItem } from '@/actions/pos/product'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconCalculator, IconLock } from '@tabler/icons-react'
+import { IconCashRegister, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -32,17 +33,15 @@ export default function MerchantPOSPage() {
   const addItem = useCartStore((state) => state.addItem)
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const clearCart = useCartStore((state) => state.clearCart)
+  const removeItem = useCartStore((state) => state.removeItem)
 
   const [search, setSearch] = useState('')
-
-  useEffect(() => {
-    clearCart()
-  }, [selectedStoreId, selectedBranchId, clearCart])
+  const debouncedSearch = useDebouncedValue(search, 400)
 
   const { data: products = [], isLoading: isProductsLoading } = usePOSProducts({
     storeId: selectedStoreId,
     branchId: selectedBranchId,
-    search,
+    search: debouncedSearch,
   })
 
   const handleAddToCart = (product: POSProductItem, variantId: string) => {
@@ -83,8 +82,8 @@ export default function MerchantPOSPage() {
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconCalculator}
-        title="ระบบขายหน้าร้าน"
+        icon={IconCashRegister}
+        title="แคชเชียร์"
         description="เลือกสินค้า สแกนบาร์โค้ด และทำรายการชำระเงิน"
         endContent={
           <div className="flex flex-wrap gap-2">
@@ -105,7 +104,7 @@ export default function MerchantPOSPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-7 xl:col-span-8">
             {isProductsLoading ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                 {[...Array(8)].map((_, i) => (
                   <Skeleton key={i} className="h-44 w-full rounded-xl" />
                 ))}
@@ -126,6 +125,7 @@ export default function MerchantPOSPage() {
               branchId={selectedBranchId}
               onUpdateQuantity={updateQuantity}
               onClearCart={clearCart}
+              onRemoveItem={removeItem}
             />
           </div>
         </div>

@@ -5,6 +5,7 @@ import { SectionProductItem } from '@/actions/storefront/sections'
 import { isVideoUrl } from '@/utils/media'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
 
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +31,7 @@ interface ProductCardProps extends VariantProps<typeof productCardVariants> {
   className?: string
   onClick?: () => void
   href?: string
+  quantity?: number
 }
 
 export function ProductCard({
@@ -38,18 +40,21 @@ export function ProductCard({
   product,
   onClick,
   href,
+  quantity,
 }: ProductCardProps) {
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
   const primaryImage = product.images?.[0]
   const isVideo = isVideoUrl(primaryImage?.url)
+  const isOutOfStock = quantity !== undefined && quantity <= 0
 
   const content = (
     <div
       className={cn(
         productCardVariants({ variant }),
         onClick && 'cursor-pointer',
+        isOutOfStock && 'opacity-50',
         className,
       )}
       onClick={onClick}
@@ -76,16 +81,25 @@ export function ProductCard({
         ) : (
           <EmptyImage className="h-32" />
         )}
-        {hasDiscount && (
-          <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
-            ลด <br /> -{maxDiscountPercent}%
+        {isOutOfStock ? (
+          <Badge
+            variant="destructive"
+            className="absolute top-2 right-2 text-xs"
+          >
+            <IconAlertCircle /> สินค้าหมด
           </Badge>
+        ) : (
+          hasDiscount && (
+            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
+              ลด <br /> -{maxDiscountPercent}%
+            </Badge>
+          )
         )}
       </div>
       <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
         {product.title}
       </h3>
-      <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
+      <div className="group-hover:text-primary mt-1 flex items-end justify-center gap-2">
         {hasDiscount ? (
           <div className="flex flex-col">
             <data value={net?.min} className="text-primary text-2xl font-bold">

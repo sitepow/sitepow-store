@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 
 import { cn } from '@/lib/utils'
 
+import { EmptyImage } from '../../EmptyImage'
+
 interface CartItemCardProps {
   item: CartItem
   onUpdateQuantity?: (id: string, newQuantity: number) => void
@@ -30,13 +32,17 @@ export function CartItemCard({
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
       <div
         className={
-          'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 bg-transparent transition-all md:size-20'
+          'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 md:size-20'
         }
       >
-        <img
-          src={item.image}
-          className="size-full object-cover object-center"
-        />
+        {item.image ? (
+          <img
+            src={item.image}
+            className="size-full object-cover object-center"
+          />
+        ) : (
+          <EmptyImage className="rounded-none" />
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn('min-w-0', productClassName)}>
