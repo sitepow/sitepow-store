@@ -79,7 +79,7 @@ export function CategorySection({
               : products.map((product) => (
                   <div
                     key={product.id}
-                    className="h-fit min-w-0 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
+                    className="h-72 min-w-52 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                   >
                     <ProductCard product={product} variant="shadow" />
                   </div>
