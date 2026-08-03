@@ -2,6 +2,8 @@
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { SettingsTab } from '@/constants/settings'
+import { useQueryParam } from '@/hooks/use-query-param'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   IconBell,
@@ -29,6 +31,11 @@ import { StoreTransferSettingsForm } from './_components/StoreTransferSettingsFo
 import { TaxSettingsForm } from './_components/TaxSettingsForm'
 
 export default function MerchantSettingsPage() {
+  const [activeTab, setActiveTab] = useQueryParam(
+    'tab',
+    SettingsTab.STORE_PROFILE,
+  )
+
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewStoreProfile,
@@ -53,34 +60,35 @@ export default function MerchantSettingsPage() {
         <ActionRequiredAlert />
       ) : (
         <Tabs
-          defaultValue="store-profile"
+          value={activeTab}
+          onValueChange={setActiveTab}
           orientation="vertical"
           className="flex flex-col gap-6 xl:flex-row"
         >
           <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1 xl:sticky xl:top-5 xl:w-57.5 xl:flex-col">
-            <TabsTrigger value="store-profile">
+            <TabsTrigger value={SettingsTab.STORE_PROFILE}>
               <IconBuildingStore size={14} /> ตั้งค่าข้อมูลร้านค้า
             </TabsTrigger>
-            <TabsTrigger value="security">
+            <TabsTrigger value={SettingsTab.SECURITY}>
               <IconLock size={14} /> ความปลอดภัยบัญชี
             </TabsTrigger>
-            <TabsTrigger value="notifications">
+            <TabsTrigger value={SettingsTab.NOTIFICATIONS}>
               <IconBell size={14} /> ระบบแจ้งเตือนไลน์/อีเมล
             </TabsTrigger>
-            <TabsTrigger value="settings-transfer">
+            <TabsTrigger value={SettingsTab.TRANSFER}>
               <IconReplace size={14} /> โอนความเป็นเจ้าของร้าน
             </TabsTrigger>
-            <TabsTrigger value="settings-tax">
+            <TabsTrigger value={SettingsTab.TAX}>
               <IconReceiptTax size={14} /> ภาษีและใบกำกับ
             </TabsTrigger>
-            <TabsTrigger value="settings-shipping">
+            <TabsTrigger value={SettingsTab.SHIPPING}>
               <IconTruck size={14} /> ระบบขนส่งสินค้า
             </TabsTrigger>
-            <TabsTrigger value="settings-payment">
+            <TabsTrigger value={SettingsTab.PAYMENT}>
               <IconCreditCard size={14} /> ช่องทางรับชำระเงิน
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="store-profile" className="flex-1">
+          <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
             {!isPermissionLoading && !canViewStoreProfile ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -91,7 +99,7 @@ export default function MerchantSettingsPage() {
               <StoreProfileForm />
             )}
           </TabsContent>
-          <TabsContent value="security" className="flex-1">
+          <TabsContent value={SettingsTab.SECURITY} className="flex-1">
             {!isPermissionLoading && !canViewSecurity ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -102,7 +110,7 @@ export default function MerchantSettingsPage() {
               <SecuritySettingsForm />
             )}
           </TabsContent>
-          <TabsContent value="notifications" className="flex-1">
+          <TabsContent value={SettingsTab.NOTIFICATIONS} className="flex-1">
             {!isPermissionLoading && !canViewNotifications ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -113,7 +121,7 @@ export default function MerchantSettingsPage() {
               <NotificationSettingsForm />
             )}
           </TabsContent>
-          <TabsContent value="settings-transfer" className="flex-1">
+          <TabsContent value={SettingsTab.TRANSFER} className="flex-1">
             {!isPermissionLoading && !canViewTransferStore ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -124,7 +132,7 @@ export default function MerchantSettingsPage() {
               <StoreTransferSettingsForm />
             )}
           </TabsContent>
-          <TabsContent value="settings-tax" className="flex-1">
+          <TabsContent value={SettingsTab.TAX} className="flex-1">
             {!isPermissionLoading && !canViewTax ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -135,7 +143,7 @@ export default function MerchantSettingsPage() {
               <TaxSettingsForm />
             )}
           </TabsContent>
-          <TabsContent value="settings-shipping" className="flex-1">
+          <TabsContent value={SettingsTab.SHIPPING} className="flex-1">
             {!isPermissionLoading && !canViewShipping ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
@@ -146,7 +154,7 @@ export default function MerchantSettingsPage() {
               <ShippingSettingsForm />
             )}
           </TabsContent>
-          <TabsContent value="settings-payment" className="flex-1">
+          <TabsContent value={SettingsTab.PAYMENT} className="flex-1">
             {!isPermissionLoading && !canViewPayment ? (
               <ActionRequiredAlert
                 icon={<IconLock />}

@@ -57,16 +57,21 @@ export default async function middleware(req: NextRequest) {
   const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
   const isRootDomain = rootDomains.includes(hostname)
 
+  const session = await auth()
+  const isAuthenticated = !!session?.user
+  const userRole = session?.user?.role
+
   if (!isRootDomain) {
     const slug = hostname.split('.')[0]
+
+    if (url.pathname.startsWith('/user') && !isAuthenticated) {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
 
     return NextResponse.rewrite(
       new URL(`/sites/${slug}${url.pathname}${url.search}`, req.url),
     )
   }
-
-  const session = await auth()
-  const userRole = session?.user?.role
 
   if (
     (url.pathname.startsWith('/merchant') && userRole !== UserRole.MERCHANT) ||

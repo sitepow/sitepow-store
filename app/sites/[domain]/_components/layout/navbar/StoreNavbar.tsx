@@ -65,7 +65,7 @@ export function StoreNavbar() {
             {store?.logo && <StoreLogo image={store?.logo} />}
             {!store?.logo && <LogoBrand className="text-white" />}
             <div className="flex items-center gap-2">
-              <div className="mx-5 hidden max-w-md flex-1 lg:flex">
+              <div className="hidden max-w-md flex-1 lg:flex">
                 <StoreSearchInput />
               </div>
               {!isAuthenticated && (

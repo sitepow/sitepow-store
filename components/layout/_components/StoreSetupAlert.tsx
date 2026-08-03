@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import { SettingsTab } from '@/constants/settings'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
 import { AlertCircleIcon } from 'lucide-react'
@@ -44,12 +45,16 @@ export function StoreSetupAlert() {
         <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">
           {!hasShipping && (
             <Button variant="outline" size="sm" asChild>
-              <Link href="/merchant/settings">ตั้งค่าการจัดส่ง</Link>
+              <Link href={`/merchant/settings?tab=${SettingsTab.SHIPPING}`}>
+                ตั้งค่าการจัดส่ง
+              </Link>
             </Button>
           )}
           {!hasPayment && (
             <Button variant="outline" size="sm" asChild>
-              <Link href="/merchant/settings">ตั้งค่าการชำระเงิน</Link>
+              <Link href={`/merchant/settings?tab=${SettingsTab.PAYMENT}`}>
+                ตั้งค่าการชำระเงิน
+              </Link>
             </Button>
           )}
         </div>
