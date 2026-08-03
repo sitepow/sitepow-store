@@ -13,6 +13,8 @@ import crypto from 'crypto'
 
 import { prisma } from '@/lib/prisma'
 
+import { sendOtpEmail } from './email'
+
 export async function registerUser(values: RegisterFormInputs) {
   try {
     const { email, password, confirmPassword, userRole } = values
@@ -94,9 +96,21 @@ export async function registerUser(values: RegisterFormInputs) {
       })
     }
 
+    try {
+      await sendOtpEmail(email, otp)
+    } catch (error) {
+      console.error(error)
+      return {
+        success: true,
+        message:
+          'ลงทะเบียนสำเร็จเรียบร้อยแล้ว แต่ระบบไม่สามารถส่งอีเมล OTP ได้ในขณะนี้ กรุณากดขอ OTP ใหม่อีกครั้ง',
+      }
+    }
+
     return {
       success: true,
-      message: 'ลงทะเบียนสำเร็จเรียบร้อยแล้ว!',
+      message:
+        'ลงทะเบียนสำเร็จเรียบร้อยแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยัน OTP!',
     }
   } catch (error) {
     console.error(error)

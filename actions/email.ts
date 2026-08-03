@@ -57,7 +57,7 @@ export async function verifyOtp({ otp }: { otp: string }) {
   }
 }
 
-async function sendOtpEmail(email: string, otp: string) {
+export async function sendOtpEmail(email: string, otp: string) {
   const { error } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: [email],
