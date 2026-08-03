@@ -16,6 +16,7 @@ import {
   upsertPaymentSetting,
 } from '../payment'
 import { paymentKeys } from '../query-keys/payment'
+import { storeKeys } from '../query-keys/store'
 
 export function usePaymentSetting(storeId: string) {
   return useQuery(
@@ -43,6 +44,9 @@ export function useUpsertPaymentSetting() {
       queryClient.invalidateQueries({
         queryKey: paymentKeys.settings(variables.storeId),
       })
+      queryClient.invalidateQueries({
+        queryKey: storeKeys.setupStatus(variables.storeId),
+      })
     },
   })
 }
@@ -61,6 +65,9 @@ export function useCreateBankAccount() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: paymentKeys.settings(variables.storeId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: storeKeys.setupStatus(variables.storeId),
       })
     },
   })
@@ -82,6 +89,9 @@ export function useUpdateBankAccount() {
       queryClient.invalidateQueries({
         queryKey: paymentKeys.settings(variables.storeId),
       })
+      queryClient.invalidateQueries({
+        queryKey: storeKeys.setupStatus(variables.storeId),
+      })
     },
   })
 }
@@ -95,6 +105,9 @@ export function useDeleteBankAccount() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: paymentKeys.settings(variables.storeId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: storeKeys.setupStatus(variables.storeId),
       })
     },
   })

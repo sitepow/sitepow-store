@@ -647,38 +647,32 @@ export async function getStoreSetupStatus(
     return { hasShipping: false, hasPayment: false, isConfigured: false }
   }
 
-  const { isAuthorized } = await requireVerifiedUser()
-  if (!isAuthorized) {
-    return { hasShipping: false, hasPayment: false, isConfigured: false }
-  }
-
   try {
-    const shippingCount = await prisma.storeCourierService.count({
-      where: {
-        storeId,
-        isEnabled: true,
-      },
-    })
-
-    const paymentSetting = await prisma.paymentSetting.findUnique({
-      where: { storeId },
-      select: {
-        isBankTransferEnabled: true,
-        isStripeEnabled: true,
-        _count: {
-          select: { bankAccounts: true },
+    const [shippingCount, paymentSetting] = await Promise.all([
+      prisma.storeCourierService.count({
+        where: {
+          storeId,
+          isEnabled: true,
         },
-      },
-    })
+      }),
+      prisma.paymentSetting.findUnique({
+        where: { storeId },
+        select: {
+          isStripeEnabled: true,
+          _count: {
+            select: { bankAccounts: true },
+          },
+        },
+      }),
+    ])
+
+    const hasShipping = shippingCount > 0
 
     const hasPayment = Boolean(
       paymentSetting &&
-      ((paymentSetting.isBankTransferEnabled &&
-        paymentSetting._count.bankAccounts > 0) ||
+      (paymentSetting._count.bankAccounts > 0 ||
         paymentSetting.isStripeEnabled),
     )
-
-    const hasShipping = shippingCount > 0
 
     return {
       hasShipping,

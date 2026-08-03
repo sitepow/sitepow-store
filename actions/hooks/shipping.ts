@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query'
 
 import { shippingKeys } from '../query-keys/shipping'
+import { storeKeys } from '../query-keys/store'
 import {
   getStoreShippingSettings,
   updateStoreShippingSettings,
@@ -44,6 +45,9 @@ export function useUpdateShippingSettings() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: shippingKeys.settings(variables.storeId, variables.branchId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: storeKeys.setupStatus(variables.storeId),
       })
     },
   })
