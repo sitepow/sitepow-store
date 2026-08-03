@@ -13,6 +13,7 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { queryKeyToRedisKey } from '@/utils/cache'
 import { formatDate } from '@/utils/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
@@ -630,5 +631,62 @@ export async function deleteStore(id: string) {
     return {
       success: false,
     }
+  }
+}
+
+export interface StoreSetupStatus {
+  hasShipping: boolean
+  hasPayment: boolean
+  isConfigured: boolean
+}
+
+export async function getStoreSetupStatus(
+  storeId: string,
+): Promise<StoreSetupStatus> {
+  if (!storeId || storeId === ALL_STORES) {
+    return { hasShipping: false, hasPayment: false, isConfigured: false }
+  }
+
+  const { isAuthorized } = await requireVerifiedUser()
+  if (!isAuthorized) {
+    return { hasShipping: false, hasPayment: false, isConfigured: false }
+  }
+
+  try {
+    const shippingCount = await prisma.storeCourierService.count({
+      where: {
+        storeId,
+        isEnabled: true,
+      },
+    })
+
+    const paymentSetting = await prisma.paymentSetting.findUnique({
+      where: { storeId },
+      select: {
+        isBankTransferEnabled: true,
+        isStripeEnabled: true,
+        _count: {
+          select: { bankAccounts: true },
+        },
+      },
+    })
+
+    const hasPayment = Boolean(
+      paymentSetting &&
+      ((paymentSetting.isBankTransferEnabled &&
+        paymentSetting._count.bankAccounts > 0) ||
+        paymentSetting.isStripeEnabled),
+    )
+
+    const hasShipping = shippingCount > 0
+
+    return {
+      hasShipping,
+      hasPayment,
+      isConfigured: hasShipping && hasPayment,
+    }
+  } catch (error) {
+    console.error(error)
+    return { hasShipping: false, hasPayment: false, isConfigured: false }
   }
 }

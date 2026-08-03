@@ -42,6 +42,7 @@ import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
 import { SupportWidget } from '../chat/SupportWidget'
 import { Button } from '../ui/button'
+import { StoreSetupAlert } from './_components/StoreSetupAlert'
 
 interface SidebarProps extends PropsWithChildren {
   items: NavigationItem[]
@@ -134,6 +135,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       </RootSidebar>
       <main className="bg-background text-foreground w-full min-w-0 space-y-5 p-5">
         {isEmailUnverified && <EmailVerified />}
+        {isMerchant && <StoreSetupAlert />}
         <div className="flex flex-wrap gap-2.5 border-b py-5">
           <SidebarTrigger />
           <ModeToggle />

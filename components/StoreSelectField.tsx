@@ -1,6 +1,11 @@
-import { useStoreOptions } from '@/actions/hooks/store'
+'use client'
+
+import { useEffect } from 'react'
+
+import { useMerchantStoreSetup, useStoreOptions } from '@/actions/hooks/store'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
 import {
@@ -19,6 +24,26 @@ export function StoreSelectField() {
   const { selectedStoreId, setSelectedStoreId, setSelectedStoreSlug } =
     useStoreFilter()
 
+  const { data: setupStatus } = useMerchantStoreSetup(selectedStoreId)
+
+  const setSetupStatus = useMerchantStoreSetupStore(
+    (state) => state.setSetupStatus,
+  )
+
+  useEffect(() => {
+    if (setupStatus) {
+      setSetupStatus({
+        hasShipping: setupStatus.hasShipping,
+        hasPayment: setupStatus.hasPayment,
+      })
+    } else if (selectedStoreId === ALL_STORES) {
+      setSetupStatus({
+        hasShipping: true,
+        hasPayment: true,
+      })
+    }
+  }, [setupStatus, selectedStoreId, setSetupStatus])
+
   if (!isMounted) {
     return
   }
@@ -34,7 +59,7 @@ export function StoreSelectField() {
         onValueChange={(value) => {
           setSelectedStoreId(value)
 
-          if (value === 'all') {
+          if (value === ALL_STORES) {
             setSelectedStoreSlug('')
           } else {
             const selectedStore = stores.find((s) => s.id === value)
@@ -49,7 +74,9 @@ export function StoreSelectField() {
           <SelectValue placeholder="เลือกดูทุกร้านค้า" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">ทุกร้านค้า ({stores.length})</SelectItem>
+          <SelectItem value={ALL_STORES}>
+            ทุกร้านค้า ({stores.length})
+          </SelectItem>
           {stores.map((store) => (
             <SelectItem key={store.id} value={store.id}>
               {store.name}

@@ -1,4 +1,5 @@
 import { Plan, StoreStatus } from '@/generated/prisma/enums'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import {
   queryOptions,
   useMutation,
@@ -15,6 +16,7 @@ import {
   deleteStore,
   getLandingStores,
   getStoreOptions,
+  getStoreSetupStatus,
   getStores,
   updateStore,
 } from '../store'
@@ -116,6 +118,16 @@ export function useLandingStores(limit: number = 12) {
     queryOptions({
       queryKey: storeKeys.landing(limit),
       queryFn: async () => await getLandingStores(limit),
+    }),
+  )
+}
+
+export function useMerchantStoreSetup(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: storeKeys.setupStatus(storeId),
+      queryFn: () => getStoreSetupStatus(storeId),
+      enabled: Boolean(storeId && storeId !== ALL_STORES),
     }),
   )
 }
