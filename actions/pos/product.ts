@@ -17,20 +17,50 @@ const posProductSelect = {
     select: { url: true },
     take: 1,
   },
+  options: {
+    select: {
+      id: true,
+      title: true,
+      maxSelect: true,
+      require: true,
+      choices: {
+        select: { id: true, name: true, extraPrice: true },
+      },
+    },
+  },
+  addons: {
+    where: { isAvailable: true },
+    select: { id: true, title: true, price: true, isAvailable: true },
+  },
   variants: {
     where: { isAvailable: true },
     select: {
       id: true,
+      sku: true,
       title: true,
       price: true,
-      sku: true,
+      isAvailable: true,
       discountActive: true,
       discountType: true,
       discountAmount: true,
+      pointsActive: true,
+      pointsAmount: true,
+      image: { select: { url: true } },
+      weight: true,
+      width: true,
+      height: true,
+      length: true,
       stocks: {
         select: {
-          branchId: true,
           quantity: true,
+          branchId: true,
+          branch: { select: { name: true } },
+        },
+      },
+      digitalItems: {
+        select: {
+          id: true,
+          isUsed: true,
         },
       },
     },
@@ -57,6 +87,10 @@ export async function getPOSProducts({
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบ', data: [] }
+  }
+
+  if (!storeId || !branchId) {
+    return { success: true, data: [] }
   }
 
   const authCheck = await verifyEmployeePermission({
@@ -93,20 +127,16 @@ export async function getPOSProducts({
       orderBy: { title: 'asc' },
     })
 
-    const formatted = products.map((p) => ({
-      ...p,
-      variants: p.variants.map((v) => ({
-        ...v,
-        stock: v.stocks.find((s) => s.branchId === branchId)?.quantity ?? 0,
-      })),
-    }))
-
     return {
       success: true,
-      data: serializeDecimal(formatted),
+      data: serializeDecimal(products) as POSProductItem[],
     }
   } catch (error) {
-    console.error(error)
-    return { success: false, data: [] }
+    console.error('getPOSProducts Error:', error)
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการโหลดสินค้า',
+      data: [],
+    }
   }
 }

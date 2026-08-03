@@ -1,6 +1,7 @@
 import {
   IconBox,
   IconBuildingStore,
+  IconCalculator,
   IconCoin,
   IconCreditCard,
   IconHierarchy2,
@@ -72,6 +73,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'แดชบอร์ด',
     tab: 'dashboard',
     icon: IconLayoutDashboard,
+  },
+  {
+    value: 'pos',
+    label: 'ระบบขายหน้าร้าน',
+    tab: 'pos',
+    icon: IconCalculator,
   },
   {
     value: 'profile',

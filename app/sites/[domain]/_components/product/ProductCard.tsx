@@ -28,72 +28,88 @@ const productCardVariants = cva(
 interface ProductCardProps extends VariantProps<typeof productCardVariants> {
   product: SectionProductItem
   className?: string
+  onClick?: () => void
+  href?: string
 }
 
-export function ProductCard({ variant, className, product }: ProductCardProps) {
+export function ProductCard({
+  variant,
+  className,
+  product,
+  onClick,
+  href,
+}: ProductCardProps) {
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
   const primaryImage = product.images?.[0]
   const isVideo = isVideoUrl(primaryImage?.url)
 
-  return (
-    <Link href={`/products/${product.slug}`}>
-      <div className={cn(productCardVariants({ variant }), className)}>
-        <div className="relative overflow-hidden rounded-t-xl">
-          {primaryImage ? (
-            <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
-              {isVideo ? (
-                <video
-                  src={primaryImage.url}
-                  className="size-full object-cover"
-                  muted
-                  playsInline
-                  loop
-                />
-              ) : (
-                <img
-                  src={primaryImage.url}
-                  alt={product.title}
-                  className="size-full object-cover"
-                />
-              )}
-            </div>
-          ) : (
-            <EmptyImage className="h-32" />
-          )}
-          {hasDiscount && (
-            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
-              ลด <br /> -{maxDiscountPercent}%
-            </Badge>
-          )}
-        </div>
-        <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
-          {product.title}
-        </h3>
-        <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
-          {hasDiscount ? (
-            <div className="flex flex-col">
-              <data
-                value={net?.min}
-                className="text-primary text-2xl font-bold"
-              >
-                {formatCurrency(net?.min || 0)}
-              </data>
-              <span className="text-muted-foreground text-sm line-through">
-                {formatCurrency(original?.min || 0)}
-              </span>
-            </div>
-          ) : (
-            <data
-              value={original?.min}
-              className="text-primary text-2xl font-bold"
-            >
-              {formatCurrency(original?.min || 0)}
-            </data>
-          )}
-        </div>
+  const content = (
+    <div
+      className={cn(
+        productCardVariants({ variant }),
+        onClick && 'cursor-pointer',
+        className,
+      )}
+      onClick={onClick}
+    >
+      <div className="relative overflow-hidden rounded-t-xl">
+        {primaryImage ? (
+          <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
+            {isVideo ? (
+              <video
+                src={primaryImage.url}
+                className="size-full object-cover"
+                muted
+                playsInline
+                loop
+              />
+            ) : (
+              <img
+                src={primaryImage.url}
+                alt={product.title}
+                className="size-full object-cover"
+              />
+            )}
+          </div>
+        ) : (
+          <EmptyImage className="h-32" />
+        )}
+        {hasDiscount && (
+          <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
+            ลด <br /> -{maxDiscountPercent}%
+          </Badge>
+        )}
       </div>
-    </Link>
+      <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
+        {product.title}
+      </h3>
+      <div className="group-hover:text-primary mt-2 flex items-end justify-center gap-2">
+        {hasDiscount ? (
+          <div className="flex flex-col">
+            <data value={net?.min} className="text-primary text-2xl font-bold">
+              {formatCurrency(net?.min || 0)}
+            </data>
+            <span className="text-muted-foreground text-sm line-through">
+              {formatCurrency(original?.min || 0)}
+            </span>
+          </div>
+        ) : (
+          <data
+            value={original?.min}
+            className="text-primary text-2xl font-bold"
+          >
+            {formatCurrency(original?.min || 0)}
+          </data>
+        )}
+      </div>
+    </div>
   )
+
+  if (onClick) {
+    return content
+  }
+
+  return <Link href={href || `/products/${product.slug}`}>{content}</Link>
 }

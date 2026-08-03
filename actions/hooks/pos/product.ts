@@ -17,12 +17,14 @@ export function usePOSProducts({
     queryOptions({
       queryKey: posProductKeys.list(storeId, branchId, search, categoryId),
       queryFn: async () => {
-        await getPOSProducts({
+        const res = await getPOSProducts({
           storeId,
           branchId,
           search,
           categoryId,
         })
+
+        return res.data ?? []
       },
       enabled: Boolean(storeId && branchId),
     }),
