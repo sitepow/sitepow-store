@@ -17,6 +17,7 @@ import bcrypt from 'bcryptjs'
 
 import { prisma } from '@/lib/prisma'
 
+import { auth } from './auth'
 import { withCache } from './cache'
 
 export type TransactionClient = Omit<
@@ -611,4 +612,48 @@ export async function findOrCreateEmployee(
   })
 
   return { employee, isNewUser: true }
+}
+
+export type RequireVerifiedUserResult =
+  | { isAuthorized: true; message: null; userId: string }
+  | { isAuthorized: false; message: string; userId: string | null }
+
+export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return {
+      isAuthorized: false,
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      userId: null,
+    }
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isEmailVerified: true },
+  })
+
+  if (!user) {
+    return {
+      isAuthorized: false,
+      message: 'ไม่พบข้อมูลผู้ใช้งานในระบบ',
+      userId: null,
+    }
+  }
+
+  if (!user.isEmailVerified) {
+    return {
+      isAuthorized: false,
+      message: 'กรุณายืนยันอีเมลของคุณก่อนทำรายการ',
+      userId,
+    }
+  }
+
+  return {
+    isAuthorized: true,
+    message: null,
+    userId,
+  }
 }

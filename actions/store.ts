@@ -22,6 +22,7 @@ import { createStoreSchema } from '@/zod/store'
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { withCache } from '@/lib/cache'
+import { requireVerifiedUser } from '@/lib/permission'
 import {
   setupStoreOwnerPermissions,
   verifyEmployeePermission,
@@ -348,15 +349,16 @@ export async function getStoreOptions(filters?: {
 
 export async function createStore(input: CreateStoreInput) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    const { isAuthorized, message, userId } = await requireVerifiedUser()
+
+    if (!isAuthorized) {
+      return { success: false, message }
     }
 
     const { billingCycle, ...storeData } = input
     const validatedInput = createStoreSchema.safeParse({
       ...input,
-      ownerId: session.user.id,
+      ownerId: userId,
     })
 
     if (!validatedInput.success) {
@@ -409,8 +411,6 @@ export async function createStore(input: CreateStoreInput) {
         return { success: false, message: 'ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว' }
       }
     }
-
-    const userId = session.user.id
 
     const store = serializeDecimal(
       await prisma.$transaction(async (tx) => {

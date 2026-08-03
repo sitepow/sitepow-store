@@ -18,6 +18,7 @@ import {
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { requireVerifiedUser } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 const storefrontOrderSelect = {
@@ -180,9 +181,10 @@ export async function getStorefrontOrders({
 
 export async function createOrder(input: CreateOrderInput) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนสั่งซื้อสินค้า' }
+    const { isAuthorized, message, userId } = await requireVerifiedUser()
+
+    if (!isAuthorized) {
+      return { success: false, message }
     }
 
     if (!input.items.length) {
@@ -190,7 +192,7 @@ export async function createOrder(input: CreateOrderInput) {
     }
 
     const customer = await prisma.customer.findUnique({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { id: true },
     })
 
