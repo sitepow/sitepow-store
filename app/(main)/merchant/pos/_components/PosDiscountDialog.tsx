@@ -273,7 +273,7 @@ export function PosDiscountDialog({
                       รหัสลูกค้า: {customer.id} <br />
                       อีเมล: {customer.email} <br />
                       เบอร์โทรศัพท์: {formatPromptPay(customer.phone)} <br />
-                      แต้มคงเหลือ:{formatNumber(customer?.points ?? 0)} แต้ม
+                      แต้มคงเหลือ: {formatNumber(customer?.points ?? 0)} แต้ม
                     </p>
                   </div>
                 </div>

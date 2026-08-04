@@ -2,13 +2,20 @@
 
 import { useMemo, useState } from 'react'
 
+import { POSCustomerData } from '@/actions/customer'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
 import { CartItem } from '@/types/sites/cart'
 import { getRemainingStock } from '@/utils/cart'
 import { calculateOrderSummary } from '@/utils/order'
-import { formatCurrency } from '@/utils/pricing'
-import { IconShoppingCart, IconTrash } from '@tabler/icons-react'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatPromptPay } from '@/utils/slip'
+import {
+  IconShoppingCart,
+  IconTrash,
+  IconUserCheck,
+  IconX,
+} from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -22,13 +29,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { PosCheckoutModal } from './PosCheckoutModal'
 import { PosDiscountDialog } from './PosDiscountDialog'
-
-export interface CustomerMember {
-  id: string
-  name: string
-  phone: string
-  points: number
-}
 
 interface PosCartProps {
   cart: CartItem[]
@@ -53,7 +53,8 @@ export function PosCart({
 }: PosCartProps) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
-  const [customer, setCustomer] = useState<CustomerMember | null>(null)
+  // 1. ใช้ POSCustomerData สำหรับ state เพื่อความสอดคล้องกับ PosDiscountDialog
+  const [customer, setCustomer] = useState<POSCustomerData | null>(null)
   const [usedPoints, setUsedPoints] = useState<number>(0)
   const [couponDiscount, setCouponDiscount] = useState<number>(0)
 
@@ -90,6 +91,11 @@ export function PosCart({
     handleResetCustomerAndDiscount()
   }
 
+  const handleRemoveCustomer = () => {
+    setCustomer(null)
+    setUsedPoints(0)
+  }
+
   return (
     <>
       <Card
@@ -123,6 +129,34 @@ export function PosCart({
                 </span>
               </div>
             </CardTitle>
+            {customer && (
+              <div className="dark from-primary via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
+                    <IconUserCheck className="size-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-foreground text-sm leading-none font-bold">
+                      {customer.name}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      รหัสลูกค้า: {customer.id} <br />
+                      อีเมล: {customer.email} <br />
+                      เบอร์โทรศัพท์: {formatPromptPay(customer.phone)} <br />
+                      แต้มคงเหลือ: {formatNumber(customer?.points ?? 0)} แต้ม
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRemoveCustomer}
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 size-8 shrink-0"
+                >
+                  <IconX className="size-4" />
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="flex-1 overflow-hidden p-0">
             <ScrollArea className="h-full px-4">
