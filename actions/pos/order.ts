@@ -99,13 +99,19 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
         })
       }
 
+      const orderStatus =
+        input.status ??
+        (input.paymentMethod === PaymentMethod.CASH_ON_DELIVERY
+          ? OrderStatus.PAID
+          : OrderStatus.PENDING)
+
       const newOrder = await tx.order.create({
         data: {
           orderNumber,
           totalAmount: finalTotal,
           totalAmountBase: finalTotal,
-          status: OrderStatus.PAID,
-          paidAt: new Date(),
+          status: input.status,
+          paidAt: orderStatus === OrderStatus.PAID ? new Date() : null,
           storeId: input.storeId,
           customerId: input.customerId ?? null,
           employeeId: employee?.id ?? null,
