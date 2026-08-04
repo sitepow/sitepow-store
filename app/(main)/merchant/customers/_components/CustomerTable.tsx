@@ -96,12 +96,14 @@ export function CustomerTable() {
               customers.map((item) => (
                 <TableRow key={item.customer.id}>
                   <TableCell>{item.customer.id}</TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-48 min-w-48 wrap-break-word whitespace-pre-line">
                     {[item.customer.firstName, item.customer.lastName]
                       .filter(Boolean)
                       .join(' ') || '-'}
                   </TableCell>
-                  <TableCell>{item.customer.email}</TableCell>
+                  <TableCell className="max-w-48 min-w-48 wrap-break-word whitespace-pre-line">
+                    {item.customer.email}
+                  </TableCell>
                   <TableCell>
                     {item.customer.phone
                       ? formatPromptPay(item.customer.phone)

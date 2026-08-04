@@ -9,6 +9,7 @@ import {
 } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import { generateOrderNumber } from '@/utils/order'
+import { deductCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -110,12 +111,13 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
           orderNumber,
           totalAmount: finalTotal,
           totalAmountBase: finalTotal,
-          status: input.status,
+          status: orderStatus,
           paidAt: orderStatus === OrderStatus.PAID ? new Date() : null,
           storeId: input.storeId,
           customerId: input.customerId ?? null,
           employeeId: employee?.id ?? null,
           paymentMethod: input.paymentMethod,
+          usedPoints: input.usedPoints ?? 0,
           items: {
             create: input.items.map((item) => ({
               productId: item.productId,
@@ -135,6 +137,14 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
       })
 
       if (input.customerId) {
+        if (input.usedPoints && input.usedPoints > 0) {
+          await deductCustomerPoints({
+            tx,
+            customerId: input.customerId,
+            storeId: input.storeId,
+            usedPoints: input.usedPoints,
+          })
+        }
         await tx.customerStore.upsert({
           where: {
             customerId_storeId: {
@@ -178,7 +188,7 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
       data: serializeDecimal(createdOrder),
     }
   } catch (error) {
-    console.error('POS Create Order Error:', error)
+    console.error(error)
     return {
       success: false,
     }

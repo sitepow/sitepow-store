@@ -15,6 +15,7 @@ import {
   classifyOrderItems,
   generateOrderNumber,
 } from '@/utils/order'
+import { deductCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -545,18 +546,21 @@ export async function createOrder(input: CreateOrderInput) {
           customerId: customer.id,
           storeId: store.id,
           totalSpent: grandTotalAmount,
-          rewardPoints: Math.max(
-            0,
-            (input.earnedPoints ?? 0) - (input.usedPoints ?? 0),
-          ),
+          rewardPoints: 0,
         },
         update: {
           totalSpent: { increment: grandTotalAmount },
-          rewardPoints: {
-            increment: (input.earnedPoints ?? 0) - (input.usedPoints ?? 0),
-          },
         },
       })
+
+      if (input.usedPoints && input.usedPoints > 0) {
+        await deductCustomerPoints({
+          tx,
+          customerId: customer.id,
+          storeId: store.id,
+          usedPoints: input.usedPoints,
+        })
+      }
 
       return orders
     })

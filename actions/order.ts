@@ -9,6 +9,7 @@ import {
 } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { refundCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -293,6 +294,8 @@ export async function cancelOrder(id: string) {
         storeId: true,
         orderNumber: true,
         status: true,
+        customerId: true,
+        usedPoints: true,
         items: {
           select: {
             quantity: true,
@@ -346,6 +349,15 @@ export async function cancelOrder(id: string) {
             },
           })
         }
+      }
+
+      if (order.customerId && order.usedPoints) {
+        await refundCustomerPoints({
+          tx,
+          customerId: order.customerId,
+          storeId: order.storeId,
+          usedPoints: order.usedPoints,
+        })
       }
 
       await tx.digitalItem.updateMany({
