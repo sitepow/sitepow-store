@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/sidebar'
 
 import { CreditBadge } from '../CreditBadge'
-// import { DateTimeBadge } from '../DateTimeBadge'
+import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
 // import { LanguageSwitcher } from '../LanguageSwitcher'
 import { ModeToggle } from '../ModeToggle'
@@ -81,7 +81,6 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
               return (
                 <Fragment key={item.value}>
                   {item.hasSeparatorBefore && <Separator className="my-2" />}
-
                   {item.items && item.items.length > 0 ? (
                     <Collapsible
                       asChild
@@ -150,7 +149,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
           {isMerchant && <CreditBadge />}
-          {/* {isMerchant && <DateTimeBadge />} */}
+          {isMerchant && <DateTimeBadge />}
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}
