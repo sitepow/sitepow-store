@@ -154,9 +154,7 @@ export function ProductVariantSelector() {
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-primary data-checked:border-primary data-checked:bg-primary dark:data-checked:bg-primary"
                     />
                     <div className="flex flex-1 flex-col gap-1">
-                      <span className="cursor-pointer text-xs">
-                        {variant.title}
-                      </span>
+                      <span className="cursor-pointer">{variant.title}</span>
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
@@ -181,7 +179,7 @@ export function ProductVariantSelector() {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-sm font-semibold">
+                          <span className="text-primary text-sm font-semibold">
                             {formatCurrency(variant.price)}
                           </span>
                         )}

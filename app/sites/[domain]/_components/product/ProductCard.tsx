@@ -60,33 +60,32 @@ export function ProductCard({
       onClick={onClick}
     >
       <div className="relative overflow-hidden rounded-t-xl">
-        {primaryImage ? (
-          <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
-            {isVideo ? (
-              <video
-                src={primaryImage.url}
-                className="size-full object-cover"
-                muted
-                playsInline
-                loop
-              />
-            ) : (
-              <img
-                src={primaryImage.url}
-                alt={product.title}
-                className="size-full object-cover"
-              />
-            )}
-          </div>
-        ) : (
-          <EmptyImage className="h-32" />
-        )}
+        <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
+          {!primaryImage ? (
+            <EmptyImage />
+          ) : isVideo ? (
+            <video
+              src={primaryImage.url}
+              className="size-full object-cover"
+              muted
+              playsInline
+              loop
+              autoPlay
+            />
+          ) : (
+            <img
+              src={primaryImage.url}
+              alt={product.title}
+              className="size-full object-cover"
+            />
+          )}
+        </div>
         {isOutOfStock ? (
           <Badge
             variant="destructive"
             className="absolute top-2 right-2 text-xs"
           >
-            <IconAlertCircle /> สินค้าหมด
+            <IconAlertCircle /> ขออภัยสินค้าหมด
           </Badge>
         ) : (
           hasDiscount && (

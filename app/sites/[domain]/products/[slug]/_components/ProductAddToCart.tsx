@@ -1,8 +1,14 @@
 import toast from 'react-hot-toast'
 
 import { ProductType } from '@/generated/prisma/enums'
+import {
+  calculateCartUnitPrice,
+  calculateRewardPoints,
+  mapSelectedOptions,
+  validateRequiredOptions,
+} from '@/utils/cart'
 import { formatNumber } from '@/utils/pricing'
-import { calculateNetPrice, getStockQuantity } from '@/utils/product'
+import { getStockQuantity } from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -44,14 +50,9 @@ export function ProductAddToCart() {
       return
     }
 
-    const missingOptions: string[] = []
-    product.options?.forEach((option) => {
-      if (
-        option.require &&
-        (selectedOptions[option.title] ?? []).length === 0
-      ) {
-        missingOptions.push(option.title)
-      }
+    const missingOptions = validateRequiredOptions({
+      options: product.options,
+      selectedOptionsMap: selectedOptions,
     })
 
     if (missingOptions.length > 0) {
@@ -59,38 +60,25 @@ export function ProductAddToCart() {
       return
     }
 
-    const mappedOptions = Object.entries(selectedOptions).flatMap(
-      ([title, choices]) => {
-        const optionGroup = product.options?.find((o) => o.title === title)
-        return choices.map((choiceName) => {
-          const choice = optionGroup?.choices.find((c) => c.name === choiceName)
-          return {
-            optionTitle: title,
-            choiceName,
-            extraPrice: choice?.extraPrice ?? 0,
-          }
-        })
-      },
+    const mappedOptions = mapSelectedOptions(
+      product.options ?? [],
+      selectedOptions,
     )
 
     const selectedAddonsData =
       product.addons?.filter((addon) => selectedAddons.includes(addon.id)) ?? []
 
-    let unitPrice = calculateNetPrice({
-      price: selectedVariant.price,
-      discount: selectedVariant.discountActive
-        ? {
-            active: true,
-            type: selectedVariant.discountType ?? '',
-            amount: selectedVariant.discountAmount ?? 0,
-          }
-        : undefined,
+    const unitPrice = calculateCartUnitPrice({
+      variant: selectedVariant,
+      options: product.options,
+      selectedOptionsMap: selectedOptions,
+      addons: product.addons,
+      selectedAddonIds: selectedAddons,
     })
-    mappedOptions.forEach((o) => {
-      unitPrice += o.extraPrice
-    })
-    selectedAddonsData.forEach((a) => {
-      if (a.isAvailable) unitPrice += a.price
+
+    const rewardPoints = calculateRewardPoints({
+      variant: selectedVariant,
+      quantity,
     })
 
     addItem({
@@ -108,9 +96,7 @@ export function ProductAddToCart() {
       selectedAddons: selectedAddonsData,
       quantity,
       unitPrice,
-      rewardPoints: selectedVariant.pointsActive
-        ? selectedVariant.pointsAmount * quantity
-        : 0,
+      rewardPoints,
       productType: product?.productType ?? ProductType.PHYSICAL,
     })
   }
@@ -153,7 +139,6 @@ export function ProductAddToCart() {
       </div>
       <Button
         size="lg"
-
         className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >

@@ -1,4 +1,9 @@
+'use client'
+
+import { useMemo } from 'react'
+
 import { formatCurrency } from '@/utils/pricing'
+import { getStockQuantity } from '@/utils/product'
 
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
@@ -6,12 +11,40 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { cn } from '@/lib/utils'
+
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductOptionGroups() {
-  const { product, selectedOptions, toggleOption, isLoading } =
-    useProductPurchaseStore()
+  const {
+    product,
+    selectedVariant,
+    selectedBranchId,
+    selectedOptions,
+    toggleOption,
+    isLoading,
+  } = useProductPurchaseStore()
+
   const hasOptionGroups = product?.options?.length !== 0
+
+  const isOutOfStock = useMemo(() => {
+    if (!product) {
+      return true
+    }
+
+    const activeVariant = selectedVariant || product.variants[0]
+    if (!activeVariant) {
+      return true
+    }
+
+    const stock = getStockQuantity(
+      activeVariant,
+      product.productType,
+      selectedBranchId,
+    )
+
+    return stock <= 0
+  }, [product, selectedVariant, selectedBranchId])
 
   if (isLoading) {
     return (
@@ -43,36 +76,48 @@ export function ProductOptionGroups() {
               </Badge>
             )}
           </div>
-
           <RadioGroup
-            value={selectedOptions[option.title]?.[0]}
-            onValueChange={(val) => toggleOption(option.title, val, 1)}
+            value={selectedOptions[option.title]?.[0] ?? ''}
+            onValueChange={(val) => {
+              if (!isOutOfStock) {
+                toggleOption(option.title, val, 1)
+              }
+            }}
+            disabled={isOutOfStock}
           >
             <div className="grid grid-cols-1 gap-2">
-              {option.choices.map((choice) => (
-                <div
-                  key={choice.name}
-                  className="flex items-center space-x-3 rounded-lg border p-3"
-                >
-                  <RadioGroupItem value={choice.name} id={choice.name} />
+              {option.choices.map((choice) => {
+                const choiceId = `${option.title}-${choice.name}`
+
+                return (
                   <Label
-                    htmlFor={choice.name}
-                    className="flex-1 cursor-pointer"
+                    key={choice.name}
+                    htmlFor={choiceId}
+                    className={cn(
+                      'has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-center space-x-3 rounded-lg border p-3 transition-colors',
+                      isOutOfStock && 'cursor-not-allowed opacity-50',
+                    )}
                   >
-                    {choice.name}
-                  </Label>
-                  {choice.extraPrice > 0 && (
-                    <span className="text-primary text-sm font-semibold">
-                      +{formatCurrency(choice.extraPrice)}
+                    <RadioGroupItem
+                      value={choice.name}
+                      id={choiceId}
+                      disabled={isOutOfStock}
+                    />
+                    <span className="flex-1 text-sm font-medium">
+                      {choice.name}
                     </span>
-                  )}
-                </div>
-              ))}
+                    {choice.extraPrice > 0 && (
+                      <span className="text-primary text-sm font-semibold">
+                        +{formatCurrency(choice.extraPrice)}
+                      </span>
+                    )}
+                  </Label>
+                )
+              })}
             </div>
           </RadioGroup>
         </div>
       ))}
-
       {hasOptionGroups && <Separator />}
     </>
   )

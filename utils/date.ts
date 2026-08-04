@@ -26,6 +26,15 @@ export const formatShortDate = (date: Date): string => {
   }).format(date)
 }
 
+export const formatShortTime = (date: Date): string => {
+  return date.toLocaleTimeString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+}
+
 export const getBlockMessage = (blockedUntil: Date | null): string => {
   if (!blockedUntil) {
     return 'บัญชีของคุณถูกระงับการสั่งซื้อถาวรเนื่องจากพบความผิดปกติ'

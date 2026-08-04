@@ -1,16 +1,49 @@
+'use client'
+
+import { useMemo } from 'react'
+
 import { formatCurrency } from '@/utils/pricing'
+import { getStockQuantity } from '@/utils/product'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { cn } from '@/lib/utils'
+
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddonSelector() {
-  const { product, selectedAddons, toggleAddon, isLoading } =
-    useProductPurchaseStore()
+  const {
+    product,
+    selectedVariant,
+    selectedBranchId,
+    selectedAddons,
+    toggleAddon,
+    isLoading,
+  } = useProductPurchaseStore()
+
   const hasAddons = product?.addons?.length !== 0
+
+  const isOutOfStock = useMemo(() => {
+    if (!product) {
+      return true
+    }
+
+    const activeVariant = selectedVariant || product.variants[0]
+    if (!activeVariant) {
+      return true
+    }
+
+    const stock = getStockQuantity(
+      activeVariant,
+      product.productType,
+      selectedBranchId,
+    )
+
+    return stock <= 0
+  }, [product, selectedVariant, selectedBranchId])
 
   if (isLoading) {
     return (
@@ -34,32 +67,46 @@ export function ProductAddonSelector() {
         <div className="space-y-4">
           <Label className="text-lg font-semibold">บริการเสริม</Label>
           <div className="space-y-2">
-            {product?.addons?.map((addon) => (
-              <div
-                key={addon.id}
-                className="flex items-center space-x-3 rounded-lg border p-3"
-              >
-                <Checkbox
-                  id={addon.id}
-                  disabled={!addon.isAvailable}
-                  checked={selectedAddons.includes(addon.id)}
-                  onCheckedChange={() => toggleAddon(addon.id)}
-                />
+            {product.addons.map((addon) => {
+              const isDisabled = !addon.isAvailable || isOutOfStock
+
+              return (
                 <Label
+                  key={addon.id}
                   htmlFor={addon.id}
-                  className="flex-1 cursor-pointer text-sm font-medium"
+                  className={cn(
+                    'has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-center space-x-3 rounded-lg border p-3 transition-colors',
+                    isDisabled &&
+                      'cursor-not-allowed opacity-50 hover:bg-transparent',
+                  )}
                 >
-                  {addon.title}
+                  <Checkbox
+                    id={addon.id}
+                    disabled={isDisabled}
+                    checked={selectedAddons.includes(addon.id)}
+                    onCheckedChange={() => {
+                      if (!isDisabled) {
+                        toggleAddon(addon.id)
+                      }
+                    }}
+                  />
+                  <span
+                    className={cn(
+                      'flex-1 text-sm font-medium',
+                      isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
+                    )}
+                  >
+                    {addon.title}
+                  </span>
+                  <span className="text-primary text-sm font-semibold">
+                    + {formatCurrency(addon.price)}
+                  </span>
                 </Label>
-                <span className="text-sm font-semibold">
-                  +{formatCurrency(addon.price)}
-                </span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
-
       {hasAddons && <Separator />}
     </>
   )

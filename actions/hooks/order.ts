@@ -8,6 +8,8 @@ import {
 
 import { cancelOrder, getOrders, updateOrderStatus } from '../order'
 import { orderKeys } from '../query-keys/order'
+import { posProductKeys } from '../query-keys/pos/product'
+import { productKeys } from '../query-keys/product'
 import { storefrontOrderKeys } from '../query-keys/storefront/order'
 
 interface UseOrdersParams {
@@ -52,8 +54,13 @@ export function useUpdateOrderStatus() {
       status: OrderStatus
       trackingNumber?: string
     }) => await updateOrderStatus(id, status, trackingNumber),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: orderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: storefrontOrderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: posProductKeys.all }),
+        queryClient.invalidateQueries({ queryKey: productKeys.all }),
+      ])
     },
   })
 }
@@ -67,6 +74,8 @@ export function useCancelOrder() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderKeys.all }),
         queryClient.invalidateQueries({ queryKey: storefrontOrderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: posProductKeys.all }),
+        queryClient.invalidateQueries({ queryKey: productKeys.all }),
       ])
     },
   })

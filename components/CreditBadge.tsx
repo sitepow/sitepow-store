@@ -9,7 +9,7 @@ export function CreditBadge({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'border-primary/20 bg-primary/5 text-primary flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs',
+        'border-primary/20 bg-primary/5 text-primary flex w-fit items-center gap-2 rounded-full border p-3 text-xs',
         className,
       )}
       {...props}

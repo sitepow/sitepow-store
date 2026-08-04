@@ -20,7 +20,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { PosCart } from './_components/PosCart'
-import { PosProductList } from './_components/PosProductList'
+import { PosProductList } from './_components/PosProductList/PosProductList'
 
 export default function MerchantPOSPage() {
   const { selectedStoreId } = useStoreFilter()

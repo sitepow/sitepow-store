@@ -1,13 +1,47 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
 import { DiscountType } from '@/generated/prisma/enums'
 import { CartItem, SelectedOption } from '@/types/sites/cart'
+import { calculateNetPrice } from '@/utils/product'
 
 type CartOption = NonNullable<StorefrontProductDetail['options']>[number]
 
-interface CalculateTotalParams {
-  subtotal: number
-  couponDiscount: number
-  pointsDiscount: number
+interface OptionInput {
+  title: string
+  choices: { name: string; extraPrice: number }[]
+}
+
+interface AddonInput {
+  id: string
+  price: number
+  isAvailable?: boolean
+}
+
+interface VariantInput {
+  id: string
+  price: number | string
+  discountActive?: boolean
+  discountType?: string | null
+  discountAmount?: number | null
+  pointsActive?: boolean
+  pointsAmount?: number | null
+}
+
+interface CalculateUnitPriceParams {
+  variant: VariantInput
+  options?: OptionInput[]
+  selectedOptionsMap: Record<string, string[]>
+  addons?: AddonInput[]
+  selectedAddonIds: string[]
+}
+
+interface CalculateRewardPointsParams {
+  variant?: VariantInput | null
+  quantity: number
+}
+
+interface ValidateOptionsParams {
+  options?: { title: string; require?: boolean }[]
+  selectedOptionsMap: Record<string, string[]>
 }
 
 export const isSameCartItem = (
@@ -75,6 +109,73 @@ export const mapSelectedOptions = (
   })
 
   return mapped
+}
+
+export const calculateCartUnitPrice = ({
+  variant,
+  options,
+  selectedOptionsMap,
+  addons,
+  selectedAddonIds,
+}: CalculateUnitPriceParams): number => {
+  let unitPrice = calculateNetPrice({
+    price: Number(variant.price),
+    discount: variant.discountActive
+      ? {
+          active: true,
+          type: variant.discountType ?? '',
+          amount: Number(variant.discountAmount ?? 0),
+        }
+      : undefined,
+  })
+
+  Object.entries(selectedOptionsMap).forEach(([title, choices]) => {
+    const optionGroup = options?.find((o) => o.title === title)
+    if (optionGroup) {
+      choices.forEach((choiceName) => {
+        const choice = optionGroup.choices.find((c) => c.name === choiceName)
+        if (choice) {
+          unitPrice += choice.extraPrice
+        }
+      })
+    }
+  })
+
+  addons?.forEach((addon) => {
+    if (selectedAddonIds.includes(addon.id) && (addon.isAvailable ?? true)) {
+      unitPrice += addon.price
+    }
+  })
+
+  return unitPrice
+}
+
+export const calculateRewardPoints = ({
+  variant,
+  quantity,
+}: CalculateRewardPointsParams): number => {
+  if (!variant || !variant.pointsActive) return 0
+  return (variant.pointsAmount ?? 0) * quantity
+}
+
+export const validateRequiredOptions = ({
+  options,
+  selectedOptionsMap,
+}: ValidateOptionsParams): string[] => {
+  const missingOptions: string[] = []
+  options?.forEach((option) => {
+    const selected = selectedOptionsMap[option.title] ?? []
+    if (option.require && selected.length === 0) {
+      missingOptions.push(option.title)
+    }
+  })
+  return missingOptions
+}
+
+interface CalculateTotalParams {
+  subtotal: number
+  couponDiscount: number
+  pointsDiscount: number
 }
 
 export const calculateGrandTotal = ({

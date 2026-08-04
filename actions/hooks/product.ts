@@ -11,12 +11,13 @@ import {
   GetProductsParams,
   createProduct,
   deleteProduct,
+  getProductById,
   getProductOptions,
   getProductQuota,
   getProducts,
   updateProduct,
 } from '../product'
-import { getProductById } from '../product'
+import { posProductKeys } from '../query-keys/pos/product'
 import { productKeys } from '../query-keys/product'
 
 export function useProducts({
@@ -45,6 +46,7 @@ export function useCreateProduct() {
     mutationFn: (input: CreateProductInput) => createProduct(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all })
+      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
     },
   })
 }
@@ -56,6 +58,7 @@ export function useDeleteProduct() {
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all })
+      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
     },
   })
 }
@@ -83,6 +86,7 @@ export function useUpdateProduct() {
       queryClient.invalidateQueries({
         queryKey: productKeys.detail(variables.id),
       })
+      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
     },
   })
 }
