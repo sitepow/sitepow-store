@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
@@ -9,6 +10,9 @@ import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/Su
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatPromptPay } from '@/utils/slip'
+import { createCustomerSchema } from '@/zod/customer'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconDiscount2,
   IconPlus,
@@ -19,6 +23,7 @@ import {
   IconWallet,
   IconX,
 } from '@tabler/icons-react'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +37,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
+
+type CreateCustomerFormValues = z.infer<typeof createCustomerSchema>
 
 export interface CustomerMember {
   id: string
@@ -72,17 +79,24 @@ export function PosDiscountDialog({
 }: PosDiscountDialogProps) {
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
   const [open, setOpen] = useState(false)
-
   const [mode, setMode] = useState<'search' | 'create'>('search')
-
   const [searchInput, setSearchInput] = useState('')
-
-  const [newFirstName, setNewFirstName] = useState('')
-  const [newLastName, setNewLastName] = useState('')
-  const [newPhone, setNewPhone] = useState('')
-  const [newEmail, setNewEmail] = useState('')
-
   const [couponCode, setCouponCode] = useState('')
+
+  const {
+    register,
+    handleSubmit,
+    reset: resetCreateForm,
+    formState: { errors },
+  } = useForm<CreateCustomerFormValues>({
+    resolver: zodResolver(createCustomerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+      email: '',
+    },
+  })
 
   const searchCustomerMutation = useSearchCustomer()
   const createCustomerMutation = useCreateCustomer()
@@ -115,23 +129,17 @@ export function PosDiscountDialog({
       { storeId: selectedStoreId, query: searchInput },
       {
         onSuccess: (data) => {
-          onSelectCustomer({
-            id: data.id,
-            name: data.name,
-            phone: data.phone,
-            points: data.points,
-          })
+          if (data.success && data.data) {
+            onSelectCustomer({
+              ...data.data,
+            })
+          }
         },
       },
     )
   }
 
-  const handleCreateMember = () => {
-    if (!newFirstName.trim() || !newPhone.trim()) {
-      toast.error('กรุณากรอกชื่อ และ เบอร์โทรศัพท์')
-      return
-    }
-
+  const handleCreateMember = (data: CreateCustomerFormValues) => {
     if (!selectedStoreId) {
       toast.error('ไม่พบรหัสร้านค้า')
       return
@@ -140,24 +148,20 @@ export function PosDiscountDialog({
     createCustomerMutation.mutate(
       {
         storeId: selectedStoreId,
-        firstName: newFirstName.trim(),
-        lastName: newLastName.trim(),
-        phone: newPhone.trim(),
-        email: newEmail.trim() || undefined,
+        firstName: data.firstName.trim(),
+        lastName: data.lastName?.trim() || undefined,
+        phone: data.phone.trim(),
+        email: data.email?.trim() || undefined,
       },
       {
-        onSuccess: (data) => {
-          onSelectCustomer({
-            id: data.id,
-            name: data.name,
-            phone: data.phone,
-            points: data.points,
-          })
-          setNewFirstName('')
-          setNewLastName('')
-          setNewPhone('')
-          setNewEmail('')
-          setMode('search')
+        onSuccess: (res) => {
+          if (res.success && res.data) {
+            onSelectCustomer({
+              ...res.data,
+            })
+            resetCreateForm()
+            setMode('search')
+          }
         },
       },
     )
@@ -263,17 +267,24 @@ export function PosDiscountDialog({
               )}
             </div>
             {customer ? (
-              <div className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+              <div className="from-primary/10 via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-600">
+                  <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
                     <IconUserCheck className="size-5" />
                   </div>
-                  <div>
-                    <p className="text-sm font-bold">{customer.name}</p>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <p className="text-foreground text-sm leading-none font-bold">
+                        {customer.name}
+                      </p>
+                      <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
+                        {formatPromptPay(customer.phone)}
+                      </span>
+                    </div>
                     <p className="text-muted-foreground text-xs">
-                      เบอร์: {customer.phone} | แต้มคงเหลือ:{' '}
-                      <span className="font-semibold text-emerald-600">
-                        {formatNumber(customer.points)}
+                      แต้มคงเหลือ:{' '}
+                      <span className="text-primary font-extrabold">
+                        {formatNumber(customer?.points ?? 0)}
                       </span>{' '}
                       แต้ม
                     </p>
@@ -283,7 +294,7 @@ export function PosDiscountDialog({
                   variant="ghost"
                   size="icon"
                   onClick={handleRemoveCustomer}
-                  className="text-muted-foreground hover:text-destructive size-8"
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 size-8 shrink-0"
                 >
                   <IconX className="size-4" />
                 </Button>
@@ -308,7 +319,10 @@ export function PosDiscountDialog({
                 </Button>
               </div>
             ) : (
-              <div className="bg-muted/30 space-y-3 rounded-xl border p-3.5">
+              <form
+                onSubmit={handleSubmit(handleCreateMember)}
+                className="bg-muted/30 space-y-3 rounded-xl border p-3.5"
+              >
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="space-y-1">
                     <Label className="text-xs">
@@ -316,18 +330,21 @@ export function PosDiscountDialog({
                     </Label>
                     <Input
                       placeholder="สมชาย"
-                      value={newFirstName}
-                      onChange={(e) => setNewFirstName(e.target.value)}
                       className="h-9 text-xs"
+                      {...register('firstName')}
                     />
+                    {errors.firstName && (
+                      <p className="text-destructive text-[10px]">
+                        {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">นามสกุล</Label>
                     <Input
                       placeholder="ใจดี"
-                      value={newLastName}
-                      onChange={(e) => setNewLastName(e.target.value)}
                       className="h-9 text-xs"
+                      {...register('lastName')}
                     />
                   </div>
                 </div>
@@ -338,25 +355,27 @@ export function PosDiscountDialog({
                     </Label>
                     <Input
                       placeholder="0812345678"
-                      value={newPhone}
-                      onChange={(e) => setNewPhone(e.target.value)}
                       className="h-9 text-xs"
+                      {...register('phone')}
                     />
+                    {errors.phone && (
+                      <p className="text-destructive text-[10px]">
+                        {errors.phone.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">อีเมล (ถ้ามี)</Label>
                     <Input
                       type="email"
                       placeholder="customer@example.com"
-                      value={newEmail}
-                      onChange={(e) => setNewEmail(e.target.value)}
                       className="h-9 text-xs"
+                      {...register('email')}
                     />
                   </div>
                 </div>
                 <Button
-                  type="button"
-                  onClick={handleCreateMember}
+                  type="submit"
                   disabled={createCustomerMutation.isPending}
                   className="w-full gap-1.5 font-semibold"
                   size="sm"
@@ -366,7 +385,7 @@ export function PosDiscountDialog({
                     ? 'กำลังบันทึก...'
                     : 'ลงทะเบียนสมาชิกใหม่'}
                 </Button>
-              </div>
+              </form>
             )}
           </div>
           <Separator />

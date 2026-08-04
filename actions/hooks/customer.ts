@@ -7,7 +7,6 @@ import {
 
 import {
   CreateCustomer,
-  POSCustomerSearch,
   blockCustomer,
   createCustomer,
   getCustomers,
@@ -84,27 +83,14 @@ export function useSearchCustomer() {
       storeId: string
       query: string
     }) => {
-      const res = await searchCustomer({ storeId, query })
-
-      if (!res.success || !res.data) {
-        throw new Error(res.message)
-      }
-
-      return res.data
+      return await searchCustomer({ storeId, query })
     },
   })
 }
 
 export function useCreateCustomer() {
-  return useMutation<POSCustomerSearch, Error, CreateCustomer>({
-    mutationFn: async (payload) => {
-      const res = await createCustomer(payload)
-
-      if (!res.success || !res.data) {
-        throw new Error(res.message)
-      }
-
-      return res.data
-    },
+  return useMutation({
+    mutationFn: async (payload: CreateCustomer) =>
+      await createCustomer(payload),
   })
 }

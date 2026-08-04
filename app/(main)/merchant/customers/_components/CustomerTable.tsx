@@ -12,6 +12,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
 import { formatNumber } from '@/utils/pricing'
+import { formatPromptPay } from '@/utils/slip'
 import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -101,7 +102,11 @@ export function CustomerTable() {
                       .join(' ') || '-'}
                   </TableCell>
                   <TableCell>{item.customer.email}</TableCell>
-                  <TableCell>{item.customer.phone ?? '-'}</TableCell>
+                  <TableCell>
+                    {item.customer.phone
+                      ? formatPromptPay(item.customer.phone)
+                      : '-'}
+                  </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.customer.isBlocked ? (
                       <span className="text-destructive">

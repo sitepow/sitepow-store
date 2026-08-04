@@ -362,40 +362,44 @@ export async function createCustomer(input: CreateCustomer) {
       return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
+    const cleanPhone = input.phone.trim()
+    const cleanEmail = input.email?.trim() || null
+
     let customer = await prisma.customer.findFirst({
-      where: { phone: input.phone },
+      where: {
+        OR: [
+          { phone: cleanPhone },
+          ...(cleanEmail ? [{ email: cleanEmail }] : []),
+        ],
+      },
     })
 
     if (!customer) {
       customer = await prisma.customer.create({
         data: {
-          firstName: input.firstName,
-          lastName: input.lastName ?? '',
-          phone: input.phone,
-          email: input.email ?? '',
+          firstName: input.firstName.trim(),
+          lastName: input.lastName?.trim() || null,
+          phone: cleanPhone,
+          email: cleanEmail!,
         },
       })
     }
 
-    let customerStore = await prisma.customerStore.findUnique({
+    const customerStore = await prisma.customerStore.upsert({
       where: {
         customerId_storeId: {
           customerId: customer.id,
           storeId: input.storeId,
         },
       },
+      create: {
+        customerId: customer.id,
+        storeId: input.storeId,
+        rewardPoints: 0,
+        totalSpent: 0,
+      },
+      update: {},
     })
-
-    if (!customerStore) {
-      customerStore = await prisma.customerStore.create({
-        data: {
-          customerId: customer.id,
-          storeId: input.storeId,
-          rewardPoints: 0,
-          totalSpent: 0,
-        },
-      })
-    }
 
     const fullName =
       [customer.firstName, customer.lastName].filter(Boolean).join(' ') ||
@@ -409,7 +413,7 @@ export async function createCustomer(input: CreateCustomer) {
         phone: customer.phone || '-',
         email: customer.email || '-',
         points: customerStore.rewardPoints || 0,
-        isBlocked: false,
+        isBlocked: customer.isBlocked || false,
       },
     }
   } catch (error) {
