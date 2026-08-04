@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+'use client'
+
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
@@ -8,8 +11,12 @@ import { formatCurrency } from '@/utils/pricing'
 import {
   IconAlertCircle,
   IconCheck,
+  IconCoins,
   IconCopy,
-  IconTicket,
+  IconFileText,
+  IconMapPin,
+  IconPackage,
+  IconReceipt,
 } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +27,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
+import { SummaryRow } from '../../../_components/cart/_components/SummaryRow'
+
+interface ShippingAddressSnapshot {
+  name?: string
+  receiverName?: string
+  phone?: string
+  addressLine?: string
+  subDistrict?: string
+  district?: string
+  province?: string
+  postalCode?: string
+}
+
 interface OrderDetailViewProps {
   order: GetStorefrontOrderItemSerialized
 }
@@ -27,6 +47,15 @@ interface OrderDetailViewProps {
 export function OrderDetailView({ order }: OrderDetailViewProps) {
   const { copied, copy } = useCopyToClipboard()
   const summary = calculateOrderSummary(order)
+
+  const couponDiscount =
+    (summary?.itemsSubtotal || 0) +
+    (summary?.shippingFee || 0) -
+    (summary?.pointsDiscount || 0) -
+    Number(order.totalAmount || 0)
+
+  const shippingAddr =
+    (order.shippingAddrSnapshot as ShippingAddressSnapshot | null) || null
 
   return (
     <>
@@ -37,7 +66,59 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
+
       <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+        {shippingAddr && (
+          <div className="space-y-1.5 rounded-lg border p-3 text-sm">
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
+              <IconMapPin size={15} /> ที่อยู่จัดส่ง
+            </div>
+            <div className="font-medium">
+              {shippingAddr.receiverName || shippingAddr.name}{' '}
+              {shippingAddr.phone && `(${shippingAddr.phone})`}
+            </div>
+            <div className="text-muted-foreground text-xs leading-relaxed">
+              {[
+                shippingAddr.addressLine,
+                shippingAddr.subDistrict,
+                shippingAddr.district,
+                shippingAddr.province,
+                shippingAddr.postalCode,
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            </div>
+          </div>
+        )}
+        {order.isTaxInvoiceRequested && (
+          <div className="space-y-1.5 rounded-lg border border-blue-500/30 bg-blue-500/5 p-3 text-sm">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400">
+              <IconReceipt size={15} /> ข้อมูลใบกำกับภาษี (Tax Invoice)
+            </div>
+            <div className="grid grid-cols-2 gap-1 text-xs">
+              <div>
+                <span className="text-muted-foreground">ชื่อ/บริษัท:</span>{' '}
+                <span className="font-medium">{order.taxName || '-'}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">เลขภาษี:</span>{' '}
+                <span className="font-medium">{order.taxId || '-'}</span>
+              </div>
+              {order.taxBranchCode && (
+                <div>
+                  <span className="text-muted-foreground">สาขา:</span>{' '}
+                  <span className="font-medium">{order.taxBranchCode}</span>
+                </div>
+              )}
+              {order.taxAddress && (
+                <div className="col-span-2">
+                  <span className="text-muted-foreground">ที่อยู่:</span>{' '}
+                  <span className="font-medium">{order.taxAddress}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         <div className="space-y-2 rounded-lg border p-4">
           <div className="text-sm font-semibold">รายการสินค้า</div>
           {order.items.map((item, idx) => (
@@ -54,6 +135,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                   {formatCurrency(Number(item.price) * item.quantity)}
                 </span>
               </div>
+              {item.customerNote && (
+                <span className="text-muted-foreground text-xs italic">
+                  โน้ต: {item.customerNote}
+                </span>
+              )}
               {item.branch?.name && (
                 <span className="text-muted-foreground text-xs">
                   จัดส่งจากสาขา {item.branch.name}
@@ -61,56 +147,76 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               )}
             </div>
           ))}
-          <div className="mt-3 space-y-1.5 border-t pt-3 text-sm">
-            <div className="text-muted-foreground flex justify-between">
-              <span>รวมราคาสินค้า</span>
-              <span>{formatCurrency(summary?.itemsSubtotal)}</span>
-            </div>
+          <div className="mt-3 space-y-1.5 border-t pt-3">
+            <SummaryRow
+              label="รวมราคาสินค้า"
+              value={formatCurrency(summary?.itemsSubtotal)}
+            />
             {summary?.shippingFee > 0 && (
-              <div className="text-muted-foreground flex justify-between">
-                <span>
-                  ค่าจัดส่ง{' '}
-                  {order.shippingMethod ? `(${order.shippingMethod})` : ''}
-                </span>
-                <span>{formatCurrency(summary?.shippingFee)}</span>
-              </div>
+              <SummaryRow
+                label={`ค่าจัดส่ง ${
+                  order.shippingMethod ? `(${order.shippingMethod})` : ''
+                }`}
+                value={formatCurrency(summary?.shippingFee)}
+              />
             )}
-            {order.coupon && (
-              <div className="flex items-center justify-between text-emerald-600">
-                <span className="flex items-center gap-1">
-                  <IconTicket size={14} /> ส่วนลดคูปอง ({order.coupon.code})
-                </span>
-                <span>
-                  -
-                  {formatCurrency(
-                    summary?.itemsSubtotal +
-                      summary?.shippingFee -
-                      Number(order.totalAmount),
-                  )}
-                </span>
-              </div>
+            {order.coupon && couponDiscount > 0 && (
+              <SummaryRow
+                label={`ส่วนลดคูปอง (${order.coupon.code})`}
+                value={formatCurrency(couponDiscount)}
+                isDiscount
+              />
             )}
-            {summary?.pointsDiscount > 0 && (
-              <div className="flex justify-between text-emerald-600">
-                <span>ส่วนลดจากแต้มสะสม ({order.usedPoints} แต้ม)</span>
-                <span>-{formatCurrency(summary?.pointsDiscount)}</span>
-              </div>
+            {(order.usedPoints ?? 0) > 0 && (
+              <SummaryRow
+                label={`ส่วนลดจากแต้มสะสม (${order.usedPoints?.toLocaleString()} แต้ม)`}
+                value={formatCurrency(summary?.pointsDiscount || 0)}
+                isDiscount
+              />
             )}
             {summary?.codFee > 0 && (
-              <div className="text-muted-foreground flex justify-between">
-                <span>ค่าธรรมเนียมเก็บเงินปลายทาง (COD)</span>
-                <span>{formatCurrency(summary?.codFee)}</span>
-              </div>
+              <SummaryRow
+                label="ค่าธรรมเนียมเก็บเงินปลายทาง (COD)"
+                value={formatCurrency(summary?.codFee)}
+              />
             )}
-            <div className="text-foreground flex justify-between border-t pt-2 text-base font-bold">
+            <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
               <span>ยอดชำระทั้งสิ้น</span>
               <span>{formatCurrency(order.totalAmount)}</span>
             </div>
+            {(order.earnedPoints ?? 0) > 0 && (
+              <div className="mt-2 flex items-center justify-between rounded-md bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
+                <span className="flex items-center gap-1 font-medium">
+                  <IconCoins size={14} /> แต้มที่จะได้รับจากออเดอร์นี้
+                </span>
+                <span className="font-bold">
+                  +{order.earnedPoints?.toLocaleString()} แต้ม
+                </span>
+              </div>
+            )}
           </div>
         </div>
+        {(order.totalWeight || order.width || order.height || order.length) && (
+          <div className="space-y-1.5 rounded-lg border p-3 text-xs">
+            <div className="text-muted-foreground flex items-center gap-1.5 font-semibold tracking-wider uppercase">
+              <IconPackage size={15} /> ขนาดและน้ำหนักพัสดุ
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {order.totalWeight && (
+                <span>น้ำหนัก: {order.totalWeight} กก.</span>
+              )}
+              {(order.width || order.height || order.length) && (
+                <span>
+                  ขนาด (กxยxส): {order.width || 0} x {order.length || 0} x{' '}
+                  {order.height || 0} ซม.
+                </span>
+              )}
+            </div>
+          </div>
+        )}
         <div className="space-y-2">
           <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
-          <div className="mb-5 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-wrap gap-2">
             <Badge
               variant={
                 (
@@ -127,7 +233,45 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                 รูปแบบชำระเงิน: {PAYMENT_METHOD_TH[order.paymentMethod]}
               </Badge>
             )}
+            {order.paidAt && (
+              <Badge variant="secondary">
+                ชำระเงินเมื่อ: {formatDateTime(order.paidAt)}
+              </Badge>
+            )}
           </div>
+          {(order.bankAccount || order.paymentProof) && (
+            <div className="space-y-2 rounded-lg border p-3 text-xs">
+              <div className="text-muted-foreground flex items-center gap-1.5 font-semibold">
+                <IconFileText size={15} /> ข้อมูลการชำระเงิน
+              </div>
+              {order.bankAccount && (
+                <div>
+                  โอนเข้าบัญชี: {order.bankAccount.bankName}{' '}
+                  {order.bankAccount.accountNumber} (
+                  {order.bankAccount.accountName})
+                </div>
+              )}
+              {order.paymentProof && (
+                <div className="space-y-1 pt-1">
+                  <span className="text-muted-foreground">
+                    หลักฐานการโอนเงิน (Slip):
+                  </span>
+                  <a
+                    href={order.paymentProof}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block max-w-32 overflow-hidden rounded-md border"
+                  >
+                    <img
+                      src={order.paymentProof}
+                      alt="Payment Proof"
+                      className="h-auto w-full object-cover transition-transform hover:scale-105"
+                    />
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
           {order.trackingNumber ? (
             <div className="from-primary/10 via-primary/2 to-background border-primary/25 flex items-center justify-between rounded-lg border bg-linear-to-br p-3">
               <div>

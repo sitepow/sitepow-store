@@ -1,13 +1,15 @@
 import { useState } from 'react'
 
+import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ORDER_STATUS_TH } from '@/constants/translate'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
+import { IconCreditCard } from '@tabler/icons-react'
 import { User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -15,6 +17,7 @@ import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -38,6 +41,8 @@ export function OrderTable() {
     page,
     limit: 10,
   })
+
+  const storeCheckoutMutation = useStoreCheckout()
 
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
@@ -70,6 +75,10 @@ export function OrderTable() {
                       .filter(Boolean)
                       .join(' ')
                   : '-'
+
+                const isStripePayment =
+                  order.paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY ||
+                  order.paymentMethod === PaymentMethod.STRIPE_CREDIT_CARD
 
                 return (
                   <TableRow key={order.id}>
@@ -117,6 +126,30 @@ export function OrderTable() {
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="flex items-center justify-end gap-2.5 text-right">
+                      {order.status === OrderStatus.PENDING &&
+                        isStripePayment && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            disabled={storeCheckoutMutation.isPending}
+                            onClick={() => {
+                              storeCheckoutMutation.mutate({
+                                customerEmail: order.customer?.email || '',
+                                storeId: order.storeId,
+                                orderId: order.id,
+                                description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,
+                                amount: order.totalAmount,
+                                successUrl: `${window.location.origin}/merchant/orders`,
+                                cancelUrl: `${window.location.origin}/merchant/orders`,
+                              })
+                            }}
+                          >
+                            <IconCreditCard className="mr-1 size-4" />
+                            {storeCheckoutMutation.isPending
+                              ? 'กำลังเชื่อมต่อ...'
+                              : 'ชำระเงินผ่าน Stripe'}
+                          </Button>
+                        )}
                       <OrderDetailDialog order={order} />
                       {order.status === OrderStatus.MANUAL_CHECK && (
                         <VerifySlipMerchantDialog order={order} />

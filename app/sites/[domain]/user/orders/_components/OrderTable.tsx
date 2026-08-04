@@ -132,7 +132,7 @@ export function OrderTable({ search }: OrderTableProps) {
                               disabled={storeCheckoutMutation.isPending}
                               onClick={() => {
                                 storeCheckoutMutation.mutate({
-                                  customerEmail: user?.email ?? ' ',
+                                  customerEmail: user?.email ?? '',
                                   storeId: order.store.id,
                                   orderId: order.id,
                                   description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,

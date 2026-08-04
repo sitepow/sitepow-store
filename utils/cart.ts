@@ -154,8 +154,20 @@ export const calculateRewardPoints = ({
   variant,
   quantity,
 }: CalculateRewardPointsParams): number => {
-  if (!variant || !variant.pointsActive) return 0
+  if (!variant || !variant.pointsActive) {
+    return 0
+  }
   return (variant.pointsAmount ?? 0) * quantity
+}
+
+export function calculateEarnedPoints(
+  total: number,
+  pointEarnRate: number,
+): number {
+  if (!pointEarnRate || pointEarnRate <= 0) {
+    return 0
+  }
+  return Math.floor(Math.max(0, total) / pointEarnRate)
 }
 
 export const validateRequiredOptions = ({

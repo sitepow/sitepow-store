@@ -82,7 +82,7 @@ export function PosCheckoutModal({
         status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
         paymentMethod: isCash
           ? PaymentMethod.CASH_ON_DELIVERY
-          : PaymentMethod.MANUAL_QR_PROMPTPAY,
+          : PaymentMethod.STRIPE_QR_PROMPTPAY,
         receivedAmount: isCash ? received : undefined,
         changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
         discountAmount,

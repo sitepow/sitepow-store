@@ -1,5 +1,6 @@
 'use server'
 
+import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
   LogAction,
@@ -7,6 +8,7 @@ import {
   PaymentMethod,
   ProductType,
 } from '@/generated/prisma/enums'
+import { calculateDiscounts, calculateEarnedPoints } from '@/utils/cart'
 import { serializeDecimal } from '@/utils/decimal'
 import { generateOrderNumber } from '@/utils/order'
 import { deductCustomerPoints } from '@/utils/points'
@@ -60,17 +62,104 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
       return { success: false, message: 'ไม่มีรายการสินค้าในตะกร้า' }
     }
 
-    const employee = await prisma.employee.findUnique({
-      where: { userId },
-      select: { id: true },
+    const store = await prisma.store.findUnique({
+      where: { id: input.storeId },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        logo: true,
+        phone: true,
+        email: true,
+        isPointsEnabled: true,
+        pointEarningRate: true,
+        pointRedeemRate: true,
+      },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    const [employee, customer] = await Promise.all([
+      prisma.employee.findUnique({
+        where: { userId },
+        select: { id: true },
+      }),
+      input.customerId
+        ? prisma.customer.findUnique({
+            where: { id: input.customerId },
+            include: {
+              addresses: {
+                where: { isDefault: true },
+                take: 1,
+              },
+            },
+          })
+        : null,
+    ])
+
+    let bankAccountId: string | null = null
+    if (
+      input.paymentMethod === PaymentMethod.MANUAL_QR_PROMPTPAY ||
+      input.paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
+    ) {
+      const defaultBank = await prisma.bankAccount.findFirst({
+        where: { storeId: input.storeId, isDefault: true },
+        select: { id: true },
+      })
+      bankAccountId = defaultBank?.id ?? null
+    }
+
+    const variantIds = Array.from(new Set(input.items.map((i) => i.variantId)))
+    const variants = await prisma.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: {
+        id: true,
+        weight: true,
+        width: true,
+        height: true,
+        length: true,
+      },
+    })
+    const variantMap = new Map(variants.map((v) => [v.id, v]))
+
+    let totalWeight = 0
+    let maxWidth = 0
+    let maxHeight = 0
+    let maxLength = 0
+
+    input.items.forEach((item) => {
+      const v = variantMap.get(item.variantId)
+      if (v) {
+        if (v.weight) totalWeight += Number(v.weight) * item.quantity
+        if (v.width && Number(v.width) > maxWidth) maxWidth = Number(v.width)
+        if (v.height && Number(v.height) > maxHeight)
+          maxHeight = Number(v.height)
+        if (v.length && Number(v.length) > maxLength)
+          maxLength = Number(v.length)
+      }
     })
 
     const subtotal = input.items.reduce(
       (sum, i) => sum + i.price * i.quantity,
       0,
     )
-    const finalTotal = Math.max(0, subtotal - (input.discountAmount ?? 0))
-    const orderNumber = `POS-${generateOrderNumber()}`
+
+    const { pointsDiscount } = calculateDiscounts({
+      subtotal,
+      usedPoints: input.usedPoints ?? 0,
+      pointRedeemRate: Number(store.pointRedeemRate ?? 0),
+    })
+
+    const manualDiscount = input.discountAmount ?? 0
+    const finalTotal = Math.max(0, subtotal - pointsDiscount - manualDiscount)
+
+    const earnedPoints = store.isPointsEnabled
+      ? calculateEarnedPoints(finalTotal, Number(store.pointEarningRate ?? 0))
+      : 0
+
+    const orderNumber = generateOrderNumber()
 
     const createdOrder = await prisma.$transaction(async (tx) => {
       for (const item of input.items) {
@@ -103,8 +192,10 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
       const orderStatus =
         input.status ??
         (input.paymentMethod === PaymentMethod.CASH_ON_DELIVERY
-          ? OrderStatus.PAID
+          ? OrderStatus.SHIPPED
           : OrderStatus.PENDING)
+
+      const defaultAddress = customer?.addresses?.[0] ?? null
 
       const newOrder = await tx.order.create({
         data: {
@@ -112,12 +203,28 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
           totalAmount: finalTotal,
           totalAmountBase: finalTotal,
           status: orderStatus,
-          paidAt: orderStatus === OrderStatus.PAID ? new Date() : null,
+          paidAt:
+            orderStatus === OrderStatus.PAID ||
+            orderStatus === OrderStatus.SHIPPED
+              ? new Date()
+              : null,
           storeId: input.storeId,
           customerId: input.customerId ?? null,
           employeeId: employee?.id ?? null,
           paymentMethod: input.paymentMethod,
+          bankAccountId,
+          storeSnapshot: store as unknown as Prisma.InputJsonValue,
+          shippingAddrSnapshot: defaultAddress
+            ? (defaultAddress as unknown as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
+          pointRedeemRateSnapshot: store.pointRedeemRate,
           usedPoints: input.usedPoints ?? 0,
+          pointsDiscount,
+          earnedPoints,
+          totalWeight: totalWeight > 0 ? totalWeight : null,
+          width: maxWidth > 0 ? maxWidth : null,
+          height: maxHeight > 0 ? maxHeight : null,
+          length: maxLength > 0 ? maxLength : null,
           items: {
             create: input.items.map((item) => ({
               productId: item.productId,
@@ -133,6 +240,7 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
         },
         include: {
           items: true,
+          bankAccount: true,
         },
       })
 
@@ -156,9 +264,11 @@ export async function createPOSOrder(input: CreatePOSOrderInput) {
             customerId: input.customerId,
             storeId: input.storeId,
             totalSpent: finalTotal,
+            rewardPoints: earnedPoints,
           },
           update: {
             totalSpent: { increment: finalTotal },
+            rewardPoints: { increment: earnedPoints },
           },
         })
       }
