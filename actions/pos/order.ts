@@ -19,6 +19,7 @@ export interface CreatePOSOrderInput {
   storeId: string
   branchId: string
   customerId?: string
+  status?: OrderStatus
   paymentMethod: PaymentMethod
   receivedAmount?: number
   changeAmount?: number

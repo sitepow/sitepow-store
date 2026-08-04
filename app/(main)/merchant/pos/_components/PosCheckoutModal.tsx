@@ -6,7 +6,8 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
-import { PaymentMethod } from '@/generated/prisma/enums'
+import { QUICK_AMOUNTS } from '@/constants/credit'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconCash, IconQrcode } from '@tabler/icons-react'
@@ -30,6 +31,8 @@ interface PosCheckoutModalProps {
   cart: CartItem[]
   storeId: string
   branchId: string
+  customerId?: string
+  usedPoints?: number
   totalAmount: number
   discountAmount: number
   onSuccess: () => void
@@ -41,6 +44,8 @@ export function PosCheckoutModal({
   cart,
   storeId,
   branchId,
+  customerId,
+  usedPoints = 0,
   totalAmount,
   discountAmount,
   onSuccess,
@@ -72,6 +77,9 @@ export function PosCheckoutModal({
       {
         storeId,
         branchId,
+        customerId,
+        usedPoints: usedPoints > 0 ? usedPoints : undefined,
+        status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
         paymentMethod: isCash
           ? PaymentMethod.CASH_ON_DELIVERY
           : PaymentMethod.MANUAL_QR_PROMPTPAY,
@@ -101,12 +109,10 @@ export function PosCheckoutModal({
     )
   }
 
-  const quickAmounts = [100, 500, 1000]
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="p-0">
-        <div className="bg-primary/10 bo rder-b p-5 text-center">
+        <div className="bg-primary/10 border-b p-5 text-center">
           <p className="text-muted-foreground text-xs font-semibold">
             ยอดรวมที่ต้องชำระ
           </p>
@@ -192,7 +198,7 @@ export function PosCheckoutModal({
                 >
                   พอดี
                 </Button>
-                {quickAmounts.map((amt) => (
+                {QUICK_AMOUNTS.map((amt) => (
                   <Button
                     key={amt}
                     type="button"

@@ -233,3 +233,187 @@ export async function blockCustomer(customerId: string, storeId: string) {
     return { success: false }
   }
 }
+
+export interface POSCustomerSearch {
+  id: string
+  name: string
+  phone: string
+  email: string
+  points: number
+  isBlocked: boolean
+}
+
+export async function searchCustomer({
+  storeId,
+  query,
+}: {
+  storeId: string
+  query: string
+}): Promise<{
+  success: boolean
+  data?: POSCustomerSearch
+  message?: string
+}> {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ' }
+  }
+
+  if (!query || !query.trim()) {
+    return { success: false, message: 'กรุณากรอกข้อมูลสำหรับค้นหา' }
+  }
+
+  try {
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId,
+      permission: 'canViewCustomers',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+    }
+
+    const cleanQuery = query.trim()
+
+    const customerStore = await prisma.customerStore.findFirst({
+      where: {
+        storeId,
+        customer: {
+          OR: [
+            { phone: cleanQuery },
+            { email: { equals: cleanQuery, mode: 'insensitive' } },
+            { id: cleanQuery },
+          ],
+        },
+      },
+      select: {
+        id: true,
+        rewardPoints: true,
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            isBlocked: true,
+          },
+        },
+      },
+    })
+
+    if (!customerStore) {
+      return { success: false, message: 'ไม่พบข้อมูลสมาชิกในระบบ' }
+    }
+
+    if (customerStore.customer.isBlocked) {
+      return { success: false, message: 'สมาชิกรายนี้ถูกระงับการใช้งาน' }
+    }
+
+    const fullName =
+      [customerStore.customer.firstName, customerStore.customer.lastName]
+        .filter(Boolean)
+        .join(' ') || 'ลูกค้า'
+
+    return {
+      success: true,
+      data: {
+        id: customerStore.customer.id,
+        name: fullName,
+        phone: customerStore.customer.phone || '-',
+        email: customerStore.customer.email || '-',
+        points: customerStore.rewardPoints || 0,
+        isBlocked: customerStore.customer.isBlocked,
+      },
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export interface CreateCustomer {
+  storeId: string
+  firstName: string
+  lastName?: string
+  phone: string
+  email?: string
+}
+
+export async function createCustomer(input: CreateCustomer) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+  }
+
+  try {
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canUpdateCustomers',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+    }
+
+    let customer = await prisma.customer.findFirst({
+      where: { phone: input.phone },
+    })
+
+    if (!customer) {
+      customer = await prisma.customer.create({
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName ?? '',
+          phone: input.phone,
+          email: input.email ?? '',
+        },
+      })
+    }
+
+    let customerStore = await prisma.customerStore.findUnique({
+      where: {
+        customerId_storeId: {
+          customerId: customer.id,
+          storeId: input.storeId,
+        },
+      },
+    })
+
+    if (!customerStore) {
+      customerStore = await prisma.customerStore.create({
+        data: {
+          customerId: customer.id,
+          storeId: input.storeId,
+          rewardPoints: 0,
+          totalSpent: 0,
+        },
+      })
+    }
+
+    const fullName =
+      [customer.firstName, customer.lastName].filter(Boolean).join(' ') ||
+      'ลูกค้า'
+
+    return {
+      success: true,
+      data: {
+        id: customer.id,
+        name: fullName,
+        phone: customer.phone || '-',
+        email: customer.email || '-',
+        points: customerStore.rewardPoints || 0,
+        isBlocked: false,
+      },
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}

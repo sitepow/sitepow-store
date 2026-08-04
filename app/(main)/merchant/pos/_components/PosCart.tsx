@@ -21,11 +21,20 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { PosCheckoutModal } from './PosCheckoutModal'
+import { PosDiscountDialog } from './PosDiscountDialog'
+
+export interface CustomerMember {
+  id: string
+  name: string
+  phone: string
+  points: number
+}
 
 interface PosCartProps {
   cart: CartItem[]
   storeId: string
   branchId: string
+  pointRedeemRate?: number
   onUpdateQuantity: (cartItemId: string, quantity: number) => void
   onRemoveItem: (cartItemId: string) => void
   onClearCart: () => void
@@ -36,6 +45,7 @@ export function PosCart({
   cart,
   storeId,
   branchId,
+  pointRedeemRate = 1,
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
@@ -43,32 +53,42 @@ export function PosCart({
 }: PosCartProps) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
+  const [customer, setCustomer] = useState<CustomerMember | null>(null)
+  const [usedPoints, setUsedPoints] = useState<number>(0)
+  const [couponDiscount, setCouponDiscount] = useState<number>(0)
+
+  const pointsDiscount = usedPoints * pointRedeemRate
+  const totalDiscount = couponDiscount + pointsDiscount
+
   const orderSummary = useMemo(() => {
+    const rawSubtotal = cart.reduce((sum, i) => sum + i.totalPrice, 0)
     return calculateOrderSummary({
       items: cart.map((i) => ({ price: i.unitPrice, quantity: i.quantity })),
-      totalAmount: cart.reduce((sum, i) => sum + i.totalPrice, 0),
+      totalAmount: Math.max(0, rawSubtotal - totalDiscount),
     })
-  }, [cart])
+  }, [cart, totalDiscount])
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
-
-  const totalPoints = useMemo(() => {
-    return cart.reduce((sum, item) => {
-      const points = item.variant?.pointsActive
-        ? (item.variant?.pointsAmount ?? 0)
-        : 0
-      return sum + points * item.quantity
-    }, 0)
-  }, [cart])
 
   const summaryData = useMemo(() => {
     return {
       subtotal: orderSummary.itemsSubtotal,
-      totalDiscount: orderSummary.couponDiscount,
+      totalDiscount,
       finalPrice: orderSummary.totalAmount,
-      totalPoints,
+      totalPoints: 0,
     }
-  }, [orderSummary, totalPoints])
+  }, [orderSummary, totalDiscount])
+
+  const handleResetCustomerAndDiscount = () => {
+    setCustomer(null)
+    setUsedPoints(0)
+    setCouponDiscount(0)
+  }
+
+  const handleClearCartAll = () => {
+    onClearCart()
+    handleResetCustomerAndDiscount()
+  }
 
   return (
     <>
@@ -92,7 +112,7 @@ export function PosCart({
                     variant="ghost"
                     size="sm"
                     className="h-8 px-2 text-xs text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                    onClick={onClearCart}
+                    onClick={handleClearCartAll}
                   >
                     <IconTrash className="mr-1 size-3.5" />
                     ล้างตะกร้า
@@ -141,6 +161,18 @@ export function PosCart({
             </ScrollArea>
           </CardContent>
           <CardFooter className="flex-col gap-3 border-t border-white/10 bg-black/60 p-4 backdrop-blur-md">
+            <div className="flex w-full items-center justify-between px-1">
+              <PosDiscountDialog
+                subtotal={summaryData.subtotal}
+                customer={customer}
+                usedPoints={usedPoints}
+                couponDiscount={couponDiscount}
+                pointRedeemRate={pointRedeemRate}
+                onSelectCustomer={setCustomer}
+                onChangeUsedPoints={setUsedPoints}
+                onChangeCouponDiscount={setCouponDiscount}
+              />
+            </div>
             <div className="dark w-full px-4 py-2 text-white!">
               <CartSummary summary={summaryData} />
             </div>
@@ -149,7 +181,7 @@ export function PosCart({
                 variant="outline"
                 className="flex-1 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
                 disabled={cart.length === 0}
-                onClick={onClearCart}
+                onClick={handleClearCartAll}
               >
                 ยกเลิก
               </Button>
@@ -171,9 +203,11 @@ export function PosCart({
         cart={cart}
         storeId={storeId}
         branchId={branchId}
+        customerId={customer?.id}
+        usedPoints={usedPoints}
+        discountAmount={totalDiscount}
         totalAmount={summaryData.finalPrice}
-        discountAmount={summaryData.totalDiscount}
-        onSuccess={onClearCart}
+        onSuccess={handleClearCartAll}
       />
     </>
   )

@@ -5,7 +5,15 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { blockCustomer, getCustomers, unblockCustomer } from '../customer'
+import {
+  CreateCustomer,
+  POSCustomerSearch,
+  blockCustomer,
+  createCustomer,
+  getCustomers,
+  searchCustomer,
+  unblockCustomer,
+} from '../customer'
 import { customerKeys } from '../query-keys/customer'
 
 interface UseCustomersParams {
@@ -63,6 +71,40 @@ export function useBlockCustomer() {
     }) => blockCustomer(customerId, storeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: customerKeys.all })
+    },
+  })
+}
+
+export function useSearchCustomer() {
+  return useMutation({
+    mutationFn: async ({
+      storeId,
+      query,
+    }: {
+      storeId: string
+      query: string
+    }) => {
+      const res = await searchCustomer({ storeId, query })
+
+      if (!res.success || !res.data) {
+        throw new Error(res.message)
+      }
+
+      return res.data
+    },
+  })
+}
+
+export function useCreateCustomer() {
+  return useMutation<POSCustomerSearch, Error, CreateCustomer>({
+    mutationFn: async (payload) => {
+      const res = await createCustomer(payload)
+
+      if (!res.success || !res.data) {
+        throw new Error(res.message)
+      }
+
+      return res.data
     },
   })
 }
