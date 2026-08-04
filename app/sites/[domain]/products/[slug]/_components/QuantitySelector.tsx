@@ -52,14 +52,12 @@ export function QuantitySelector({
           <MinusIcon className="size-4" />
         </Button>
       </InputGroupAddon>
-
       <InputGroupInput
         type="number"
         value={value}
         onChange={handleInputChange}
         className="h-9 [appearance:textfield] border-none text-center focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
-
       <InputGroupAddon align="inline-end" className="border-l p-0">
         <Button
           type="button"

@@ -21,6 +21,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { PosCart } from './_components/PosCart'
 import { PosProductList } from './_components/PosProductList/PosProductList'
+import {
+  SelectedAddonPayload,
+  SelectedOptionPayload,
+} from './_components/PosProductList/_components/PosProductOptionDialog'
 
 export default function MerchantPOSPage() {
   const { selectedStoreId } = useStoreFilter()
@@ -44,7 +48,13 @@ export default function MerchantPOSPage() {
     search: debouncedSearch,
   })
 
-  const handleAddToCart = (product: POSProductItem, variantId: string) => {
+  const handleAddToCart = (
+    product: POSProductItem,
+    variantId: string,
+    options?: SelectedOptionPayload[],
+    addons?: SelectedAddonPayload[],
+    quantity: number = 1,
+  ) => {
     if (!selectedBranchId) {
       return
     }
@@ -59,6 +69,26 @@ export default function MerchantPOSPage() {
       (s) => s.branchId === selectedBranchId,
     )
 
+    const formattedOptions = (options ?? []).map((opt) => {
+      const optionGroup = product.options?.find(
+        (o) => o.title === opt.groupTitle,
+      )
+      const choice = optionGroup?.choices.find((c) => c.name === opt.choiceName)
+
+      return {
+        optionTitle: opt.groupTitle,
+        choiceName: opt.choiceName,
+        extraPrice: choice?.extraPrice ?? 0,
+      }
+    })
+
+    const formattedAddons = (addons ?? []).map((addon) => ({
+      id: addon.id,
+      title: addon.title,
+      price: addon.price,
+      isAvailable: true,
+    }))
+
     addItem({
       productId: product.id,
       productTitle: product.title,
@@ -68,9 +98,9 @@ export default function MerchantPOSPage() {
         ...variant,
         price: unitPrice,
       },
-      selectedOptions: [],
-      selectedAddons: [],
-      quantity: 1,
+      selectedOptions: formattedOptions,
+      selectedAddons: formattedAddons,
+      quantity: quantity,
       unitPrice,
       rewardPoints: variant.pointsActive ? variant.pointsAmount : 0,
       branchId: selectedBranchId,

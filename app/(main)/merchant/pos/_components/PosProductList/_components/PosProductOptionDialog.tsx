@@ -3,11 +3,11 @@
 import { useMemo, useState } from 'react'
 
 import { POSProductItem } from '@/actions/pos/product'
+import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
 import { calculateCartUnitPrice } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
-import { IconMinus, IconPlus } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -75,7 +75,9 @@ export function PosProductOptionDialog({
   }
 
   const currentVariant = useMemo(() => {
-    if (!product) return null
+    if (!product) {
+      return null
+    }
     return (
       product.variants.find((v) => v.id === selectedVariantId) ||
       product.variants[0]
@@ -83,7 +85,9 @@ export function PosProductOptionDialog({
   }, [product, selectedVariantId])
 
   const currentVariantStock = useMemo(() => {
-    if (!currentVariant) return 0
+    if (!currentVariant) {
+      return 0
+    }
     return getVariantStock(currentVariant)
   }, [currentVariant])
 
@@ -96,7 +100,9 @@ export function PosProductOptionDialog({
   }, [selectedOptions])
 
   const unitPrice = useMemo(() => {
-    if (!product || !currentVariant) return 0
+    if (!product || !currentVariant) {
+      return 0
+    }
 
     return calculateCartUnitPrice({
       variant: currentVariant,
@@ -356,31 +362,12 @@ export function PosProductOptionDialog({
           </div>
         </ScrollArea>
         <DialogFooter className="flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center justify-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="size-9"
-              disabled={currentVariantStock <= 0}
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            >
-              <IconMinus className="size-4" />
-            </Button>
-            <span className="w-8 text-center text-lg font-bold">
-              {quantity}
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="size-9"
-              disabled={currentVariantStock <= 0}
-              onClick={() => setQuantity((q) => q + 1)}
-            >
-              <IconPlus className="size-4" />
-            </Button>
-          </div>
+          <QuantitySelector
+            value={quantity}
+            onChange={setQuantity}
+            min={1}
+            max={currentVariantStock > 0 ? currentVariantStock : 1}
+          />
           <Button
             size="lg"
             className="w-full font-bold sm:w-auto"
