@@ -1,3 +1,4 @@
+import { CreateCustomerInput } from '@/zod/customer'
 import {
   queryOptions,
   useMutation,
@@ -6,7 +7,6 @@ import {
 } from '@tanstack/react-query'
 
 import {
-  CreateCustomer,
   blockCustomer,
   createCustomer,
   getCustomers,
@@ -90,7 +90,7 @@ export function useSearchCustomer() {
 
 export function useCreateCustomer() {
   return useMutation({
-    mutationFn: async (payload: CreateCustomer) =>
+    mutationFn: async (payload: CreateCustomerInput) =>
       await createCustomer(payload),
   })
 }

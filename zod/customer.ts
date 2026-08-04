@@ -2,6 +2,7 @@ import { FORBIDDEN_TITLES } from '@/constants/system'
 import z from 'zod'
 
 export const createCustomerSchema = z.object({
+  storeId: z.string(),
   firstName: z
     .string()
     .min(1, 'กรุณากรอกชื่อ')

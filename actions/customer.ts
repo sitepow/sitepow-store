@@ -350,7 +350,7 @@ export type CreateCustomerResponse = {
 }
 
 export async function createCustomer(
-  input: CreateCustomerInput & { storeId: string },
+  input: CreateCustomerInput,
 ): Promise<CreateCustomerResponse> {
   const session = await auth()
   const userId = session?.user?.id
