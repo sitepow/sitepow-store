@@ -3,13 +3,14 @@
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { CreateCustomerInput } from '@/zod/customer'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
-interface GetCustomersParams {
+export interface GetCustomersParams {
   storeId: string
   page?: number
   limit?: number
@@ -234,6 +235,10 @@ export async function blockCustomer(customerId: string, storeId: string) {
   }
 }
 
+export type POSCustomerData = NonNullable<
+  Awaited<ReturnType<typeof searchCustomer>>['data']
+>
+
 export interface POSCustomerSearch {
   id: string
   name: string
@@ -243,17 +248,19 @@ export interface POSCustomerSearch {
   isBlocked: boolean
 }
 
+export type SearchCustomerResponse = {
+  success: boolean
+  data?: POSCustomerSearch
+  message?: string
+}
+
 export async function searchCustomer({
   storeId,
   query,
 }: {
   storeId: string
   query: string
-}): Promise<{
-  success: boolean
-  data?: POSCustomerSearch
-  message?: string
-}> {
+}): Promise<SearchCustomerResponse> {
   const session = await auth()
   const userId = session?.user?.id
 
@@ -320,6 +327,7 @@ export async function searchCustomer({
 
     return {
       success: true,
+      message: 'พบข้อมูลสมาชิก พร้อมใช้แต้มสะสมสำหรับร้านนี้',
       data: {
         id: customerStore.customer.id,
         name: fullName,
@@ -335,15 +343,15 @@ export async function searchCustomer({
   }
 }
 
-export interface CreateCustomer {
-  storeId: string
-  firstName: string
-  lastName?: string
-  phone: string
-  email?: string
+export type CreateCustomerResponse = {
+  success: boolean
+  data?: POSCustomerSearch
+  message?: string
 }
 
-export async function createCustomer(input: CreateCustomer) {
+export async function createCustomer(
+  input: CreateCustomerInput & { storeId: string },
+): Promise<CreateCustomerResponse> {
   const session = await auth()
   const userId = session?.user?.id
 
@@ -407,6 +415,7 @@ export async function createCustomer(input: CreateCustomer) {
 
     return {
       success: true,
+      message: 'สร้างสมาชิกใหม่สำเร็จ พร้อมใช้สะสมแต้มสำหรับร้านนี้',
       data: {
         id: customer.id,
         name: fullName,

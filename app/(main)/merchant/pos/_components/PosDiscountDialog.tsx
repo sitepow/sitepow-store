@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { POSCustomerData } from '@/actions/customer'
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
 import { useValidateCoupon } from '@/actions/hooks/storefront/discount'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
@@ -11,7 +12,7 @@ import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
-import { createCustomerSchema } from '@/zod/customer'
+import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconDiscount2,
@@ -23,7 +24,6 @@ import {
   IconWallet,
   IconX,
 } from '@tabler/icons-react'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -38,15 +38,6 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 
-type CreateCustomerFormValues = z.infer<typeof createCustomerSchema>
-
-export interface CustomerMember {
-  id: string
-  name: string
-  phone: string
-  points: number
-}
-
 export interface AppliedCoupon {
   code: string
   discountAmount: number
@@ -54,12 +45,12 @@ export interface AppliedCoupon {
 
 interface PosDiscountDialogProps {
   subtotal: number
-  customer: CustomerMember | null
+  customer: POSCustomerData | null
   usedPoints: number
   couponDiscount: number
   pointRedeemRate: number
   appliedCoupon?: AppliedCoupon | null
-  onSelectCustomer: (customer: CustomerMember | null) => void
+  onSelectCustomer: (customer: POSCustomerData | null) => void
   onChangeUsedPoints: (points: number) => void
   onChangeCouponDiscount: (amount: number) => void
   onApplyCoupon?: (coupon: AppliedCoupon | null) => void
@@ -88,7 +79,7 @@ export function PosDiscountDialog({
     handleSubmit,
     reset: resetCreateForm,
     formState: { errors },
-  } = useForm<CreateCustomerFormValues>({
+  } = useForm<CreateCustomerInput>({
     resolver: zodResolver(createCustomerSchema),
     defaultValues: {
       firstName: '',
@@ -139,7 +130,7 @@ export function PosDiscountDialog({
     )
   }
 
-  const handleCreateMember = (data: CreateCustomerFormValues) => {
+  const handleCreateMember = (data: CreateCustomerInput) => {
     if (!selectedStoreId) {
       toast.error('ไม่พบรหัสร้านค้า')
       return
@@ -184,7 +175,9 @@ export function PosDiscountDialog({
   }
 
   const handleApplyCouponCode = () => {
-    if (!couponCode.trim()) return
+    if (!couponCode.trim()) {
+      return
+    }
 
     validateCouponMutation.mutate(
       {
@@ -273,20 +266,14 @@ export function PosDiscountDialog({
                     <IconUserCheck className="size-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <p className="text-foreground text-sm leading-none font-bold">
-                        {customer.name}
-                      </p>
-                      <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
-                        {formatPromptPay(customer.phone)}
-                      </span>
-                    </div>
+                    <p className="text-foreground text-sm leading-none font-bold">
+                      {customer.name}
+                    </p>
                     <p className="text-muted-foreground text-xs">
-                      แต้มคงเหลือ:{' '}
-                      <span className="text-primary font-extrabold">
-                        {formatNumber(customer?.points ?? 0)}
-                      </span>{' '}
-                      แต้ม
+                      รหัสลูกค้า: {customer.id} <br />
+                      อีเมล: {customer.email} <br />
+                      เบอร์โทรศัพท์: {formatPromptPay(customer.phone)} <br />
+                      แต้มคงเหลือ:{formatNumber(customer?.points ?? 0)} แต้ม
                     </p>
                   </div>
                 </div>
@@ -302,7 +289,7 @@ export function PosDiscountDialog({
             ) : mode === 'search' ? (
               <div className="flex gap-2">
                 <Input
-                  placeholder="เบอร์โทร / อีเมล / ID สมาชิก..."
+                  placeholder="ค้นหาด้วย เบอร์โทร / อีเมล / รหัสสมาชิก..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchMember()}
@@ -365,7 +352,7 @@ export function PosDiscountDialog({
                     )}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">อีเมล (ถ้ามี)</Label>
+                    <Label className="text-xs">อีเมล</Label>
                     <Input
                       type="email"
                       placeholder="customer@example.com"

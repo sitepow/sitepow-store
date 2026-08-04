@@ -1,5 +1,5 @@
 import { FORBIDDEN_TITLES } from '@/constants/system'
-import { z } from 'zod'
+import z from 'zod'
 
 export const createCustomerSchema = z.object({
   firstName: z
@@ -31,7 +31,7 @@ export const createCustomerSchema = z.object({
     .string()
     .min(1, 'กรุณากรอกเบอร์โทรศัพท์')
     .regex(/^[0-9\-\+]{9,15}$/, 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง'),
-  email: z.string().email('รูปแบบอีเมลไม่ถูกต้อง').optional().or(z.literal('')),
+  email: z.email('รูปแบบอีเมลไม่ถูกต้อง').optional().or(z.literal('')),
 })
 
 export type CreateCustomerInput = z.infer<typeof createCustomerSchema>
