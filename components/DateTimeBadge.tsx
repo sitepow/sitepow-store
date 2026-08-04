@@ -1,31 +1,21 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { ComponentProps, useSyncExternalStore } from 'react'
+import { ComponentProps, useEffect, useState } from 'react'
 
 import { formatShortDate, formatShortTime } from '@/utils/date'
 import { IconClock } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
 
-function subscribe(callback: () => void) {
-  const timer = setInterval(callback, 1000)
-  return () => clearInterval(timer)
-}
-
-function getSnapshot() {
-  return Date.now()
-}
-
-function getServerSnapshot() {
-  return null
-}
-
 export function DateTimeBadge({ className, ...props }: ComponentProps<'div'>) {
-  const timestamp = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  )
+  const [timestamp, setTimestamp] = useState<number | null>(null)
+
+  useEffect(() => {
+    setTimestamp(Date.now())
+    const timer = setInterval(() => setTimestamp(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   if (!timestamp) {
     return null
