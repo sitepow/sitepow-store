@@ -244,12 +244,12 @@ export function PosCart({
             </ScrollArea>
           </CardContent>
           <CardFooter className="flex-col gap-3 border-t border-white/10 bg-black/60 p-4 backdrop-blur-md">
-            <div className="flex w-full items-center justify-between px-1">
+            {orderItems?.length !== 0 && (
               <PosDiscountDialog
                 subtotal={summaryData.subtotal}
                 pointRedeemRate={pointRedeemRate}
               />
-            </div>
+            )}
             <div className="dark w-full px-4 py-2 text-white!">
               <CartSummary summary={summaryData} />
             </div>
