@@ -6,19 +6,23 @@ import { useUpdateOrderStatus } from '@/actions/hooks/order'
 import { GetOrdersItem } from '@/actions/order'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { formatFullAddress } from '@/utils/address'
 import { formatDateTime } from '@/utils/date'
-import { IconEye } from '@tabler/icons-react'
-
+import { formatNumber } from '@/utils/pricing'
+import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import {
-  OrderAddressCard,
+  IconEye,
+  IconMapPin,
+  IconPackage,
+  IconReceipt,
+} from '@tabler/icons-react'
+
+import { CustomerCard } from '@/components/CustomerCard'
+import {
   OrderItemsSummary,
-  OrderPackageSizeCard,
-  OrderPaymentInfoCard,
-  OrderTaxInvoiceCard,
   OrderTrackingCard,
   ShippingAddressSnapshot,
 } from '@/components/order'
-import { OrderCustomerInfoCard } from '@/components/order/CustomerInfoCard'
 import { OrderStatusBadges } from '@/components/order/StatusBadges'
 import { OrderTrackingForm } from '@/components/order/TrackingForm'
 import { Button } from '@/components/ui/button'
@@ -96,9 +100,16 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
             paymentMethod={order.paymentMethod}
             paidAt={order.paidAt}
           />
-          <OrderPaymentInfoCard
-            bankAccount={order.bankAccount}
-            paymentProof={order.paymentProof}
+          <CustomerCard
+            title="ข้อมูลการชำระเงิน"
+            content={
+              <>
+                เลขที่บัญชี:{' '}
+                {formatBankAccount(order.bankAccount?.accountNumber)} <br />
+                โอนเข้าบัญชี: {order.bankAccount?.bankName} <br />
+                ชื่อบัญชีธนาคาร: {order.bankAccount?.accountName}
+              </>
+            }
           />
           {(order.status === OrderStatus.PAID ||
             order.status === OrderStatus.SHIPPED) &&
@@ -119,7 +130,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               />
             )}
         </div>
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
             <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
             <Select
@@ -142,22 +153,57 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               </SelectContent>
             </Select>
           </div>
-          <OrderCustomerInfoCard customer={order.customer} />
-          <OrderAddressCard address={shippingAddr} />
-          <OrderTaxInvoiceCard
-            isRequested={order.isTaxInvoiceRequested}
-            taxName={order.taxName}
-            taxId={order.taxId}
-            taxBranchCode={order.taxBranchCode}
-            taxAddress={order.taxAddress}
+          <CustomerCard
+            title={`${order.customer?.firstName} ${order.customer?.lastName}`}
+            content={
+              <>
+                รหัสลูกค้า: {order.customer?.id} <br />
+                อีเมล: {order.customer?.email} <br />
+                เบอร์โทรศัพท์: {formatPromptPay(order.customer?.phone)} <br />
+              </>
+            }
+          />
+          <CustomerCard
+            icon={<IconMapPin />}
+            title="ที่อยู่จัดส่ง"
+            content={
+              <>
+                ชื่อผู้รับสินค้า:{' '}
+                {shippingAddr?.receiverName || shippingAddr?.name} <br />
+                เบอร์โทรศัพท์:{' '}
+                {shippingAddr?.phone && formatPromptPay(shippingAddr.phone)}
+                <br />
+                ที่อยู่รับสินค้า: {formatFullAddress(shippingAddr)}
+              </>
+            }
+          />
+          <CustomerCard
+            icon={<IconPackage />}
+            title="ขนาดและน้ำหนักพัสดุ"
+            content={
+              <>
+                น้ำหนัก: {formatNumber(60)} กก. <br />
+                ขนาด (กxยxส): {formatNumber(0)}x {formatNumber(0)} x{' '}
+                {formatNumber(0)} ซม.
+              </>
+            }
+          />
+          <CustomerCard
+            icon={<IconReceipt />}
+            title="ข้อมูลใบกำกับภาษี"
+            content={
+              <>
+                ชื่อ/บริษัท: ไซต์พาว โซลูชั่น จำกัด
+                <br />
+                เลขภาษี: {formatPromptPay('1348500011161')}
+                <br />
+                สาขา: สำนักงานใหญ่
+                <br />
+                ที่อยู่: <br />
+              </>
+            }
           />
           <OrderItemsSummary order={order} />
-          <OrderPackageSizeCard
-            totalWeight={order.totalWeight}
-            width={order.width}
-            height={order.height}
-            length={order.length}
-          />
         </div>
       </DialogContent>
     </Dialog>

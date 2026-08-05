@@ -19,13 +19,9 @@ import { calculateNetPrice } from '@/utils/product'
 import { formatPromptPay } from '@/utils/slip'
 import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IconShoppingCart,
-  IconTrash,
-  IconUserCheck,
-  IconX,
-} from '@tabler/icons-react'
+import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
+import { CustomerCard } from '@/components/CustomerCard'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -238,32 +234,26 @@ export function PosCart({
               </div>
             </CardTitle>
             {customerId && (
-              <div className="dark from-primary via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
-                    <IconUserCheck className="size-5" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-foreground text-sm leading-none font-bold">
-                      {customerName}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      รหัสลูกค้า: {customerId} <br />
-                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')}{' '}
-                      <br />
-                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRemoveCustomer}
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 size-8 shrink-0"
-                >
-                  <IconX className="size-4" />
-                </Button>
-              </div>
+              <CustomerCard
+                className="dark from-primary"
+                title={customerName}
+                content={
+                  <>
+                    รหัสลูกค้า: {customerId} <br />
+                    เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')} <br />
+                    แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                  </>
+                }
+                action={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveCustomer}
+                  >
+                    <IconX />
+                  </Button>
+                }
+              />
             )}
           </CardHeader>
           <CardContent className="flex-1 overflow-hidden p-0">

@@ -29,6 +29,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 
+import { CustomerCard } from '@/components/CustomerCard'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -234,32 +235,25 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
               )}
             </div>
             {customerId ? (
-              <div className="from-primary/10 via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
-                    <IconUserCheck className="size-5" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-foreground text-sm leading-none font-bold">
-                      {customerName}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      รหัสลูกค้า: {customerId} <br />
-                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')}{' '}
-                      <br />
-                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRemoveCustomer}
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 size-8 shrink-0"
-                >
-                  <IconX className="size-4" />
-                </Button>
-              </div>
+              <CustomerCard
+                title={customerName}
+                content={
+                  <>
+                    รหัสลูกค้า: {customerId} <br />
+                    เบอร์โทรศัพท์: {formatPromptPay(customerPhone)} <br />
+                    แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                  </>
+                }
+                action={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveCustomer}
+                  >
+                    <IconX />
+                  </Button>
+                }
+              />
             ) : mode === 'search' ? (
               <div className="flex gap-2">
                 <Input

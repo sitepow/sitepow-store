@@ -16,7 +16,9 @@ export function OrderPaymentInfoCard({
   bankAccount,
   paymentProof,
 }: OrderPaymentInfoCardProps) {
-  if (!bankAccount && !paymentProof) return null
+  if (!bankAccount && !paymentProof) {
+    return null
+  }
 
   return (
     <div className="space-y-2 rounded-lg border p-3 text-xs">

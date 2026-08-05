@@ -1,0 +1,64 @@
+import {
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+  cloneElement,
+  isValidElement,
+} from 'react'
+
+import { IconUserCheck } from '@tabler/icons-react'
+
+import { cn } from '@/lib/utils'
+
+export interface CustomerCardProps extends Omit<
+  ComponentProps<'div'>,
+  'title' | 'content'
+> {
+  icon?: ReactNode
+  title: ReactNode
+  content?: ReactNode
+  action?: ReactNode
+}
+
+export function CustomerCard({
+  icon = <IconUserCheck />,
+  title,
+  content,
+  action,
+  className,
+  ...props
+}: CustomerCardProps) {
+  const renderedIcon = isValidElement(icon)
+    ? cloneElement(icon as ReactElement<{ className?: string }>, {
+        className: cn(
+          'size-4',
+          (icon.props as { className?: string }).className,
+        ),
+      })
+    : icon
+
+  return (
+    <div
+      className={cn(
+        'from-primary/10 via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs',
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-3">
+        <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
+          {renderedIcon}
+        </div>
+        <div className="space-y-2.5">
+          <p className="text-foreground text-sm leading-none font-bold">
+            {title}
+          </p>
+          {content && (
+            <div className="text-muted-foreground text-xs">{content}</div>
+          )}
+        </div>
+      </div>
+      {action}
+    </div>
+  )
+}

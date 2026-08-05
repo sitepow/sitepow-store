@@ -8,10 +8,10 @@ interface OrderPackageSizeCardProps {
 }
 
 export function OrderPackageSizeCard({
-  totalWeight,
-  width,
-  height,
-  length,
+  totalWeight = 20,
+  width = 70,
+  height = 25,
+  length = 25,
 }: OrderPackageSizeCardProps) {
   if (!totalWeight && !width && !height && !length) {
     return null
