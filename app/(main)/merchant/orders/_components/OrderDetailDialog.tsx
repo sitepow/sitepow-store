@@ -84,7 +84,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
           <DialogDescription>
@@ -127,7 +127,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               </Avatar>
               <div className="ml-3 max-w-72 space-y-0.5">
                 <p className="text-sm leading-none font-medium">
-                  {/* {order.customer?.name || 'คุณลูกค้า'} */}
+                  {order.customer?.firstName} {order.customer?.lastName}
                 </p>
                 <p className="text-muted-foreground text-xs">
                   อีเมล: {order.customer?.email ?? '-'}
@@ -183,10 +183,13 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               bankAccount={order.bankAccount}
               paymentProof={order.paymentProof}
             />
-            <OrderTrackingCard
-              status={order.status}
-              trackingNumber={order.trackingNumber}
-            />
+            {(order.status === OrderStatus.PAID ||
+              order.status === OrderStatus.SHIPPED) && (
+              <OrderTrackingCard
+                status={order.status}
+                trackingNumber={order.trackingNumber}
+              />
+            )}
           </div>
           {selectedStatus === OrderStatus.SHIPPED && !order.trackingNumber && (
             <div className="space-y-3 rounded-lg border p-4">

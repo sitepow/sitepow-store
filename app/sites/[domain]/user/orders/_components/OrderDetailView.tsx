@@ -38,7 +38,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
-      <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+      <div className="max-h-[85vh] space-y-5 overflow-y-auto sm:max-w-lg">
         <OrderAddressCard address={shippingAddr} />
         <OrderTaxInvoiceCard
           isRequested={order.isTaxInvoiceRequested}
