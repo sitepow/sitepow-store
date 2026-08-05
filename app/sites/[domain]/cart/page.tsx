@@ -88,8 +88,9 @@ export default function StoreCartPage() {
   const pointsDiscount = usedPoints * (loyalty?.pointRedeemRate ?? 0)
   const couponDiscount = appliedCoupon?.discountAmount ?? 0
 
-  const physicalItems = items.filter(
-    (item) => item.productType === ProductType.PHYSICAL,
+  const physicalItems = useMemo(
+    () => items.filter((item) => item.productType === ProductType.PHYSICAL),
+    [items],
   )
   const hasPhysical = physicalItems.length > 0
 
@@ -243,7 +244,6 @@ export default function StoreCartPage() {
     if (userSelectedSection) {
       return userSelectedSection
     }
-
     return hasPhysical ? 'address' : 'payment'
   }, [hasPhysical, userSelectedSection])
 
@@ -312,6 +312,45 @@ export default function StoreCartPage() {
     }
   }, [activeSection])
 
+  useEffect(() => {
+    if (hasUserIntervened) {
+      return
+    }
+
+    if (hasPhysical && !selectedAddress && addressOptions.length > 0) {
+      const defaultAddr =
+        addressOptions.find((a) => a.isDefault) || addressOptions[0]
+      if (defaultAddr) {
+        setSelectedAddress(defaultAddr.id)
+      }
+    }
+
+    if (hasPhysical && selectedAddress && !selectedShipping) {
+      const validOptions = shippingOptionsWithFees.filter(
+        (opt) => opt.fee !== null,
+      )
+      if (validOptions.length > 0) {
+        const cheapest = validOptions.reduce((prev, curr) =>
+          prev.fee! < curr.fee! ? prev : curr,
+        )
+        setSelectedShipping(cheapest.id)
+      }
+    }
+
+    if (!selectedPayment && paymentMethods.length === 1) {
+      setSelectedPayment(paymentMethods[0].id)
+    }
+  }, [
+    hasUserIntervened,
+    hasPhysical,
+    selectedAddress,
+    addressOptions,
+    selectedShipping,
+    shippingOptionsWithFees,
+    selectedPayment,
+    paymentMethods,
+  ])
+
   const handleCreateOrder = () => {
     if (hasPhysical && (!selectedAddressData || !selectedShippingData)) {
       return
@@ -328,7 +367,9 @@ export default function StoreCartPage() {
     const paymentMethodEnum = getPaymentMethod(selectedPaymentData.id)
     const isStripePayment =
       paymentMethodEnum === PaymentMethod.STRIPE_QR_PROMPTPAY ||
-      paymentMethodEnum === PaymentMethod.STRIPE_CREDIT_CARD
+      paymentMethodEnum === PaymentMethod.STRIPE_CREDIT_CARD ||
+      paymentMethodEnum === PaymentMethod.STRIPE_GOOGLE_PAY ||
+      paymentMethodEnum === PaymentMethod.STRIPE_APPLE_PAY
 
     createOrderMutation.mutate(
       {
@@ -363,7 +404,7 @@ export default function StoreCartPage() {
               .map((order) => order.orderNumber)
               .join(', ')
 
-            const grandTotal = res.allOrders.reduce(
+            const calculatedGrandTotal = res.allOrders.reduce(
               (sum: number, order) => sum + Number(order.totalAmount),
               0,
             )
@@ -376,7 +417,7 @@ export default function StoreCartPage() {
                 storeId: store.id,
                 orderIds: orderIdsString,
                 description: `ชำระเงินคำสั่งซื้อ #${orderNumbersString}`,
-                amount: grandTotal,
+                amount: calculatedGrandTotal,
                 successUrl: `${window.location.origin}/user/orders`,
                 cancelUrl: `${window.location.origin}/user/orders`,
               })
@@ -388,80 +429,6 @@ export default function StoreCartPage() {
       },
     )
   }
-
-  const cheapestShippingId = useMemo(() => {
-    if (!hasPhysical) {
-      return ''
-    }
-
-    const availableOptions = shippingOptionsWithFees.filter(
-      (opt) => opt.fee !== null,
-    )
-
-    if (availableOptions.length === 0) {
-      return ''
-    }
-
-    return availableOptions.reduce((prev, curr) =>
-      prev.fee! < curr.fee! ? prev : curr,
-    ).id
-  }, [hasPhysical, shippingOptionsWithFees])
-
-  useEffect(() => {
-    if (hasUserIntervened) {
-      return
-    }
-
-    if (
-      !hasPhysical &&
-      activeSection !== 'payment' &&
-      activeSection !== 'review'
-    ) {
-      setUserSelectedSection('payment')
-      return
-    }
-
-    if (hasPhysical) {
-      const defaultAddress = addressOptions.find((addr) => addr.isDefault)
-      if (defaultAddress && !selectedAddress) {
-        setSelectedAddress(defaultAddress.id)
-        setUserSelectedSection('shipping')
-        return
-      }
-
-      if (
-        cheapestShippingId &&
-        !selectedShipping &&
-        activeSection === 'shipping'
-      ) {
-        setSelectedShipping(cheapestShippingId)
-        setUserSelectedSection('payment')
-        return
-      }
-    }
-
-    if (paymentMethods.length === 1 && !selectedPayment) {
-      setSelectedPayment(paymentMethods[0].id)
-      return
-    }
-
-    const isPhysicalReady = hasPhysical
-      ? selectedAddress && selectedShipping
-      : true
-    if (isPhysicalReady && selectedPayment && activeSection !== 'review') {
-      setUserSelectedSection('review')
-    }
-  }, [
-    hasPhysical,
-    activeSection,
-    addressOptions,
-    selectedAddress,
-    cheapestShippingId,
-    selectedShipping,
-    paymentMethods,
-    selectedPayment,
-    hasUserIntervened,
-  ])
 
   if (!isMounted) {
     return null
@@ -639,7 +606,11 @@ export default function StoreCartPage() {
                               key={method.id}
                               id={`ship-${method.id}`}
                               value={method.id}
-                              title={`${method.courierService.name} (${isSupported ? formatCurrency(method.fee!) : 'ไม่รองรับน้ำหนักนี้'})`}
+                              title={`${method.courierService.name} (${
+                                isSupported
+                                  ? formatCurrency(method.fee!)
+                                  : 'ไม่รองรับน้ำหนักนี้'
+                              })`}
                               description={
                                 method.courierService.estimatedDays
                                   ? `จัดส่งภายใน ${method.courierService.estimatedDays}`

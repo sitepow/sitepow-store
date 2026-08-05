@@ -357,10 +357,17 @@ export async function cancelOrder(id: string) {
     })
 
     return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
+    let errorMessage
+
+    if (error instanceof Error) {
+      errorMessage = error.message
+    }
+
     return {
       success: false,
+      message: errorMessage,
     }
   }
 }

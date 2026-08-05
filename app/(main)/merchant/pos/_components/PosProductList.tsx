@@ -5,6 +5,9 @@ import { useState } from 'react'
 import { POSProductItem } from '@/actions/pos/product'
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { ProductCard } from '@/app/sites/[domain]/_components/product/ProductCard'
+import { useBranchFilter } from '@/stores/use-branch-filter'
+import { CartItem } from '@/types/sites/cart'
+import { getRemainingStock } from '@/utils/cart'
 import { IconSearch } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -21,6 +24,7 @@ export type { SelectedOptionPayload, SelectedAddonPayload }
 
 interface PosProductListProps {
   products: POSProductItem[]
+  cartItems?: CartItem[]
   search: string
   onSearchChange: (val: string) => void
   onAddToCart: (
@@ -34,16 +38,37 @@ interface PosProductListProps {
 
 export function PosProductList({
   products,
+  cartItems = [],
   search,
   onSearchChange,
   onAddToCart,
 }: PosProductListProps) {
+  const { selectedBranchId } = useBranchFilter()
   const [selectedProduct, setSelectedProduct] = useState<POSProductItem | null>(
     null,
   )
 
-  const getVariantStock = (variant: POSProductItem['variants'][number]) => {
-    return variant.stocks.reduce((sum, s) => sum + (s.quantity || 0), 0)
+  const getVariantAvailableStock = (
+    variant: POSProductItem['variants'][number],
+  ) => {
+    if (!selectedBranchId) {
+      return 0
+    }
+
+    const branchStock =
+      variant.stocks.find((s) => s.branchId === selectedBranchId)?.quantity ?? 0
+
+    return getRemainingStock(cartItems, {
+      variantId: variant.id,
+      stock: branchStock,
+    })
+  }
+
+  const getProductTotalStock = (product: POSProductItem) => {
+    return product.variants.reduce(
+      (sum, v) => sum + getVariantAvailableStock(v),
+      0,
+    )
   }
 
   const handleProductClick = (product: POSProductItem) => {
@@ -52,7 +77,9 @@ export function PosProductList({
     const hasAddons = (product.addons?.length ?? 0) > 0
 
     const singleVariantStock =
-      product.variants.length > 0 ? getVariantStock(product.variants[0]) : 0
+      product.variants.length > 0
+        ? getVariantAvailableStock(product.variants[0])
+        : 0
 
     if (
       !hasMultipleVariants &&
@@ -87,10 +114,7 @@ export function PosProductList({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => {
-              const totalStock = product.variants.reduce(
-                (sum, v) => sum + getVariantStock(v),
-                0,
-              )
+              const totalStock = getProductTotalStock(product)
 
               return (
                 <ProductCard

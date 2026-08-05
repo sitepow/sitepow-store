@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { usePOSProducts } from '@/actions/hooks/pos/product'
@@ -10,6 +11,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { IconCashRegister, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -64,12 +66,26 @@ export default function MerchantPOSPage() {
       return
     }
 
-    const unitPrice = Number(variant.price)
+    const branchStock =
+      variant.stocks.find((s) => s.branchId === selectedBranchId)?.quantity ?? 0
+
+    const remainingStock = getRemainingStock(cartItems, {
+      variantId: variant.id,
+      stock: branchStock,
+    })
+
+    if (quantity > remainingStock) {
+      toast.error(`สินค้าในสาขานี้มีไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`)
+      return
+    }
+
     const currentBranchStock = variant.stocks.find(
       (s) => s.branchId === selectedBranchId,
     )
 
+    const selectedOptionsMap: Record<string, string[]> = {}
     const formattedOptions = (options ?? []).map((opt) => {
+      selectedOptionsMap[opt.groupTitle] = [opt.choiceName]
       const optionGroup = product.options?.find(
         (o) => o.title === opt.groupTitle,
       )
@@ -82,12 +98,21 @@ export default function MerchantPOSPage() {
       }
     })
 
+    const selectedAddonIds = addons?.map((a) => a.id) ?? []
     const formattedAddons = (addons ?? []).map((addon) => ({
       id: addon.id,
       title: addon.title,
       price: addon.price,
       isAvailable: true,
     }))
+
+    const unitPrice = calculateCartUnitPrice({
+      variant,
+      options: product.options,
+      selectedOptionsMap,
+      addons: product.addons,
+      selectedAddonIds,
+    })
 
     addItem({
       productId: product.id,
@@ -96,13 +121,13 @@ export default function MerchantPOSPage() {
       weight: variant.weight ?? 0,
       variant: {
         ...variant,
-        price: unitPrice,
+        price: Number(variant.price),
       },
       selectedOptions: formattedOptions,
       selectedAddons: formattedAddons,
-      quantity: quantity,
+      quantity,
       unitPrice,
-      rewardPoints: variant.pointsActive ? variant.pointsAmount : 0,
+      rewardPoints: variant.pointsActive ? (variant.pointsAmount ?? 0) : 0,
       branchId: selectedBranchId,
       branchName: currentBranchStock?.branch.name ?? '',
       productType: product.productType,
@@ -142,6 +167,7 @@ export default function MerchantPOSPage() {
             ) : (
               <PosProductList
                 products={products}
+                cartItems={cartItems}
                 search={search}
                 onSearchChange={setSearch}
                 onAddToCart={handleAddToCart}

@@ -128,31 +128,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     input.items,
   )
 
-  for (const [branchId, groupItems] of Object.entries(physicalGroups)) {
-    const targetBranchId = branchId || input.branchId
-    if (!targetBranchId) {
-      throw new Error('ระบุสาขาไม่ถูกต้องสำหรับสินค้า Physical')
-    }
-
-    for (const item of groupItems) {
-      const stock = await prisma.productStock.findUnique({
-        where: {
-          branchId_variantId: {
-            branchId: targetBranchId,
-            variantId: item.variantId,
-          },
-        },
-        select: { quantity: true },
-      })
-
-      if (!stock || stock.quantity < item.quantity) {
-        throw new Error(
-          `สินค้า "${item.title} (${item.variantTitle})" มีสต็อกไม่เพียงพอ`,
-        )
-      }
-    }
-  }
-
   const subtotalAll = input.items.reduce(
     (sum, i) => sum + i.price * i.quantity,
     0,
@@ -180,6 +155,36 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     : 0
 
   const createdOrders = await prisma.$transaction(async (tx) => {
+    if (input.couponId) {
+      const coupon = await tx.coupon.findUnique({
+        where: { id: input.couponId },
+        select: { usageLimit: true, usedCount: true },
+      })
+
+      if (
+        coupon &&
+        coupon.usageLimit !== null &&
+        coupon.usedCount >= coupon.usageLimit
+      ) {
+        throw new Error('รหัสส่วนลดนี้ถูกใช้งานครบจำนวนแล้ว')
+      }
+
+      const updatedCoupon = await tx.coupon.updateMany({
+        where: {
+          id: input.couponId,
+          OR: [
+            { usageLimit: null },
+            { usedCount: { lt: prisma.coupon.fields.usageLimit } },
+          ],
+        },
+        data: { usedCount: { increment: 1 } },
+      })
+
+      if (updatedCoupon.count === 0) {
+        throw new Error('รหัสส่วนลดนี้ถูกใช้งานเต็มสิทธิ์แล้ว')
+      }
+    }
+
     const orders = []
     const baseOrderNumber = generateOrderNumber()
     let orderCounter = 1
@@ -197,7 +202,11 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         : OrderStatus.PENDING)
 
     for (const branchKey of branchIds) {
-      const targetBranchId = branchKey || input.branchId!
+      const targetBranchId = branchKey || input.branchId
+      if (!targetBranchId) {
+        throw new Error('ระบุสาขาไม่ถูกต้องสำหรับสินค้า Physical')
+      }
+
       const groupItems = physicalGroups[branchKey]
       const groupSubtotal = groupItems.reduce(
         (sum, i) => sum + i.price * i.quantity,
@@ -225,15 +234,26 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       )
 
       for (const item of groupItems) {
-        await tx.productStock.update({
+        const updateResult = await tx.productStock.updateMany({
           where: {
-            branchId_variantId: {
-              branchId: targetBranchId,
-              variantId: item.variantId,
+            branchId: targetBranchId,
+            variantId: item.variantId,
+            quantity: {
+              gte: item.quantity,
             },
           },
-          data: { quantity: { decrement: item.quantity } },
+          data: {
+            quantity: {
+              decrement: item.quantity,
+            },
+          },
         })
+
+        if (updateResult.count === 0) {
+          throw new Error(
+            `สินค้า "${item.title} (${item.variantTitle})" ในสาขานี้มีสต็อกไม่เพียงพอ`,
+          )
+        }
       }
 
       const subOrderNumber = hasMultipleGroups
@@ -363,11 +383,24 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           select: { id: true },
         })
 
-        if (availableItems.length > 0) {
-          await tx.digitalItem.updateMany({
-            where: { id: { in: availableItems.map((i) => i.id) } },
-            data: { isUsed: true, orderId: order.id },
-          })
+        if (availableItems.length < item.quantity) {
+          throw new Error(
+            `สินค้าดิจิทัล "${item.title} (${item.variantTitle})" มีจำนวนไม่เพียงพอ`,
+          )
+        }
+
+        const assignResult = await tx.digitalItem.updateMany({
+          where: {
+            id: { in: availableItems.map((i) => i.id) },
+            isUsed: false,
+          },
+          data: { isUsed: true, orderId: order.id },
+        })
+
+        if (assignResult.count < item.quantity) {
+          throw new Error(
+            `เกิดข้อผิดพลาดในการดึงรหัสสินค้าดิจิทัลของ "${item.title}" กรุณาลองใหม่อีกครั้ง`,
+          )
         }
       }
       orders.push(order)
@@ -441,13 +474,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       }
     }
 
-    if (input.couponId) {
-      await tx.coupon.update({
-        where: { id: input.couponId },
-        data: { usedCount: { increment: 1 } },
-      })
-    }
-
     if (input.customerId) {
       if (input.usedPoints && input.usedPoints > 0) {
         await deductCustomerPoints({
@@ -512,6 +538,7 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       status: true,
       customerId: true,
       usedPoints: true,
+      couponId: true,
       items: {
         select: {
           quantity: true,
@@ -560,6 +587,15 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
         customerId: order.customerId,
         storeId: order.storeId,
         usedPoints: order.usedPoints,
+      })
+    }
+
+    if (order.couponId) {
+      await tx.coupon.update({
+        where: { id: order.couponId },
+        data: {
+          usedCount: { decrement: 1 },
+        },
       })
     }
 

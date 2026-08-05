@@ -1,11 +1,14 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { POSProductItem } from '@/actions/pos/product'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
-import { calculateCartUnitPrice } from '@/utils/cart'
+import { useBranchFilter } from '@/stores/use-branch-filter'
+import { CartItem } from '@/types/sites/cart'
+import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
 
@@ -38,6 +41,7 @@ export interface SelectedAddonPayload {
 
 interface PosProductOptionDialogProps {
   product: POSProductItem | null
+  cartItems?: CartItem[]
   onClose: () => void
   onConfirm: (
     product: POSProductItem,
@@ -50,9 +54,11 @@ interface PosProductOptionDialogProps {
 
 export function PosProductOptionDialog({
   product,
+  cartItems = [],
   onClose,
   onConfirm,
 }: PosProductOptionDialogProps) {
+  const { selectedBranchId } = useBranchFilter()
   const [selectedVariantId, setSelectedVariantId] = useState<string>(
     product?.variants[0]?.id ?? '',
   )
@@ -70,9 +76,23 @@ export function PosProductOptionDialog({
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
   const [quantity, setQuantity] = useState<number>(1)
 
-  const getVariantStock = (variant: POSProductItem['variants'][number]) => {
-    return variant.stocks.reduce((sum, s) => sum + (s.quantity || 0), 0)
-  }
+  const getVariantAvailableStock = useCallback(
+    (variant: POSProductItem['variants'][number]) => {
+      if (!selectedBranchId) {
+        return 0
+      }
+
+      const branchStock =
+        variant.stocks.find((s) => s.branchId === selectedBranchId)?.quantity ??
+        0
+
+      return getRemainingStock(cartItems, {
+        variantId: variant.id,
+        stock: branchStock,
+      })
+    },
+    [selectedBranchId, cartItems],
+  )
 
   const currentVariant = useMemo(() => {
     if (!product) {
@@ -88,8 +108,17 @@ export function PosProductOptionDialog({
     if (!currentVariant) {
       return 0
     }
-    return getVariantStock(currentVariant)
-  }, [currentVariant])
+    return getVariantAvailableStock(currentVariant)
+  }, [currentVariant, getVariantAvailableStock])
+
+  useEffect(() => {
+    if (currentVariantStock > 0 && quantity > currentVariantStock) {
+      setQuantity(currentVariantStock)
+    }
+  }, [selectedVariantId, currentVariantStock, quantity])
+
+  const isInvalidQuantity =
+    currentVariantStock <= 0 || quantity > currentVariantStock
 
   const selectedOptionsMap = useMemo(() => {
     const map: Record<string, string[]> = {}
@@ -114,7 +143,7 @@ export function PosProductOptionDialog({
   }, [product, currentVariant, selectedOptionsMap, selectedAddonIds])
 
   const handleConfirmAddToCart = () => {
-    if (!product || !currentVariant || currentVariantStock <= 0) {
+    if (!product || !currentVariant || isInvalidQuantity) {
       return
     }
 
@@ -194,7 +223,7 @@ export function PosProductOptionDialog({
                   className="grid gap-2"
                 >
                   {product.variants.map((variant) => {
-                    const stock = getVariantStock(variant)
+                    const stock = getVariantAvailableStock(variant)
                     const isOutOfStock = stock <= 0
 
                     const discountConfig =
@@ -248,7 +277,7 @@ export function PosProductOptionDialog({
                             )}
                           </div>
                           <span className="text-muted-foreground text-[10px]">
-                            คงเหลือ: {stock} ชิ้น
+                            คงเหลือในสาขา: {stock} ชิ้น
                             {variant?.sku ? `, SKU: ${variant.sku}` : ''}
                           </span>
                         </div>
@@ -371,12 +400,14 @@ export function PosProductOptionDialog({
           <Button
             size="lg"
             className="w-full font-bold sm:w-auto"
-            disabled={currentVariantStock <= 0}
+            disabled={isInvalidQuantity}
             onClick={handleConfirmAddToCart}
           >
             {currentVariantStock <= 0
               ? 'สินค้าหมด'
-              : `เพิ่มลงตะกร้า ${formatCurrency(unitPrice * quantity)}`}
+              : quantity > currentVariantStock
+                ? 'สินค้าในสาขานี้ไม่พอ'
+                : `เพิ่มลงตะกร้า ${formatCurrency(unitPrice * quantity)}`}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -229,10 +229,17 @@ export async function createOrder(input: CreateOrderInput) {
       data: serializeDecimal(createdOrders[0]),
       allOrders: serializeDecimal(createdOrders),
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
+    let errorMessage
+
+    if (error instanceof Error) {
+      errorMessage = error.message
+    }
+
     return {
       success: false,
+      message: errorMessage,
     }
   }
 }

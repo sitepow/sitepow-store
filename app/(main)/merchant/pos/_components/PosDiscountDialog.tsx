@@ -1,14 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
-import { useValidateCoupon } from '@/actions/hooks/storefront/discount'
+import {
+  useStorefrontLoyalty,
+  useValidateCoupon,
+} from '@/actions/hooks/storefront/discount'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
@@ -40,21 +44,16 @@ import { Slider } from '@/components/ui/slider'
 
 interface PosDiscountDialogProps {
   subtotal: number
-  pointRedeemRate?: number
 }
 
-export function PosDiscountDialog({
-  subtotal,
-  pointRedeemRate = 1,
-}: PosDiscountDialogProps) {
+export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
+  const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'search' | 'create'>('search')
   const [searchInput, setSearchInput] = useState('')
   const [inputCouponCode, setInputCouponCode] = useState('')
-
   const { watch, setValue } = useFormContext<POSCheckoutInput>()
-
   const customerId = watch('customerId')
   const customerName = watch('customerName')
   const customerPhone = watch('customerPhone')
@@ -74,16 +73,26 @@ export function PosDiscountDialog({
   const searchCustomerMutation = useSearchCustomer()
   const createCustomerMutation = useCreateCustomer()
   const validateCouponMutation = useValidateCoupon()
+  const pointRedeemRate = loyalty?.pointRedeemRate ?? 0
+  const isPointsEnabled = loyalty?.isPointsEnabled ?? false
 
   const maxUsablePoints = customerId
-    ? Math.min(
+    ? calculateMaxUsablePoints(
+        subtotal,
+        couponDiscount,
+        pointRedeemRate,
         customerPoints,
-        Math.floor(subtotal / (pointRedeemRate > 0 ? pointRedeemRate : 1)),
       )
     : 0
 
   const pointsDiscount = usedPoints * pointRedeemRate
   const totalDiscount = pointsDiscount + couponDiscount
+
+  useEffect(() => {
+    if (usedPoints > maxUsablePoints) {
+      setValue('usedPoints', maxUsablePoints)
+    }
+  }, [maxUsablePoints, usedPoints, setValue])
 
   const handleSearchMember = () => {
     if (!searchInput.trim()) {
@@ -91,7 +100,9 @@ export function PosDiscountDialog({
       return
     }
 
-    if (!selectedStoreId) return
+    if (!selectedStoreId) {
+      return
+    }
 
     searchCustomerMutation.mutate(
       { storeId: selectedStoreId, query: searchInput },
@@ -144,7 +155,9 @@ export function PosDiscountDialog({
   }
 
   const handleApplyCouponCode = () => {
-    if (!inputCouponCode.trim()) return
+    if (!inputCouponCode.trim()) {
+      return
+    }
 
     validateCouponMutation.mutate(
       {
@@ -326,50 +339,59 @@ export function PosDiscountDialog({
               </form>
             )}
           </div>
-          <Separator />
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <IconWallet className="text-muted-foreground size-4" />
-                ใช้แต้มสะสม
-              </Label>
-              <span className="text-primary text-sm font-semibold">
-                {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
-                แต้ม
-              </span>
-            </div>
-            <Slider
-              max={maxUsablePoints || 1}
-              step={1}
-              value={[usedPoints]}
-              onValueChange={(val) => setValue('usedPoints', val[0])}
-              disabled={!customerId || maxUsablePoints === 0}
-              className="cursor-pointer"
-            />
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={usedPoints}
-                onChange={(e) =>
-                  setValue(
-                    'usedPoints',
-                    Math.max(
-                      0,
-                      Math.min(Number(e.target.value), maxUsablePoints),
-                    ),
-                  )
-                }
-                disabled={!customerId || maxUsablePoints === 0}
-                className="w-24 text-center font-bold"
-              />
-              <span className="text-muted-foreground text-sm">
-                แลกเป็นส่วนลดได้{' '}
-                <strong className="text-foreground">
-                  {formatCurrency(pointsDiscount)}
-                </strong>
-              </span>
-            </div>
-          </div>
+          {isPointsEnabled && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2">
+                    <IconWallet className="text-muted-foreground size-4" />
+                    ใช้แต้มสะสม
+                  </Label>
+                  <span className="text-primary text-sm font-semibold">
+                    {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
+                    แต้ม
+                  </span>
+                </div>
+                <Slider
+                  max={maxUsablePoints || 1}
+                  step={1}
+                  value={[usedPoints]}
+                  onValueChange={(val) => setValue('usedPoints', val[0])}
+                  disabled={!customerId || maxUsablePoints === 0}
+                  className="cursor-pointer"
+                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={usedPoints}
+                    onChange={(e) =>
+                      setValue(
+                        'usedPoints',
+                        Math.max(
+                          0,
+                          Math.min(Number(e.target.value), maxUsablePoints),
+                        ),
+                      )
+                    }
+                    disabled={!customerId || maxUsablePoints === 0}
+                    className="w-24 text-center font-bold"
+                  />
+                  <span className="text-muted-foreground text-sm">
+                    แลกเป็นส่วนลดได้{' '}
+                    <strong className="text-foreground">
+                      {formatCurrency(pointsDiscount)}
+                    </strong>
+                  </span>
+                </div>
+                {pointRedeemRate > 0 && (
+                  <p className="text-muted-foreground text-xs">
+                    (1 แต้ม = {formatCurrency(pointRedeemRate)})
+                  </p>
+                )}
+              </div>
+            </>
+          )}
           <Separator />
           <div className="space-y-3">
             <Label className="flex items-center gap-2">

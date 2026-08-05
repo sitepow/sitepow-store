@@ -52,10 +52,17 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
       message: 'ทำรายการขายสำเร็จ',
       data: serializeDecimal(orders[0]),
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
+    let errorMessage
+
+    if (error instanceof Error) {
+      errorMessage = error.message
+    }
+
     return {
       success: false,
+      message: errorMessage,
     }
   }
 }
