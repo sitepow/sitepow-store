@@ -1,7 +1,6 @@
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { calculateOrderSummary } from '@/utils/order'
-import { formatCurrency } from '@/utils/pricing'
-import { IconCoins } from '@tabler/icons-react'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 export interface OrderItemDetails {
   title: string
@@ -92,20 +91,22 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             value={formatCurrency(summary?.codFee)}
           />
         )}
+        {(order.earnedPoints ?? 0) > 0 && (
+          <SummaryRow
+            label="แต้มสะสมที่จะได้รับ"
+            value={
+              <span className="text-primary">
+                + {formatNumber(order.earnedPoints ?? 0)} แต้ม
+              </span>
+            }
+          />
+        )}
         <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
           <span>ยอดชำระทั้งสิ้น</span>
-          <span>{formatCurrency(order.totalAmount)}</span>
+          <span className="text-primary">
+            {formatCurrency(order.totalAmount)}
+          </span>
         </div>
-        {(order.earnedPoints ?? 0) > 0 && (
-          <div className="mt-2 flex items-center justify-between rounded-md bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
-            <span className="flex items-center gap-1 font-medium">
-              <IconCoins size={14} /> แต้มสะสมที่จะได้รับ
-            </span>
-            <span className="font-bold">
-              +{order.earnedPoints?.toLocaleString()} แต้ม
-            </span>
-          </div>
-        )}
       </div>
     </div>
   )

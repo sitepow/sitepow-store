@@ -4,12 +4,10 @@ import { useState } from 'react'
 
 import { useUpdateOrderStatus } from '@/actions/hooks/order'
 import { GetOrdersItem } from '@/actions/order'
-import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
+import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
-import { formatPromptPay } from '@/utils/slip'
 import { IconEye } from '@tabler/icons-react'
-import { User2 } from 'lucide-react'
 
 import {
   OrderAddressCard,
@@ -20,8 +18,9 @@ import {
   OrderTrackingCard,
   ShippingAddressSnapshot,
 } from '@/components/order'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { OrderCustomerInfoCard } from '@/components/order/CustomerInfoCard'
+import { OrderStatusBadges } from '@/components/order/StatusBadges'
+import { OrderTrackingForm } from '@/components/order/TrackingForm'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -31,8 +30,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -92,6 +89,36 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
             {order.employee && ` | จัดการโดย: ${order.employee.name}`}
           </DialogDescription>
         </DialogHeader>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
+          <OrderStatusBadges
+            status={order.status}
+            paymentMethod={order.paymentMethod}
+            paidAt={order.paidAt}
+          />
+          <OrderPaymentInfoCard
+            bankAccount={order.bankAccount}
+            paymentProof={order.paymentProof}
+          />
+          {(order.status === OrderStatus.PAID ||
+            order.status === OrderStatus.SHIPPED) &&
+            order.trackingNumber && (
+              <OrderTrackingCard
+                status={order.status}
+                trackingNumber={order.trackingNumber}
+              />
+            )}
+          {selectedStatus === OrderStatus.SHIPPED &&
+            !order.trackingNumber &&
+            order.trackingNumber && (
+              <OrderTrackingForm
+                trackingNumber={trackingNumber}
+                isPending={updateStatusMutation.isPending}
+                onTrackingNumberChange={setTrackingNumber}
+                onSubmit={handleSaveTrackingAndStatus}
+              />
+            )}
+        </div>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
             <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
@@ -115,30 +142,7 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
               </SelectContent>
             </Select>
           </div>
-          <div className="bg-muted/20 space-y-2 rounded-lg border p-3">
-            <div className="flex items-center">
-              <Avatar className="size-9 border">
-                {order.customer?.avatar && (
-                  <AvatarImage src={order.customer.avatar} />
-                )}
-                <AvatarFallback>
-                  <User2 size={16} />
-                </AvatarFallback>
-              </Avatar>
-              <div className="ml-3 max-w-72 space-y-0.5">
-                <p className="text-sm leading-none font-medium">
-                  {order.customer?.firstName} {order.customer?.lastName}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  อีเมล: {order.customer?.email ?? '-'}
-                  <br />
-                  เบอร์โทรศัพท์:{' '}
-                  {order.customer?.phone &&
-                    formatPromptPay(order.customer.phone)}
-                </p>
-              </div>
-            </div>
-          </div>
+          <OrderCustomerInfoCard customer={order.customer} />
           <OrderAddressCard address={shippingAddr} />
           <OrderTaxInvoiceCard
             isRequested={order.isTaxInvoiceRequested}
@@ -154,72 +158,6 @@ export function OrderDetailDialog({ order }: OrderDetailDialogProps) {
             height={order.height}
             length={order.length}
           />
-          <div className="space-y-2">
-            <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
-            <div className="mb-3 flex flex-wrap gap-2">
-              <Badge
-                variant={
-                  (
-                    [OrderStatus.PAID, OrderStatus.SHIPPED] as OrderStatus[]
-                  ).includes(order.status)
-                    ? 'default'
-                    : 'outline'
-                }
-              >
-                ออเดอร์: {ORDER_STATUS_TH[order.status]}
-              </Badge>
-              {order.paymentMethod && (
-                <Badge variant="outline">
-                  รูปแบบชำระเงิน: {PAYMENT_METHOD_TH[order.paymentMethod]}
-                </Badge>
-              )}
-              {order.paidAt && (
-                <Badge variant="secondary">
-                  ชำระเงินเมื่อ: {formatDateTime(order.paidAt)}
-                </Badge>
-              )}
-            </div>
-            <OrderPaymentInfoCard
-              bankAccount={order.bankAccount}
-              paymentProof={order.paymentProof}
-            />
-            {(order.status === OrderStatus.PAID ||
-              order.status === OrderStatus.SHIPPED) && (
-              <OrderTrackingCard
-                status={order.status}
-                trackingNumber={order.trackingNumber}
-              />
-            )}
-          </div>
-          {selectedStatus === OrderStatus.SHIPPED && !order.trackingNumber && (
-            <div className="space-y-3 rounded-lg border p-4">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">
-                  กรุณากรอกเลขพัสดุสำหรับการจัดส่ง
-                </Label>
-                <p className="text-muted-foreground text-xs">
-                  จำเป็นต้องระบุเลข Tracking Number
-                  ก่อนเปลี่ยนสถานะเป็นกำลังจัดส่ง
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="ระบุเลข Tracking Number เช่น TH123456789..."
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value)}
-                />
-                <Button
-                  onClick={handleSaveTrackingAndStatus}
-                  disabled={
-                    updateStatusMutation.isPending || !trackingNumber.trim()
-                  }
-                  className="shrink-0"
-                >
-                  {updateStatusMutation.isPending ? <Spinner /> : 'บันทึก'}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>

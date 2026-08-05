@@ -1,7 +1,6 @@
 'use client'
 
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
-import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
 
@@ -14,7 +13,7 @@ import {
   OrderTrackingCard,
   ShippingAddressSnapshot,
 } from '@/components/order'
-import { Badge } from '@/components/ui/badge'
+import { OrderStatusBadges } from '@/components/order/StatusBadges'
 import {
   DialogDescription,
   DialogHeader,
@@ -38,6 +37,27 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           {formatDateTime(order.createdAt)}
         </DialogDescription>
       </DialogHeader>
+      <div className="space-y-2">
+        <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
+        <OrderStatusBadges
+          status={order.status}
+          paymentMethod={order.paymentMethod}
+          paidAt={order.paidAt}
+        />
+        <OrderPaymentInfoCard
+          bankAccount={order.bankAccount}
+          paymentProof={order.paymentProof}
+        />
+        <OrderTrackingCard
+          status={order.status}
+          trackingNumber={order.trackingNumber}
+          emptyMessage={
+            order.status === OrderStatus.PENDING
+              ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
+              : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ และจะแสดงสถานะอัปเดตในระบบสำหรับออเดอร์นี้ทันที'
+          }
+        />
+      </div>
       <div className="max-h-[85vh] space-y-5 overflow-y-auto sm:max-w-lg">
         <OrderAddressCard address={shippingAddr} />
         <OrderTaxInvoiceCard
@@ -54,45 +74,6 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           height={order.height}
           length={order.length}
         />
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">สถานะและข้อมูลการจัดส่ง</div>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <Badge
-              variant={
-                (
-                  [OrderStatus.PAID, OrderStatus.SHIPPED] as OrderStatus[]
-                ).includes(order.status)
-                  ? 'default'
-                  : 'outline'
-              }
-            >
-              ออเดอร์: {ORDER_STATUS_TH[order.status]}
-            </Badge>
-            {order.paymentMethod && (
-              <Badge variant="outline">
-                รูปแบบชำระเงิน: {PAYMENT_METHOD_TH[order.paymentMethod]}
-              </Badge>
-            )}
-            {order.paidAt && (
-              <Badge variant="secondary">
-                ชำระเงินเมื่อ: {formatDateTime(order.paidAt)}
-              </Badge>
-            )}
-          </div>
-          <OrderPaymentInfoCard
-            bankAccount={order.bankAccount}
-            paymentProof={order.paymentProof}
-          />
-          <OrderTrackingCard
-            status={order.status}
-            trackingNumber={order.trackingNumber}
-            emptyMessage={
-              order.status === OrderStatus.PENDING
-                ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
-                : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ และจะแสดงสถานะอัปเดตในระบบสำหรับออเดอร์นี้ทันที'
-            }
-          />
-        </div>
       </div>
     </>
   )
