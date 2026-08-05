@@ -5,6 +5,7 @@ import { ComponentProps, useState } from 'react'
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { formatPromptPay } from '@/utils/slip'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -106,7 +107,9 @@ export function CustomerPointsTable({
                         .join(' ') || item.customer.email}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">
-                      {item.customer.phone ?? '-'}
+                      {item.customer.phone
+                        ? formatPromptPay(item.customer.phone)
+                        : '-'}
                     </TableCell>
                     <TableCell className="text-primary text-right font-semibold">
                       {item.rewardPoints.toLocaleString()}

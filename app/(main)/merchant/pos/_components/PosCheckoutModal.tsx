@@ -70,20 +70,13 @@ export function PosCheckoutModal({
       return
     }
 
-    const formattedItems = (data.items || []).map((item) => ({
-      ...item,
-      variantTitle: item.variantTitle ?? '',
-    }))
-
-    const usedPoints =
-      data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined
-
     createOrder(
       {
         storeId: data.storeId,
         branchId: data.branchId,
         customerId: data.customerId,
-        usedPoints,
+        usedPoints:
+          data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined,
         status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
         paymentMethod: isCash
           ? PaymentMethod.CASH_ON_DELIVERY
@@ -91,7 +84,11 @@ export function PosCheckoutModal({
         receivedAmount: isCash ? receivedAmount : undefined,
         changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
         discountAmount: data.discountAmount,
-        items: formattedItems,
+        items: (data.items || []).map((item) => ({
+          ...item,
+          branchId: item.branchId || data.branchId,
+          variantTitle: item.variantTitle ?? '',
+        })),
       },
       {
         onSuccess: (res) => {
