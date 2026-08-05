@@ -1,18 +1,13 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import {
-  ActorType,
-  LogAction,
-  OrderStatus,
-  ProductType,
-} from '@/generated/prisma/enums'
+import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
-import { refundCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -335,21 +330,7 @@ export async function cancelOrder(id: string) {
 
     const order = await prisma.order.findUnique({
       where: { id },
-      select: {
-        storeId: true,
-        orderNumber: true,
-        status: true,
-        customerId: true,
-        usedPoints: true,
-        items: {
-          select: {
-            quantity: true,
-            variantId: true,
-            branchId: true,
-            productType: true,
-          },
-        },
-      },
+      select: { storeId: true },
     })
 
     if (!order) {
@@ -369,72 +350,17 @@ export async function cancelOrder(id: string) {
       }
     }
 
-    if (order.status === OrderStatus.CANCELLED) {
-      return { success: false, message: 'ออเดอร์นี้ถูกยกเลิกไปแล้ว' }
-    }
-
-    await prisma.$transaction(async (tx) => {
-      for (const item of order.items) {
-        if (
-          item.productType === ProductType.PHYSICAL &&
-          item.variantId &&
-          item.branchId
-        ) {
-          await tx.productStock.update({
-            where: {
-              branchId_variantId: {
-                branchId: item.branchId,
-                variantId: item.variantId,
-              },
-            },
-            data: {
-              quantity: {
-                increment: item.quantity,
-              },
-            },
-          })
-        }
-      }
-
-      if (order.customerId && order.usedPoints) {
-        await refundCustomerPoints({
-          tx,
-          customerId: order.customerId,
-          storeId: order.storeId,
-          usedPoints: order.usedPoints,
-        })
-      }
-
-      await tx.digitalItem.updateMany({
-        where: { orderId: id },
-        data: {
-          orderId: null,
-          isUsed: false,
-        },
-      })
-
-      await tx.order.update({
-        where: { id },
-        data: { status: OrderStatus.CANCELLED },
-      })
-    })
-
-    await createLog({
-      action: LogAction.CANCEL_ORDER,
+    await cancelOrderCore({
+      orderId: id,
+      actorId: userId,
       actorType: ActorType.MERCHANT,
-      storeId: order.storeId,
-      entity: 'Order',
-      entityId: id,
-      details: {
-        orderNumber: order.orderNumber,
-        from: order.status,
-        to: OrderStatus.CANCELLED,
-      },
     })
 
     return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+    }
   }
 }

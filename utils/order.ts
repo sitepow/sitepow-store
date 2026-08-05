@@ -1,6 +1,7 @@
 import { ProductType } from '@/generated/prisma/enums'
-import { CreateOrderItemInput } from '@/types/order'
 import crypto from 'crypto'
+
+import { CreateOrderItemInput } from '@/lib/order/types'
 
 interface CalculateGroupShareParams {
   groupSubtotal: number

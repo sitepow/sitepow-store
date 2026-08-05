@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 
-import { cancelOrder } from '@/actions/order'
 import {
   MILLISECONDS_PER_MINUTE,
   ORDER_EXPIRY_MINUTES,
 } from '@/constants/system'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { ActorType, OrderStatus } from '@/generated/prisma/enums'
 
+import { cancelOrderCore } from '@/lib/order'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
@@ -27,16 +27,18 @@ export async function GET(request: Request) {
         status: OrderStatus.PENDING,
         createdAt: { lt: expirationThreshold },
       },
-      select: { id: true, storeId: true },
+      select: { id: true },
     })
 
     let processedCount = 0
 
     for (const order of expiredOrders) {
-      const result = await cancelOrder(order.id)
-      if (result.success) {
-        processedCount++
-      }
+      await cancelOrderCore({
+        orderId: order.id,
+        actorType: ActorType.SYSTEM,
+        skipAuthCheck: true,
+      })
+      processedCount++
     }
 
     return NextResponse.json({

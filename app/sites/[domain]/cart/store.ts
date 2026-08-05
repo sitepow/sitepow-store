@@ -18,15 +18,12 @@ interface CartStore {
   items: CartItem[]
   appliedCoupon: AppliedCoupon | null
   usedPoints: number
-
   addItem: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, qty: number) => void
   clearCart: () => void
-
   setAppliedCoupon: (coupon: AppliedCoupon | null) => void
   setUsedPoints: (points: number) => void
-
   getCartSummary: () => CartSummary
 }
 
@@ -44,10 +41,8 @@ export const useCartStore = create<CartStore>()(
       items: [],
       appliedCoupon: null,
       usedPoints: 0,
-
       addItem: (newItem) => {
         const { items } = get()
-
         const getAvailableStock = () => {
           if (
             newItem.productType === ProductType.DIGITAL_LINK ||
@@ -55,25 +50,20 @@ export const useCartStore = create<CartStore>()(
           ) {
             return 999999
           }
-
           return getStockQuantity(
             newItem.variant,
             newItem.productType,
             newItem.branchId,
           )
         }
-
         const branchStock = getAvailableStock()
-
         const itemsInSameBranch = items.filter(
           (i) => i.branchId === newItem.branchId,
         )
-
         const remaining = getRemainingStock(itemsInSameBranch, {
           variantId: newItem.variant.id,
           stock: branchStock,
         })
-
         if (
           newItem.productType !== ProductType.DIGITAL_LINK &&
           newItem.productType !== ProductType.DIGITAL_SERVICE &&
@@ -82,12 +72,10 @@ export const useCartStore = create<CartStore>()(
           toast.error('สินค้าในสาขานี้หมดแล้ว')
           return
         }
-
         const existingIndex = items.findIndex(
           (item) =>
             isSameCartItem(item, newItem) && item.branchId === newItem.branchId,
         )
-
         const finalQty =
           newItem.productType === ProductType.DIGITAL_LINK ||
           newItem.productType === ProductType.DIGITAL_SERVICE
@@ -115,36 +103,28 @@ export const useCartStore = create<CartStore>()(
           }
           set({ items: [...items, cartItem] })
         }
-
         toast.success('เพิ่มสินค้าลงในตะกร้าแล้ว')
       },
-
       removeItem: (cartItemId) => {
         set((state) => ({
           items: state.items.filter((item) => item.cartItemId !== cartItemId),
         }))
       },
-
       updateQuantity: (cartItemId, qty) => {
         const { items } = get()
         const target = items.find((i) => i.cartItemId === cartItemId)
         if (!target) {
           return
         }
-
         const branchStock = getStockByBranch(target.variant, target.branchId)
-
         const itemsInSameBranch = items.filter(
           (i) => i.branchId === target.branchId && i.cartItemId !== cartItemId,
         )
-
         const remaining = getRemainingStock(itemsInSameBranch, {
           variantId: target.variant.id,
           stock: branchStock,
         })
-
         const validatedQty = Math.max(1, Math.min(qty, remaining))
-
         set({
           items: items.map((item) =>
             item.cartItemId === cartItemId
@@ -158,13 +138,9 @@ export const useCartStore = create<CartStore>()(
           ),
         })
       },
-
       clearCart: () => set({ items: [], appliedCoupon: null, usedPoints: 0 }),
-
       setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
-
       setUsedPoints: (points) => set({ usedPoints: Math.max(0, points) }),
-
       getCartSummary: () => {
         const { items } = get()
         return items.reduce(

@@ -1,4 +1,5 @@
 import { useBranchOptions } from '@/actions/hooks/branch'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
@@ -14,9 +15,14 @@ import {
 import { Field, FieldLabel } from './ui/field'
 
 export function BranchSelectField() {
+  const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId, setSelectedBranchId } = useBranchFilter()
   const { data: branches = [], isLoading } = useBranchOptions(selectedStoreId)
+
+  if (!isMounted) {
+    return
+  }
 
   return (
     <Field className="text-foreground w-full sm:w-fit">

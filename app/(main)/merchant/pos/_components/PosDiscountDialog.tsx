@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { POSCustomerData } from '@/actions/customer'
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
 import { useValidateCoupon } from '@/actions/hooks/storefront/discount'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
@@ -13,6 +12,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
+import { POSCheckoutInput } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconDiscount2,
@@ -38,63 +38,44 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 
-export interface AppliedCoupon {
-  code: string
-  discountAmount: number
-}
-
 interface PosDiscountDialogProps {
   subtotal: number
-  customer: POSCustomerData | null
-  usedPoints: number
-  couponDiscount: number
-  pointRedeemRate: number
-  appliedCoupon?: AppliedCoupon | null
-  onSelectCustomer: (customer: POSCustomerData | null) => void
-  onChangeUsedPoints: (points: number) => void
-  onChangeCouponDiscount: (amount: number) => void
-  onApplyCoupon?: (coupon: AppliedCoupon | null) => void
+  pointRedeemRate?: number
 }
 
 export function PosDiscountDialog({
   subtotal,
-  customer,
-  usedPoints,
-  couponDiscount,
   pointRedeemRate = 1,
-  appliedCoupon = null,
-  onSelectCustomer,
-  onChangeUsedPoints,
-  onChangeCouponDiscount,
-  onApplyCoupon,
 }: PosDiscountDialogProps) {
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<'search' | 'create'>('search')
   const [searchInput, setSearchInput] = useState('')
-  const [couponCode, setCouponCode] = useState('')
+  const [inputCouponCode, setInputCouponCode] = useState('')
+
+  const { watch, setValue } = useFormContext<POSCheckoutInput>()
+
+  const customerId = watch('customerId')
+  const customerName = watch('customerName')
+  const customerPhone = watch('customerPhone')
+  const customerPoints = watch('customerPoints') || 0
+  const usedPoints = watch('usedPoints') || 0
+  const couponCode = watch('couponCode')
+  const couponDiscount = watch('couponDiscount') || 0
 
   const {
     register,
     handleSubmit,
     reset: resetCreateForm,
-    formState: { errors },
   } = useForm<CreateCustomerInput>({
     resolver: zodResolver(createCustomerSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-    },
   })
 
   const searchCustomerMutation = useSearchCustomer()
   const createCustomerMutation = useCreateCustomer()
   const validateCouponMutation = useValidateCoupon()
 
-  const customerPoints = customer?.points ?? 0
-  const maxUsablePoints = customer
+  const maxUsablePoints = customerId
     ? Math.min(
         customerPoints,
         Math.floor(subtotal / (pointRedeemRate > 0 ? pointRedeemRate : 1)),
@@ -102,8 +83,7 @@ export function PosDiscountDialog({
     : 0
 
   const pointsDiscount = usedPoints * pointRedeemRate
-  const activeCouponDiscount = appliedCoupon?.discountAmount ?? couponDiscount
-  const totalDiscount = pointsDiscount + activeCouponDiscount
+  const totalDiscount = pointsDiscount + couponDiscount
 
   const handleSearchMember = () => {
     if (!searchInput.trim()) {
@@ -111,19 +91,17 @@ export function PosDiscountDialog({
       return
     }
 
-    if (!selectedStoreId) {
-      toast.error('ไม่พบรหัสร้านค้า')
-      return
-    }
+    if (!selectedStoreId) return
 
     searchCustomerMutation.mutate(
       { storeId: selectedStoreId, query: searchInput },
       {
         onSuccess: (data) => {
           if (data.success && data.data) {
-            onSelectCustomer({
-              ...data.data,
-            })
+            setValue('customerId', data.data.id)
+            setValue('customerName', data.data.name)
+            setValue('customerPhone', data.data.phone)
+            setValue('customerPoints', data.data.points)
           }
         },
       },
@@ -131,10 +109,7 @@ export function PosDiscountDialog({
   }
 
   const handleCreateMember = (data: CreateCustomerInput) => {
-    if (!selectedStoreId) {
-      toast.error('ไม่พบรหัสร้านค้า')
-      return
-    }
+    if (!selectedStoreId) return
 
     createCustomerMutation.mutate(
       {
@@ -147,9 +122,10 @@ export function PosDiscountDialog({
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            onSelectCustomer({
-              ...res.data,
-            })
+            setValue('customerId', res.data.id)
+            setValue('customerName', res.data.name)
+            setValue('customerPhone', res.data.phone)
+            setValue('customerPoints', res.data.points)
             resetCreateForm()
             setMode('search')
           }
@@ -159,44 +135,29 @@ export function PosDiscountDialog({
   }
 
   const handleRemoveCustomer = () => {
-    onSelectCustomer(null)
-    onChangeUsedPoints(0)
+    setValue('customerId', undefined)
+    setValue('customerName', undefined)
+    setValue('customerPhone', undefined)
+    setValue('customerPoints', 0)
+    setValue('usedPoints', 0)
     setSearchInput('')
   }
 
-  const handlePointsChange = (value: number[]) => {
-    const val = Math.max(0, Math.min(value[0], maxUsablePoints))
-    onChangeUsedPoints(val)
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Math.max(0, Math.min(Number(e.target.value), maxUsablePoints))
-    onChangeUsedPoints(val)
-  }
-
   const handleApplyCouponCode = () => {
-    if (!couponCode.trim()) {
-      return
-    }
+    if (!inputCouponCode.trim()) return
 
     validateCouponMutation.mutate(
       {
         storeSlug: selectedStoreSlug,
-        code: couponCode.trim(),
+        code: inputCouponCode.trim(),
         subtotal,
       },
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            if (onApplyCoupon) {
-              onApplyCoupon({
-                code: res.data.code,
-                discountAmount: res.data.discountAmount,
-              })
-            } else {
-              onChangeCouponDiscount(res.data.discountAmount)
-            }
-            setCouponCode('')
+            setValue('couponCode', res.data.code)
+            setValue('couponDiscount', res.data.discountAmount)
+            setInputCouponCode('')
           }
         },
       },
@@ -204,10 +165,8 @@ export function PosDiscountDialog({
   }
 
   const handleRemoveCoupon = () => {
-    if (onApplyCoupon) {
-      onApplyCoupon(null)
-    }
-    onChangeCouponDiscount(0)
+    setValue('couponCode', undefined)
+    setValue('couponDiscount', 0)
   }
 
   return (
@@ -215,7 +174,9 @@ export function PosDiscountDialog({
       <DialogTrigger asChild>
         <Button variant="secondary" className="dark w-full gap-2">
           <IconTicket />
-          เพิ่มลูกค้า/เพิ่มส่วนลด
+          {couponCode || usedPoints > 0
+            ? 'แก้ไขส่วนลด/สมาชิก'
+            : 'เพิ่มลูกค้า/เพิ่มส่วนลด'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -232,7 +193,7 @@ export function PosDiscountDialog({
                 <IconUserPlus className="text-primary size-4" />
                 สมาชิกสะสมแต้ม
               </Label>
-              {!customer && (
+              {!customerId && (
                 <div className="bg-muted flex rounded-lg p-0.5 text-xs">
                   <button
                     type="button"
@@ -259,7 +220,7 @@ export function PosDiscountDialog({
                 </div>
               )}
             </div>
-            {customer ? (
+            {customerId ? (
               <div className="from-primary/10 via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
@@ -267,13 +228,13 @@ export function PosDiscountDialog({
                   </div>
                   <div className="space-y-0.5">
                     <p className="text-foreground text-sm leading-none font-bold">
-                      {customer.name}
+                      {customerName}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      รหัสลูกค้า: {customer.id} <br />
-                      อีเมล: {customer.email} <br />
-                      เบอร์โทรศัพท์: {formatPromptPay(customer.phone)} <br />
-                      แต้มคงเหลือ: {formatNumber(customer?.points ?? 0)} แต้ม
+                      รหัสลูกค้า: {customerId} <br />
+                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')}{' '}
+                      <br />
+                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
                     </p>
                   </div>
                 </div>
@@ -320,11 +281,6 @@ export function PosDiscountDialog({
                       className="h-9 text-xs"
                       {...register('firstName')}
                     />
-                    {errors.firstName && (
-                      <p className="text-destructive text-[10px]">
-                        {errors.firstName.message}
-                      </p>
-                    )}
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">นามสกุล</Label>
@@ -345,11 +301,6 @@ export function PosDiscountDialog({
                       className="h-9 text-xs"
                       {...register('phone')}
                     />
-                    {errors.phone && (
-                      <p className="text-destructive text-[10px]">
-                        {errors.phone.message}
-                      </p>
-                    )}
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">อีเมล</Label>
@@ -391,16 +342,24 @@ export function PosDiscountDialog({
               max={maxUsablePoints || 1}
               step={1}
               value={[usedPoints]}
-              onValueChange={handlePointsChange}
-              disabled={!customer || maxUsablePoints === 0}
+              onValueChange={(val) => setValue('usedPoints', val[0])}
+              disabled={!customerId || maxUsablePoints === 0}
               className="cursor-pointer"
             />
             <div className="flex items-center gap-2">
               <Input
                 type="number"
                 value={usedPoints}
-                onChange={handleInputChange}
-                disabled={!customer || maxUsablePoints === 0}
+                onChange={(e) =>
+                  setValue(
+                    'usedPoints',
+                    Math.max(
+                      0,
+                      Math.min(Number(e.target.value), maxUsablePoints),
+                    ),
+                  )
+                }
+                disabled={!customerId || maxUsablePoints === 0}
                 className="w-24 text-center font-bold"
               />
               <span className="text-muted-foreground text-sm">
@@ -410,12 +369,6 @@ export function PosDiscountDialog({
                 </strong>
               </span>
             </div>
-            {customer && (
-              <p className="text-muted-foreground text-xs">
-                คุณมีแต้มสะสม {formatNumber(customerPoints)} แต้ม (1 แต้ม ={' '}
-                {formatCurrency(pointRedeemRate)})
-              </p>
-            )}
           </div>
           <Separator />
           <div className="space-y-3">
@@ -423,14 +376,12 @@ export function PosDiscountDialog({
               <IconDiscount2 className="text-muted-foreground size-4" />
               รหัสส่วนลด
             </Label>
-            {appliedCoupon ? (
+            {couponCode ? (
               <div className="border-primary/20 bg-primary/5 flex items-center justify-between rounded-md border px-3 py-2">
-                <span className="text-sm font-medium">
-                  {appliedCoupon.code}
-                </span>
+                <span className="text-sm font-medium">{couponCode}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-primary text-sm font-semibold">
-                    -{formatCurrency(appliedCoupon.discountAmount)}
+                    -{formatCurrency(couponDiscount)}
                   </span>
                   <Button
                     variant="outline"
@@ -445,9 +396,9 @@ export function PosDiscountDialog({
               <div className="flex gap-2">
                 <Input
                   placeholder="กรอกรหัสส่วนลด"
-                  value={couponCode}
+                  value={inputCouponCode}
                   className="uppercase"
-                  onChange={(e) => setCouponCode(e.target.value)}
+                  onChange={(e) => setInputCouponCode(e.target.value)}
                   onKeyDown={(e) =>
                     e.key === 'Enter' && handleApplyCouponCode()
                   }
@@ -456,7 +407,7 @@ export function PosDiscountDialog({
                   variant="outline"
                   onClick={handleApplyCouponCode}
                   disabled={
-                    !couponCode.trim() || validateCouponMutation.isPending
+                    !inputCouponCode.trim() || validateCouponMutation.isPending
                   }
                 >
                   {validateCouponMutation.isPending
@@ -473,7 +424,7 @@ export function PosDiscountDialog({
             />
             <SummaryRow
               label="ส่วนลดจากรหัส"
-              value={`-${formatCurrency(activeCouponDiscount)}`}
+              value={`-${formatCurrency(couponDiscount)}`}
             />
             <Separator />
             <SummaryTotal

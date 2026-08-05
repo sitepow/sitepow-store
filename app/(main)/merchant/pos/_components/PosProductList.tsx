@@ -15,7 +15,7 @@ import {
   PosProductOptionDialog,
   SelectedAddonPayload,
   SelectedOptionPayload,
-} from './_components/PosProductOptionDialog'
+} from './PosProductOptionDialog'
 
 export type { SelectedOptionPayload, SelectedAddonPayload }
 

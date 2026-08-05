@@ -508,10 +508,10 @@ export default function StoreCartPage() {
               {items?.length !== 0 && (
                 <div className="space-y-8 p-5 text-start">
                   {items.map((item) => {
-                    const stock = item.variant.stocks.reduce(
-                      (sum, s) => sum + s.quantity,
-                      0,
-                    )
+                    const stock = item.variant.stocks
+                      .filter((s) => s.branchId === item.branchId)
+                      .reduce((sum, s) => sum + s.quantity, 0)
+
                     return (
                       <CartItemCard
                         key={item.cartItemId}

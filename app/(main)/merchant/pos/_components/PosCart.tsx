@@ -1,15 +1,18 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 
-import { POSCustomerData } from '@/actions/customer'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { CartItem } from '@/types/sites/cart'
 import { getRemainingStock } from '@/utils/cart'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
+import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconShoppingCart,
   IconTrash,
@@ -53,13 +56,55 @@ export function PosCart({
 }: PosCartProps) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
-  // 1. ใช้ POSCustomerData สำหรับ state เพื่อความสอดคล้องกับ PosDiscountDialog
-  const [customer, setCustomer] = useState<POSCustomerData | null>(null)
-  const [usedPoints, setUsedPoints] = useState<number>(0)
-  const [couponDiscount, setCouponDiscount] = useState<number>(0)
+  const orderItems = useMemo(
+    () =>
+      cart.map((item) => ({
+        productId: item.productId,
+        variantId: item.variant.id,
+        title: item.productTitle,
+        variantTitle: item.variant.title,
+        quantity: item.quantity,
+        price: item.unitPrice,
+        productType: item.productType,
+      })),
+    [cart],
+  )
+
+  const methods = useForm<POSCheckoutInput>({
+    resolver: zodResolver(posCheckoutSchema),
+    defaultValues: {
+      storeId,
+      branchId,
+      usedPoints: 0,
+      couponDiscount: 0,
+      discountAmount: 0,
+      status: OrderStatus.SHIPPED,
+      paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
+      items: orderItems,
+    },
+  })
+
+  const { watch, setValue, reset } = methods
+
+  useEffect(() => {
+    setValue('storeId', storeId)
+    setValue('branchId', branchId)
+    setValue('items', orderItems)
+  }, [storeId, branchId, orderItems, setValue])
+
+  const customerId = watch('customerId')
+  const customerName = watch('customerName')
+  const customerPhone = watch('customerPhone')
+  const customerPoints = watch('customerPoints') || 0
+  const usedPoints = watch('usedPoints') || 0
+  const couponDiscount = watch('couponDiscount') || 0
 
   const pointsDiscount = usedPoints * pointRedeemRate
   const totalDiscount = couponDiscount + pointsDiscount
+
+  useEffect(() => {
+    setValue('discountAmount', totalDiscount)
+  }, [totalDiscount, setValue])
 
   const orderSummary = useMemo(() => {
     const rawSubtotal = cart.reduce((sum, i) => sum + i.totalPrice, 0)
@@ -80,24 +125,28 @@ export function PosCart({
     }
   }, [orderSummary, totalDiscount])
 
-  const handleResetCustomerAndDiscount = () => {
-    setCustomer(null)
-    setUsedPoints(0)
-    setCouponDiscount(0)
-  }
-
   const handleClearCartAll = () => {
     onClearCart()
-    handleResetCustomerAndDiscount()
+    reset({
+      storeId,
+      branchId,
+      usedPoints: 0,
+      couponDiscount: 0,
+      discountAmount: 0,
+      items: [],
+    })
   }
 
   const handleRemoveCustomer = () => {
-    setCustomer(null)
-    setUsedPoints(0)
+    setValue('customerId', undefined)
+    setValue('customerName', undefined)
+    setValue('customerPhone', undefined)
+    setValue('customerPoints', 0)
+    setValue('usedPoints', 0)
   }
 
   return (
-    <>
+    <FormProvider {...methods}>
       <Card
         className="relative flex flex-col overflow-hidden bg-cover bg-center shadow-sm transition-all"
         style={bgImage ? { backgroundImage: `url(${bgImage})` } : undefined}
@@ -129,7 +178,7 @@ export function PosCart({
                 </span>
               </div>
             </CardTitle>
-            {customer && (
+            {customerId && (
               <div className="dark from-primary via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
@@ -137,13 +186,13 @@ export function PosCart({
                   </div>
                   <div className="space-y-0.5">
                     <p className="text-foreground text-sm leading-none font-bold">
-                      {customer.name}
+                      {customerName}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      รหัสลูกค้า: {customer.id} <br />
-                      อีเมล: {customer.email} <br />
-                      เบอร์โทรศัพท์: {formatPromptPay(customer.phone)} <br />
-                      แต้มคงเหลือ: {formatNumber(customer?.points ?? 0)} แต้ม
+                      รหัสลูกค้า: {customerId} <br />
+                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')}{' '}
+                      <br />
+                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
                     </p>
                   </div>
                 </div>
@@ -198,13 +247,7 @@ export function PosCart({
             <div className="flex w-full items-center justify-between px-1">
               <PosDiscountDialog
                 subtotal={summaryData.subtotal}
-                customer={customer}
-                usedPoints={usedPoints}
-                couponDiscount={couponDiscount}
                 pointRedeemRate={pointRedeemRate}
-                onSelectCustomer={setCustomer}
-                onChangeUsedPoints={setUsedPoints}
-                onChangeCouponDiscount={setCouponDiscount}
               />
             </div>
             <div className="dark w-full px-4 py-2 text-white!">
@@ -234,15 +277,9 @@ export function PosCart({
       <PosCheckoutModal
         open={isCheckoutOpen}
         onOpenChange={setIsCheckoutOpen}
-        cart={cart}
-        storeId={storeId}
-        branchId={branchId}
-        customerId={customer?.id}
-        usedPoints={usedPoints}
-        discountAmount={totalDiscount}
         totalAmount={summaryData.finalPrice}
         onSuccess={handleClearCartAll}
       />
-    </>
+    </FormProvider>
   )
 }
