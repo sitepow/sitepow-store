@@ -80,8 +80,8 @@ export function OrderTable() {
                   : '-'
 
                 const isStripePayment =
-                  order.paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY ||
-                  order.paymentMethod === PaymentMethod.STRIPE_CREDIT_CARD
+                  order.paymentMethod !== PaymentMethod.BANK_TRANSFER &&
+                  order.paymentMethod !== PaymentMethod.MANUAL_QR_PROMPTPAY
 
                 return (
                   <TableRow key={order.id}>
