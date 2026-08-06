@@ -614,7 +614,7 @@ export default function StoreCartPage() {
                               description={
                                 <>
                                   <span>
-                                    ค่าจัดส่ง: {formatCurrency(method.fee!)}
+                                    ค่าจัดส่ง: {formatCurrency(method.fee ?? 0)}
                                   </span>{' '}
                                   <br />
                                   <span>

@@ -188,7 +188,7 @@ export function UploadSlipDialog({
           <IconUpload size={16} className="mr-2" /> แจ้งชำระเงิน
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="gap-2.5 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
@@ -208,12 +208,14 @@ export function UploadSlipDialog({
         </div>
         <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3 text-sm">
           <span className="text-muted-foreground">ยอดเงินที่ต้องชำระ</span>
-          <span className="font-bold">{formatCurrency(totalAmount ?? 0)}</span>
+          <span className="text-primary font-bold">
+            {formatCurrency(totalAmount ?? 0)}
+          </span>
         </div>
         <RadioGroup
           value={selectedId}
           onValueChange={setSelectedId}
-          className="grid gap-2 py-2"
+          className="grid gap-2"
         >
           {bankAccounts.map((acc) => (
             <RadioCard
@@ -261,7 +263,7 @@ export function UploadSlipDialog({
           title="คำเตือนสำคัญ"
           description={`กรุณาโอนเงินให้ตรงกับยอดรวม (${formatCurrency(totalAmount ?? 0)}) และอัปโหลดสลิปให้ตรงกับคำสั่งซื้อ #${orderNumber} นี้เท่านั้น หากยอดเงินไม่ตรงหรือสลิปไม่ถูกต้อง ระบบจะตีตกสถานะเป็นไม่ผ่านอัตโนมัติ`}
         />
-        <div className="flex flex-col items-center justify-center pt-2">
+        <div className="flex flex-col items-center justify-center">
           {previewUrl ? (
             <div className="border-primary relative h-96 w-full border border-dashed">
               <Image
