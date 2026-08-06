@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { GetOrdersItem } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
+import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -49,25 +50,37 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
         return (
           <div
             key={itemKey}
-            className="flex flex-col gap-0.5 border-b pb-2 text-sm last:border-b-0 last:pb-0"
+            className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
-            <div className="flex justify-between">
-              <span>
-                {item.title} {item.variantTitle && `(${item.variantTitle})`} x
-                {item.quantity}
+            <EmptyImage className="size-16 shrink-0 rounded-md text-[10px]" />
+            <div className="flex flex-1 flex-col gap-0.5">
+              <div className="flex flex-wrap items-start justify-between gap-2 sm:flex-nowrap">
+                <span className="text-foreground font-medium">
+                  {item.title}{' '}
+                  {item.variantTitle && (
+                    <span className="text-muted-foreground font-normal">
+                      ({item.variantTitle})
+                    </span>
+                  )}
+                </span>
+                <span className="text-primary font-semibold whitespace-nowrap">
+                  {formatCurrency(totalPrice)}
+                </span>
+              </div>
+              <span className="text-muted-foreground text-xs">
+                จำนวน: {item.quantity} ชิ้น
               </span>
-              <span className="text-primary">{formatCurrency(totalPrice)}</span>
+              {item.customerNote && (
+                <span className="text-primary mt-0.5 text-xs italic">
+                  โน้ต: {item.customerNote}
+                </span>
+              )}
+              {item.branch?.name && (
+                <span className="text-primary mt-0.5 text-xs">
+                  จัดส่งจากสาขา {item.branch.name}
+                </span>
+              )}
             </div>
-            {item.customerNote && (
-              <span className="text-primary text-xs italic">
-                โน้ต: {item.customerNote}
-              </span>
-            )}
-            {item.branch?.name && (
-              <span className="text-primary text-xs">
-                จัดส่งจากสาขา {item.branch.name}
-              </span>
-            )}
           </div>
         )
       })}

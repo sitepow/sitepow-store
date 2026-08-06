@@ -94,6 +94,12 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
     order.paymentMethod === PaymentMethod.BANK_TRANSFER ||
     order.paymentMethod === PaymentMethod.MANUAL_QR_PROMPTPAY
 
+  const customerName =
+    [order.customer?.firstName, order.customer?.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim() || '-'
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -141,7 +147,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             onSubmit={handleSaveTracking}
           />
         )}
-        {order.trackingNumber && (
+        {order.trackingNumber ? (
           <CustomerCard
             icon={<IconCubeSend />}
             title="เลขพัสดุ (Tracking Number)"
@@ -169,15 +175,25 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               </Button>
             }
           />
-        )}
+        ) : order.status !== OrderStatus.CANCELLED &&
+          order.status !== OrderStatus.SHIPPED ? (
+          <CustomerCard
+            icon={<IconCubeSend />}
+            title="สถานะการจัดส่ง"
+            content={
+              order.status === OrderStatus.PENDING
+                ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
+                : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ'
+            }
+          />
+        ) : null}
         <OrderItemsSummary order={order} />
         <CustomerCard
           icon={<IconUser />}
           title="ข้อมูลลูกค้า"
           content={
             <>
-              ชื่อลูกค้า: {order.customer?.firstName} {order.customer?.lastName}{' '}
-              <br />
+              ชื่อลูกค้า: {customerName} <br />
               อีเมล: {order.customer?.email || '-'} <br />
               เบอร์โทรศัพท์:{' '}
               {order.customer?.phone

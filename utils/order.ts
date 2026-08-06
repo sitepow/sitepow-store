@@ -10,6 +10,7 @@ interface CalculateGroupShareParams {
   branchCount: number
   couponDiscount: number
   pointsDiscount: number
+  manualDiscount?: number
   usedPoints: number
   earnedPoints: number
 }
@@ -83,6 +84,7 @@ export const calculateGroupShare = ({
   branchCount,
   couponDiscount,
   pointsDiscount,
+  manualDiscount = 0,
   usedPoints,
   earnedPoints,
 }: CalculateGroupShareParams) => {
@@ -93,6 +95,7 @@ export const calculateGroupShare = ({
       branchCount === 1 ? totalShippingFee : totalShippingFee * ratio,
     couponDiscount: couponDiscount * ratio,
     pointsDiscount: pointsDiscount * ratio,
+    manualDiscount: manualDiscount * ratio,
     usedPoints: Math.round(usedPoints * ratio),
     earnedPoints: Math.round(earnedPoints * ratio),
   }
@@ -110,12 +113,30 @@ export function classifyOrderItems(items: CreateOrderItemInput[]) {
         physicalGroups[branchId] = []
       }
       physicalGroups[branchId].push(item)
-    } else if (item.productType === ProductType.DIGITAL_SERVICE) {
+    } else if (
+      item.productType === ProductType.DIGITAL_SERVICE ||
+      item.productType === ProductType.DIGITAL_LINK
+    ) {
       digitalServices.push(item)
+    } else if (item.productType === ProductType.DIGITAL_ITEM) {
+      digitalItems.push(item)
     } else {
       digitalItems.push(item)
     }
   }
 
   return { physicalGroups, digitalItems, digitalServices }
+}
+
+export function checkIsSplitOrder(classified: {
+  physicalGroups: Record<string, unknown[]>
+  digitalItems: unknown[]
+  digitalServices: unknown[]
+}) {
+  const branchCount = Object.keys(classified.physicalGroups).length
+  const hasDigitalItems = classified.digitalItems.length > 0 ? 1 : 0
+  const digitalServicesCount = classified.digitalServices.length
+
+  const totalSubOrders = branchCount + hasDigitalItems + digitalServicesCount
+  return totalSubOrders > 1
 }

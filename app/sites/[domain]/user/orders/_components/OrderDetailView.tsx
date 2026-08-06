@@ -98,7 +98,8 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               </Button>
             }
           />
-        ) : (
+        ) : order.status !== OrderStatus.CANCELLED &&
+          order.status !== OrderStatus.SHIPPED ? (
           <CustomerCard
             icon={<IconCubeSend />}
             title="สถานะการจัดส่ง"
@@ -108,7 +109,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                 : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ'
             }
           />
-        )}
+        ) : null}
         <OrderItemsSummary order={order} />
         <CustomerCard
           icon={<IconMapPin />}

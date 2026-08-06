@@ -9,6 +9,7 @@ import {
 import { calculateDiscounts, calculateEarnedPoints } from '@/utils/cart'
 import {
   calculateGroupShare,
+  checkIsSplitOrder,
   classifyOrderItems,
   generateOrderNumber,
 } from '@/utils/order'
@@ -116,22 +117,24 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     }
   }
 
-  const variantIds = Array.from(new Set(input.items.map((i) => i.variantId)))
+  const variantIds = Array.from(
+    new Set(input.items.map((i) => i.variantId).filter(Boolean)),
+  )
   const variants = await prisma.productVariant.findMany({
-    where: { id: { in: variantIds } },
+    where: { id: { in: variantIds as string[] } },
     select: { id: true, weight: true, width: true, height: true, length: true },
   })
   const variantMap = new Map(variants.map((v) => [v.id, v]))
   const dimensions = calculateOrderDimensions(input.items, variantMap)
 
-  const { physicalGroups, digitalItems, digitalServices } = classifyOrderItems(
-    input.items,
-  )
+  const classified = classifyOrderItems(input.items)
+  const { physicalGroups, digitalItems, digitalServices } = classified
 
   const subtotalAll = input.items.reduce(
     (sum, i) => sum + i.price * i.quantity,
     0,
   )
+
   const { couponDiscount, pointsDiscount } = calculateDiscounts({
     subtotal: subtotalAll,
     coupon: couponData,
@@ -154,6 +157,9 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       calculateEarnedPoints(grandTotal, Number(store.pointEarningRate ?? 0)))
     : 0
 
+  const branchIds = Object.keys(physicalGroups)
+  const isSplitOrder = checkIsSplitOrder(classified)
+
   const createdOrders = await prisma.$transaction(async (tx) => {
     if (input.couponId) {
       const coupon = await tx.coupon.findUnique({
@@ -172,10 +178,9 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       const updatedCoupon = await tx.coupon.updateMany({
         where: {
           id: input.couponId,
-          OR: [
-            { usageLimit: null },
-            { usedCount: { lt: prisma.coupon.fields.usageLimit } },
-          ],
+          ...(coupon?.usageLimit != null
+            ? { usedCount: { lt: coupon.usageLimit } }
+            : {}),
         },
         data: { usedCount: { increment: 1 } },
       })
@@ -185,15 +190,33 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       }
     }
 
+    if (input.customerId && input.usedPoints && input.usedPoints > 0) {
+      const customerStore = await tx.customerStore.findUnique({
+        where: {
+          customerId_storeId: {
+            customerId: input.customerId,
+            storeId: store.id,
+          },
+        },
+        select: { rewardPoints: true },
+      })
+
+      const currentPoints = customerStore?.rewardPoints ?? 0
+      if (currentPoints < input.usedPoints) {
+        throw new Error(`แต้มสะสมไม่เพียงพอ (คุณมี ${currentPoints} แต้ม)`)
+      }
+
+      await deductCustomerPoints({
+        tx,
+        customerId: input.customerId,
+        storeId: store.id,
+        usedPoints: input.usedPoints,
+      })
+    }
+
     const orders = []
     const baseOrderNumber = generateOrderNumber()
     let orderCounter = 1
-
-    const branchIds = Object.keys(physicalGroups)
-    const hasMultipleGroups =
-      branchIds.length > 1 ||
-      digitalItems.length > 0 ||
-      digitalServices.length > 0
 
     const defaultStatus =
       input.status ??
@@ -220,6 +243,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         branchCount: branchIds.length,
         couponDiscount,
         pointsDiscount,
+        manualDiscount,
         usedPoints: input.usedPoints ?? 0,
         earnedPoints: calculatedEarnedPoints,
       })
@@ -230,7 +254,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           share.shippingFee -
           share.couponDiscount -
           share.pointsDiscount -
-          manualDiscount,
+          share.manualDiscount,
       )
 
       for (const item of groupItems) {
@@ -238,14 +262,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           where: {
             branchId: targetBranchId,
             variantId: item.variantId,
-            quantity: {
-              gte: item.quantity,
-            },
+            quantity: { gte: item.quantity },
           },
           data: {
-            quantity: {
-              decrement: item.quantity,
-            },
+            quantity: { decrement: item.quantity },
           },
         })
 
@@ -256,7 +276,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         }
       }
 
-      const subOrderNumber = hasMultipleGroups
+      const subOrderNumber = isSplitOrder
         ? `${baseOrderNumber}-${orderCounter++}`
         : baseOrderNumber
 
@@ -323,15 +343,22 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         branchCount: branchIds.length,
         couponDiscount,
         pointsDiscount,
+        manualDiscount,
         usedPoints: input.usedPoints ?? 0,
         earnedPoints: calculatedEarnedPoints,
       })
 
       const digitalTotal = Math.max(
         0,
-        digitalSubtotal - share.couponDiscount - share.pointsDiscount,
+        digitalSubtotal -
+          share.couponDiscount -
+          share.pointsDiscount -
+          share.manualDiscount,
       )
-      const subOrderNumber = `${baseOrderNumber}-${orderCounter++}`
+
+      const subOrderNumber = isSplitOrder
+        ? `${baseOrderNumber}-${orderCounter++}`
+        : baseOrderNumber
 
       const mainBranch = await tx.branch.findFirst({
         where: { storeId: store.id, isMain: true },
@@ -421,15 +448,22 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           branchCount: branchIds.length,
           couponDiscount,
           pointsDiscount,
+          manualDiscount,
           usedPoints: input.usedPoints ?? 0,
           earnedPoints: calculatedEarnedPoints,
         })
 
         const serviceTotal = Math.max(
           0,
-          serviceSubtotal - share.couponDiscount - share.pointsDiscount,
+          serviceSubtotal -
+            share.couponDiscount -
+            share.pointsDiscount -
+            share.manualDiscount,
         )
-        const subOrderNumber = `${baseOrderNumber}-${orderCounter++}`
+
+        const subOrderNumber = isSplitOrder
+          ? `${baseOrderNumber}-${orderCounter++}`
+          : baseOrderNumber
 
         const order = await tx.order.create({
           data: {
@@ -475,15 +509,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     }
 
     if (input.customerId) {
-      if (input.usedPoints && input.usedPoints > 0) {
-        await deductCustomerPoints({
-          tx,
-          customerId: input.customerId,
-          storeId: store.id,
-          usedPoints: input.usedPoints,
-        })
-      }
-
       await tx.customerStore.upsert({
         where: {
           customerId_storeId: {
@@ -537,7 +562,9 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       orderNumber: true,
       status: true,
       customerId: true,
+      totalAmount: true,
       usedPoints: true,
+      earnedPoints: true,
       couponId: true,
       items: {
         select: {
@@ -565,38 +592,39 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
         item.variantId &&
         item.branchId
       ) {
-        await tx.productStock.update({
-          where: {
-            branchId_variantId: {
+        const variantExists = await tx.productVariant.findUnique({
+          where: { id: item.variantId },
+          select: { id: true },
+        })
+
+        const branchExists = await tx.branch.findUnique({
+          where: { id: item.branchId },
+          select: { id: true },
+        })
+
+        if (variantExists && branchExists) {
+          await tx.productStock.upsert({
+            where: {
+              branchId_variantId: {
+                branchId: item.branchId,
+                variantId: item.variantId,
+              },
+            },
+            update: {
+              quantity: { increment: item.quantity },
+            },
+            create: {
               branchId: item.branchId,
               variantId: item.variantId,
+              quantity: item.quantity,
             },
-          },
-          data: {
-            quantity: {
-              increment: item.quantity,
-            },
-          },
-        })
+          })
+        } else {
+          console.warn(
+            `[CancelOrder] Cannot restore stock for variant ${item.variantId} in branch ${item.branchId} because it no longer exists.`,
+          )
+        }
       }
-    }
-
-    if (order.customerId && order.usedPoints && order.usedPoints > 0) {
-      await refundCustomerPoints({
-        tx,
-        customerId: order.customerId,
-        storeId: order.storeId,
-        usedPoints: order.usedPoints,
-      })
-    }
-
-    if (order.couponId) {
-      await tx.coupon.update({
-        where: { id: order.couponId },
-        data: {
-          usedCount: { decrement: 1 },
-        },
-      })
     }
 
     await tx.digitalItem.updateMany({
@@ -606,6 +634,55 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
         isUsed: false,
       },
     })
+
+    if (order.customerId) {
+      if (order.usedPoints && order.usedPoints > 0) {
+        await refundCustomerPoints({
+          tx,
+          customerId: order.customerId,
+          storeId: order.storeId,
+          usedPoints: order.usedPoints,
+        })
+      }
+
+      if (order.earnedPoints && order.earnedPoints > 0) {
+        await deductCustomerPoints({
+          tx,
+          customerId: order.customerId,
+          storeId: order.storeId,
+          usedPoints: order.earnedPoints,
+        })
+      }
+
+      const amountToDeduct = Number(order.totalAmount ?? 0)
+      if (amountToDeduct > 0) {
+        await tx.customerStore.update({
+          where: {
+            customerId_storeId: {
+              customerId: order.customerId,
+              storeId: order.storeId,
+            },
+          },
+          data: {
+            totalSpent: {
+              decrement: amountToDeduct,
+            },
+          },
+        })
+      }
+    }
+
+    if (order.couponId) {
+      await tx.coupon.updateMany({
+        where: {
+          id: order.couponId,
+          usedCount: { gt: 0 },
+        },
+        data: {
+          usedCount: { decrement: 1 },
+        },
+      })
+    }
 
     await tx.order.update({
       where: { id: order.id },
