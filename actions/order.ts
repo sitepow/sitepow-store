@@ -333,38 +333,65 @@ export async function cancelOrder(id: string) {
     }
 
     const session = await auth()
-    const userId = session?.user?.id
+    const currentUserId = session?.user?.id
 
-    if (!userId) {
+    if (!currentUserId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const order = await prisma.order.findUnique({
       where: { id },
-      select: { storeId: true },
+      select: {
+        id: true,
+        storeId: true,
+        customerId: true,
+        customer: {
+          select: {
+            id: true,
+            userId: true,
+          },
+        },
+        store: {
+          select: {
+            ownerId: true,
+          },
+        },
+      },
     })
 
     if (!order) {
       return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
-    const authCheck = await verifyEmployeePermission({
-      userId,
-      storeId: order.storeId,
-      permission: 'canDeleteOrders',
-    })
+    const isOrderCustomer =
+      order.customerId === currentUserId ||
+      order.customer?.id === currentUserId ||
+      order.customer?.userId === currentUserId
 
-    if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+    const isStoreOwner = order.store?.ownerId === currentUserId
+
+    let actorType: ActorType = ActorType.MERCHANT
+
+    if (!isOrderCustomer && !isStoreOwner) {
+      const authCheck = await verifyEmployeePermission({
+        userId: currentUserId,
+        storeId: order.storeId,
+        permission: 'canDeleteOrders',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return {
+          success: false,
+          message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        }
       }
+    } else if (isOrderCustomer && !isStoreOwner) {
+      actorType = ActorType.SYSTEM
     }
 
     await cancelOrderCore({
       orderId: id,
-      actorId: userId,
-      actorType: ActorType.MERCHANT,
+      actorType,
     })
 
     return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
