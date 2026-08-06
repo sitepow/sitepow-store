@@ -2,7 +2,6 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 import { OrderStatus } from '@/generated/prisma/enums'
-import { earnCustomerPoints } from '@/utils/points'
 import Stripe from 'stripe'
 
 import { prisma } from '@/lib/prisma'
@@ -68,8 +67,6 @@ export async function POST(req: Request, props: RouteParams) {
           select: {
             id: true,
             storeId: true,
-            customerId: true,
-            earnedPoints: true,
           },
         })
 
@@ -83,19 +80,6 @@ export async function POST(req: Request, props: RouteParams) {
                   paidAt: new Date(),
                 },
               })
-
-              if (
-                order.customerId &&
-                order.earnedPoints &&
-                order.earnedPoints > 0
-              ) {
-                await earnCustomerPoints({
-                  tx,
-                  customerId: order.customerId,
-                  storeId: order.storeId,
-                  earnedPoints: order.earnedPoints,
-                })
-              }
             }
           })
         }

@@ -1,6 +1,8 @@
 'use server'
 
+import { PaymentMethod } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
+import { earnCustomerPoints } from '@/utils/points'
 
 import { auth } from '@/lib/auth'
 import { createOrderCore } from '@/lib/order'
@@ -46,6 +48,28 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
       items: input.items,
       isPOS: true,
     })
+
+    if (
+      input.paymentMethod === PaymentMethod.CASH_ON_DELIVERY &&
+      orders.length > 0
+    ) {
+      await prisma.$transaction(async (tx) => {
+        for (const order of orders) {
+          if (
+            order.customerId &&
+            order.earnedPoints &&
+            order.earnedPoints > 0
+          ) {
+            await earnCustomerPoints({
+              tx,
+              customerId: order.customerId,
+              storeId: order.storeId,
+              earnedPoints: order.earnedPoints,
+            })
+          }
+        }
+      })
+    }
 
     return {
       success: true,

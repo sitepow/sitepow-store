@@ -520,11 +520,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           customerId: input.customerId,
           storeId: store.id,
           totalSpent: grandTotal,
-          rewardPoints: calculatedEarnedPoints,
+          rewardPoints: 0,
         },
         update: {
           totalSpent: { increment: grandTotal },
-          rewardPoints: { increment: calculatedEarnedPoints },
         },
       })
     }
@@ -642,15 +641,6 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
           customerId: order.customerId,
           storeId: order.storeId,
           usedPoints: order.usedPoints,
-        })
-      }
-
-      if (order.earnedPoints && order.earnedPoints > 0) {
-        await deductCustomerPoints({
-          tx,
-          customerId: order.customerId,
-          storeId: order.storeId,
-          usedPoints: order.earnedPoints,
         })
       }
 

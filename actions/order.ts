@@ -4,6 +4,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { earnCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
@@ -277,7 +278,13 @@ export async function updateOrderStatus(
 
     const order = await prisma.order.findUnique({
       where: { id },
-      select: { storeId: true, orderNumber: true, status: true },
+      select: {
+        storeId: true,
+        orderNumber: true,
+        status: true,
+        customerId: true,
+        earnedPoints: true,
+      },
     })
 
     if (!order) {
@@ -297,12 +304,32 @@ export async function updateOrderStatus(
       }
     }
 
-    await prisma.order.update({
-      where: { id },
-      data: {
-        status,
-        ...(trackingNumber ? { trackingNumber } : {}),
-      },
+    const isBecomingShipped = status === OrderStatus.SHIPPED
+    const wasAlreadyShipped = order.status === OrderStatus.SHIPPED
+
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id },
+        data: {
+          status,
+          ...(trackingNumber ? { trackingNumber } : {}),
+        },
+      })
+
+      if (
+        isBecomingShipped &&
+        !wasAlreadyShipped &&
+        order.customerId &&
+        order.earnedPoints &&
+        order.earnedPoints > 0
+      ) {
+        await earnCustomerPoints({
+          tx,
+          customerId: order.customerId,
+          storeId: order.storeId,
+          earnedPoints: order.earnedPoints,
+        })
+      }
     })
 
     await createLog({
