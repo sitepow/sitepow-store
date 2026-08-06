@@ -113,6 +113,17 @@ const orderSelect = {
   },
 } satisfies Prisma.OrderSelect
 
+export interface ShippingAddressSnapshot {
+  name?: string
+  receiverName?: string
+  phone?: string
+  addressLine?: string
+  subDistrict?: string
+  district?: string
+  province?: string
+  postalCode?: string
+}
+
 export type GetOrdersItem = DecimalToNumber<
   Prisma.OrderGetPayload<{
     select: typeof orderSelect

@@ -184,7 +184,7 @@ export function UploadSlipDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" variant="outline">
           <IconUpload size={16} className="mr-2" /> แจ้งชำระเงิน
         </Button>
       </DialogTrigger>

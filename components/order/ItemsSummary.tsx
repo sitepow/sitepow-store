@@ -1,111 +1,128 @@
+import { useMemo } from 'react'
+
+import { GetOrdersItem } from '@/actions/order'
+import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
-export interface OrderItemDetails {
-  title: string
-  variantTitle?: string | null
-  quantity: number
-  price: number
-  customerNote?: string | null
-  branch?: { name: string } | null
-}
+import { HighlightText } from '../HighlightText'
 
-interface OrderItemsSummaryProps {
-  order: {
-    items: OrderItemDetails[]
-    totalAmount: number
-    shippingMethod?: string | null
-    coupon?: { code: string } | null
-    usedPoints?: number | null
-    earnedPoints?: number | null
-  }
+export interface OrderItemsSummaryProps {
+  order: GetOrdersItem | GetStorefrontOrderItemSerialized
 }
 
 export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
-  const summary = calculateOrderSummary(order)
+  const { summary, couponDiscount } = useMemo(() => {
+    const summaryResult = calculateOrderSummary(order)
+    const itemsSubtotal = summaryResult?.itemsSubtotal ?? 0
+    const shippingFee = summaryResult?.shippingFee ?? 0
+    const pointsDiscount = summaryResult?.pointsDiscount ?? 0
+    const totalAmount = Number(order.totalAmount ?? 0)
 
-  const couponDiscount =
-    (summary?.itemsSubtotal || 0) +
-    (summary?.shippingFee || 0) -
-    (summary?.pointsDiscount || 0) -
-    Number(order.totalAmount || 0)
+    const calculatedCouponDiscount =
+      itemsSubtotal + shippingFee - pointsDiscount - totalAmount
+
+    return {
+      summary: summaryResult,
+      couponDiscount: Math.max(0, calculatedCouponDiscount),
+    }
+  }, [order])
+
+  const {
+    items = [],
+    shippingMethod,
+    coupon,
+    usedPoints = 0,
+    earnedPoints = 0,
+    totalAmount,
+  } = order
 
   return (
     <div className="space-y-2 rounded-lg border p-4">
       <div className="text-sm font-semibold">รายการสินค้า</div>
-      {order.items.map((item, idx) => (
-        <div
-          key={idx}
-          className="flex flex-col gap-0.5 border-b pb-2 text-sm last:border-b-0 last:pb-0"
-        >
-          <div className="flex justify-between">
-            <span>
-              {item.title} {item.variantTitle && `(${item.variantTitle})`} x
-              {item.quantity}
-            </span>
-            <span>{formatCurrency(Number(item.price) * item.quantity)}</span>
+
+      {items.map((item, idx) => {
+        const itemKey = item.id || `${item.title}-${item.variantTitle}-${idx}`
+        const totalPrice = Number(item.price) * item.quantity
+
+        return (
+          <div
+            key={itemKey}
+            className="flex flex-col gap-0.5 border-b pb-2 text-sm last:border-b-0 last:pb-0"
+          >
+            <div className="flex justify-between">
+              <span>
+                {item.title} {item.variantTitle && `(${item.variantTitle})`} x
+                {item.quantity}
+              </span>
+              <span className="text-primary">{formatCurrency(totalPrice)}</span>
+            </div>
+            {item.customerNote && (
+              <span className="text-primary text-xs italic">
+                โน้ต: {item.customerNote}
+              </span>
+            )}
+            {item.branch?.name && (
+              <span className="text-primary text-xs">
+                จัดส่งจากสาขา {item.branch.name}
+              </span>
+            )}
           </div>
-          {item.customerNote && (
-            <span className="text-muted-foreground text-xs italic">
-              โน้ต: {item.customerNote}
-            </span>
-          )}
-          {item.branch?.name && (
-            <span className="text-muted-foreground text-xs">
-              จัดส่งจากสาขา {item.branch.name}
-            </span>
-          )}
-        </div>
-      ))}
+        )
+      })}
       <div className="mt-3 space-y-1.5 border-t pt-3">
         <SummaryRow
           label="รวมราคาสินค้า"
-          value={formatCurrency(summary?.itemsSubtotal)}
+          value={
+            <HighlightText>
+              {formatCurrency(summary?.itemsSubtotal)}
+            </HighlightText>
+          }
         />
-        {summary?.shippingFee > 0 && (
+        {!!summary?.shippingFee && (
           <SummaryRow
-            label={`ค่าจัดส่ง ${
-              order.shippingMethod ? `(${order.shippingMethod})` : ''
-            }`}
-            value={formatCurrency(summary?.shippingFee)}
+            label={`ค่าจัดส่ง ${shippingMethod ? `(${shippingMethod})` : ''}`}
+            value={
+              <HighlightText>
+                {formatCurrency(summary.shippingFee)}
+              </HighlightText>
+            }
           />
         )}
-        {order.coupon && couponDiscount > 0 && (
+        {!!coupon && couponDiscount > 0 && (
           <SummaryRow
-            label={`ส่วนลดคูปอง (${order.coupon.code})`}
+            label={`ส่วนลดคูปอง (${coupon.code})`}
             value={formatCurrency(couponDiscount)}
             isDiscount
           />
         )}
-        {(order.usedPoints ?? 0) > 0 && (
+        {(usedPoints ?? 0) > 0 && (
           <SummaryRow
-            label={`ส่วนลดจากแต้มสะสม (${order.usedPoints?.toLocaleString()} แต้ม)`}
-            value={formatCurrency(summary?.pointsDiscount || 0)}
+            label={`ส่วนลดจากแต้มสะสม (${usedPoints?.toLocaleString()} แต้ม)`}
+            value={formatCurrency(summary?.pointsDiscount ?? 0)}
             isDiscount
           />
         )}
-        {summary?.codFee > 0 && (
+        {!!summary?.codFee && (
           <SummaryRow
             label="ค่าธรรมเนียมเก็บเงินปลายทาง (COD)"
-            value={formatCurrency(summary?.codFee)}
+            value={formatCurrency(summary.codFee)}
           />
         )}
-        {(order.earnedPoints ?? 0) > 0 && (
+        {(earnedPoints ?? 0) > 0 && (
           <SummaryRow
             label="แต้มสะสมที่จะได้รับ"
             value={
-              <span className="text-primary">
-                + {formatNumber(order.earnedPoints ?? 0)} แต้ม
-              </span>
+              <HighlightText>
+                + {formatNumber(earnedPoints ?? 0)} แต้ม
+              </HighlightText>
             }
           />
         )}
         <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
           <span>ยอดชำระทั้งสิ้น</span>
-          <span className="text-primary">
-            {formatCurrency(order.totalAmount)}
-          </span>
+          <HighlightText>{formatCurrency(totalAmount)}</HighlightText>
         </div>
       </div>
     </div>

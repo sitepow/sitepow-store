@@ -6,7 +6,7 @@ import {
   isValidElement,
 } from 'react'
 
-import { IconUserCheck } from '@tabler/icons-react'
+import { IconUser } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
 
@@ -21,7 +21,7 @@ export interface CustomerCardProps extends Omit<
 }
 
 export function CustomerCard({
-  icon = <IconUserCheck />,
+  icon = <IconUser />,
   title,
   content,
   action,
@@ -40,7 +40,7 @@ export function CustomerCard({
   return (
     <div
       className={cn(
-        'from-primary/10 via-primary/2 to-background border-primary/20 flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5 shadow-xs',
+        'from-primary/10 via-primary/2 to-background border-primary/20 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5',
         className,
       )}
       {...props}

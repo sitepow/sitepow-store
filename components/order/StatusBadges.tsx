@@ -8,21 +8,23 @@ interface OrderStatusBadgesProps {
   status: OrderStatus
   paymentMethod?: PaymentMethod | null
   paidAt?: Date | string | null
+  isTaxInvoiceRequested?: boolean | null
 }
 
 export function OrderStatusBadges({
   status,
   paymentMethod,
   paidAt,
+  isTaxInvoiceRequested,
 }: OrderStatusBadgesProps) {
-  const isPaidOrShipped = (
-    [OrderStatus.PAID, OrderStatus.SHIPPED] as OrderStatus[]
-  ).includes(status)
+  const isPaidOrShipped =
+    status === OrderStatus.PAID || status === OrderStatus.SHIPPED
 
   return (
     <div className="mb-3 flex flex-wrap gap-2">
+      {isTaxInvoiceRequested && <Badge>ขอใบกำกับภาษี</Badge>}
       <Badge variant={isPaidOrShipped ? 'default' : 'outline'}>
-        ออเดอร์: {ORDER_STATUS_TH[status]}
+        สถานะออเดอร์: {ORDER_STATUS_TH[status]}
       </Badge>
       {paymentMethod && (
         <Badge variant="outline">

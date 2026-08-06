@@ -59,7 +59,7 @@ export function VerifySlipMerchantDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" variant="outline">
           <IconDownload size={16} /> ตรวจสอบสลิป
         </Button>
       </DialogTrigger>

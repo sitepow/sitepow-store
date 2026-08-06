@@ -16,10 +16,18 @@ export function OrderTrackingForm({
   onTrackingNumberChange,
   onSubmit,
 }: OrderTrackingFormProps) {
+  const isInputEmpty = !trackingNumber.trim()
+
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!isInputEmpty && !isPending) onSubmit()
+      }}
+      className="space-y-3 rounded-lg border p-4"
+    >
       <div className="space-y-1">
-        <Label className="text-sm font-medium">
+        <Label htmlFor="trackingNumber" className="text-sm font-medium">
           กรุณากรอกเลขพัสดุสำหรับการจัดส่ง
         </Label>
         <p className="text-muted-foreground text-xs">
@@ -28,18 +36,20 @@ export function OrderTrackingForm({
       </div>
       <div className="flex gap-2">
         <Input
+          id="trackingNumber"
           placeholder="ระบุเลข Tracking Number เช่น TH123456789..."
           value={trackingNumber}
           onChange={(e) => onTrackingNumberChange(e.target.value)}
+          disabled={isPending}
         />
         <Button
-          onClick={onSubmit}
-          disabled={isPending || !trackingNumber.trim()}
+          type="submit"
+          disabled={isPending || isInputEmpty}
           className="shrink-0"
         >
           {isPending ? <Spinner /> : 'บันทึก'}
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
