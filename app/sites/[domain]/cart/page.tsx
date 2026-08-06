@@ -139,22 +139,25 @@ export default function StoreCartPage() {
             {
               id: PaymentMethod.STRIPE_QR_PROMPTPAY,
               title: '(Stripe) QR พร้อมเพย์',
-              description: 'รองรับธนาคารไทยทุกแห่ง',
+              description:
+                'รองรับธนาคารไทยทุกแห่ง (กสิกร, ไทยพาณิชย์, กรุงเทพ, กรุงไทย, กสิกรไทย ฯลฯ) (ระบบอัตโนมัติ)',
             },
             {
               id: PaymentMethod.STRIPE_CREDIT_CARD,
               title: '(Stripe) บัตรเครดิต / เดบิต',
-              description: 'ชำระผ่าน Visa หรือ Mastercard',
+              description: 'ชำระผ่าน Visa หรือ Mastercard (ระบบอัตโนมัติ)',
             },
             {
               id: PaymentMethod.STRIPE_GOOGLE_PAY,
               title: '(Stripe) Google Pay',
-              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay',
+              description:
+                'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay (ระบบอัตโนมัติ)',
             },
             {
               id: PaymentMethod.STRIPE_APPLE_PAY,
               title: '(Stripe) Apple Pay',
-              description: 'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay',
+              description:
+                'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay (ระบบอัตโนมัติ)',
             },
           ]
         : []),
@@ -366,16 +369,17 @@ export default function StoreCartPage() {
 
     const paymentMethodEnum = getPaymentMethod(selectedPaymentData.id)
     const isStripePayment =
-      paymentMethodEnum === PaymentMethod.STRIPE_QR_PROMPTPAY ||
-      paymentMethodEnum === PaymentMethod.STRIPE_CREDIT_CARD ||
-      paymentMethodEnum === PaymentMethod.STRIPE_GOOGLE_PAY ||
-      paymentMethodEnum === PaymentMethod.STRIPE_APPLE_PAY
+      paymentMethodEnum !== PaymentMethod.BANK_TRANSFER &&
+      paymentMethodEnum !== PaymentMethod.CASH_ON_DELIVERY &&
+      paymentMethodEnum !== PaymentMethod.MANUAL_QR_PROMPTPAY
 
     createOrderMutation.mutate(
       {
         storeSlug,
         addressId: selectedAddressData?.id ?? '',
-        shippingMethod: selectedShippingData?.courierService.name ?? '',
+        shippingMethod: selectedShippingData
+          ? `${selectedShippingData.courierService.courier.name} (${selectedShippingData.courierService.name})`
+          : '',
         storeCourierServiceId: selectedShippingData?.id ?? '',
         shippingFee: shippingFee,
         paymentMethod: paymentMethodEnum,
@@ -606,15 +610,20 @@ export default function StoreCartPage() {
                               key={method.id}
                               id={`ship-${method.id}`}
                               value={method.id}
-                              title={`${method.courierService.name} (${
-                                isSupported
-                                  ? formatCurrency(method.fee!)
-                                  : 'ไม่รองรับน้ำหนักนี้'
-                              })`}
+                              title={`${method.courierService.courier.name} (${method.courierService.name})`}
                               description={
-                                method.courierService.estimatedDays
-                                  ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
-                                  : method.courierService.courier.name
+                                <>
+                                  <span>
+                                    ค่าจัดส่ง: {formatCurrency(method.fee!)}
+                                  </span>{' '}
+                                  <br />
+                                  <span>
+                                    ใช้เวลาจัดส่ง:{' '}
+                                    {method.courierService.estimatedDays
+                                      ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
+                                      : method.courierService.courier.name}
+                                  </span>
+                                </>
                               }
                               disabled={!isSupported}
                             />
@@ -637,15 +646,24 @@ export default function StoreCartPage() {
                     <RadioCard
                       id={`summary-ship-${selectedShippingData.id}`}
                       value={selectedShippingData.id}
-                      title={`${selectedShippingData.courierService.name} ${
-                        selectedShippingData.fee !== null
-                          ? `(${formatCurrency(selectedShippingData.fee)})`
-                          : 'ไม่รองรับน้ำหนักนี้'
-                      }`}
+                      title={`${selectedShippingData.courierService.courier.name} (${selectedShippingData.courierService.name})`}
                       description={
-                        selectedShippingData.courierService.estimatedDays
-                          ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
-                          : selectedShippingData.courierService.courier.name
+                        <>
+                          <span>
+                            ค่าจัดส่ง:{' '}
+                            {selectedShippingData.fee !== null
+                              ? formatCurrency(selectedShippingData.fee)
+                              : 'ไม่รองรับน้ำหนักนี้'}
+                          </span>{' '}
+                          <br />
+                          <span>
+                            ใช้เวลาจัดส่ง:{' '}
+                            {selectedShippingData.courierService.estimatedDays
+                              ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
+                              : selectedShippingData.courierService.courier
+                                  .name}
+                          </span>
+                        </>
                       }
                     />
                   </RadioGroup>
