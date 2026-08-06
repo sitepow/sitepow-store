@@ -8,7 +8,7 @@ import { useApproveSlipManual } from '@/actions/hooks/verify-slip'
 import { SlipVerificationAction } from '@/types/slip'
 import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount } from '@/utils/slip'
-import { IconCheck, IconDownload, IconX } from '@tabler/icons-react'
+import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
@@ -60,7 +60,7 @@ export function VerifySlipMerchantDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconDownload size={16} /> ตรวจสอบสลิป
+          <IconSearch size={16} /> ตรวจสอบสลิป
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
