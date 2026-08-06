@@ -19,6 +19,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 
+import { HighlightText } from '@/components/HighlightText'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -157,7 +158,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                   />
                   <span className="text-muted-foreground text-sm">
                     แลกเป็นส่วนลดได้{' '}
-                    <strong className="text-foreground">
+                    <strong className="text-primary">
                       {formatCurrency(pointsDiscount)}
                     </strong>
                   </span>
@@ -221,11 +222,19 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
           <div className="bg-muted/20 space-y-3 rounded-xl border p-4">
             <SummaryRow
               label="ส่วนลดจากแต้มสะสม"
-              value={`-${formatCurrency(pointsDiscount)}`}
+              value={
+                <HighlightText>
+                  - {formatCurrency(pointsDiscount)}
+                </HighlightText>
+              }
             />
             <SummaryRow
               label="ส่วนลดจากรหัส"
-              value={`-${formatCurrency(couponDiscount)}`}
+              value={
+                <HighlightText>
+                  - {formatCurrency(couponDiscount)}
+                </HighlightText>
+              }
             />
             <Separator />
             <SummaryTotal

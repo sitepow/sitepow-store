@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 
 import { useStoreCheckout } from '@/actions/hooks/checkout'
@@ -10,14 +11,13 @@ import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
-import { IconCreditCard, IconEye, IconX } from '@tabler/icons-react'
+import { IconCreditCard, IconX } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -38,8 +38,6 @@ interface OrderTableProps {
 export function OrderTable({ search }: OrderTableProps) {
   const { user } = useSession()
   const [page, setPage] = useState(1)
-  const [selectedOrder, setSelectedOrder] =
-    useState<GetStorefrontOrderItemSerialized | null>(null)
 
   const { data: { data: orders = [], meta } = {}, isLoading } =
     useStorefrontOrders({ page, limit: 10, search })
@@ -104,30 +102,11 @@ export function OrderTable({ search }: OrderTableProps) {
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="flex items-center justify-end gap-2.5 text-right">
-                      {(
-                        [
-                          OrderStatus.MANUAL_CHECK,
-                          OrderStatus.PENDING,
-                        ] as OrderStatus[]
-                      ).includes(order.status) && (
-                        <DeleteButton
-                          icon={<IconX />}
-                          isPending={cancelOrderMutation.isPending}
-                          onDelete={() => cancelOrderMutation.mutate(order.id)}
-                        />
-                      )}
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <IconEye />
-                      </Button>
                       {order.status === OrderStatus.PENDING && (
                         <>
                           {isStripePayment ? (
                             <Button
-                              variant="default"
+                              variant="outline"
                               size="sm"
                               disabled={storeCheckoutMutation.isPending}
                               onClick={() => {
@@ -162,6 +141,19 @@ export function OrderTable({ search }: OrderTableProps) {
                           )}
                         </>
                       )}
+                      {(
+                        [
+                          OrderStatus.MANUAL_CHECK,
+                          OrderStatus.PENDING,
+                        ] as OrderStatus[]
+                      ).includes(order.status) && (
+                        <DeleteButton
+                          icon={<IconX />}
+                          isPending={cancelOrderMutation.isPending}
+                          onDelete={() => cancelOrderMutation.mutate(order.id)}
+                        />
+                      )}
+                      <OrderDetailView order={order} />
                     </TableCell>
                   </TableRow>
                 )
@@ -179,14 +171,6 @@ export function OrderTable({ search }: OrderTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-      <Dialog
-        open={selectedOrder !== null}
-        onOpenChange={(open) => !open && setSelectedOrder(null)}
-      >
-        <DialogContent className="sm:max-w-lg">
-          {selectedOrder && <OrderDetailView order={selectedOrder} />}
-        </DialogContent>
-      </Dialog>
     </>
   )
 }

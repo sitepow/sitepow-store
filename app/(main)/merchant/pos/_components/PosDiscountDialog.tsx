@@ -23,7 +23,6 @@ import {
   IconPlus,
   IconSearch,
   IconTicket,
-  IconUserCheck,
   IconUserPlus,
   IconWallet,
   IconX,
@@ -446,7 +445,9 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
             <SummaryRow
               label="ส่วนลดจากรหัส"
               value={
-                <HighlightText>{formatCurrency(couponDiscount)}</HighlightText>
+                <HighlightText>
+                  - {formatCurrency(couponDiscount)}
+                </HighlightText>
               }
             />
             <Separator />
