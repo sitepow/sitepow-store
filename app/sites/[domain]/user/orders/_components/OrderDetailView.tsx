@@ -56,7 +56,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
           <DialogDescription>
