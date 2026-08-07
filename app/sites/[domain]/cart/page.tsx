@@ -99,7 +99,6 @@ export default function StoreCartPage() {
   const [selectedPayment, setSelectedPayment] = useState<string>('')
   const [userSelectedSection, setUserSelectedSection] =
     useState<CheckoutStep | null>(null)
-  const [hasUserIntervened, setHasUserIntervened] = useState(false)
 
   const { data: addressOptions = [] } = useAddressOptions()
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
@@ -255,12 +254,25 @@ export default function StoreCartPage() {
 
   const handleSectionChange = (section: CheckoutStep) => {
     setUserSelectedSection(section)
-    setHasUserIntervened(true)
   }
 
   const getStepNumber = (step: CheckoutStep) => {
     return stepsOrder.indexOf(step) + 1
   }
+
+  const getNextStep = useCallback(
+    (
+      currentAddr: string,
+      currentShip: string,
+      currentPay: string,
+    ): CheckoutStep => {
+      if (hasPhysical && !currentAddr) return 'address'
+      if (hasPhysical && !currentShip) return 'shipping'
+      if (!currentPay) return 'payment'
+      return 'review'
+    },
+    [hasPhysical],
+  )
 
   const goToNextIncompleteStep = useCallback(() => {
     const currentIndex = stepsOrder.indexOf(activeSection)
@@ -316,18 +328,28 @@ export default function StoreCartPage() {
   }, [activeSection])
 
   useEffect(() => {
-    if (hasUserIntervened) {
-      return
-    }
-
     if (hasPhysical && !selectedAddress && addressOptions.length > 0) {
       const defaultAddr =
         addressOptions.find((a) => a.isDefault) || addressOptions[0]
       if (defaultAddr) {
         setSelectedAddress(defaultAddr.id)
+        setUserSelectedSection(
+          (prev) =>
+            prev ??
+            getNextStep(defaultAddr.id, selectedShipping, selectedPayment),
+        )
       }
     }
+  }, [
+    hasPhysical,
+    selectedAddress,
+    addressOptions,
+    selectedShipping,
+    selectedPayment,
+    getNextStep,
+  ])
 
+  useEffect(() => {
     if (hasPhysical && selectedAddress && !selectedShipping) {
       const validOptions = shippingOptionsWithFees.filter(
         (opt) => opt.fee !== null,
@@ -337,21 +359,38 @@ export default function StoreCartPage() {
           prev.fee! < curr.fee! ? prev : curr,
         )
         setSelectedShipping(cheapest.id)
+        setUserSelectedSection((prev) =>
+          prev === 'shipping' || prev === 'address' || !prev
+            ? getNextStep(selectedAddress, cheapest.id, selectedPayment)
+            : prev,
+        )
       }
     }
-
-    if (!selectedPayment && paymentMethods.length === 1) {
-      setSelectedPayment(paymentMethods[0].id)
-    }
   }, [
-    hasUserIntervened,
     hasPhysical,
     selectedAddress,
-    addressOptions,
     selectedShipping,
     shippingOptionsWithFees,
     selectedPayment,
+    getNextStep,
+  ])
+
+  useEffect(() => {
+    if (!selectedPayment && paymentMethods.length > 0) {
+      const firstPayment = paymentMethods[0].id
+      setSelectedPayment(firstPayment)
+      setUserSelectedSection((prev) =>
+        prev === 'payment' || !prev
+          ? getNextStep(selectedAddress, selectedShipping, firstPayment)
+          : prev,
+      )
+    }
+  }, [
+    selectedPayment,
     paymentMethods,
+    selectedAddress,
+    selectedShipping,
+    getNextStep,
   ])
 
   const handleCreateOrder = () => {
