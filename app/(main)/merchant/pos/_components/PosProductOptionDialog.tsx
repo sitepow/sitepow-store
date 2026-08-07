@@ -262,7 +262,7 @@ export function PosProductOptionDialog({
                         />
                         <div className="flex flex-1 flex-col gap-1">
                           <span className="font-medium">{variant.title}</span>
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
                             {hasDiscount &&
                               variant.discountType ===
                                 DiscountType.PERCENTAGE && (

@@ -9,7 +9,7 @@ import { POSProductItem } from '@/actions/pos/product'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import { useBranchFilter } from '@/stores/use-branch-filter'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { IconCashRegister, IconLock } from '@tabler/icons-react'
@@ -150,6 +150,11 @@ export default function MerchantPOSPage() {
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
+      ) : selectedBranchId === ALL_BRANCHES ? (
+        <ActionRequiredAlert
+          title="โปรดเลือกสาขา"
+          description="กรุณาเลือกสาขาที่ต้องการก่อนเพื่อดำเนินการต่อ"
+        />
       ) : !isPermissionLoading && !canCreateOrder ? (
         <ActionRequiredAlert
           icon={<IconLock />}
