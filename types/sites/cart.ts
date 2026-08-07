@@ -21,6 +21,7 @@ export interface CartItem {
   selectedAddons: CartAddon[]
   quantity: number
   unitPrice: number
+  originalPrice?: number
   totalPrice: number
   rewardPoints: number
   branchId: string

@@ -6,16 +6,15 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
-import {
-  DiscountType,
-  OrderStatus,
-  PaymentMethod,
-} from '@/generated/prisma/enums'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CartItem } from '@/types/sites/cart'
-import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
+import {
+  calculateCartSummary,
+  calculateGrandTotal,
+  getRemainingStock,
+} from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { calculateNetPrice } from '@/utils/product'
 import { formatPromptPay } from '@/utils/slip'
 import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -58,6 +57,7 @@ export function PosCart({
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
+
   const orderItems = useMemo(
     () =>
       cart.map((item) => ({
@@ -67,7 +67,9 @@ export function PosCart({
         variantTitle: item.variant.title,
         quantity: item.quantity,
         price: item.unitPrice,
+        originalPrice: item.originalPrice ?? item.unitPrice,
         productType: item.productType,
+        rewardPoints: item.rewardPoints ?? 0,
       })),
     [cart],
   )
@@ -103,81 +105,39 @@ export function PosCart({
   const couponDiscount = watch('couponDiscount') || 0
   const manualDiscount = watch('discountAmount') || 0
 
-  const totalEarnedPoints = useMemo(() => {
-    return cart.reduce((sum, item) => {
-      return sum + (item.rewardPoints || 0) * item.quantity
-    }, 0)
-  }, [cart])
-
-  const { rawSubtotal, productDiscount, cartSubtotalAfterProductDiscount } =
-    useMemo(() => {
-      let raw = 0
-      let prodDiscount = 0
-
-      cart.forEach((item) => {
-        const variant = item.variant
-        const rawPricePerUnit = Number(variant.price)
-
-        const discountConfig =
-          variant.discountActive && variant.discountType
-            ? {
-                active: true,
-                type: variant.discountType as DiscountType,
-                amount: variant.discountAmount ?? 0,
-              }
-            : undefined
-
-        const netVariantPrice = calculateNetPrice({
-          price: rawPricePerUnit,
-          discount: discountConfig,
-        })
-
-        const discountPerUnit = Math.max(0, rawPricePerUnit - netVariantPrice)
-
-        raw += rawPricePerUnit * item.quantity
-        prodDiscount += discountPerUnit * item.quantity
-      })
-
-      return {
-        rawSubtotal: raw,
-        productDiscount: prodDiscount,
-        cartSubtotalAfterProductDiscount: raw - prodDiscount,
-      }
-    }, [cart])
+  const cartSummary = useMemo(() => calculateCartSummary(cart), [cart])
 
   const pointsDiscount = usedPoints * (loyalty?.pointRedeemRate ?? 0)
   const orderDiscount = couponDiscount + manualDiscount
 
   const grandTotal = useMemo(() => {
     return calculateGrandTotal({
-      subtotal: cartSubtotalAfterProductDiscount,
+      subtotal: cartSummary.finalPrice,
       pointsDiscount,
       couponDiscount: orderDiscount,
     })
-  }, [cartSubtotalAfterProductDiscount, pointsDiscount, orderDiscount])
+  }, [cartSummary.finalPrice, pointsDiscount, orderDiscount])
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const totalItems = cartSummary.totalQuantity
 
   const summaryData = useMemo(() => {
     return {
-      subtotal: rawSubtotal,
-      productDiscount,
+      subtotal: cartSummary.subtotal,
+      productDiscount: cartSummary.totalDiscount,
       couponDiscount,
       manualDiscount,
       pointsDiscount,
-      totalDiscount: productDiscount + pointsDiscount + orderDiscount,
+      totalDiscount: cartSummary.totalDiscount + pointsDiscount + orderDiscount,
       finalPrice: grandTotal,
-      totalPoints: totalEarnedPoints,
+      totalPoints: cartSummary.totalPoints,
     }
   }, [
-    rawSubtotal,
-    productDiscount,
+    cartSummary,
     couponDiscount,
     manualDiscount,
     pointsDiscount,
     orderDiscount,
     grandTotal,
-    totalEarnedPoints,
   ])
 
   const handleClearCartAll = () => {
@@ -294,7 +254,7 @@ export function PosCart({
           </CardContent>
           <CardFooter className="flex-col gap-3 border-t border-white/10 bg-black/60 p-4 backdrop-blur-md">
             {orderItems?.length !== 0 && (
-              <PosDiscountDialog subtotal={cartSubtotalAfterProductDiscount} />
+              <PosDiscountDialog subtotal={cartSummary.finalPrice} />
             )}
             <div className="dark w-full px-4 py-2 text-white!">
               <CartSummary summary={summaryData} />
@@ -324,6 +284,7 @@ export function PosCart({
         open={isCheckoutOpen}
         onOpenChange={setIsCheckoutOpen}
         totalAmount={summaryData.finalPrice}
+        earnedPoints={cartSummary.totalPoints}
         onSuccess={handleClearCartAll}
       />
     </FormProvider>

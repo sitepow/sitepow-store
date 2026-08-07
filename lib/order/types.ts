@@ -12,6 +12,7 @@ export interface OrderItemInput {
   variantTitle: string
   quantity: number
   price: number
+  originalPrice?: number
   productType: ProductType
   branchId?: string
   customerNote?: string

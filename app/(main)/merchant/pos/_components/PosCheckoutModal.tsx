@@ -29,6 +29,7 @@ interface PosCheckoutModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   totalAmount: number
+  earnedPoints: number
   onSuccess: () => void
 }
 
@@ -36,6 +37,7 @@ export function PosCheckoutModal({
   open,
   onOpenChange,
   totalAmount,
+  earnedPoints,
   onSuccess,
 }: PosCheckoutModalProps) {
   const router = useRouter()
@@ -77,6 +79,7 @@ export function PosCheckoutModal({
         customerId: data.customerId,
         usedPoints:
           data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined,
+        earnedPoints: earnedPoints,
         status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
         paymentMethod: isCash
           ? PaymentMethod.CASH_ON_DELIVERY
@@ -86,6 +89,7 @@ export function PosCheckoutModal({
         discountAmount: data.discountAmount,
         items: (data.items || []).map((item) => ({
           ...item,
+          originalPrice: item.originalPrice ?? item.price,
           branchId: item.branchId || data.branchId,
           variantTitle: item.variantTitle ?? '',
         })),

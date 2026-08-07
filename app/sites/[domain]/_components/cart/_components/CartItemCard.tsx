@@ -41,7 +41,7 @@ export function CartItemCard({
             className="size-full object-cover object-center"
           />
         ) : (
-          <EmptyImage className="rounded-none" />
+          <EmptyImage className="rounded-none text-[10px]" />
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">

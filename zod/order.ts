@@ -12,6 +12,7 @@ export const orderItemSchema = z.object({
   variantTitle: z.string().default(''),
   quantity: z.number().int().min(1),
   price: z.number().min(0),
+  originalPrice: z.number().optional(),
   productType: z.enum(ProductType),
   branchId: z.string().optional(),
   customerNote: z.string().optional(),

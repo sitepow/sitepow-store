@@ -1,6 +1,6 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
 import { DiscountType } from '@/generated/prisma/enums'
-import { CartItem, SelectedOption } from '@/types/sites/cart'
+import { CartItem, CartSummary, SelectedOption } from '@/types/sites/cart'
 import { calculateNetPrice } from '@/utils/product'
 
 type CartOption = NonNullable<StorefrontProductDetail['options']>[number]
@@ -64,6 +64,14 @@ export const isSameCartItem = (
     optionKey1 === optionKey2 &&
     addonKey1 === addonKey2
   )
+}
+
+export const getStockByBranch = (
+  variant: CartItem['variant'],
+  branchId: string,
+) => {
+  const stock = variant?.stocks?.find((s) => s.branchId === branchId)
+  return stock ? stock.quantity : 0
 }
 
 export const getRemainingStock = (
@@ -244,4 +252,53 @@ export function calculateDiscounts({
   )
 
   return { couponDiscount, pointsDiscount }
+}
+
+export const calculateCartSummary = (items: CartItem[]): CartSummary => {
+  return items.reduce(
+    (acc, item) => {
+      const qty = item.quantity
+      const unitPrice = item.unitPrice ?? 0
+
+      const baseNetPrice = calculateNetPrice({
+        price: Number(item.variant?.price ?? 0),
+        discount: item.variant?.discountActive
+          ? {
+              active: true,
+              type: item.variant.discountType ?? '',
+              amount: Number(item.variant.discountAmount ?? 0),
+            }
+          : undefined,
+      })
+
+      const extraPrice = Math.max(0, unitPrice - baseNetPrice)
+
+      const rawVariantPrice = Number(item.variant?.price ?? 0)
+      const originalUnitPrice = Math.max(
+        unitPrice,
+        rawVariantPrice + extraPrice,
+      )
+
+      const itemSubtotal = originalUnitPrice * qty
+      const itemFinalPrice = item.totalPrice ?? unitPrice * qty
+      const itemDiscount = Math.max(0, itemSubtotal - itemFinalPrice)
+
+      return {
+        subtotal: acc.subtotal + itemSubtotal,
+        totalDiscount: acc.totalDiscount + itemDiscount,
+        totalPoints: acc.totalPoints + (item.rewardPoints ?? 0),
+        totalQuantity: acc.totalQuantity + qty,
+        finalPrice: acc.finalPrice + itemFinalPrice,
+        totalWeight: acc.totalWeight + (item.weight || 0) * qty,
+      }
+    },
+    {
+      subtotal: 0,
+      totalDiscount: 0,
+      totalPoints: 0,
+      totalQuantity: 0,
+      finalPrice: 0,
+      totalWeight: 0,
+    },
+  )
 }

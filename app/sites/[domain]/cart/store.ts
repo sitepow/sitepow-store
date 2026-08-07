@@ -2,7 +2,13 @@ import toast from 'react-hot-toast'
 
 import { ProductType } from '@/generated/prisma/enums'
 import { CartItem, CartSummary } from '@/types/sites/cart'
-import { getRemainingStock, isSameCartItem } from '@/utils/cart'
+import {
+  calculateCartSummary,
+  calculateRewardPoints,
+  getRemainingStock,
+  getStockByBranch,
+  isSameCartItem,
+} from '@/utils/cart'
 import { getStockQuantity } from '@/utils/product'
 import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
@@ -25,14 +31,6 @@ interface CartStore {
   setAppliedCoupon: (coupon: AppliedCoupon | null) => void
   setUsedPoints: (points: number) => void
   getCartSummary: () => CartSummary
-}
-
-const getRewardPoints = (variant: CartItem['variant'], quantity: number) =>
-  variant.pointsActive ? variant.pointsAmount * quantity : 0
-
-const getStockByBranch = (variant: CartItem['variant'], branchId: string) => {
-  const stock = variant.stocks.find((s) => s.branchId === branchId)
-  return stock ? stock.quantity : 0
 }
 
 export const useCartStore = create<CartStore>()(
@@ -88,10 +86,10 @@ export const useCartStore = create<CartStore>()(
           updatedItems[existingIndex].totalPrice =
             updatedItems[existingIndex].unitPrice *
             updatedItems[existingIndex].quantity
-          updatedItems[existingIndex].rewardPoints = getRewardPoints(
-            newItem.variant,
-            updatedItems[existingIndex].quantity,
-          )
+          updatedItems[existingIndex].rewardPoints = calculateRewardPoints({
+            variant: newItem.variant,
+            quantity: updatedItems[existingIndex].quantity,
+          })
           set({ items: updatedItems })
         } else {
           const cartItem: CartItem = {
@@ -99,7 +97,10 @@ export const useCartStore = create<CartStore>()(
             cartItemId: uuidv7(),
             quantity: finalQty,
             totalPrice: newItem.unitPrice * finalQty,
-            rewardPoints: getRewardPoints(newItem.variant, finalQty),
+            rewardPoints: calculateRewardPoints({
+              variant: newItem.variant,
+              quantity: finalQty,
+            }),
           }
           set({ items: [...items, cartItem] })
         }
@@ -132,7 +133,10 @@ export const useCartStore = create<CartStore>()(
                   ...item,
                   quantity: validatedQty,
                   totalPrice: item.unitPrice * validatedQty,
-                  rewardPoints: getRewardPoints(item.variant, validatedQty),
+                  rewardPoints: calculateRewardPoints({
+                    variant: item.variant,
+                    quantity: validatedQty,
+                  }),
                 }
               : item,
           ),
@@ -141,29 +145,7 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [], appliedCoupon: null, usedPoints: 0 }),
       setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
       setUsedPoints: (points) => set({ usedPoints: Math.max(0, points) }),
-      getCartSummary: () => {
-        const { items } = get()
-        return items.reduce(
-          (acc, item) => ({
-            subtotal: acc.subtotal + item.variant.price * item.quantity,
-            totalDiscount:
-              acc.totalDiscount +
-              (item.variant.price - item.unitPrice) * item.quantity,
-            totalPoints: acc.totalPoints + item.rewardPoints,
-            totalQuantity: acc.totalQuantity + item.quantity,
-            finalPrice: acc.finalPrice + item.totalPrice,
-            totalWeight: acc.totalWeight + (item.weight || 0) * item.quantity,
-          }),
-          {
-            subtotal: 0,
-            totalDiscount: 0,
-            totalPoints: 0,
-            totalQuantity: 0,
-            finalPrice: 0,
-            totalWeight: 0,
-          },
-        )
-      },
+      getCartSummary: () => calculateCartSummary(get().items),
     }),
     {
       name: 'shopping-cart-storage',

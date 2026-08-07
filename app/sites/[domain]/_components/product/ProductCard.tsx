@@ -98,7 +98,7 @@ export function ProductCard({
       <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
         {product.title}
       </h3>
-      <div className="group-hover:text-primary mt-1 flex items-end justify-center gap-2">
+      <div className="group-hover:text-primary flex items-end justify-center gap-2">
         {hasDiscount ? (
           <div className="flex flex-col">
             <data value={net?.min} className="text-primary text-2xl font-bold">

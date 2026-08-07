@@ -82,11 +82,10 @@ export function CartDrawer() {
         </ScrollArea>
         {items.length > 0 && (
           <DrawerFooter className="border-t">
-            <CartSummary summary={summary} />
+            <CartSummary />
             <Link href="/cart">
               <Button
                 size="lg"
-
                 className="h-12 w-full text-lg shadow-md sm:text-lg"
               >
                 สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})

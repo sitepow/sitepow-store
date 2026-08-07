@@ -1083,14 +1083,15 @@ model OrderItem {
   branchId String
   branch   Branch @relation(fields: [branchId], references: [id])
 
-  productType  ProductType
-  customerNote String?     @db.Text
-  productId    String
-  title        String
-  variantId    String
-  variantTitle String
-  quantity     Int
-  price        Decimal     @db.Decimal(10, 2)
+  productType   ProductType
+  customerNote  String?     @db.Text
+  productId     String
+  title         String
+  variantId     String
+  variantTitle  String
+  quantity      Int
+  price         Decimal     @db.Decimal(10, 2)
+  originalPrice Decimal?    @db.Decimal(10, 2)
 
   @@index([orderId])
 }

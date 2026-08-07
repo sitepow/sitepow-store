@@ -127,6 +127,7 @@ export default function MerchantPOSPage() {
       selectedAddons: formattedAddons,
       quantity,
       unitPrice,
+      originalPrice: Number(variant.price),
       rewardPoints: variant.pointsActive ? (variant.pointsAmount ?? 0) : 0,
       branchId: selectedBranchId,
       branchName: currentBranchStock?.branch.name ?? '',
