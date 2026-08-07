@@ -215,7 +215,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     }
 
     const orders = []
-    const baseOrderNumber = generateOrderNumber()
+    const rawOrderNumber = generateOrderNumber()
+    const baseOrderNumber = input.isPOS
+      ? `POS-${rawOrderNumber}`
+      : rawOrderNumber
     let orderCounter = 1
 
     const defaultStatus =

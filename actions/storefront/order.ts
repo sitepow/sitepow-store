@@ -70,6 +70,7 @@ const storefrontOrderSelect = {
       variantTitle: true,
       quantity: true,
       price: true,
+      originalPrice: true,
       branch: true,
       customerNote: true,
     },

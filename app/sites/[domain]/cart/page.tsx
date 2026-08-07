@@ -394,6 +394,7 @@ export default function StoreCartPage() {
           variantTitle: item.variant.title,
           quantity: item.quantity,
           price: item.unitPrice,
+          originalPrice: item.originalPrice ?? item.unitPrice,
           productType: item.productType,
           branchId: item.branchId,
         })),

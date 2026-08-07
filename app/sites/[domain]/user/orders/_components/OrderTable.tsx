@@ -55,7 +55,7 @@ export function OrderTable({ search }: OrderTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>รหัสสั่งซื้อ</TableHead>
-              <TableHead>ร้านค้า</TableHead>
+              <TableHead>ร้านค้า / ช่องทาง</TableHead>
               <TableHead>รายการสินค้า</TableHead>
               <TableHead>ยอดสุทธิ</TableHead>
               <TableHead>สถานะ</TableHead>
@@ -70,6 +70,8 @@ export function OrderTable({ search }: OrderTableProps) {
               <TableEmptyRow colSpan={7} title="ไม่พบประวัติคำสั่งซื้อของคุณ" />
             ) : (
               orders.map((order) => {
+                const isPOSOrder = order.orderNumber?.startsWith('POS-')
+
                 const isStripePayment =
                   order.paymentMethod !== PaymentMethod.BANK_TRANSFER &&
                   order.paymentMethod !== PaymentMethod.MANUAL_QR_PROMPTPAY
@@ -78,7 +80,17 @@ export function OrderTable({ search }: OrderTableProps) {
                   <TableRow key={order.id}>
                     <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
-                      <Badge>{order.store.name}</Badge>
+                      <div className="flex flex-col items-start gap-1">
+                        <Badge variant="outline">{order.store.name}</Badge>
+                        {isPOSOrder && (
+                          <Badge
+                            variant="secondary"
+                            className="px-1.5 py-0 text-[10px] font-normal"
+                          >
+                            ซื้อที่หน้าร้าน (POS)
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       {getItemsSummary(order.items)}
@@ -102,7 +114,7 @@ export function OrderTable({ search }: OrderTableProps) {
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
                     <TableCell className="flex items-center justify-end gap-2.5 text-right">
-                      {order.status === OrderStatus.PENDING && (
+                      {!isPOSOrder && order.status === OrderStatus.PENDING && (
                         <>
                           {isStripePayment ? (
                             <Button
@@ -141,18 +153,22 @@ export function OrderTable({ search }: OrderTableProps) {
                           )}
                         </>
                       )}
-                      {(
-                        [
-                          OrderStatus.MANUAL_CHECK,
-                          OrderStatus.PENDING,
-                        ] as OrderStatus[]
-                      ).includes(order.status) && (
-                        <DeleteButton
-                          icon={<IconX />}
-                          isPending={cancelOrderMutation.isPending}
-                          onDelete={() => cancelOrderMutation.mutate(order.id)}
-                        />
-                      )}
+                      {!isPOSOrder &&
+                        (
+                          [
+                            OrderStatus.MANUAL_CHECK,
+                            OrderStatus.PENDING,
+                          ] as OrderStatus[]
+                        ).includes(order.status) && (
+                          <DeleteButton
+                            icon={<IconX />}
+                            isPending={cancelOrderMutation.isPending}
+                            onDelete={() =>
+                              cancelOrderMutation.mutate(order.id)
+                            }
+                          />
+                        )}
+
                       <OrderDetailView order={order} />
                     </TableCell>
                   </TableRow>

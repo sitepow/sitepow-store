@@ -13,7 +13,7 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { IconCreditCard } from '@tabler/icons-react'
-import { User2 } from 'lucide-react'
+import { Store, User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
@@ -58,7 +58,7 @@ export function OrderTable() {
           <TableHeader>
             <TableRow>
               <TableHead>รหัสออเดอร์</TableHead>
-              <TableHead>ลูกค้า</TableHead>
+              <TableHead>ลูกค้า / ช่องทาง</TableHead>
               <TableHead>รายการสินค้า</TableHead>
               <TableHead>ยอดรวม</TableHead>
               <TableHead>สถานะ</TableHead>
@@ -73,11 +73,51 @@ export function OrderTable() {
               <TableEmptyRow colSpan={7} title="ยังไม่มีออเดอร์" />
             ) : (
               orders.map((order) => {
-                const customerName = order.customer
+                const isPOSOrder =
+                  order.orderNumber?.startsWith('POS-') ||
+                  (order as { isPOS?: boolean }).isPOS
+
+                const registeredCustomerName = order.customer
                   ? [order.customer.firstName, order.customer.lastName]
                       .filter(Boolean)
                       .join(' ')
-                  : '-'
+                  : null
+
+                const employeeName = (
+                  order as {
+                    employee?: { firstName?: string; lastName?: string }
+                  }
+                ).employee
+                  ? [
+                      (order as { employee?: { firstName?: string } }).employee
+                        ?.firstName,
+                      (order as { employee?: { lastName?: string } }).employee
+                        ?.lastName,
+                    ]
+                      .filter(Boolean)
+                      .join(' ')
+                  : null
+
+                let displayName = registeredCustomerName
+                let displaySubtext = order.customer?.email || null
+
+                if (isPOSOrder) {
+                  if (!displayName) {
+                    displayName = 'ลูกค้าหน้าร้าน (Walk-in)'
+                  }
+                  if (employeeName) {
+                    displaySubtext = `พนักงาน: ${employeeName}`
+                  } else if (!displaySubtext) {
+                    displaySubtext = 'ขายหน้าร้าน (POS)'
+                  }
+                } else {
+                  if (!displayName) {
+                    displayName = 'ลูกค้าทั่วไป'
+                  }
+                  if (!displaySubtext) {
+                    displaySubtext = '-'
+                  }
+                }
 
                 const isStripePayment =
                   order.paymentMethod !== PaymentMethod.BANK_TRANSFER &&
@@ -87,18 +127,32 @@ export function OrderTable() {
                   <TableRow key={order.id}>
                     <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-3">
                         <Avatar className="size-8 border">
-                          <AvatarFallback>
-                            <User2 size={16} />
+                          <AvatarFallback className="bg-muted text-muted-foreground">
+                            {isPOSOrder && !registeredCustomerName ? (
+                              <Store size={15} />
+                            ) : (
+                              <User2 size={15} />
+                            )}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
-                          <p className="text-sm leading-none font-medium">
-                            {customerName || 'ลูกค้า'}
-                          </p>
-                          <p className="text-muted-foreground text-sm">
-                            {order.customer?.email ?? '-'}
+                        <div className="max-w-64 space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm leading-none font-medium">
+                              {displayName}
+                            </p>
+                            {isPOSOrder && (
+                              <Badge
+                                variant="secondary"
+                                className="px-1.5 py-0 text-[10px] font-normal"
+                              >
+                                POS
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground text-xs">
+                            {displaySubtext}
                           </p>
                         </div>
                       </div>

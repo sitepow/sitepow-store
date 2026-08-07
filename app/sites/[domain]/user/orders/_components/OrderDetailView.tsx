@@ -52,7 +52,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon-lg">
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
