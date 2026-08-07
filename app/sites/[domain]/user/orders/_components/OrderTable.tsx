@@ -153,6 +153,7 @@ export function OrderTable({ search }: OrderTableProps) {
                           )}
                         </>
                       )}
+                      <OrderDetailView order={order} />
                       {!isPOSOrder &&
                         (
                           [
@@ -168,8 +169,6 @@ export function OrderTable({ search }: OrderTableProps) {
                             }
                           />
                         )}
-
-                      <OrderDetailView order={order} />
                     </TableCell>
                   </TableRow>
                 )

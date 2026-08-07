@@ -144,7 +144,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
         {!!shippingFee && (
           <SummaryRow
             label={`ค่าจัดส่ง ${shippingMethod ? `(${shippingMethod})` : ''}`}
-            value={<HighlightText>{formatCurrency(shippingFee)}</HighlightText>}
+            value={formatCurrency(shippingFee)}
           />
         )}
         {!!coupon && couponDiscount > 0 && (
@@ -171,9 +171,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
           <SummaryRow
             label="แต้มสะสมที่จะได้รับ"
             value={
-              <HighlightText>
-                + {formatNumber(earnedPoints ?? 0)} แต้ม
-              </HighlightText>
+              <HighlightText>+ {formatNumber(earnedPoints ?? 0)}</HighlightText>
             }
           />
         )}

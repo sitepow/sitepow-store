@@ -34,10 +34,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { RadioGroup } from '@/components/ui/radio-group'
 import { Spinner } from '@/components/ui/spinner'
-
-import { RadioCard } from '../../../cart/_components/RadioCard'
 
 interface UploadSlipDialogProps {
   orderId: string
@@ -206,31 +203,6 @@ export function UploadSlipDialog({
           </div>
           <span className="font-bold">{timeLeft} นาที</span>
         </div>
-        <div className="bg-muted/50 flex items-center justify-between rounded-lg border p-3 text-sm">
-          <span className="text-muted-foreground">ยอดเงินที่ต้องชำระ</span>
-          <span className="text-primary font-bold">
-            {formatCurrency(totalAmount ?? 0)}
-          </span>
-        </div>
-        <RadioGroup
-          value={selectedId}
-          onValueChange={setSelectedId}
-          className="grid gap-2"
-        >
-          {bankAccounts.map((acc) => (
-            <RadioCard
-              key={acc.id}
-              id={acc.id}
-              value={acc.id}
-              title={acc.bankName}
-              description={
-                acc.type === BankAccountType.PROMPTPAY
-                  ? formatPromptPay(acc.promptPayId)
-                  : formatBankAccount(acc.accountNumber)
-              }
-            />
-          ))}
-        </RadioGroup>
         {selectedAccount.type === BankAccountType.PROMPTPAY && qrCodeUrl && (
           <div className="relative h-52 w-full">
             <Image
@@ -244,7 +216,7 @@ export function UploadSlipDialog({
         <div className="bg-muted/50 space-y-2 rounded-lg border p-4 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">ชื่อบัญชี</span>
-            <span className="font-medium">{selectedAccount.accountName}</span>
+            <span>{selectedAccount.accountName}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">
@@ -252,10 +224,16 @@ export function UploadSlipDialog({
                 ? 'หมายเลขพร้อมเพย์'
                 : 'เลขบัญชี'}
             </span>
-            <span className="font-bold">
+            <span>
               {selectedAccount.type === BankAccountType.PROMPTPAY
                 ? formatPromptPay(selectedAccount.promptPayId)
                 : formatBankAccount(selectedAccount.accountNumber)}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">ยอดเงินที่ต้องชำระ</span>
+            <span className="text-primary font-bold">
+              {formatCurrency(totalAmount ?? 0)}
             </span>
           </div>
         </div>
