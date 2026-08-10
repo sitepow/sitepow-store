@@ -26,11 +26,12 @@ export interface CreateProductInput {
   title: string
   slug: string
   tags?: string
-  images?: string[]
+  images?: { url: string; isPrimary: boolean }[]
   variants: {
     title: string
     price: number
     sku?: string
+    image?: string | null
     digitalUrl: string
     weight?: number
     width?: number
@@ -294,13 +295,17 @@ export async function createProduct(input: CreateProductInput) {
           },
           images: {
             create:
-              images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+              images?.map((img) => ({
+                url: img.url,
+                isPrimary: img.isPrimary,
+              })) ?? [],
           },
           variants: {
             create: variants.map((v) => ({
               title: v.title,
               price: v.price,
               sku: v.sku ?? '',
+              image: v.image ?? null,
               digitalUrl: v.digitalUrl ?? '',
               discountActive: v.discount.active,
               discountType: v.discount.active ? v.discount.type : null,
@@ -571,13 +576,17 @@ export async function updateProduct(id: string, input: CreateProductInput) {
           tags: { create: tagsArray.map((name) => ({ name })) },
           images: {
             create:
-              images?.map((url, i) => ({ url, isPrimary: i === 0 })) ?? [],
+              images?.map((img) => ({
+                url: img.url,
+                isPrimary: img.isPrimary,
+              })) ?? [],
           },
           variants: {
             create: variants.map((v) => ({
               title: v.title,
               price: v.price,
               sku: v.sku ?? '',
+              image: v.image ?? null,
               digitalUrl: v.digitalUrl ?? '',
               discountActive: v.discount.active,
               discountType: v.discount.active ? v.discount.type : null,

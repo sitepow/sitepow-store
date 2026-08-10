@@ -150,7 +150,7 @@ export function BranchDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" onClick={onAdd}>
-          <IconPlus className="mr-2 size-4" />
+          <IconPlus className="size-4" />
           เพิ่มสาขาใหม่
         </Button>
       </DialogTrigger>

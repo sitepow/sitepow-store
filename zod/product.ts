@@ -23,9 +23,13 @@ const stockSchema = z.object({
   minStock: z.number().min(0).int().default(0),
 })
 
-const variantSchema = z.object({
+export const variantSchema = z.object({
   title: z.string().min(1, { message: 'กรุณาระบุชื่อตัวเลือก' }),
   price: z.number().min(0, { message: 'ราคาต้องไม่ต่ำกว่า 0' }),
+  image: z
+    .union([z.string(), z.instanceof(File)])
+    .nullable()
+    .optional(),
   digitalUrl: z.string().optional(),
   sku: z.string().optional().or(z.literal('')),
   weight: z.number().min(0).optional(),
@@ -64,6 +68,7 @@ export const productFormSchema = z.object({
   images: z.array(
     z.object({
       url: z.union([z.string(), z.instanceof(File)]),
+      isPrimary: z.boolean().default(false),
     }),
   ),
   variants: z

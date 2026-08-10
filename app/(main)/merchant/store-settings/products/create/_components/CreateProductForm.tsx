@@ -126,6 +126,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           title: 'มาตรฐาน',
           price: 0,
           sku: '',
+          image: null,
           weight: 0,
           width: 0,
           height: 0,
@@ -255,21 +256,28 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     try {
       const oldImageUrls = product?.images.map((img) => img.url) || []
 
-      const newImages = await Promise.all(
+      const processedImages = await Promise.all(
         data.images.map(async (img) => {
-          if (img.url instanceof File) {
+          let url: string | File | undefined = img.url
+
+          if (url instanceof File) {
             const formData = new FormData()
-            formData.append('file', img.url)
+            formData.append('file', url)
             const res = await uploadMutation.mutateAsync(formData)
-            return res.success ? res.url : null
+            if (res.success) {
+              url = res.url
+            }
           }
-          return img.url
+
+          return {
+            url: typeof url === 'string' ? url : '',
+            isPrimary: img.isPrimary ?? false,
+          }
         }),
       )
 
-      const finalImageUrls = newImages.filter(
-        (url): url is string => url !== null,
-      )
+      const validImages = processedImages.filter((img) => img.url !== '')
+      const finalImageUrls = validImages.map((img) => img.url)
 
       const imagesToDelete = oldImageUrls.filter(
         (url) => !finalImageUrls.includes(url),
@@ -284,39 +292,58 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         }),
       )
 
+      const processedVariants = await Promise.all(
+        data.variants.map(async (v) => {
+          let variantImageUrl: string | undefined | null =
+            typeof v.image === 'string' ? v.image : null
+
+          if (v.image instanceof File) {
+            const formData = new FormData()
+            formData.append('file', v.image)
+            const res = await uploadMutation.mutateAsync(formData)
+            if (res.success) {
+              variantImageUrl = res.url
+            }
+          }
+
+          return {
+            title: v.title,
+            price: v.price,
+            sku: v.sku,
+            image: variantImageUrl,
+            digitalUrl: v.digitalUrl ?? '',
+            stocks: v.stocks.map((s) => ({
+              branchId: s.branchId,
+              quantity: s.quantity ?? 0,
+              minStock: s.minStock ?? 0,
+            })),
+            discount: {
+              active: v.discount.active ?? false,
+              type: v.discount.type ?? DiscountType.PERCENTAGE,
+              amount: v.discount.amount ?? 0,
+            },
+            rewardPoints: {
+              isActive: v.rewardPoints.isActive ?? false,
+              amount: v.rewardPoints.amount ?? 0,
+            },
+            digitalItems:
+              v.digitalItems?.map((item) => ({
+                content: item.content ?? '',
+                isUsed: !!item.isUsed,
+              })) || [],
+            isAvailable: v.isAvailable ?? false,
+          }
+        }),
+      )
+
       const payload: CreateProductInput = {
         storeId: selectedStoreId,
         categoryId: data.categoryId,
         title: data.title,
         slug: data.slug,
         tags: data.tags,
-        images: finalImageUrls,
-        variants: data.variants.map((v) => ({
-          title: v.title,
-          price: v.price,
-          sku: v.sku,
-          digitalUrl: v.digitalUrl ?? '',
-          stocks: v.stocks.map((s) => ({
-            branchId: s.branchId,
-            quantity: s.quantity ?? 0,
-            minStock: s.minStock ?? 0,
-          })),
-          discount: {
-            active: v.discount.active ?? false,
-            type: v.discount.type ?? DiscountType.PERCENTAGE,
-            amount: v.discount.amount ?? 0,
-          },
-          rewardPoints: {
-            isActive: v.rewardPoints.isActive ?? false,
-            amount: v.rewardPoints.amount ?? 0,
-          },
-          digitalItems:
-            v.digitalItems?.map((item) => ({
-              content: item.content ?? '',
-              isUsed: !!item.isUsed,
-            })) || [],
-          isAvailable: v.isAvailable ?? false,
-        })),
+        images: validImages,
+        variants: processedVariants,
         addons: data.addons?.map((a) => ({
           title: a.title,
           price: a.price,
@@ -334,7 +361,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
       router.push('/merchant/store-settings/products')
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -468,6 +495,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     title: '',
                     price: 0,
                     sku: '',
+                    image: null,
                     stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
                     discount: {
                       active: false,
@@ -475,6 +503,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                       amount: 0,
                     },
                     rewardPoints: { isActive: false, amount: 0 },
+                    isAvailable: true,
                   })
                 }
               >

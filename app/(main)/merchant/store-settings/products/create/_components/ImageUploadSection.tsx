@@ -4,13 +4,13 @@
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
 import { ProductFormValues } from '@/zod/product'
-import { ImagePlus, X } from 'lucide-react'
+import { ImagePlus, Star, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field'
 
 export function ImageUploadSection() {
-  const { control } = useFormContext<ProductFormValues>()
+  const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'images',
@@ -22,8 +22,38 @@ export function ImageUploadSection() {
       return
     }
 
+    const currentImages = getValues('images') || []
+
     for (let i = 0; i < files.length; i++) {
-      append({ url: files[i] })
+      const isFirstImage = currentImages.length === 0 && i === 0
+      append({
+        url: files[i],
+        isPrimary: isFirstImage,
+      })
+    }
+  }
+
+  const handleSetPrimary = (targetIndex: number) => {
+    const currentImages = getValues('images') || []
+    const updated = currentImages.map((img, idx) => ({
+      ...img,
+      isPrimary: idx === targetIndex,
+    }))
+    setValue('images', updated, { shouldDirty: true })
+  }
+
+  const handleRemoveImage = (index: number) => {
+    const currentImages = getValues('images') || []
+    const isRemovingPrimary = currentImages[index]?.isPrimary
+
+    remove(index)
+
+    if (isRemovingPrimary && currentImages.length > 1) {
+      const remainingImages = currentImages.filter((_, idx) => idx !== index)
+      if (remainingImages.length > 0) {
+        remainingImages[0].isPrimary = true
+        setValue('images', remainingImages, { shouldDirty: true })
+      }
     }
   }
 
@@ -46,10 +76,14 @@ export function ImageUploadSection() {
             ? (file as File).type.startsWith('video/')
             : previewUrl.match(/\.(mp4|webm|ogg)$/i)
 
+          const isPrimary = field.isPrimary
+
           return (
             <div
               key={field.id}
-              className="group bg-muted/10 relative aspect-square overflow-hidden rounded-md border"
+              className={`group bg-muted/10 relative aspect-square overflow-hidden rounded-md border-2 ${
+                isPrimary ? 'border-primary' : 'border-border'
+              }`}
             >
               {isVideo ? (
                 <video
@@ -65,20 +99,41 @@ export function ImageUploadSection() {
                   className="h-full w-full object-cover"
                 />
               )}
-
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70"
-                onClick={() => remove(index)}
-              >
-                <X className="size-4" />
-              </Button>
+              {isPrimary && (
+                <span className="bg-primary text-primary-foreground absolute top-1.5 left-1.5 rounded px-1.5 py-0.5 text-[10px] font-bold">
+                  รูปหลัก
+                </span>
+              )}
+              <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                {!isVideo && (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant={isPrimary ? 'default' : 'outline'}
+                    className="size-8"
+                    onClick={() => handleSetPrimary(index)}
+                    title="ตั้งเป็นรูปหลัก"
+                  >
+                    <Star
+                      className={`size-4 ${
+                        isPrimary && 'fill-yellow-400 text-yellow-400'
+                      }`}
+                    />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => handleRemoveImage(index)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
             </div>
           )
         })}
-
         <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-colors">
           <ImagePlus className="size-5" />
           <span className="mt-2 text-xs font-medium">เพิ่มสื่อ</span>

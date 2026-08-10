@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+'use client'
+
 import { useEffect, useMemo } from 'react'
 import {
   Controller,
@@ -10,7 +13,7 @@ import { useBranches } from '@/actions/hooks/branch'
 import { ProductType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
-import { IconTrash } from '@tabler/icons-react'
+import { IconPhoto, IconTrash, IconX } from '@tabler/icons-react'
 import { PlusCircle } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -64,6 +67,8 @@ export function VariantItem({
     name: `variants.${index}.rewardPoints.isActive`,
   })
 
+  const imageValue = watch(`variants.${index}.image`)
+
   const { selectedStoreId } = useStoreFilter()
   const { data: branchesData } = useBranches({ storeId: selectedStoreId })
   const branches = useMemo(() => branchesData?.data ?? [], [branchesData])
@@ -109,6 +114,24 @@ export function VariantItem({
     }
   }, [branches, stocks, index, setValue])
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setValue(`variants.${index}.image`, file, { shouldDirty: true })
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setValue(`variants.${index}.image`, null, { shouldDirty: true })
+  }
+
+  const previewUrl =
+    imageValue instanceof File
+      ? URL.createObjectURL(imageValue)
+      : typeof imageValue === 'string'
+        ? imageValue
+        : null
+
   return (
     <Card
       className={cn(
@@ -116,7 +139,7 @@ export function VariantItem({
         isAvailable && 'border-primary',
       )}
     >
-      <div className="flex flex-wrap justify-between gap-2.5 border-b px-5 pb-2.5">
+      <div className="flex flex-wrap justify-between gap-2.5 border-b px-5 pt-3 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
             {isAvailable ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
@@ -140,41 +163,92 @@ export function VariantItem({
       </div>
       <CardContent className="grid gap-6 pt-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
-          <div className="sm:col-span-6">
-            <Controller
-              name={`variants.${index}.title`}
-              control={control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel className="text-xs">
-                    ชื่อตัวเลือก (เช่น ไซส์ M)
-                  </FieldLabel>
-                  <Input {...field} />
-                </Field>
-              )}
-            />
-          </div>
-          <div className="sm:col-span-6">
-            <Controller
-              name={`variants.${index}.price`}
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel className="text-xs">ราคา</FieldLabel>
-                  <Input
-                    {...field}
-                    type="number"
-                    min="0"
-                    step="1"
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    aria-invalid={fieldState.invalid}
+          <div className="flex items-center justify-center sm:col-span-3 lg:col-span-2">
+            <div className="bg-muted/10 border-border relative flex aspect-square size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed">
+              {previewUrl ? (
+                <>
+                  <img
+                    src={previewUrl}
+                    alt="Variant thumbnail"
+                    className="size-full object-cover"
                   />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="bg-destructive text-destructive-foreground absolute top-1 right-1 rounded-full p-1 shadow hover:opacity-90"
+                  >
+                    <IconX className="size-3" />
+                  </button>
+                </>
+              ) : (
+                <label className="text-muted-foreground hover:text-foreground flex size-full cursor-pointer flex-col items-center justify-center transition-colors">
+                  <IconPhoto className="size-6" />
+                  <span className="mt-1 text-[10px] font-medium">
+                    รูปตัวเลือก
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </label>
               )}
-            />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:col-span-9 sm:grid-cols-12 lg:col-span-10">
+            <div className="sm:col-span-6">
+              <Controller
+                name={`variants.${index}.title`}
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-xs">
+                      ชื่อตัวเลือก (เช่น ไซส์ M)
+                    </FieldLabel>
+                    <Input {...field} />
+                  </Field>
+                )}
+              />
+            </div>
+            <div className="sm:col-span-6">
+              <Controller
+                name={`variants.${index}.price`}
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel className="text-xs">ราคา</FieldLabel>
+                    <Input
+                      {...field}
+                      type="number"
+                      min="0"
+                      step="1"
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
+            <div className="sm:col-span-12">
+              <Controller
+                name={`variants.${index}.sku`}
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-xs">SKU (ถ้ามี)</FieldLabel>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="SKU-12345"
+                    />
+                  </Field>
+                )}
+              />
+            </div>
           </div>
           <div className="grid gap-5 border-t pt-5 sm:col-span-12 sm:grid-cols-2 xl:col-span-12">
             <DiscountField index={index} />
