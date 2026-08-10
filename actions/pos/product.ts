@@ -45,7 +45,6 @@ const posProductSelect = {
       discountAmount: true,
       pointsActive: true,
       pointsAmount: true,
-      image: { select: { url: true } },
       weight: true,
       width: true,
       height: true,

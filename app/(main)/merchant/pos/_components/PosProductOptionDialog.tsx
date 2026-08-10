@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { POSProductItem } from '@/actions/pos/product'
+import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
@@ -18,6 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -202,25 +204,28 @@ export function PosProductOptionDialog({
 
   return (
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            เลือกตัวเลือกสินค้า: {product.title}
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-lg font-semibold">
+            {product.title}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            เลือกรูปแบบ ตัวเลือกเพิ่มเติม และจำนวนสินค้าสำหรับรายการนี้
+          </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="max-h-[60vh] pr-3">
-          <div className="space-y-6 py-2">
+        <ScrollArea className="max-h-[60vh] pr-4">
+          <div className="space-y-5 py-2">
             {(product.variants.length > 1 ||
               (currentVariant?.pointsActive &&
                 (currentVariant?.pointsAmount ?? 0) > 0)) && (
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">
-                  ตัวเลือกสินค้า
+              <div className="space-y-2">
+                <Label className="text-muted-foreground text-xs font-semibold">
+                  รูปแบบสินค้า
                 </Label>
                 <RadioGroup
                   value={selectedVariantId}
                   onValueChange={setSelectedVariantId}
-                  className="grid gap-2"
+                  className="gap-2"
                 >
                   {product.variants.map((variant) => {
                     const stock = getVariantAvailableStock(variant)
@@ -250,44 +255,60 @@ export function PosProductOptionDialog({
                         key={variant.id}
                         htmlFor={variant.id}
                         className={cn(
-                          'has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-start space-x-3 rounded-lg border p-3 transition-colors',
-                          isOutOfStock && 'cursor-not-allowed opacity-50',
+                          'hover:bg-accent/50 flex cursor-pointer flex-col gap-3 rounded-md border p-3 transition-colors sm:flex-row sm:items-center sm:justify-between',
+                          'has-checked:border-primary has-checked:bg-accent/50',
+                          isOutOfStock &&
+                            'cursor-not-allowed opacity-50 hover:bg-transparent',
                         )}
                       >
-                        <RadioGroupItem
-                          value={variant.id}
-                          id={variant.id}
-                          disabled={isOutOfStock}
-                          className="mt-0.5"
-                        />
-                        <div className="flex flex-1 flex-col gap-1">
-                          <span className="font-medium">{variant.title}</span>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
-                            {hasDiscount &&
-                              variant.discountType ===
-                                DiscountType.PERCENTAGE && (
-                                <span className="text-primary text-[10px] font-semibold">
-                                  ส่วนลด {variant.discountAmount}%
-                                </span>
-                              )}
-                            {hasPoint && (
-                              <span className="text-primary text-[10px] font-semibold">
-                                + {variant.pointsAmount} แต้ม
+                        <div className="flex w-full items-start space-x-3 sm:items-center">
+                          <RadioGroupItem
+                            value={variant.id}
+                            id={variant.id}
+                            disabled={isOutOfStock}
+                            className="mt-1 sm:mt-0"
+                          />
+                          <EmptyImage className="size-14 shrink-0 rounded-lg text-[8px] sm:size-16" />
+                          <div className="flex min-w-0 flex-col gap-0.5">
+                            <span className="text-sm leading-tight font-medium wrap-break-word">
+                              {variant.title}
+                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                              <span className="text-muted-foreground text-xs">
+                                คงเหลือ: {stock}
+                                {variant?.sku ? ` · SKU: ${variant.sku}` : ''}
                               </span>
-                            )}
+                              {hasDiscount &&
+                                variant.discountType ===
+                                  DiscountType.PERCENTAGE && (
+                                  <Badge
+                                    variant="outline"
+                                    className="px-1.5 py-0 text-[10px]"
+                                  >
+                                    ลด {variant.discountAmount}%
+                                  </Badge>
+                                )}
+                              {hasPoint && (
+                                <Badge
+                                  variant="outline"
+                                  className="px-1.5 py-0 text-[10px]"
+                                >
+                                  +{variant.pointsAmount} แต้ม
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <span className="text-muted-foreground text-[10px]">
-                            คงเหลือในสาขา: {stock} ชิ้น
-                            {variant?.sku ? `, SKU: ${variant.sku}` : ''}
-                          </span>
                         </div>
-                        <div className="text-right">
+                        <div className="flex shrink-0 items-baseline justify-between border-t pt-2 text-right sm:flex-col sm:items-end sm:border-t-0 sm:pt-0">
+                          <span className="text-muted-foreground mr-2.5 text-xs sm:hidden">
+                            ราคา
+                          </span>
                           {hasDiscount ? (
-                            <div className="flex flex-col items-end">
-                              <span className="text-primary text-sm font-bold">
+                            <div className="flex items-baseline gap-2 sm:flex-col sm:items-end sm:gap-0">
+                              <span className="text-primary text-sm font-semibold">
                                 {formatCurrency(netPrice)}
                               </span>
-                              <span className="text-muted-foreground text-[10px] line-through">
+                              <span className="text-muted-foreground text-xs line-through">
                                 {formatCurrency(variantPrice)}
                               </span>
                             </div>
@@ -304,45 +325,45 @@ export function PosProductOptionDialog({
               </div>
             )}
             {product.options?.map((option, idx) => (
-              <div key={idx} className="space-y-3">
+              <div key={idx} className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Label className="text-base font-semibold">
+                  <Label className="text-muted-foreground text-xs font-semibold">
                     {option.title}
                   </Label>
                   {option.require && (
-                    <Badge
-                      variant="outline"
-                      className="border-primary text-primary text-[10px]"
-                    >
+                    <span className="text-destructive text-xs font-medium">
                       * จำเป็น
-                    </Badge>
+                    </span>
                   )}
                 </div>
                 <RadioGroup
                   value={selectedOptions[option.title] ?? ''}
                   onValueChange={(val) => handleOptionChange(option.title, val)}
-                  className="space-y-1.5"
+                  className="gap-2"
                 >
                   {option.choices.map((choice) => (
                     <Label
                       key={choice.name}
                       htmlFor={`${option.title}-${choice.name}`}
                       className={cn(
-                        'has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors',
+                        'hover:bg-accent/50 flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
+                        'has-checked:border-primary has-checked:bg-accent/50',
                         currentVariantStock <= 0 &&
-                          'cursor-not-allowed opacity-50',
+                          'cursor-not-allowed opacity-50 hover:bg-transparent',
                       )}
                     >
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         <RadioGroupItem
                           value={choice.name}
                           id={`${option.title}-${choice.name}`}
                           disabled={currentVariantStock <= 0}
                         />
-                        <span className="text-sm">{choice.name}</span>
+                        <span className="text-sm leading-none font-medium">
+                          {choice.name}
+                        </span>
                       </div>
                       {choice.extraPrice > 0 && (
-                        <span className="text-primary font-semibold">
+                        <span className="text-primary text-xs font-medium">
                           +{formatCurrency(choice.extraPrice)}
                         </span>
                       )}
@@ -352,9 +373,11 @@ export function PosProductOptionDialog({
               </div>
             ))}
             {product.addons && product.addons.length > 0 && (
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">บริการเสริม</Label>
-                <div className="space-y-1.5">
+              <div className="space-y-2">
+                <Label className="text-muted-foreground text-xs font-semibold">
+                  ท็อปปิ้ง / บริการเสริม
+                </Label>
+                <div className="grid gap-2">
                   {product.addons.map((addon) => {
                     const isDisabled =
                       !addon.isAvailable || currentVariantStock <= 0
@@ -364,23 +387,25 @@ export function PosProductOptionDialog({
                         key={addon.id}
                         htmlFor={addon.id}
                         className={cn(
-                          'has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors',
-                          isDisabled && 'cursor-not-allowed opacity-50',
+                          'hover:bg-accent/50 flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
+                          'has-checked:border-primary has-checked:bg-accent/50',
+                          isDisabled &&
+                            'cursor-not-allowed opacity-50 hover:bg-transparent',
                         )}
                       >
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                           <Checkbox
                             id={addon.id}
                             disabled={isDisabled}
                             checked={selectedAddonIds.includes(addon.id)}
                             onCheckedChange={() => handleAddonToggle(addon.id)}
                           />
-                          <span className="text-sm font-medium">
+                          <span className="text-sm leading-none font-medium">
                             {addon.title}
                           </span>
                         </div>
                         <span className="text-primary font-semibold">
-                          +{formatCurrency(addon.price)}
+                          + {formatCurrency(addon.price)}
                         </span>
                       </Label>
                     )
@@ -390,7 +415,7 @@ export function PosProductOptionDialog({
             )}
           </div>
         </ScrollArea>
-        <DialogFooter className="flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <DialogFooter className="gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
           <QuantitySelector
             value={quantity}
             onChange={setQuantity}
@@ -399,15 +424,15 @@ export function PosProductOptionDialog({
           />
           <Button
             size="lg"
-            className="w-full font-bold sm:w-auto"
+            className="w-full min-w-40 font-semibold sm:w-auto"
             disabled={isInvalidQuantity}
             onClick={handleConfirmAddToCart}
           >
             {currentVariantStock <= 0
               ? 'สินค้าหมด'
               : quantity > currentVariantStock
-                ? 'สินค้าในสาขานี้ไม่พอ'
-                : `เพิ่มลงตะกร้า ${formatCurrency(unitPrice * quantity)}`}
+                ? 'สินค้าไม่พอ'
+                : `เพิ่มลงตะกร้า · ${formatCurrency(unitPrice * quantity)}`}
           </Button>
         </DialogFooter>
       </DialogContent>

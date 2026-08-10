@@ -168,12 +168,9 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
           />
         )}
         {(earnedPoints ?? 0) > 0 && (
-          <SummaryRow
-            label="แต้มสะสมที่จะได้รับ"
-            value={
-              <HighlightText>+ {formatNumber(earnedPoints ?? 0)}</HighlightText>
-            }
-          />
+          <p className="text-primary text-right text-xs font-medium">
+            คุณจะได้รับ {formatNumber(earnedPoints ?? 0)} แต้ม
+          </p>
         )}
         <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
           <span>ยอดชำระทั้งสิ้น</span>

@@ -812,8 +812,6 @@ model ProductImage {
   url       String
   isPrimary Boolean @default(false)
 
-  variants ProductVariant[]
-
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
@@ -837,6 +835,7 @@ model ProductVariant {
   title       String
   price       Decimal @db.Decimal(10, 2)
   sku         String
+  image       String?
   digitalUrl  String? @db.Text
   isAvailable Boolean @default(true)
 
@@ -851,9 +850,6 @@ model ProductVariant {
 
   pointsAmount Int     @default(0)
   pointsActive Boolean @default(false)
-
-  imageId String?
-  image   ProductImage? @relation(fields: [imageId], references: [id])
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)

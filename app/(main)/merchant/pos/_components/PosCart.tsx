@@ -52,7 +52,7 @@ export function PosCart({
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
-  bgImage = '/images/hero-section/section-5.jpeg',
+  bgImage = '/images/pos-cart.jpeg',
 }: PosCartProps) {
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -252,7 +252,7 @@ export function PosCart({
               )}
             </ScrollArea>
           </CardContent>
-          <CardFooter className="flex-col gap-3 border-t border-white/10 bg-black/60 p-4 backdrop-blur-md">
+          <CardFooter className="flex-col gap-3 border-t border-white/10 p-4 backdrop-blur-md">
             {orderItems?.length !== 0 && (
               <PosDiscountDialog subtotal={cartSummary.finalPrice} />
             )}
