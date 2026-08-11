@@ -9,6 +9,8 @@ import { ImagePlus, Star, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field'
 
+import { cn } from '@/lib/utils'
+
 export function ImageUploadSection() {
   const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
@@ -81,60 +83,55 @@ export function ImageUploadSection() {
           return (
             <div
               key={field.id}
-              className={`group bg-muted/10 relative aspect-square overflow-hidden rounded-md border-2 ${
-                isPrimary ? 'border-primary' : 'border-border'
-              }`}
+              className={cn(
+                'bg-muted/20 relative flex aspect-square w-full shrink-0 items-center justify-center overflow-hidden border border-dashed p-1.5',
+                isPrimary ? 'border-primary' : 'border-border',
+              )}
             >
-              {isVideo ? (
-                <video
-                  src={previewUrl}
-                  className="h-full w-full object-cover"
-                  muted
-                  playsInline
-                />
-              ) : (
-                <img
-                  src={previewUrl}
-                  alt="product"
-                  className="h-full w-full object-cover"
-                />
-              )}
-              {isPrimary && (
-                <span className="bg-primary text-primary-foreground absolute top-1.5 left-1.5 rounded px-1.5 py-0.5 text-[10px] font-bold">
-                  รูปหลัก
-                </span>
-              )}
-              <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                {!isVideo && (
+              <div className="group relative size-full">
+                {isVideo ? (
+                  <video
+                    src={previewUrl}
+                    className="size-full object-cover"
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={previewUrl}
+                    alt="product"
+                    className="size-full object-cover"
+                  />
+                )}
+                <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-100 transition-opacity">
+                  {!isVideo && !isPrimary && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-lg"
+                      className="size-8"
+                      onClick={() => handleSetPrimary(index)}
+                      title="ตั้งเป็นรูปหลัก"
+                    >
+                      <Star className="size-4" />
+                    </Button>
+                  )}
                   <Button
                     type="button"
-                    size="icon"
-                    variant={isPrimary ? 'default' : 'outline'}
+                    variant="outline"
+                    size="icon-lg"
                     className="size-8"
-                    onClick={() => handleSetPrimary(index)}
-                    title="ตั้งเป็นรูปหลัก"
+                    onClick={() => handleRemoveImage(index)}
+                    title="ลบรูปภาพ"
                   >
-                    <Star
-                      className={`size-4 ${
-                        isPrimary && 'fill-yellow-400 text-yellow-400'
-                      }`}
-                    />
+                    <X className="size-4" />
                   </Button>
-                )}
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="size-8"
-                  onClick={() => handleRemoveImage(index)}
-                >
-                  <X className="size-4" />
-                </Button>
+                </div>
               </div>
             </div>
           )
         })}
-        <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-colors">
+        <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center border border-dashed">
           <ImagePlus className="size-5" />
           <span className="mt-2 text-xs font-medium">เพิ่มสื่อ</span>
           <input

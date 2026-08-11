@@ -27,8 +27,7 @@ export const variantSchema = z.object({
   title: z.string().min(1, { message: 'กรุณาระบุชื่อตัวเลือก' }),
   price: z.number().min(0, { message: 'ราคาต้องไม่ต่ำกว่า 0' }),
   image: z
-    .union([z.string(), z.instanceof(File)])
-    .nullable()
+    .union([z.string(), z.instanceof(File), z.null(), z.any()])
     .optional(),
   digitalUrl: z.string().optional(),
   sku: z.string().optional().or(z.literal('')),
@@ -67,8 +66,9 @@ export const productFormSchema = z.object({
   categoryId: z.string().min(1, { message: 'กรุณาเลือกหมวดหมู่' }),
   images: z.array(
     z.object({
-      url: z.union([z.string(), z.instanceof(File)]),
+      url: z.union([z.string(), z.instanceof(File), z.any()]),
       isPrimary: z.boolean().default(false),
+      file: z.instanceof(File).optional(),
     }),
   ),
   variants: z

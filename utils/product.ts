@@ -139,11 +139,16 @@ export const transformProductToFormValues = (
   return {
     ...product,
     tags: product.tags.map((t) => t.name).join(', '),
-    images: product.images.map((img) => ({ url: img.url })),
+    images:
+      product.images?.map((img) => ({
+        url: img.url,
+        isPrimary: img.isPrimary ?? false,
+      })) || [],
     variants: product.variants.map((v) => ({
       title: v.title,
       price: Number(v.price),
       sku: v.sku || '',
+      image: v.image || null,
       weight: v.weight ?? 0,
       width: v.width ?? 0,
       height: v.height ?? 0,

@@ -34,6 +34,30 @@ export function ProductPreviewContent() {
     return Math.min(...prices)
   }
 
+  const getPreviewImageUrl = () => {
+    if (!images || images.length === 0) {
+      return FALLBACK_IMAGE
+    }
+
+    const primaryImg = images.find(
+      (img: { isPrimary?: boolean }) => img?.isPrimary,
+    )
+    const targetImg = primaryImg || images[0]
+    const rawUrl = targetImg?.url
+
+    if (!rawUrl) {
+      return FALLBACK_IMAGE
+    }
+
+    if (rawUrl instanceof File) {
+      return URL.createObjectURL(rawUrl)
+    }
+
+    return typeof rawUrl === 'string' ? rawUrl : FALLBACK_IMAGE
+  }
+
+  const previewImageUrl = getPreviewImageUrl()
+
   const minPrice = getMinPrice()
 
   const priceText =
@@ -61,11 +85,12 @@ export function ProductPreviewContent() {
           Social Share (ตัวอย่าง)
         </p>
         <Image
-          src={images[0]?.url ?? FALLBACK_IMAGE}
+          src={previewImageUrl}
           className="h-96 w-full object-cover object-center"
           width={800}
           height={800}
           alt="preview-image"
+          unoptimized={previewImageUrl.startsWith('blob:')}
         />
         <div className="p-3">
           <p className="text-[12px] text-emerald-700 uppercase">

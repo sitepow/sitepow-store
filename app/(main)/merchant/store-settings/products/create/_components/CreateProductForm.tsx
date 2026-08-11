@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -116,6 +116,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
+    values: product ? transformProductToFormValues(product) : undefined,
     defaultValues: {
       title: '',
       slug: '',
@@ -195,16 +196,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     formState: { isDirty },
   } = form
 
-  useEffect(() => {
-    if (product) {
-      const formValues = transformProductToFormValues(product)
-      reset(formValues, {
-        keepDirty: false,
-        keepValues: false,
-      })
-    }
-  }, [product, reset])
-
   const handleApplyPreset = (id: string) => {
     const preset = PRODUCT_PRESETS_MASTER.find((p) => p.id === id)
     if (!preset) {
@@ -254,24 +245,26 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     }
 
     try {
-      const oldImageUrls = product?.images.map((img) => img.url) || []
+      const oldImageUrls = product?.images?.map((img) => img.url) || []
 
       const processedImages = await Promise.all(
         data.images.map(async (img) => {
-          let url: string | File | undefined = img.url
+          const rawFile = img.file || img.url || img
+          let finalUrl = typeof img.url === 'string' ? img.url : ''
 
-          if (url instanceof File) {
+          if (rawFile instanceof File) {
             const formData = new FormData()
-            formData.append('file', url)
+            formData.append('file', rawFile)
+
             const res = await uploadMutation.mutateAsync(formData)
-            if (res.success) {
-              url = res.url
+            if (res?.success && res?.url) {
+              finalUrl = res.url
             }
           }
 
           return {
-            url: typeof url === 'string' ? url : '',
-            isPrimary: img.isPrimary ?? false,
+            url: finalUrl,
+            isPrimary: Boolean(img.isPrimary),
           }
         }),
       )
@@ -294,14 +287,15 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
       const processedVariants = await Promise.all(
         data.variants.map(async (v) => {
-          let variantImageUrl: string | undefined | null =
+          let variantImageUrl: string | null =
             typeof v.image === 'string' ? v.image : null
+          const rawVariantFile = v.image?.file || v.image
 
-          if (v.image instanceof File) {
+          if (rawVariantFile instanceof File) {
             const formData = new FormData()
-            formData.append('file', v.image)
+            formData.append('file', rawVariantFile)
             const res = await uploadMutation.mutateAsync(formData)
-            if (res.success) {
+            if (res?.success && res?.url) {
               variantImageUrl = res.url
             }
           }

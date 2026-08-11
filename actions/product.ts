@@ -405,6 +405,7 @@ export async function deleteProduct(id: string) {
         storeId: true,
         store: { select: { slug: true } },
         images: { select: { url: true } },
+        variants: { select: { image: true } },
       },
     })
 
@@ -425,10 +426,17 @@ export async function deleteProduct(id: string) {
       }
     }
 
-    if (product.images && product.images.length > 0) {
+    const allUrls = [
+      ...product.images.map((img) => img.url),
+      ...product.variants
+        .map((v) => v.image)
+        .filter((img): img is string => Boolean(img)),
+    ]
+
+    if (allUrls.length > 0) {
       await Promise.all(
-        product.images.map(async (img) => {
-          const key = getPathR2FromUrl(img.url)
+        allUrls.map(async (url) => {
+          const key = getPathR2FromUrl(url)
           if (key) {
             await r2DeleteImage(key)
           }
@@ -522,7 +530,11 @@ export async function updateProduct(id: string, input: CreateProductInput) {
   try {
     const existingProduct = await prisma.product.findUnique({
       where: { id },
-      select: { storeId: true },
+      select: {
+        storeId: true,
+        images: { select: { url: true } },
+        variants: { select: { image: true } },
+      },
     })
 
     if (!existingProduct) {
@@ -544,6 +556,37 @@ export async function updateProduct(id: string, input: CreateProductInput) {
 
     const { variants, addons, metadata, tags, images, categoryId, ...rest } =
       input
+
+    const oldImageUrls = new Set<string>()
+    existingProduct.images.forEach((img) => {
+      if (img.url) oldImageUrls.add(img.url)
+    })
+    existingProduct.variants.forEach((v) => {
+      if (v.image) oldImageUrls.add(v.image)
+    })
+
+    const newImageUrls = new Set<string>()
+    images?.forEach((img) => {
+      if (img.url) newImageUrls.add(img.url)
+    })
+    variants?.forEach((v) => {
+      if (v.image) newImageUrls.add(v.image)
+    })
+
+    const urlsToDelete = Array.from(oldImageUrls).filter(
+      (url) => !newImageUrls.has(url),
+    )
+
+    if (urlsToDelete.length > 0) {
+      await Promise.all(
+        urlsToDelete.map(async (url) => {
+          const key = getPathR2FromUrl(url)
+          if (key) {
+            await r2DeleteImage(key)
+          }
+        }),
+      )
+    }
 
     const tagsArray = tags
       ? tags

@@ -13,8 +13,8 @@ import { useBranches } from '@/actions/hooks/branch'
 import { ProductType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
-import { IconPhoto, IconTrash, IconX } from '@tabler/icons-react'
-import { PlusCircle } from 'lucide-react'
+import { IconTrash } from '@tabler/icons-react'
+import { ImagePlus, PlusCircle, X } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
@@ -163,28 +163,38 @@ export function VariantItem({
       </div>
       <CardContent className="grid gap-6 pt-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
-          <div className="flex items-center justify-center sm:col-span-3 lg:col-span-2">
-            <div className="bg-muted/10 border-border relative flex aspect-square size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed">
+          <div className="flex items-center justify-center sm:col-span-3">
+            <div
+              className={cn(
+                'bg-muted/20 hover:bg-muted/40 relative flex aspect-square w-full shrink-0 items-center justify-center overflow-hidden border border-dashed p-1.5',
+                previewUrl ? 'border-primary' : 'border-border',
+              )}
+            >
               {previewUrl ? (
-                <>
+                <div className="group relative size-full">
                   <img
                     src={previewUrl}
                     alt="Variant thumbnail"
                     className="size-full object-cover"
                   />
-                  <button
-                    type="button"
-                    onClick={handleRemoveImage}
-                    className="bg-destructive text-destructive-foreground absolute top-1 right-1 rounded-full p-1 shadow hover:opacity-90"
-                  >
-                    <IconX className="size-3" />
-                  </button>
-                </>
+                  <div className="dark absolute inset-0 flex items-center justify-center bg-black/40 opacity-100 transition-opacity">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-lg"
+                      className="size-8"
+                      onClick={handleRemoveImage}
+                      title="ลบรูปภาพ"
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <label className="text-muted-foreground hover:text-foreground flex size-full cursor-pointer flex-col items-center justify-center transition-colors">
-                  <IconPhoto className="size-6" />
-                  <span className="mt-1 text-[10px] font-medium">
-                    รูปตัวเลือก
+                  <ImagePlus className="size-5" />
+                  <span className="mt-2 text-xs font-medium">
+                    เพิ่มรูปตัวเลือก
                   </span>
                   <input
                     type="file"

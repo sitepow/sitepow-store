@@ -108,7 +108,7 @@ export function OrderTable() {
                   if (employeeName) {
                     displaySubtext = `พนักงาน: ${employeeName}`
                   } else if (!displaySubtext) {
-                    displaySubtext = 'ขายหน้าร้าน (POS)'
+                    displaySubtext = ''
                   }
                 } else {
                   if (!displayName) {
