@@ -6,6 +6,7 @@ import { ShippingAddressSnapshot } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { formatFullAddress } from '@/utils/address'
 import { formatDateTime } from '@/utils/date'
 import { formatNumber } from '@/utils/pricing'
@@ -39,6 +40,7 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
+  const { store } = useStoreData()
   const { copied, copy } = useCopyToClipboard()
   const [open, setOpen] = useState(false)
 
@@ -56,7 +58,10 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg"
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      >
         <DialogHeader>
           <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
           <DialogDescription>

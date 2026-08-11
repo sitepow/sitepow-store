@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { BUYER_NAVIGATION } from '@/constants/navigation'
+import { FALLBACK_MERCHANT_LOGO_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
@@ -13,7 +14,6 @@ import { getClientAuthUrl } from '@/utils/auth'
 import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrand } from '@/components/LogoBrand'
 import { ModeToggle } from '@/components/ModeToggle'
 import { StoreLogo } from '@/components/StoreLogo'
 import { Button } from '@/components/ui/button'
@@ -62,8 +62,9 @@ export function StoreNavbar() {
         <StoreHeaderBackground coverImage={store?.coverImage} />
         <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
           <div className="flex items-center justify-between gap-4">
-            {store?.logo && <StoreLogo image={store?.logo} />}
-            {!store?.logo && <LogoBrand className="text-white" />}
+            <StoreLogo
+              image={store?.logo ? store.logo : FALLBACK_MERCHANT_LOGO_IMAGE}
+            />
             <div className="flex items-center gap-2">
               <div className="hidden max-w-md flex-1 lg:flex">
                 <StoreSearchInput />

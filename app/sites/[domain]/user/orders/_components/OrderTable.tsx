@@ -80,8 +80,8 @@ export function OrderTable({ search }: OrderTableProps) {
                   <TableRow key={order.id}>
                     <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
-                      <div className="flex flex-col items-start gap-1">
-                        <Badge variant="outline">{order.store.name}</Badge>
+                      <div className="flex flex-col items-start">
+                        <Badge>{order.store.name}</Badge>
                         {isPOSOrder && (
                           <Badge
                             variant="secondary"

@@ -24,7 +24,7 @@ export function CheckoutSection({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-xl border transition-all duration-300',
+        'overflow-hidden border transition-all duration-300',
         isDisabled
           ? 'bg-foreground/5 border opacity-60'
           : isActive && 'border-primary/35',

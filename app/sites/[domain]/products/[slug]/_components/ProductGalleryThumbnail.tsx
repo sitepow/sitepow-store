@@ -35,10 +35,7 @@ export function ProductGalleryThumbnail() {
     return (
       <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="size-16 flex-none rounded-lg md:size-20"
-          />
+          <Skeleton key={i} className="size-16 flex-none md:size-20" />
         ))}
       </div>
     )
@@ -47,11 +44,10 @@ export function ProductGalleryThumbnail() {
   if (images?.length === 0) {
     return (
       <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div
-            key={i}
-            className="bg-foreground/10 size-16 rounded-lg md:size-20"
-          />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="border-primary border border-dashed p-1">
+            <div className="bg-foreground/10 size-16 md:size-20" />
+          </div>
         ))}
       </div>
     )
@@ -72,10 +68,8 @@ export function ProductGalleryThumbnail() {
             key={image.id || index}
             onClick={() => setActiveImageIndex(index)}
             className={cn(
-              'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 bg-transparent transition-all md:size-20',
-              activeImageIndex === index
-                ? 'border-primary'
-                : 'border-transparent',
+              'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden border border-dashed bg-transparent p-1 transition-all md:size-20',
+              activeImageIndex === index ? 'border-primary' : 'border-muted',
             )}
           >
             {isVideoUrl(image.url) ? (

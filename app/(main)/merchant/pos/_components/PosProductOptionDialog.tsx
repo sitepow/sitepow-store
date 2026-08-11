@@ -268,7 +268,7 @@ export function PosProductOptionDialog({
                             disabled={isOutOfStock}
                             className="mt-1 sm:mt-0"
                           />
-                          <EmptyImage className="size-14 shrink-0 rounded-lg text-[8px] sm:size-16" />
+                          <EmptyImage className="size-14 shrink-0 text-[8px] sm:size-16" />
                           <div className="flex min-w-0 flex-col gap-0.5">
                             <span className="text-sm leading-tight font-medium wrap-break-word">
                               {variant.title}
@@ -278,23 +278,14 @@ export function PosProductOptionDialog({
                                 คงเหลือ: {stock}
                                 {variant?.sku ? ` · SKU: ${variant.sku}` : ''}
                               </span>
+                              <br />
                               {hasDiscount &&
                                 variant.discountType ===
                                   DiscountType.PERCENTAGE && (
-                                  <Badge
-                                    variant="outline"
-                                    className="px-1.5 py-0 text-[10px]"
-                                  >
-                                    ลด {variant.discountAmount}%
-                                  </Badge>
+                                  <Badge>ลด {variant.discountAmount}%</Badge>
                                 )}
                               {hasPoint && (
-                                <Badge
-                                  variant="outline"
-                                  className="px-1.5 py-0 text-[10px]"
-                                >
-                                  +{variant.pointsAmount} แต้ม
-                                </Badge>
+                                <Badge>+{variant.pointsAmount} แต้ม</Badge>
                               )}
                             </div>
                           </div>
@@ -432,7 +423,7 @@ export function PosProductOptionDialog({
               ? 'สินค้าหมด'
               : quantity > currentVariantStock
                 ? 'สินค้าไม่พอ'
-                : `เพิ่มลงตะกร้า · ${formatCurrency(unitPrice * quantity)}`}
+                : `เพิ่มลงตะกร้า ${formatCurrency(unitPrice * quantity)}`}
           </Button>
         </DialogFooter>
       </DialogContent>

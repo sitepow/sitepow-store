@@ -143,10 +143,7 @@ export function OrderTable() {
                               {displayName}
                             </p>
                             {isPOSOrder && (
-                              <Badge
-                                variant="secondary"
-                                className="px-1.5 py-0 text-[10px] font-normal"
-                              >
+                              <Badge className="px-1.5 py-0 text-[10px] font-normal">
                                 POS
                               </Badge>
                             )}

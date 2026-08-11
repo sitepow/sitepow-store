@@ -58,7 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn() {
       return true
     },
     async jwt({ token, user, account, trigger }) {

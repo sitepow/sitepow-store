@@ -3,9 +3,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import Image from 'next/image'
+
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
+import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CartItem } from '@/types/sites/cart'
@@ -52,7 +55,7 @@ export function PosCart({
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
-  bgImage = '/images/pos-cart.jpeg',
+  bgImage = FALLBACK_MERCHANT_BANNER_IMAGE,
 }: PosCartProps) {
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -162,13 +165,15 @@ export function PosCart({
 
   return (
     <FormProvider {...methods}>
-      <Card
-        className="relative flex flex-col overflow-hidden bg-cover bg-center shadow-sm transition-all"
-        style={bgImage ? { backgroundImage: `url(${bgImage})` } : undefined}
-      >
-        {bgImage && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-xs" />
-        )}
+      <Card className="relative flex flex-col overflow-hidden border-0 bg-neutral-900 sm:rounded-none">
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <Image
+            src={bgImage || FALLBACK_MERCHANT_BANNER_IMAGE}
+            alt="cart-background"
+            fill
+            className="object-cover opacity-40"
+          />
+        </div>
         <div className="relative z-10 flex h-full flex-col">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between text-lg text-white">
@@ -179,9 +184,9 @@ export function PosCart({
               <div className="flex items-center gap-2">
                 {cart.length > 0 && (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="h-8 px-2 text-xs text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                    className="dark"
                     onClick={handleClearCartAll}
                   >
                     <IconTrash className="mr-1 size-3.5" />
@@ -252,7 +257,7 @@ export function PosCart({
               )}
             </ScrollArea>
           </CardContent>
-          <CardFooter className="flex-col gap-3 border-t border-white/10 p-4 backdrop-blur-md">
+          <CardFooter className="flex-col gap-3 border-t border-white/10 p-4">
             {orderItems?.length !== 0 && (
               <PosDiscountDialog subtotal={cartSummary.finalPrice} />
             )}

@@ -2,6 +2,7 @@
 
 import { ComponentProps } from 'react'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { HighlightText } from '@/components/HighlightText'
@@ -28,18 +29,25 @@ export function CartSummary({
   summary: customSummary,
   ...props
 }: CartSummaryProps) {
+  const { store } = useStoreData()
   const { getCartSummary } = useCartStore()
-
   const summary = customSummary ?? getCartSummary()
 
   return (
-    <div className={cn('space-y-1.5 py-2', className)} {...props}>
+    <div
+      className={cn('space-y-1.5 py-2', className)}
+      {...props}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+    >
       <SummaryRow label="ราคาสินค้า" value={formatCurrency(summary.subtotal)} />
       {summary.totalDiscount > 0 && (
         <SummaryRow
           label="ส่วนลด"
-          value={formatCurrency(Math.abs(summary.totalDiscount))}
-          isDiscount
+          value={
+            <HighlightText>
+              - {formatCurrency(Math.abs(summary.totalDiscount))}
+            </HighlightText>
+          }
         />
       )}
       <Separator className="my-2" />
@@ -50,9 +58,7 @@ export function CartSummary({
       )}
       <SummaryRow
         label="ยอดที่ต้องจ่ายจริง"
-        value={
-          <HighlightText>{formatCurrency(summary.finalPrice)}</HighlightText>
-        }
+        value={formatCurrency(summary.finalPrice)}
       />
     </div>
   )

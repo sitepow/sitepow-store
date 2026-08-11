@@ -32,7 +32,7 @@ export function CartItemCard({
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
       <div
         className={
-          'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden rounded-lg border-2 md:size-20'
+          'border-primary relative aspect-square size-16 flex-none cursor-pointer overflow-hidden border border-dashed p-1 md:size-20'
         }
       >
         {item.image ? (
@@ -41,15 +41,15 @@ export function CartItemCard({
             className="size-full object-cover object-center"
           />
         ) : (
-          <EmptyImage className="rounded-none text-[10px]" />
+          <EmptyImage className="text-[10px]" />
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn('min-w-0', productClassName)}>
-          <h4 className="text-sm leading-tight font-medium sm:text-base">
+          <h4 className="max-w-2/3 text-sm leading-tight font-medium sm:text-base">
             {item.productTitle}
           </h4>
-          <p className="text-primary mt-0.5 text-[11px] sm:text-xs">
+          <p className="text-primary mt-0.5 max-w-2/3 text-[11px] sm:text-xs">
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}

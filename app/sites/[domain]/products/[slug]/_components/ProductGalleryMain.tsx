@@ -12,19 +12,15 @@ export function ProductGalleryMain() {
   const activeImage = product?.images?.[activeImageIndex]
 
   if (isLoading) {
-    return (
-      <Skeleton className="aspect-square w-full rounded-xl md:aspect-4/3" />
-    )
+    return <Skeleton className="aspect-square w-full md:aspect-4/3" />
   }
 
   if (!activeImage) {
-    return (
-      <EmptyImage className="aspect-square w-full rounded-xl md:aspect-4/3" />
-    )
+    return <EmptyImage className="aspect-square w-full md:aspect-4/3" />
   }
 
   return (
-    <div className="flex aspect-square h-52 w-full items-center justify-center overflow-hidden rounded-xl bg-gray-50 md:aspect-4/3 md:h-full">
+    <div className="flex aspect-square h-52 w-full items-center justify-center overflow-hidden bg-gray-50 md:aspect-4/3 md:h-full">
       {isVideoUrl(activeImage.url) ? (
         <video
           key={activeImage.url}

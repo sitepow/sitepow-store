@@ -170,7 +170,7 @@ export function CustomerAddressCreateDialog() {
               </Field>
             )}
             {showTaxFields && (
-              <div className="bg-muted/30 col-span-2 grid grid-cols-12 gap-4 rounded-lg border border-dashed p-4">
+              <div className="bg-muted/30 border-primary col-span-2 grid grid-cols-12 gap-4 rounded-lg border border-dashed p-4">
                 <div className="text-muted-foreground col-span-12 text-sm font-semibold">
                   ข้อมูลผู้เสียภาษี
                 </div>

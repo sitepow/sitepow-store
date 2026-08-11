@@ -1,5 +1,7 @@
 import { ComponentProps } from 'react'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
+
 import { cn } from '@/lib/utils'
 
 interface SummaryRowProps extends ComponentProps<'div'> {
@@ -15,6 +17,8 @@ export function SummaryRow({
   className,
   ...props
 }: SummaryRowProps) {
+  const { store } = useStoreData()
+
   return (
     <div
       className={cn(
@@ -23,6 +27,7 @@ export function SummaryRow({
         className,
       )}
       {...props}
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       <span className="text-muted-foreground">{label}</span>
       <span>

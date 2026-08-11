@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -15,6 +16,7 @@ import {
   useShippingCalculation,
   useStorefrontShippingOptions,
 } from '@/actions/hooks/storefront/shipping'
+import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import {
   BankAccountType,
   PaymentMethod,
@@ -40,6 +42,7 @@ import {
 import { ChevronLeftIcon } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { HighlightText } from '@/components/HighlightText'
 import { SectionContainer } from '@/components/SectionContainer'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -546,20 +549,32 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="dark:bg-foreground/5 border-primary/35 flex items-center gap-5 rounded-xl border px-5 py-2.5 text-start">
-              <CircularProgress
-                size={60}
-                value={progressValue}
-                icon={stepIcons[activeSection]}
-              />
-              <div className="space-y-0.5">
-                <h3 className="font-bold" suppressHydrationWarning>
-                  ยอดที่ต้องชำระ{' '}
-                  <span className="text-primary">
-                    {formatCurrency(grandTotal)}
-                  </span>
-                </h3>
-                <p className="text-xs opacity-50">{sectionDescription}</p>
+            <div className="relative overflow-hidden bg-neutral-900/80 px-5 py-2.5 text-start shadow-sm backdrop-blur-md">
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <Image
+                  src={FALLBACK_MERCHANT_BANNER_IMAGE}
+                  alt="progress-background"
+                  fill
+                  className="object-cover opacity-30"
+                />
+              </div>
+              <div className="relative z-10 flex items-center gap-5 text-white">
+                <CircularProgress
+                  size={60}
+                  value={progressValue}
+                  icon={stepIcons[activeSection]}
+                />
+                <div className="space-y-0.5">
+                  <h3 className="font-bold text-white" suppressHydrationWarning>
+                    ยอดที่ต้องชำระ{' '}
+                    <span className="text-primary font-extrabold">
+                      {formatCurrency(grandTotal)}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-neutral-300 opacity-80">
+                    {sectionDescription}
+                  </p>
+                </div>
               </div>
             </div>
             {physicalItems?.length > 0 && (
@@ -762,67 +777,94 @@ export default function StoreCartPage() {
                 </RadioGroup>
               )}
             </CheckoutSection>
-            <div className="dark:bg-foreground/5 bg-foreground/1 border-border rounded-xl border p-5">
-              <SummaryRow
-                className="mb-5"
-                label="ส่วนลด"
-                value={<DiscountForm subtotal={summary.finalPrice} />}
-              />
-              <SummaryRow
-                label="ค่าจัดส่งรวม"
-                value={formatCurrency(shippingFee)}
-              />
-              <CartSummary summary={summary} />
-              {(pointsDiscount > 0 || couponDiscount > 0) && (
-                <div className="mt-2 space-y-1 border-t pt-2">
-                  {pointsDiscount > 0 && (
-                    <SummaryRow
-                      label="ส่วนลดจากแต้มสะสม"
-                      value={`-${formatCurrency(pointsDiscount)}`}
-                    />
-                  )}
-                  {couponDiscount > 0 && (
-                    <SummaryRow
-                      label={`ส่วนลดจากรหัส (${appliedCoupon?.code})`}
-                      value={`-${formatCurrency(couponDiscount)}`}
-                    />
-                  )}
+            <div
+              style={
+                { '--primary': store?.primaryColor } as React.CSSProperties
+              }
+              className="dark relative overflow-hidden rounded-xl bg-neutral-900 p-5"
+            >
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <Image
+                  src={FALLBACK_MERCHANT_BANNER_IMAGE}
+                  alt="summary-background"
+                  fill
+                  className="object-cover opacity-40"
+                />
+              </div>
+              <div className="relative z-10 text-white">
+                <SummaryRow
+                  className="mb-5"
+                  label="ส่วนลด"
+                  value={<DiscountForm subtotal={summary.finalPrice} />}
+                />
+                <SummaryRow
+                  label="ค่าจัดส่งรวม"
+                  value={formatCurrency(shippingFee)}
+                />
+                <div className="dark text-white!">
+                  <CartSummary summary={summary} />
                 </div>
-              )}
-              <SummaryTotal
-                label="ยอดที่ต้องชำระ"
-                value={formatCurrency(grandTotal)}
-              />
-              {isAuthenticated && (
-                <Button
-                  className="mt-6 h-12 w-full text-lg"
-                  size="lg"
-                  disabled={
-                    activeSection !== 'review' ||
-                    createOrderMutation.isPending ||
-                    storeCheckoutMutation.isPending ||
-                    items?.length === 0 ||
-                    isEmailUnverified
-                  }
-                  onClick={handleCreateOrder}
-                >
-                  {createOrderMutation.isPending ||
-                  storeCheckoutMutation.isPending
-                    ? 'กำลังดำเนินการ...'
-                    : 'สั่งสินค้า'}
-                </Button>
-              )}
-              {!isAuthenticated && (
-                <Button
-                  className="mt-6 h-12 w-full text-lg"
-                  onClick={() => {
-                    router.push(loginHref)
-                  }}
-                >
-                  <IconLock />
-                  เข้าสู่ระบบเพื่อสั่งสินค้า
-                </Button>
-              )}
+                {(pointsDiscount > 0 || couponDiscount > 0) && (
+                  <div className="mt-2 space-y-1 border-t border-white/10 pt-2">
+                    {pointsDiscount > 0 && (
+                      <SummaryRow
+                        label="ส่วนลดจากแต้มสะสม"
+                        value={
+                          <HighlightText>
+                            - {formatCurrency(pointsDiscount)}
+                          </HighlightText>
+                        }
+                      />
+                    )}
+                    {couponDiscount > 0 && (
+                      <SummaryRow
+                        label={`ส่วนลดจากรหัส (${appliedCoupon?.code})`}
+                        value={
+                          <HighlightText>
+                            - {formatCurrency(couponDiscount)}
+                          </HighlightText>
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+                <div className="mt-4 border-t border-white/10 pt-2">
+                  <SummaryTotal
+                    label="ยอดที่ต้องชำระ"
+                    value={formatCurrency(grandTotal)}
+                  />
+                </div>
+                {isAuthenticated && (
+                  <Button
+                    className="mt-6 h-12 w-full text-lg font-bold shadow-md transition-transform hover:scale-[1.01]"
+                    size="lg"
+                    disabled={
+                      activeSection !== 'review' ||
+                      createOrderMutation.isPending ||
+                      storeCheckoutMutation.isPending ||
+                      items?.length === 0 ||
+                      isEmailUnverified
+                    }
+                    onClick={handleCreateOrder}
+                  >
+                    {createOrderMutation.isPending ||
+                    storeCheckoutMutation.isPending
+                      ? 'กำลังดำเนินการ...'
+                      : 'สั่งสินค้า'}
+                  </Button>
+                )}
+                {!isAuthenticated && (
+                  <Button
+                    className="mt-6 h-12 w-full text-lg font-bold shadow-md"
+                    onClick={() => {
+                      router.push(loginHref)
+                    }}
+                  >
+                    <IconLock />
+                    เข้าสู่ระบบเพื่อสั่งสินค้า
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

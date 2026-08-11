@@ -89,7 +89,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             key={itemKey}
             className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
-            <EmptyImage className="size-16 shrink-0 rounded-md text-[10px]" />
+            <EmptyImage className="size-16 shrink-0 text-[10px]" />
             <div className="flex w-full flex-col items-start justify-between gap-2.5 sm:flex-row sm:items-center">
               <div className="flex flex-1 flex-col gap-0.5">
                 <span className="text-foreground font-medium">

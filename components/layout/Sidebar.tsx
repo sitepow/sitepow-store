@@ -7,12 +7,12 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NavigationItem } from '@/constants/navigation'
+import { FALLBACK_MERCHANT_LOGO_IMAGE } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
 
-import { LogoBrand } from '@/components/LogoBrand'
 import {
   Collapsible,
   CollapsibleContent,
@@ -66,8 +66,9 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
     <SidebarProvider>
       <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
-          {store?.logo && <StoreLogo image={store?.logo} />}
-          {!store?.logo && <LogoBrand />}
+          <StoreLogo
+            image={store?.logo ? store.logo : FALLBACK_MERCHANT_LOGO_IMAGE}
+          />
         </SidebarHeader>
         <SidebarContent className="px-2">
           <SidebarMenu>
@@ -133,7 +134,10 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         </SidebarContent>
         <SidebarFooter />
       </RootSidebar>
-      <main className="bg-background text-foreground w-full min-w-0 space-y-5 p-5">
+      <main
+        className="bg-background text-foreground w-full min-w-0 space-y-5 p-5"
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
         <div className="flex flex-wrap gap-2.5 border-b py-5">

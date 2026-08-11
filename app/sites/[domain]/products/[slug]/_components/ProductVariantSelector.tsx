@@ -6,6 +6,7 @@ import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice, getStockQuantity } from '@/utils/product'
 
+import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
@@ -158,14 +159,10 @@ export function ProductVariantSelector() {
                       <div className="flex flex-wrap gap-2">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
-                            <span className="text-primary text-[10px] font-semibold">
-                              ส่วนลด {variant.discountAmount}%
-                            </span>
+                            <Badge>ส่วนลด {variant.discountAmount}%</Badge>
                           )}
                         {hasPoint && (
-                          <span className="text-primary text-[10px] font-semibold">
-                            + {variant.pointsAmount} แต้ม
-                          </span>
+                          <Badge>+ {variant.pointsAmount} แต้ม</Badge>
                         )}
                       </div>
                       <div>

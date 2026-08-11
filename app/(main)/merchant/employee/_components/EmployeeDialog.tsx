@@ -257,9 +257,12 @@ export function EmployeeDialog({
                   className="bg-card relative grid gap-3 space-y-2 rounded-md border p-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="bg-primary flex items-center gap-1 p-2.5 font-bold text-white">
-                      <IconKey /> สาขาที่ {index + 1}
-                    </span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="bg-muted border-border flex items-center gap-1 border p-2.5 font-bold">
+                        <IconKey />
+                      </div>
+                      <span>สาขาที่ {index + 1}</span>
+                    </div>
                     <Button
                       type="button"
                       variant="destructive"

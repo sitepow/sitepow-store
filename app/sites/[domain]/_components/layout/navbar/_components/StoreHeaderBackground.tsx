@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-import { FALLBACK_IMAGE } from '@/constants/system'
+import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 
 interface StoreHeaderBackgroundProps {
   coverImage?: string | File | null
@@ -31,7 +31,7 @@ export function StoreHeaderBackground({
         <Image
           src={
             (typeof coverImage === 'string' ? coverImage : null) ||
-            FALLBACK_IMAGE
+            FALLBACK_MERCHANT_BANNER_IMAGE
           }
           alt="footer-background"
           fill
