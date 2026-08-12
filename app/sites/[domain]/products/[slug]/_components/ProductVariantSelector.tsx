@@ -114,7 +114,7 @@ export function ProductVariantSelector() {
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2"
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2"
             >
               {product?.variants?.map((variant) => {
                 const discountConfig =

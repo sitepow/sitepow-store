@@ -81,16 +81,21 @@ export function ProductAddToCart() {
       quantity,
     })
 
+    const itemImage =
+      (selectedVariant.image && selectedVariant.image.trim() !== ''
+        ? selectedVariant.image
+        : null) ||
+      product.images?.find((img) => img.isPrimary)?.url ||
+      product.images?.[0]?.url ||
+      ''
+
     addItem({
       productId: product.id,
       productTitle: product.title,
       branchId: selectedBranchId ?? '',
       branchName: selectedBranchName ?? '',
       weight: selectedVariant.weight || 0,
-      image:
-        product.images.find((img) => img.isPrimary)?.url ||
-        product.images[0]?.url ||
-        '',
+      image: itemImage,
       variant: selectedVariant,
       selectedOptions: mappedOptions,
       selectedAddons: selectedAddonsData,

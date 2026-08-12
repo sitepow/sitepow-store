@@ -80,11 +80,11 @@ export function OrderTable({ search }: OrderTableProps) {
                   <TableRow key={order.id}>
                     <TableCell>#{order.orderNumber}</TableCell>
                     <TableCell>
-                      <div className="flex flex-col items-start">
+                      <div className="flex flex-col items-start gap-1">
                         <Badge>{order.store.name}</Badge>
                         {isPOSOrder && (
                           <Badge
-                            variant="secondary"
+                            variant="outline"
                             className="px-1.5 py-0 text-[10px] font-normal"
                           >
                             ซื้อที่หน้าร้าน (POS)
