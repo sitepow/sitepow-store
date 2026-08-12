@@ -10,10 +10,10 @@ interface SeeMoreButtonProps {
 
 export function SeeMoreButton({ href }: SeeMoreButtonProps) {
   return (
-    <Link href={href}>
-      <Button variant="outline" className="w-full md:w-auto">
+    <Link href={href} className="flex shrink-0 items-center justify-center">
+      <Button variant="outline" className="whitespace-nowrap">
         <span>ดูทั้งหมด</span>
-        <ArrowRightIcon className="ml-2 size-4" />
+        <ArrowRightIcon className="size-4" />
       </Button>
     </Link>
   )

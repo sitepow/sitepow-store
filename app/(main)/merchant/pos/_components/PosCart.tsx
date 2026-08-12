@@ -165,7 +165,7 @@ export function PosCart({
 
   return (
     <FormProvider {...methods}>
-      <Card className="relative flex flex-col overflow-hidden border-0 bg-neutral-900 sm:rounded-none">
+      <Card className="relative flex flex-col overflow-hidden border-0 bg-neutral-900 **:text-white!">
         <div className="absolute inset-0 z-0 overflow-hidden">
           <Image
             src={bgImage || FALLBACK_MERCHANT_BANNER_IMAGE}
@@ -245,6 +245,7 @@ export function PosCart({
 
                     return (
                       <CartItemCard
+                        textClassName="max-w-2/3 lg:max-w-full 2xl:max-w-2/3"
                         key={item.cartItemId}
                         item={item}
                         onUpdateQuantity={onUpdateQuantity}

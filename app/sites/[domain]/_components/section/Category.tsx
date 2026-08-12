@@ -68,7 +68,7 @@ export function CategorySection({
           </div>
         )}
         <div className="relative w-full overflow-hidden p-2.5" ref={emblaRef}>
-          <div className="flex items-center gap-5">
+          <div className="flex items-stretch gap-5">
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton

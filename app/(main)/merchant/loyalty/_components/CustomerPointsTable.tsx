@@ -5,6 +5,7 @@ import { ComponentProps, useState } from 'react'
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
@@ -106,16 +107,16 @@ export function CustomerPointsTable({
                         .filter(Boolean)
                         .join(' ') || item.customer.email}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-xs">
+                    <TableCell>
                       {item.customer.phone
                         ? formatPromptPay(item.customer.phone)
                         : '-'}
                     </TableCell>
-                    <TableCell className="text-primary text-right font-semibold">
-                      {item.rewardPoints.toLocaleString()}
+                    <TableCell className="text-right">
+                      {formatNumber(item.rewardPoints)}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-right">
-                      ฿{Number(item.totalSpent).toLocaleString()}
+                    <TableCell className="text-right">
+                      {formatCurrency(item.totalSpent)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="icon-lg">

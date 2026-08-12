@@ -82,15 +82,8 @@ export function CreditHistoryTable() {
                   <TableRow key={tx.id}>
                     <TableCell>{tx.id}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 font-medium">
-                        <div
-                          className={cn(
-                            'shrink-0 rounded-md border p-1',
-                            isIncome
-                              ? 'border-green-200 bg-green-50 text-green-600'
-                              : 'border-blue-200 bg-blue-50 text-blue-600',
-                          )}
-                        >
+                      <div className="flex items-center gap-2">
+                        <div className="shrink-0 rounded-md border p-1">
                           {tx.type === TransactionType.AI_USAGE && (
                             <IconCpu size={14} />
                           )}
@@ -112,13 +105,13 @@ export function CreditHistoryTable() {
                     </TableCell>
                     <TableCell
                       className={cn(
-                        'text-right font-bold',
+                        'text-right',
                         isIncome ? 'text-green-600' : 'text-foreground',
                       )}
                     >
                       {isIncome
-                        ? `+${formatNumber(tx.amount)}`
-                        : `-${formatNumber(tx.amount)}`}
+                        ? `+ ${formatNumber(tx.amount)}`
+                        : `- ${formatNumber(tx.amount)}`}
                     </TableCell>
                   </TableRow>
                 )

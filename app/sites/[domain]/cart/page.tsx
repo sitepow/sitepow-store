@@ -485,7 +485,7 @@ export default function StoreCartPage() {
     <StoreLayoutCheckout>
       <SectionContainer>
         <div className="text-foreground grid w-full items-start gap-5 lg:grid-cols-12">
-          <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-7">
+          <div className="flex flex-col gap-5 lg:sticky lg:top-40 lg:col-span-8">
             <div className="flex items-center justify-between">
               <Link href={'/'}>
                 <Button variant="ghost" className="text-muted-foreground -ml-4">
@@ -548,8 +548,8 @@ export default function StoreCartPage() {
               )}
             </div>
           </div>
-          <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-5">
-            <div className="relative overflow-hidden bg-neutral-900/80 px-5 py-2.5 text-start shadow-sm backdrop-blur-md">
+          <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-4">
+            <div className="relative overflow-hidden rounded-xl bg-neutral-900/80 px-5 py-2.5 text-start shadow-sm backdrop-blur-md">
               <div className="absolute inset-0 z-0 overflow-hidden">
                 <Image
                   src={FALLBACK_MERCHANT_BANNER_IMAGE}
@@ -567,7 +567,7 @@ export default function StoreCartPage() {
                 <div className="space-y-0.5">
                   <h3 className="font-bold text-white" suppressHydrationWarning>
                     ยอดที่ต้องชำระ{' '}
-                    <span className="text-primary font-extrabold">
+                    <span className="font-extrabold">
                       {formatCurrency(grandTotal)}
                     </span>
                   </h3>
@@ -781,7 +781,7 @@ export default function StoreCartPage() {
               style={
                 { '--primary': store?.primaryColor } as React.CSSProperties
               }
-              className="dark relative overflow-hidden rounded-xl bg-neutral-900 p-5"
+              className="dark relative overflow-hidden rounded-xl bg-neutral-900 p-5 **:text-white!"
             >
               <div className="absolute inset-0 z-0 overflow-hidden">
                 <Image

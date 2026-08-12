@@ -182,7 +182,6 @@ export function PosProductOptionDialog({
   }
 
   const handleOptionChange = (groupTitle: string, choiceName: string) => {
-    if (currentVariantStock <= 0) return
     setSelectedOptions((prev) => ({
       ...prev,
       [groupTitle]: choiceName,
@@ -190,7 +189,6 @@ export function PosProductOptionDialog({
   }
 
   const handleAddonToggle = (addonId: string) => {
-    if (currentVariantStock <= 0) return
     setSelectedAddonIds((prev) =>
       prev.includes(addonId)
         ? prev.filter((id) => id !== addonId)
@@ -215,9 +213,7 @@ export function PosProductOptionDialog({
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-5 py-2">
-            {(product.variants.length > 1 ||
-              (currentVariant?.pointsActive &&
-                (currentVariant?.pointsAmount ?? 0) > 0)) && (
+            {product.variants.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs font-semibold">
                   รูปแบบสินค้า
@@ -265,7 +261,6 @@ export function PosProductOptionDialog({
                           <RadioGroupItem
                             value={variant.id}
                             id={variant.id}
-                            disabled={isOutOfStock}
                             className="mt-1 sm:mt-0"
                           />
                           <EmptyImage className="size-14 shrink-0 text-[8px] sm:size-16" />
@@ -339,15 +334,12 @@ export function PosProductOptionDialog({
                       className={cn(
                         'hover:bg-accent/50 flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
                         'has-checked:border-primary has-checked:bg-accent/50',
-                        currentVariantStock <= 0 &&
-                          'cursor-not-allowed opacity-50 hover:bg-transparent',
                       )}
                     >
                       <div className="flex items-center space-x-3">
                         <RadioGroupItem
                           value={choice.name}
                           id={`${option.title}-${choice.name}`}
-                          disabled={currentVariantStock <= 0}
                         />
                         <span className="text-sm leading-none font-medium">
                           {choice.name}
@@ -370,8 +362,7 @@ export function PosProductOptionDialog({
                 </Label>
                 <div className="grid gap-2">
                   {product.addons.map((addon) => {
-                    const isDisabled =
-                      !addon.isAvailable || currentVariantStock <= 0
+                    const isDisabled = !addon.isAvailable
 
                     return (
                       <Label

@@ -11,7 +11,7 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
-import { formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
@@ -79,6 +79,7 @@ export function CustomerTable() {
               <TableHead>สถานะบล็อกสลิป</TableHead>
               <TableHead>กำหนดปลดล็อก</TableHead>
               <TableHead className="text-right">แต้มสะสม</TableHead>
+              <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
               {showManageColumn && (
                 <TableHead className="text-right">จัดการ</TableHead>
               )}
@@ -123,8 +124,11 @@ export function CustomerTable() {
                       ? formatDateTime(new Date(item.customer.blockedUntil))
                       : '-'}
                   </TableCell>
-                  <TableCell className="text-primary text-right font-semibold">
+                  <TableCell className="text-right">
                     {formatNumber(item.rewardPoints)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrency(item.totalSpent)}
                   </TableCell>
                   {showManageColumn && (
                     <TableCell className="text-right">

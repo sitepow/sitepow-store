@@ -16,6 +16,7 @@ interface CartItemCardProps {
   onRemove?: (id: string) => void
   isMaxStock?: boolean
   productClassName?: string
+  textClassName?: string
 }
 
 export function CartItemCard({
@@ -24,6 +25,7 @@ export function CartItemCard({
   onRemove,
   isMaxStock = false,
   productClassName,
+  textClassName,
 }: CartItemCardProps) {
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
@@ -46,10 +48,20 @@ export function CartItemCard({
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn('min-w-0', productClassName)}>
-          <h4 className="max-w-2/3 text-sm leading-tight font-medium sm:text-base">
+          <h4
+            className={cn(
+              'text-sm leading-tight font-medium sm:text-base',
+              textClassName,
+            )}
+          >
             {item.productTitle}
           </h4>
-          <p className="text-primary mt-0.5 max-w-2/3 text-[11px] sm:text-xs">
+          <p
+            className={cn(
+              'text-primary mt-0.5 text-[11px] sm:text-xs',
+              textClassName,
+            )}
+          >
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}

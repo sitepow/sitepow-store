@@ -95,27 +95,25 @@ export function ProductCard({
           )
         )}
       </div>
-      <h3 className="group-hover:text-primary line-clamp-2 h-12 px-1 font-medium">
-        {product.title}
-      </h3>
-      <div className="group-hover:text-primary flex items-end justify-center gap-2">
-        {hasDiscount ? (
-          <div className="flex flex-col">
-            <data value={net?.min} className="text-primary text-2xl font-bold">
-              {formatCurrency(net?.min || 0)}
-            </data>
+      <div className="flex flex-col gap-1">
+        {product.title && (
+          <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
+            {product.title}
+          </h3>
+        )}
+        <div className="group-hover:text-primary flex items-baseline justify-center gap-2">
+          <data
+            value={hasDiscount ? net?.min : original?.min}
+            className="text-primary text-2xl font-bold"
+          >
+            {formatCurrency((hasDiscount ? net?.min : original?.min) || 0)}
+          </data>
+          {hasDiscount && (
             <span className="text-muted-foreground text-sm line-through">
               {formatCurrency(original?.min || 0)}
             </span>
-          </div>
-        ) : (
-          <data
-            value={original?.min}
-            className="text-primary text-2xl font-bold"
-          >
-            {formatCurrency(original?.min || 0)}
-          </data>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

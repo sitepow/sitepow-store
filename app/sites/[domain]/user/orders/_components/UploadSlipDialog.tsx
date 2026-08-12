@@ -11,6 +11,7 @@ import { ORDER_EXPIRY_MINUTES } from '@/constants/system'
 import { BankAccount, BankAccountType } from '@/generated/prisma/browser'
 import { useOrderCountdown } from '@/hooks/use-order-countdown'
 import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
@@ -66,6 +67,7 @@ export function UploadSlipDialog({
   createdAt,
   bankAccounts,
 }: UploadSlipDialogProps) {
+  const { store } = useStoreData()
   const { userId } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -185,7 +187,10 @@ export function UploadSlipDialog({
           <IconUpload size={16} className="mr-2" /> แจ้งชำระเงิน
         </Button>
       </DialogTrigger>
-      <DialogContent className="gap-2.5 sm:max-w-md">
+      <DialogContent
+        className="gap-2.5 sm:max-w-md"
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      >
         <DialogHeader>
           <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
           <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>

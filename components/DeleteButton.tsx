@@ -2,6 +2,7 @@
 
 import React from 'react'
 
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconTrash } from '@tabler/icons-react'
 
 import {
@@ -23,6 +24,7 @@ interface DeleteButtonProps {
   icon?: React.ReactNode
   title?: string
   description?: string
+  children?: React.ReactNode
 }
 
 export function DeleteButton({
@@ -31,22 +33,31 @@ export function DeleteButton({
   icon = <IconTrash />,
   title = 'ยืนยันการลบข้อมูล?',
   description = 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลของคุณจะถูกลบออกจากระบบอย่างถาวร',
+  children,
 }: DeleteButtonProps) {
+  const { store } = useStoreData()
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="icon-lg" disabled={isPending}>
-          {icon}
-        </Button>
+        {children ?? (
+          <Button variant="outline" size="icon-lg" disabled={isPending}>
+            {icon}
+          </Button>
+        )}
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent
+        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>ยืนยัน</AlertDialogAction>
+          <AlertDialogCancel disabled={isPending}>ยกเลิก</AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete} disabled={isPending}>
+            {isPending ? 'กำลังลบ...' : 'ยืนยัน'}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

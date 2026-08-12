@@ -1,5 +1,8 @@
 'use client'
 
+import Image from 'next/image'
+
+import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import { LucideIcon } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,16 +20,18 @@ export function StatsCard({
   value,
   description,
   icon: Icon,
-  bgImage = '/images/hero-section/section-5.jpeg',
+  bgImage = FALLBACK_MERCHANT_BANNER_IMAGE,
 }: StatsCardProps) {
   return (
-    <Card
-      className="relative overflow-hidden bg-cover bg-center transition-all"
-      style={bgImage ? { backgroundImage: `url(${bgImage})` } : undefined}
-    >
-      {bgImage && (
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-      )}
+    <Card className="relative overflow-hidden border-white/10 bg-neutral-900 shadow-sm">
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Image
+          src={bgImage}
+          alt={title}
+          fill
+          className="object-cover opacity-40"
+        />
+      </div>
       <div className="relative z-10">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-white">
@@ -36,7 +41,7 @@ export function StatsCard({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-white">{value}</div>
-          <p className="text-xs text-neutral-300">{description}</p>
+          <p className="text-xs text-neutral-300 opacity-80">{description}</p>
         </CardContent>
       </div>
     </Card>
