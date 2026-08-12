@@ -2,13 +2,16 @@
 
 import { useIsMounted } from '@/hooks/use-is-mounted'
 
+import { cn } from '@/lib/utils'
+
 import { PointerHighlight } from './ui/pointer-highlight'
 
 interface HighlightParserProps {
   text: string
+  className?: string
 }
 
-export function HighlightParser({ text }: HighlightParserProps) {
+export function HighlightParser({ text, className }: HighlightParserProps) {
   const isMounted = useIsMounted()
 
   if (!isMounted) {
@@ -27,7 +30,7 @@ export function HighlightParser({ text }: HighlightParserProps) {
               rectangleClassName="bg-neutral-700 border-neutral-600"
               pointerClassName="text-yellow-500"
             >
-              <span className="relative z-10">{content}</span>
+              <span className={cn('relative z-10', className)}>{content}</span>
             </PointerHighlight>
           )
         }

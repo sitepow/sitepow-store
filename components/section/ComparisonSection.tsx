@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { HighlightParser } from '../HighlightParser'
 import { SectionContainer } from '../SectionContainer'
 import { SectionHeader } from '../SectionHeader'
 
@@ -20,7 +21,15 @@ export function ComparisonSection() {
   return (
     <SectionContainer>
       <SectionHeader
-        title="ตารางเปรียบเทียบ การขายสินค้าใน แพลตฟอร์มออนไลน์"
+        title={
+          <span>
+            ตารางเปรียบเทียบ{' '}
+            <HighlightParser
+              className="text-white"
+              text="<hilight>การขายสินค้าในแพลตฟอร์มออนไลน์</hilight>"
+            />
+          </span>
+        }
         description="ลองเช็คให้ชัดว่ากำไรเหลือเท่าไหร่หลังหักค่าธรรมเนียม และมาดูเหตุการณ์จริงที่คุณอาจต้องเจอเมื่อขายผ่านแพลตฟอร์ม"
       />
       <Table className="border text-start">
