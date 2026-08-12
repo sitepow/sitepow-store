@@ -13,9 +13,7 @@ const posProductSelect = {
   productType: true,
   categoryId: true,
   images: {
-    where: { isPrimary: true },
-    select: { url: true },
-    take: 1,
+    select: { url: true, isPrimary: true },
   },
   options: {
     select: {
@@ -39,6 +37,7 @@ const posProductSelect = {
       sku: true,
       title: true,
       price: true,
+      image: true,
       isAvailable: true,
       discountActive: true,
       discountType: true,

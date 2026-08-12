@@ -10,6 +10,12 @@ export interface OrderItemInput {
   variantId: string
   title: string
   variantTitle: string
+  image?: string | null
+  variant?: {
+    id?: string
+    image?: string | null
+    [key: string]: any
+  } | null
   quantity: number
   price: number
   originalPrice?: number

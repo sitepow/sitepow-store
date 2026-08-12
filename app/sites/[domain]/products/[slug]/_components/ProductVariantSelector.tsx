@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo } from 'react'
 
+import Image from 'next/image'
+
+import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice, getStockQuantity } from '@/utils/product'
@@ -111,7 +114,7 @@ export function ProductVariantSelector() {
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2"
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2"
             >
               {product?.variants?.map((variant) => {
                 const discountConfig =
@@ -138,12 +141,16 @@ export function ProductVariantSelector() {
                   selectedBranchId,
                 )
 
+                const variantImageUrl = variant.image || null
+
                 return (
                   <Label
                     htmlFor={variant.id}
                     key={variant.id}
                     className={cn(
-                      'hover:bg-accent relative flex items-start space-x-3 rounded-lg border p-3 transition-colors',
+                      'hover:bg-accent relative flex cursor-pointer items-center space-x-3 rounded-lg border p-3 transition-colors',
+                      selectedVariant?.id === variant.id &&
+                        'border-primary bg-accent/50',
                       (!isAvaliable || stock <= 0) &&
                         'cursor-not-allowed opacity-50',
                     )}
@@ -154,20 +161,40 @@ export function ProductVariantSelector() {
                       disabled={!isAvaliable || stock <= 0}
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-primary data-checked:border-primary data-checked:bg-primary dark:data-checked:bg-primary"
                     />
-                    <div className="flex flex-1 flex-col gap-1">
-                      <span className="cursor-pointer">{variant.title}</span>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="border-primary relative size-12 shrink-0 overflow-hidden border border-dashed p-1">
+                      {variantImageUrl ? (
+                        <Image
+                          src={variantImageUrl}
+                          alt={variant.title || product.title}
+                          className="size-full object-cover"
+                          width={48}
+                          height={48}
+                          unoptimized
+                        />
+                      ) : (
+                        <EmptyImage className="text-[10px]" />
+                      )}
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <span className="text-sm font-medium">
+                        {variant.title}
+                      </span>
+                      <div className="flex flex-wrap gap-1">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
-                            <Badge>ส่วนลด {variant.discountAmount}%</Badge>
+                            <Badge className="px-1.5 py-0 text-[10px]">
+                              ส่วนลด {variant.discountAmount}%
+                            </Badge>
                           )}
                         {hasPoint && (
-                          <Badge>+ {variant.pointsAmount} แต้ม</Badge>
+                          <Badge className="px-1.5 py-0 text-[10px]">
+                            + {variant.pointsAmount} แต้ม
+                          </Badge>
                         )}
                       </div>
                       <div>
                         {hasDiscount ? (
-                          <div className="flex flex-col">
+                          <div className="flex items-baseline gap-1.5">
                             <span className="text-primary text-sm font-bold">
                               {formatCurrency(netPrice)}
                             </span>

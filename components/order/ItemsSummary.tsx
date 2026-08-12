@@ -1,4 +1,8 @@
+'use client'
+
 import { useMemo } from 'react'
+
+import Image from 'next/image'
 
 import { GetOrdersItem } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
@@ -84,12 +88,35 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
 
         const hasDiscount = originalUnitPrice > unitPrice
 
+        const itemAny = item as any
+        const imageUrl =
+          itemAny.image ||
+          itemAny.variant?.image ||
+          itemAny.product?.images?.find((img: any) => img.isPrimary)?.url ||
+          itemAny.product?.images?.[0]?.url ||
+          null
+
         return (
           <div
             key={itemKey}
             className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
-            <EmptyImage className="size-16 shrink-0 text-[10px]" />
+            {imageUrl ? (
+              <div className="border-primary size-16 shrink-0 overflow-hidden border border-dashed p-1">
+                <Image
+                  src={imageUrl}
+                  alt={item.title || 'รูปสินค้า'}
+                  className="size-full object-cover"
+                  width={100}
+                  height={100}
+                  unoptimized
+                />
+              </div>
+            ) : (
+              <div className="border-primary size-16 shrink-0 border border-dashed p-1">
+                <EmptyImage className="text-[10px]" />
+              </div>
+            )}
             <div className="flex w-full flex-col items-start justify-between gap-2.5 sm:flex-row sm:items-center">
               <div className="flex flex-1 flex-col gap-0.5">
                 <span className="text-foreground font-medium">

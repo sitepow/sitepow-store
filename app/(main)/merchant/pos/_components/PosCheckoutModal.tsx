@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
+import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { QUICK_AMOUNTS } from '@/constants/credit'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -44,6 +45,7 @@ export function PosCheckoutModal({
   const { watch, setValue, handleSubmit } = useFormContext<POSCheckoutInput>()
 
   const { mutate: createOrder, isPending } = useCreatePOSOrder()
+  const cartItems = useCartStore((state) => state.items)
 
   const paymentMethod = watch('paymentMethod')
   const receivedAmount = watch('receivedAmount') || 0
@@ -87,11 +89,17 @@ export function PosCheckoutModal({
         receivedAmount: isCash ? receivedAmount : undefined,
         changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
         discountAmount: data.discountAmount,
-        items: (data.items || []).map((item) => ({
-          ...item,
-          originalPrice: item.originalPrice ?? item.price,
+        items: cartItems.map((item) => ({
+          productId: item.productId,
+          variantId: item.variant.id,
+          title: item.productTitle,
+          variantTitle: item.variant.title || '',
+          quantity: item.quantity,
+          price: item.unitPrice,
+          originalPrice: item.originalPrice ?? item.unitPrice,
+          image: item.image || null,
+          productType: item.productType,
           branchId: item.branchId || data.branchId,
-          variantTitle: item.variantTitle ?? '',
         })),
       },
       {

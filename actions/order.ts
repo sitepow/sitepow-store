@@ -100,6 +100,7 @@ const orderSelect = {
       variantTitle: true,
       quantity: true,
       price: true,
+      image: true,
       originalPrice: true,
       customerNote: true,
       productType: true,

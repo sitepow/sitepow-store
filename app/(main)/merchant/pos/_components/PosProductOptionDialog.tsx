@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import Image from 'next/image'
+
 import { POSProductItem } from '@/actions/pos/product'
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
@@ -246,6 +248,8 @@ export function PosProductOptionDialog({
                       !!discountConfig && netPrice < variantPrice
                     const hasPoint = variant.pointsActive
 
+                    const variantImageUrl = variant.image || null
+
                     return (
                       <Label
                         key={variant.id}
@@ -263,7 +267,20 @@ export function PosProductOptionDialog({
                             id={variant.id}
                             className="mt-1 sm:mt-0"
                           />
-                          <EmptyImage className="size-14 shrink-0 text-[8px] sm:size-16" />
+                          <div className="border-primary relative size-14 shrink-0 border border-dashed p-1 sm:size-16">
+                            {variantImageUrl ? (
+                              <Image
+                                src={variantImageUrl}
+                                alt={variant.title || product.title}
+                                className="size-full object-cover"
+                                width={48}
+                                height={48}
+                                unoptimized
+                              />
+                            ) : (
+                              <EmptyImage className="text-[8px]" />
+                            )}
+                          </div>
                           <div className="flex min-w-0 flex-col gap-0.5">
                             <span className="text-sm leading-tight font-medium wrap-break-word">
                               {variant.title}

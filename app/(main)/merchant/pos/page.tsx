@@ -114,10 +114,16 @@ export default function MerchantPOSPage() {
       selectedAddonIds,
     })
 
+    const selectedImage =
+      variant.image ||
+      product.images.find((img) => img.isPrimary)?.url ||
+      product.images[0]?.url ||
+      ''
+
     addItem({
       productId: product.id,
       productTitle: product.title,
-      image: product.images[0]?.url ?? '',
+      image: selectedImage,
       weight: variant.weight ?? 0,
       variant: {
         ...variant,

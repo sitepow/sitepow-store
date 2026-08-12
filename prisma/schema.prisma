@@ -1085,6 +1085,7 @@ model OrderItem {
   title         String
   variantId     String
   variantTitle  String
+  image         String?
   quantity      Int
   price         Decimal     @db.Decimal(10, 2)
   originalPrice Decimal?    @db.Decimal(10, 2)

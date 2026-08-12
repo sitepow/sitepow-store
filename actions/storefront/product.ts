@@ -49,6 +49,7 @@ const storefrontProductDetailSelect = {
       id: true,
       title: true,
       price: true,
+      image: true,
       isAvailable: true,
       discountActive: true,
       discountType: true,
