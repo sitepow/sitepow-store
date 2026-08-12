@@ -66,12 +66,29 @@ model Message {
 
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
-  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([conversationId, createdAt])
+}
+
+model CustomerCoupon {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  couponId   String
+  coupon     Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  usedCount Int @default(0)
+
+  assignedAt DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  @@unique([customerId, couponId])
+  @@index([customerId])
+  @@index([couponId])
 }
 
 model Coupon {
   id          String  @id @default(uuid())
-  code        String  @unique
+  code        String
   description String?
 
   discountType   DiscountType
@@ -85,6 +102,8 @@ model Coupon {
   usageLimit Int?
   usedCount  Int      @default(0)
 
+  limitPerCustomer Int?
+
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
@@ -94,8 +113,10 @@ model Coupon {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order Order[]
+  order           Order[]
+  customerCoupons CustomerCoupon[]
 
+  @@unique([storeId, code])
   @@index([storeId])
   @@index([code])
 }
@@ -109,30 +130,35 @@ model Customer {
   avatar    String?
   deletedAt DateTime?
 
-  isBlocked     Boolean   @default(false)
-  fakeSlipCount Int       @default(0)
-  blockedUntil  DateTime?
-  userId        String?   @unique
-  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   stores             CustomerStore[]
   reviews            Review[]
   orders             Order[]
-  cart               Cart?
+  carts              Cart[]
   addresses          Address[]
   slipHistories      SlipVerificationHistory[]
   resellerAgreements ResellerAgreement[]
+  customerCoupon     CustomerCoupon[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([email, deletedAt])
 }
 
 model SlipVerificationHistory {
   id         String   @id @default(uuid())
   customerId String
-  customer   Customer @relation(fields: [customerId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  orderId  String
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  storeId String?
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
   imageUrl String
   isValid  Boolean
   message  String?
@@ -140,6 +166,8 @@ model SlipVerificationHistory {
   checkedAt DateTime @default(now())
 
   @@index([customerId])
+  @@index([orderId])
+  @@index([storeId])
 }
 
 model CustomerStore {
@@ -152,7 +180,18 @@ model CustomerStore {
   totalSpent   Decimal @default(0) @db.Decimal(10, 2)
   rewardPoints Int     @default(0)
 
+  isBlocked     Boolean   @default(false)
+  blockedUntil  DateTime?
+  fakeSlipCount Int       @default(0)
+
+  merchantNote String?  @db.Text
+  tags         String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([customerId, storeId])
+  @@index([storeId, isBlocked])
 }
 
 model Branch {
@@ -633,8 +672,9 @@ model Store {
   conversations        Conversation[]
   StoreDomain          StoreDomain[]
   role                 Role[]
-  supplierAgreements   ResellerAgreement[]    @relation("SupplierAgreements")
-  resellerAgreements   ResellerAgreement[]    @relation("ResellerAgreements")
+  supplierAgreements   ResellerAgreement[]       @relation("SupplierAgreements")
+  resellerAgreements   ResellerAgreement[]       @relation("ResellerAgreements")
+  slipHistories        SlipVerificationHistory[]
 
   translations Json?
 
@@ -796,6 +836,7 @@ model Product {
 
   @@unique([storeId, slug])
   @@index([categoryId])
+  @@index([storeId, categoryId])
 }
 
 model ProductTag {
@@ -821,8 +862,9 @@ model DigitalItem {
   content String  @db.Text
   isUsed  Boolean @default(false)
 
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  orderItemId String?
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   orderId String?
   order   Order?  @relation(fields: [orderId], references: [id])
@@ -864,6 +906,8 @@ model ProductVariant {
   stockAdjustments StockAdjustment[]
   digitalItems     DigitalItem[]
   resellerPrices   ResellerCustomPrice[]
+
+  @@index([productId, isAvailable])
 }
 
 model ProductOption {
@@ -911,15 +955,16 @@ model Review {
   video   String?
   date    DateTime @default(now())
 
+  orderId    String?
   customerId String
-  customer   Customer @relation(fields: [customerId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   storeId   String
-  store     Store          @relation(fields: [storeId], references: [id])
+  store     Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
   productId String
   product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   selectedOptions Json?
   categories      ReviewCategory[]
@@ -1006,7 +1051,7 @@ model Address {
 
 model Order {
   id          String      @id @default(uuid())
-  orderNumber String      @unique
+  orderNumber String
   totalAmount Decimal     @db.Decimal(10, 2)
   status      OrderStatus @default(PENDING)
 
@@ -1065,10 +1110,15 @@ model Order {
   customerCurrency CurrencyCode @default(THB)
   totalAmountBase  Decimal
 
+  slipHistories SlipVerificationHistory[]
+
+  @@unique([storeId, orderNumber])
   @@index([storeId])
   @@index([customerId])
   @@index([bankAccountId])
   @@index([employeeId])
+  @@index([storeId, status])
+  @@index([storeId, createdAt])
 }
 
 model OrderItem {
@@ -1091,11 +1141,13 @@ model OrderItem {
   originalPrice Decimal?    @db.Decimal(10, 2)
 
   @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
 }
 
 model Cart {
   id         String   @id @default(uuid())
-  customerId String   @unique
+  customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   storeId String
@@ -1105,6 +1157,8 @@ model Cart {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([customerId, storeId])
 }
 
 model CartItem {
@@ -1129,6 +1183,8 @@ model CartItem {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([cartId])
 }
 
 enum LogAction {
