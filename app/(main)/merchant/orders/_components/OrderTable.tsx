@@ -112,7 +112,7 @@ export function OrderTable() {
                   }
                 } else {
                   if (!displayName) {
-                    displayName = 'ลูกค้าทั่วไป'
+                    displayName = 'ไม่มีชื่อผู้ใช้งาน (ลูกค้าออนไลน์)'
                   }
                   if (!displaySubtext) {
                     displaySubtext = '-'

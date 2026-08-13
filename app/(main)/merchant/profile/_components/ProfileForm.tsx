@@ -128,8 +128,8 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
             อีเมลล็อกอินไม่สามารถเปลี่ยนได้เอง กรุณาติดต่อฝ่ายสนับสนุน
           </FieldDescription>
         </Field>
-        <Field>
-          <FieldLabel>เบอร์โทรศัพท์ติดต่อ</FieldLabel>
+        <Field className="col-span-2">
+          <FieldLabel>หมายเลขโทรศัพท์ติดต่อ *</FieldLabel>
           <Controller
             name="phone"
             control={control}

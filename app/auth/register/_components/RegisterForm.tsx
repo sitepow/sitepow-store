@@ -116,7 +116,6 @@ export function RegisterForm() {
               )
             }
           />
-
           {isCredentials && (
             <form
               onSubmit={handleSubmit((data) =>
@@ -139,7 +138,6 @@ export function RegisterForm() {
                 </FieldDescription>
                 <FieldError>{errors?.email?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>รหัสผ่าน</FieldLabel>
                 <Input
@@ -150,7 +148,6 @@ export function RegisterForm() {
                 />
                 <FieldError>{errors?.password?.message}</FieldError>
               </Field>
-
               <Field>
                 <FieldLabel>ยืนยันรหัสผ่าน</FieldLabel>
                 <Input
@@ -163,11 +160,7 @@ export function RegisterForm() {
                 />
                 <FieldError>{errors?.confirmPassword?.message}</FieldError>
               </Field>
-
               <div className="mt-2 grid grid-cols-12 gap-2">
-                <Button className="col-span-8" size="lg" disabled={isPending}>
-                  {isPending && <Spinner />} สมัครสมาชิก
-                </Button>
                 <Button
                   className="col-span-4"
                   variant="outline"
@@ -177,10 +170,17 @@ export function RegisterForm() {
                 >
                   <ArrowLeftIcon /> ย้อนกลับ
                 </Button>
+                <Button
+                  type="submit"
+                  className="col-span-8"
+                  size="lg"
+                  disabled={isPending}
+                >
+                  {isPending && <Spinner />} สมัครสมาชิก
+                </Button>
               </div>
             </form>
           )}
-
           {!isCredentials && (
             <div className="w-full max-w-md space-y-8">
               <div className="space-y-6">
@@ -198,7 +198,6 @@ export function RegisterForm() {
                   ))}
                 </div>
               </div>
-
               <p className="text-center text-sm">
                 มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
                 <a
@@ -212,7 +211,6 @@ export function RegisterForm() {
           )}
         </div>
       </div>
-
       {role !== UserRole.CUSTOMER && <SupportContact />}
       {role === UserRole.CUSTOMER && <ProtectedByBrand />}
     </div>

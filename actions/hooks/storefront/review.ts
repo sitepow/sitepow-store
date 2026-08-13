@@ -1,13 +1,12 @@
 import { storefrontReviewKeys } from '@/actions/query-keys/storefront/review'
 import {
-  CreateReviewInput,
-  UpdateReviewInput,
-  createReview,
-  updateReview,
-} from '@/actions/review'
-import {
+  CreateCustomerReviewParams,
   GetCustomerReviewsParams,
+  UpdateCustomerReviewParams,
+  createCustomerReview,
   getCustomerReviews,
+  getPurchasableProductsForReview,
+  updateCustomerReview,
 } from '@/actions/storefront/review'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -22,7 +21,8 @@ export function useCreateReview() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: CreateReviewInput) => createReview(input),
+    mutationFn: (params: CreateCustomerReviewParams) =>
+      createCustomerReview(params),
     onSuccess: (res) => {
       if (res.success) {
         queryClient.invalidateQueries({
@@ -37,8 +37,13 @@ export function useUpdateReview() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateReviewInput }) =>
-      updateReview(id, input),
+    mutationFn: ({
+      id,
+      input,
+    }: {
+      id: string
+      input: UpdateCustomerReviewParams
+    }) => updateCustomerReview(id, input),
     onSuccess: (res, variables) => {
       if (res.success) {
         queryClient.invalidateQueries({
@@ -49,5 +54,12 @@ export function useUpdateReview() {
         })
       }
     },
+  })
+}
+
+export function usePurchasableProducts() {
+  return useQuery({
+    queryKey: storefrontReviewKeys.purchasable(),
+    queryFn: async () => (await getPurchasableProductsForReview()).data,
   })
 }

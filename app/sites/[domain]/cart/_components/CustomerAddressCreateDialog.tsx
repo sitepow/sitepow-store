@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useCreateAddress } from '@/actions/hooks/storefront/address'
 import { AddressType } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { formatPhoneInput } from '@/utils/slip'
 import { AddressSchema, addressSchema } from '@/zod/address'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
@@ -71,9 +72,12 @@ export function CustomerAddressCreateDialog() {
   }
 
   const onSubmit = (data: AddressSchema) => {
+    const rawPhone = data.phone ? data.phone.replace(/\D/g, '') : ''
+
     createAddress(
       {
         ...data,
+        phone: rawPhone,
         receiverName: data.receiverName ?? null,
         taxName: data.taxName ?? null,
         taxId: data.taxId ?? null,
@@ -204,10 +208,20 @@ export function CustomerAddressCreateDialog() {
             )}
             <Field className="col-span-2">
               <Label>หมายเลขโทรศัพท์ติดต่อ *</Label>
-              <Input
-                {...register('phone')}
-                type="tel"
-                placeholder="ระบุหมายเลขโทรศัพท์"
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                  <Input
+                    {...field}
+                    value={value ?? ''}
+                    placeholder="08X-XXX-XXXX"
+                    onChange={(e) => {
+                      const formatted = formatPhoneInput(e.target.value)
+                      onChange(formatted)
+                    }}
+                  />
+                )}
               />
               <FieldError>{errors.phone?.message}</FieldError>
             </Field>
