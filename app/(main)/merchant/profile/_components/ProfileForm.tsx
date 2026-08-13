@@ -1,11 +1,12 @@
 'use client'
 
 import { ComponentProps, useCallback, useEffect } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { getPathR2FromUrl } from '@/utils/image'
+import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
 import { UpdateProfileSchema } from '@/zod/profile'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
@@ -38,6 +39,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { isDirty, errors },
   } = useFormContext<UpdateProfileSchema>()
 
@@ -50,7 +52,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     const values = {
       firstName,
       lastName: rest.join(' '),
-      phone: profile.phone ?? undefined,
+      phone: profile.phone ? formatPromptPay(profile.phone) : undefined,
       image: profile.image ?? '',
     }
     reset(values, { keepDefaultValues: false })
@@ -62,6 +64,8 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
 
   async function onSubmit(values: UpdateProfileSchema) {
     let imageUrl = values.image
+
+    const rawPhone = values.phone ? values.phone.replace(/\D/g, '') : undefined
 
     try {
       if (values.image instanceof File) {
@@ -81,10 +85,10 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
       }
 
       updateProfileMutation.mutate(
-        { ...values, image: imageUrl },
+        { ...values, phone: rawPhone, image: imageUrl },
         {
           onSuccess: () => {
-            reset(values)
+            reset({ ...values, phone: values.phone })
           },
         },
       )
@@ -126,7 +130,21 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
         </Field>
         <Field>
           <FieldLabel>เบอร์โทรศัพท์ติดต่อ</FieldLabel>
-          <Input {...register('phone')} />
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field: { onChange, value, ...field } }) => (
+              <Input
+                {...field}
+                value={value ?? ''}
+                placeholder="08X-XXX-XXXX"
+                onChange={(e) => {
+                  const formatted = formatPhoneInput(e.target.value)
+                  onChange(formatted)
+                }}
+              />
+            )}
+          />
           <FieldError>{errors.phone?.message}</FieldError>
         </Field>
       </CardContent>
