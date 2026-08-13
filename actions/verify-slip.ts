@@ -76,16 +76,39 @@ export async function verifySlip(
     }
   }
 
-  if (customer.isBlocked) {
-    if (customer.blockedUntil && new Date() > customer.blockedUntil) {
-      await prisma.customer.update({
-        where: { id: customerId },
+  let customerStore = await prisma.customerStore.findUnique({
+    where: {
+      customerId_storeId: {
+        customerId,
+        storeId,
+      },
+    },
+  })
+
+  if (!customerStore) {
+    customerStore = await prisma.customerStore.create({
+      data: {
+        customerId,
+        storeId,
+      },
+    })
+  }
+
+  if (customerStore.isBlocked) {
+    if (customerStore.blockedUntil && new Date() > customerStore.blockedUntil) {
+      await prisma.customerStore.update({
+        where: {
+          customerId_storeId: {
+            customerId,
+            storeId,
+          },
+        },
         data: { isBlocked: false, blockedUntil: null, fakeSlipCount: 0 },
       })
     } else {
       return {
         success: false,
-        message: getBlockMessage(customer.blockedUntil),
+        message: getBlockMessage(customerStore.blockedUntil),
         shouldDeleteImage: true,
       }
     }
@@ -165,6 +188,7 @@ export async function verifySlip(
       data: {
         customerId,
         orderId,
+        storeId,
         imageUrl: slipImageUrl,
         isValid: isSlipValid,
         message: responseMessage,
@@ -172,40 +196,57 @@ export async function verifySlip(
     })
 
     if (!isSlipValid) {
-      const updatedCustomer = await tx.customer.update({
-        where: { id: customerId },
+      const updatedCustomerStore = await tx.customerStore.update({
+        where: {
+          customerId_storeId: {
+            customerId,
+            storeId,
+          },
+        },
         data: { fakeSlipCount: { increment: 1 } },
       })
 
-      if (updatedCustomer.fakeSlipCount >= 5) {
-        await tx.customer.update({
-          where: { id: customerId },
+      if (updatedCustomerStore.fakeSlipCount >= 5) {
+        await tx.customerStore.update({
+          where: {
+            customerId_storeId: {
+              customerId,
+              storeId,
+            },
+          },
           data: { isBlocked: true, blockedUntil: null },
         })
         await tx.activityLog.create({
           data: {
-            action: 'BLOCK_CUSTOMER',
-            actorType: 'SYSTEM',
-            entity: 'CUSTOMER',
-            entityId: customerId,
+            action: LogAction.BLOCK_CUSTOMER,
+            actorType: ActorType.SYSTEM,
+            storeId,
+            entity: 'CustomerStore',
+            entityId: updatedCustomerStore.id,
             details: { message: 'ระบบบล็อกถาวรเนื่องจากพบสลิปปลอมครบ 5 ครั้ง' },
           },
         })
-      } else if (updatedCustomer.fakeSlipCount >= 3) {
+      } else if (updatedCustomerStore.fakeSlipCount >= 3) {
         const blockDate = new Date()
         blockDate.setDate(blockDate.getDate() + 7)
-        await tx.customer.update({
-          where: { id: customerId },
+        await tx.customerStore.update({
+          where: {
+            customerId_storeId: {
+              customerId,
+              storeId,
+            },
+          },
           data: { isBlocked: true, blockedUntil: blockDate },
         })
         await tx.activityLog.create({
           data: {
-            action: 'BLOCK_CUSTOMER',
-            actorType: 'SYSTEM',
-            entity: 'CUSTOMER',
-            entityId: customerId,
+            action: LogAction.BLOCK_CUSTOMER,
+            actorType: ActorType.SYSTEM,
+            storeId,
+            entity: 'CustomerStore',
+            entityId: updatedCustomerStore.id,
             details: {
-              message: `ระบบบล็อกชั่วคราว 7 วัน (ครบ ${updatedCustomer.fakeSlipCount} ครั้ง)`,
+              message: `ระบบบล็อกชั่วคราว 7 วัน (ครบ ${updatedCustomerStore.fakeSlipCount} ครั้ง)`,
             },
           },
         })
@@ -289,7 +330,7 @@ export async function approveSlipManual(
     let logActionText = ''
 
     if (action === SlipVerificationAction.APPROVE) {
-      updatedData = { status: OrderStatus.PAID }
+      updatedData = { status: OrderStatus.PAID, paidAt: new Date() }
       logActionText = 'approve_slip_manual'
     } else {
       if (order.paymentProof) {

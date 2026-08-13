@@ -64,7 +64,7 @@ export function CustomerTable() {
   }
 
   const showManageColumn = canUpdateCustomers
-  const totalColumns = showManageColumn ? 8 : 7
+  const totalColumns = showManageColumn ? 9 : 8
 
   return (
     <>
@@ -111,17 +111,17 @@ export function CustomerTable() {
                       : '-'}
                   </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                    {item.customer.isBlocked ? (
+                    {item.isBlocked ? (
                       <span className="text-destructive">
-                        โดนบล็อก ({getBlockMessage(item.customer.blockedUntil)})
+                        โดนบล็อก ({getBlockMessage(item.blockedUntil)})
                       </span>
                     ) : (
                       '-'
                     )}
                   </TableCell>
                   <TableCell>
-                    {item.customer.blockedUntil
-                      ? formatDateTime(new Date(item.customer.blockedUntil))
+                    {item.blockedUntil
+                      ? formatDateTime(new Date(item.blockedUntil))
                       : '-'}
                   </TableCell>
                   <TableCell className="text-right">
@@ -132,7 +132,7 @@ export function CustomerTable() {
                   </TableCell>
                   {showManageColumn && (
                     <TableCell className="text-right">
-                      {item.customer.isBlocked ? (
+                      {item.isBlocked ? (
                         <DeleteButton
                           isPending={unblockMutation.isPending}
                           icon={<IconLockOpen />}

@@ -194,12 +194,17 @@ export async function createCoupon(input: CreateCouponInput) {
     }
 
     const existing = await prisma.coupon.findUnique({
-      where: { code: input.code },
+      where: {
+        storeId_code: {
+          storeId: input.storeId,
+          code: input.code,
+        },
+      },
       select: { id: true },
     })
 
     if (existing) {
-      return { success: false, message: 'รหัสคูปองนี้ถูกใช้งานไปแล้ว' }
+      return { success: false, message: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว' }
     }
 
     const coupon = await prisma.coupon.create({
@@ -250,7 +255,7 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
 
     const existingCoupon = await prisma.coupon.findUnique({
       where: { id },
-      select: { storeId: true },
+      select: { storeId: true, code: true },
     })
 
     if (!existingCoupon) {
@@ -267,6 +272,25 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       return {
         success: false,
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    if (input.code && input.code !== existingCoupon.code) {
+      const duplicateCode = await prisma.coupon.findUnique({
+        where: {
+          storeId_code: {
+            storeId: existingCoupon.storeId,
+            code: input.code,
+          },
+        },
+        select: { id: true },
+      })
+
+      if (duplicateCode) {
+        return {
+          success: false,
+          message: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว',
+        }
       }
     }
 

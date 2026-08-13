@@ -21,6 +21,9 @@ const customerStoreSelect = {
   id: true,
   rewardPoints: true,
   totalSpent: true,
+  isBlocked: true,
+  blockedUntil: true,
+  fakeSlipCount: true,
   customer: {
     select: {
       id: true,
@@ -28,9 +31,6 @@ const customerStoreSelect = {
       lastName: true,
       email: true,
       phone: true,
-      isBlocked: true,
-      blockedUntil: true,
-      fakeSlipCount: true,
       createdAt: true,
     },
   },
@@ -170,8 +170,13 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
-    const updatedCustomer = await prisma.customer.update({
-      where: { id: customerId },
+    const updatedCustomerStore = await prisma.customerStore.update({
+      where: {
+        customerId_storeId: {
+          customerId,
+          storeId,
+        },
+      },
       data: {
         isBlocked: false,
         fakeSlipCount: 0,
@@ -183,8 +188,8 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       action: LogAction.UNBLOCK_CUSTOMER,
       actorType: ActorType.MERCHANT,
       storeId,
-      entity: 'Customer',
-      entityId: updatedCustomer.id,
+      entity: 'CustomerStore',
+      entityId: updatedCustomerStore.id,
     })
 
     return { success: true, message: 'ปลดล็อกลูกค้าสำเร็จ' }
@@ -212,8 +217,13 @@ export async function blockCustomer(customerId: string, storeId: string) {
       return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
-    const updatedCustomer = await prisma.customer.update({
-      where: { id: customerId },
+    const updatedCustomerStore = await prisma.customerStore.update({
+      where: {
+        customerId_storeId: {
+          customerId,
+          storeId,
+        },
+      },
       data: {
         isBlocked: true,
         blockedUntil: null,
@@ -224,8 +234,8 @@ export async function blockCustomer(customerId: string, storeId: string) {
       action: LogAction.BLOCK_CUSTOMER,
       actorType: ActorType.MERCHANT,
       storeId,
-      entity: 'Customer',
-      entityId: updatedCustomer.id,
+      entity: 'CustomerStore',
+      entityId: updatedCustomerStore.id,
     })
 
     return { success: true, message: 'บล็อกลูกค้าสำเร็จ' }
@@ -299,6 +309,7 @@ export async function searchCustomer({
       select: {
         id: true,
         rewardPoints: true,
+        isBlocked: true,
         customer: {
           select: {
             id: true,
@@ -306,7 +317,6 @@ export async function searchCustomer({
             lastName: true,
             email: true,
             phone: true,
-            isBlocked: true,
           },
         },
       },
@@ -316,8 +326,11 @@ export async function searchCustomer({
       return { success: false, message: 'ไม่พบข้อมูลสมาชิกในระบบ' }
     }
 
-    if (customerStore.customer.isBlocked) {
-      return { success: false, message: 'สมาชิกรายนี้ถูกระงับการใช้งาน' }
+    if (customerStore.isBlocked) {
+      return {
+        success: false,
+        message: 'สมาชิกรายนี้ถูกระงับการใช้งานในร้านนี้',
+      }
     }
 
     const fullName =
@@ -334,7 +347,7 @@ export async function searchCustomer({
         phone: customerStore.customer.phone || '-',
         email: customerStore.customer.email || '-',
         points: customerStore.rewardPoints || 0,
-        isBlocked: customerStore.customer.isBlocked,
+        isBlocked: customerStore.isBlocked,
       },
     }
   } catch (error) {
@@ -388,7 +401,7 @@ export async function createCustomer(
           firstName: input.firstName.trim(),
           lastName: input.lastName?.trim() || null,
           phone: cleanPhone,
-          email: cleanEmail!,
+          email: cleanEmail || `${cleanPhone}@temporary.com`,
         },
       })
     }
@@ -422,7 +435,7 @@ export async function createCustomer(
         phone: customer.phone || '-',
         email: customer.email || '-',
         points: customerStore.rewardPoints || 0,
-        isBlocked: customer.isBlocked || false,
+        isBlocked: customerStore.isBlocked || false,
       },
     }
   } catch (error) {
