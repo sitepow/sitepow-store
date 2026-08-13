@@ -12,6 +12,7 @@ import {
   IconPackage,
   IconSettings,
   IconShoppingCart,
+  IconStar,
   IconTicket,
   IconUser,
   IconUserCog,
@@ -46,6 +47,12 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     label: 'การซื้อของฉัน',
     tab: 'orders',
     icon: IconPackage,
+  },
+  {
+    value: 'reviews',
+    label: 'รีวิวของฉัน',
+    tab: 'reviews',
+    icon: IconStar,
   },
   {
     value: 'profile',
@@ -108,6 +115,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
         url: '/merchant/store-settings/products',
       },
     ],
+  },
+  {
+    value: 'reviews',
+    label: 'จัดการรีวิว',
+    tab: 'reviews',
+    icon: IconStar,
   },
   {
     value: 'orders',

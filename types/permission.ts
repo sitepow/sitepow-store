@@ -95,3 +95,7 @@ export type PermissionKey =
   | 'canCreateStore'
   | 'canUpdateStore'
   | 'canDeleteStore'
+  | 'canViewReviews'
+  | 'canCreateReviews'
+  | 'canUpdateReviews'
+  | 'canDeleteReviews'

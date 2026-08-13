@@ -348,6 +348,7 @@ enum PermissionDomain {
   NOTIFICATION
   STORE_TRANSFER
   TAX
+  REVIEW
 }
 
 enum PermissionAction {

@@ -99,6 +99,10 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateTax',
     'canUpdateTax',
     'canDeleteTax',
+    'canViewReviews',
+    'canCreateReviews',
+    'canUpdateReviews',
+    'canDeleteReviews',
   ],
   OWNER_VIEWER: [
     'canViewStore',
@@ -125,6 +129,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewNotifications',
     'canViewTransferStore',
     'canViewTax',
+    'canViewReviews',
   ],
   MANAGER: [
     'canViewCategory',
@@ -172,6 +177,9 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateNotifications',
     'canViewTax',
     'canUpdateTax',
+    'canViewReviews',
+    'canCreateReviews',
+    'canUpdateReviews',
   ],
   CASHIER: [
     'canViewDashboard',
@@ -236,6 +244,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canDeleteCategory',
     'canViewProducts',
     'canViewStoreProfile',
+    'canViewReviews',
   ],
   AUDITOR: [
     'canViewStore',
@@ -249,6 +258,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewActivityLogs',
     'canViewTax',
     'canViewPayment',
+    'canViewReviews',
   ],
   SUPPORT: [
     'canViewConversation',
@@ -260,6 +270,9 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewOrders',
     'canViewProducts',
     'canViewCoupons',
+    'canViewReviews',
+    'canCreateReviews',
+    'canUpdateReviews',
   ],
   MARKETING: [
     'canViewCoupons',
@@ -273,6 +286,9 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateBlogs',
     'canDeleteBlogs',
     'canViewDashboard',
+    'canViewReviews',
+    'canCreateReviews',
+    'canUpdateReviews',
   ],
   FULFILLMENT: [
     'canViewOrders',
@@ -671,6 +687,22 @@ export const PERMISSION_MAPPING: Record<
     domain: PermissionDomain.TAX,
     action: PermissionAction.DELETE,
   },
+  canViewReviews: {
+    domain: PermissionDomain.REVIEW,
+    action: PermissionAction.READ,
+  },
+  canCreateReviews: {
+    domain: PermissionDomain.REVIEW,
+    action: PermissionAction.CREATE,
+  },
+  canUpdateReviews: {
+    domain: PermissionDomain.REVIEW,
+    action: PermissionAction.UPDATE,
+  },
+  canDeleteReviews: {
+    domain: PermissionDomain.REVIEW,
+    action: PermissionAction.DELETE,
+  },
 }
 
 export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
@@ -827,4 +859,8 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
   canUpdateTax:
     'มีสิทธิ์ในการตั้งค่าและจัดการข้อมูลอัตราภาษี การคำนวณภาษีมูลค่าเพิ่ม หรือเอกสารทางภาษีของร้าน',
   canDeleteTax: 'มีสิทธิ์ในการลบข้อมูลอัตราภาษีออกจากระบบ',
+  canViewReviews: 'มีสิทธิ์ในการเปิดดูรีวิวและความคิดเห็นทั้งหมดของสินค้า',
+  canCreateReviews: 'มีสิทธิ์ในการตอบกลับรีวิวของลูกค้าหรือเพิ่มรีวิวในระบบ',
+  canUpdateReviews: 'มีสิทธิ์ในการแก้ไขการตอบกลับ หรือจัดการซ่อน/แสดงรีวิว',
+  canDeleteReviews: 'มีสิทธิ์ในการลบรีวิวหรือคำตอบกลับออกจากระบบ',
 }
