@@ -26,10 +26,8 @@ export function ProductReviewRating({ reviews }: { reviews: ReviewItem[] }) {
 
   return (
     <div className="flex flex-col gap-8 rounded-2xl border p-6 sm:flex-row">
-      <div className="flex flex-col items-center justify-center space-y-2 border-gray-100 sm:border-r sm:pr-8">
-        <span className="text-5xl font-bold text-slate-900">
-          {averageRating}
-        </span>
+      <div className="border-border flex flex-col items-center justify-center space-y-2 sm:border-r sm:pr-8">
+        <span className="text-5xl font-bold">{averageRating}</span>
         <StarRating rating={Math.round(Number(averageRating))} size={18} />
         <span className="text-muted-foreground text-xs font-medium">
           {totalReviews} รีวิวทั้งหมด
@@ -38,9 +36,7 @@ export function ProductReviewRating({ reviews }: { reviews: ReviewItem[] }) {
       <div className="flex-1 space-y-2.5">
         {starCounts.map((item) => (
           <div key={item.star} className="flex items-center gap-4 text-sm">
-            <span className="w-3 font-semibold text-slate-700">
-              {item.star}
-            </span>
+            <span className="w-3 font-semibold opacity-60">{item.star}</span>
             <Progress value={item.percentage} className="h-2" />
           </div>
         ))}

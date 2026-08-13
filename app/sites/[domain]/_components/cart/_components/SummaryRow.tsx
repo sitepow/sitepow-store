@@ -29,7 +29,7 @@ export function SummaryRow({
       {...props}
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
-      <span className="text-muted-foreground">{label}</span>
+      <span className="opacity-60">{label}</span>
       <span>
         {isDiscount && (typeof value === 'string' || typeof value === 'number')
           ? `- ${value}`

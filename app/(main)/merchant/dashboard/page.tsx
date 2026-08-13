@@ -139,10 +139,7 @@ export default function MerchantDashboardPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link
-                href={`https://${selectedStoreSlug}.sitepow.store/pos`}
-                target="_blank"
-              >
+              <Link href="/merchant/pos" target="_blank">
                 เข้าระบบ POS ขายหน้าร้าน <IconExternalLink />
               </Link>
             </Button>

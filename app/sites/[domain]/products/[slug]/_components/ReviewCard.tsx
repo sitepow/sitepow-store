@@ -19,8 +19,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
       .join(' ') || 'ลูกค้า'
 
   const selectedOptions = review.selectedOptions as
-    | { title: string; name: string }[]
-    | null
+    { title: string; name: string }[] | null
 
   return (
     <div className="space-y-4">

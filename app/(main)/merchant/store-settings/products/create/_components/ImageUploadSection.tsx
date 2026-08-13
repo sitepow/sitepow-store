@@ -11,7 +11,13 @@ import { FieldDescription, FieldLegend, FieldSet } from '@/components/ui/field'
 
 import { cn } from '@/lib/utils'
 
-export function ImageUploadSection() {
+interface ImageUploadSectionProps {
+  showPrimaryControl?: boolean
+}
+
+export function ImageUploadSection({
+  showPrimaryControl = true,
+}: ImageUploadSectionProps) {
   const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
     control,
@@ -30,12 +36,13 @@ export function ImageUploadSection() {
       const isFirstImage = currentImages.length === 0 && i === 0
       append({
         url: files[i],
-        isPrimary: isFirstImage,
+        ...(showPrimaryControl && { isPrimary: isFirstImage }),
       })
     }
   }
 
   const handleSetPrimary = (targetIndex: number) => {
+    if (!showPrimaryControl) return
     const currentImages = getValues('images') || []
     const updated = currentImages.map((img, idx) => ({
       ...img,
@@ -46,14 +53,15 @@ export function ImageUploadSection() {
 
   const handleRemoveImage = (index: number) => {
     const currentImages = getValues('images') || []
-    const isRemovingPrimary = currentImages[index]?.isPrimary
+    const isRemovingPrimary =
+      showPrimaryControl && currentImages[index]?.isPrimary
 
     remove(index)
 
-    if (isRemovingPrimary && currentImages.length > 1) {
+    if (isRemovingPrimary && currentImages.length > 1 && showPrimaryControl) {
       const remainingImages = currentImages.filter((_, idx) => idx !== index)
       if (remainingImages.length > 0) {
-        remainingImages[0].isPrimary = true
+        ;(remainingImages[0] as any).isPrimary = true
         setValue('images', remainingImages, { shouldDirty: true })
       }
     }
@@ -62,13 +70,13 @@ export function ImageUploadSection() {
   return (
     <FieldSet className="space-y-4">
       <FieldLegend variant="label" className="text-lg font-bold">
-        สื่อสินค้า ({fields.length})
+        สื่อประกอบ ({fields.length})
       </FieldLegend>
       <FieldDescription>
         รองรับรูปภาพและวิดีโอ (ขนาดไฟล์สูงสุด 10 MB)
       </FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-        {fields.map((field, index) => {
+        {fields.map((field: any, index) => {
           const file = field.url
           const isFileObj = file instanceof File
           const previewUrl = isFileObj
@@ -78,7 +86,7 @@ export function ImageUploadSection() {
             ? (file as File).type.startsWith('video/')
             : previewUrl.match(/\.(mp4|webm|ogg)$/i)
 
-          const isPrimary = field.isPrimary
+          const isPrimary = showPrimaryControl && field.isPrimary
 
           return (
             <div
@@ -104,7 +112,7 @@ export function ImageUploadSection() {
                   />
                 )}
                 <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-100 transition-opacity">
-                  {!isVideo && !isPrimary && (
+                  {showPrimaryControl && !isVideo && !isPrimary && (
                     <Button
                       type="button"
                       variant="outline"

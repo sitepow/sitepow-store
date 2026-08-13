@@ -236,7 +236,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
             </div>
             {customerId ? (
               <CustomerCard
-                title={customerName}
+                title="ข้อมูลลูกค้า"
                 content={
                   <>
                     รหัสลูกค้า: {customerId} <br />
@@ -246,7 +246,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                 }
                 action={
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="icon"
                     onClick={handleRemoveCustomer}
                   >

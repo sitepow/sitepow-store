@@ -1,17 +1,18 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useState } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import {
   useCreateReview,
   useUpdateReview,
 } from '@/actions/hooks/storefront/review'
-import {
-  IconStar,
-  IconStarFilled,
-  IconUpload,
-  IconX,
-} from '@tabler/icons-react'
+import { ImageUploadSection } from '@/app/(main)/merchant/store-settings/products/create/_components/ImageUploadSection'
+import { getPathR2FromUrl } from '@/utils/image'
+import { ReviewFormValues, reviewFormSchema } from '@/zod/storefront/review'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { IconStar, IconStarFilled } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -20,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 
 interface ReviewFormDialogProps {
@@ -29,7 +31,7 @@ interface ReviewFormDialogProps {
     id?: string
     rating: number
     comment: string
-    images?: string[]
+    images?: (string | File)[]
   }
   targetInfo?: {
     storeId: string
@@ -49,74 +51,96 @@ export function ReviewFormDialog({
 }: ReviewFormDialogProps) {
   const isEditing = !!initialData?.id
 
-  const [rating, setRating] = useState(initialData?.rating || 5)
-  const [hoverRating, setHoverRating] = useState(0)
-  const [comment, setComment] = useState(initialData?.comment || '')
-  const [images, setImages] = useState<string[]>(initialData?.images || [])
-  const [error, setError] = useState('')
-
   const createMutation = useCreateReview()
   const updateMutation = useUpdateReview()
 
-  const isPending = createMutation.isPending || updateMutation.isPending
+  const uploadMutation = useR2UploadImage(
+    `store/${targetInfo?.storeId || 'reviews'}/reviews`,
+  )
+  const deleteMutation = useR2DeleteImage()
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files) return
-    const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
-    setImages((prev) => [...prev, ...newImages].slice(0, 5))
-  }
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    uploadMutation.isPending ||
+    deleteMutation.isPending
 
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index))
-  }
+  const form = useForm<ReviewFormValues>({
+    resolver: zodResolver(reviewFormSchema),
+    defaultValues: {
+      rating: initialData?.rating || 5,
+      comment: initialData?.comment || '',
+      images:
+        initialData?.images?.map((img) => ({
+          url: img,
+          isPrimary: false,
+          file: img instanceof File ? img : undefined,
+        })) ?? [],
+    },
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = form
 
-    if (!comment.trim()) {
-      setError('กรุณากรอกความคิดเห็น')
-      return
-    }
+  const onSubmit = async (data: ReviewFormValues) => {
+    try {
+      const oldImageUrls =
+        initialData?.images?.filter(
+          (img): img is string => typeof img === 'string',
+        ) || []
 
-    if (isEditing && initialData?.id) {
-      updateMutation.mutate(
-        {
-          id: initialData.id,
-          input: {
-            rating,
-            comment,
-            images,
-          },
-        },
-        {
-          onSuccess: (res) => {
-            if (res.success) {
-              onClose()
-            }
-          },
-        },
+      const processedImages = await Promise.all(
+        (data.images || []).map(async (img) => {
+          const rawFile = img.file || (img.url instanceof File ? img.url : null)
+          let finalUrl = typeof img.url === 'string' ? img.url : ''
+
+          if (rawFile instanceof File) {
+            const formData = new FormData()
+            formData.append('file', rawFile)
+            const res = await uploadMutation.mutateAsync(formData)
+            if (res?.success && res?.url) finalUrl = res.url
+          }
+          return { url: finalUrl, isPrimary: Boolean(img.isPrimary) }
+        }),
       )
-    } else if (targetInfo) {
-      createMutation.mutate(
-        {
-          storeId: targetInfo.storeId,
-          productId: targetInfo.productId,
-          variantId: targetInfo.variantId,
-          orderId: targetInfo.orderId,
-          rating,
-          comment,
-          images,
-        },
-        {
-          onSuccess: (res) => {
-            if (res.success) {
-              onClose()
-            }
-          },
-        },
+
+      const validImages = processedImages
+        .filter((img) => img.url !== '')
+        .map((img) => img.url)
+      const imagesToDelete = oldImageUrls.filter(
+        (url) => !validImages.includes(url),
       )
+
+      await Promise.all(
+        imagesToDelete.map(async (url) => {
+          const path = getPathR2FromUrl(url)
+          if (path) await deleteMutation.mutateAsync(path)
+        }),
+      )
+
+      const input = {
+        rating: data.rating,
+        comment: data.comment,
+        images: validImages,
+      }
+
+      if (isEditing && initialData?.id) {
+        updateMutation.mutate(
+          { id: initialData.id, input },
+          { onSuccess: (res) => res.success && onClose() },
+        )
+      } else if (targetInfo) {
+        createMutation.mutate(
+          { ...targetInfo, ...input },
+          { onSuccess: (res) => res.success && onClose() },
+        )
+      }
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -134,7 +158,7 @@ export function ReviewFormDialog({
               <img
                 src={targetInfo.productImage}
                 alt={targetInfo.productTitle}
-                className="h-12 w-12 rounded-md object-cover"
+                className="size-12 rounded-md object-cover"
               />
             )}
             <span className="line-clamp-2 text-sm font-medium">
@@ -142,100 +166,89 @@ export function ReviewFormDialog({
             </span>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          <div className="flex flex-col items-center justify-center gap-1 py-2">
-            <span className="text-muted-foreground text-sm">
-              ให้คะแนนสินค้า
-            </span>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => {
-                const isFilled = star <= (hoverRating || rating)
-                return (
-                  <button
-                    key={star}
-                    type="button"
-                    className="p-1 focus:outline-none"
-                    onMouseEnter={() => setHoverRating(star)}
-                    onMouseLeave={() => setHoverRating(0)}
-                    onClick={() => setRating(star)}
-                  >
-                    {isFilled ? (
-                      <IconStarFilled className="h-8 w-8 text-amber-400" />
-                    ) : (
-                      <IconStar className="h-8 w-8 text-gray-300" />
+        <FormProvider {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
+            <FieldGroup className="space-y-4">
+              <Field>
+                <div className="flex flex-col items-center justify-center gap-1 py-2">
+                  <FieldLabel className="text-muted-foreground text-sm">
+                    ให้คะแนนสินค้า
+                  </FieldLabel>
+                  <Controller
+                    control={control}
+                    name="rating"
+                    render={({ field }) => (
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isFilled = star <= field.value
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              className="p-1 focus:outline-none"
+                              onClick={() => field.onChange(star)}
+                            >
+                              {isFilled ? (
+                                <IconStarFilled className="size-8 text-amber-400" />
+                              ) : (
+                                <IconStar className="size-8 text-gray-300" />
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
                     )}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-sm font-medium">ความคิดเห็นของคุณ</label>
-            <Textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="แบ่งปันความประทับใจเกี่ยวกับสินค้าชิ้นนี้..."
-              rows={4}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              รูปภาพประกอบ (สูงสุด 5 รูป)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className="relative h-16 w-16 overflow-hidden rounded-md border"
-                >
-                  <img
-                    src={img}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
                   />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(idx)}
-                    className="absolute top-1 right-1 rounded-full bg-black/60 p-0.5 text-white"
-                  >
-                    <IconX className="h-3 w-3" />
-                  </button>
+                  {errors.rating && (
+                    <p className="text-destructive text-xs">
+                      {errors.rating.message}
+                    </p>
+                  )}
                 </div>
-              ))}
-              {images.length < 5 && (
-                <label className="text-muted-foreground flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed text-xs hover:bg-gray-50">
-                  <IconUpload className="h-5 w-5" />
-                  <span>เพิ่มรูป</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              )}
+              </Field>
+              <Field>
+                <FieldLabel className="text-sm font-medium">
+                  ความคิดเห็นของคุณ
+                </FieldLabel>
+                <Textarea
+                  {...register('comment')}
+                  placeholder="แบ่งปันความประทับใจเกี่ยวกับสินค้าชิ้นนี้..."
+                  rows={4}
+                />
+                {errors.comment && (
+                  <p className="text-destructive mt-1 text-xs">
+                    {errors.comment.message}
+                  </p>
+                )}
+              </Field>
+              <Field>
+                <ImageUploadSection showPrimaryControl={false} />
+                {errors.images && (
+                  <p className="text-destructive mt-1 text-xs">
+                    {errors.images.message as string}
+                  </p>
+                )}
+              </Field>
+            </FieldGroup>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isPending}
+              >
+                ยกเลิก
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending
+                  ? 'กำลังบันทึก...'
+                  : isEditing
+                    ? 'บันทึกการแก้ไข'
+                    : 'ส่งรีวิว'}
+              </Button>
             </div>
-          </div>
-          {error && <p className="text-destructive text-sm">{error}</p>}
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isPending}
-            >
-              ยกเลิก
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending
-                ? 'กำลังบันทึก...'
-                : isEditing
-                  ? 'บันทึกการแก้ไข'
-                  : 'ส่งรีวิว'}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   )

@@ -4,6 +4,7 @@ import {
   GetCustomerReviewsParams,
   UpdateCustomerReviewParams,
   createCustomerReview,
+  deleteCustomerReview,
   getCustomerReviews,
   getPurchasableProductsForReview,
   updateCustomerReview,
@@ -61,5 +62,20 @@ export function usePurchasableProducts() {
   return useQuery({
     queryKey: storefrontReviewKeys.purchasable(),
     queryFn: async () => (await getPurchasableProductsForReview()).data,
+  })
+}
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => deleteCustomerReview(id),
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({
+          queryKey: storefrontReviewKeys.all,
+        })
+      }
+    },
   })
 }

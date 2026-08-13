@@ -40,13 +40,13 @@ export function CustomerCard({
   return (
     <div
       className={cn(
-        'from-primary/10 via-primary/2 to-background border-primary/20 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-linear-to-br p-3.5',
+        'from-primary/10 via-primary/2 border-border flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-linear-to-br to-transparent p-3.5',
         className,
       )}
       {...props}
     >
       <div className="flex items-center gap-3">
-        <div className="bg-primary/15 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
+        <div className="bg-primary/15 border-border text-primary flex size-9 shrink-0 items-center justify-center rounded-full border">
           {renderedIcon}
         </div>
         <div className="space-y-2.5">

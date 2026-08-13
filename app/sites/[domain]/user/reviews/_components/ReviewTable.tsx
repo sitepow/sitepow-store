@@ -65,21 +65,10 @@ export function MyReviewTable() {
                   <TableRow
                     key={`${item.orderId}-${item.productId}-${item.variantId}`}
                   >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        {item.productImage && (
-                          <img
-                            src={item.productImage}
-                            alt={item.productTitle}
-                            className="h-12 w-12 rounded object-cover"
-                          />
-                        )}
-                        <div>
-                          <div className="font-medium">{item.productTitle}</div>
-                          <div className="text-muted-foreground text-xs">
-                            หมายเลขคำสั่งซื้อ: #{item.orderNumber}
-                          </div>
-                        </div>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                      <div>{item.productTitle}</div>
+                      <div className="text-muted-foreground text-xs">
+                        หมายเลขคำสั่งซื้อ: #{item.orderNumber}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -94,7 +83,7 @@ export function MyReviewTable() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       {isReviewed ? (
                         <div>
                           <p className="text-sm">{item.comment}</p>
@@ -102,12 +91,16 @@ export function MyReviewTable() {
                             item.reviewImages.length > 0 && (
                               <div className="mt-1 flex gap-1">
                                 {item.reviewImages.map((img, idx) => (
-                                  <img
+                                  <div
                                     key={idx}
-                                    src={img}
-                                    alt="Review"
-                                    className="h-8 w-8 rounded object-cover"
-                                  />
+                                    className="border-primary border border-dashed p-1"
+                                  >
+                                    <img
+                                      src={img}
+                                      alt="Review"
+                                      className="size-14 object-cover"
+                                    />
+                                  </div>
                                 ))}
                               </div>
                             )}
@@ -124,24 +117,15 @@ export function MyReviewTable() {
                     <TableCell className="text-right">
                       {isReviewed ? (
                         <Button
-                          size="sm"
                           variant="outline"
                           onClick={() =>
                             setSelectedItem({
-                              reviewId: item.reviewId,
-                              storeId: item.storeId,
-                              productId: item.productId,
-                              variantId: item.variantId,
-                              orderId: item.orderId,
-                              productTitle: item.productTitle,
-                              productImage: item.productImage,
-                              rating: item.rating,
-                              comment: item.comment,
+                              ...item,
                               images: item.reviewImages,
                             })
                           }
                         >
-                          <IconEdit className="mr-1 size-4" />
+                          <IconEdit className="size-4" />
                           แก้ไข
                         </Button>
                       ) : (
@@ -149,12 +133,7 @@ export function MyReviewTable() {
                           size="sm"
                           onClick={() =>
                             setSelectedItem({
-                              storeId: item.storeId,
-                              productId: item.productId,
-                              variantId: item.variantId,
-                              orderId: item.orderId,
-                              productTitle: item.productTitle,
-                              productImage: item.productImage,
+                              ...item,
                             })
                           }
                         >
@@ -185,12 +164,7 @@ export function MyReviewTable() {
               : undefined
           }
           targetInfo={{
-            storeId: selectedItem.storeId,
-            productId: selectedItem.productId,
-            variantId: selectedItem.variantId,
-            orderId: selectedItem.orderId,
-            productTitle: selectedItem.productTitle,
-            productImage: selectedItem.productImage,
+            ...selectedItem,
           }}
         />
       )}

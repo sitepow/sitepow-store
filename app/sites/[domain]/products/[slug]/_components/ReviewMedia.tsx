@@ -16,10 +16,12 @@ export function ReviewMedia({
           </div>
         </div>
       )}
-
       {images.map((img, i) => (
-        <div key={i} className="size-24 overflow-hidden rounded-xl bg-slate-50">
-          {/* <img src={img} alt="review" className="size-full object-cover" /> */}
+        <div
+          key={i}
+          className="border-primary size-20 overflow-hidden border border-dashed p-1"
+        >
+          <img src={img} alt="review" className="size-full object-cover" />
         </div>
       ))}
     </div>

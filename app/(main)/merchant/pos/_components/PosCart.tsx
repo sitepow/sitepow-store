@@ -201,7 +201,7 @@ export function PosCart({
             {customerId && (
               <CustomerCard
                 className="dark from-primary"
-                title={customerName}
+                title="ข้อมูลลูกค้า"
                 content={
                   <>
                     รหัสลูกค้า: {customerId} <br />
@@ -211,7 +211,7 @@ export function PosCart({
                 }
                 action={
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="icon"
                     onClick={handleRemoveCustomer}
                   >
@@ -245,7 +245,7 @@ export function PosCart({
 
                     return (
                       <CartItemCard
-                        textClassName="max-w-2/3 lg:max-w-full 2xl:max-w-2/3"
+                        textClassName="sm:max-w-1/2 lg:max-w-full"
                         key={item.cartItemId}
                         item={item}
                         onUpdateQuantity={onUpdateQuantity}

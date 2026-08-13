@@ -5,6 +5,7 @@ import {
   useDeleteAddress,
   useSetDefaultAddress,
 } from '@/actions/hooks/storefront/address'
+import { formatPromptPay } from '@/utils/slip'
 import { IconArrowForward, IconBriefcase, IconHome } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
@@ -59,7 +60,7 @@ export function AddressTable() {
                   </div>
                 </TableCell>
                 <TableCell>{addr.receiverName}</TableCell>
-                <TableCell>{addr.phone}</TableCell>
+                <TableCell>{formatPromptPay(addr.phone)}</TableCell>
                 <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                   {`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province} ${addr.postalCode}`}
                 </TableCell>
@@ -74,7 +75,6 @@ export function AddressTable() {
                         ตั้งเป็นที่อยู่หลัก
                       </Button>
                     )}
-
                     <DeleteButton
                       isPending={isDeletePending}
                       onDelete={() => deleteAddress(addr.id)}

@@ -1,18 +1,27 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState } from 'react'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { useDeleteReview, useReviews } from '@/actions/hooks/review'
+import { useReviews } from '@/actions/hooks/review'
+import { useDeleteReview } from '@/actions/hooks/storefront/review'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { ReviewFormDialog } from '@/app/sites/[domain]/user/reviews/_components/ReviewFormDialog'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
-import { IconLock, IconStarFilled, IconTrash } from '@tabler/icons-react'
+import {
+  IconEdit,
+  IconLock,
+  IconStarFilled,
+  IconTrash,
+} from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -25,6 +34,18 @@ import {
 export function ReviewTable() {
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
+  const [selectedItem, setSelectedItem] = useState<{
+    reviewId?: string
+    storeId: string
+    productId: string
+    variantId?: string
+    orderId?: string
+    productTitle?: string
+    productImage?: string
+    rating?: number
+    comment?: string
+    images?: string[]
+  } | null>(null)
 
   const {
     canViewReviews,
@@ -67,7 +88,9 @@ export function ReviewTable() {
               <TableHead>ลูกค้า</TableHead>
               <TableHead>คะแนน</TableHead>
               <TableHead>ความคิดเห็น</TableHead>
-              {showManageColumn && <TableHead>จัดการ</TableHead>}
+              {showManageColumn && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,47 +105,83 @@ export function ReviewTable() {
               reviews.map((item: any) => (
                 <TableRow key={item.id}>
                   <TableCell>{formatDateTime(new Date(item.date))}</TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <div>{item.product?.title || '-'}</div>
                     {item.variant?.title && (
-                      <div>ตัวเลือก: {item.variant.title}</div>
+                      <div className="text-muted-foreground text-xs">
+                        ตัวเลือก: {item.variant.title}
+                      </div>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-48 min-w-48 wrap-break-word whitespace-pre-line">
                     <div>
                       {[item.customer?.firstName, item.customer?.lastName]
                         .filter(Boolean)
                         .join(' ') || 'ลูกค้าไม่ระบุชื่อ'}
                     </div>
-                    <div>{item.customer?.email || '-'}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      {item.rating}
-                      <IconStarFilled />
+                    <div className="text-muted-foreground text-xs">
+                      {item.customer?.email || '-'}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p>{item.comment}</p>
-                    {item.images && item.images.length > 0 && (
-                      <div>
-                        {item.images.map((img: string, idx: number) => (
-                          <div key={idx}>
-                            <img src={img} alt="Review" />
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1 font-semibold">
+                      {item.rating}
+                      <IconStarFilled className="size-4 text-amber-400" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    <div>
+                      <p className="text-sm">{item.comment}</p>
+                      {item.images && item.images.length > 0 && (
+                        <div className="mt-1 flex gap-1">
+                          {item.images.map((img: string, idx: number) => (
+                            <div
+                              key={idx}
+                              className="border-primary border border-dashed p-1"
+                            >
+                              <img
+                                src={img}
+                                alt="Review"
+                                className="size-14 object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </TableCell>
                   {showManageColumn && (
-                    <TableCell>
-                      <DeleteButton
-                        isPending={deleteMutation.isPending}
-                        icon={<IconTrash />}
-                        title="ยืนยันการลบรีวิว?"
-                        description="คุณต้องการลบรีวิวสินค้านี้ใช่หรือไม่? หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้"
-                        onDelete={() => deleteMutation.mutate(item.id)}
-                      />
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setSelectedItem({
+                              reviewId: item.id,
+                              storeId: selectedStoreId,
+                              productId: item.productId,
+                              variantId: item.variantId,
+                              orderId: item.orderId,
+                              productTitle: item.product?.title,
+                              productImage: item.product?.image,
+                              rating: item.rating,
+                              comment: item.comment,
+                              images: item.images,
+                            })
+                          }
+                        >
+                          <IconEdit className="size-4" />
+                          แก้ไข
+                        </Button>
+                        <DeleteButton
+                          isPending={deleteMutation.isPending}
+                          icon={<IconTrash className="size-4" />}
+                          title="ยืนยันการลบรีวิว?"
+                          description="คุณต้องการลบรีวิวสินค้านี้ใช่หรือไม่? หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้"
+                          onDelete={() => deleteMutation.mutate(item.id)}
+                        />
+                      </div>
                     </TableCell>
                   )}
                 </TableRow>
@@ -138,6 +197,30 @@ export function ReviewTable() {
           hasNextPage={meta.hasNextPage}
           hasPreviousPage={meta.hasPreviousPage}
           onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
+      {selectedItem && (
+        <ReviewFormDialog
+          isOpen={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          initialData={
+            selectedItem.reviewId
+              ? {
+                  id: selectedItem.reviewId,
+                  rating: selectedItem.rating || 5,
+                  comment: selectedItem.comment || '',
+                  images: selectedItem.images || [],
+                }
+              : undefined
+          }
+          targetInfo={{
+            storeId: selectedItem.storeId,
+            productId: selectedItem.productId,
+            variantId: selectedItem.variantId || '',
+            orderId: selectedItem.orderId,
+            productTitle: selectedItem.productTitle,
+            productImage: selectedItem.productImage,
+          }}
         />
       )}
     </>

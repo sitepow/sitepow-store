@@ -58,20 +58,17 @@ export function CartItemCard({
           </h4>
           <p
             className={cn(
-              'text-primary mt-0.5 text-[11px] sm:text-xs',
+              'text-primary mt-0.5 text-[11px] opacity-60 sm:text-xs',
               textClassName,
             )}
           >
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
-            , {item.branchName}
+            , {item.branchName}{' '}
+            {item.selectedAddons.length > 0 &&
+              `+ ${item.selectedAddons.map((a) => a.title).join(', ')}`}
           </p>
-          {item.selectedAddons.length > 0 && (
-            <p className="text-primary mt-0.5 text-[10px] sm:text-[11px]">
-              + {item.selectedAddons.map((a) => a.title).join(', ')}
-            </p>
-          )}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           {onUpdateQuantity && (

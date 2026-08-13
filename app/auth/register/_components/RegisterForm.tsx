@@ -162,6 +162,14 @@ export function RegisterForm() {
               </Field>
               <div className="mt-2 grid grid-cols-12 gap-2">
                 <Button
+                  type="submit"
+                  className="col-span-8"
+                  size="lg"
+                  disabled={isPending}
+                >
+                  {isPending && <Spinner />} สมัครสมาชิก
+                </Button>
+                <Button
                   className="col-span-4"
                   variant="outline"
                   size="lg"
@@ -169,14 +177,6 @@ export function RegisterForm() {
                   onClick={() => setIsCredentials(false)}
                 >
                   <ArrowLeftIcon /> ย้อนกลับ
-                </Button>
-                <Button
-                  type="submit"
-                  className="col-span-8"
-                  size="lg"
-                  disabled={isPending}
-                >
-                  {isPending && <Spinner />} สมัครสมาชิก
                 </Button>
               </div>
             </form>
