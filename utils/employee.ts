@@ -79,12 +79,29 @@ export function mapEmployeeDataToFormValues(
     branches?:
       | {
           branch: { id: string }
+          roleId?: string | null
           role?: {
             id?: string | null
-            permissions?: { permission?: { id: string } | null }[] | null
+            name?: string | null
+            permissions?:
+              | {
+                  permission?: { id: string } | null
+                  permissionId?: string | null
+                }[]
+              | null
           } | null
-          customPermissions?: { permissionId?: string | null }[] | null
-          rolePermissions?: { permission?: { id: string } | null }[] | null
+          customPermissions?:
+            | {
+                permissionId?: string | null
+                permission?: { id: string } | null
+              }[]
+            | null
+          rolePermissions?:
+            | {
+                permission?: { id: string } | null
+                permissionId?: string | null
+              }[]
+            | null
         }[]
       | null
   } | null,
@@ -100,16 +117,25 @@ export function mapEmployeeDataToFormValues(
   const mappedAssignments =
     employeeData.branches?.map((b) => {
       const extractedIds: string[] = []
+
       b.customPermissions?.forEach((cp) => {
-        if (cp.permissionId) extractedIds.push(cp.permissionId)
+        const pId = cp.permissionId || cp.permission?.id
+        if (pId) extractedIds.push(pId)
       })
+
       b.rolePermissions?.forEach((rp) => {
-        if (rp.permission?.id) extractedIds.push(rp.permission.id)
+        const pId = rp.permissionId || rp.permission?.id
+        if (pId) extractedIds.push(pId)
+      })
+
+      b.role?.permissions?.forEach((pItem) => {
+        const pId = pItem.permissionId || pItem.permission?.id
+        if (pId) extractedIds.push(pId)
       })
 
       return {
         branchId: b.branch.id,
-        roleId: b.role?.id ?? '',
+        roleId: b.role?.id || b.roleId || '',
         permissionIds: Array.from(new Set(extractedIds)),
       }
     }) ?? []

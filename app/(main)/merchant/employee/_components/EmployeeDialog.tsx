@@ -94,8 +94,14 @@ export function EmployeeDialog({
   })
 
   useEffect(() => {
-    reset(mapEmployeeDataToFormValues(employeeData))
-  }, [employeeData, reset])
+    if (open) {
+      if (employeeData && allPermissions.length > 0) {
+        reset(mapEmployeeDataToFormValues(employeeData))
+      } else if (!employeeId) {
+        reset(DEFAULT_VALUES)
+      }
+    }
+  }, [open, employeeData, allPermissions, employeeId, reset])
 
   const handleClose = () => {
     reset(DEFAULT_VALUES)
