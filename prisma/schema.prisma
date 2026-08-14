@@ -676,6 +676,7 @@ model Store {
   supplierAgreements   ResellerAgreement[]       @relation("SupplierAgreements")
   resellerAgreements   ResellerAgreement[]       @relation("ResellerAgreements")
   slipHistories        SlipVerificationHistory[]
+  reviewRewardConfig   ReviewRewardConfig?
 
   translations Json?
 
@@ -1322,6 +1323,20 @@ model ProductStock {
   @@unique([branchId, variantId])
   @@index([branchId])
   @@index([variantId])
+}
+
+model ReviewRewardConfig {
+  id      String @id @default(uuid())
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  basePoints       Int @default(10)
+  photoBonus       Int @default(5)
+  videoBonus       Int @default(20)
+  minCommentLength Int @default(50)
+  longReviewBonus  Int @default(10)
+
+  isEnabled Boolean @default(true)
 }
 
 enum ActorType {

@@ -205,14 +205,16 @@ export function PosProductOptionDialog({
   return (
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg font-semibold">
-            {product.title}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            เลือกรูปแบบ ตัวเลือกเพิ่มเติม และจำนวนสินค้าสำหรับรายการนี้
-          </DialogDescription>
+        <DialogHeader>
+          <DialogTitle>ตัวเลือกสินค้า</DialogTitle>
         </DialogHeader>
+        {product?.title && (
+          <div className="flex items-center gap-3 border-b pb-3">
+            <span className="line-clamp-2 text-sm font-medium">
+              {product.title}
+            </span>
+          </div>
+        )}
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-5 py-2">
             {product.variants.length > 0 && (

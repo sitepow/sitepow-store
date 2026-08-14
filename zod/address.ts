@@ -7,7 +7,14 @@ export const addressSchema = z
     type: z.enum(AddressType),
     phone: z
       .string()
-      .regex(/^(0[689]\d{8}|0[2-9]\d{7})$/, 'เบอร์โทรศัพท์ไม่ถูกต้อง'),
+      .transform((val) => val.replace(/\D/g, ''))
+      .pipe(
+        z
+          .string()
+          .regex(/^(0[689]\d{8}|0[2-9]\d{7})$/, 'เบอร์โทรศัพท์ไม่ถูกต้อง'),
+      )
+      .optional()
+      .or(z.literal('')),
     addressLine: z.string().min(1, 'กรุณากรอกบ้านเลขที่'),
     subDistrict: z.string().min(1, 'กรุณาระบุตำบล/แขวง'),
     district: z.string().min(1, 'กรุณาระบุอำเภอ/เขต'),

@@ -6,7 +6,12 @@ export const updateProfileSchema = z.object({
   image: z.any().optional(),
   phone: z
     .string()
-    .regex(/^(0[689]\d{8}|0[2-9]\d{7})$/, 'เบอร์โทรศัพท์ไม่ถูกต้อง')
+    .transform((val) => val.replace(/\D/g, ''))
+    .pipe(
+      z
+        .string()
+        .regex(/^(0[689]\d{8}|0[2-9]\d{7})$/, 'เบอร์โทรศัพท์ไม่ถูกต้อง'),
+    )
     .optional()
     .or(z.literal('')),
 })
