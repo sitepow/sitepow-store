@@ -164,7 +164,7 @@ export async function setupStoreOwnerPermissions(
   if (!employee) {
     employee = await db.employee.create({
       data: {
-        name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
+        name: user.name ?? 'ผู้ใช้งานไม่มีชื่อ',
         email: user.email!,
         userId,
       },
@@ -499,7 +499,7 @@ export async function assignNewBranchToOwners(
 
     employee = await db.employee.create({
       data: {
-        name: user.name ?? 'ไม่มีชื่อผู้ใช้งาน',
+        name: user.name ?? 'ผู้ใช้งานไม่มีชื่อ',
         email: user.email!,
         userId,
       },
@@ -571,7 +571,7 @@ export async function findOrCreateEmployee(
   const db = tx || prisma
   const {
     email,
-    name = 'ไม่มีชื่อผู้ใช้งาน',
+    name = 'ผู้ใช้งานไม่มีชื่อ',
     defaultPassword = DEFAULT_PASSWORD_EMPLOYEE,
   } = params
 

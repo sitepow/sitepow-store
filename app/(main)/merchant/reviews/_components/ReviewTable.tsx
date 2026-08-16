@@ -131,7 +131,7 @@ export function ReviewTable() {
                   </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <div>
-                      <p className="text-sm">{item.comment}</p>
+                      <p className="text-sm">{item?.comment || '-'}</p>
                       {item.images && item.images.length > 0 && (
                         <div className="mt-1 flex gap-1">
                           {item.images.map((img: string, idx: number) => (

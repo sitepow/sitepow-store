@@ -1,5 +1,3 @@
-'use client'
-
 import { transactionKeys } from '@/actions/query-keys/transaction'
 import {
   queryOptions,

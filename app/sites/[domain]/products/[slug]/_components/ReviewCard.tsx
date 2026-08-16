@@ -16,7 +16,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
   const customerName =
     [review.customer.firstName, review.customer.lastName]
       .filter(Boolean)
-      .join(' ') || 'ลูกค้า'
+      .join(' ') || 'ลูกค้าไม่ระบุชื่อ'
 
   const selectedOptions = review.selectedOptions as
     { title: string; name: string }[] | null
@@ -38,7 +38,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
             <div className="text-muted-foreground mt-2.5 text-xs">
               <span>{new Date(review.date).toLocaleDateString('th-TH')}</span>
-              <span> | {review.variant.title}</span>
+              {review.variant?.title && <span> | {review.variant.title}</span>}
               {selectedOptions && selectedOptions.length > 0 && (
                 <div className="flex gap-2">
                   {selectedOptions.map((opt) => (
@@ -46,7 +46,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                       {opt.title}: {opt.name}
                     </span>
                   ))}
-                  <span>({review.variant.sku})</span>
+                  {review.variant?.sku && <span>({review.variant.sku})</span>}
                 </div>
               )}
             </div>

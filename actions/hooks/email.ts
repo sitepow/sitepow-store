@@ -1,5 +1,3 @@
-'use client'
-
 import { resendOtp, verifyOtp } from '@/actions/email'
 import { useSession } from '@/hooks/use-session'
 import { useMutation } from '@tanstack/react-query'

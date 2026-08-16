@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { usePurchasableProducts } from '@/actions/hooks/storefront/review'
 import { formatDateTime } from '@/utils/date'
-import { IconEdit, IconMessagePlus, IconStarFilled } from '@tabler/icons-react'
+import { IconMessagePlus, IconStarFilled } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
@@ -22,19 +22,17 @@ import { ReviewFormDialog } from './ReviewFormDialog'
 
 export function MyReviewTable() {
   const [selectedItem, setSelectedItem] = useState<{
-    reviewId?: string
     storeId: string
     productId: string
     variantId: string
     orderId: string
     productTitle: string
     productImage?: string
-    rating?: number
-    comment?: string
-    images?: string[]
   } | null>(null)
 
   const { data: items = [], isLoading } = usePurchasableProducts()
+
+  const hasUnreviewedItems = items.some((item) => !item.reviewId)
 
   return (
     <>
@@ -42,19 +40,22 @@ export function MyReviewTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
               <TableHead>สินค้า</TableHead>
               <TableHead>คะแนน</TableHead>
               <TableHead>ความคิดเห็น</TableHead>
               <TableHead>วันที่เขียน</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              {hasUnreviewedItems && (
+                <TableHead className="text-right">จัดการ</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableLoadingRow colSpan={5} />
+              <TableLoadingRow colSpan={hasUnreviewedItems ? 6 : 5} />
             ) : items.length === 0 ? (
               <TableEmptyRow
-                colSpan={5}
+                colSpan={hasUnreviewedItems ? 6 : 5}
                 title="ยังไม่มีรายการสินค้าที่จัดส่งสำเร็จ หรือพร้อมให้รีวิว"
               />
             ) : (
@@ -65,11 +66,9 @@ export function MyReviewTable() {
                   <TableRow
                     key={`${item.orderId}-${item.productId}-${item.variantId}`}
                   >
+                    <TableCell>#{item.orderNumber}</TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div>{item.productTitle}</div>
-                      <div className="text-muted-foreground text-xs">
-                        หมายเลขคำสั่งซื้อ: #{item.orderNumber}
-                      </div>
                     </TableCell>
                     <TableCell>
                       {isReviewed ? (
@@ -86,7 +85,7 @@ export function MyReviewTable() {
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       {isReviewed ? (
                         <div>
-                          <p className="text-sm">{item.comment}</p>
+                          <p className="text-sm">{item.comment || '-'}</p>
                           {item.reviewImages &&
                             item.reviewImages.length > 0 && (
                               <div className="mt-1 flex gap-1">
@@ -114,34 +113,28 @@ export function MyReviewTable() {
                         ? formatDateTime(new Date(item.reviewDate))
                         : '-'}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {isReviewed ? (
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            setSelectedItem({
-                              ...item,
-                              images: item.reviewImages,
-                            })
-                          }
-                        >
-                          <IconEdit className="size-4" />
-                          แก้ไข
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            setSelectedItem({
-                              ...item,
-                            })
-                          }
-                        >
-                          <IconMessagePlus className="mr-1 size-4" />
-                          เขียนรีวิว
-                        </Button>
-                      )}
-                    </TableCell>
+                    {hasUnreviewedItems && (
+                      <TableCell className="text-right">
+                        {!isReviewed && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              setSelectedItem({
+                                storeId: item.storeId,
+                                productId: item.productId,
+                                variantId: item.variantId,
+                                orderId: item.orderId,
+                                productTitle: item.productTitle,
+                                productImage: item.productImage,
+                              })
+                            }
+                          >
+                            <IconMessagePlus className="size-4" />
+                            เขียนรีวิวรับแต้ม
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 )
               })
@@ -153,19 +146,7 @@ export function MyReviewTable() {
         <ReviewFormDialog
           isOpen={!!selectedItem}
           onClose={() => setSelectedItem(null)}
-          initialData={
-            selectedItem.reviewId
-              ? {
-                  id: selectedItem.reviewId,
-                  rating: selectedItem.rating || 5,
-                  comment: selectedItem.comment || '',
-                  images: selectedItem.images || [],
-                }
-              : undefined
-          }
-          targetInfo={{
-            ...selectedItem,
-          }}
+          targetInfo={selectedItem}
         />
       )}
     </>

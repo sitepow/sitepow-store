@@ -3,11 +3,13 @@
 import { OrderStatus, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
+import { calculateReviewPoints } from '@/utils/review-points'
 
 import { auth } from '@/lib/auth'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
+import { invalidateStorefrontProductCache } from '../query-keys/storefront/invalidation/product'
 import { r2DeleteImage } from '../r2'
 
 export interface PurchasableItem {
@@ -33,20 +35,22 @@ export interface UpdateCustomerReviewParams {
   selectedOptions?: Prisma.InputJsonValue
 }
 
+export interface CreateReviewCategoryParam {
+  label: string
+  rating: number
+}
+
 export interface CreateCustomerReviewParams {
   storeId: string
   productId: string
   variantId: string
   orderId?: string
   rating: number
-  comment: string
+  comment?: string
   images?: string[]
   video?: string
-  selectedOptions?: Prisma.InputJsonValue
-  categories?: {
-    label: string
-    rating: number
-  }[]
+  selectedOptions?: any
+  categories?: CreateReviewCategoryParam[]
 }
 
 export interface GetCustomerReviewsParams {
@@ -64,7 +68,6 @@ const customerReviewSelect = {
   selectedOptions: true,
   orderId: true,
   productId: true,
-  variantId: true,
   storeId: true,
   product: {
     select: {
@@ -161,7 +164,7 @@ export async function getCustomerReviews({
       data: serializeDecimal(reviews),
       meta: {
         currentPage: sanitizedPage,
-        limit: sanitizedLimit,
+        limit,
         totalItems,
         totalPages,
         hasNextPage: sanitizedPage < totalPages,
@@ -195,7 +198,7 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
     const {
       storeId,
       productId,
-      variantId,
+      variantId: inputVariantId,
       orderId,
       rating,
       comment,
@@ -205,77 +208,172 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
       categories,
     } = params
 
-    if (!storeId || !productId || !variantId) {
+    if (!productId) {
       return {
         success: false,
-        error: 'ข้อมูลไม่ครบถ้วน (ขาด storeId, productId หรือ variantId)',
+        message: 'ไม่พบรหัสสินค้าที่ถูกต้องในระบบ',
       }
     }
 
-    if (!rating || rating < 1 || rating > 5) {
-      return { success: false, message: 'คะแนนต้องอยู่ระหว่าง 1 ถึง 5 ดาว' }
+    let candidateVariantId = inputVariantId
+    if (orderId) {
+      const orderItem = await prisma.orderItem.findFirst({
+        where: { orderId, productId },
+        select: { variantId: true },
+      })
+      if (orderItem?.variantId) {
+        candidateVariantId = orderItem.variantId
+      }
     }
 
-    if (!comment || comment.trim() === '') {
-      return { success: false, message: 'กรุณากรอกความคิดเห็น' }
+    let finalVariantId: string | null = null
+
+    if (candidateVariantId) {
+      const existingVariant = await prisma.productVariant.findUnique({
+        where: { id: candidateVariantId },
+        select: { id: true },
+      })
+      if (existingVariant) {
+        finalVariantId = existingVariant.id
+      }
+    }
+
+    if (!finalVariantId) {
+      const fallbackVariant = await prisma.productVariant.findFirst({
+        where: { productId },
+        select: { id: true },
+      })
+      if (fallbackVariant) {
+        finalVariantId = fallbackVariant.id
+      }
     }
 
     if (orderId) {
-      const order = await prisma.order.findUnique({
-        where: { id: orderId },
-        select: { customerId: true, storeId: true, status: true },
+      const existingReview = await prisma.review.findFirst({
+        where: {
+          customerId: customer.id,
+          orderId,
+          productId,
+        },
       })
 
-      if (!order || order.customerId !== customer.id) {
+      if (existingReview) {
         return {
           success: false,
-          error: 'คำสั่งซื้อไม่ถูกต้อง หรือคุณไม่ใช่เจ้าของคำสั่งซื้อนี้',
-        }
-      }
-
-      if (order.status !== 'SHIPPED') {
-        return {
-          success: false,
-          error: 'สามารถเขียนรีวิวได้เฉพาะสินค้าที่จัดส่งสำเร็จแล้วเท่านั้น',
+          message: 'คุณได้ทำการรีวิวสินค้านี้ในคำสั่งซื้อนี้ไปแล้ว',
         }
       }
     }
 
-    const newReview = await prisma.review.create({
-      data: {
-        customerId: customer.id,
-        storeId,
-        productId,
-        variantId,
-        orderId,
+    const reviewConfig = await prisma.reviewRewardConfig.findUnique({
+      where: { storeId },
+    })
+
+    let awardedPoints = 0
+    let breakdown: { description: string; points: number }[] = []
+
+    if (!reviewConfig || reviewConfig.isEnabled) {
+      const calculated = calculateReviewPoints({
         rating,
-        comment,
+        comment: comment ?? '',
         images,
         video,
-        selectedOptions: selectedOptions ?? Prisma.JsonNull,
-        categories:
-          categories && categories.length > 0
-            ? {
-                createMany: {
-                  data: categories.map((cat) => ({
-                    label: cat.label,
-                    rating: cat.rating,
-                  })),
-                },
-              }
-            : undefined,
-      },
-      select: customerReviewSelect,
+        config: reviewConfig,
+      })
+      awardedPoints = calculated.totalPoints
+      breakdown = calculated.breakdown
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const newReview = await tx.review.create({
+        data: {
+          customerId: customer.id,
+          storeId,
+          productId,
+          variantId: finalVariantId,
+          orderId,
+          rating,
+          comment: comment ?? '',
+          images,
+          video,
+          selectedOptions: selectedOptions ?? Prisma.JsonNull,
+          categories:
+            categories && categories.length > 0
+              ? {
+                  createMany: {
+                    data: categories.map((cat) => ({
+                      label: cat.label,
+                      rating: cat.rating,
+                    })),
+                  },
+                }
+              : undefined,
+        },
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          images: true,
+          video: true,
+          date: true,
+          customer: {
+            select: {
+              firstName: true,
+              lastName: true,
+              avatar: true,
+            },
+          },
+          categories: true,
+        },
+      })
+
+      if (awardedPoints > 0) {
+        await tx.customerStore.upsert({
+          where: {
+            customerId_storeId: {
+              customerId: customer.id,
+              storeId,
+            },
+          },
+          update: {
+            rewardPoints: {
+              increment: awardedPoints,
+            },
+          },
+          create: {
+            customerId: customer.id,
+            storeId,
+            rewardPoints: awardedPoints,
+          },
+        })
+      }
+
+      return { newReview, awardedPoints, breakdown }
     })
+
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { slug: true },
+    })
+
+    if (store?.slug) {
+      await invalidateStorefrontProductCache(store.slug)
+    }
 
     return {
       success: true,
-      message: 'รีวิวสินค้าสำเร็จแล้ว',
-      data: serializeDecimal(newReview),
+      message:
+        result.awardedPoints > 0
+          ? `รีวิวสำเร็จ! คุณได้รับ ${result.awardedPoints} แต้มสะสม`
+          : 'รีวิวสินค้าสำเร็จแล้ว',
+      data: serializeDecimal(result.newReview),
+      pointsDetail: result.breakdown,
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+    }
   }
 }
 
@@ -356,6 +454,17 @@ export async function updateCustomerReview(
       select: customerReviewSelect,
     })
 
+    if (existingReview.storeId) {
+      const store = await prisma.store.findUnique({
+        where: { id: existingReview.storeId },
+        select: { slug: true },
+      })
+
+      if (store?.slug) {
+        await invalidateStorefrontProductCache(store.slug)
+      }
+    }
+
     return {
       success: true,
       message: 'อัพเดตการรีวิวสินค้าสำเร็จแล้ว',
@@ -408,10 +517,7 @@ export async function getPurchasableProductsForReview() {
     for (const order of orders) {
       for (const item of order.items) {
         const existingReview = reviews.find(
-          (r) =>
-            r.orderId === order.id &&
-            r.productId === item.productId &&
-            r.variantId === item.variantId,
+          (r) => r.orderId === order.id && r.productId === item.productId,
         )
 
         result.push({
@@ -424,7 +530,7 @@ export async function getPurchasableProductsForReview() {
           productImage: item.image || undefined,
           reviewId: existingReview?.id,
           rating: existingReview?.rating,
-          comment: existingReview?.comment,
+          comment: existingReview?.comment ?? '',
           reviewImages: existingReview?.images,
           reviewDate: existingReview?.date
             ? existingReview.date.toISOString()
@@ -458,16 +564,20 @@ export async function deleteCustomerReview(reviewId: string) {
       return { success: false, message: 'ไม่พบข้อมูลรีวิว' }
     }
 
-    let isAuthorized = false
-
     const customer = await prisma.customer.findUnique({
       where: { userId },
       select: { id: true },
     })
 
     if (customer && review.customerId === customer.id) {
-      isAuthorized = true
-    } else if (review.storeId) {
+      return {
+        success: false,
+        message: 'ไม่อนุญาตให้ลบรีวิว คุณสามารถแก้ไขรีวิวได้เท่านั้น',
+      }
+    }
+
+    let isAuthorized = false
+    if (review.storeId) {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId: review.storeId,
@@ -494,6 +604,17 @@ export async function deleteCustomerReview(reviewId: string) {
     await prisma.review.delete({
       where: { id: reviewId },
     })
+
+    if (review.storeId) {
+      const store = await prisma.store.findUnique({
+        where: { id: review.storeId },
+        select: { slug: true },
+      })
+
+      if (store?.slug) {
+        await invalidateStorefrontProductCache(store.slug)
+      }
+    }
 
     return { success: true, message: 'ลบรีวิวสำเร็จ' }
   } catch (error) {

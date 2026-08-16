@@ -8,7 +8,6 @@ export const storefrontProductKeys = {
     search?: string
     categorySlug?: string
   }) => [...storefrontProductKeys.lists(), filters] as const,
-
   details: () => [...storefrontProductKeys.all, 'detail'] as const,
   detail: (storeSlug: string, productSlug: string) =>
     [...storefrontProductKeys.all, 'detail', storeSlug, productSlug] as const,

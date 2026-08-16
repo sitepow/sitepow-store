@@ -1,5 +1,3 @@
-'use client'
-
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 

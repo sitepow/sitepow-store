@@ -1,5 +1,3 @@
-'use client'
-
 import { storefrontSectionsKeys } from '@/actions/query-keys/storefront/sections'
 import { getStorefrontCategoriesProductsSections } from '@/actions/storefront/sections'
 import { queryOptions, useQuery } from '@tanstack/react-query'

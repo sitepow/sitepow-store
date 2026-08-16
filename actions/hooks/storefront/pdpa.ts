@@ -1,5 +1,3 @@
-'use client'
-
 import toast from 'react-hot-toast'
 
 import { storefrontPdpaKeys } from '@/actions/query-keys/storefront/pdpa'

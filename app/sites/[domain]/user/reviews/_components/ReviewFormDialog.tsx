@@ -1,19 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
+import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
 import {
   useCreateReview,
   useUpdateReview,
 } from '@/actions/hooks/storefront/review'
 import { ImageUploadSection } from '@/app/(main)/merchant/store-settings/products/create/_components/ImageUploadSection'
 import { getPathR2FromUrl } from '@/utils/image'
+import { calculateReviewPoints } from '@/utils/review-points'
 import { ReviewFormValues, reviewFormSchema } from '@/zod/storefront/review'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconStar, IconStarFilled } from '@tabler/icons-react'
+import { IconSparkles, IconStar, IconStarFilled } from '@tabler/icons-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -32,6 +35,7 @@ interface ReviewFormDialogProps {
     rating: number
     comment: string
     images?: (string | File)[]
+    video?: string
   }
   targetInfo?: {
     storeId: string
@@ -50,6 +54,11 @@ export function ReviewFormDialog({
   targetInfo,
 }: ReviewFormDialogProps) {
   const isEditing = !!initialData?.id
+
+  const { data: rewardConfigRes } = useReviewRewardConfig(
+    targetInfo?.storeId || '',
+  )
+  const rewardConfig = rewardConfigRes?.data
 
   const createMutation = useCreateReview()
   const updateMutation = useUpdateReview()
@@ -72,7 +81,7 @@ export function ReviewFormDialog({
       comment: initialData?.comment || '',
       images:
         initialData?.images?.map((img) => ({
-          url: img,
+          url: img instanceof File ? URL.createObjectURL(img) : img,
           isPrimary: false,
           file: img instanceof File ? img : undefined,
         })) ?? [],
@@ -86,6 +95,29 @@ export function ReviewFormDialog({
     formState: { errors },
   } = form
 
+  const watchedRating = useWatch({ control, name: 'rating' })
+  const watchedComment = useWatch({ control, name: 'comment' })
+  const watchedImages = useWatch({ control, name: 'images' })
+
+  const imageStringUrls =
+    watchedImages
+      ?.map((img: any) => {
+        if (typeof img?.url === 'string') return img.url
+        if (img?.url instanceof File) return URL.createObjectURL(img.url)
+        if (img?.file instanceof File) return URL.createObjectURL(img.file)
+        if (img instanceof File) return URL.createObjectURL(img)
+
+        return null
+      })
+      .filter((url): url is string => Boolean(url)) || []
+
+  const calculatedPoints = calculateReviewPoints({
+    rating: watchedRating || 5,
+    comment: watchedComment || '',
+    images: imageStringUrls,
+    config: rewardConfig,
+  })
+
   const onSubmit = async (data: ReviewFormValues) => {
     try {
       const oldImageUrls =
@@ -93,24 +125,67 @@ export function ReviewFormDialog({
           (img): img is string => typeof img === 'string',
         ) || []
 
-      const processedImages = await Promise.all(
-        (data.images || []).map(async (img) => {
-          const rawFile = img.file || (img.url instanceof File ? img.url : null)
-          let finalUrl = typeof img.url === 'string' ? img.url : ''
+      let uploadedVideoUrl: string | undefined = initialData?.video
 
-          if (rawFile instanceof File) {
-            const formData = new FormData()
-            formData.append('file', rawFile)
-            const res = await uploadMutation.mutateAsync(formData)
-            if (res?.success && res?.url) finalUrl = res.url
+      const processedImages = await Promise.all(
+        (data.images || []).map(async (rawItem: any) => {
+          let fileObj: File | null = null
+          let currentUrl = ''
+
+          if (rawItem?.url instanceof File) {
+            fileObj = rawItem.url
+          } else if (rawItem instanceof File) {
+            fileObj = rawItem
+          } else if (rawItem?.file instanceof File) {
+            fileObj = rawItem.file
+          } else if (typeof rawItem?.url === 'string') {
+            currentUrl = rawItem.url
+          } else if (typeof rawItem === 'string') {
+            currentUrl = rawItem
           }
-          return { url: finalUrl, isPrimary: Boolean(img.isPrimary) }
+
+          if (currentUrl && !currentUrl.startsWith('blob:')) {
+            return { url: currentUrl, isVideo: false }
+          }
+
+          if (!fileObj && currentUrl.startsWith('blob:')) {
+            try {
+              const res = await fetch(currentUrl)
+              const blob = await res.blob()
+              fileObj = new File([blob], `review-media-${Date.now()}`, {
+                type: blob.type || 'image/jpeg',
+              })
+            } catch (e) {
+              console.error(e)
+            }
+          }
+
+          if (fileObj) {
+            const isVideo = fileObj.type.startsWith('video/')
+            const formData = new FormData()
+            formData.append('file', fileObj)
+
+            const res = await uploadMutation.mutateAsync(formData)
+
+            if (res?.success && res?.url) {
+              if (isVideo) {
+                uploadedVideoUrl = res.url
+                return null
+              }
+              return { url: res.url, isVideo: false }
+            }
+          }
+
+          return null
         }),
       )
 
       const validImages = processedImages
-        .filter((img) => img.url !== '')
-        .map((img) => img.url)
+        .filter((item): item is { url: string; isVideo: boolean } =>
+          Boolean(item?.url),
+        )
+        .map((item) => item.url)
+
       const imagesToDelete = oldImageUrls.filter(
         (url) => !validImages.includes(url),
       )
@@ -126,17 +201,32 @@ export function ReviewFormDialog({
         rating: data.rating,
         comment: data.comment,
         images: validImages,
+        video: uploadedVideoUrl,
       }
 
       if (isEditing && initialData?.id) {
         updateMutation.mutate(
           { id: initialData.id, input },
-          { onSuccess: (res) => res.success && onClose() },
+          {
+            onSuccess: (res) => {
+              if (res.success) onClose()
+            },
+          },
         )
       } else if (targetInfo) {
         createMutation.mutate(
-          { ...targetInfo, ...input },
-          { onSuccess: (res) => res.success && onClose() },
+          {
+            storeId: targetInfo.storeId,
+            productId: targetInfo.productId,
+            variantId: targetInfo.variantId,
+            orderId: targetInfo.orderId,
+            ...input,
+          },
+          {
+            onSuccess: (res) => {
+              if (res.success) onClose()
+            },
+          },
         )
       }
     } catch (error) {
@@ -144,14 +234,26 @@ export function ReviewFormDialog({
     }
   }
 
+  const photoBonusText = rewardConfig?.photoBonus ?? 5
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? 'แก้ไขรีวิวสินค้า' : 'เขียนรีวิวสินค้า'}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              {isEditing ? 'แก้ไขรีวิวสินค้า' : 'เขียนรีวิวสินค้า'}
+            </DialogTitle>
+            <Badge
+              variant="secondary"
+              className="flex items-center gap-1.5 border-amber-200 bg-amber-50 px-3 py-1 text-amber-600"
+            >
+              <IconSparkles className="size-4 text-amber-500" />
+              <span>รับ +{calculatedPoints.totalPoints} แต้ม</span>
+            </Badge>
+          </div>
         </DialogHeader>
+
         {targetInfo?.productTitle && (
           <div className="flex items-center gap-3 border-b pb-3">
             {targetInfo.productImage && (
@@ -166,6 +268,7 @@ export function ReviewFormDialog({
             </span>
           </div>
         )}
+
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
             <FieldGroup className="space-y-4">
@@ -206,10 +309,16 @@ export function ReviewFormDialog({
                   )}
                 </div>
               </Field>
+
               <Field>
-                <FieldLabel className="text-sm font-medium">
-                  ความคิดเห็นของคุณ
-                </FieldLabel>
+                <div className="mb-1 flex items-center justify-between">
+                  <FieldLabel className="text-sm font-medium">
+                    ความคิดเห็นของคุณ
+                  </FieldLabel>
+                  <span className="text-muted-foreground text-xs">
+                    {(watchedComment || '').trim().length} ตัวอักษร
+                  </span>
+                </div>
                 <Textarea
                   {...register('comment')}
                   placeholder="แบ่งปันความประทับใจเกี่ยวกับสินค้าชิ้นนี้..."
@@ -221,7 +330,16 @@ export function ReviewFormDialog({
                   </p>
                 )}
               </Field>
+
               <Field>
+                <div className="mb-1 flex items-center justify-between">
+                  <FieldLabel className="text-sm font-medium">
+                    รูปภาพสินค้า
+                  </FieldLabel>
+                  <span className="text-muted-foreground text-xs">
+                    แนบสูงสุด 3 รูป (+{photoBonusText} แต้ม/รูป)
+                  </span>
+                </div>
                 <ImageUploadSection showPrimaryControl={false} />
                 {errors.images && (
                   <p className="text-destructive mt-1 text-xs">
@@ -230,6 +348,7 @@ export function ReviewFormDialog({
                 )}
               </Field>
             </FieldGroup>
+
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"

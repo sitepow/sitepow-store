@@ -1,5 +1,3 @@
-'use client'
-
 import { getAllPermissions, getRoleOptions } from '@/actions/role'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 

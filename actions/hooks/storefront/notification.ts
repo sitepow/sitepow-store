@@ -1,5 +1,3 @@
-'use client'
-
 import { storefrontNotificationKeys } from '@/actions/query-keys/storefront/notification'
 import {
   getNotificationSettings,

@@ -952,7 +952,7 @@ model ProductAddon {
 model Review {
   id      String   @id @default(uuid())
   rating  Int
-  comment String   @db.Text
+  comment String?  @db.Text
   images  String[]
   video   String?
   date    DateTime @default(now())
@@ -962,11 +962,11 @@ model Review {
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   storeId   String
-  store     Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  store     Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
   productId String
-  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
   selectedOptions Json?
   categories      ReviewCategory[]

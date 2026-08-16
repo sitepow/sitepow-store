@@ -54,7 +54,7 @@ export function OrderTable({ search }: OrderTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสั่งซื้อ</TableHead>
+              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
               <TableHead>ร้านค้า / ช่องทาง</TableHead>
               <TableHead>รายการสินค้า</TableHead>
               <TableHead>ยอดสุทธิ</TableHead>

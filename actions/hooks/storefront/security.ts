@@ -1,5 +1,3 @@
-'use client'
-
 import { storefrontSecurityKeys } from '@/actions/query-keys/storefront/security'
 import { updatePassword } from '@/actions/security'
 import { ChangePasswordFormValues } from '@/zod/storefront/change-password'

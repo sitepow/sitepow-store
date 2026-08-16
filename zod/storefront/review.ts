@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 export const reviewFormSchema = z.object({
   rating: z.number().min(1, 'กรุณาให้คะแนนอย่างน้อย 1 ดาว').max(5),
-  comment: z.string().min(1, 'กรุณากรอกความคิดเห็น'),
+
+  comment: z.string().optional(),
+
   images: z
     .array(
       z.object({

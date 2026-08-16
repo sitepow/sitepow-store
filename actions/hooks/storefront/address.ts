@@ -1,5 +1,3 @@
-'use client'
-
 import { storefrontAddressKeys } from '@/actions/query-keys/storefront/address'
 import {
   AddressDetail,

@@ -57,7 +57,7 @@ export function OrderTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสออเดอร์</TableHead>
+              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
               <TableHead>ลูกค้า / ช่องทาง</TableHead>
               <TableHead>รายการสินค้า</TableHead>
               <TableHead>ยอดรวม</TableHead>

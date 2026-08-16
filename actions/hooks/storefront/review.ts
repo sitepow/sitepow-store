@@ -1,3 +1,5 @@
+import { reviewKeys } from '@/actions/query-keys/review'
+import { storefrontProductKeys } from '@/actions/query-keys/storefront/product'
 import { storefrontReviewKeys } from '@/actions/query-keys/storefront/review'
 import {
   CreateCustomerReviewParams,
@@ -29,6 +31,12 @@ export function useCreateReview() {
         queryClient.invalidateQueries({
           queryKey: storefrontReviewKeys.all,
         })
+        queryClient.invalidateQueries({
+          queryKey: storefrontProductKeys.all,
+        })
+        queryClient.invalidateQueries({
+          queryKey: reviewKeys.all,
+        })
       }
     },
   })
@@ -53,6 +61,15 @@ export function useUpdateReview() {
         queryClient.invalidateQueries({
           queryKey: storefrontReviewKeys.detail(variables.id),
         })
+        queryClient.invalidateQueries({
+          queryKey: storefrontProductKeys.all,
+        })
+        queryClient.invalidateQueries({
+          queryKey: reviewKeys.all,
+        })
+        queryClient.invalidateQueries({
+          queryKey: reviewKeys.detail(variables.id),
+        })
       }
     },
   })
@@ -74,6 +91,12 @@ export function useDeleteReview() {
       if (res.success) {
         queryClient.invalidateQueries({
           queryKey: storefrontReviewKeys.all,
+        })
+        queryClient.invalidateQueries({
+          queryKey: storefrontProductKeys.all,
+        })
+        queryClient.invalidateQueries({
+          queryKey: reviewKeys.all,
         })
       }
     },
