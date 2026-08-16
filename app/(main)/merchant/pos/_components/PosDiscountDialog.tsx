@@ -42,6 +42,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface PosDiscountDialogProps {
   subtotal: number
@@ -56,7 +57,6 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   const [inputCouponCode, setInputCouponCode] = useState('')
   const { watch, setValue } = useFormContext<POSCheckoutInput>()
   const customerId = watch('customerId')
-  const customerName = watch('customerName')
   const customerPhone = watch('customerPhone')
   const customerPoints = watch('customerPoints') || 0
   const usedPoints = watch('usedPoints') || 0
@@ -202,135 +202,137 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between">
-              <Label className="flex items-center gap-1.5 text-sm font-semibold">
-                <IconUserPlus className="text-primary size-4" />
-                สมาชิกสะสมแต้ม
-              </Label>
-              {!customerId && (
-                <div className="bg-muted flex rounded-lg p-0.5 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setMode('search')}
-                    className={`rounded-md px-2.5 py-1 font-medium transition-all ${
-                      mode === 'search'
-                        ? 'bg-background text-foreground shadow-xs'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
-                    ค้นหา
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMode('create')}
-                    className={`rounded-md px-2.5 py-1 font-medium transition-all ${
-                      mode === 'create'
-                        ? 'bg-background text-foreground shadow-xs'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
-                    + สมัครใหม่
-                  </button>
-                </div>
-              )}
-            </div>
             {customerId ? (
-              <CustomerCard
-                title="ข้อมูลลูกค้า"
-                content={
-                  <>
-                    รหัสลูกค้า: {customerId} <br />
-                    เบอร์โทรศัพท์: {formatPromptPay(customerPhone)} <br />
-                    แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
-                  </>
-                }
-                action={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleRemoveCustomer}
-                  >
-                    <IconX />
-                  </Button>
-                }
-              />
-            ) : mode === 'search' ? (
-              <div className="flex gap-2">
-                <Input
-                  placeholder="ค้นหาด้วย เบอร์โทร / อีเมล / รหัสสมาชิก..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearchMember()}
-                  className="h-10 text-sm"
+              <>
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-1.5 text-sm font-semibold">
+                    <IconUserPlus className="text-primary size-4" />
+                    สมาชิกสะสมแต้ม
+                  </Label>
+                </div>
+                <CustomerCard
+                  title="ข้อมูลลูกค้า"
+                  content={
+                    <>
+                      รหัสลูกค้า: {customerId} <br />
+                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone)} <br />
+                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                    </>
+                  }
+                  action={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleRemoveCustomer}
+                    >
+                      <IconX />
+                    </Button>
+                  }
                 />
-                <Button
-                  type="button"
-                  onClick={handleSearchMember}
-                  disabled={searchCustomerMutation.isPending}
-                  className="h-10 gap-1.5 px-4 font-medium"
-                >
-                  <IconSearch className="size-4" />
-                  {searchCustomerMutation.isPending ? 'ค้นหา...' : 'ค้นหา'}
-                </Button>
-              </div>
+              </>
             ) : (
-              <form
-                onSubmit={handleSubmit(handleCreateMember)}
-                className="bg-muted/30 space-y-3 rounded-xl border p-3.5"
+              <Tabs
+                value={mode}
+                onValueChange={(val) => setMode(val as 'search' | 'create')}
+                className="w-full space-y-3"
               >
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">
-                      ชื่อ <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      placeholder="สมชาย"
-                      className="h-9 text-xs"
-                      {...register('firstName')}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">นามสกุล</Label>
-                    <Input
-                      placeholder="ใจดี"
-                      className="h-9 text-xs"
-                      {...register('lastName')}
-                    />
-                  </div>
+                <div className="flex flex-wrap items-center justify-between">
+                  <Label className="flex items-center gap-1.5 text-sm font-semibold">
+                    <IconUserPlus className="text-primary size-4" />
+                    สมาชิกสะสมแต้ม
+                  </Label>
+                  <TabsList className="h-8 p-0.5">
+                    <TabsTrigger value="search" className="text-xs">
+                      ค้นหา
+                    </TabsTrigger>
+                    <TabsTrigger value="create" className="text-xs">
+                      + สมัครใหม่
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs">
-                      เบอร์โทรศัพท์ <span className="text-destructive">*</span>
-                    </Label>
+                <TabsContent value="search" className="mt-0">
+                  <div className="flex gap-2">
                     <Input
-                      placeholder="0812345678"
-                      className="h-9 text-xs"
-                      {...register('phone')}
+                      placeholder="ค้นหาด้วย เบอร์โทร / อีเมล / รหัสสมาชิก..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' && handleSearchMember()
+                      }
+                      className="h-10 text-sm"
                     />
+                    <Button
+                      type="button"
+                      onClick={handleSearchMember}
+                      disabled={searchCustomerMutation.isPending}
+                      className="h-10 gap-1.5 px-4 font-medium"
+                    >
+                      <IconSearch className="size-4" />
+                      {searchCustomerMutation.isPending ? 'ค้นหา...' : 'ค้นหา'}
+                    </Button>
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">อีเมล</Label>
-                    <Input
-                      type="email"
-                      placeholder="customer@example.com"
-                      className="h-9 text-xs"
-                      {...register('email')}
-                    />
-                  </div>
-                </div>
-                <Button
-                  type="submit"
-                  disabled={createCustomerMutation.isPending}
-                  className="w-full gap-1.5 font-semibold"
-                  size="sm"
-                >
-                  <IconPlus className="size-4" />
-                  {createCustomerMutation.isPending
-                    ? 'กำลังบันทึก...'
-                    : 'ลงทะเบียนสมาชิกใหม่'}
-                </Button>
-              </form>
+                </TabsContent>
+                <TabsContent value="create" className="mt-0">
+                  <form
+                    onSubmit={handleSubmit(handleCreateMember)}
+                    className="bg-muted/30 space-y-3 rounded-xl border p-3.5"
+                  >
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">
+                          ชื่อ <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          placeholder="สมชาย"
+                          className="h-9 text-xs"
+                          {...register('firstName')}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">นามสกุล</Label>
+                        <Input
+                          placeholder="ใจดี"
+                          className="h-9 text-xs"
+                          {...register('lastName')}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">
+                          เบอร์โทรศัพท์{' '}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          placeholder="0812345678"
+                          className="h-9 text-xs"
+                          {...register('phone')}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">อีเมล</Label>
+                        <Input
+                          type="email"
+                          placeholder="customer@example.com"
+                          className="h-9 text-xs"
+                          {...register('email')}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={createCustomerMutation.isPending}
+                      className="w-full gap-1.5 font-semibold"
+                      size="sm"
+                    >
+                      <IconPlus className="size-4" />
+                      {createCustomerMutation.isPending
+                        ? 'กำลังบันทึก...'
+                        : 'ลงทะเบียนสมาชิกใหม่'}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
             )}
           </div>
           {isPointsEnabled && (

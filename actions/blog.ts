@@ -1,6 +1,7 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
@@ -84,7 +85,7 @@ export async function getBlogs({
   }
 
   try {
-    if (storeId && storeId !== 'all' && storeId !== '') {
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
