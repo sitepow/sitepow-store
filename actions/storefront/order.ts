@@ -1,8 +1,9 @@
 'use server'
 
 import { Prisma } from '@/generated/prisma/client'
-import { OrderStatus } from '@/generated/prisma/enums'
+import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import { sendNewOrderNotificationEmail } from '@/utils/store-staff'
 
 import { auth } from '@/lib/auth'
 import { createOrderCore } from '@/lib/order'
@@ -194,7 +195,12 @@ export async function createOrder(input: CreateOrderInput) {
 
     const customer = await prisma.customer.findUnique({
       where: { userId },
-      select: { id: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        user: { select: { name: true } },
+      },
     })
 
     if (!customer) {
@@ -203,7 +209,7 @@ export async function createOrder(input: CreateOrderInput) {
 
     const store = await prisma.store.findUnique({
       where: { slug: input.storeSlug },
-      select: { id: true },
+      select: { id: true, name: true },
     })
 
     if (!store) {
@@ -224,6 +230,29 @@ export async function createOrder(input: CreateOrderInput) {
       items: input.items,
       isPOS: false,
     })
+
+    const primaryOrder = createdOrders[0]
+
+    if (primaryOrder) {
+      const customerName =
+        customer.firstName && customer.lastName
+          ? `${customer.firstName} ${customer.lastName}`
+          : customer.user?.name || 'คุณลูกค้า'
+
+      sendNewOrderNotificationEmail({
+        storeId: store.id,
+        storeName: store.name,
+        orderNumber: primaryOrder.orderNumber,
+        customerName,
+        totalAmount: Number(primaryOrder.totalAmount),
+        paymentMethod: primaryOrder.paymentMethod as PaymentMethod,
+        items: primaryOrder.items.map((item) => ({
+          title: item.title,
+          quantity: item.quantity,
+          price: Number(item.price),
+        })),
+      }).catch((err) => console.error(err))
+    }
 
     return {
       success: true,

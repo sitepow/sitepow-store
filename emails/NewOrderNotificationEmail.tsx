@@ -1,3 +1,5 @@
+import { PAYMENT_METHOD_TH } from '@/constants/translate'
+import { PaymentMethod } from '@/generated/prisma/enums'
 import {
   Body,
   Container,
@@ -25,7 +27,7 @@ interface NewOrderNotificationEmailProps {
   storeName?: string
   customerName?: string
   totalAmount?: string
-  paymentMethod?: string
+  paymentMethod?: PaymentMethod
   items?: OrderItem[]
   dashboardUrl?: string
 }
@@ -35,7 +37,7 @@ export default function NewOrderNotificationEmail({
   storeName = 'Sitepow Store',
   customerName = 'คุณลูกค้า',
   totalAmount = '฿1,130.00',
-  paymentMethod = 'โอนเงินผ่านธนาคาร / PromptPay',
+  paymentMethod = PaymentMethod.STRIPE_QR_PROMPTPAY,
   items = [
     {
       title: 'เสื้อยืด Oversized Cotton 100%',
@@ -74,7 +76,7 @@ export default function NewOrderNotificationEmail({
             </Text>
             <Text className="text-xs opacity-50">
               หมายเลข: #{orderNumber} <br />
-              {paymentMethod}
+              {PAYMENT_METHOD_TH[paymentMethod]}
             </Text>
             <Section className="my-6">
               <Link
