@@ -2,9 +2,10 @@
 
 import { StorefrontProductDetail } from '@/actions/storefront/product'
 import { getRatingLabel } from '@/utils/review'
-import { User2Icon } from 'lucide-react'
+import { CheckCircle2, User2Icon } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
 import { StarRating } from '../../../_components/product/StarRating'
@@ -32,7 +33,16 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm font-bold text-slate-900">{customerName}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-bold">{customerName}</p>
+              <Badge
+                variant="secondary"
+                className="gap-1 border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-normal text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-400"
+              >
+                <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
+                <span>สั่งซื้อจริง</span>
+              </Badge>
+            </div>
             <div className="mt-1.5">
               <StarRating rating={review.rating} />
             </div>

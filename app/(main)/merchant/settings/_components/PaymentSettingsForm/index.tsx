@@ -23,7 +23,6 @@ import {
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -115,7 +114,6 @@ export function PaymentSettingsForm() {
             icon={IconCreditCard}
             title="ช่องทางรับชำระเงิน"
             description="เปิด-ปิดช่องทางการรับเงินสำหรับลูกค้าหน้าร้านค้า พร้อมตั้งค่าบัญชีปลายทางในการรับรายได้"
-            endContent={<StoreSelectField />}
           />
         </CardHeader>
         {selectedStoreId !== ALL_STORES && (

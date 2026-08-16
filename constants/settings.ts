@@ -6,6 +6,7 @@ export enum SettingsTab {
   TAX = 'settings-tax',
   SHIPPING = 'settings-shipping',
   PAYMENT = 'settings-payment',
+  REVIEW_REWARD = 'review-reward',
 }
 
 export enum UserSettingsTab {

@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState } from 'react'
 
+import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
 import { usePurchasableProducts } from '@/actions/hooks/storefront/review'
 import { formatDateTime } from '@/utils/date'
 import { IconMessagePlus, IconStarFilled } from '@tabler/icons-react'
@@ -19,6 +21,31 @@ import {
 } from '@/components/ui/table'
 
 import { ReviewFormDialog } from './ReviewFormDialog'
+
+function ReviewActionButton({
+  item,
+  onSelect,
+}: {
+  item: {
+    storeId: string
+    productId: string
+    variantId: string
+    orderId: string
+    productTitle: string
+    productImage?: string
+  }
+  onSelect: () => void
+}) {
+  const { data: rewardConfigRes } = useReviewRewardConfig(item.storeId)
+  const isRewardEnabled = rewardConfigRes?.data?.isEnabled ?? false
+
+  return (
+    <Button size="sm" onClick={onSelect}>
+      <IconMessagePlus className="size-4" />
+      {isRewardEnabled ? 'เขียนรีวิวรับแต้ม' : 'เขียนรีวิว'}
+    </Button>
+  )
+}
 
 export function MyReviewTable() {
   const [selectedItem, setSelectedItem] = useState<{
@@ -116,9 +143,9 @@ export function MyReviewTable() {
                     {hasUnreviewedItems && (
                       <TableCell className="text-right">
                         {!isReviewed && (
-                          <Button
-                            size="sm"
-                            onClick={() =>
+                          <ReviewActionButton
+                            item={item}
+                            onSelect={() =>
                               setSelectedItem({
                                 storeId: item.storeId,
                                 productId: item.productId,
@@ -128,10 +155,7 @@ export function MyReviewTable() {
                                 productImage: item.productImage,
                               })
                             }
-                          >
-                            <IconMessagePlus className="size-4" />
-                            เขียนรีวิวรับแต้ม
-                          </Button>
+                          />
                         )}
                       </TableCell>
                     )}

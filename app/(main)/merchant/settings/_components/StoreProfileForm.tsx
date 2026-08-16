@@ -20,7 +20,6 @@ import { IconBuildingStore } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreLogo } from '@/components/StoreLogo'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import {
@@ -184,7 +183,6 @@ export function StoreProfileForm() {
           icon={IconBuildingStore}
           title="ตั้งค่าข้อมูลร้านค้า"
           description="แก้ไขข้อมูลสาขาหลัก, URL Slug หน้าระบบ และข้อมูลข้อความหมายเหตุที่จะปรากฏในกระดาษใบเสร็จ POS"
-          endContent={<StoreSelectField />}
         />
       </CardHeader>
       {selectedStoreId === ALL_STORES ? (

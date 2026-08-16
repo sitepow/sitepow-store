@@ -13,10 +13,12 @@ import {
   IconReceiptTax,
   IconReplace,
   IconSettings,
+  IconStar,
   IconTruck,
 } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -24,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PaymentSettingsForm } from './_components/PaymentSettingsForm'
+import { ReviewRewardSettingsForm } from './_components/ReviewRewardSettingsForm'
 import { SecuritySettingsForm } from './_components/SecuritySettingsForm'
 import { ShippingSettingsForm } from './_components/ShippingSettingsForm'
 import { StoreProfileForm } from './_components/StoreProfileForm'
@@ -45,6 +48,7 @@ export default function MerchantSettingsPage() {
     canViewTax,
     canViewShipping,
     canViewPayment,
+    canViewReviews,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -54,7 +58,12 @@ export default function MerchantSettingsPage() {
         icon={IconSettings}
         title="การตั้งค่าระบบ"
         description="จัดการข้อมูลโครงสร้างร้านค้าหลัก ปรับปรุงระบบความปลอดภัยชั้นสูง และควบคุมตัวเลือกแจ้งเตือนผ่านบัญชี"
-        endContent={<StoreSelectField />}
+        endContent={
+          <div className="flex flex-wrap gap-2.5">
+            <StoreSelectField />
+            <BranchSelectField />
+          </div>
+        }
       />
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert />
@@ -86,6 +95,9 @@ export default function MerchantSettingsPage() {
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.PAYMENT}>
               <IconCreditCard size={14} /> ช่องทางรับชำระเงิน
+            </TabsTrigger>
+            <TabsTrigger value={SettingsTab.REVIEW_REWARD}>
+              <IconStar size={14} /> คะแนนการรีวิว
             </TabsTrigger>
           </TabsList>
           <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
@@ -163,6 +175,17 @@ export default function MerchantSettingsPage() {
               />
             ) : (
               <PaymentSettingsForm />
+            )}
+          </TabsContent>
+          <TabsContent value={SettingsTab.REVIEW_REWARD} className="flex-1">
+            {!isPermissionLoading && !canViewReviews ? (
+              <ActionRequiredAlert
+                icon={<IconLock />}
+                title="ไม่มีสิทธิ์เข้าถึง"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลการตั้งค่าคะแนนรีวิวของสาขาหรือร้านค้านี้"
+              />
+            ) : (
+              <ReviewRewardSettingsForm />
             )}
           </TabsContent>
         </Tabs>

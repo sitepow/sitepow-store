@@ -5,12 +5,14 @@ import { Fragment, PropsWithChildren } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
+import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NavigationItem } from '@/constants/navigation'
 import { FALLBACK_MERCHANT_LOGO_IMAGE } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconChevronRight, IconHome } from '@tabler/icons-react'
 
 import {
@@ -56,10 +58,20 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const userRole = user?.role
 
   const { store } = useStoreData()
+  const { selectedStoreId } = useStoreFilter()
+  const { data: loyaltySettings } = useLoyaltySettings(
+    store?.id || selectedStoreId,
+  )
+
+  const isPointsEnabled = loyaltySettings?.isPointsEnabled ?? false
+  const pointRate = loyaltySettings?.pointRedeemRate
+    ? Number(loyaltySettings.pointRedeemRate)
+    : 1
 
   const pathname = usePathname()
   const isMerchant =
     userRole === UserRole.MERCHANT && redirectPath === 'merchant'
+  const isStoreFront = redirectPath === 'user'
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   return (
@@ -154,6 +166,9 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
           <UserAvatarDropdown redirectPath="merchant" items={items} />
           {isMerchant && <CreditBadge />}
           {isMerchant && <DateTimeBadge />}
+          {isPointsEnabled && (
+            <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+          )}
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

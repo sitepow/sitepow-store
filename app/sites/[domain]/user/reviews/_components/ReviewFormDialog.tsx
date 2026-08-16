@@ -11,6 +11,7 @@ import {
 } from '@/actions/hooks/storefront/review'
 import { ImageUploadSection } from '@/app/(main)/merchant/store-settings/products/create/_components/ImageUploadSection'
 import { getPathR2FromUrl } from '@/utils/image'
+import { formatNumber } from '@/utils/pricing'
 import { calculateReviewPoints } from '@/utils/review-points'
 import { ReviewFormValues, reviewFormSchema } from '@/zod/storefront/review'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -59,6 +60,7 @@ export function ReviewFormDialog({
     targetInfo?.storeId || '',
   )
   const rewardConfig = rewardConfigRes?.data
+  const isRewardEnabled = rewardConfig?.isEnabled ?? false
 
   const createMutation = useCreateReview()
   const updateMutation = useUpdateReview()
@@ -244,16 +246,19 @@ export function ReviewFormDialog({
             <DialogTitle>
               {isEditing ? 'แก้ไขรีวิวสินค้า' : 'เขียนรีวิวสินค้า'}
             </DialogTitle>
-            <Badge
-              variant="secondary"
-              className="flex items-center gap-1.5 border-amber-200 bg-amber-50 px-3 py-1 text-amber-600"
-            >
-              <IconSparkles className="size-4 text-amber-500" />
-              <span>รับ +{calculatedPoints.totalPoints} แต้ม</span>
-            </Badge>
+            {isRewardEnabled && (
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1.5 border-amber-200 bg-amber-50 px-3 py-1 text-amber-600"
+              >
+                <IconSparkles className="size-4 text-amber-500" />
+                <span>
+                  รับ +{formatNumber(calculatedPoints.totalPoints)} แต้ม
+                </span>
+              </Badge>
+            )}
           </div>
         </DialogHeader>
-
         {targetInfo?.productTitle && (
           <div className="flex items-center gap-3 border-b pb-3">
             {targetInfo.productImage && (
@@ -268,7 +273,6 @@ export function ReviewFormDialog({
             </span>
           </div>
         )}
-
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
             <FieldGroup className="space-y-4">
@@ -309,7 +313,6 @@ export function ReviewFormDialog({
                   )}
                 </div>
               </Field>
-
               <Field>
                 <div className="mb-1 flex items-center justify-between">
                   <FieldLabel className="text-sm font-medium">
@@ -330,14 +333,15 @@ export function ReviewFormDialog({
                   </p>
                 )}
               </Field>
-
               <Field>
                 <div className="mb-1 flex items-center justify-between">
                   <FieldLabel className="text-sm font-medium">
                     รูปภาพสินค้า
                   </FieldLabel>
                   <span className="text-muted-foreground text-xs">
-                    แนบสูงสุด 3 รูป (+{photoBonusText} แต้ม/รูป)
+                    {isRewardEnabled
+                      ? `แนบสูงสุด 3 รูป (+${photoBonusText} แต้ม/รูป)`
+                      : 'แนบสูงสุด 3 รูป'}
                   </span>
                 </div>
                 <ImageUploadSection showPrimaryControl={false} />
@@ -348,7 +352,6 @@ export function ReviewFormDialog({
                 )}
               </Field>
             </FieldGroup>
-
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"

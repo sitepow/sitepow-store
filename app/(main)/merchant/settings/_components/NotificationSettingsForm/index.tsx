@@ -17,7 +17,6 @@ import { IconBell } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
@@ -75,7 +74,6 @@ export function NotificationSettingsForm() {
           title="ระบบแจ้งเตือนไลน์/อีเมล"
           description="กำหนดพฤติกรรมการรับส่งข้อมูลสำคัญและตัวแจ้งเตือนแบบเรียลไทม์ของระบบหลังบ้านไปยังพนักงานและผู้บริหาร"
           icon={IconBell}
-          endContent={<StoreSelectField />}
         />
       </CardHeader>
 

@@ -7,7 +7,6 @@ import { IconMail, IconReplace } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -30,7 +29,6 @@ export function StoreTransferSettingsForm() {
             icon={IconReplace}
             title="โอนย้ายความเป็นเจ้าของร้าน"
             description="ทำการส่งคำขอไปยังบัญชีผู้ใช้ท่านอื่นเพื่อโอนกรรมสิทธิ์ สิทธิ์ขาดในการตั้งค่า และสิทธิ์ความเป็น Owner ของร้านค้านี้"
-            endContent={<StoreSelectField />}
           />
         </CardHeader>
 

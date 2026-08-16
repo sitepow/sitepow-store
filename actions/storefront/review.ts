@@ -272,7 +272,7 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
     let awardedPoints = 0
     let breakdown: { description: string; points: number }[] = []
 
-    if (!reviewConfig || reviewConfig.isEnabled) {
+    if (reviewConfig?.isEnabled) {
       const calculated = calculateReviewPoints({
         rating,
         comment: comment ?? '',

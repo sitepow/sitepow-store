@@ -11,7 +11,6 @@ import { IconDeviceFloppy, IconReceiptTax } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -72,7 +71,6 @@ export function TaxSettingsForm() {
           icon={IconReceiptTax}
           title="ภาษีและใบกำกับ"
           description="ตั้งค่าการคำนวณภาษีของร้านค้าเพื่อเปิดตัวเลือกให้ลูกค้าขอใบกำกับภาษีเต็มรูปแบบในขั้นตอนเช็คเอาท์ออเดอร์"
-          endContent={<StoreSelectField />}
         />
       </CardHeader>
       {selectedStoreId !== ALL_STORES && (

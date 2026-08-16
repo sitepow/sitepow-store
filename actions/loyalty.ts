@@ -69,16 +69,6 @@ export async function getLoyaltySettings(storeId: string) {
       return null
     }
 
-    const authCheck = await verifyEmployeePermission({
-      userId,
-      storeId,
-      permission: 'canViewStoreSettings',
-    })
-
-    if (!authCheck.isAuthorized) {
-      return null
-    }
-
     const data = await prisma.store.findUnique({
       where: { id: storeId },
       select: loyaltySettingsSelect,

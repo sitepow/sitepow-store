@@ -21,9 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -108,14 +106,8 @@ export function ShippingSettingsForm() {
               title="ระบบขนส่งสินค้า"
               description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
-                <div className="flex flex-wrap items-end gap-2">
-                  <StoreSelectField />
-                  <BranchSelectField />
-                  {selectedStoreId !== ALL_STORES &&
-                    selectedBranchId !== ALL_BRANCHES && (
-                      <ApplyGlobalRatesDialog />
-                    )}
-                </div>
+                selectedStoreId !== ALL_STORES &&
+                selectedBranchId !== ALL_BRANCHES && <ApplyGlobalRatesDialog />
               }
             />
           </CardHeader>
