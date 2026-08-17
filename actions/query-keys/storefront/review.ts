@@ -4,5 +4,6 @@ export const storefrontReviewKeys = {
   list: (filters: { page?: number; limit?: number; search?: string }) =>
     [...storefrontReviewKeys.lists(), filters] as const,
   detail: (id: string) => [...storefrontReviewKeys.all, 'detail', id] as const,
-  purchasable: () => [...storefrontReviewKeys.all, 'purchasable'] as const,
+  purchasable: (storeSlug?: string) =>
+    [...storefrontReviewKeys.all, 'purchasable', storeSlug] as const,
 }

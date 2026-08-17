@@ -476,7 +476,7 @@ export async function updateCustomerReview(
   }
 }
 
-export async function getPurchasableProductsForReview() {
+export async function getPurchasableProductsForReview(storeSlug?: string) {
   const session = await auth()
   const userId = session?.user?.id
   if (!userId) {
@@ -496,6 +496,16 @@ export async function getPurchasableProductsForReview() {
       where: {
         customerId: customer.id,
         status: OrderStatus.SHIPPED,
+        ...(storeSlug && {
+          store: {
+            OR: [
+              { slug: storeSlug },
+              {
+                StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } },
+              },
+            ],
+          },
+        }),
       },
       include: {
         items: true,

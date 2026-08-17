@@ -3,6 +3,8 @@
 
 import { useState } from 'react'
 
+import { useParams } from 'next/navigation'
+
 import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
 import { usePurchasableProducts } from '@/actions/hooks/storefront/review'
 import { formatDateTime } from '@/utils/date'
@@ -48,6 +50,9 @@ function ReviewActionButton({
 }
 
 export function MyReviewTable() {
+  const params = useParams()
+  const domain = params?.domain as string
+
   const [selectedItem, setSelectedItem] = useState<{
     storeId: string
     productId: string
@@ -57,7 +62,7 @@ export function MyReviewTable() {
     productImage?: string
   } | null>(null)
 
-  const { data: items = [], isLoading } = usePurchasableProducts()
+  const { data: items = [], isLoading } = usePurchasableProducts(domain)
 
   const hasUnreviewedItems = items.some((item) => !item.reviewId)
 

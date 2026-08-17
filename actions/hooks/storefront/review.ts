@@ -75,10 +75,11 @@ export function useUpdateReview() {
   })
 }
 
-export function usePurchasableProducts() {
+export function usePurchasableProducts(storeSlug?: string) {
   return useQuery({
-    queryKey: storefrontReviewKeys.purchasable(),
-    queryFn: async () => (await getPurchasableProductsForReview()).data,
+    queryKey: storefrontReviewKeys.purchasable(storeSlug),
+    queryFn: async () =>
+      (await getPurchasableProductsForReview(storeSlug)).data,
   })
 }
 

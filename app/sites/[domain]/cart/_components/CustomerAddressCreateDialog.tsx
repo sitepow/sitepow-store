@@ -36,7 +36,9 @@ export function CustomerAddressCreateDialog() {
   const { store } = useStoreData()
 
   const [open, setOpen] = useState(false)
-  const { mutate: createAddress, isPending } = useCreateAddress()
+  const { mutate: createAddress, isPending } = useCreateAddress(
+    store?.slug ?? '',
+  )
 
   const {
     register,
@@ -72,6 +74,8 @@ export function CustomerAddressCreateDialog() {
   }
 
   const onSubmit = (data: AddressSchema) => {
+    if (!store?.slug) return
+
     const rawPhone = data.phone ? data.phone.replace(/\D/g, '') : ''
 
     createAddress(
@@ -299,8 +303,7 @@ export function CustomerAddressCreateDialog() {
               className="w-full"
               type="submit"
               size="lg"
-
-              disabled={isPending}
+              disabled={isPending || !store?.slug}
             >
               {isPending ? (
                 <>

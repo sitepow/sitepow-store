@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useParams } from 'next/navigation'
+
 import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useCancelOrder } from '@/actions/hooks/order'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
@@ -36,11 +38,13 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ search }: OrderTableProps) {
+  const params = useParams()
+  const domain = params?.domain as string
   const { user } = useSession()
   const [page, setPage] = useState(1)
 
   const { data: { data: orders = [], meta } = {}, isLoading } =
-    useStorefrontOrders({ page, limit: 10, search })
+    useStorefrontOrders({ page, limit: 10, search, storeSlug: domain })
 
   const storeCheckoutMutation = useStoreCheckout()
   const cancelOrderMutation = useCancelOrder()

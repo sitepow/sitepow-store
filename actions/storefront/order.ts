@@ -103,6 +103,7 @@ interface GetStorefrontOrdersParams {
   limit?: number
   search?: string
   status?: OrderStatus
+  storeSlug?: string
 }
 
 export async function getStorefrontOrders({
@@ -110,6 +111,7 @@ export async function getStorefrontOrders({
   limit = 10,
   search,
   status,
+  storeSlug,
 }: GetStorefrontOrdersParams = {}): Promise<GetStorefrontOrdersResponse> {
   const empty = {
     data: [],
@@ -142,7 +144,10 @@ export async function getStorefrontOrders({
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.OrderWhereInput = { customerId: customer.id }
+    const whereClause: Prisma.OrderWhereInput = {
+      customerId: customer.id,
+      ...(storeSlug ? { store: { slug: storeSlug } } : {}),
+    }
 
     if (status) {
       whereClause.status = status

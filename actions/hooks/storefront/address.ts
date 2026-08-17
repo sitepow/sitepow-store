@@ -1,4 +1,5 @@
-import { storefrontAddressKeys } from '@/actions/query-keys/storefront/address'
+'use client'
+
 import {
   AddressDetail,
   createAddress,
@@ -15,37 +16,52 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-export function useAddresses() {
+export const storefrontAddressKeys = {
+  all: ['addresses'] as const,
+  lists: (storeSlug?: string) =>
+    [...storefrontAddressKeys.all, 'list', storeSlug] as const,
+  options: (storeSlug?: string) =>
+    [...storefrontAddressKeys.all, 'options', storeSlug] as const,
+}
+
+export function useAddresses(storeSlug: string) {
   return useQuery(
     queryOptions({
-      queryKey: storefrontAddressKeys.lists(),
-      queryFn: () => getAddresses(),
+      queryKey: storefrontAddressKeys.lists(storeSlug),
+      queryFn: () => getAddresses(storeSlug),
+      enabled: !!storeSlug,
     }),
   )
 }
 
-export function useAddressOptions() {
+export function useAddressOptions(storeSlug: string) {
   return useQuery(
     queryOptions({
-      queryKey: storefrontAddressKeys.options(),
-      queryFn: () => getAddressOptions(),
+      queryKey: storefrontAddressKeys.options(storeSlug),
+      queryFn: () => getAddressOptions(storeSlug),
+      enabled: !!storeSlug,
     }),
   )
 }
 
-export function useCreateAddress() {
+export function useCreateAddress(storeSlug: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: Omit<AddressDetail, 'id' | 'isDefault'>) =>
-      createAddress(data),
+    mutationFn: (data: Omit<AddressDetail, 'id' | 'isDefault' | 'storeId'>) =>
+      createAddress(data, storeSlug),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      queryClient.invalidateQueries({
+        queryKey: storefrontAddressKeys.lists(storeSlug),
+      })
+      queryClient.invalidateQueries({
+        queryKey: storefrontAddressKeys.options(storeSlug),
+      })
     },
   })
 }
 
-export function useUpdateAddress() {
+export function useUpdateAddress(storeSlug?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -54,32 +70,59 @@ export function useUpdateAddress() {
       data,
     }: {
       id: string
-      data: Partial<Omit<AddressDetail, 'id' | 'isDefault'>>
+      data: Partial<Omit<AddressDetail, 'id' | 'isDefault' | 'storeId'>>
     }) => updateAddress(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      if (storeSlug) {
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.lists(storeSlug),
+        })
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.options(storeSlug),
+        })
+      } else {
+        queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      }
     },
   })
 }
 
-export function useDeleteAddress() {
+export function useDeleteAddress(storeSlug?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) => deleteAddress(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      if (storeSlug) {
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.lists(storeSlug),
+        })
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.options(storeSlug),
+        })
+      } else {
+        queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      }
     },
   })
 }
 
-export function useSetDefaultAddress() {
+export function useSetDefaultAddress(storeSlug?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) => setDefaultAddress(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      if (storeSlug) {
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.lists(storeSlug),
+        })
+        queryClient.invalidateQueries({
+          queryKey: storefrontAddressKeys.options(storeSlug),
+        })
+      } else {
+        queryClient.invalidateQueries({ queryKey: storefrontAddressKeys.all })
+      }
     },
   })
 }

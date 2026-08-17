@@ -103,7 +103,7 @@ export default function StoreCartPage() {
   const [userSelectedSection, setUserSelectedSection] =
     useState<CheckoutStep | null>(null)
 
-  const { data: addressOptions = [] } = useAddressOptions()
+  const { data: addressOptions = [] } = useAddressOptions(store?.slug!)
   const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
   const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
 

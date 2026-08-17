@@ -1,9 +1,20 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client'
+import { Prisma } from '@/generated/prisma/client';
 
-import { auth } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+
+
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
+
+
+
+
+
+
+
+
 
 const addressOptionSelect = {
   id: true,
@@ -16,6 +27,7 @@ const addressOptionSelect = {
   subDistrict: true,
   postalCode: true,
   isDefault: true,
+  storeId: true,
 } satisfies Prisma.AddressSelect
 
 const addressDetailSelect = {
@@ -33,6 +45,7 @@ const addressDetailSelect = {
   taxId: true,
   branchCode: true,
   isDefault: true,
+  storeId: true,
 } satisfies Prisma.AddressSelect
 
 export type AddressOption = Prisma.AddressGetPayload<{
@@ -76,7 +89,23 @@ async function getCustomerId(userId: string) {
   return customer.id
 }
 
-export async function getAddressOptions() {
+async function getStoreIdBySlug(storeSlug?: string) {
+  if (!storeSlug) {
+    return null
+  }
+  const store = await prisma.store.findFirst({
+    where: {
+      OR: [
+        { slug: storeSlug },
+        { StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } } },
+      ],
+    },
+    select: { id: true },
+  })
+  return store?.id || null
+}
+
+export async function getAddressOptions(storeSlug?: string) {
   try {
     const session = await auth()
 
@@ -89,8 +118,17 @@ export async function getAddressOptions() {
       return []
     }
 
+    const storeId = await getStoreIdBySlug(storeSlug)
+
+    if (!storeId) {
+      return []
+    }
+
     return await prisma.address.findMany({
-      where: { customerId },
+      where: {
+        customerId,
+        storeId,
+      },
       select: addressOptionSelect,
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     })
@@ -100,19 +138,25 @@ export async function getAddressOptions() {
   }
 }
 
-export async function getAddresses() {
+export async function getAddresses(storeSlug: string) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
       return []
     }
+
     const customerId = await getCustomerId(session.user.id)
-    if (!customerId) {
+    const storeId = await getStoreIdBySlug(storeSlug)
+
+    if (!customerId || !storeId) {
       return []
     }
 
     return await prisma.address.findMany({
-      where: { customerId },
+      where: {
+        customerId,
+        storeId,
+      },
       select: addressDetailSelect,
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     })
@@ -123,7 +167,8 @@ export async function getAddresses() {
 }
 
 export async function createAddress(
-  data: Omit<AddressDetail, 'id' | 'isDefault'>,
+  data: Omit<AddressDetail, 'id' | 'isDefault' | 'storeId'>,
+  storeSlug: string,
 ) {
   try {
     const session = await auth()
@@ -132,13 +177,23 @@ export async function createAddress(
     }
 
     const customerId = await getCustomerId(session.user.id)
-    if (!customerId) {
-      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+    const storeId = await getStoreIdBySlug(storeSlug)
+
+    if (!customerId || !storeId) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้าหรือลูกค้า' }
     }
 
-    const count = await prisma.address.count({ where: { customerId } })
+    const countInStore = await prisma.address.count({
+      where: { customerId, storeId },
+    })
+
     const address = await prisma.address.create({
-      data: { ...data, customerId, isDefault: count === 0 },
+      data: {
+        ...data,
+        customerId,
+        storeId,
+        isDefault: countInStore === 0,
+      },
       select: addressDetailSelect,
     })
 
@@ -225,18 +280,25 @@ export async function deleteAddress(id: string) {
 export async function setDefaultAddress(id: string) {
   try {
     const session = await auth()
-    if (!session?.user?.id) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
-    }
+    if (!session?.user?.id) return { success: false }
 
     const customerId = await getCustomerId(session.user.id)
-    if (!customerId) {
-      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+
+    const targetAddress = await prisma.address.findUnique({
+      where: { id },
+      select: { customerId: true, storeId: true },
+    })
+
+    if (!targetAddress || targetAddress.customerId !== customerId) {
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
     }
 
     await prisma.$transaction([
       prisma.address.updateMany({
-        where: { customerId },
+        where: {
+          customerId,
+          storeId: targetAddress.storeId,
+        },
         data: { isDefault: false },
       }),
       prisma.address.update({

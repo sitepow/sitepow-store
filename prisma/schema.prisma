@@ -218,6 +218,8 @@ model Branch {
   transfersIn      StockTransfer[]   @relation("TransferTo")
   stockAdjustments StockAdjustment[]
 
+  expenses Expense[]
+
   translations Json?
 
   createdAt DateTime @default(now())
@@ -677,6 +679,8 @@ model Store {
   resellerAgreements   ResellerAgreement[]       @relation("ResellerAgreements")
   slipHistories        SlipVerificationHistory[]
   reviewRewardConfig   ReviewRewardConfig?
+  expenses             Expense[]
+  addresses            Address[]
 
   translations Json?
 
@@ -875,13 +879,14 @@ model DigitalItem {
 }
 
 model ProductVariant {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  price       Decimal @db.Decimal(10, 2)
+  price       Decimal  @db.Decimal(10, 2)
+  costPrice   Decimal? @default(0) @db.Decimal(10, 2)
   sku         String
   image       String?
-  digitalUrl  String? @db.Text
-  isAvailable Boolean @default(true)
+  digitalUrl  String?  @db.Text
+  isAvailable Boolean  @default(true)
 
   discountType   DiscountType?
   discountAmount Decimal?      @db.Decimal(10, 2)
@@ -1025,9 +1030,13 @@ enum AddressType {
 }
 
 model Address {
-  id         String   @id @default(uuid())
+  id String @id @default(uuid())
+
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   name         String
   taxName      String?
@@ -1049,6 +1058,10 @@ model Address {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([storeId])
+  @@index([customerId, storeId])
 }
 
 model Order {
@@ -1451,4 +1464,37 @@ enum CurrencyCode {
   AED // United Arab Emirates Dirham
   SAR // Saudi Riyal
   NZD // New Zealand Dollar
+}
+
+enum ExpenseCategory {
+  RENT // ค่าเช่าร้าน
+  UTILITIES // ค่าน้ำ/ค่าไฟ/อินเทอร์เน็ต
+  SALARY // ค่าจ้าง/เงินเดือนพนักงาน
+  MARKETING // ค่าโฆษณา/การตลาด
+  SUPPLIES // ค่าอุปกรณ์/ของใช้ในร้าน
+  MAINTENANCE // ค่าซ่อมบำรุง
+  OTHER // ค่าใช้จ่ายอื่นๆ
+}
+
+model Expense {
+  id      String @id @default(uuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  title        String
+  amount       Decimal         @db.Decimal(10, 2)
+  category     ExpenseCategory @default(OTHER)
+  receiptImage String?
+
+  expenseDate DateTime @default(now())
+  note        String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, expenseDate])
+  @@index([branchId])
 }

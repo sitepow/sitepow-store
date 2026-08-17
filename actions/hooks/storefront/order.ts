@@ -25,13 +25,15 @@ export function useStorefrontOrders({
   limit = 10,
   search,
   status,
+  storeSlug,
 }: {
   page?: number
   limit?: number
   search?: string
   status?: OrderStatus
+  storeSlug?: string
 } = {}) {
-  const filters = { page, limit, search, status }
+  const filters = { page, limit, search, status, storeSlug }
 
   return useQuery(
     queryOptions({

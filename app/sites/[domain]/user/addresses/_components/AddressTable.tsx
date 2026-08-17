@@ -1,5 +1,7 @@
 'use client'
 
+import { useParams } from 'next/navigation'
+
 import {
   useAddresses,
   useDeleteAddress,
@@ -23,7 +25,10 @@ import {
 } from '@/components/ui/table'
 
 export function AddressTable() {
-  const { data: addresses = [], isLoading } = useAddresses()
+  const params = useParams()
+  const domain = params?.domain as string
+
+  const { data: addresses = [], isLoading } = useAddresses(domain)
   const { mutate: deleteAddress, isPending: isDeletePending } =
     useDeleteAddress()
   const { mutate: setDefault } = useSetDefaultAddress()
