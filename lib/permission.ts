@@ -83,55 +83,79 @@ export async function initializeStoreRolesAndPermissions(
 ) {
   const db = tx || prisma
   const permissionKeys = Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-  const permMap = new Map<string, string>()
 
-  for (const key of permissionKeys) {
-    const { domain, action } = PERMISSION_MAPPING[key]
-    const perm = await db.permission.upsert({
-      where: { domain_action: { domain, action } },
-      update: {},
-      create: { domain, action },
-      select: { id: true },
+  const permissionConditions = permissionKeys.map((key) => ({
+    domain: PERMISSION_MAPPING[key].domain,
+    action: PERMISSION_MAPPING[key].action,
+  }))
+
+  const existingPerms = await db.permission.findMany({
+    where: { OR: permissionConditions },
+    select: { id: true, domain: true, action: true },
+  })
+
+  const permMap = new Map<string, string>()
+  existingPerms.forEach((p) => permMap.set(`${p.domain}_${p.action}`, p.id))
+
+  const missingPerms = permissionConditions.filter(
+    (cond) => !permMap.has(`${cond.domain}_${cond.action}`),
+  )
+
+  if (missingPerms.length > 0) {
+    await db.permission.createMany({
+      data: missingPerms,
+      skipDuplicates: true,
     })
-    permMap.set(`${domain}_${action}`, perm.id)
+    const newPerms = await db.permission.findMany({
+      where: { OR: missingPerms },
+      select: { id: true, domain: true, action: true },
+    })
+    newPerms.forEach((p) => permMap.set(`${p.domain}_${p.action}`, p.id))
   }
 
+  const roleEntries = Object.entries(ROLE_PERMISSION_PRESETS)
+  const roleNames = roleEntries.map(([roleName]) => roleName as DefaultRole)
+
+  await db.role.createMany({
+    data: roleNames.map((name) => ({ storeId, name })),
+    skipDuplicates: true,
+  })
+
+  const createdRoles = await db.role.findMany({
+    where: { storeId, name: { in: roleNames } },
+    select: { id: true, name: true },
+  })
+
   let ownerRoleId = ''
+  const roleMap = new Map<string, string>()
+  createdRoles.forEach((r) => {
+    roleMap.set(r.name, r.id)
+    if (r.name === DefaultRole.OWNER) {
+      ownerRoleId = r.id
+    }
+  })
 
-  for (const [roleName, presetKeys] of Object.entries(
-    ROLE_PERMISSION_PRESETS,
-  )) {
-    const role = await db.role.upsert({
-      where: {
-        storeId_name: { storeId, name: roleName as DefaultRole },
-      },
-      update: {},
-      create: { storeId, name: roleName as DefaultRole },
-      select: { id: true, name: true },
+  const allRolePermData: { roleId: string; permissionId: string }[] = []
+
+  for (const [roleName, presetKeys] of roleEntries) {
+    const roleId = roleMap.get(roleName)
+    if (!roleId) continue
+
+    for (const key of presetKeys) {
+      const mapping = PERMISSION_MAPPING[key as PermissionKey]
+      if (!mapping) continue
+      const permId = permMap.get(`${mapping.domain}_${mapping.action}`)
+      if (permId) {
+        allRolePermData.push({ roleId, permissionId: permId })
+      }
+    }
+  }
+
+  if (allRolePermData.length > 0) {
+    await db.rolePermission.createMany({
+      data: allRolePermData,
+      skipDuplicates: true,
     })
-
-    if (roleName === DefaultRole.OWNER) {
-      ownerRoleId = role.id
-    }
-
-    const rolePermData = presetKeys
-      .map((key) => {
-        const mapping = PERMISSION_MAPPING[key as PermissionKey]
-        if (!mapping) return null
-        const permId = permMap.get(`${mapping.domain}_${mapping.action}`)
-        return permId ? { roleId: role.id, permissionId: permId } : null
-      })
-      .filter(
-        (item): item is { roleId: string; permissionId: string } =>
-          item !== null,
-      )
-
-    if (rolePermData.length > 0) {
-      await db.rolePermission.createMany({
-        data: rolePermData,
-        skipDuplicates: true,
-      })
-    }
   }
 
   return { ownerRoleId }
@@ -154,7 +178,7 @@ export async function setupStoreOwnerPermissions(
   })
 
   if (!user) {
-    throw new Error()
+    throw new Error('ไม่พบข้อมูลผู้ใช้')
   }
 
   let employee = await db.employee.findUnique({
@@ -188,15 +212,14 @@ export async function setupStoreOwnerPermissions(
   })
 
   if (branchIds.length > 0) {
-    for (const branchId of branchIds) {
-      await db.employeeBranch.create({
-        data: {
-          employeeStoreId: employeeStore.id,
-          branchId,
-          roleId: ownerRoleId,
-        },
-      })
-    }
+    await db.employeeBranch.createMany({
+      data: branchIds.map((branchId) => ({
+        employeeStoreId: employeeStore.id,
+        branchId,
+        roleId: ownerRoleId,
+      })),
+      skipDuplicates: true,
+    })
   }
 
   return {
@@ -494,7 +517,7 @@ export async function assignNewBranchToOwners(
     })
 
     if (!user) {
-      throw new Error()
+      throw new Error('ไม่พบข้อมูลผู้ใช้')
     }
 
     employee = await db.employee.create({
@@ -549,13 +572,14 @@ export async function assignNewBranchToOwners(
     targetEmployeeStoreIds.push(currentEmployeeStore.id)
   }
 
-  for (const employeeStoreId of targetEmployeeStoreIds) {
-    await db.employeeBranch.create({
-      data: {
+  if (targetEmployeeStoreIds.length > 0) {
+    await db.employeeBranch.createMany({
+      data: targetEmployeeStoreIds.map((employeeStoreId) => ({
         employeeStoreId,
         branchId,
         roleId: ownerRoleId,
-      },
+      })),
+      skipDuplicates: true,
     })
   }
 }

@@ -354,23 +354,23 @@ export async function createStore(input: CreateStoreInput) {
   try {
     const { isAuthorized, message, userId } = await requireVerifiedUser()
 
-    if (!isAuthorized) {
-      return { success: false, message }
+    if (!isAuthorized || !userId) {
+      return { success: false, message: message || 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
-    const { billingCycle, ...storeData } = input
     const validatedInput = createStoreSchema.safeParse({
       ...input,
       ownerId: userId,
     })
 
     if (!validatedInput.success) {
-      const errorMessage = validatedInput.error.issues[0].message
-
+      const errorMessage =
+        validatedInput.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง'
       return { success: false, message: errorMessage }
     }
 
-    const cycle = input.billingCycle ?? PRICING_VALUE.ONE_MONTH
+    const { billingCycle, ...storeData } = input
+    const cycle = billingCycle ?? PRICING_VALUE.ONE_MONTH
     const months =
       cycle === PRICING_VALUE.TWELVE_MONTHS
         ? 12
@@ -390,10 +390,8 @@ export async function createStore(input: CreateStoreInput) {
       ? StoreStatus.ACTIVE
       : StoreStatus.MAINTENANCE
 
-    const { finalPrice } = calculatePlanPrice(
-      PLAN_DETAILS[input.plan ?? Plan.STARTER].price.toString(),
-      cycle,
-    )
+    const planPrice = PLAN_DETAILS[selectedPlan]?.price?.toString() ?? '0'
+    const { finalPrice } = calculatePlanPrice(planPrice, cycle)
 
     const { name, slug } = validatedInput.data
 
@@ -404,13 +402,14 @@ export async function createStore(input: CreateStoreInput) {
           { name: { equals: name, mode: 'insensitive' } },
         ],
       },
+      select: { id: true, slug: true, name: true },
     })
 
     if (existingStore) {
-      if (existingStore.slug === slug) {
+      if (existingStore.slug.toLowerCase() === slug.toLowerCase()) {
         return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้ว' }
       }
-      if (existingStore.name === name) {
+      if (existingStore.name.toLowerCase() === name.toLowerCase()) {
         return { success: false, message: 'ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว' }
       }
     }
@@ -430,7 +429,7 @@ export async function createStore(input: CreateStoreInput) {
             },
             subscription: {
               create: {
-                plan: input.plan ?? Plan.STARTER,
+                plan: selectedPlan,
                 status: SubStatus.ACTIVE,
                 startDate,
                 endDate,
@@ -439,13 +438,13 @@ export async function createStore(input: CreateStoreInput) {
             },
             subscriptionInvoices: {
               create: {
-                plan: input.plan ?? Plan.STARTER,
+                plan: selectedPlan,
                 amount: new Prisma.Decimal(finalPrice),
                 status: isFreePlan ? InvoiceStatus.PAID : InvoiceStatus.UNPAID,
                 paidAt: isFreePlan ? new Date() : null,
                 periodStart: startDate,
                 periodEnd: endDate,
-                description: `ค่าบริการแพลน ${PLAN_DETAILS[input.plan ?? Plan.STARTER].name} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
+                description: `ค่าบริการแพลน ${PLAN_DETAILS[selectedPlan]?.name ?? selectedPlan} (รอบ ${formatDate(startDate)} ถึง ${formatDate(endDate)})`,
               },
             },
           },
@@ -534,6 +533,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     if (input.slug) {
       const existingStore = await prisma.store.findUnique({
         where: { slug: input.slug },
+        select: { id: true },
       })
 
       if (existingStore && existingStore.id !== id) {
@@ -595,23 +595,9 @@ export async function deleteStore(id: string) {
       }
     }
 
-    const store = await prisma.$transaction(async (tx) => {
-      await tx.orderItem.deleteMany({ where: { order: { storeId: id } } })
-      await tx.order.deleteMany({ where: { storeId: id } })
-      await tx.employeeStore.deleteMany({ where: { storeId: id } })
-      await tx.subscription.deleteMany({ where: { storeId: id } })
-      await tx.subscriptionInvoice.deleteMany({ where: { storeId: id } })
-      await tx.coupon.deleteMany({ where: { storeId: id } })
-      await tx.product.deleteMany({ where: { storeId: id } })
-      await tx.category.deleteMany({ where: { storeId: id } })
-      await tx.branch.deleteMany({ where: { storeId: id } })
-      await tx.customerStore.deleteMany({ where: { storeId: id } })
-      await tx.activityLog.deleteMany({ where: { storeId: id } })
-
-      return await tx.store.delete({
-        where: { id },
-        select: { slug: true },
-      })
+    const store = await prisma.store.delete({
+      where: { id },
+      select: { slug: true },
     })
 
     await createLog({
