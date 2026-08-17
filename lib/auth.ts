@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
 import Line from 'next-auth/providers/line'
 
+import { UserRole } from '@/generated/prisma/enums'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import bcrypt from 'bcryptjs'
 
@@ -57,6 +58,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  events: {
+    async createUser({ user }) {
+      if (user.id) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            role: UserRole.MERCHANT,
+            isEmailVerified: true,
+            emailVerified: new Date(),
+          },
+        })
+      }
+    },
+  },
   callbacks: {
     async signIn() {
       return true
@@ -66,26 +81,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isOAuth =
           account.provider === 'google' || account.provider === 'line'
 
-        if (isOAuth && token.isEmailVerified !== true) {
-          try {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                isEmailVerified: true,
-                emailVerified: new Date(),
-              },
-            })
-
-            token.isEmailVerified = true
-          } catch (error) {
-            console.error(error)
-          }
+        if (isOAuth) {
+          token.role = UserRole.MERCHANT
+          token.isEmailVerified = true
         }
       }
 
       if (user) {
         token.id = user.id as string
-        token.role = user.role
+        token.role = user.role ?? token.role
         token.isEmailVerified = token.isEmailVerified ?? user.isEmailVerified
       }
 
