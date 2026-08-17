@@ -57,20 +57,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  events: {
-    async createUser({ user }) {
-      if (user.id) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            role: 'MERCHANT',
-            isEmailVerified: true,
-            emailVerified: new Date(),
-          },
-        })
-      }
-    },
-  },
   callbacks: {
     async signIn() {
       return true
@@ -80,15 +66,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isOAuth =
           account.provider === 'google' || account.provider === 'line'
 
-        if (isOAuth) {
-          token.role = 'MERCHANT'
-          token.isEmailVerified = true
+        if (isOAuth && token.isEmailVerified !== true) {
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                isEmailVerified: true,
+                emailVerified: new Date(),
+              },
+            })
+
+            token.isEmailVerified = true
+          } catch (error) {
+            console.error(error)
+          }
         }
       }
 
       if (user) {
         token.id = user.id as string
-        token.role = user.role ?? token.role
+        token.role = user.role
         token.isEmailVerified = token.isEmailVerified ?? user.isEmailVerified
       }
 
