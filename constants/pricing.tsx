@@ -13,8 +13,11 @@ import {
   IconHeadset,
   IconInfinity,
   IconLayersIntersect,
+  IconLock,
+  IconMessage,
   IconPalette,
   IconPrinter,
+  IconReceipt,
   IconShieldCheck,
   IconSparkles,
   IconTicket,
@@ -97,6 +100,18 @@ export const COMMON_FEATURES = [
   {
     text: 'ปรับแต่งหน้าร้านได้อย่างอิสระ (สี, มัลติมีเดีย, Header)',
     icon: <IconPalette size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบบันทึกค่าใช้จ่ายร้านค้าแยกหมวดหมู่และแยกสาขา',
+    icon: <IconReceipt size={18} stroke={1.5} />,
+  },
+  {
+    text: 'ระบบบริหารสิทธิ์พนักงาน (Granular Permissions & Activity Log)',
+    icon: <IconLock size={18} stroke={1.5} />,
+  },
+  {
+    text: 'กล่องรวมแชทกลาง รองรับแชทซื้อขาย และ Support',
+    icon: <IconMessage size={18} stroke={1.5} />,
   },
 ]
 

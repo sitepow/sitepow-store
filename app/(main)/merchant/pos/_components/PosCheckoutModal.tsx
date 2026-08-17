@@ -1,17 +1,17 @@
-'use client'
-
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { usePaymentSetting } from '@/actions/hooks/payment'
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { QUICK_AMOUNTS } from '@/constants/credit'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { POSCheckoutInput } from '@/zod/order'
-import { IconCash, IconQrcode } from '@tabler/icons-react'
+import { IconCash, IconExternalLink, IconQrcode } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -44,13 +44,21 @@ export function PosCheckoutModal({
   const router = useRouter()
   const { watch, setValue, handleSubmit } = useFormContext<POSCheckoutInput>()
 
+  const storeId = watch('storeId')
+
+  const { data: paymentSetting } = usePaymentSetting(storeId)
+
+  const isStripeAvailable =
+    !!paymentSetting?.isStripeEnabled && !!paymentSetting?.stripeSecretKey
+
   const { mutate: createOrder, isPending } = useCreatePOSOrder()
   const cartItems = useCartStore((state) => state.items)
 
   const paymentMethod = watch('paymentMethod')
   const receivedAmount = watch('receivedAmount') || 0
 
-  const isCash = paymentMethod === PaymentMethod.CASH_ON_DELIVERY
+  const isCash =
+    !isStripeAvailable || paymentMethod === PaymentMethod.CASH_ON_DELIVERY
   const changeAmount = receivedAmount - totalAmount
   const isValidCash = isCash ? receivedAmount >= totalAmount : true
 
@@ -59,6 +67,11 @@ export function PosCheckoutModal({
   }
 
   const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    if (method !== PaymentMethod.CASH_ON_DELIVERY && !isStripeAvailable) {
+      toast.error('กรุณาตั้งค่า Stripe ก่อนเปิดรับชำระด้วย PromptPay')
+      return
+    }
+
     setValue('paymentMethod', method)
     setValue(
       'status',
@@ -148,21 +161,38 @@ export function PosCheckoutModal({
                 <IconCash className="size-7" />
                 <span className="text-sm">เงินสด (Cash)</span>
               </button>
-              <button
-                type="button"
-                onClick={() =>
-                  handlePaymentMethodSelect(PaymentMethod.MANUAL_QR_PROMPTPAY)
-                }
-                className={cn(
-                  'hover:bg-muted/50 relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
-                  !isCash
-                    ? 'border-primary bg-primary/5 text-primary font-semibold shadow-sm'
-                    : 'border-border text-muted-foreground',
-                )}
-              >
-                <IconQrcode className="size-7" />
-                <span className="text-sm">พร้อมเพย์ / QR</span>
-              </button>
+              {isStripeAvailable ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handlePaymentMethodSelect(PaymentMethod.STRIPE_QR_PROMPTPAY)
+                  }
+                  className={cn(
+                    'hover:bg-muted/50 relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
+                    !isCash
+                      ? 'border-primary bg-primary/5 text-primary font-semibold shadow-sm'
+                      : 'border-border text-muted-foreground',
+                  )}
+                >
+                  <IconQrcode className="size-7" />
+                  <span className="text-sm">พร้อมเพย์ / QR</span>
+                </button>
+              ) : (
+                <div className="border-border text-muted-foreground bg-muted/20 relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center">
+                  <IconQrcode className="text-muted-foreground/60 size-6" />
+                  <span className="text-xs font-medium">
+                    พร้อมเพย์ (ยังไม่พร้อมใช้)
+                  </span>
+                  <Link
+                    href="http://lvh.me:3000/merchant/settings?tab=settings-payment"
+                    target="_blank"
+                    className="text-primary flex items-center gap-1 text-xs font-semibold hover:underline"
+                  >
+                    ตั้งค่าระบบชำระเงิน
+                    <IconExternalLink className="size-3" />
+                  </Link>
+                </div>
+              )}
             </div>
             {isCash && (
               <div className="bg-muted/30 border-border/80 space-y-4 rounded-xl border p-4">
@@ -253,7 +283,7 @@ export function PosCheckoutModal({
           <DialogFooter className="bg-muted/20 mt-5 gap-2 border-t p-4 sm:flex-row sm:justify-end">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isPending}
               className="w-full sm:w-auto"
