@@ -372,6 +372,10 @@ export async function createCustomer(
     return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
   }
 
+  if (!input.storeId) {
+    return { success: false, message: 'กรุณาระบุรหัสร้านค้า (storeId)' }
+  }
+
   try {
     const authCheck = await verifyEmployeePermission({
       userId,
