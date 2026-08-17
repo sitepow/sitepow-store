@@ -1,11 +1,10 @@
 import Stripe from 'stripe'
 
-export const getStripeInstance = (secretKey?: string) => {
-  const apiKey = secretKey || process.env.STRIPE_SECRET_KEY
+const globalForStripe = global as unknown as { stripe: Stripe | undefined }
 
-  if (!apiKey) {
-    throw new Error('Missing Stripe Secret Key')
-  }
+export const getStripeInstance = (secretKey?: string) => {
+  const apiKey =
+    secretKey || process.env.STRIPE_SECRET_KEY || 'dummy_key_for_build'
 
   return new Stripe(apiKey, {
     apiVersion: '2026-07-29.dahlia',
@@ -13,15 +12,8 @@ export const getStripeInstance = (secretKey?: string) => {
   })
 }
 
-const globalForStripe = global as unknown as { stripe: Stripe }
+export const stripe = globalForStripe.stripe || getStripeInstance()
 
-export const stripe =
-  globalForStripe.stripe ||
-  new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2026-07-29.dahlia',
-    typescript: true,
-  })
-
-if (process.env.NODE_ENV !== 'production' && process.env.STRIPE_SECRET_KEY) {
+if (process.env.NODE_ENV !== 'production') {
   globalForStripe.stripe = stripe
 }
