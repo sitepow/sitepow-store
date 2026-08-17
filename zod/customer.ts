@@ -2,7 +2,7 @@ import { FORBIDDEN_TITLES } from '@/constants/system'
 import z from 'zod'
 
 export const createCustomerSchema = z.object({
-  storeId: z.string(),
+  storeId: z.string().optional(),
   firstName: z
     .string()
     .min(1, 'กรุณากรอกชื่อ')
@@ -31,7 +31,12 @@ export const createCustomerSchema = z.object({
   phone: z
     .string()
     .min(1, 'กรุณากรอกเบอร์โทรศัพท์')
-    .regex(/^[0-9\-\+]{9,15}$/, 'รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง'),
+    .transform((val) => val.replace(/\D/g, ''))
+    .pipe(
+      z.string().refine((val) => /^[0-9]{9,10}$/.test(val), {
+        message: 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 9-10 หลัก',
+      }),
+    ),
   email: z.email('รูปแบบอีเมลไม่ถูกต้อง').optional().or(z.literal('')),
 })
 

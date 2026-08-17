@@ -10,6 +10,7 @@ import {
   IconMapPin,
   IconNews,
   IconPackage,
+  IconReceipt,
   IconSettings,
   IconShoppingCart,
   IconStar,
@@ -133,6 +134,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'คลังสินค้า',
     tab: 'inventory',
     icon: IconBox,
+  },
+  {
+    value: 'expenses',
+    label: 'จัดการค่าใช้จ่าย',
+    tab: 'expenses',
+    icon: IconReceipt,
   },
   {
     value: 'employee',

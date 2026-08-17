@@ -277,7 +277,6 @@ export function CategoryDialog({
           </FormProvider>
         </DialogContent>
       </Dialog>
-
       <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

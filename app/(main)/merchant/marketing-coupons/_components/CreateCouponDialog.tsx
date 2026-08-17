@@ -101,14 +101,13 @@ export function CouponCreateDialog() {
           สร้างคูปองใหม่
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="overflow-x-hidden sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>สร้างคูปองส่วนลดใหม่</DialogTitle>
           <DialogDescription>
             กำหนดเงื่อนไขและมูลค่าส่วนลดสำหรับคูปองโปรโมชันของร้านค้าคุณ
           </DialogDescription>
         </DialogHeader>
-
         <div className="grid gap-4 sm:grid-cols-2">
           <Field className="sm:col-span-2">
             <FieldLabel>รหัสคูปอง</FieldLabel>
@@ -124,7 +123,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.code?.message}</FieldError>
           </Field>
-
           <Field className="sm:col-span-2">
             <FieldLabel>คำอธิบาย</FieldLabel>
             <Textarea
@@ -135,7 +133,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.description?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>ประเภทส่วนลด</FieldLabel>
             <Select
@@ -161,7 +158,6 @@ export function CouponCreateDialog() {
             </Select>
             <FieldError>{errors?.discountType?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>
               มูลค่าส่วนลด{' '}
@@ -179,7 +175,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.discountAmount?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>ยอดสั่งซื้อขั้นต่ำ (฿)</FieldLabel>
             <Input
@@ -191,7 +186,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.minOrderAmount?.message}</FieldError>
           </Field>
-
           {discountType === DiscountType.PERCENTAGE && (
             <Field>
               <FieldLabel>ส่วนลดสูงสุด (฿)</FieldLabel>
@@ -205,7 +199,6 @@ export function CouponCreateDialog() {
               <FieldError>{errors?.maxDiscount?.message}</FieldError>
             </Field>
           )}
-
           <Field>
             <FieldLabel>วันเริ่มต้น</FieldLabel>
             <DatePicker
@@ -218,7 +211,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.startDate?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>วันสิ้นสุด</FieldLabel>
             <DatePicker
@@ -229,7 +221,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.endDate?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>จำนวนสิทธิ์</FieldLabel>
             <Input
@@ -241,7 +232,6 @@ export function CouponCreateDialog() {
             />
             <FieldError>{errors?.usageLimit?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>สาขาที่เข้าร่วม</FieldLabel>
             <Select
@@ -267,7 +257,6 @@ export function CouponCreateDialog() {
             <FieldError>{errors?.branchId?.message}</FieldError>
           </Field>
         </div>
-
         <DialogFooter className="mt-2 flex gap-2 border-t pt-4">
           <Button
             variant="outline"

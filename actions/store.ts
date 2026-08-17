@@ -74,6 +74,8 @@ const storeDropdownSelect = {
   id: true,
   name: true,
   slug: true,
+  logo: true,
+  primaryColor: true,
 } satisfies Prisma.StoreSelect
 
 const storeSelect = {

@@ -3,6 +3,7 @@ import {
   AddressType,
   DefaultRole,
   DiscountType,
+  ExpenseCategory,
   InvoiceStatus,
   LogAction,
   OrderStatus,
@@ -95,6 +96,9 @@ export const LOG_ACTION_TH: Record<LogAction, string> = {
   [LogAction.DELETE_BLOG]: 'ลบบทความ',
   [LogAction.LOGIN]: 'เข้าสู่ระบบ',
   [LogAction.LOGOUT]: 'ออกจากระบบ',
+  [LogAction.CREATE_EXPENSE]: 'บันทึกค่าใช้จ่าย',
+  [LogAction.UPDATE_EXPENSE]: 'แก้ไขรายการค่าใช้จ่าย',
+  [LogAction.DELETE_EXPENSE]: 'ลบรายการค่าใช้จ่าย',
 }
 
 export const TRANSACTION_TYPE_TH: Record<TransactionType, string> = {
@@ -162,6 +166,24 @@ export const DEFAULT_ROLE_OPTIONS = Object.entries(DEFAULT_ROLE_TH).map(
   }),
 )
 
+export const EXPENSE_CATEGORY_TH: Record<ExpenseCategory, string> = {
+  [ExpenseCategory.UTILITIES]: 'ค่าน้ำ/ค่าไฟ/อินเทอร์เน็ต',
+  [ExpenseCategory.RENT]: 'ค่าเช่าสถานที่',
+  [ExpenseCategory.SALARY]: 'เงินเดือน/ค่าจ้าง',
+  [ExpenseCategory.SUPPLIES]: 'อุปกรณ์/วัตถุดิบ',
+  [ExpenseCategory.MARKETING]: 'การตลาด/โฆษณา',
+  [ExpenseCategory.MAINTENANCE]: 'ซ่อมแซม/บำรุงรักษา',
+  [ExpenseCategory.TRANSPORT]: 'ค่าเดินทาง/ขนส่ง',
+  [ExpenseCategory.OTHER]: 'อื่นๆ',
+}
+
+export const EXPENSE_CATEGORY_OPTIONS = Object.entries(EXPENSE_CATEGORY_TH).map(
+  ([value, label]) => ({
+    value,
+    label,
+  }),
+)
+
 export const getLabel = {
   orderStatus: (v: OrderStatus) => ORDER_STATUS_TH[v] || v,
   paymentMethod: (v: PaymentMethod) => PAYMENT_METHOD_TH[v] || v,
@@ -176,4 +198,5 @@ export const getLabel = {
   productType: (v: ProductType) => PRODUCT_TYPE_TH[v] || v,
   invoiceStatus: (v: InvoiceStatus) => INVOICE_STATUS_TH[v] || v,
   defaultRole: (v: DefaultRole) => DEFAULT_ROLE_TH[v] || v,
+  expenseCategory: (v: ExpenseCategory) => EXPENSE_CATEGORY_TH[v] || v,
 }

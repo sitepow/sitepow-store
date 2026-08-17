@@ -351,6 +351,7 @@ enum PermissionDomain {
   STORE_TRANSFER
   TAX
   REVIEW
+  EXPENSE
 }
 
 enum PermissionAction {
@@ -1227,6 +1228,9 @@ enum LogAction {
   DELETE_BLOG
   LOGIN
   LOGOUT
+  CREATE_EXPENSE
+  UPDATE_EXPENSE
+  DELETE_EXPENSE
 }
 
 model ActivityLog {
@@ -1473,6 +1477,7 @@ enum ExpenseCategory {
   MARKETING // ค่าโฆษณา/การตลาด
   SUPPLIES // ค่าอุปกรณ์/ของใช้ในร้าน
   MAINTENANCE // ค่าซ่อมบำรุง
+  TRANSPORT //ค่าเดินทาง/ขนส่ง
   OTHER // ค่าใช้จ่ายอื่นๆ
 }
 

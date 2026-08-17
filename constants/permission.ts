@@ -103,6 +103,10 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateReviews',
     'canUpdateReviews',
     'canDeleteReviews',
+    'canViewExpenses',
+    'canCreateExpenses',
+    'canUpdateExpenses',
+    'canDeleteExpenses',
   ],
   OWNER_VIEWER: [
     'canViewStore',
@@ -130,6 +134,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewTransferStore',
     'canViewTax',
     'canViewReviews',
+    'canViewExpenses',
   ],
   MANAGER: [
     'canViewCategory',
@@ -180,6 +185,9 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewReviews',
     'canCreateReviews',
     'canUpdateReviews',
+    'canViewExpenses',
+    'canCreateExpenses',
+    'canUpdateExpenses',
   ],
   CASHIER: [
     'canViewDashboard',
@@ -194,6 +202,8 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewConversation',
     'canCreateConversation',
     'canUpdateConversation',
+    'canViewExpenses',
+    'canCreateExpenses',
   ],
   STAFF: [
     'canViewDashboard',
@@ -211,6 +221,8 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewConversation',
     'canCreateConversation',
     'canUpdateConversation',
+    'canViewExpenses',
+    'canCreateExpenses',
   ],
   POS_CASHIER: [
     'canViewDashboard',
@@ -259,6 +271,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewTax',
     'canViewPayment',
     'canViewReviews',
+    'canViewExpenses',
   ],
   SUPPORT: [
     'canViewConversation',
@@ -703,6 +716,22 @@ export const PERMISSION_MAPPING: Record<
     domain: PermissionDomain.REVIEW,
     action: PermissionAction.DELETE,
   },
+  canViewExpenses: {
+    domain: PermissionDomain.EXPENSE,
+    action: PermissionAction.READ,
+  },
+  canCreateExpenses: {
+    domain: PermissionDomain.EXPENSE,
+    action: PermissionAction.CREATE,
+  },
+  canUpdateExpenses: {
+    domain: PermissionDomain.EXPENSE,
+    action: PermissionAction.UPDATE,
+  },
+  canDeleteExpenses: {
+    domain: PermissionDomain.EXPENSE,
+    action: PermissionAction.DELETE,
+  },
 }
 
 export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
@@ -863,4 +892,10 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
   canCreateReviews: 'มีสิทธิ์ในการตอบกลับรีวิวของลูกค้าหรือเพิ่มรีวิวในระบบ',
   canUpdateReviews: 'มีสิทธิ์ในการแก้ไขการตอบกลับ หรือจัดการซ่อน/แสดงรีวิว',
   canDeleteReviews: 'มีสิทธิ์ในการลบรีวิวหรือคำตอบกลับออกจากระบบ',
+  canViewExpenses:
+    'มีสิทธิ์ในการเปิดดูรายการและประวัติค่าใช้จ่ายทั้งหมดของร้าน',
+  canCreateExpenses:
+    'มีสิทธิ์ในการบันทึกและเพิ่มรายการค่าใช้จ่ายใหม่เข้าสู่ระบบ',
+  canUpdateExpenses: 'มีสิทธิ์ในการแก้ไขข้อมูลและรายละเอียดรายการค่าใช้จ่าย',
+  canDeleteExpenses: 'มีสิทธิ์ในการลบรายการค่าใช้จ่ายออกจากระบบ',
 }

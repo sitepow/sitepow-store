@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useForm, useFormContext } from 'react-hook-form'
+import { Controller, useForm, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
@@ -14,7 +14,7 @@ import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { formatPromptPay } from '@/utils/slip'
+import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
 import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
 import { POSCheckoutInput } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -66,7 +66,9 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   const {
     register,
     handleSubmit,
+    control,
     reset: resetCreateForm,
+    formState: { errors },
   } = useForm<CreateCustomerInput>({
     resolver: zodResolver(createCustomerSchema),
   })
@@ -105,8 +107,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
       return
     }
 
+    const cleanQuery =
+      searchInput.trim().replace(/\D/g, '') || searchInput.trim()
+
     searchCustomerMutation.mutate(
-      { storeId: selectedStoreId, query: searchInput },
+      { storeId: selectedStoreId, query: cleanQuery },
       {
         onSuccess: (data) => {
           if (data.success && data.data) {
@@ -121,14 +126,16 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   }
 
   const handleCreateMember = (data: CreateCustomerInput) => {
-    if (!selectedStoreId) return
+    if (!selectedStoreId) {
+      return
+    }
 
     createCustomerMutation.mutate(
       {
         storeId: selectedStoreId,
         firstName: data.firstName.trim(),
         lastName: data.lastName?.trim() || undefined,
-        phone: data.phone.trim(),
+        phone: data.phone,
         email: data.email?.trim() || undefined,
       },
       {
@@ -287,6 +294,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                           className="h-9 text-xs"
                           {...register('firstName')}
                         />
+                        {errors.firstName && (
+                          <p className="text-destructive text-[11px]">
+                            {errors.firstName.message}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">นามสกุล</Label>
@@ -295,6 +307,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                           className="h-9 text-xs"
                           {...register('lastName')}
                         />
+                        {errors.lastName && (
+                          <p className="text-destructive text-[11px]">
+                            {errors.lastName.message}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="grid gap-2 sm:grid-cols-2">
@@ -303,11 +320,31 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                           เบอร์โทรศัพท์{' '}
                           <span className="text-destructive">*</span>
                         </Label>
-                        <Input
-                          placeholder="0812345678"
-                          className="h-9 text-xs"
-                          {...register('phone')}
+                        <Controller
+                          name="phone"
+                          control={control}
+                          render={({
+                            field: { onChange, value, ...field },
+                          }) => (
+                            <Input
+                              {...field}
+                              placeholder="08X-XXX-XXXX"
+                              className="h-9 text-xs"
+                              value={value ?? ''}
+                              onChange={(e) => {
+                                const formatted = formatPhoneInput(
+                                  e.target.value,
+                                )
+                                onChange(formatted)
+                              }}
+                            />
+                          )}
                         />
+                        {errors.phone && (
+                          <p className="text-destructive text-[11px]">
+                            {errors.phone.message}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">อีเมล</Label>
@@ -317,6 +354,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                           className="h-9 text-xs"
                           {...register('email')}
                         />
+                        {errors.email && (
+                          <p className="text-destructive text-[11px]">
+                            {errors.email.message}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <Button

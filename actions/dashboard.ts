@@ -19,6 +19,20 @@ export interface GetDashboardResult {
     dailySalesYesterday: number
     newCustomers: number
     newCustomersLastMonth: number
+    dailyExpense: number
+    dailyProfit: number
+    dailyProfitYesterday: number
+    dailyMargin: number
+    monthlyExpense: number
+    monthlyExpenseLastMonth: number
+    monthlyProfit: number
+    monthlyProfitLastMonth: number
+    monthlyMargin: number
+    yearlyExpense: number
+    yearlyExpenseLastYear: number
+    yearlyProfit: number
+    yearlyProfitLastYear: number
+    yearlyMargin: number
   }
   salesTrend: { name: string; total: number }[]
   recentSales: { id: string; name: string; email: string; amount: number }[]
@@ -43,10 +57,31 @@ const emptyDashboardResult: GetDashboardResult = {
     dailySalesYesterday: 0,
     newCustomers: 0,
     newCustomersLastMonth: 0,
+    dailyExpense: 0,
+    dailyProfit: 0,
+    dailyProfitYesterday: 0,
+    dailyMargin: 0,
+    monthlyExpense: 0,
+    monthlyExpenseLastMonth: 0,
+    monthlyProfit: 0,
+    monthlyProfitLastMonth: 0,
+    monthlyMargin: 0,
+    yearlyExpense: 0,
+    yearlyExpenseLastYear: 0,
+    yearlyProfit: 0,
+    yearlyProfitLastYear: 0,
+    yearlyMargin: 0,
   },
   salesTrend: [],
   recentSales: [],
   lowStock: [],
+}
+
+const calcMargin = (profit: number, revenue: number): number => {
+  if (!revenue || revenue === 0) {
+    return 0
+  }
+  return Math.round((profit / revenue) * 1000) / 10
 }
 
 export async function getDashboard(
@@ -81,24 +116,31 @@ export async function getDashboard(
       ? { items: { some: { branchId: validBranchId } } }
       : {}
 
+    const expenseBranchFilter = validBranchId
+      ? {
+          OR: [{ branchId: validBranchId }, { branchId: null }],
+        }
+      : {}
+
     const stockBranchFilter = validBranchId ? { branchId: validBranchId } : {}
 
     const now = new Date()
-    const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    const endOfLastMonth = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      0,
-      23,
-      59,
-      59,
-    )
+
     const startOfToday = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
     )
+    const endOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+      999,
+    )
+
     const startOfYesterday = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -111,18 +153,66 @@ export async function getDashboard(
       23,
       59,
       59,
+      999,
     )
+
+    const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const endOfThisMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    )
+
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const endOfLastMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999,
+    )
+
+    const startOfThisYear = new Date(now.getFullYear(), 0, 1)
+    const endOfThisYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
+
+    const startOfLastYear = new Date(now.getFullYear() - 1, 0, 1)
+    const endOfLastYear = new Date(
+      now.getFullYear() - 1,
+      11,
+      31,
+      23,
+      59,
+      59,
+      999,
+    )
+
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
 
     const [
-      revenueThisMonth,
-      revenueLastMonth,
-      ordersThisMonth,
-      ordersLastMonth,
       salesToday,
       salesYesterday,
+      revenueThisMonth,
+      revenueLastMonth,
+      revenueThisYear,
+      revenueLastYear,
+      ordersThisMonth,
+      ordersLastMonth,
       customersThisMonth,
       customersLastMonth,
+
+      expenseToday,
+      expenseYesterday,
+      expenseThisMonth,
+      expenseLastMonth,
+      expenseThisYear,
+      expenseLastYear,
+
       salesTrendRaw,
       recentOrdersRaw,
       lowStockRaw,
@@ -130,39 +220,7 @@ export async function getDashboard(
       prisma.order.aggregate({
         where: {
           ...storeFilter,
-          createdAt: { gte: startOfThisMonth },
-          status: { not: OrderStatus.CANCELLED },
-          ...orderBranchFilter,
-        },
-        _sum: { totalAmount: true },
-      }),
-      prisma.order.aggregate({
-        where: {
-          ...storeFilter,
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-          status: { not: OrderStatus.CANCELLED },
-          ...orderBranchFilter,
-        },
-        _sum: { totalAmount: true },
-      }),
-      prisma.order.count({
-        where: {
-          ...storeFilter,
-          createdAt: { gte: startOfThisMonth },
-          ...orderBranchFilter,
-        },
-      }),
-      prisma.order.count({
-        where: {
-          ...storeFilter,
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-          ...orderBranchFilter,
-        },
-      }),
-      prisma.order.aggregate({
-        where: {
-          ...storeFilter,
-          createdAt: { gte: startOfToday },
+          createdAt: { gte: startOfToday, lte: endOfToday },
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
@@ -176,6 +234,56 @@ export async function getDashboard(
           ...orderBranchFilter,
         },
         _sum: { totalAmount: true },
+      }),
+      prisma.order.aggregate({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfThisMonth, lte: endOfThisMonth },
+          status: { not: OrderStatus.CANCELLED },
+          ...orderBranchFilter,
+        },
+        _sum: { totalAmount: true },
+      }),
+      prisma.order.aggregate({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+          status: { not: OrderStatus.CANCELLED },
+          ...orderBranchFilter,
+        },
+        _sum: { totalAmount: true },
+      }),
+      prisma.order.aggregate({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfThisYear, lte: endOfThisYear },
+          status: { not: OrderStatus.CANCELLED },
+          ...orderBranchFilter,
+        },
+        _sum: { totalAmount: true },
+      }),
+      prisma.order.aggregate({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfLastYear, lte: endOfLastYear },
+          status: { not: OrderStatus.CANCELLED },
+          ...orderBranchFilter,
+        },
+        _sum: { totalAmount: true },
+      }),
+      prisma.order.count({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfThisMonth, lte: endOfThisMonth },
+          ...orderBranchFilter,
+        },
+      }),
+      prisma.order.count({
+        where: {
+          ...storeFilter,
+          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+          ...orderBranchFilter,
+        },
       }),
       prisma.customerStore.count({
         where: {
@@ -191,6 +299,56 @@ export async function getDashboard(
           },
         },
       }),
+
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfToday, lte: endOfToday },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfYesterday, lte: endOfYesterday },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfThisMonth, lte: endOfThisMonth },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfLastMonth, lte: endOfLastMonth },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfThisYear, lte: endOfThisYear },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          ...storeFilter,
+          expenseDate: { gte: startOfLastYear, lte: endOfLastYear },
+          ...expenseBranchFilter,
+        },
+        _sum: { amount: true },
+      }),
+
       prisma.order.findMany({
         where: {
           ...storeFilter,
@@ -212,7 +370,7 @@ export async function getDashboard(
           id: true,
           totalAmount: true,
           customer: {
-            select: { name: true, email: true },
+            select: { firstName: true, lastName: true, email: true },
           },
         },
       }),
@@ -238,6 +396,33 @@ export async function getDashboard(
       }),
     ])
 
+    const dSales = Number(salesToday._sum.totalAmount ?? 0)
+    const dSalesYesterday = Number(salesYesterday._sum.totalAmount ?? 0)
+    const mRevenue = Number(revenueThisMonth._sum.totalAmount ?? 0)
+    const mRevenueLastMonth = Number(revenueLastMonth._sum.totalAmount ?? 0)
+    const yRevenue = Number(revenueThisYear._sum.totalAmount ?? 0)
+    const yRevenueLastYear = Number(revenueLastYear._sum.totalAmount ?? 0)
+
+    const dExpense = Number(expenseToday._sum.amount ?? 0)
+    const dExpenseYesterday = Number(expenseYesterday._sum.amount ?? 0)
+    const mExpense = Number(expenseThisMonth._sum.amount ?? 0)
+    const mExpenseLastMonth = Number(expenseLastMonth._sum.amount ?? 0)
+    const yExpense = Number(expenseThisYear._sum.amount ?? 0)
+    const yExpenseLastYear = Number(expenseLastYear._sum.amount ?? 0)
+
+    const dProfit = dSales - dExpense
+    const dProfitYesterday = dSalesYesterday - dExpenseYesterday
+
+    const mProfit = mRevenue - mExpense
+    const mProfitLastMonth = mRevenueLastMonth - mExpenseLastMonth
+
+    const yProfit = yRevenue - yExpense
+    const yProfitLastYear = yRevenueLastYear - yExpenseLastYear
+
+    const dMargin = calcMargin(dProfit, dSales)
+    const mMargin = calcMargin(mProfit, mRevenue)
+    const yMargin = calcMargin(yProfit, yRevenue)
+
     const trendMap: Record<string, number> = {}
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
@@ -256,22 +441,43 @@ export async function getDashboard(
 
     return {
       stats: {
-        totalRevenue: Number(revenueThisMonth._sum.totalAmount ?? 0),
-        totalRevenueLastMonth: Number(revenueLastMonth._sum.totalAmount ?? 0),
+        totalRevenue: mRevenue,
+        totalRevenueLastMonth: mRevenueLastMonth,
         totalOrders: ordersThisMonth,
         totalOrdersLastMonth: ordersLastMonth,
-        dailySales: Number(salesToday._sum.totalAmount ?? 0),
-        dailySalesYesterday: Number(salesYesterday._sum.totalAmount ?? 0),
+        dailySales: dSales,
+        dailySalesYesterday: dSalesYesterday,
         newCustomers: customersThisMonth,
         newCustomersLastMonth: customersLastMonth,
+
+        dailyExpense: dExpense,
+        dailyProfit: dProfit,
+        dailyProfitYesterday: dProfitYesterday,
+        dailyMargin: dMargin,
+        monthlyExpense: mExpense,
+        monthlyExpenseLastMonth: mExpenseLastMonth,
+        monthlyProfit: mProfit,
+        monthlyProfitLastMonth: mProfitLastMonth,
+        monthlyMargin: mMargin,
+        yearlyExpense: yExpense,
+        yearlyExpenseLastYear: yExpenseLastYear,
+        yearlyProfit: yProfit,
+        yearlyProfitLastYear: yProfitLastYear,
+        yearlyMargin: yMargin,
       },
       salesTrend,
-      recentSales: recentOrdersRaw.map((o) => ({
-        id: o.id,
-        name: o.customer?.name || 'ลูกค้า',
-        email: o.customer?.email ?? '-',
-        amount: Number(o.totalAmount),
-      })),
+      recentSales: recentOrdersRaw.map((o) => {
+        const customerName = o.customer
+          ? `${o.customer.firstName ?? ''} ${o.customer.lastName ?? ''}`.trim()
+          : ''
+
+        return {
+          id: o.id,
+          name: customerName || 'ลูกค้า',
+          email: o.customer?.email ?? '-',
+          amount: Number(o.totalAmount),
+        }
+      }),
       lowStock: lowStockRaw.map((stock) => ({
         id: `${stock.variant.product.id}-${stock.variant.title ?? 'default'}-${stock.branch.name}`,
         productName: stock.variant.product.title,

@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
+import { useStoreOptions } from '@/actions/hooks/store'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { NavigationItem } from '@/constants/navigation'
-import { FALLBACK_MERCHANT_LOGO_IMAGE } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -39,7 +39,7 @@ import {
 import { CreditBadge } from '../CreditBadge'
 import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
-// import { LanguageSwitcher } from '../LanguageSwitcher'
+import { LogoBrand } from '../LogoBrand'
 import { ModeToggle } from '../ModeToggle'
 import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
@@ -59,8 +59,16 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
+
+  const { data: storeOptions } = useStoreOptions()
+
+  const currentStore =
+    storeOptions?.find((s) => s.id === selectedStoreId) || storeOptions?.[0]
+
+  const logoImage = currentStore?.logo ?? store?.logo
+
   const { data: loyaltySettings } = useLoyaltySettings(
-    store?.id || selectedStoreId,
+    currentStore?.id || store?.id || selectedStoreId,
   )
 
   const isPointsEnabled = loyaltySettings?.isPointsEnabled ?? false
@@ -71,16 +79,13 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const pathname = usePathname()
   const isMerchant =
     userRole === UserRole.MERCHANT && redirectPath === 'merchant'
-  const isStoreFront = redirectPath === 'user'
   const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
 
   return (
     <SidebarProvider>
       <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
-          <StoreLogo
-            image={store?.logo ? store.logo : FALLBACK_MERCHANT_LOGO_IMAGE}
-          />
+          {logoImage ? <StoreLogo image={logoImage} /> : <LogoBrand />}
         </SidebarHeader>
         <SidebarContent className="px-2">
           <SidebarMenu>
@@ -148,14 +153,17 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       </RootSidebar>
       <main
         className="bg-background text-foreground w-full min-w-0 space-y-5 p-5"
-        style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
         <div className="flex flex-wrap gap-2.5 border-b py-5">
           <SidebarTrigger />
           <ModeToggle />
-          {/* <LanguageSwitcher /> */}
           <Button
             variant="outline"
             onClick={() => router.push('/')}

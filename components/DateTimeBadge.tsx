@@ -26,15 +26,13 @@ export function DateTimeBadge({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'border-primary/20 bg-primary/5 text-primary flex w-fit items-center gap-2 rounded-full border p-3 text-xs',
+        'border-primary/20 bg-primary/5 text-primary flex w-fit items-center gap-2 rounded-full border p-3 text-xs font-medium',
         className,
       )}
       {...props}
     >
       <IconClock size={14} />
-      <span className="font-medium">
-        {formatShortDate(date)} {formatShortTime(date)}
-      </span>
+      {formatShortDate(date)} {formatShortTime(date)}
     </div>
   )
 }

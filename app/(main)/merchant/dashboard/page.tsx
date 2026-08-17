@@ -9,12 +9,18 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { IconExternalLink, IconLock } from '@tabler/icons-react'
+import {
+  IconExternalLink,
+  IconLock,
+  IconReceipt,
+  IconWallet,
+} from '@tabler/icons-react'
 import {
   ArrowRight,
   CreditCard,
   DollarSign,
   Package,
+  TrendingDown,
   TrendingUp,
   User2,
   Users,
@@ -53,15 +59,19 @@ import {
 
 import { StoreCreditCard } from '../credits/_components/StoreCreditCard'
 
-function pctChange(current: number, previous: number): string {
+function pctChange(
+  current: number,
+  previous: number,
+  periodLabel: string = 'จากเดือนที่แล้ว',
+): string {
   if (previous === 0 && current === 0) {
-    return '0% จากเดือนที่แล้ว'
+    return `0% ${periodLabel}`
   }
   if (previous === 0) {
-    return '+100% จากเดือนที่แล้ว'
+    return `+100% ${periodLabel}`
   }
-  const pct = ((current - previous) / previous) * 100
-  return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% จากเดือนที่แล้ว`
+  const pct = ((current - previous) / Math.abs(previous)) * 100
+  return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% ${periodLabel}`
 }
 
 const chartConfig = {
@@ -81,37 +91,93 @@ export default function MerchantDashboardPage() {
   const { data, isLoading } = useDashboard(selectedStoreId, selectedBranchId)
 
   const stats = data?.stats
-  const statsData = stats
+
+  const primaryStatsData = stats
     ? [
         {
-          title: 'รายได้ทั้งหมด',
+          title: 'ยอดขายเดือนนี้',
           value: formatCurrency(stats.totalRevenue),
           description: pctChange(
             stats.totalRevenue,
             stats.totalRevenueLastMonth,
+            'จากเดือนที่แล้ว',
           ),
           icon: DollarSign,
         },
         {
-          title: 'คำสั่งซื้อ',
+          title: 'คำสั่งซื้อเดือนนี้',
           value: formatNumber(stats.totalOrders),
-          description: pctChange(stats.totalOrders, stats.totalOrdersLastMonth),
+          description: pctChange(
+            stats.totalOrders,
+            stats.totalOrdersLastMonth,
+            'จากเดือนที่แล้ว',
+          ),
           icon: Package,
         },
         {
-          title: 'ยอดขายรายวัน',
+          title: 'ยอดขายวันนี้',
           value: formatCurrency(stats.dailySales),
-          description: pctChange(stats.dailySales, stats.dailySalesYesterday),
+          description: pctChange(
+            stats.dailySales,
+            stats.dailySalesYesterday,
+            'จากเมื่อวาน',
+          ),
           icon: CreditCard,
         },
         {
-          title: 'ลูกค้าใหม่',
+          title: 'ลูกค้าใหม่เดือนนี้',
           value: formatNumber(stats.newCustomers),
           description: pctChange(
             stats.newCustomers,
             stats.newCustomersLastMonth,
+            'จากเดือนที่แล้ว',
           ),
           icon: Users,
+        },
+      ]
+    : []
+
+  const financialStatsData = stats
+    ? [
+        {
+          title: 'กำไรวันนี้',
+          value: formatCurrency(stats.dailyProfit),
+          description: `Margin ${stats.dailyMargin}% (${pctChange(
+            stats.dailyProfit,
+            stats.dailyProfitYesterday,
+            'จากเมื่อวาน',
+          )})`,
+          icon: stats.dailyProfit >= 0 ? TrendingUp : TrendingDown,
+        },
+        {
+          title: 'กำไรเดือนนี้',
+          value: formatCurrency(stats.monthlyProfit),
+          description: `Margin ${stats.monthlyMargin}% (${pctChange(
+            stats.monthlyProfit,
+            stats.monthlyProfitLastMonth,
+            'จากเดือนที่แล้ว',
+          )})`,
+          icon: IconWallet,
+        },
+        {
+          title: 'กำไรปีนี้',
+          value: formatCurrency(stats.yearlyProfit),
+          description: `Margin ${stats.yearlyMargin}% (${pctChange(
+            stats.yearlyProfit,
+            stats.yearlyProfitLastYear,
+            'จากปีที่แล้ว',
+          )})`,
+          icon: TrendingUp,
+        },
+        {
+          title: 'ค่าใช้จ่ายปีนี้',
+          value: formatCurrency(stats.yearlyExpense),
+          description: pctChange(
+            stats.yearlyExpense,
+            stats.yearlyExpenseLastYear,
+            'จากปีที่แล้ว',
+          ),
+          icon: IconReceipt,
         },
       ]
     : []
@@ -150,7 +216,7 @@ export default function MerchantDashboardPage() {
       {selectedStoreId !== ALL_STORES && (isPermissionLoading || isLoading) && (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <Skeleton key={i} className="h-28" />
             ))}
           </div>
@@ -176,9 +242,20 @@ export default function MerchantDashboardPage() {
         canViewDashboard &&
         !isLoading &&
         data && (
-          <>
+          <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {statsData.map((stat, i) => (
+              {primaryStatsData.map((stat, i) => (
+                <StatsCard
+                  key={i}
+                  title={stat.title}
+                  value={stat.value}
+                  description={stat.description}
+                  icon={stat.icon}
+                />
+              ))}
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {financialStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
                   title={stat.title}
@@ -355,7 +432,7 @@ export default function MerchantDashboardPage() {
                 </CardFooter>
               </Card>
             </div>
-          </>
+          </div>
         )}
     </Sidebar>
   )
