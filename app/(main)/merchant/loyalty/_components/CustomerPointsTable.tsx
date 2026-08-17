@@ -119,7 +119,7 @@ export function CustomerPointsTable({
                       {formatCurrency(item.totalSpent)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="icon-lg">
+                      <Button variant="outline" disabled size="icon-lg">
                         <IconHistory />
                       </Button>
                     </TableCell>
