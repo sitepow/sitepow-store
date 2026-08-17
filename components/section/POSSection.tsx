@@ -9,7 +9,7 @@ export function POSSection() {
   return (
     <FeatureDisplay
       isLeft={true}
-      imageUrl="/images/landing/landing-pos.avif"
+      imageUrl="/images/landing/landing-pos.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

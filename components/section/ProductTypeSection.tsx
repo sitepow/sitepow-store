@@ -9,7 +9,7 @@ export function ProductTypeSection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-product-type.avif"
+      imageUrl="/images/landing/landing-product-type.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

@@ -9,7 +9,7 @@ export function InventorySection() {
   return (
     <FeatureDisplay
       isLeft={true}
-      imageUrl="/images/landing/landing-inventory.avif"
+      imageUrl="/images/landing/landing-inventory.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

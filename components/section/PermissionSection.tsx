@@ -9,7 +9,7 @@ export function PermissionSection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-permission.avif"
+      imageUrl="/images/landing/landing-permission.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

@@ -9,7 +9,7 @@ export function CustomerLoyaltySection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-loyalty.avif"
+      imageUrl="/images/landing/landing-loyalty.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

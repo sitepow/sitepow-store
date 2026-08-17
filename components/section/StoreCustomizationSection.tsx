@@ -9,7 +9,7 @@ export function StoreCustomizationSection() {
   return (
     <FeatureDisplay
       isLeft={true}
-      imageUrl="/images/landing/landing-customization.avif"
+      imageUrl="/images/landing/landing-customization.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

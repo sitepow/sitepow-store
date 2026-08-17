@@ -9,7 +9,7 @@ export function SecurityTrustSection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-security.png"
+      imageUrl="/images/landing/landing-security.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

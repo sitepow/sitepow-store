@@ -9,7 +9,7 @@ export function ExpenseSection() {
   return (
     <FeatureDisplay
       isLeft={true}
-      imageUrl="/images/landing/landing-expense.avif"
+      imageUrl="/images/landing/landing-expense.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

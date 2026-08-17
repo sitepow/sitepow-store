@@ -9,7 +9,7 @@ export function ChatSection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-chat.avif"
+      imageUrl="/images/landing/landing-chat.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

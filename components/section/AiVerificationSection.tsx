@@ -9,7 +9,7 @@ export function AiVerificationSection() {
   return (
     <FeatureDisplay
       isLeft={true}
-      imageUrl="/images/landing/landing-ai-slip.avif"
+      imageUrl="/images/landing/landing-ai-slip.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"

@@ -9,7 +9,7 @@ export function ResellerSection() {
   return (
     <FeatureDisplay
       isLeft={false}
-      imageUrl="/images/landing/landing-reseller.avif"
+      imageUrl="/images/landing/landing-reseller.jpeg"
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
