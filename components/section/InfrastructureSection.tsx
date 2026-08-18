@@ -8,6 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function InfrastructureSection() {
   return (
     <FeatureDisplay
+      isLeft={false}
       imageUrl="/images/landing/landing-cloud.jpeg"
       sectionHeader={
         <SectionHeader

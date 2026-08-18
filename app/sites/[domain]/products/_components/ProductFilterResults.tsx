@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import {
   Select,
   SelectContent,
@@ -78,9 +79,10 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed">
-          <p className="text-muted-foreground">ไม่พบสินค้าที่คุณกำลังมองหา</p>
-        </div>
+        <ActionRequiredAlert
+          title="ขออภัย"
+          description="ไม่พบสินค้าที่คุณกำลังมองหา"
+        />
       ) : (
         <div className="grid grid-cols-2 gap-5 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           {products.map((product) => (

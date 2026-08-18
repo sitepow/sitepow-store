@@ -8,7 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function LogisticsSection() {
   return (
     <FeatureDisplay
-      isLeft={false}
+      isLeft={true}
       imageUrl="/images/landing/landing-product-boxs.jpeg"
       sectionHeader={
         <SectionHeader

@@ -165,6 +165,7 @@ export async function getStorefrontProducts({
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
     const whereClause: Prisma.ProductWhereInput = {
+      isPublished: true,
       store: { slug: storeSlug, status: StoreStatus.ACTIVE },
     }
 
@@ -235,6 +236,7 @@ export async function getStorefrontProductDetail(
     const res = await prisma.product.findFirst({
       where: {
         slug: productSlug,
+        isPublished: true,
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
       },
       select: storefrontProductDetailSelect,
@@ -255,6 +257,7 @@ export async function getRelatedProducts(
     await prisma.product.findMany({
       where: {
         categoryId: categoryId,
+        isPublished: true,
         id: {
           not: productId,
         },

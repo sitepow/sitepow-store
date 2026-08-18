@@ -8,7 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function SecurityTrustSection() {
   return (
     <FeatureDisplay
-      isLeft={false}
+      isLeft={true}
       imageUrl="/images/landing/landing-security.jpeg"
       sectionHeader={
         <SectionHeader

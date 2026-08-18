@@ -27,6 +27,7 @@ export interface CreateProductInput {
   slug: string
   tags?: string
   images?: { url: string; isPrimary: boolean }[]
+  isPublished?: boolean
   variants: {
     title: string
     price: number
@@ -56,6 +57,7 @@ const productSelect = {
   id: true,
   title: true,
   slug: true,
+  isPublished: true,
   createdAt: true,
   productType: true,
   category: {
@@ -271,6 +273,7 @@ export async function createProduct(input: CreateProductInput) {
       images,
       storeId,
       categoryId,
+      isPublished = true,
       ...rest
     } = input
 
@@ -291,6 +294,7 @@ export async function createProduct(input: CreateProductInput) {
           ...rest,
           storeId,
           categoryId,
+          isPublished,
           details,
           tags: {
             create: tagsArray.map((name) => ({ name })),
@@ -557,8 +561,16 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       }
     }
 
-    const { variants, addons, metadata, tags, images, categoryId, ...rest } =
-      input
+    const {
+      variants,
+      addons,
+      metadata,
+      tags,
+      images,
+      categoryId,
+      isPublished,
+      ...rest
+    } = input
 
     const oldImageUrls = new Set<string>()
     existingProduct.images.forEach((img) => {
@@ -607,6 +619,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
         data: {
           ...rest,
           categoryId,
+          isPublished,
           details,
         },
       })
@@ -763,5 +776,61 @@ export async function getProductQuota(storeId: string) {
   } catch (error) {
     console.error(error)
     return null
+  }
+}
+
+export async function toggleProductVisibility(
+  id: string,
+  isPublished: boolean,
+) {
+  const session = await auth()
+  const userId = session?.user?.id
+
+  if (!userId) {
+    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+  }
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: {
+        storeId: true,
+        store: { select: { slug: true } },
+      },
+    })
+
+    if (!product) {
+      return { success: false, message: 'ไม่พบสินค้า' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: product.storeId,
+      permission: 'canUpdateProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    await prisma.product.update({
+      where: { id },
+      data: { isPublished },
+    })
+
+    await invalidateStorefrontProductCache(product.store.slug)
+
+    return {
+      success: true,
+      message: isPublished
+        ? 'แสดงสินค้าที่หน้าร้านแล้ว'
+        : 'ซ่อนสินค้าจากหน้าร้านแล้ว',
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
   }
 }

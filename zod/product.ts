@@ -68,6 +68,7 @@ export const productFormSchema = z.object({
       message: 'Slug ใช้ได้เฉพาะตัวอักษร ตัวเลข และขีดกลาง',
     }),
   categoryId: z.string().min(1, { message: 'กรุณาเลือกหมวดหมู่' }),
+  isPublished: z.boolean().default(true),
   images: z.array(
     z.object({
       url: z.union([z.string(), z.instanceof(File), z.any()]),

@@ -824,6 +824,8 @@ model Product {
   tags    ProductTag[]
   details Json?
 
+  isPublished Boolean @default(true)
+
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 

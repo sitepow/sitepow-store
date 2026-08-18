@@ -8,6 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function PaymentSection() {
   return (
     <FeatureDisplay
+      isLeft={false}
       imageUrl="/images/landing/landing-payments.jpeg"
       sectionHeader={
         <SectionHeader

@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useBranches } from '@/actions/hooks/branch'
-import { FALLBACK_MERCHANT_LOGO_IMAGE } from '@/constants/system'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { OpeningHours } from '@/types/branch'
@@ -121,9 +120,7 @@ export function StoreFooter() {
       <div className="container mx-auto px-5 py-12 sm:px-10">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div className="max-w-sm">
-            <StoreLogo
-              image={store?.logo ? store.logo : FALLBACK_MERCHANT_LOGO_IMAGE}
-            />
+            {store?.logo ? <StoreLogo image={store?.logo} /> : <LogoBrand />}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               {store?.description
                 ? store?.description

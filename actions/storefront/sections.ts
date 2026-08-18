@@ -54,7 +54,14 @@ export async function getStorefrontCategoriesProductsSections(
 
   const data = await withCache(cacheKey, async () => {
     const categories = await prisma.category.findMany({
-      where: { store: { slug: storeSlug } },
+      where: {
+        store: { slug: storeSlug },
+        products: {
+          some: {
+            isPublished: true,
+          },
+        },
+      },
       select: { id: true, title: true, slug: true, image: true },
       orderBy: { title: 'asc' },
     })
@@ -67,17 +74,23 @@ export async function getStorefrontCategoriesProductsSections(
 
     const allProducts = serializeDecimal(
       await prisma.product.findMany({
-        where: { categoryId: { in: categoryIds } },
-        take: 10,
+        where: {
+          categoryId: { in: categoryIds },
+          isPublished: true,
+        },
         orderBy: { createdAt: 'desc' },
         select: storefrontSectionProductSelect,
       }),
     )
 
-    return categories.map((cat) => ({
-      ...cat,
-      products: allProducts.filter((p) => p.categoryId === cat.id),
-    }))
+    return categories
+      .map((cat) => ({
+        ...cat,
+        products: allProducts
+          .filter((p) => p.categoryId === cat.id)
+          .slice(0, 10),
+      }))
+      .filter((cat) => cat.products.length > 0)
   })
 
   return data ?? []

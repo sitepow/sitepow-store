@@ -8,7 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function ExpenseSection() {
   return (
     <FeatureDisplay
-      isLeft={true}
+      isLeft={false}
       imageUrl="/images/landing/landing-expense.jpeg"
       sectionHeader={
         <SectionHeader

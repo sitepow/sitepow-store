@@ -15,7 +15,11 @@ const storefrontCategoryListSelect = {
   description: true,
   image: true,
   _count: {
-    select: { products: true },
+    select: {
+      products: {
+        where: { isPublished: true },
+      },
+    },
   },
 } satisfies Prisma.CategorySelect
 
@@ -49,6 +53,11 @@ export async function getStorefrontCategories({
   const data = await withCache(cacheKey, async () => {
     const whereClause: Prisma.CategoryWhereInput = {
       store: { slug: storeSlug, status: StoreStatus.ACTIVE },
+      products: {
+        some: {
+          isPublished: true,
+        },
+      },
     }
 
     if (search) {
@@ -74,7 +83,11 @@ export async function getStorefrontCategoryOptions(
     return await prisma.category.findMany({
       where: {
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
-        products: { some: {} },
+        products: {
+          some: {
+            isPublished: true,
+          },
+        },
       },
       select: storefrontCategoryOptionsSelect,
       orderBy: { title: 'asc' },

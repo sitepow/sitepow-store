@@ -19,7 +19,7 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
       <SectionContainer>
         <ActionRequiredAlert
           className="w-fit"
-          title="ขออภัยครับ"
+          title="ขออภัย"
           description="ไม่พบสินค้าในระบบที่คุณกำลังค้นหา โปรดติดต่อร้านค้าโดยตรง"
         />
       </SectionContainer>

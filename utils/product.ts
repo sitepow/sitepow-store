@@ -138,6 +138,7 @@ export const transformProductToFormValues = (
 ): ProductFormValues => {
   return {
     ...product,
+    isPublished: product.isPublished ?? true,
     tags: product.tags.map((t) => t.name).join(', '),
     images:
       product.images?.map((img) => ({

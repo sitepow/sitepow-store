@@ -108,7 +108,7 @@ export function PosProductList({
       <ScrollArea>
         {products.length === 0 ? (
           <ActionRequiredAlert
-            title="ขออภัยครับ"
+            title="ขออภัย"
             description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
           />
         ) : (

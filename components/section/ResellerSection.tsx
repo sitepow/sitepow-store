@@ -8,7 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function ResellerSection() {
   return (
     <FeatureDisplay
-      isLeft={false}
+      isLeft={true}
       imageUrl="/images/landing/landing-reseller.jpeg"
       sectionHeader={
         <SectionHeader

@@ -70,6 +70,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
+import { Switch } from '@/components/ui/switch'
 
 import { CategoryField } from './CategoryField'
 import { CopyProductDataPicker } from './CopyProductDataPicker'
@@ -121,6 +122,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       title: '',
       slug: '',
       categoryId: '',
+      isPublished: true,
       images: [],
       variants: [
         {
@@ -337,6 +339,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         categoryId: data.categoryId,
         title: data.title,
         slug: data.slug,
+        isPublished: data.isPublished,
         tags: data.tags,
         images: validImages,
         variants: processedVariants,
@@ -438,6 +441,28 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 />
                 <CategoryField isPending={isPending} />
               </div>
+              <Controller
+                control={form.control}
+                name="isPublished"
+                render={({ field }) => (
+                  <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FieldLabel className="text-base font-semibold">
+                        แสดงสินค้าที่หน้าร้าน
+                      </FieldLabel>
+                      <p className="text-muted-foreground text-xs">
+                        เปิดเพื่อแสดงสินค้านี้บนเว็บไซต์/หน้าร้านออนไลน์
+                        หรือปิดเพื่อซ่อนไว้ชั่วคราว
+                      </p>
+                    </div>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isPending}
+                    />
+                  </Field>
+                )}
+              />
             </FieldGroup>
           </FieldSet>
           <Field>

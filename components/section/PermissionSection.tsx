@@ -8,7 +8,7 @@ import { FeatureDisplay } from './_components/FeatureDisplay'
 export function PermissionSection() {
   return (
     <FeatureDisplay
-      isLeft={false}
+      isLeft={true}
       imageUrl="/images/landing/landing-permission.jpeg"
       sectionHeader={
         <SectionHeader

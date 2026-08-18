@@ -149,7 +149,11 @@ export function ProductsTable() {
                     </TableCell>
                     <TableCell>{formatCurrency(basePrice)}</TableCell>
                     <TableCell>
-                      <Badge>พร้อมขาย</Badge>
+                      {product.isPublished ? (
+                        <Badge>แสดงหน้าร้าน</Badge>
+                      ) : (
+                        <Badge variant="outline">ซ่อนหน้าร้าน</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
                       <Button variant="outline" size="icon-lg" asChild>
