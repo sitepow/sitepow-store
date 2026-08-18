@@ -19,17 +19,44 @@ export interface GetDashboardResult {
     dailySalesYesterday: number
     newCustomers: number
     newCustomersLastMonth: number
+
+    dailyCOGS: number
+    dailyGrossProfit: number
+    dailyGrossMargin: number
+
+    monthlyCOGS: number
+    monthlyGrossProfit: number
+    monthlyGrossProfitLastMonth: number
+    monthlyGrossMargin: number
+
+    yearlyCOGS: number
+    yearlyGrossProfit: number
+    yearlyGrossProfitLastYear: number
+    yearlyGrossMargin: number
+
     dailyExpense: number
+    monthlyExpense: number
+    monthlyExpenseLastMonth: number
+    yearlyExpense: number
+    yearlyExpenseLastYear: number
+
+    dailyNetProfit: number
+    dailyNetProfitYesterday: number
+
+    monthlyNetProfit: number
+    monthlyNetProfitLastMonth: number
+    monthlyNetMargin: number
+
+    yearlyNetProfit: number
+    yearlyNetProfitLastYear: number
+    yearlyNetMargin: number
+
     dailyProfit: number
     dailyProfitYesterday: number
     dailyMargin: number
-    monthlyExpense: number
-    monthlyExpenseLastMonth: number
     monthlyProfit: number
     monthlyProfitLastMonth: number
     monthlyMargin: number
-    yearlyExpense: number
-    yearlyExpenseLastYear: number
     yearlyProfit: number
     yearlyProfitLastYear: number
     yearlyMargin: number
@@ -57,17 +84,44 @@ const emptyDashboardResult: GetDashboardResult = {
     dailySalesYesterday: 0,
     newCustomers: 0,
     newCustomersLastMonth: 0,
+
+    dailyCOGS: 0,
+    dailyGrossProfit: 0,
+    dailyGrossMargin: 0,
+
+    monthlyCOGS: 0,
+    monthlyGrossProfit: 0,
+    monthlyGrossProfitLastMonth: 0,
+    monthlyGrossMargin: 0,
+
+    yearlyCOGS: 0,
+    yearlyGrossProfit: 0,
+    yearlyGrossProfitLastYear: 0,
+    yearlyGrossMargin: 0,
+
     dailyExpense: 0,
+    monthlyExpense: 0,
+    monthlyExpenseLastMonth: 0,
+    yearlyExpense: 0,
+    yearlyExpenseLastYear: 0,
+
+    dailyNetProfit: 0,
+    dailyNetProfitYesterday: 0,
+
+    monthlyNetProfit: 0,
+    monthlyNetProfitLastMonth: 0,
+    monthlyNetMargin: 0,
+
+    yearlyNetProfit: 0,
+    yearlyNetProfitLastYear: 0,
+    yearlyNetMargin: 0,
+
     dailyProfit: 0,
     dailyProfitYesterday: 0,
     dailyMargin: 0,
-    monthlyExpense: 0,
-    monthlyExpenseLastMonth: 0,
     monthlyProfit: 0,
     monthlyProfitLastMonth: 0,
     monthlyMargin: 0,
-    yearlyExpense: 0,
-    yearlyExpenseLastYear: 0,
     yearlyProfit: 0,
     yearlyProfitLastYear: 0,
     yearlyMargin: 0,
@@ -114,6 +168,10 @@ export async function getDashboard(
 
     const orderBranchFilter = validBranchId
       ? { items: { some: { branchId: validBranchId } } }
+      : {}
+
+    const orderItemBranchFilter = validBranchId
+      ? { branchId: validBranchId }
       : {}
 
     const expenseBranchFilter = validBranchId
@@ -205,6 +263,13 @@ export async function getDashboard(
       ordersLastMonth,
       customersThisMonth,
       customersLastMonth,
+
+      cogsToday,
+      cogsYesterday,
+      cogsThisMonth,
+      cogsLastMonth,
+      cogsThisYear,
+      cogsLastYear,
 
       expenseToday,
       expenseYesterday,
@@ -298,6 +363,73 @@ export async function getDashboard(
             createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
           },
         },
+      }),
+
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfToday, lte: endOfToday },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
+      }),
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfYesterday, lte: endOfYesterday },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
+      }),
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfThisMonth, lte: endOfThisMonth },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
+      }),
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
+      }),
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfThisYear, lte: endOfThisYear },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
+      }),
+      prisma.orderItem.aggregate({
+        where: {
+          order: {
+            ...storeFilter,
+            createdAt: { gte: startOfLastYear, lte: endOfLastYear },
+            status: { not: OrderStatus.CANCELLED },
+          },
+          ...orderItemBranchFilter,
+        },
+        _sum: { costPrice: true },
       }),
 
       prisma.expense.aggregate({
@@ -403,6 +535,13 @@ export async function getDashboard(
     const yRevenue = Number(revenueThisYear._sum.totalAmount ?? 0)
     const yRevenueLastYear = Number(revenueLastYear._sum.totalAmount ?? 0)
 
+    const dCOGS = Number(cogsToday._sum.costPrice ?? 0)
+    const dCOGSYesterday = Number(cogsYesterday._sum.costPrice ?? 0)
+    const mCOGS = Number(cogsThisMonth._sum.costPrice ?? 0)
+    const mCOGSLastMonth = Number(cogsLastMonth._sum.costPrice ?? 0)
+    const yCOGS = Number(cogsThisYear._sum.costPrice ?? 0)
+    const yCOGSLastYear = Number(cogsLastYear._sum.costPrice ?? 0)
+
     const dExpense = Number(expenseToday._sum.amount ?? 0)
     const dExpenseYesterday = Number(expenseYesterday._sum.amount ?? 0)
     const mExpense = Number(expenseThisMonth._sum.amount ?? 0)
@@ -410,18 +549,21 @@ export async function getDashboard(
     const yExpense = Number(expenseThisYear._sum.amount ?? 0)
     const yExpenseLastYear = Number(expenseLastYear._sum.amount ?? 0)
 
-    const dProfit = dSales - dExpense
-    const dProfitYesterday = dSalesYesterday - dExpenseYesterday
+    const dGrossProfit = dSales - dCOGS
+    const mGrossProfit = mRevenue - mCOGS
+    const mGrossProfitLastMonth = mRevenueLastMonth - mCOGSLastMonth
+    const yGrossProfit = yRevenue - yCOGS
+    const yGrossProfitLastYear = yRevenueLastYear - yCOGSLastYear
 
-    const mProfit = mRevenue - mExpense
-    const mProfitLastMonth = mRevenueLastMonth - mExpenseLastMonth
+    const dNetProfit = dGrossProfit - dExpense
+    const dNetProfitYesterday =
+      dSalesYesterday - dCOGSYesterday - dExpenseYesterday
 
-    const yProfit = yRevenue - yExpense
-    const yProfitLastYear = yRevenueLastYear - yExpenseLastYear
+    const mNetProfit = mGrossProfit - mExpense
+    const mNetProfitLastMonth = mGrossProfitLastMonth - mExpenseLastMonth
 
-    const dMargin = calcMargin(dProfit, dSales)
-    const mMargin = calcMargin(mProfit, mRevenue)
-    const yMargin = calcMargin(yProfit, yRevenue)
+    const yNetProfit = yGrossProfit - yExpense
+    const yNetProfitLastYear = yGrossProfitLastYear - yExpenseLastYear
 
     const trendMap: Record<string, number> = {}
     for (let i = 5; i >= 0; i--) {
@@ -450,20 +592,46 @@ export async function getDashboard(
         newCustomers: customersThisMonth,
         newCustomersLastMonth: customersLastMonth,
 
+        dailyCOGS: dCOGS,
+        dailyGrossProfit: dGrossProfit,
+        dailyGrossMargin: calcMargin(dGrossProfit, dSales),
+
+        monthlyCOGS: mCOGS,
+        monthlyGrossProfit: mGrossProfit,
+        monthlyGrossProfitLastMonth: mGrossProfitLastMonth,
+        monthlyGrossMargin: calcMargin(mGrossProfit, mRevenue),
+
+        yearlyCOGS: yCOGS,
+        yearlyGrossProfit: yGrossProfit,
+        yearlyGrossProfitLastYear: yGrossProfitLastYear,
+        yearlyGrossMargin: calcMargin(yGrossProfit, yRevenue),
+
         dailyExpense: dExpense,
-        dailyProfit: dProfit,
-        dailyProfitYesterday: dProfitYesterday,
-        dailyMargin: dMargin,
         monthlyExpense: mExpense,
         monthlyExpenseLastMonth: mExpenseLastMonth,
-        monthlyProfit: mProfit,
-        monthlyProfitLastMonth: mProfitLastMonth,
-        monthlyMargin: mMargin,
         yearlyExpense: yExpense,
         yearlyExpenseLastYear: yExpenseLastYear,
-        yearlyProfit: yProfit,
-        yearlyProfitLastYear: yProfitLastYear,
-        yearlyMargin: yMargin,
+
+        dailyNetProfit: dNetProfit,
+        dailyNetProfitYesterday: dNetProfitYesterday,
+
+        monthlyNetProfit: mNetProfit,
+        monthlyNetProfitLastMonth: mNetProfitLastMonth,
+        monthlyNetMargin: calcMargin(mNetProfit, mRevenue),
+
+        yearlyNetProfit: yNetProfit,
+        yearlyNetProfitLastYear: yNetProfitLastYear,
+        yearlyNetMargin: calcMargin(yNetProfit, yRevenue),
+
+        dailyProfit: dNetProfit,
+        dailyProfitYesterday: dNetProfitYesterday,
+        dailyMargin: calcMargin(dNetProfit, dSales),
+        monthlyProfit: mNetProfit,
+        monthlyProfitLastMonth: mNetProfitLastMonth,
+        monthlyMargin: calcMargin(mNetProfit, mRevenue),
+        yearlyProfit: yNetProfit,
+        yearlyProfitLastYear: yNetProfitLastYear,
+        yearlyMargin: calcMargin(yNetProfit, yRevenue),
       },
       salesTrend,
       recentSales: recentOrdersRaw.map((o) => {

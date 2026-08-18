@@ -120,9 +120,17 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
   const variantIds = Array.from(
     new Set(input.items.map((i) => i.variantId).filter(Boolean)),
   )
+
   const variants = await prisma.productVariant.findMany({
     where: { id: { in: variantIds as string[] } },
-    select: { id: true, weight: true, width: true, height: true, length: true },
+    select: {
+      id: true,
+      weight: true,
+      width: true,
+      height: true,
+      length: true,
+      costPrice: true,
+    },
   })
   const variantMap = new Map(variants.map((v) => [v.id, v]))
   const dimensions = calculateOrderDimensions(input.items, variantMap)
@@ -316,19 +324,23 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           height: dimensions.height,
           length: dimensions.length,
           items: {
-            create: groupItems.map((item) => ({
-              productId: item.productId,
-              variantId: item.variantId,
-              title: item.title,
-              variantTitle: item.variantTitle,
-              image: item.variant?.image || item.image || null,
-              quantity: item.quantity,
-              price: item.price,
-              originalPrice: item.originalPrice ?? item.price,
-              branchId: targetBranchId,
-              productType: item.productType,
-              customerNote: item.customerNote ?? null,
-            })),
+            create: groupItems.map((item) => {
+              const variant = variantMap.get(item.variantId)
+              return {
+                productId: item.productId,
+                variantId: item.variantId,
+                title: item.title,
+                variantTitle: item.variantTitle,
+                image: item.variant?.image || item.image || null,
+                quantity: item.quantity,
+                price: item.price,
+                originalPrice: item.originalPrice ?? item.price,
+                costPrice: variant?.costPrice ?? 0,
+                branchId: targetBranchId,
+                productType: item.productType,
+                customerNote: item.customerNote ?? null,
+              }
+            }),
           },
         },
         include: { items: true, bankAccount: true },
@@ -392,19 +404,23 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           earnedPoints: share.earnedPoints,
           storeSnapshot: store as unknown as Prisma.InputJsonValue,
           items: {
-            create: digitalItems.map((item) => ({
-              productId: item.productId,
-              variantId: item.variantId,
-              title: item.title,
-              variantTitle: item.variantTitle,
-              image: item.variant?.image || item.image || null,
-              quantity: item.quantity,
-              price: item.price,
-              originalPrice: item.originalPrice ?? item.price,
-              branchId: input.branchId || mainBranch?.id || '',
-              productType: item.productType,
-              customerNote: item.customerNote ?? null,
-            })),
+            create: digitalItems.map((item) => {
+              const variant = variantMap.get(item.variantId)
+              return {
+                productId: item.productId,
+                variantId: item.variantId,
+                title: item.title,
+                variantTitle: item.variantTitle,
+                image: item.variant?.image || item.image || null,
+                quantity: item.quantity,
+                price: item.price,
+                originalPrice: item.originalPrice ?? item.price,
+                costPrice: variant?.costPrice ?? 0,
+                branchId: input.branchId || mainBranch?.id || '',
+                productType: item.productType,
+                customerNote: item.customerNote ?? null,
+              }
+            }),
           },
         },
         include: { items: true, bankAccount: true },
@@ -472,6 +488,8 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
           ? `${baseOrderNumber}-${orderCounter++}`
           : baseOrderNumber
 
+        const variant = variantMap.get(serviceItem.variantId)
+
         const order = await tx.order.create({
           data: {
             orderNumber: subOrderNumber,
@@ -505,6 +523,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
                   quantity: serviceItem.quantity,
                   price: serviceItem.price,
                   originalPrice: serviceItem.originalPrice ?? serviceItem.price,
+                  costPrice: variant?.costPrice ?? 0,
                   branchId: input.branchId || mainBranch?.id || '',
                   productType: serviceItem.productType,
                   customerNote: serviceItem.customerNote ?? null,

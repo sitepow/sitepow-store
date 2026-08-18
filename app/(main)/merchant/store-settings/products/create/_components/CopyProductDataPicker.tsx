@@ -154,8 +154,8 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <IconDatabaseImport className="mr-2 size-4" />{' '}
+        <Button variant="outline">
+          <IconDatabaseImport className="size-4" />{' '}
           คัดลอกข้อมูลสินค้าในฐานข้อมูล
         </Button>
       </DialogTrigger>

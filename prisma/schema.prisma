@@ -1155,6 +1155,7 @@ model OrderItem {
   quantity      Int
   price         Decimal     @db.Decimal(10, 2)
   originalPrice Decimal?    @db.Decimal(10, 2)
+  costPrice     Decimal?    @default(0) @db.Decimal(10, 2)
 
   @@index([orderId])
   @@index([productId])

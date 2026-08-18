@@ -147,6 +147,7 @@ export const transformProductToFormValues = (
     variants: product.variants.map((v) => ({
       title: v.title,
       price: Number(v.price),
+      costPrice: Number(v.costPrice ?? 0),
       sku: v.sku || '',
       image: v.image || null,
       weight: v.weight ?? 0,

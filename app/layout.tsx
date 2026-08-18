@@ -3,7 +3,11 @@ import { Toaster } from 'react-hot-toast'
 import type { Metadata } from 'next'
 // import { NextIntlClientProvider } from 'next-intl'
 // import { getMessages } from 'next-intl/server'
-import { Dancing_Script, IBM_Plex_Sans_Thai, Inter } from 'next/font/google'
+import {
+  Dancing_Script,
+  IBM_Plex_Sans_Thai_Looped,
+  Inter,
+} from 'next/font/google'
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -15,7 +19,7 @@ import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
-const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai({
+const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',

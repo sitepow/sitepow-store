@@ -40,7 +40,7 @@ export function StatsCard({
           <Icon className="size-4 text-white" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-white">{value}</div>
+          <div className="font-bold text-white sm:text-2xl">{value}</div>
           <p className="text-xs text-neutral-300 opacity-80">{description}</p>
         </CardContent>
       </div>

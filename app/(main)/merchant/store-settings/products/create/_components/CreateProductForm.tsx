@@ -126,6 +126,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         {
           title: 'มาตรฐาน',
           price: 0,
+          costPrice: 0,
           sku: '',
           image: null,
           weight: 0,
@@ -303,6 +304,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           return {
             title: v.title,
             price: v.price,
+            costPrice: v.costPrice ?? 0,
             sku: v.sku,
             image: variantImageUrl,
             digitalUrl: v.digitalUrl ?? '',

@@ -206,8 +206,8 @@ export function VariantItem({
               )}
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:col-span-9 sm:grid-cols-12 lg:col-span-10">
-            <div className="sm:col-span-6">
+          <div className="grid grid-cols-1 gap-4 sm:col-span-9 sm:grid-cols-12">
+            <div className="sm:col-span-6 md:col-span-6">
               <Controller
                 name={`variants.${index}.title`}
                 control={control}
@@ -221,13 +221,29 @@ export function VariantItem({
                 )}
               />
             </div>
+            <div className="sm:col-span-6 md:col-span-6">
+              <Controller
+                name={`variants.${index}.sku`}
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel className="text-xs">SKU (ถ้ามี)</FieldLabel>
+                    <Input
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="SKU-12345"
+                    />
+                  </Field>
+                )}
+              />
+            </div>
             <div className="sm:col-span-6">
               <Controller
                 name={`variants.${index}.price`}
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="text-xs">ราคา</FieldLabel>
+                    <FieldLabel className="text-xs">ราคาขาย</FieldLabel>
                     <Input
                       {...field}
                       type="number"
@@ -243,18 +259,26 @@ export function VariantItem({
                 )}
               />
             </div>
-            <div className="sm:col-span-12">
+            <div className="sm:col-span-6">
               <Controller
-                name={`variants.${index}.sku`}
+                name={`variants.${index}.costPrice`}
                 control={control}
-                render={({ field }) => (
-                  <Field>
-                    <FieldLabel className="text-xs">SKU (ถ้ามี)</FieldLabel>
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel className="text-xs">ต้นทุนสินค้า</FieldLabel>
                     <Input
                       {...field}
-                      value={field.value ?? ''}
-                      placeholder="SKU-12345"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      value={field.value ?? 0}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      aria-invalid={fieldState.invalid}
                     />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />

@@ -136,37 +136,65 @@ export default function MerchantDashboardPage() {
         },
       ]
     : []
-
-  const financialStatsData = stats
+  const grossStatsData = stats
     ? [
         {
-          title: 'กำไรวันนี้',
-          value: formatCurrency(stats.dailyProfit),
-          description: `Margin ${stats.dailyMargin}% (${pctChange(
-            stats.dailyProfit,
-            stats.dailyProfitYesterday,
-            'จากเมื่อวาน',
-          )})`,
-          icon: stats.dailyProfit >= 0 ? TrendingUp : TrendingDown,
+          title: 'ต้นทุนสินค้าขายเดือนนี้ (COGS)',
+          value: formatCurrency(stats.monthlyCOGS),
+          description: 'รวมทุนสินค้าที่ขายได้จริง',
+          icon: IconReceipt,
         },
         {
-          title: 'กำไรเดือนนี้',
-          value: formatCurrency(stats.monthlyProfit),
-          description: `Margin ${stats.monthlyMargin}% (${pctChange(
-            stats.monthlyProfit,
-            stats.monthlyProfitLastMonth,
+          title: 'กำไรขั้นต้นเดือนนี้ (Gross Profit)',
+          value: formatCurrency(stats.monthlyGrossProfit),
+          description: `Gross Margin ${stats.monthlyGrossMargin}% (${pctChange(
+            stats.monthlyGrossProfit,
+            stats.monthlyGrossProfitLastMonth,
+            'จากเดือนที่แล้ว',
+          )})`,
+          icon: TrendingUp,
+        },
+        {
+          title: 'กำไรขั้นต้นวันนี้',
+          value: formatCurrency(stats.dailyGrossProfit),
+          description: `Gross Margin ${stats.dailyGrossMargin}%`,
+          icon: stats.dailyGrossProfit >= 0 ? TrendingUp : TrendingDown,
+        },
+        {
+          title: 'ค่าใช้จ่ายดำเนินงานเดือนนี้',
+          value: formatCurrency(stats.monthlyExpense),
+          description: pctChange(
+            stats.monthlyExpense,
+            stats.monthlyExpenseLastMonth,
+            'จากเดือนที่แล้ว',
+          ),
+          icon: IconReceipt,
+        },
+      ]
+    : []
+
+  const netProfitStatsData = stats
+    ? [
+        {
+          title: 'กำไรสุทธิวันนี้',
+          value: formatCurrency(stats.dailyNetProfit),
+          description: `หักต้นทุนสินค้าและค่าใช้จ่ายแล้ว`,
+          icon: stats.dailyNetProfit >= 0 ? TrendingUp : TrendingDown,
+        },
+        {
+          title: 'กำไรสุทธิเดือนนี้',
+          value: formatCurrency(stats.monthlyNetProfit),
+          description: `Net Margin ${stats.monthlyNetMargin}% (${pctChange(
+            stats.monthlyNetProfit,
+            stats.monthlyNetProfitLastMonth,
             'จากเดือนที่แล้ว',
           )})`,
           icon: IconWallet,
         },
         {
-          title: 'กำไรปีนี้',
-          value: formatCurrency(stats.yearlyProfit),
-          description: `Margin ${stats.yearlyMargin}% (${pctChange(
-            stats.yearlyProfit,
-            stats.yearlyProfitLastYear,
-            'จากปีที่แล้ว',
-          )})`,
+          title: 'กำไรสุทธิปีนี้',
+          value: formatCurrency(stats.yearlyNetProfit),
+          description: `Net Margin ${stats.yearlyNetMargin}%`,
           icon: TrendingUp,
         },
         {
@@ -196,27 +224,24 @@ export default function MerchantDashboardPage() {
                 ตั้งค่าร้านค้า <IconExternalLink />
               </Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link
-                href={`https://${selectedStoreSlug}.sitepow.store`}
-                target="_blank"
-              >
-                ดูหน้าร้านออนไลน์ของคุณ <IconExternalLink />
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/merchant/pos" target="_blank">
-                เข้าระบบ POS ขายหน้าร้าน <IconExternalLink />
-              </Link>
-            </Button>
+            {selectedStoreSlug && (
+              <Button variant="outline" asChild>
+                <Link
+                  href={`https://${selectedStoreSlug}.sitepow.store`}
+                  target="_blank"
+                >
+                  ดูหน้าร้านออนไลน์ของคุณ <IconExternalLink />
+                </Link>
+              </Button>
+            )}
           </div>
         )}
       </div>
       {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
       {selectedStoreId !== ALL_STORES && (isPermissionLoading || isLoading) && (
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[...Array(12)].map((_, i) => (
               <Skeleton key={i} className="h-28" />
             ))}
           </div>
@@ -243,7 +268,7 @@ export default function MerchantDashboardPage() {
         !isLoading &&
         data && (
           <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {primaryStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
@@ -254,8 +279,19 @@ export default function MerchantDashboardPage() {
                 />
               ))}
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {financialStatsData.map((stat, i) => (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {grossStatsData.map((stat, i) => (
+                <StatsCard
+                  key={i}
+                  title={stat.title}
+                  value={stat.value}
+                  description={stat.description}
+                  icon={stat.icon}
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {netProfitStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
                   title={stat.title}

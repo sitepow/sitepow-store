@@ -30,6 +30,7 @@ export interface CreateProductInput {
   variants: {
     title: string
     price: number
+    costPrice: number
     sku?: string
     image?: string | null
     digitalUrl: string
@@ -81,6 +82,7 @@ const productSelect = {
       id: true,
       title: true,
       price: true,
+      costPrice: true,
       sku: true,
       digitalUrl: true,
     },
@@ -304,6 +306,7 @@ export async function createProduct(input: CreateProductInput) {
             create: variants.map((v) => ({
               title: v.title,
               price: v.price,
+              costPrice: v.costPrice,
               sku: v.sku ?? '',
               image: v.image ?? null,
               digitalUrl: v.digitalUrl ?? '',
@@ -628,6 +631,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
             create: variants.map((v) => ({
               title: v.title,
               price: v.price,
+              costPrice: v.costPrice,
               sku: v.sku ?? '',
               image: v.image ?? null,
               digitalUrl: v.digitalUrl ?? '',

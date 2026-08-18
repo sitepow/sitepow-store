@@ -26,6 +26,10 @@ const stockSchema = z.object({
 export const variantSchema = z.object({
   title: z.string().min(1, { message: 'กรุณาระบุชื่อตัวเลือก' }),
   price: z.number().min(0, { message: 'ราคาต้องไม่ต่ำกว่า 0' }),
+  costPrice: z
+    .number()
+    .min(0, { message: 'ต้นทุนต้องไม่ต่ำกว่า 0' })
+    .default(0),
   image: z
     .union([z.string(), z.instanceof(File), z.null(), z.any()])
     .optional(),
