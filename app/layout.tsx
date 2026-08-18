@@ -38,15 +38,6 @@ export const metadata: Metadata = {
     'ขายของออนไลน์',
     'โปรแกรมสต็อกสินค้า',
   ],
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: {
-      index: false,
-      follow: false,
-    },
-  },
 }
 
 export default async function RootLayout({
