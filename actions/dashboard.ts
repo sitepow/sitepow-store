@@ -5,7 +5,7 @@ import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -142,8 +142,8 @@ export async function getDashboard(
   storeId: string,
   branchId?: string,
 ): Promise<GetDashboardResult> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId || !storeId || storeId === ALL_STORES) {
     return emptyDashboardResult
@@ -641,7 +641,7 @@ export async function getDashboard(
 
         return {
           id: o.id,
-          name: customerName || 'ลูกค้า',
+          name: customerName || 'ลูกค้าไม่ทราบชื่อ',
           email: o.customer?.email ?? '-',
           amount: Number(o.totalAmount),
         }

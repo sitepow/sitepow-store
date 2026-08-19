@@ -4,7 +4,7 @@ import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 const profileSelect = {
@@ -14,20 +14,22 @@ const profileSelect = {
   image: true,
   phone: true,
   createdAt: true,
-  isEmailVerified: true,
+  emailVerified: true,
 } satisfies Prisma.UserSelect
 
 export type ProfileData = NonNullable<Awaited<ReturnType<typeof getProfile>>>
 
 export async function getProfile() {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return null
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: profileSelect,
     })
 
@@ -51,15 +53,17 @@ export interface UpdateProfileInput {
 
 export async function updateProfile(input: UpdateProfileInput) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const fullName = `${input.firstName.trim()} ${input.lastName.trim()}`.trim()
 
     const updated = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: {
         name: fullName,
         phone: input.phone ?? null,
@@ -72,7 +76,7 @@ export async function updateProfile(input: UpdateProfileInput) {
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
       entity: 'User',
-      entityId: session.user.id,
+      entityId: userId,
       details: { setting: 'profile', updatedFields: Object.keys(input) },
     })
 

@@ -17,7 +17,7 @@ import { calculatePlanPrice, calculateProration } from '@/utils/pricing'
 import { differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -94,8 +94,8 @@ export async function getStoreSubscriptions(
   ownerId: string,
 ): Promise<GetSubscriptionItemSerialized[]> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return []
@@ -123,8 +123,8 @@ export async function getStoreSubscription(
   }
 
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return null
@@ -161,8 +161,8 @@ export async function changePlan(
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -351,8 +351,8 @@ export async function getSubscriptionInvoices({
   limit?: number
 }): Promise<GetSubscriptionInvoicesResponse> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return {
@@ -443,8 +443,8 @@ export async function initiatePlanUpgrade(
   newPlan: Plan,
   billingCycle: string,
 ) {
-  const userSession = await auth()
-  const userId = userSession?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   try {
     if (!userId) {
@@ -511,7 +511,7 @@ export async function initiatePlanUpgrade(
 
     if (amountToPay > 0) {
       const session = await createCheckoutSession({
-        customerEmail: userSession?.user?.email ?? '',
+        customerEmail: userSession?.email ?? '',
         amount: Number(amountToPay),
         description: `ชำระส่วนต่างสำหรับ Upgrade ไปยังแพลน ${PLAN_DETAILS[newPlan].name}`,
         successUrl: `${process.env.APP_URL}/merchant/billing-subscription`,
@@ -542,8 +542,8 @@ export async function calculateUpgradeCost(
   billingCycle: string,
 ) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { amountToPay: 0 }
@@ -603,8 +603,8 @@ export async function cancelPendingPlanChange(storeId: string) {
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

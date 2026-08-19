@@ -1,17 +1,30 @@
-import { useSession as useNextAuthSession } from 'next-auth/react'
+import { UserRole } from '@/generated/prisma/enums'
+
+import { authClient } from '@/lib/auth-client'
 
 export function useSession() {
-  const { data: session, status, update } = useNextAuthSession()
+  const {
+    data: sessionData,
+    isPending,
+    error,
+    refetch,
+  } = authClient.useSession()
+
+  const user = sessionData?.user ?? null
+  const session = sessionData?.session ?? null
 
   return {
     session,
-    user: session?.user ?? null,
-    userId: session?.user?.id ?? null,
-    userRole: session?.user?.role,
-    status,
-    isAuthenticated: status === 'authenticated',
-    isLoading: status === 'loading',
-    tokenExpires: session?.expires,
-    update,
+    user,
+    userId: user?.id ?? null,
+    userRole: user?.role as UserRole,
+    status: isPending ? 'loading' : user ? 'authenticated' : 'unauthenticated',
+    isAuthenticated: !!user,
+    isLoading: isPending,
+    error,
+    tokenExpires: session?.expiresAt
+      ? new Date(session.expiresAt).toISOString()
+      : undefined,
+    update: refetch,
   }
 }

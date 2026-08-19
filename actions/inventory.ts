@@ -5,7 +5,7 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -93,8 +93,8 @@ export async function getInventory({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -185,8 +185,8 @@ export async function updateStock(id: string, input: UpdateStockInput) {
       return { success: false, message: 'ไม่พบ Stock ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -247,8 +247,8 @@ export async function updateStock(id: string, input: UpdateStockInput) {
 
 export async function upsertStock(input: UpsertStockInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

@@ -3,10 +3,36 @@
 import { serializeDecimal } from '@/utils/decimal'
 import { ReviewRewardConfigFormValues } from '@/zod/review-reward'
 
+import { getCurrentUser } from '@/lib/auth-server'
+import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 export async function getReviewRewardConfig(storeId: string) {
   try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId,
+      permission: 'canViewStoreProfile',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const config = await prisma.reviewRewardConfig.findUnique({
       where: { storeId },
     })
@@ -42,6 +68,30 @@ export async function updateReviewRewardConfig(
   input: ReviewRewardConfigFormValues,
 ) {
   try {
+    if (!storeId) {
+      return { success: false, message: 'ไม่พบ Store ID' }
+    }
+
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId,
+      permission: 'canUpdateStoreProfile',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
     const config = await prisma.reviewRewardConfig.upsert({
       where: { storeId },
       update: {

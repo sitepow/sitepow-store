@@ -5,7 +5,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
 import { calculateReviewPoints } from '@/utils/review-points'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -122,8 +122,8 @@ export async function getCustomerReviews({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -178,8 +178,8 @@ export async function getCustomerReviews({
 }
 
 export async function createCustomerReview(params: CreateCustomerReviewParams) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -381,8 +381,8 @@ export async function updateCustomerReview(
   reviewId: string,
   params: UpdateCustomerReviewParams,
 ) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -477,8 +477,8 @@ export async function updateCustomerReview(
 }
 
 export async function getPurchasableProductsForReview(storeSlug?: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
   if (!userId) {
     return { success: false, data: [] }
   }
@@ -557,8 +557,8 @@ export async function getPurchasableProductsForReview(storeSlug?: string) {
 }
 
 export async function deleteCustomerReview(reviewId: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

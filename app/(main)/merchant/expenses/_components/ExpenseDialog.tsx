@@ -268,12 +268,10 @@ export function ExpenseDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="ส่วนกลาง / ทุกสาขา" />
+                    <SelectValue placeholder="ทุกสาขา" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={ALL_BRANCHES}>
-                      ส่วนกลาง / ทุกสาขา
-                    </SelectItem>
+                    <SelectItem value={ALL_BRANCHES}>ทุกสาขา</SelectItem>
                     {branches.map((branch) => (
                       <SelectItem key={branch.id} value={branch.id}>
                         {branch.name}

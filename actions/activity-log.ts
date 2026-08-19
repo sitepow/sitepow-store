@@ -3,7 +3,7 @@
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -72,8 +72,8 @@ export async function getActivityLogs({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse

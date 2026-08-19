@@ -2,7 +2,6 @@ import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 import { usePaymentSetting } from '@/actions/hooks/payment'
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
@@ -41,8 +40,9 @@ export function PosCheckoutModal({
   earnedPoints,
   onSuccess,
 }: PosCheckoutModalProps) {
-  const router = useRouter()
-  const { watch, setValue, handleSubmit } = useFormContext<POSCheckoutInput>()
+  const clearCart = useCartStore((state) => state.clearCart)
+  const { watch, setValue, handleSubmit, reset } =
+    useFormContext<POSCheckoutInput>()
 
   const storeId = watch('storeId')
 
@@ -118,9 +118,10 @@ export function PosCheckoutModal({
       {
         onSuccess: (res) => {
           if (res.success) {
+            clearCart()
+            reset()
             onSuccess()
             onOpenChange(false)
-            router.push('/merchant/orders')
           }
         },
       },

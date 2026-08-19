@@ -3,7 +3,7 @@
 import { Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -80,8 +80,8 @@ export async function getPOSProducts({
   search?: string
   categoryId?: string
 }) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบ', data: [] }
@@ -130,7 +130,7 @@ export async function getPOSProducts({
       data: serializeDecimal(products) as POSProductItem[],
     }
   } catch (error) {
-    console.error('getPOSProducts Error:', error)
+    console.error(error)
     return {
       success: false,
       message: 'เกิดข้อผิดพลาดในการโหลดสินค้า',

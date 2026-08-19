@@ -84,6 +84,13 @@ export async function registerUser(values: RegisterFormInputs) {
         role: userRole,
         otp: otp,
         otpExpires: otpExpires,
+        accounts: {
+          create: {
+            accountId: email,
+            providerId: 'credential',
+            password: hashedPassword,
+          },
+        },
       },
     })
 

@@ -5,7 +5,7 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -68,8 +68,8 @@ export async function getCategory(id: string) {
       return null
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return null
@@ -120,8 +120,8 @@ export async function getCategories({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -198,8 +198,8 @@ export async function getCategoryOptions(filters?: {
   search?: string
 }): Promise<GetCategoryOptionsItem[]> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return []
@@ -254,8 +254,8 @@ export async function getCategoryOptions(filters?: {
 
 export async function createCategory(input: CreateCategoryInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -306,8 +306,8 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       return { success: false, message: 'ไม่พบ Category ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -374,8 +374,8 @@ export async function deleteCategory(id: string) {
       return { success: false, message: 'ไม่พบ Category ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

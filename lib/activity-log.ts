@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 
-import { auth } from '@/lib/auth'
+import { getServerSession } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export async function createLog({
@@ -22,7 +22,10 @@ export async function createLog({
   details?: Prisma.InputJsonValue
 }) {
   try {
-    const [session, headersList] = await Promise.all([auth(), headers()])
+    const [session, headersList] = await Promise.all([
+      getServerSession(),
+      headers(),
+    ])
 
     const userId = session?.user?.id
     const employee = userId

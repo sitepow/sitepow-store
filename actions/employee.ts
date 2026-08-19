@@ -7,7 +7,7 @@ import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import {
   type EmployeePermissionResult,
   findOrCreateEmployee,
@@ -138,8 +138,8 @@ export async function getEmployees({
   }
 
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId || !storeId || storeId === ALL_STORES) {
       return emptyResponse
@@ -220,8 +220,8 @@ export async function getEmployees({
 
 export async function createEmployee(input: CreateEmployeeInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -314,8 +314,8 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return { success: false, message: 'ไม่พบ Employee ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -469,8 +469,8 @@ export async function deleteEmployee(id: string) {
       }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -565,8 +565,8 @@ export async function getEmployee(
       return null
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return null
@@ -603,8 +603,8 @@ export async function getEmployeePermission(
   branchId?: string,
 ): Promise<EmployeePermissionResult | null> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return null

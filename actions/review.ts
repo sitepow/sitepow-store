@@ -4,7 +4,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -86,8 +86,8 @@ export async function getReviews({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse

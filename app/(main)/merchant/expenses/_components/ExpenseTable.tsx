@@ -115,9 +115,7 @@ export function ExpenseTable({
                     <Badge
                       variant={expense?.branch?.name ? 'default' : 'outline'}
                     >
-                      {expense?.branch?.name
-                        ? expense.branch.name
-                        : 'ส่วนกลาง / ทุกสาขา'}
+                      {expense?.branch?.name ? expense.branch.name : 'ทุกสาขา'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

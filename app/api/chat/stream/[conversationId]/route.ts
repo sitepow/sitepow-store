@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { REDIS_CACHE_TTL_SECONDS } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
@@ -13,19 +13,16 @@ export async function GET(
   { params }: { params: Promise<{ conversationId: string }> },
 ) {
   const { conversationId } = await params
-  const session = await auth()
-  const userId = session?.user?.id
-  const userRole = session?.user?.role
 
-  if (!session?.user?.id) {
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+  const userRole = userSession?.role as UserRole | undefined
+
+  if (!userId) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const hasAccess = await checkAccessWithCache(
-    conversationId,
-    userId!,
-    userRole,
-  )
+  const hasAccess = await checkAccessWithCache(conversationId, userId, userRole)
 
   if (!hasAccess) {
     return new Response('Forbidden', { status: 403 })
@@ -62,7 +59,7 @@ export async function GET(
 export async function checkAccessWithCache(
   conversationId: string,
   userId: string,
-  userRole: UserRole,
+  userRole?: UserRole,
 ) {
   const cacheKey = `chat:access:${userId}:${conversationId}`
 

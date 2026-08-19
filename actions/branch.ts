@@ -5,7 +5,7 @@ import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import {
   findOrCreateEmployee,
   verifyEmployeePermission,
@@ -84,8 +84,8 @@ export async function getBranchOptions(
       return []
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return []
@@ -120,8 +120,8 @@ export async function getBranches({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -201,8 +201,8 @@ export async function getBranch(id: string) {
       return null
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return null
@@ -236,8 +236,8 @@ export async function getBranch(id: string) {
 
 export async function createBranch(input: CreateBranchInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -375,8 +375,8 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       return { success: false, message: 'ไม่พบ Branch ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -432,8 +432,8 @@ export async function setMainBranch(id: string, storeId: string) {
       return { success: false, message: 'ไม่พบ Branch ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -491,8 +491,8 @@ export async function deleteBranch(id: string, storeId: string) {
       return { success: false, message: 'ไม่พบ Branch ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

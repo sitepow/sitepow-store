@@ -4,18 +4,20 @@ import { UserRole } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import { randomUUID } from 'crypto'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export async function exportUserData() {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return null
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: {
         email: true,
         name: true,
@@ -74,12 +76,12 @@ export async function exportUserData() {
 
 export async function deleteUserAccount() {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
-
-    const userId = session.user.id
 
     const user = await prisma.user.findUnique({
       where: { id: userId },

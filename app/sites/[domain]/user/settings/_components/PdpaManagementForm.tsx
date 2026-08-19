@@ -1,6 +1,5 @@
 'use client'
 
-import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -14,6 +13,8 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
+import { authClient } from '@/lib/auth-client'
+
 export function PdpaManagementForm() {
   const router = useRouter()
 
@@ -25,8 +26,13 @@ export function PdpaManagementForm() {
     deleteAccount(undefined, {
       onSuccess: async (data) => {
         if (data?.success) {
-          await signOut({ redirect: false })
-          router.replace('/')
+          await authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                router.replace('/')
+              },
+            },
+          })
         }
       },
     })

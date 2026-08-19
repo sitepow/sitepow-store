@@ -6,7 +6,7 @@ import { ComponentProps, useEffect, useMemo, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useProfile } from '@/actions/hooks/profile'
-import { BASE_FAVICON } from '@/constants/favicon'
+import { USER_ICON } from '@/constants/favicon'
 import { formatDateTime } from '@/utils/date'
 import { IconCamera } from '@tabler/icons-react'
 
@@ -36,7 +36,7 @@ export function ProfileAvartar({
       return URL.createObjectURL(image)
     }
 
-    return image || profile?.image || BASE_FAVICON
+    return image || profile?.image || USER_ICON
   }, [image, profile?.image])
 
   useEffect(() => {

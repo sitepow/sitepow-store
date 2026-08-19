@@ -4,7 +4,7 @@ import { PaymentMethod } from '@/generated/prisma/enums'
 import { serializeDecimal } from '@/utils/decimal'
 import { earnCustomerPoints } from '@/utils/points'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { createOrderCore } from '@/lib/order'
 import { CreateOrderCoreInput } from '@/lib/order/types'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -12,8 +12,8 @@ import { prisma } from '@/lib/prisma'
 
 export async function createPOSOrder(input: CreateOrderCoreInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

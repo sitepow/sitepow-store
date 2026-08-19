@@ -107,7 +107,7 @@ export function StoreCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" disabled={!user?.isEmailVerified}>
+        <Button variant="outline" disabled={!user?.emailVerified}>
           <IconPlus />
           สร้างร้านค้าใหม่
         </Button>

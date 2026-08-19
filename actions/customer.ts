@@ -6,7 +6,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { CreateCustomerInput } from '@/zod/customer'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -70,8 +70,8 @@ export async function getCustomers({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -154,8 +154,8 @@ export async function getCustomers({
 
 export async function unblockCustomer(customerId: string, storeId: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
@@ -201,8 +201,8 @@ export async function unblockCustomer(customerId: string, storeId: string) {
 
 export async function blockCustomer(customerId: string, storeId: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
@@ -271,8 +271,8 @@ export async function searchCustomer({
   storeId: string
   query: string
 }): Promise<SearchCustomerResponse> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ' }
@@ -365,8 +365,8 @@ export type CreateCustomerResponse = {
 export async function createCustomer(
   input: CreateCustomerInput,
 ): Promise<CreateCustomerResponse> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }

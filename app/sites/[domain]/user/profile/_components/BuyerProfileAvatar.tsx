@@ -5,7 +5,7 @@
 import { ComponentProps } from 'react'
 
 import { useProfile } from '@/actions/hooks/profile'
-import { BASE_FAVICON } from '@/constants/favicon'
+import { USER_ICON } from '@/constants/favicon'
 import { formatDateTime } from '@/utils/date'
 import { IconCamera } from '@tabler/icons-react'
 
@@ -32,7 +32,7 @@ export function BuyerProfileAvatar({
       <CardContent className="relative flex flex-col items-center">
         <div className="group relative">
           <img
-            src={BASE_FAVICON}
+            src={USER_ICON}
             className="border-background bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full"
           />
           <Button size="icon-lg" className="absolute right-0 bottom-0">

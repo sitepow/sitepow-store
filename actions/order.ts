@@ -7,7 +7,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { earnCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
@@ -165,8 +165,8 @@ export async function getOrders({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -267,8 +267,8 @@ export async function updateOrderStatus(
       return { success: false, message: 'ไม่พบ Order ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -361,8 +361,8 @@ export async function cancelOrder(id: string) {
       return { success: false, message: 'ไม่พบ Order ID' }
     }
 
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

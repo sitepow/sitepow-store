@@ -1,10 +1,8 @@
-/* eslint-disable react-hooks/immutability */
 'use client'
 
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 
 import { LOGIN_PROVIDERS } from '@/constants/login'
@@ -24,6 +22,8 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+
+import { authClient } from '@/lib/auth-client'
 
 export function LoginForm() {
   const isMounted = useIsMounted()
@@ -50,33 +50,34 @@ export function LoginForm() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ email, password }: LoginFormInputs) => {
-      const result = await signIn('credentials', {
+      const response = await authClient.signIn.email({
         email,
         password,
-        redirect: false,
-        callbackUrl,
+        callbackURL: callbackUrl,
       })
 
-      return result
+      return response
     },
-    onSuccess: (data) => {
-      if (data?.error) {
-        if (data.error === 'CredentialsSignin') {
-          toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
-        } else {
-          toast.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ')
-        }
+    onSuccess: (response) => {
+      if (response.error) {
+        toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
         return
       }
 
       window.location.href = callbackUrl
     },
+   
   })
 
   const handleSSO = async (providerId: string) => {
-    await signIn(providerId, {
-      callbackUrl: callbackUrl,
-    })
+    try {
+      await authClient.signIn.social({
+        provider: providerId as 'google' | 'line',
+        callbackURL: callbackUrl,
+      })
+    } catch {
+      toast.error('ไม่สามารถเชื่อมต่อ Social Provider ได้')
+    }
   }
 
   return (

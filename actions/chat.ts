@@ -22,7 +22,7 @@ import { calculateAiCost } from '@/utils/ai'
 import { queryKeyToRedisKey } from '@/utils/cache'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
 import { chatEvents } from '@/lib/events'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -47,8 +47,8 @@ function cleanBadWords(content: string): string {
 }
 
 export async function getMerchantConversations(storeSlug: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'ไม่พบผู้ใช้งาน' }
@@ -96,8 +96,8 @@ export async function getMerchantConversations(storeSlug: string) {
 }
 
 export async function getOrCreateStoreConversation(storeId: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId || !storeId) {
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งานหรือร้านค้า' }
@@ -148,10 +148,10 @@ export async function getConversation(
   type: ConversationType,
   storeId?: string,
 ) {
-  const session = await auth()
-  const currentUserId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
-  if (!currentUserId) {
+  if (!userId) {
     return { success: false, message: 'ไม่พบผู้ใช้งาน' }
   }
 
@@ -163,7 +163,7 @@ export async function getConversation(
     where: {
       type,
       storeId: type === ConversationType.STORE ? storeId : undefined,
-      members: { some: { userId: currentUserId } },
+      members: { some: { userId } },
     },
     include: { members: true },
   })
@@ -181,7 +181,7 @@ export async function getConversation(
         return { success: false, message: 'ไม่พบร้านค้า' }
       }
 
-      if (store.ownerId === currentUserId) {
+      if (store.ownerId === userId) {
         return {
           success: false,
           message: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
@@ -197,7 +197,7 @@ export async function getConversation(
         storeId: type === ConversationType.STORE ? storeId : undefined,
         members: {
           create: [
-            { userId: currentUserId },
+            { userId: userId },
             ...extraMemberIds.map((id) => ({ userId: id })),
           ],
         },
@@ -210,8 +210,8 @@ export async function getConversation(
 }
 
 export async function getCustomerConversations() {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
@@ -246,9 +246,9 @@ export async function getCustomerConversations() {
 }
 
 export async function getSupportConversations(storeId?: string) {
-  const session = await auth()
-  const userId = session?.user?.id
-  const userRole = session?.user?.role
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+  const userRole = userSession?.role
 
   if (!userId) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
@@ -327,9 +327,9 @@ export async function sendMessage(
   content: string,
   type: MessageType = MessageType.TEXT,
 ) {
-  const session = await auth()
-  const userId = session?.user?.id
-  const userRole = session?.user?.role
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+  const userRole = userSession?.role as UserRole
 
   if (!userId) {
     return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
@@ -610,11 +610,11 @@ export async function getMessages(conversationId: string, cursor?: string) {
 }
 
 async function fetchMessagesFromDb(conversationId: string, cursor?: string) {
-  const session = await auth()
-  const userId = session?.user?.id
-  const userRole = session?.user?.role
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+  const userRole = userSession?.role as UserRole
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return { items: [], nextCursor: undefined }
   }
 
@@ -646,9 +646,9 @@ export async function toggleConversationAi(
   conversationId: string,
   enabled: boolean,
 ) {
-  const session = await auth()
-  const userId = session?.user?.id
-  const userRole = session?.user?.role
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+  const userRole = userSession?.role as UserRole
 
   if (!userId) {
     return { success: false, message: 'ไม่ได้รับอนุญาต' }
@@ -671,16 +671,17 @@ export async function toggleConversationAi(
 }
 
 export async function markAsRead(conversationId: string) {
-  const session = await auth()
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return
   }
 
   await prisma.conversationMember.updateMany({
     where: {
       conversationId: conversationId,
-      userId: session.user.id,
+      userId,
     },
     data: {
       unreadCount: 0,
@@ -690,14 +691,15 @@ export async function markAsRead(conversationId: string) {
 }
 
 export async function getUnreadCount() {
-  const session = await auth()
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
-  if (!session?.user?.id) {
+  if (!userId) {
     return 0
   }
 
   const result = await prisma.conversationMember.aggregate({
-    where: { userId: session.user.id },
+    where: { userId },
     _sum: { unreadCount: true },
   })
   return result._sum.unreadCount || 0

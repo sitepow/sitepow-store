@@ -21,7 +21,7 @@ import { calculatePlanPrice } from '@/utils/pricing'
 import { createStoreSchema } from '@/zod/store'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { withCache } from '@/lib/cache'
 import { requireVerifiedUser } from '@/lib/permission'
 import {
@@ -235,9 +235,9 @@ export async function getStores({
     const sanitizedPage = Math.max(1, page)
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
-    const session = await auth()
+    const userSession = await getCurrentUser()
 
-    if (!session?.user?.id) {
+    if (!userSession?.id) {
       return {
         data: [],
         meta: {
@@ -252,7 +252,7 @@ export async function getStores({
     }
 
     const whereClause: Prisma.StoreWhereInput = {
-      ownerId: session.user.id,
+      ownerId: userSession.id,
     }
 
     if (search) {
@@ -316,12 +316,12 @@ export async function getStoreOptions(filters?: {
   status?: StoreStatus
 }): Promise<GetStoreOptionsItem[]> {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    if (!userSession?.id) {
       return []
     }
 
-    const userId = session.user.id
+    const userId = userSession.id
 
     const whereClause: Prisma.StoreWhereInput = {
       OR: [
@@ -506,8 +506,8 @@ export async function createStore(input: CreateStoreInput) {
 
 export async function updateStore(id: string, input: UpdateStoreInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
@@ -571,8 +571,8 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
 
 export async function deleteStore(id: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }

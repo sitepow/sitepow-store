@@ -2,18 +2,20 @@
 
 import { NotificationSettingsFormValues } from '@/zod/storefront/notification-settings'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export async function getNotificationSettings() {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return null
     }
 
     const settings = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { orderNotify: true, marketingNotify: true },
     })
 
@@ -28,13 +30,15 @@ export async function updateNotificationSettings(
   input: NotificationSettingsFormValues,
 ) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: {
         orderNotify: input.orderNotify,
         marketingNotify: input.marketingNotify,

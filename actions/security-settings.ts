@@ -5,7 +5,7 @@ import { ChangePasswordFormValues } from '@/zod/security-settings'
 import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -27,8 +27,8 @@ export async function getSecuritySettings(
   }
 
   try {
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId) {
       return null
@@ -67,8 +67,8 @@ export async function updateSecuritySettings(
       return { success: false, message: 'ไม่พบ User ID' }
     }
 
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -139,8 +139,8 @@ export async function updateTwoFactor(
       return { success: false, message: 'ไม่พบ User ID' }
     }
 
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

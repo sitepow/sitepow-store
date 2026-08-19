@@ -7,7 +7,7 @@ import { getPathR2FromUrl } from '@/utils/image'
 import { CreateExpenseInput, UpdateExpenseInput } from '@/zod/expense'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -82,8 +82,8 @@ export async function getExpenses({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -176,8 +176,9 @@ export async function getExpenses({
 
 export async function createExpense(input: CreateExpenseInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
@@ -231,8 +232,9 @@ export async function createExpense(input: CreateExpenseInput) {
 
 export async function updateExpense(input: UpdateExpenseInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
@@ -310,8 +312,9 @@ export async function updateExpense(input: UpdateExpenseInput) {
 
 export async function deleteExpense(expenseId: string, storeId: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
     if (!userId) {
       return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }

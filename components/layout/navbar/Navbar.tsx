@@ -35,7 +35,9 @@ export function Navbar() {
   const { isAuthenticated, user, userRole } = useSession()
   const isMounted = useIsMounted()
 
-  const navbarItems = [UserRole.SUPPORT, UserRole.CUSTOMER].includes(userRole)
+  const navbarItems = (
+    [UserRole.SUPPORT, UserRole.CUSTOMER] as UserRole[]
+  ).includes(userRole)
     ? SUPPORT_NAVIGATION
     : MERCHANT_NAVIGATION
 
@@ -46,7 +48,7 @@ export function Navbar() {
     ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
     : '#'
 
-  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
   useEffect(() => {
     if (isMenuOpen) {

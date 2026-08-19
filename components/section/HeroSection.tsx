@@ -25,7 +25,6 @@ export function HeroSection() {
           style={{ backgroundImage: `url('${currentImage}')` }}
         />
       </div>
-
       <div className="z-10 space-y-5">
         <HeroHeader
           className="text-white"
@@ -37,7 +36,6 @@ export function HeroSection() {
             </>
           }
         />
-
         {!isAuthenticated && (
           <div className="flex flex-wrap justify-center gap-2.5 px-10 text-white">
             <Link href="/pricing">
@@ -53,7 +51,6 @@ export function HeroSection() {
             </Link>
           </div>
         )}
-
         {isAuthenticated && (
           <div className="flex flex-wrap justify-center gap-2.5 px-5 text-white">
             <Link href="/pricing">
@@ -62,14 +59,13 @@ export function HeroSection() {
               </Button>
             </Link>
             <Button size="lg" asChild>
-              <Link href="/merchant/dashboard" target="_blank">
+              <Link href="/merchant/dashboard">
                 จัดการร้านค้าของคุณ
                 <ArrowUpRight />
               </Link>
             </Button>
           </div>
         )}
-
         <div className="absolute -bottom-10 left-1/2">
           <div className="relative md:max-w-[1890px]">
             {AVATARS_SEED.map(({ seed, left, top, size, bg, dur, delay }) => (
@@ -92,7 +88,6 @@ export function HeroSection() {
                 className="rounded-full"
               />
             ))}
-
             <svg
               className="h-[50vh]"
               style={{

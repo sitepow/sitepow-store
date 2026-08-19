@@ -1,13 +1,13 @@
 import { redirect } from 'next/navigation'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 
 import { RegisterForm } from './_components/RegisterForm'
 
 export default async function RegisterPage() {
-  const session = await auth()
+  const userSession = await getCurrentUser()
 
-  if (session) {
+  if (userSession) {
     redirect('/')
   }
 

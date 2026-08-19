@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, PropsWithChildren } from 'react'
+import { Fragment, PropsWithChildren, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -60,6 +60,17 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
 
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const { data: storeOptions } = useStoreOptions()
 
   const currentStore =
@@ -79,7 +90,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const pathname = usePathname()
   const isMerchant =
     userRole === UserRole.MERCHANT && redirectPath === 'merchant'
-  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
   return (
     <SidebarProvider>
@@ -161,7 +172,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-        <div className="flex flex-wrap gap-2.5 border-b py-5">
+        <div className="bg-background sticky top-0 z-20 flex h-fit flex-wrap items-center gap-2.5 border-b py-3">
           <SidebarTrigger />
           <ModeToggle />
           <Button
@@ -172,11 +183,15 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
             <IconHome />
           </Button>
           <UserAvatarDropdown redirectPath="merchant" items={items} />
-          {isMerchant && <CreditBadge />}
-          {isMerchant && <DateTimeBadge />}
-          {isPointsEnabled && (
-            <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
-          )}
+          <div
+            className={`flex flex-wrap items-center gap-2.5 ${isScrolled ? 'hidden' : 'flex'}`}
+          >
+            {isMerchant && <CreditBadge />}
+            {isMerchant && <DateTimeBadge />}
+            {isPointsEnabled && (
+              <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+            )}
+          </div>
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

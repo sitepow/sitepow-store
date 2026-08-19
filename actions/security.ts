@@ -3,18 +3,20 @@
 import { ChangePasswordFormValues } from '@/zod/storefront/change-password'
 import bcrypt from 'bcryptjs'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export async function updatePassword(input: ChangePasswordFormValues) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { password: true },
     })
 
@@ -33,7 +35,7 @@ export async function updatePassword(input: ChangePasswordFormValues) {
     const hashedPassword = await bcrypt.hash(input.newPassword, 10)
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: { password: hashedPassword },
     })
 

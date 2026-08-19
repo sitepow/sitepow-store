@@ -3,7 +3,7 @@
 import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export interface GetStorefrontDashboardStats {
@@ -47,8 +47,8 @@ export async function getStorefrontDashboard(
   storeSlug: string,
 ): Promise<GetStorefrontDashboardResult> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return EMPTY_RESULT

@@ -1,20 +1,9 @@
 'use server'
 
-import { Prisma } from '@/generated/prisma/client';
+import { Prisma } from '@/generated/prisma/client'
 
-
-
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-
-
-
-
-
-
-
-
-
+import { getCurrentUser } from '@/lib/auth-server'
+import { prisma } from '@/lib/prisma'
 
 const addressOptionSelect = {
   id: true,
@@ -107,13 +96,14 @@ async function getStoreIdBySlug(storeSlug?: string) {
 
 export async function getAddressOptions(storeSlug?: string) {
   try {
-    const session = await auth()
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return []
     }
 
-    const customerId = await getCustomerId(session.user.id)
+    const customerId = await getCustomerId(userId)
     if (!customerId) {
       return []
     }
@@ -140,12 +130,14 @@ export async function getAddressOptions(storeSlug?: string) {
 
 export async function getAddresses(storeSlug: string) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return []
     }
 
-    const customerId = await getCustomerId(session.user.id)
+    const customerId = await getCustomerId(userId)
     const storeId = await getStoreIdBySlug(storeSlug)
 
     if (!customerId || !storeId) {
@@ -171,12 +163,14 @@ export async function createAddress(
   storeSlug: string,
 ) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    const customerId = await getCustomerId(session.user.id)
+    const customerId = await getCustomerId(userId)
     const storeId = await getStoreIdBySlug(storeSlug)
 
     if (!customerId || !storeId) {
@@ -209,12 +203,14 @@ export async function updateAddress(
   data: Partial<Omit<AddressDetail, 'id' | 'isDefault'>>,
 ) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    const customerId = await getCustomerId(session.user.id)
+    const customerId = await getCustomerId(userId)
     const address = await prisma.address.findUnique({
       where: { id },
       select: { customerId: true },
@@ -239,12 +235,14 @@ export async function updateAddress(
 
 export async function deleteAddress(id: string) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    const customerId = await getCustomerId(session.user.id)
+    const customerId = await getCustomerId(userId)
     const address = await prisma.address.findUnique({
       where: { id },
       select: { customerId: true, isDefault: true },
@@ -279,10 +277,12 @@ export async function deleteAddress(id: string) {
 
 export async function setDefaultAddress(id: string) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) return { success: false }
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
-    const customerId = await getCustomerId(session.user.id)
+    if (!userId) return { success: false }
+
+    const customerId = await getCustomerId(userId)
 
     const targetAddress = await prisma.address.findUnique({
       where: { id },

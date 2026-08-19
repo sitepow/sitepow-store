@@ -1,64 +1,103 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
 
-import { useStoreCheckout } from '@/actions/hooks/checkout'
-import { useAddressOptions } from '@/actions/hooks/storefront/address'
-import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
-import { useCreateOrder } from '@/actions/hooks/storefront/order'
-import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
-import {
-  useShippingCalculation,
-  useStorefrontShippingOptions,
-} from '@/actions/hooks/storefront/shipping'
-import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
-import {
-  BankAccountType,
-  PaymentMethod,
-  ProductType,
-  UserRole,
-} from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { getClientAuthUrl } from '@/utils/auth'
-import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
-import { formatCurrency } from '@/utils/pricing'
-import { formatBankAccount, formatPromptPay } from '@/utils/slip'
-import {
-  IconAlertCircle,
-  IconArrowRight,
-  IconCreditCard,
-  IconLock,
-  IconMapPin,
-  IconShoppingCartCheck,
-  IconTruckDelivery,
-} from '@tabler/icons-react'
-import { ChevronLeftIcon } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { HighlightText } from '@/components/HighlightText'
-import { SectionContainer } from '@/components/SectionContainer'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { RadioGroup } from '@/components/ui/radio-group'
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
-import { CircularProgress } from '../_components/CircularProgress'
-import { CartItemCard } from '../_components/cart/_components/CartItemCard'
-import { CartSummary } from '../_components/cart/_components/CartSummary'
-import { SummaryRow } from '../_components/cart/_components/SummaryRow'
-import { SummaryTotal } from '../_components/cart/_components/SummaryTotal'
-import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout'
-import { CheckoutSection } from './_components/CheckoutSection'
-import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog'
-import { DiscountForm } from './_components/DiscountForm'
-import { RadioCard } from './_components/RadioCard'
-import { useCartStore } from './store'
+
+
+import { useStoreCheckout } from '@/actions/hooks/checkout';
+import { useAddressOptions } from '@/actions/hooks/storefront/address';
+import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount';
+import { useCreateOrder } from '@/actions/hooks/storefront/order';
+import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment';
+import { useShippingCalculation, useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping';
+import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system';
+import { BankAccountType, PaymentMethod, ProductType, UserRole } from '@/generated/prisma/enums';
+import { useIsMounted } from '@/hooks/use-is-mounted';
+import { useSession } from '@/hooks/use-session';
+import { useStoreData } from '@/stores/sites/use-store-data';
+import { getClientAuthUrl } from '@/utils/auth';
+import { calculateGrandTotal, getRemainingStock } from '@/utils/cart';
+import { formatCurrency } from '@/utils/pricing';
+import { formatBankAccount, formatPromptPay } from '@/utils/slip';
+import { IconAlertCircle, IconArrowRight, IconCreditCard, IconLock, IconMapPin, IconShoppingCartCheck, IconTruckDelivery } from '@tabler/icons-react';
+import { ChevronLeftIcon } from 'lucide-react';
+
+
+
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert';
+import { HighlightText } from '@/components/HighlightText';
+import { SectionContainer } from '@/components/SectionContainer';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { RadioGroup } from '@/components/ui/radio-group';
+
+
+
+import { CircularProgress } from '../_components/CircularProgress';
+import { CartItemCard } from '../_components/cart/_components/CartItemCard';
+import { CartSummary } from '../_components/cart/_components/CartSummary';
+import { SummaryRow } from '../_components/cart/_components/SummaryRow';
+import { SummaryTotal } from '../_components/cart/_components/SummaryTotal';
+import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout';
+import { CheckoutSection } from './_components/CheckoutSection';
+import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog';
+import { DiscountForm } from './_components/DiscountForm';
+import { RadioCard } from './_components/RadioCard';
+import { useCartStore } from './store';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
@@ -70,7 +109,7 @@ export default function StoreCartPage() {
   const storeSlug = params.domain as string
   const { isAuthenticated, user } = useSession()
 
-  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
   const loginHref = isMounted
     ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })

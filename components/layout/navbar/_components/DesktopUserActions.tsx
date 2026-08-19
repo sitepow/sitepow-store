@@ -27,7 +27,7 @@ export function DesktopUserActions({
       />
       {userRole === UserRole.MERCHANT && (
         <Button variant="secondary" className="flex gap-2 font-bold" asChild>
-          <Link href="/merchant/dashboard" target="_blank">
+          <Link href="/merchant/dashboard">
             <IconLock />
             จัดการร้านค้าของคุณ
           </Link>

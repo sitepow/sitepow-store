@@ -2,10 +2,9 @@
 
 import { ComponentProps, Fragment } from 'react'
 
-import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
-import { BASE_FAVICON } from '@/constants/favicon'
+import { USER_ICON } from '@/constants/favicon'
 import { NavigationItem } from '@/constants/navigation'
 import { useSession } from '@/hooks/use-session'
 import { IconLogout } from '@tabler/icons-react'
@@ -20,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+import { authClient } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarDropdownProps extends ComponentProps<typeof Avatar> {
@@ -36,9 +36,12 @@ export function UserAvatarDropdown({
   const { user } = useSession()
 
   const handleLogout = async () => {
-    await signOut({
-      callbackUrl: window.location.href,
-      redirect: true,
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = window.location.href
+        },
+      },
     })
   }
 
@@ -54,7 +57,7 @@ export function UserAvatarDropdown({
           {...props}
         >
           <AvatarImage
-            src={user?.image || BASE_FAVICON}
+            src={user?.image || USER_ICON}
             alt={user?.email || 'sitepowStore'}
           />
         </Avatar>

@@ -18,6 +18,7 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 
 import { auth } from './auth'
+import { getCurrentUser } from './auth-server'
 import { withCache } from './cache'
 
 export type TransactionClient = Omit<
@@ -643,8 +644,8 @@ export type RequireVerifiedUserResult =
   | { isAuthorized: false; message: string; userId: string | null }
 
 export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return {
@@ -656,7 +657,7 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { isEmailVerified: true },
+    select: { emailVerified: true },
   })
 
   if (!user) {
@@ -667,7 +668,7 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
     }
   }
 
-  if (!user.isEmailVerified) {
+  if (!user.emailVerified) {
     return {
       isAuthorized: false,
       message: 'กรุณายืนยันอีเมลของคุณก่อนทำรายการ',

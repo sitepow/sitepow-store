@@ -2,7 +2,7 @@
 
 import { DiscountType } from '@/generated/prisma/enums'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 
 export interface StorefrontLoyaltyInfo {
@@ -23,8 +23,8 @@ export async function getStorefrontLoyalty(
   storeSlug: string,
 ): Promise<StorefrontLoyaltyInfo> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     const store = await prisma.store.findUnique({
       where: { slug: storeSlug },

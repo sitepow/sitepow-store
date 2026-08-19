@@ -1,17 +1,17 @@
 'use server'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 export async function getRoleOptions(storeId: string) {
   try {
-    const session = await auth()
-    if (!session?.user?.id || !storeId) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId || !storeId) {
       return []
     }
-
-    const userId = session.user.id
 
     const authCheck = await verifyEmployeePermission({
       userId,
@@ -41,8 +41,10 @@ export async function getRoleOptions(storeId: string) {
 
 export async function getAllPermissions() {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return []
     }
 

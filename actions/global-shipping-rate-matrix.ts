@@ -10,6 +10,7 @@ import {
 
 import { createLog } from '@/lib/activity-log'
 import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -92,8 +93,8 @@ export async function applyGlobalRatesToStore(
       return { success: false, message: 'ไม่พบ Store ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

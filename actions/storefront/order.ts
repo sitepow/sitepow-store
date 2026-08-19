@@ -5,7 +5,7 @@ import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { sendNewOrderNotificationEmail } from '@/utils/store-staff'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { createOrderCore } from '@/lib/order'
 import { CreateOrderInput } from '@/lib/order/types'
 import { requireVerifiedUser } from '@/lib/permission'
@@ -126,13 +126,15 @@ export async function getStorefrontOrders({
   }
 
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
       return empty
     }
 
     const customer = await prisma.customer.findUnique({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { id: true },
     })
 

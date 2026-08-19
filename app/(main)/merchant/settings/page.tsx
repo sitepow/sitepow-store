@@ -1,5 +1,7 @@
 'use client'
 
+import { Suspense } from 'react'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { SettingsTab } from '@/constants/settings'
@@ -33,7 +35,9 @@ import { StoreProfileForm } from './_components/StoreProfileForm'
 import { StoreTransferSettingsForm } from './_components/StoreTransferSettingsForm'
 import { TaxSettingsForm } from './_components/TaxSettingsForm'
 
-export default function MerchantSettingsPage() {
+export const dynamic = 'force-dynamic'
+
+function MerchantSettingsContent() {
   const [activeTab, setActiveTab] = useQueryParam(
     'tab',
     SettingsTab.STORE_PROFILE,
@@ -191,5 +195,13 @@ export default function MerchantSettingsPage() {
         </Tabs>
       )}
     </Sidebar>
+  )
+}
+
+export default function MerchantSettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <MerchantSettingsContent />
+    </Suspense>
   )
 }

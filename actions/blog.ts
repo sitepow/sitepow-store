@@ -5,7 +5,7 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -67,8 +67,8 @@ export async function getBlogs({
   limit = 10,
   search,
 }: GetBlogsParams): Promise<GetBlogsResponse> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return {
@@ -181,8 +181,8 @@ export async function getBlogs({
 
 export async function createBlog(input: CreateBlogInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -240,8 +240,8 @@ export async function createBlog(input: CreateBlogInput) {
 }
 
 export async function getBlogById(id: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return null
@@ -277,8 +277,8 @@ export async function getBlogById(id: string) {
 }
 
 export async function updateBlog(id: string, input: CreateBlogInput) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -356,8 +356,8 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
 
 export async function deleteBlog(id: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

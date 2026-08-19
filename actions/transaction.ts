@@ -4,7 +4,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { TransactionType } from '@/generated/prisma/enums'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -47,8 +47,8 @@ export async function getTransactions({
   type,
 }: GetTransactionsParams): Promise<GetTransactionsResponse> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return {

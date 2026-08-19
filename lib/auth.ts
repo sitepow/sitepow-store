@@ -1,128 +1,72 @@
-import NextAuth from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
-import Google from 'next-auth/providers/google'
-import Line from 'next-auth/providers/line'
-
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import bcrypt from 'bcryptjs'
+import { betterAuth } from 'better-auth'
+import { prismaAdapter } from 'better-auth/adapters/prisma'
 
 import { prisma } from './prisma'
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: 'jwt' },
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? `__Secure-next-auth.session-token`
-          : `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        domain:
-          process.env.NODE_ENV === 'production' ? '.sitepow.store' : 'lvh.me',
+const isProd = process.env.NODE_ENV === 'production'
+
+export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://lvh.me:3000',
+    'http://*.lvh.me:3000',
+    'http://store.lvh.me:3000',
+    'http://accounts.lvh.me:3000',
+    ...(isProd
+      ? [
+          'https://sitepow.store',
+          'https://*.sitepow.store',
+          'https://accounts.sitepow.store',
+        ]
+      : []),
+  ],
+
+  database: prismaAdapter(prisma, {
+    provider: 'postgresql',
+  }),
+
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: isProd ? '.sitepow.store' : '.lvh.me',
+    },
+    defaultCookieAttributes: {
+      sameSite: 'lax',
+      secure: isProd,
+    },
+  },
+
+  emailAndPassword: {
+    enabled: true,
+    password: {
+      async verify({ password, hash }) {
+        return await bcrypt.compare(password, hash)
+      },
+      async hash(password) {
+        return await bcrypt.hash(password, 10)
       },
     },
   },
-  providers: [
-    Google({ allowDangerousEmailAccountLinking: true }),
-    Line({ allowDangerousEmailAccountLinking: true }),
-    Credentials({
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        })
+  socialProviders: {
+    google: {
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    },
+    line: {
+      clientId: process.env.AUTH_LINE_ID!,
+      clientSecret: process.env.AUTH_LINE_SECRET!,
+    },
+  },
 
-        if (!user || !user.password) {
-          return null
-        }
-
-        const isMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.password,
-        )
-
-        if (!isMatch) {
-          return null
-        }
-
-        return user
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        defaultValue: 'MERCHANT',
       },
-    }),
-  ],
-  callbacks: {
-    async signIn() {
-      return true
-    },
-    async jwt({ token, user, account, trigger }) {
-      if (user && account) {
-        const isOAuth =
-          account.provider === 'google' || account.provider === 'line'
-
-        if (isOAuth && token.isEmailVerified !== true) {
-          try {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                isEmailVerified: true,
-                emailVerified: new Date(),
-              },
-            })
-
-            token.isEmailVerified = true
-          } catch (error) {
-            console.error(error)
-          }
-        }
-      }
-
-      if (user) {
-        token.id = user.id as string
-        token.role = user.role
-        token.isEmailVerified = token.isEmailVerified ?? user.isEmailVerified
-      }
-
-      if (trigger === 'update' && token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: String(token.id) },
-          select: { isEmailVerified: true, role: true },
-        })
-
-        if (dbUser) {
-          token.isEmailVerified = dbUser.isEmailVerified
-          token.role = dbUser.role
-        }
-      }
-
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role
-        session.user.isEmailVerified = token.isEmailVerified as boolean | null
-        session.user.image = token.picture || ''
-      }
-      return session
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith('/')) {
-        return `${baseUrl}${url}`
-      }
-
-      if (url.includes('callbackUrl=')) {
-        const params = new URL(url).searchParams
-        return params.get('callbackUrl') || baseUrl
-      }
-
-      return url
     },
   },
 })

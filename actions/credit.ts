@@ -10,7 +10,7 @@ import { getCredits } from '@/utils/credit'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -34,8 +34,8 @@ export async function purchaseCredit({
   userId?: string
 }) {
   try {
-    const session = userId ? { user: { id: userId } } : await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userId || userSession?.id
 
     if (!currentUserId) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
@@ -107,8 +107,8 @@ export async function purchaseCredit({
 
 export async function getStoreCredit(storeId: string) {
   try {
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId) {
       return null

@@ -5,7 +5,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -25,8 +25,8 @@ export async function getTransferRequests(
   storeId: string,
 ): Promise<GetTransferRequestItem[]> {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return []
@@ -65,8 +65,8 @@ export async function createTransferRequest(
       return { success: false, message: 'กรุณาระบุอีเมลผู้รับ' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -154,8 +154,8 @@ export async function cancelTransferRequest(
       return { success: false, message: 'ไม่พบ Request ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -214,8 +214,8 @@ export async function cancelTransferRequest(
 
 export async function acceptTransferRequest(token: string, userId: string) {
   try {
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId || currentUserId !== userId) {
       return {
@@ -281,8 +281,8 @@ export async function acceptTransferRequest(token: string, userId: string) {
 
 export async function declineTransferRequest(token: string, userId: string) {
   try {
-    const session = await auth()
-    const currentUserId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const currentUserId = userSession?.id
 
     if (!currentUserId || currentUserId !== userId) {
       return {

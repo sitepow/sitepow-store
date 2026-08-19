@@ -9,11 +9,7 @@ export function useVerifyOtp() {
     mutationFn: async ({ otp }: { otp: string }) => await verifyOtp({ otp }),
     onSuccess: async (result) => {
       if (result.success) {
-        await update({
-          user: {
-            isEmailVerified: true,
-          },
-        })
+        await update({})
       }
     },
   })

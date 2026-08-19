@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 
 import { registerUser } from '@/actions/auth'
@@ -31,6 +30,8 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+
+import { authClient } from '@/lib/auth-client'
 
 export function RegisterForm() {
   const isMounted = useIsMounted()
@@ -60,14 +61,13 @@ export function RegisterForm() {
   const { mutate, isPending } = useMutation({
     mutationFn: registerUser,
     onSuccess: async (_, variables) => {
-      const result = await signIn('credentials', {
+      const response = await authClient.signIn.email({
         email: variables.email,
         password: variables.password,
-        redirect: false,
-        callbackUrl,
+        callbackURL: callbackUrl,
       })
 
-      if (result?.error) {
+      if (response.error) {
         toast.error(
           'สมัครสมาชิกสำเร็จ แต่เข้าสู่ระบบล้มเหลว กรุณาเข้าสู่ระบบเอง',
         )
@@ -83,9 +83,14 @@ export function RegisterForm() {
     if (providerId === 'credentials') {
       setIsCredentials(true)
     } else {
-      await signIn(providerId, {
-        callbackUrl: callbackUrl,
-      })
+      try {
+        await authClient.signIn.social({
+          provider: providerId as 'google' | 'line',
+          callbackURL: callbackUrl,
+        })
+      } catch {
+        toast.error('ไม่สามารถเชื่อมต่อ Social Provider ได้')
+      }
     }
   }
 
@@ -96,7 +101,7 @@ export function RegisterForm() {
           style={{
             backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
           }}
-          className="hidden w-full rounded-l-3xl lg:block"
+          className="hidden w-full rounded-l-3xl bg-cover bg-center lg:block"
         />
         <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
           <SectionHeader
@@ -170,6 +175,7 @@ export function RegisterForm() {
                   {isPending && <Spinner />} สมัครสมาชิก
                 </Button>
                 <Button
+                  type="button"
                   className="col-span-4"
                   variant="outline"
                   size="lg"

@@ -1,36 +1,76 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
-import Link from 'next/link'
 
-import { BUYER_NAVIGATION } from '@/constants/navigation'
-import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { getClientAuthUrl } from '@/utils/auth'
-import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
-import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrand } from '@/components/LogoBrand'
-import { ModeToggle } from '@/components/ModeToggle'
-import { StoreLogo } from '@/components/StoreLogo'
-import { Button } from '@/components/ui/button'
-import {
-  NavigationMenu,
-  NavigationMenuList,
-} from '@/components/ui/navigation-menu'
+import Link from 'next/link';
 
-import { cn } from '@/lib/utils'
 
-import { CategoryDropdown } from '../../CategoryDropdown'
-import { UserAvatarDropdown } from '../../UserAvatarDropdown'
-import { CartDrawer } from '../../cart/CartDrawer'
-import { StoreHeaderBackground } from './_components/StoreHeaderBackground'
-import { StoreMenuItems } from './_components/StoreMenuItems'
-import { StoreMobileMenu } from './_components/StoreMobileMenu'
-import { StoreSearchInput } from './_components/StoreSearchInput'
+
+import { BUYER_NAVIGATION } from '@/constants/navigation';
+import { UserRole } from '@/generated/prisma/enums';
+import { useIsMounted } from '@/hooks/use-is-mounted';
+import { useSession } from '@/hooks/use-session';
+import { useStoreData } from '@/stores/sites/use-store-data';
+import { getClientAuthUrl } from '@/utils/auth';
+import { LockKeyholeIcon, Menu, X } from 'lucide-react';
+
+
+
+import { EmailVerified } from '@/components/EmailVerified';
+import { LogoBrand } from '@/components/LogoBrand';
+import { ModeToggle } from '@/components/ModeToggle';
+import { StoreLogo } from '@/components/StoreLogo';
+import { Button } from '@/components/ui/button';
+import { NavigationMenu, NavigationMenuList } from '@/components/ui/navigation-menu';
+
+
+
+import { cn } from '@/lib/utils';
+
+
+
+import { CategoryDropdown } from '../../CategoryDropdown';
+import { UserAvatarDropdown } from '../../UserAvatarDropdown';
+import { CartDrawer } from '../../cart/CartDrawer';
+import { StoreHeaderBackground } from './_components/StoreHeaderBackground';
+import { StoreMenuItems } from './_components/StoreMenuItems';
+import { StoreMobileMenu } from './_components/StoreMobileMenu';
+import { StoreSearchInput } from './_components/StoreSearchInput';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export function StoreNavbar() {
   const { store } = useStoreData()
@@ -43,7 +83,7 @@ export function StoreNavbar() {
     ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
     : '#'
 
-  const isEmailUnverified = isAuthenticated && !user?.isEmailVerified
+  const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
   useEffect(() => {
     if (isMenuOpen) {

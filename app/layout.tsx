@@ -11,7 +11,6 @@ import {
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
-import { SessionProviders } from '@/providers/SessionProviders'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
 
@@ -76,9 +75,7 @@ export default async function RootLayout({
         >
           <Toaster />
           {/* <NextIntlClientProvider locale={lng} messages={messages}> */}
-          <SessionProviders>
-            <QueryProviders>{children}</QueryProviders>
-          </SessionProviders>
+          <QueryProviders>{children}</QueryProviders>
           {/* </NextIntlClientProvider> */}
         </ThemeProvider>
       </body>

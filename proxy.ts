@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { UserRole } from './generated/prisma/enums'
 // import { routing } from './i18n/routing'
-import { auth } from './lib/auth'
+import { getCurrentUser } from './lib/auth-server'
 
 // const intlMiddleware = createIntlMiddleware(routing)
 
@@ -57,9 +57,9 @@ export default async function middleware(req: NextRequest) {
   const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
   const isRootDomain = rootDomains.includes(hostname)
 
-  const session = await auth()
-  const isAuthenticated = !!session?.user
-  const userRole = session?.user?.role
+  const userSession = await getCurrentUser()
+  const isAuthenticated = !!userSession
+  const userRole = userSession?.role as UserRole | undefined
 
   if (!isRootDomain) {
     const slug = hostname.split('.')[0]

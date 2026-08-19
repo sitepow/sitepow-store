@@ -11,15 +11,16 @@ import {
 import OtpEmail from '@/emails/OtpEmail'
 import crypto from 'crypto'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 import { resend } from '@/lib/resend'
 
 export async function verifyOtp({ otp }: { otp: string }) {
   try {
-    const session = await auth()
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return { success: false, message: 'ไม่พบเซสชันการเข้าสู่ระบบ' }
     }
 
@@ -29,7 +30,7 @@ export async function verifyOtp({ otp }: { otp: string }) {
 
     const user = await prisma.user.findUnique({
       where: {
-        id: session.user.id,
+        id: userId,
       },
     })
 
@@ -46,8 +47,8 @@ export async function verifyOtp({ otp }: { otp: string }) {
     }
 
     await prisma.user.update({
-      where: { id: session.user.id },
-      data: { otp: null, otpExpires: null, isEmailVerified: true },
+      where: { id: userId },
+      data: { otp: null, otpExpires: null, emailVerified: true },
     })
 
     return { success: true, message: 'ยืนยัน OTP สำเร็จ' }
@@ -72,22 +73,23 @@ export async function sendOtpEmail(email: string, otp: string) {
 
 export async function resendOtp() {
   try {
-    const session = await auth()
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return { success: false, message: 'ไม่พบเซสชันการเข้าสู่ระบบ' }
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { email: true, isEmailVerified: true, otpExpires: true },
+      where: { id: userId },
+      select: { email: true, emailVerified: true, otpExpires: true },
     })
 
     if (!user) {
       return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
-    if (user.isEmailVerified) {
+    if (user.emailVerified) {
       return {
         success: false,
         message: 'บัญชีนี้ได้รับการยืนยันอีเมลเรียบร้อยแล้ว',
@@ -115,7 +117,7 @@ export async function resendOtp() {
     const otpExpires = new Date(Date.now() + otpDurationInMs)
 
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: userId },
       data: {
         otp: newOtp,
         otpExpires: otpExpires,

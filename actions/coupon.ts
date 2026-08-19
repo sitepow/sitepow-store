@@ -10,7 +10,7 @@ import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -93,8 +93,8 @@ export async function getCoupons({
     },
   }
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return emptyResponse
@@ -173,8 +173,8 @@ export async function getCoupons({
 
 export async function createCoupon(input: CreateCouponInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -246,8 +246,8 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       return { success: false, message: 'ไม่พบ Coupon ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -330,8 +330,8 @@ export async function deleteCoupon(id: string) {
       return { success: false, message: 'ไม่พบ Coupon ID' }
     }
 
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

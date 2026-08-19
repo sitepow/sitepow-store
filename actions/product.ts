@@ -13,7 +13,7 @@ import { getPathR2FromUrl } from '@/utils/image'
 import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -122,8 +122,8 @@ export async function getProducts({
   search,
   categoryId,
 }: GetProductsParams): Promise<GetProductsResponse> {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return {
@@ -239,8 +239,8 @@ export async function getProducts({
 
 export async function createProduct(input: CreateProductInput) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -397,8 +397,8 @@ export async function createProduct(input: CreateProductInput) {
 
 export async function deleteProduct(id: string) {
   try {
-    const session = await auth()
-    const userId = session?.user?.id
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
 
     if (!userId) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -481,8 +481,8 @@ export async function deleteProduct(id: string) {
 }
 
 export async function getProductById(id: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return null
@@ -527,8 +527,8 @@ export async function getProductById(id: string) {
 }
 
 export async function updateProduct(id: string, input: CreateProductInput) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
@@ -698,8 +698,8 @@ export async function updateProduct(id: string, input: CreateProductInput) {
 }
 
 export async function getProductOptions(storeId: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return []
@@ -738,8 +738,8 @@ export async function getProductOptions(storeId: string) {
 }
 
 export async function getProductQuota(storeId: string) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return null
@@ -783,8 +783,8 @@ export async function toggleProductVisibility(
   id: string,
   isPublished: boolean,
 ) {
-  const session = await auth()
-  const userId = session?.user?.id
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
 
   if (!userId) {
     return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }

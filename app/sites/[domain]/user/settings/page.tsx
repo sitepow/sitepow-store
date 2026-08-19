@@ -1,5 +1,7 @@
 'use client'
 
+import { Suspense } from 'react'
+
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { UserSettingsTab } from '@/constants/settings'
 import { useQueryParam } from '@/hooks/use-query-param'
@@ -18,7 +20,9 @@ import { ChangePasswordForm } from './_components/ChangePasswordForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PdpaManagementForm } from './_components/PdpaManagementForm'
 
-export default function StoreUserSettingsPage() {
+export const dynamic = 'force-dynamic'
+
+function StoreUserSettingsContent() {
   const [activeTab, setActiveTab] = useQueryParam(
     'tab',
     UserSettingsTab.PASSWORD,
@@ -59,5 +63,13 @@ export default function StoreUserSettingsPage() {
         </TabsContent>
       </Tabs>
     </Sidebar>
+  )
+}
+
+export default function StoreUserSettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <StoreUserSettingsContent />
+    </Suspense>
   )
 }
