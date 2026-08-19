@@ -27,6 +27,13 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
 
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ['google', 'line'],
+    },
+  },
+
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
