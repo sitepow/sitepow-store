@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { AVATARS_SEED } from '@/constants/avartar'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 import { HeroHeader } from '../HeroHeader'
 import { LogoBrand } from '../LogoBrand'
@@ -40,7 +40,7 @@ export function HeroSection() {
           <div className="flex flex-wrap justify-center gap-2.5 px-10 text-white">
             <Link href="/pricing">
               <Button variant="secondary" size="lg">
-                ดูราคาและแพ็กเกจ <ArrowRight />
+                ดูราคาและแพ็กเกจ
               </Button>
             </Link>
             <Link href="/auth/register">
@@ -55,13 +55,13 @@ export function HeroSection() {
           <div className="flex flex-wrap justify-center gap-2.5 px-5 text-white">
             <Link href="/pricing">
               <Button variant="secondary" size="lg">
-                ดูราคาและแพ็กเกจ <ArrowRight />
+                ดูราคาและแพ็กเกจ
               </Button>
             </Link>
             <Button size="lg" asChild>
               <Link href="/merchant/dashboard">
                 จัดการร้านค้าของคุณ
-                <ArrowUpRight />
+                <ArrowRight />
               </Link>
             </Button>
           </div>

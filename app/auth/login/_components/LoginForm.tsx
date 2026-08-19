@@ -14,6 +14,7 @@ import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
+import { ForgotPasswordDialog } from '@/components/ForgotPasswordForm'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
@@ -50,23 +51,19 @@ export function LoginForm() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ email, password }: LoginFormInputs) => {
-      const response = await authClient.signIn.email({
+      return await authClient.signIn.email({
         email,
         password,
         callbackURL: callbackUrl,
       })
-
-      return response
     },
     onSuccess: (response) => {
       if (response.error) {
         toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
         return
       }
-
       window.location.href = callbackUrl
     },
-   
   })
 
   const handleSSO = async (providerId: string) => {
@@ -76,87 +73,93 @@ export function LoginForm() {
         callbackURL: callbackUrl,
       })
     } catch {
-      toast.error('ไม่สามารถเชื่อมต่อ Social Provider ได้')
+      toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
+  }
+
+  const onSubmit = (data: LoginFormInputs) => {
+    mutate(data)
   }
 
   return (
     <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
-      <div className="flex w-full">
+      <div className="border-border bg-background sm:shadow-airy flex w-full overflow-hidden rounded-3xl border">
         <div
           style={{
             backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
           }}
-          className="hidden w-full rounded-l-3xl bg-cover bg-center lg:block"
+          className="hidden w-1/2 bg-cover bg-center lg:block"
         />
-
-        <div className="sm:shadow-airy border-border bg-background flex w-full flex-col items-center gap-8 rounded-3xl border p-6 sm:p-10 md:p-14 lg:-ml-6 lg:rounded-r-3xl dark:bg-neutral-800">
+        <div className="flex w-full flex-col items-center justify-center gap-6 p-6 sm:p-10 md:p-12 lg:w-1/2 dark:bg-neutral-800">
           <SectionHeader
-            title={
+            className="text-center"
+            title="เข้าสู่ระบบ"
+            description={
               role !== UserRole.CUSTOMER
-                ? 'เข้าสู่ระบบหลังบ้านของคุณ'
-                : 'เข้าสู่ระบบร้านค้าของคุณ'
+                ? 'จัดการร้านค้าและระบบหลังบ้านของคุณ'
+                : 'เข้าสู่ระบบเพื่อเริ่มสั่งซื้อสินค้า'
             }
           />
-          <div className="w-full max-w-md space-y-8">
-            <div className="space-y-6">
-              <ContentDivider name="ด้วย E-mail" />
-              <div className="flex flex-col gap-3">
-                <Field>
-                  <FieldLabel>E-mail</FieldLabel>
-                  <Input
-                    placeholder="ระบุ E-mail ของคุณ"
-                    className="h-12 rounded-xl"
-                    {...register('email', {
-                      required: 'โปรดระบุ E-mail ของคุณ',
-                    })}
-                  />
-                  <FieldError>{errors?.email?.message}</FieldError>
-                </Field>
-                <Field>
-                  <FieldLabel>รหัสผ่าน</FieldLabel>
-                  <Input
-                    type="password"
-                    placeholder="ระบุรหัสผ่าน"
-                    className="h-12 rounded-xl"
-                    {...register('password', { required: 'โปรดระบุรหัสผ่าน' })}
-                  />
-                  <FieldError>{errors?.password?.message}</FieldError>
-                </Field>
-                <Button
-                  onClick={handleSubmit((data) => mutate(data))}
-                  className="col-span-7"
-                  size="lg"
-                  disabled={isPending}
-                >
-                  {isPending && <Spinner />}
-                  เข้าสู่ระบบ
-                </Button>
-              </div>
+          <div className="w-full max-w-sm space-y-6">
+            <div className="flex flex-col gap-3">
+              {LOGIN_PROVIDERS.map((provider, idx) => (
+                <SSOButton
+                  key={idx}
+                  onClick={() => handleSSO(provider.id)}
+                  {...provider}
+                />
+              ))}
             </div>
-            <div className="space-y-6">
-              <ContentDivider name="ด้วยบัญชี Social" />
-              <div className="flex w-full flex-wrap justify-center gap-4">
-                {LOGIN_PROVIDERS.map((provider, idx) => (
-                  <div key={idx} className="shrink-0">
-                    <SSOButton
-                      onClick={() => handleSSO(provider.id)}
-                      {...provider}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <p className="text-center text-sm">
-            ยังไม่มีบัญชีใช่มั้ย?{' '}
-            <a
-              href={registerHref}
-              className="text-primary transition-all hover:underline"
+            <ContentDivider name="หรือเข้าสู่ระบบด้วยอีเมล" />
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
             >
-              สมัครสมาชิก
-            </a>
-          </p>
+              <Field>
+                <FieldLabel>อีเมล (E-mail)</FieldLabel>
+                <Input
+                  type="email"
+                  placeholder="name@example.com"
+                  className="h-11 rounded-xl"
+                  {...register('email', {
+                    required: 'กรุณาระบุอีเมลของคุณ',
+                  })}
+                />
+                <FieldError>{errors?.email?.message}</FieldError>
+              </Field>
+              <Field>
+                <div className="flex items-center justify-between">
+                  <FieldLabel>รหัสผ่าน</FieldLabel>
+                  <ForgotPasswordDialog />
+                </div>
+                <Input
+                  type="password"
+                  placeholder="ระบุรหัสผ่าน"
+                  className="h-11 rounded-xl"
+                  {...register('password', { required: 'กรุณาระบุรหัสผ่าน' })}
+                />
+                <FieldError>{errors?.password?.message}</FieldError>
+              </Field>
+              <Button
+                type="submit"
+                className="mt-2 h-11 w-full rounded-xl text-base font-medium"
+                size="lg"
+                disabled={isPending}
+              >
+                {isPending && <Spinner className="mr-2" />}
+                เข้าสู่ระบบ
+              </Button>
+            </form>
+            <p className="text-muted-foreground text-center text-sm">
+              ยังไม่มีบัญชีผู้ใช้งาน?{' '}
+              <a
+                href={registerHref}
+                className="text-primary font-semibold transition-all hover:underline"
+              >
+                สมัครสมาชิกฟรี
+              </a>
+            </p>
+          </div>
         </div>
       </div>
       {role !== UserRole.CUSTOMER && <SupportContact />}

@@ -80,7 +80,7 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           {!isAuthenticated && (
-            <div className="hidden items-center gap-4 lg:flex">
+            <div className="hidden items-center gap-2.5 lg:flex">
               <DesktopGuestActions
                 loginHref={loginHref}
                 registerHref={registerHref}

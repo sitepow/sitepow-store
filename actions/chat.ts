@@ -134,11 +134,17 @@ export async function getOrCreateStoreConversation(storeId: string) {
       data: {
         type: ConversationType.STORE,
         storeId,
+        isAiEnabled: true,
         members: {
           create: [{ userId }, { userId: store.ownerId }],
         },
       },
     })
+
+    const initialTriggerPrompt =
+      '[System Trigger]: ลูกค้าเพิ่งเปิดหน้าแชทเข้ามาเป็นครั้งแรก โปรดกล่าวทักทายต้อนรับลูกค้าสั้นๆ และเสนอการช่วยเหลืออย่างสุภาพ'
+
+    await handleAiResponse(conversation.id, initialTriggerPrompt, storeId)
   }
 
   return { success: true, data: conversation }
@@ -195,6 +201,7 @@ export async function getConversation(
       data: {
         type,
         storeId: type === ConversationType.STORE ? storeId : undefined,
+        isAiEnabled: true,
         members: {
           create: [
             { userId: userId },
@@ -204,6 +211,17 @@ export async function getConversation(
       },
       include: { members: true },
     })
+
+    const initialTriggerPrompt =
+      type === ConversationType.SUPPORT
+        ? '[System Trigger]: ลูกค้าเพิ่งติดต่อฝ่ายบริการลูกค้า กล่าวทักทายสั้นๆ และถามว่ามีอะไรให้ช่วยเหลือไหม'
+        : '[System Trigger]: ลูกค้าเพิ่งเปิดหน้าแชทร้านค้า กล่าวทักทายและเสนอการช่วยเหลือเกี่ยวกับสินค้า'
+
+    await handleAiResponse(
+      conversation.id,
+      initialTriggerPrompt,
+      type === ConversationType.STORE ? (storeId ?? null) : null,
+    )
   }
 
   return { success: true, data: conversation }
@@ -534,6 +552,7 @@ async function handleAiResponse(
 
   const formattedHistory = recentMessages
     .reverse()
+    .filter((m) => !m.content.startsWith('[System Trigger]'))
     .map(
       (m) =>
         `${m.senderId === AI_BOT_ID ? UserRole.BOT : UserRole.CUSTOMER}: ${m.content}`,

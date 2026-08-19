@@ -15,6 +15,16 @@ import { prisma } from '@/lib/prisma'
 
 import { sendOtpEmail } from './email'
 
+export interface RequestOtpInput {
+  email: string
+}
+
+export interface ResetPasswordWithOtpInput {
+  email: string
+  otp: string
+  newPassword: string
+}
+
 export async function registerUser(values: RegisterFormInputs) {
   try {
     const { email, password, confirmPassword, userRole } = values
@@ -122,5 +132,120 @@ export async function registerUser(values: RegisterFormInputs) {
   } catch (error) {
     console.error(error)
     return { success: false }
+  }
+}
+
+export async function requestForgotPasswordOtp(input: RequestOtpInput) {
+  try {
+    const { email } = input
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (!user) {
+      return { success: false, message: 'ไม่พบผู้ใช้งานด้วยอีเมลนี้ในระบบ' }
+    }
+
+    const now = new Date()
+    let otpToSend = user.otp
+
+    const isOtpValid =
+      user.otp && user.otpExpires && new Date(user.otpExpires) > now
+
+    if (!isOtpValid) {
+      const newOtp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
+      const otpDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+      const otpExpires = new Date(Date.now() + otpDurationInMs)
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otp: newOtp,
+          otpExpires: otpExpires,
+        },
+      })
+
+      otpToSend = newOtp
+    }
+
+    try {
+      await sendOtpEmail(email, otpToSend!)
+    } catch (error) {
+      console.error(error)
+      return {
+        success: false,
+      }
+    }
+
+    return {
+      success: true,
+      message: isOtpValid
+        ? 'ส่งรหัส OTP เดิมที่ยังไม่หมดอายุไปยังอีเมลเรียบร้อยแล้ว'
+        : 'ส่งรหัส OTP ใหม่ไปยังอีเมลเรียบร้อยแล้ว',
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+    }
+  }
+}
+
+export async function resetPasswordWithOtp(input: ResetPasswordWithOtpInput) {
+  try {
+    const { email, otp, newPassword } = input
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (!user) {
+      return { success: false, message: 'ไม่พบผู้ใช้งานในระบบ' }
+    }
+
+    if (!user.otp || !user.otpExpires) {
+      return { success: false, message: 'กรุณากดขอรหัส OTP ก่อนทำรายการ' }
+    }
+
+    if (user.otp !== otp) {
+      return { success: false, message: 'รหัส OTP ไม่ถูกต้อง' }
+    }
+
+    if (new Date() > new Date(user.otpExpires)) {
+      return { success: false, message: 'รหัส OTP หมดอายุแล้ว กรุณาขอรหัสใหม่' }
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12)
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          otp: null,
+          otpExpires: null,
+        },
+      }),
+      prisma.account.updateMany({
+        where: {
+          userId: user.id,
+          providerId: 'credential',
+        },
+        data: {
+          password: hashedPassword,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      message: 'ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว',
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+    }
   }
 }
