@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
@@ -11,12 +12,12 @@ import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { getClientAuthUrl } from '@/utils/auth'
+import { IconLogin } from '@tabler/icons-react'
 import { Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
-// import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { LogoBrand } from '@/components/LogoBrand'
-import { ModeToggle } from '@/components/ModeToggle'
+import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,
@@ -100,8 +101,14 @@ export function Navbar() {
               <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
             )}
             <div className="flex flex-wrap gap-2">
-              <ModeToggle buttonVariant="secondary" />
-              {/* <LanguageSwitcher buttonVariant="secondary" /> */}
+              {!isAuthenticated && (
+                <Button size="icon-lg" variant="secondary" asChild>
+                  <Link href={loginHref} aria-label="เข้าสู่ระบบ">
+                    <IconLogin className="size-[1.2rem]" />
+                  </Link>
+                </Button>
+              )}
+              <QuickSettingsMenu buttonVariant="secondary" />
               <Button
                 variant="secondary"
                 size="icon-lg"

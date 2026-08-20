@@ -1,11 +1,4 @@
-// import createIntlMiddleware from 'next-intl/middleware'
 import { NextRequest, NextResponse } from 'next/server'
-
-import { UserRole } from './generated/prisma/enums'
-// import { routing } from './i18n/routing'
-import { getCurrentUser } from './lib/auth-server'
-
-// const intlMiddleware = createIntlMiddleware(routing)
 
 export const config = {
   matcher: [
@@ -41,14 +34,47 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  const sessionToken =
+    req.cookies.get('better-auth.session_token')?.value ||
+    req.cookies.get('__Secure-better-auth.session_token')?.value ||
+    req.cookies.get('__Host-better-auth.session_token')?.value
+
+  const isAuthenticated = !!sessionToken
+
   if (hostname === 'accounts.sitepow.store' || hostname === 'accounts.lvh.me') {
-    if (url.pathname.startsWith('/auth')) return NextResponse.next()
+    if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {
+      return NextResponse.next()
+    }
+
+    const defaultTarget = hostname.includes('sitepow.store')
+      ? 'https://sitepow.store'
+      : 'http://lvh.me:3000'
+
+    const callbackUrl = url.searchParams.get('callbackUrl') || defaultTarget
+
+    if (url.pathname === '/') {
+      if (isAuthenticated) {
+        return NextResponse.redirect(new URL(callbackUrl))
+      }
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+
     if (
+      isAuthenticated &&
+      (url.pathname.startsWith('/login') ||
+        url.pathname.startsWith('/register'))
+    ) {
+      return NextResponse.redirect(new URL(callbackUrl))
+    }
+
+    if (
+      !isAuthenticated &&
       !url.pathname.startsWith('/login') &&
       !url.pathname.startsWith('/register')
     ) {
       return NextResponse.redirect(new URL(`/login${url.search}`, req.url))
     }
+
     return NextResponse.rewrite(
       new URL(`/auth${url.pathname}${url.search}`, req.url),
     )
@@ -57,15 +83,13 @@ export default async function middleware(req: NextRequest) {
   const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
   const isRootDomain = rootDomains.includes(hostname)
 
-  const userSession = await getCurrentUser()
-  const isAuthenticated = !!userSession
-  const userRole = userSession?.role as UserRole | undefined
-
   if (!isRootDomain) {
     const slug = hostname.split('.')[0]
 
     if (url.pathname.startsWith('/user') && !isAuthenticated) {
-      return NextResponse.redirect(new URL('/', req.url))
+      const loginUrl = new URL('https://accounts.sitepow.store/login', req.url)
+      loginUrl.searchParams.set('callbackUrl', req.url)
+      return NextResponse.redirect(loginUrl)
     }
 
     return NextResponse.rewrite(
@@ -73,13 +97,5 @@ export default async function middleware(req: NextRequest) {
     )
   }
 
-  if (
-    (url.pathname.startsWith('/merchant') && userRole !== UserRole.MERCHANT) ||
-    (url.pathname.startsWith('/user') && userRole !== UserRole.CUSTOMER)
-  ) {
-    return NextResponse.redirect(new URL('/', req.url))
-  }
-
-  // return intlMiddleware(req)
   return NextResponse.next()
 }

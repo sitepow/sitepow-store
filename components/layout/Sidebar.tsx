@@ -13,7 +13,7 @@ import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconChevronRight, IconHome } from '@tabler/icons-react'
+import { IconChevronRight } from '@tabler/icons-react'
 
 import {
   Collapsible,
@@ -41,10 +41,10 @@ import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
 import { ModeToggle } from '../ModeToggle'
+import { QuickSettingsMenu } from '../QuickSettingsMenu'
 import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
 import { SupportWidget } from '../chat/SupportWidget'
-import { Button } from '../ui/button'
 import { StoreSetupAlert } from './_components/StoreSetupAlert'
 
 interface SidebarProps extends PropsWithChildren {
@@ -174,24 +174,18 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         {isMerchant && <StoreSetupAlert />}
         <div className="bg-background sticky top-0 z-20 flex h-fit flex-wrap items-center gap-2.5 border-b py-3">
           <SidebarTrigger />
-          <ModeToggle />
-          <Button
-            variant="outline"
-            onClick={() => router.push('/')}
-            size="icon-lg"
-          >
-            <IconHome />
-          </Button>
+          <QuickSettingsMenu />
           <UserAvatarDropdown redirectPath="merchant" items={items} />
-          <div
-            className={`flex flex-wrap items-center gap-2.5 ${isScrolled ? 'hidden' : 'flex'}`}
-          >
-            {isMerchant && <CreditBadge />}
-            {isMerchant && <DateTimeBadge />}
-            {isPointsEnabled && (
-              <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
-            )}
-          </div>
+          {isScrolled && isMerchant && <DateTimeBadge />}
+          {!isScrolled && (
+            <div className="flex flex-wrap items-center gap-2.5">
+              {isMerchant && <CreditBadge />}
+              {isMerchant && <DateTimeBadge />}
+              {isPointsEnabled && (
+                <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+              )}
+            </div>
+          )}
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

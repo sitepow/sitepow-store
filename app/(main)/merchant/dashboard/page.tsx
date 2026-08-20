@@ -10,21 +10,20 @@ import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
+  IconBuildingStore,
+  IconCurrencyDollar,
   IconExternalLink,
   IconLock,
+  IconPackage,
   IconReceipt,
+  IconReceiptOff,
+  IconTrendingDown,
+  IconTrendingUp,
+  IconUser,
+  IconUsers,
   IconWallet,
 } from '@tabler/icons-react'
-import {
-  ArrowRight,
-  CreditCard,
-  DollarSign,
-  Package,
-  TrendingDown,
-  TrendingUp,
-  User2,
-  Users,
-} from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -102,7 +101,7 @@ export default function MerchantDashboardPage() {
             stats.totalRevenueLastMonth,
             'จากเดือนที่แล้ว',
           ),
-          icon: DollarSign,
+          icon: IconCurrencyDollar,
         },
         {
           title: 'คำสั่งซื้อเดือนนี้',
@@ -112,7 +111,7 @@ export default function MerchantDashboardPage() {
             stats.totalOrdersLastMonth,
             'จากเดือนที่แล้ว',
           ),
-          icon: Package,
+          icon: IconPackage,
         },
         {
           title: 'ยอดขายวันนี้',
@@ -122,7 +121,7 @@ export default function MerchantDashboardPage() {
             stats.dailySalesYesterday,
             'จากเมื่อวาน',
           ),
-          icon: CreditCard,
+          icon: IconBuildingStore,
         },
         {
           title: 'ลูกค้าใหม่เดือนนี้',
@@ -132,17 +131,18 @@ export default function MerchantDashboardPage() {
             stats.newCustomersLastMonth,
             'จากเดือนที่แล้ว',
           ),
-          icon: Users,
+          icon: IconUsers,
         },
       ]
     : []
+
   const grossStatsData = stats
     ? [
         {
           title: 'ต้นทุนสินค้าขายเดือนนี้ (COGS)',
           value: formatCurrency(stats.monthlyCOGS),
           description: 'รวมทุนสินค้าที่ขายได้จริง',
-          icon: IconReceipt,
+          icon: IconReceiptOff,
         },
         {
           title: 'กำไรขั้นต้นเดือนนี้ (Gross Profit)',
@@ -152,13 +152,13 @@ export default function MerchantDashboardPage() {
             stats.monthlyGrossProfitLastMonth,
             'จากเดือนที่แล้ว',
           )})`,
-          icon: TrendingUp,
+          icon: IconTrendingUp,
         },
         {
           title: 'กำไรขั้นต้นวันนี้',
           value: formatCurrency(stats.dailyGrossProfit),
           description: `Gross Margin ${stats.dailyGrossMargin}%`,
-          icon: stats.dailyGrossProfit >= 0 ? TrendingUp : TrendingDown,
+          icon: stats.dailyGrossProfit >= 0 ? IconTrendingUp : IconTrendingDown,
         },
         {
           title: 'ค่าใช้จ่ายดำเนินงานเดือนนี้',
@@ -179,7 +179,7 @@ export default function MerchantDashboardPage() {
           title: 'กำไรสุทธิวันนี้',
           value: formatCurrency(stats.dailyNetProfit),
           description: `หักต้นทุนสินค้าและค่าใช้จ่ายแล้ว`,
-          icon: stats.dailyNetProfit >= 0 ? TrendingUp : TrendingDown,
+          icon: stats.dailyNetProfit >= 0 ? IconTrendingUp : IconTrendingDown,
         },
         {
           title: 'กำไรสุทธิเดือนนี้',
@@ -195,7 +195,7 @@ export default function MerchantDashboardPage() {
           title: 'กำไรสุทธิปีนี้',
           value: formatCurrency(stats.yearlyNetProfit),
           description: `Net Margin ${stats.yearlyNetMargin}%`,
-          icon: TrendingUp,
+          icon: IconTrendingUp,
         },
         {
           title: 'ค่าใช้จ่ายปีนี้',
@@ -346,7 +346,7 @@ export default function MerchantDashboardPage() {
                 </CardContent>
                 <CardFooter>
                   <div className="flex items-center gap-2 text-sm font-medium">
-                    <TrendingUp className="size-4" /> 6 เดือนล่าสุด
+                    <IconTrendingUp className="size-4" /> 6 เดือนล่าสุด
                   </div>
                 </CardFooter>
               </Card>
@@ -367,7 +367,7 @@ export default function MerchantDashboardPage() {
                         <div key={sale.id} className="flex items-center">
                           <Avatar className="size-8 border">
                             <AvatarFallback>
-                              <User2 size={16} />
+                              <IconUser size={16} />
                             </AvatarFallback>
                           </Avatar>
                           <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">

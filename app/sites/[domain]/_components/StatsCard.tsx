@@ -37,7 +37,7 @@ export function StatsCard({
           <CardTitle className="text-sm font-medium text-white">
             {title}
           </CardTitle>
-          <Icon className="size-4 text-white" />
+          <Icon className="size-4 shrink-0 text-white" />
         </CardHeader>
         <CardContent className="p-0">
           <div className="font-bold text-white sm:text-2xl">{value}</div>

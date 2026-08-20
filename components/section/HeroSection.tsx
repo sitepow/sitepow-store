@@ -4,8 +4,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
+import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
+import { getClientAuthUrl } from '@/utils/auth'
 import { ArrowRight } from 'lucide-react'
 
 import { HeroHeader } from '../HeroHeader'
@@ -14,7 +17,12 @@ import { Button } from '../ui/button'
 
 export function HeroSection() {
   const { isAuthenticated } = useSession()
+  const isMounted = useIsMounted()
   const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
+
+  const registerHref = isMounted
+    ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
+    : '#'
 
   return (
     <section className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">
@@ -38,26 +46,22 @@ export function HeroSection() {
         />
         {!isAuthenticated && (
           <div className="flex flex-wrap justify-center gap-2.5 px-10 text-white">
-            <Link href="/pricing">
-              <Button variant="secondary" size="lg">
-                ดูราคาและแพ็กเกจ
-              </Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button size="lg">
+            <Button variant="secondary" size="lg" asChild>
+              <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
+            </Button>
+            <Button size="lg" asChild>
+              <Link href={registerHref}>
                 สมัครเปิดร้านฟรี
                 <ArrowRight />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         )}
         {isAuthenticated && (
           <div className="flex flex-wrap justify-center gap-2.5 px-5 text-white">
-            <Link href="/pricing">
-              <Button variant="secondary" size="lg">
-                ดูราคาและแพ็กเกจ
-              </Button>
-            </Link>
+            <Button variant="secondary" size="lg" asChild>
+              <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
+            </Button>
             <Button size="lg" asChild>
               <Link href="/merchant/dashboard">
                 จัดการร้านค้าของคุณ

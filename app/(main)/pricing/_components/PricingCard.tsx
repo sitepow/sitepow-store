@@ -57,7 +57,9 @@ export function PricingCard({
         className="border-primary mb-2.5 size-32 rounded-full border bg-white"
       />
       <h2 className="text-xl leading-tight font-bold">{title}</h2>
-      <p className="text-center font-medium opacity-70">{description}</p>
+      <p className="max-w-[85%] text-center font-medium opacity-70">
+        {description}
+      </p>
       <Separator className="my-5 max-w-[75%]" />
       <div className="flex flex-col items-center gap-1">
         {discountPercent > 0 && basePrice > 0 && (

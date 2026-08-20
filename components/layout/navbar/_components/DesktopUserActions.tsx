@@ -6,7 +6,7 @@ import { UserRole } from '@/generated/prisma/enums'
 import { IconLock } from '@tabler/icons-react'
 
 // import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { ModeToggle } from '@/components/ModeToggle'
+import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 
 interface DesktopUserActionsProps {
@@ -33,7 +33,8 @@ export function DesktopUserActions({
           </Link>
         </Button>
       )}
-      <ModeToggle buttonVariant="secondary" />
+      <QuickSettingsMenu buttonVariant="secondary" />
+      {/* <ModeToggle buttonVariant="secondary" /> */}
       {/* <LanguageSwitcher buttonVariant="secondary" /> */}
     </>
   )

@@ -2,6 +2,7 @@
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { parseExpenseDateWithCurrentTime } from '@/utils/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
 import { CreateExpenseInput, UpdateExpenseInput } from '@/zod/expense'
@@ -150,7 +151,7 @@ export async function getExpenses({
         where: whereClause,
         skip,
         take: sanitizedLimit,
-        orderBy: { expenseDate: 'desc' },
+        orderBy: [{ expenseDate: 'desc' }, { createdAt: 'desc' }],
         select: expenseSelect,
       }),
     ])
@@ -201,7 +202,7 @@ export async function createExpense(input: CreateExpenseInput) {
         amount: input.amount,
         category: input.category,
         receiptImage: input.receiptImage || null,
-        expenseDate: new Date(input.expenseDate),
+        expenseDate: parseExpenseDateWithCurrentTime(input.expenseDate),
         note: input.note || null,
       },
     })
@@ -281,7 +282,7 @@ export async function updateExpense(input: UpdateExpenseInput) {
           receiptImage: input.receiptImage || null,
         }),
         ...(input.expenseDate && {
-          expenseDate: new Date(input.expenseDate),
+          expenseDate: parseExpenseDateWithCurrentTime(input.expenseDate),
         }),
         ...(input.note !== undefined && { note: input.note }),
       },

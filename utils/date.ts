@@ -75,3 +75,19 @@ export const getBlockMessage = (blockedUntil: Date | null): string => {
 
   return `บัญชีของคุณถูกระงับการสั่งซื้อชั่วคราว ระบบจะปลดล็อกอัตโนมัติในวันที่ ${unlockDateStr} เวลา ${unlockTimeStr} น. (${remainingTimeStr})`
 }
+
+export function parseExpenseDateWithCurrentTime(
+  inputDate: string | Date,
+): Date {
+  const targetDate = new Date(inputDate)
+  const now = new Date()
+
+  targetDate.setHours(
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+    now.getMilliseconds(),
+  )
+
+  return targetDate
+}
