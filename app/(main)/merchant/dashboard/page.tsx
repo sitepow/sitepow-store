@@ -94,6 +94,16 @@ export default function MerchantDashboardPage() {
   const primaryStatsData = stats
     ? [
         {
+          title: 'ยอดขายวันนี้',
+          value: formatCurrency(stats.dailySales),
+          description: pctChange(
+            stats.dailySales,
+            stats.dailySalesYesterday,
+            'จากเมื่อวาน',
+          ),
+          icon: IconBuildingStore,
+        },
+        {
           title: 'ยอดขายเดือนนี้',
           value: formatCurrency(stats.totalRevenue),
           description: pctChange(
@@ -114,16 +124,6 @@ export default function MerchantDashboardPage() {
           icon: IconPackage,
         },
         {
-          title: 'ยอดขายวันนี้',
-          value: formatCurrency(stats.dailySales),
-          description: pctChange(
-            stats.dailySales,
-            stats.dailySalesYesterday,
-            'จากเมื่อวาน',
-          ),
-          icon: IconBuildingStore,
-        },
-        {
           title: 'ลูกค้าใหม่เดือนนี้',
           value: formatNumber(stats.newCustomers),
           description: pctChange(
@@ -139,9 +139,15 @@ export default function MerchantDashboardPage() {
   const grossStatsData = stats
     ? [
         {
+          title: 'กำไรขั้นต้นวันนี้',
+          value: formatCurrency(stats.dailyGrossProfit),
+          description: `Gross Margin ${stats.dailyGrossMargin}%`,
+          icon: stats.dailyGrossProfit >= 0 ? IconTrendingUp : IconTrendingDown,
+        },
+        {
           title: 'ต้นทุนสินค้าขายเดือนนี้ (COGS)',
           value: formatCurrency(stats.monthlyCOGS),
-          description: 'รวมทุนสินค้าที่ขายได้จริง',
+          description: 'รวมต้นทุนสินค้าที่ขายได้จริง',
           icon: IconReceiptOff,
         },
         {
@@ -155,18 +161,45 @@ export default function MerchantDashboardPage() {
           icon: IconTrendingUp,
         },
         {
-          title: 'กำไรขั้นต้นวันนี้',
-          value: formatCurrency(stats.dailyGrossProfit),
-          description: `Gross Margin ${stats.dailyGrossMargin}%`,
-          icon: stats.dailyGrossProfit >= 0 ? IconTrendingUp : IconTrendingDown,
+          title: 'กำไรขั้นต้นเดือนก่อน',
+          value: formatCurrency(stats.monthlyGrossProfitLastMonth),
+          description: 'ยอดสรุปกำไรขั้นต้นเดือนที่แล้ว',
+          icon: IconTrendingUp,
+        },
+      ]
+    : []
+
+  const expenseStatsData = stats
+    ? [
+        {
+          title: 'ค่าใช้จ่ายวันนี้',
+          value: formatCurrency(stats.dailyExpense),
+          description: 'รวมค่าใช้จ่ายดำเนินงานวันนี้',
+          icon: IconReceipt,
         },
         {
-          title: 'ค่าใช้จ่ายดำเนินงานเดือนนี้',
+          title: 'ค่าใช้จ่ายเดือนนี้',
           value: formatCurrency(stats.monthlyExpense),
           description: pctChange(
             stats.monthlyExpense,
             stats.monthlyExpenseLastMonth,
             'จากเดือนที่แล้ว',
+          ),
+          icon: IconReceipt,
+        },
+        {
+          title: 'ค่าใช้จ่ายเดือนก่อน',
+          value: formatCurrency(stats.monthlyExpenseLastMonth),
+          description: 'ยอดสรุปค่าใช้จ่ายดำเนินงานเดือนที่แล้ว',
+          icon: IconReceipt,
+        },
+        {
+          title: 'ค่าใช้จ่ายปีนี้',
+          value: formatCurrency(stats.yearlyExpense),
+          description: pctChange(
+            stats.yearlyExpense,
+            stats.yearlyExpenseLastYear,
+            'จากปีที่แล้ว',
           ),
           icon: IconReceipt,
         },
@@ -178,7 +211,7 @@ export default function MerchantDashboardPage() {
         {
           title: 'กำไรสุทธิวันนี้',
           value: formatCurrency(stats.dailyNetProfit),
-          description: `หักต้นทุนสินค้าและค่าใช้จ่ายแล้ว`,
+          description: 'หักต้นทุนสินค้าและค่าใช้จ่ายแล้ว',
           icon: stats.dailyNetProfit >= 0 ? IconTrendingUp : IconTrendingDown,
         },
         {
@@ -192,20 +225,16 @@ export default function MerchantDashboardPage() {
           icon: IconWallet,
         },
         {
+          title: 'กำไรสุทธิเดือนก่อน',
+          value: formatCurrency(stats.monthlyNetProfitLastMonth),
+          description: 'ยอดสรุปกำไรสุทธิเดือนที่แล้ว',
+          icon: IconWallet,
+        },
+        {
           title: 'กำไรสุทธิปีนี้',
           value: formatCurrency(stats.yearlyNetProfit),
           description: `Net Margin ${stats.yearlyNetMargin}%`,
           icon: IconTrendingUp,
-        },
-        {
-          title: 'ค่าใช้จ่ายปีนี้',
-          value: formatCurrency(stats.yearlyExpense),
-          description: pctChange(
-            stats.yearlyExpense,
-            stats.yearlyExpenseLastYear,
-            'จากปีที่แล้ว',
-          ),
-          icon: IconReceipt,
         },
       ]
     : []
@@ -241,7 +270,7 @@ export default function MerchantDashboardPage() {
       {selectedStoreId !== ALL_STORES && (isPermissionLoading || isLoading) && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {[...Array(12)].map((_, i) => (
+            {[...Array(16)].map((_, i) => (
               <Skeleton key={i} className="h-28" />
             ))}
           </div>
@@ -281,6 +310,17 @@ export default function MerchantDashboardPage() {
             </div>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {grossStatsData.map((stat, i) => (
+                <StatsCard
+                  key={i}
+                  title={stat.title}
+                  value={stat.value}
+                  description={stat.description}
+                  icon={stat.icon}
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {expenseStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
                   title={stat.title}

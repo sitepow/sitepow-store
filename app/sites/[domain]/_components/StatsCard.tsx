@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import { LucideIcon } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface StatsCardProps {
@@ -37,7 +38,9 @@ export function StatsCard({
           <CardTitle className="text-sm font-medium text-white">
             {title}
           </CardTitle>
-          <Icon className="size-4 shrink-0 text-white" />
+          <Button variant="outline" size="icon-lg" className="dark">
+            <Icon className="size-4 shrink-0 text-white" />
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           <div className="font-bold text-white sm:text-2xl">{value}</div>

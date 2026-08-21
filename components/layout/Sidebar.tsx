@@ -3,7 +3,7 @@
 import { Fragment, PropsWithChildren, useEffect, useState } from 'react'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
@@ -40,7 +40,6 @@ import { CreditBadge } from '../CreditBadge'
 import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
-import { ModeToggle } from '../ModeToggle'
 import { QuickSettingsMenu } from '../QuickSettingsMenu'
 import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
@@ -53,7 +52,6 @@ interface SidebarProps extends PropsWithChildren {
 }
 
 export function Sidebar({ items, redirectPath, children }: SidebarProps) {
-  const router = useRouter()
   const { isAuthenticated, user } = useSession()
   const userRole = user?.role
 
