@@ -104,5 +104,9 @@ export const NAVBAR_ITEMS = [
     ],
   },
   { title: 'ราคาและแพ็กเกจ', href: '/pricing' },
+  {
+    title: 'ดาวน์โหลดโปรแกรม POS',
+    href: '/',
+  },
   { title: 'ติดต่อเรา', href: '/' },
 ]
