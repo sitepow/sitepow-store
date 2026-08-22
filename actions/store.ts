@@ -132,7 +132,7 @@ export type StoreLandingItem = Prisma.StoreGetPayload<{
 }>
 
 export async function getLandingStores(
-  limit = 12,
+  limit = 11,
 ): Promise<StoreLandingItem[]> {
   const cacheKey = queryKeyToRedisKey(storeKeys.landing())
 

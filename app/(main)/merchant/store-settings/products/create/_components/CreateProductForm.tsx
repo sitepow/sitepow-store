@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -81,6 +81,27 @@ import { ProductSlugField } from './ProductSlugField'
 import { ProductTitleField } from './ProductTitleField'
 import { VariantItem } from './VariantItem'
 
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+
+const dataURLtoFile = (dataurl: string, filename: string): File => {
+  const arr = dataurl.split(',')
+  const mimeMatch = arr[0].match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png'
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
+
 export function CreateProductForm({ productId }: { productId?: string }) {
   const { store } = useStoreData()
   const [aiTaskConfirm, setAiTaskConfirm] = useState<{
@@ -88,6 +109,9 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     cost: number
     action: () => void
   } | null>(null)
+
+  const DRAFT_KEY = `product_form_draft_${productId || 'new'}`
+  const isRestoredRef = useRef(false)
 
   const handleAiTrigger = async (task: AiGenTask, action: () => void) => {
     const storePlan = store?.plan || Plan.FREE
@@ -115,37 +139,39 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/products`)
   const deleteMutation = useR2DeleteImage()
 
+  const defaultFormValues: ProductFormValues = {
+    title: '',
+    slug: '',
+    categoryId: '',
+    isPublished: true,
+    images: [],
+    variants: [
+      {
+        title: 'มาตรฐาน',
+        price: 0,
+        costPrice: 0,
+        sku: '',
+        image: null,
+        weight: 0,
+        width: 0,
+        height: 0,
+        length: 0,
+        stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
+        discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
+        rewardPoints: { isActive: false, amount: 0 },
+        isAvailable: true,
+      },
+    ],
+    addons: [],
+    metadata: [{ key: 'brand', value: '' }],
+    tags: '',
+    productType: ProductType.PHYSICAL,
+  }
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     values: product ? transformProductToFormValues(product) : undefined,
-    defaultValues: {
-      title: '',
-      slug: '',
-      categoryId: '',
-      isPublished: true,
-      images: [],
-      variants: [
-        {
-          title: 'มาตรฐาน',
-          price: 0,
-          costPrice: 0,
-          sku: '',
-          image: null,
-          weight: 0,
-          width: 0,
-          height: 0,
-          length: 0,
-          stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-          discount: { active: false, type: DiscountType.PERCENTAGE, amount: 0 },
-          rewardPoints: { isActive: false, amount: 0 },
-          isAvailable: true,
-        },
-      ],
-      addons: [],
-      metadata: [{ key: 'brand', value: '' }],
-      tags: '',
-      productType: ProductType.PHYSICAL,
-    },
+    defaultValues: defaultFormValues,
   })
 
   const { mutate: genAll, isPending: isGenAll } = useProductAi(
@@ -196,17 +222,131 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     handleSubmit,
     reset,
     getValues,
+    watch,
     formState: { isDirty },
   } = form
 
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY)
+    if (savedDraft) {
+      try {
+        const parsedDraft = JSON.parse(savedDraft)
+
+        if (Array.isArray(parsedDraft.images)) {
+          parsedDraft.images = parsedDraft.images.map((img: any) => {
+            if (img?.fileBase64 && img?.fileName) {
+              const restoredFile = dataURLtoFile(img.fileBase64, img.fileName)
+              return {
+                ...img,
+                url: restoredFile,
+                fileBase64: img.fileBase64,
+              }
+            }
+            return img
+          })
+        }
+
+        if (Array.isArray(parsedDraft.variants)) {
+          parsedDraft.variants = parsedDraft.variants.map((v: any) => {
+            if (v?.imageBase64 && v?.imageFileName) {
+              const restoredFile = dataURLtoFile(v.imageBase64, v.imageFileName)
+              return {
+                ...v,
+                image: restoredFile,
+                imageBase64: v.imageBase64,
+              }
+            }
+            return v
+          })
+        }
+
+        reset(parsedDraft)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    isRestoredRef.current = true
+  }, [DRAFT_KEY, reset])
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      if (!isRestoredRef.current) {
+        return
+      }
+
+      const timer = setTimeout(async () => {
+        try {
+          const serializableValues = JSON.parse(
+            JSON.stringify(value, (key, val) =>
+              val instanceof File ? undefined : val,
+            ),
+          )
+
+          if (Array.isArray(value.images)) {
+            serializableValues.images = await Promise.all(
+              value.images.map(async (img: any) => {
+                const rawFile = img?.url || img?.file
+                if (rawFile instanceof File) {
+                  const base64 = await fileToBase64(rawFile)
+                  return {
+                    ...img,
+                    fileBase64: base64,
+                    fileName: rawFile.name,
+                    url: undefined,
+                  }
+                }
+                return {
+                  ...img,
+                  url: typeof img?.url === 'string' ? img.url : undefined,
+                }
+              }),
+            )
+          }
+
+          if (Array.isArray(value.variants)) {
+            serializableValues.variants = await Promise.all(
+              value.variants.map(async (v: any) => {
+                const rawFile = v.image
+                if (rawFile instanceof File) {
+                  const base64 = await fileToBase64(rawFile)
+                  return {
+                    ...v,
+                    imageBase64: base64,
+                    imageFileName: rawFile.name,
+                    image: undefined,
+                  }
+                }
+                return {
+                  ...v,
+                  image: typeof v?.image === 'string' ? v.image : undefined,
+                }
+              }),
+            )
+          }
+
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(serializableValues))
+        } catch (err) {
+          console.error(err)
+        }
+      }, 600)
+
+      return () => clearTimeout(timer)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [watch, DRAFT_KEY])
+
+  const handleResetForm = () => {
+    localStorage.removeItem(DRAFT_KEY)
+    reset(defaultFormValues)
+    toast.success('ล้างข้อมูลและข้อมูลร่างเรียบร้อยแล้ว')
+  }
+
   const handleApplyPreset = (id: string) => {
     const preset = PRODUCT_PRESETS_MASTER.find((p) => p.id === id)
-    if (!preset) {
-      return
-    }
+    if (!preset) return
 
     const currentValues = getValues()
-
     reset({
       ...currentValues,
       ...preset.data,
@@ -358,6 +498,8 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         create(payload)
       }
 
+      localStorage.removeItem(DRAFT_KEY)
+
       router.push('/merchant/store-settings/products')
     } catch (error) {
       console.error(error)
@@ -403,18 +545,21 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
           <CopyProductDataPicker storeId={selectedStoreId!} />
+
           {isDirty && (
             <Button
               type="button"
               disabled={isPending}
               variant="outline"
-              onClick={() => reset()}
+              onClick={handleResetForm}
             >
               <IconX /> ล้างการตั้งค่า
             </Button>
           )}
-          {!!isDirty && (
+
+          {isDirty && (
             <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
               {isPending && <Spinner />}
               บันทึกข้อมูล
@@ -422,6 +567,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           )}
         </CardContent>
       </Card>
+
       <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
         <div className="space-y-10">
           <FieldSet disabled={isPending}>
@@ -465,6 +611,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               />
             </FieldGroup>
           </FieldSet>
+
           <Field>
             <FieldLabel>ประเภทสินค้า</FieldLabel>
             <Controller
@@ -486,7 +633,9 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               )}
             />
           </Field>
+
           <ImageUploadSection />
+
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <FieldLegend variant="label" className="text-lg font-bold">
               ตัวเลือกสินค้า
@@ -532,6 +681,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               </Button>
             </div>
           </div>
+
           <FieldGroup className="space-y-4">
             {variantFields.map((item, index) => (
               <VariantItem
@@ -542,6 +692,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               />
             ))}
           </FieldGroup>
+
           <FieldSet
             disabled={isPending}
             className="dark:bg-foreground/5 border-l-primary rounded-lg border p-4"
@@ -632,6 +783,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               </div>
             </Field>
           </FieldSet>
+
           <FieldSet
             disabled={isPending}
             className="dark:bg-foreground/5 border-l-primary rounded-lg border p-6"
@@ -708,10 +860,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
             </FieldGroup>
           </FieldSet>
         </div>
+
         <div className="sticky top-6 space-y-6 xl:col-span-1">
           <ProductPreviewContent />
         </div>
       </div>
+
       <AlertDialog
         open={!!aiTaskConfirm}
         onOpenChange={() => setAiTaskConfirm(null)}

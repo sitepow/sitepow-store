@@ -23,7 +23,7 @@ export function LogoBrandText({ className, ...props }: LogoBrandTextProps) {
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       {...props}
     >
-      <span className="line-clamp-2 max-w-64 bg-linear-to-r bg-clip-text text-2xl">
+      <span className="line-clamp-2 max-w-64 bg-linear-to-r bg-clip-text text-lg sm:text-xl">
         {store?.name}
       </span>
     </Link>

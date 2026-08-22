@@ -19,7 +19,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { ActionRequiredAlert } from '../ActionRequiredAlert'
-import { PointerHighlight } from '../ui/pointer-highlight'
 
 export function StoresSection() {
   const isMounted = useIsMounted()
@@ -50,10 +49,6 @@ export function StoresSection() {
     )
   }
 
-  const targetBoxes = 6
-  const storeDisplayCount = Math.min(stores.length, targetBoxes - 1)
-  const displayedStores = stores.slice(0, storeDisplayCount)
-
   return (
     <SectionContainer>
       <SectionHeader
@@ -61,8 +56,8 @@ export function StoresSection() {
         description="สัมผัสประสบการณ์ร้านค้าที่รันบนโครงสร้างพื้นฐานระดับสูง"
       />
 
-      <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {displayedStores.map((store) => (
+      <div className="grid w-full gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        {stores.map((store) => (
           <Card
             key={store.id}
             className="group from-background relative flex h-full flex-col overflow-hidden bg-linear-to-t p-0 transition-all"
@@ -78,7 +73,7 @@ export function StoresSection() {
               />
             </div>
             <CardContent className="flex flex-1 flex-col pb-5">
-              <h3 className="mb-5 line-clamp-2 text-xl font-bold sm:text-2xl">
+              <h3 className="mb-5 line-clamp-2 text-lg font-bold sm:text-xl">
                 {store.name}
               </h3>
               <ActionRequiredAlert
@@ -102,7 +97,7 @@ export function StoresSection() {
         ))}
         {isLoading &&
           Array.from({
-            length: Math.max(0, targetBoxes - 1 - displayedStores.length),
+            length: Math.max(0, stores?.length - 1 - stores.length),
           }).map((_, i) => (
             <Card
               key={`skeleton-${i}`}

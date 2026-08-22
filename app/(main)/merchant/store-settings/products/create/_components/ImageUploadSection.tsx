@@ -77,14 +77,23 @@ export function ImageUploadSection({
       </FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field: any, index) => {
-          const file = field.url
-          const isFileObj = file instanceof File
-          const previewUrl = isFileObj
-            ? URL.createObjectURL(file as File)
-            : (file as string)
+          const rawFile = field.url || field.file
+          const isFileObj = rawFile instanceof File
+
+          let previewUrl = ''
+          if (typeof field.fileBase64 === 'string' && field.fileBase64) {
+            previewUrl = field.fileBase64
+          } else if (isFileObj) {
+            previewUrl = URL.createObjectURL(rawFile)
+          } else if (typeof rawFile === 'string') {
+            previewUrl = rawFile
+          }
+
           const isVideo = isFileObj
-            ? (file as File).type.startsWith('video/')
-            : previewUrl.match(/\.(mp4|webm|ogg)$/i)
+            ? rawFile.type.startsWith('video/')
+            : typeof previewUrl === 'string' &&
+              (previewUrl.startsWith('data:video/') ||
+                Boolean(previewUrl.match(/\.(mp4|webm|ogg)$/i)))
 
           const isPrimary = showPrimaryControl && field.isPrimary
 

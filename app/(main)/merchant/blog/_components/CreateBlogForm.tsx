@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -47,6 +48,27 @@ import { Spinner } from '@/components/ui/spinner'
 
 import { BlogPreviewContent } from './BlogPreviewDialog'
 
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+
+const dataURLtoFile = (dataurl: string, filename: string): File => {
+  const arr = dataurl.split(',')
+  const mimeMatch = arr[0].match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png'
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
+
 interface CreateBlogFormProps {
   blogId?: string
   onDataChange?: (data: {
@@ -67,6 +89,9 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     action: () => void
   } | null>(null)
 
+  const DRAFT_KEY = `blog_form_draft_${blogId || 'new'}`
+  const isRestoredRef = useRef(false)
+
   const { data: blog, isLoading: isBlogLoading } = useBlog(blogId ?? '')
   const { mutateAsync: createBlogAsync, isPending: isCreating } =
     useCreateBlog()
@@ -76,15 +101,17 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
   const uploadMutation = useR2UploadImage(`store/${selectedStoreId}/blogs`)
   const deleteMutation = useR2DeleteImage()
 
+  const defaultFormValues: BlogFormValues = {
+    title: '',
+    slug: '',
+    image: '',
+    content: '',
+    tags: '',
+  }
+
   const form = useForm<BlogFormValues>({
     resolver: zodResolver(blogFormSchema),
-    defaultValues: {
-      title: '',
-      slug: '',
-      image: '',
-      content: '',
-      tags: '',
-    },
+    defaultValues: defaultFormValues,
   })
 
   const {
@@ -118,17 +145,82 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
     })
   }
 
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(DRAFT_KEY)
+    if (savedDraft) {
+      try {
+        const parsedDraft = JSON.parse(savedDraft)
+
+        if (parsedDraft?.imageBase64 && parsedDraft?.imageFileName) {
+          const restoredFile = dataURLtoFile(
+            parsedDraft.imageBase64,
+            parsedDraft.imageFileName,
+          )
+          parsedDraft.image = restoredFile
+        }
+
+        reset(parsedDraft)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    isRestoredRef.current = true
+  }, [DRAFT_KEY, reset])
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      if (!isRestoredRef.current) {
+        return
+      }
+
+      const timer = setTimeout(async () => {
+        try {
+          const serializableValues = JSON.parse(
+            JSON.stringify(value, (key, val) =>
+              val instanceof File ? undefined : val,
+            ),
+          )
+
+          const rawImage = value.image
+          if (rawImage instanceof File) {
+            const base64 = await fileToBase64(rawImage)
+            serializableValues.imageBase64 = base64
+            serializableValues.imageFileName = rawImage.name
+            serializableValues.image = undefined
+          } else if (typeof rawImage === 'string') {
+            serializableValues.image = rawImage
+          }
+
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(serializableValues))
+        } catch (err) {
+          console.error(err)
+        }
+      }, 600)
+
+      return () => clearTimeout(timer)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [watch, DRAFT_KEY])
+
+  const coverImageValue = watch('image')
+  const previewImageUrl =
+    coverImageValue instanceof File
+      ? URL.createObjectURL(coverImageValue)
+      : typeof coverImageValue === 'string'
+        ? coverImageValue
+        : ''
+
   const watchedValues = watch(['title', 'content', 'image'])
   useEffect(() => {
     if (onDataChange) {
       onDataChange({
         title: watchedValues[0] || '',
         content: watchedValues[1] || '',
-        coverImage:
-          typeof watchedValues[2] === 'string' ? watchedValues[2] : '',
+        coverImage: previewImageUrl,
       })
     }
-  }, [watchedValues, onDataChange])
+  }, [watchedValues, previewImageUrl, onDataChange])
 
   useEffect(() => {
     if (blog) {
@@ -141,6 +233,12 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
       })
     }
   }, [blog, reset])
+
+  const handleResetForm = () => {
+    localStorage.removeItem(DRAFT_KEY)
+    reset(defaultFormValues)
+    toast.success('ล้างข้อมูลร่างบทความเรียบร้อยแล้ว')
+  }
 
   const isPending =
     isCreating ||
@@ -200,11 +298,13 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
       if (blogId) {
         const res = await updateBlogAsync({ id: blogId, data: payload })
         if (res.success) {
+          localStorage.removeItem(DRAFT_KEY)
           router.push('/merchant/blog')
         }
       } else {
         const res = await createBlogAsync(payload)
         if (res.success) {
+          localStorage.removeItem(DRAFT_KEY)
           router.push('/merchant/blog')
         }
       }
@@ -212,12 +312,6 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
       console.error(error)
     }
   }
-
-  const coverImageValue = watch('image')
-  const previewImageUrl =
-    coverImageValue instanceof File
-      ? URL.createObjectURL(coverImageValue)
-      : coverImageValue
 
   return (
     <FormProvider {...form}>
@@ -267,16 +361,18 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
           {isDirty && (
             <Button
               type="button"
               disabled={isPending}
               variant="outline"
-              onClick={() => reset()}
+              onClick={handleResetForm}
             >
               <IconX className="mr-1 size-4" /> ล้างการเปลี่ยนแปลง
             </Button>
           )}
+
           {isDirty && (
             <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
               {isPending && <Spinner className="mr-2" />}
