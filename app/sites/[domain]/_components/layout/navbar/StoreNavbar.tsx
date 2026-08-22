@@ -13,7 +13,7 @@ import { getClientAuthUrl } from '@/utils/auth'
 import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrand } from '@/components/LogoBrand'
+import { LogoBrandText } from '@/components/LogoBrandText'
 import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
 import { StoreLogo } from '@/components/StoreLogo'
 import { Button } from '@/components/ui/button'
@@ -65,7 +65,7 @@ export function StoreNavbar() {
             {store?.logo ? (
               <StoreLogo image={store?.logo} />
             ) : (
-              <LogoBrand className="text-white" />
+              <LogoBrandText className="text-white" />
             )}
             <div className="flex items-center gap-2">
               <div className="hidden max-w-md flex-1 lg:flex">

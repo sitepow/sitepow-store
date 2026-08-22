@@ -6,7 +6,7 @@ import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { OpeningHours } from '@/types/branch'
 
-import { LogoBrand } from '@/components/LogoBrand'
+import { LogoBrandText } from '@/components/LogoBrandText'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { StoreLogo } from '@/components/StoreLogo'
 
@@ -120,7 +120,11 @@ export function StoreFooter() {
       <div className="container mx-auto px-5 py-12 sm:px-10">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div className="max-w-sm">
-            {store?.logo ? <StoreLogo image={store?.logo} /> : <LogoBrand />}
+            {store?.logo ? (
+              <StoreLogo image={store?.logo} />
+            ) : (
+              <LogoBrandText />
+            )}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               {store?.description
                 ? store?.description

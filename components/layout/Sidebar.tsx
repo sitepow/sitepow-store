@@ -40,6 +40,7 @@ import { CreditBadge } from '../CreditBadge'
 import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
 import { LogoBrand } from '../LogoBrand'
+import { LogoBrandText } from '../LogoBrandText'
 import { QuickSettingsMenu } from '../QuickSettingsMenu'
 import { StoreLogo } from '../StoreLogo'
 import { ChatWidget } from '../chat/ChatWidget'
@@ -94,7 +95,13 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
     <SidebarProvider>
       <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
-          {logoImage ? <StoreLogo image={logoImage} /> : <LogoBrand />}
+          {logoImage ? (
+            <StoreLogo image={logoImage} />
+          ) : isMerchant ? (
+            <LogoBrand />
+          ) : (
+            <LogoBrandText />
+          )}
         </SidebarHeader>
         <SidebarContent className="px-2">
           <SidebarMenu>
