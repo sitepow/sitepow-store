@@ -47,34 +47,37 @@ export async function r2UploadImage(
   }
 
   const inputBuffer = Buffer.from(await file.arrayBuffer())
-  const config = PRESETS[preset] || PRESETS.general
+  const isVideo = file.type.startsWith('video/')
+  const isAnimated = file.type === 'image/gif'
+
+  const ext = file.name.split('.').pop() || ''
+  const baseName = file.name
+    .replace(/\.[^/.]+$/, '')
+    .replace(/[^a-zA-Z0-9]/g, '-')
 
   try {
-    let pipeline = sharp(inputBuffer).resize({
-      width: config.width,
-      height: config.height,
-      fit: config.fit,
-      withoutEnlargement: true,
-    })
-
-    const isAnimated = file.type === 'image/gif'
     let optimizedBuffer: Buffer
-    let contentType = 'image/webp'
-    let extension = 'webp'
+    let contentType = file.type
+    let extension = ext
 
-    if (isAnimated) {
+    if (isVideo || isAnimated) {
       optimizedBuffer = inputBuffer
-      contentType = file.type
-      extension = file.name.split('.').pop() || 'gif'
     } else {
-      optimizedBuffer = await pipeline
+      const config = PRESETS[preset] || PRESETS.general
+      optimizedBuffer = await sharp(inputBuffer)
+        .resize({
+          width: config.width,
+          height: config.height,
+          fit: config.fit,
+          withoutEnlargement: true,
+        })
         .webp({ quality: config.quality })
         .toBuffer()
+
+      contentType = 'image/webp'
+      extension = 'webp'
     }
 
-    const baseName = file.name
-      .replace(/\.[^/.]+$/, '')
-      .replace(/[^a-zA-Z0-9]/g, '-')
     const fileName = `${folder}/${Date.now()}-${baseName}.${extension}`
 
     await s3Client.send(
