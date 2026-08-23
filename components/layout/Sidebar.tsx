@@ -63,10 +63,14 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+      if (window.scrollY > 30) {
+        setIsScrolled(true)
+      } else if (window.scrollY < 10) {
+        setIsScrolled(false)
+      }
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -177,20 +181,21 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-        <div className="bg-background sticky top-0 z-20 flex h-fit flex-wrap items-center gap-2.5 border-b py-3">
+        <div className="bg-background sticky top-0 z-20 flex min-h-13 flex-wrap items-center gap-2.5 border-b py-3 transition-all">
           <SidebarTrigger />
           <QuickSettingsMenu />
           <UserAvatarDropdown redirectPath="merchant" items={items} />
-          {isScrolled && isMerchant && <DateTimeBadge />}
-          {!isScrolled && (
-            <div className="flex flex-wrap items-center gap-2.5">
-              {isMerchant && <CreditBadge />}
-              {isMerchant && <DateTimeBadge />}
-              {isPointsEnabled && (
-                <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
-              )}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-2.5 transition-opacity duration-200">
+            {isMerchant && <DateTimeBadge />}
+            {!isScrolled && (
+              <>
+                {isMerchant && <CreditBadge />}
+                {isPointsEnabled && (
+                  <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+                )}
+              </>
+            )}
+          </div>
         </div>
         {children}
         {userRole === UserRole.SUPPORT && <SupportWidget />}

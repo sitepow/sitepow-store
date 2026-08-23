@@ -16,7 +16,7 @@ export function Footer() {
           height={34}
         />
       ),
-      href: '/',
+      href: 'https://web.facebook.com/profile.php?id=61584675643468',
       label: 'Facebook',
     },
     {
@@ -28,21 +28,21 @@ export function Footer() {
           height={34}
         />
       ),
-      href: '/',
+      href: 'https://www.instagram.com/sitepow.store',
       label: 'Instagram',
     },
-    {
-      icon: (
-        <Image
-          src="https://thesvg.org/icons/tiktok/default.svg"
-          alt="Tiktok"
-          width={34}
-          height={34}
-        />
-      ),
-      href: '/',
-      label: 'Tiktok',
-    },
+    // {
+    //   icon: (
+    //     <Image
+    //       src="https://thesvg.org/icons/tiktok/default.svg"
+    //       alt="Tiktok"
+    //       width={34}
+    //       height={34}
+    //     />
+    //   ),
+    //   href: '/',
+    //   label: 'Tiktok',
+    // },
     {
       icon: (
         <Image
@@ -52,7 +52,7 @@ export function Footer() {
           height={34}
         />
       ),
-      href: '/',
+      href: 'https://m.me/61584675643468',
       label: 'Messenger',
     },
     {
@@ -64,21 +64,21 @@ export function Footer() {
           height={34}
         />
       ),
-      href: '/',
+      href: 'https://line.me/ti/p/~@830sdfow',
       label: 'Line',
     },
-    {
-      icon: (
-        <Image
-          src="https://thesvg.org/icons/discord/default.svg"
-          alt="Discord"
-          width={34}
-          height={34}
-        />
-      ),
-      href: '/',
-      label: 'Discord',
-    },
+    // {
+    //   icon: (
+    //     <Image
+    //       src="https://thesvg.org/icons/discord/default.svg"
+    //       alt="Discord"
+    //       width={34}
+    //       height={34}
+    //     />
+    //   ),
+    //   href: '/',
+    //   label: 'Discord',
+    // },
   ]
 
   return (
