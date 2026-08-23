@@ -95,16 +95,16 @@ export function ProductCard({
           )
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 p-1.5">
         {product.title && (
           <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
             {product.title}
           </h3>
         )}
-        <div className="group-hover:text-primary flex items-baseline justify-center gap-2">
+        <div className="group-hover:text-primary flex flex-col items-center justify-center">
           <data
             value={hasDiscount ? net?.min : original?.min}
-            className="text-primary text-2xl font-bold"
+            className="text-primary text-lg font-bold sm:text-xl lg:text-2xl"
           >
             {formatCurrency((hasDiscount ? net?.min : original?.min) || 0)}
           </data>

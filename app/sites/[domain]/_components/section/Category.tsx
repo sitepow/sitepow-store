@@ -66,9 +66,9 @@ export function CategorySection({
         ) : (
           <div className="border-border/50 group relative flex h-44 w-full shrink-0 overflow-hidden rounded-2xl border bg-neutral-900 text-start sm:h-56 md:h-auto md:w-80 lg:w-96">
             <div className="absolute inset-0 z-0 transition-transform duration-700 group-hover:scale-105">
-              {isVideoUrl(currentImage) ? (
+              {displayMedia && isVideoUrl(displayMedia) ? (
                 <video
-                  src={displayMedia ?? ''}
+                  src={displayMedia}
                   autoPlay
                   loop
                   muted
@@ -77,8 +77,12 @@ export function CategorySection({
                 />
               ) : (
                 <div
-                  className="size-full bg-cover bg-center opacity-50"
-                  style={{ backgroundImage: `url('${displayMedia}')` }}
+                  className="animate-ken-burns size-full bg-cover bg-center opacity-50"
+                  style={{
+                    backgroundImage: displayMedia
+                      ? `url('${displayMedia}')`
+                      : undefined,
+                  }}
                 />
               )}
             </div>
