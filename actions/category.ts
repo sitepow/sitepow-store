@@ -293,7 +293,7 @@ export async function createCategory(input: CreateCategoryInput) {
       details: { title: input.title, slug: input.slug, type: 'created' },
     })
 
-    return { success: true, data: category }
+    return { success: true, message: 'สร้างหมวดหมู่สำเร็จแล้ว', data: category }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -361,7 +361,11 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       await invalidateStorefrontCategoryCache(category.store.slug)
     }
 
-    return { success: true, data: category }
+    return {
+      success: true,
+      message: 'อัพเดตหมวดหมู่สำเร็จแล้ว',
+      data: category,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -428,7 +432,7 @@ export async function deleteCategory(id: string) {
       await invalidateStorefrontCategoryCache(category.store.slug)
     }
 
-    return { success: true, message: 'ลบหมวดหมู่สำเร็จ' }
+    return { success: true, message: 'ลบหมวดหมู่สำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }

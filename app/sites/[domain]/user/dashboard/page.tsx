@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation'
 
 import { useStorefrontDashboard } from '@/actions/hooks/storefront/dashboard'
+import { AnalyticsCardShell } from '@/app/(main)/merchant/analytics/_components/_components/AnalyticsCardShell'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -18,14 +19,6 @@ import {
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { Sidebar } from '@/components/layout/Sidebar'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import {
   ChartConfig,
   ChartContainer,
@@ -122,16 +115,14 @@ export default function StoreUserDashboardPage() {
               />
             ))}
           </div>
-
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>ประวัติการใช้จ่ายของคุณ</CardTitle>
-                <CardDescription>
-                  แสดงยอดสรุปการซื้อสินค้าของคุณในรอบ 6 เดือนที่ผ่านมา
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            <AnalyticsCardShell
+              title="ประวัติการใช้จ่ายของคุณ"
+              description="แสดงยอดสรุปการซื้อสินค้าของคุณในรอบ 6 เดือนที่ผ่านมา"
+              isEmpty={!spendingTrend || spendingTrend.length === 0}
+              emptyMessage="ไม่มีข้อมูลประวัติการใช้จ่าย"
+            >
+              <div className="space-y-4">
                 <ChartContainer config={spendingChartConfig}>
                   <AreaChart
                     accessibilityLayer
@@ -167,9 +158,7 @@ export default function StoreUserDashboardPage() {
                     />
                   </AreaChart>
                 </ChartContainer>
-              </CardContent>
-              <CardFooter>
-                <div className="flex w-full items-start gap-2 text-sm">
+                <div className="border-border/40 flex w-full items-start gap-2 border-t pt-2 text-sm">
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2 leading-none font-medium">
                       {isSpendingUp
@@ -186,17 +175,15 @@ export default function StoreUserDashboardPage() {
                     </div>
                   </div>
                 </div>
-              </CardFooter>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>ความเคลื่อนไหวของแต้มสะสม</CardTitle>
-                <CardDescription>
-                  เปรียบเทียบแต้มที่คุณได้รับและแต้มที่ใช้ไปในแต่ละเดือน
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+              </div>
+            </AnalyticsCardShell>
+            <AnalyticsCardShell
+              title="ความเคลื่อนไหวของแต้มสะสม"
+              description="เปรียบเทียบแต้มที่คุณได้รับและแต้มที่ใช้ไปในแต่ละเดือน"
+              isEmpty={!pointsHistory || pointsHistory.length === 0}
+              emptyMessage="ไม่มีข้อมูลความเคลื่อนไหวของแต้มสะสม"
+            >
+              <div className="space-y-4">
                 <ChartContainer config={pointsChartConfig}>
                   <AreaChart
                     accessibilityLayer
@@ -241,34 +228,34 @@ export default function StoreUserDashboardPage() {
                     />
                   </AreaChart>
                 </ChartContainer>
-              </CardContent>
-              <CardFooter className="flex-col items-start gap-3">
-                <div className="flex w-full items-start gap-2 text-sm">
-                  <div className="grid gap-1">
-                    <div className="flex items-center gap-2 leading-none font-medium">
-                      สะสมแต้มให้ครบเพื่อแลกรับส่วนลดพิเศษในออเดอร์ถัดไป
+                <div className="border-border/40 space-y-3 border-t pt-3">
+                  <div className="flex w-full items-start gap-2 text-sm">
+                    <div className="grid gap-1">
+                      <div className="flex items-center gap-2 leading-none font-medium">
+                        สะสมแต้มให้ครบเพื่อแลกรับส่วนลดพิเศษในออเดอร์ถัดไป
+                      </div>
+                      <div className="text-muted-foreground flex items-center gap-2 leading-none">
+                        6 เดือนล่าสุด
+                      </div>
                     </div>
-                    <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                      6 เดือนล่าสุด
+                  </div>
+                  <div className="text-muted-foreground border-border/40 flex w-full flex-wrap items-center gap-4 border-t pt-3 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <div className="shrink-0 rounded-md border border-green-200 bg-green-50 p-1 text-green-600 dark:border-green-900/50 dark:bg-green-950 dark:text-green-400">
+                        <IconArrowDownLeft size={14} />
+                      </div>
+                      <span>แต้มที่ได้รับ (Earned)</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="shrink-0 rounded-md border border-red-200 bg-red-50 p-1 text-red-500 dark:border-red-900/50 dark:bg-red-950 dark:text-red-400">
+                        <IconArrowUpRight size={14} />
+                      </div>
+                      <span>แต้มที่ใช้ (Used)</span>
                     </div>
                   </div>
                 </div>
-                <div className="text-muted-foreground flex w-full flex-wrap items-center gap-4 border-t pt-3 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <div className="shrink-0 rounded-md border border-green-200 bg-green-50 p-1 text-green-600">
-                      <IconArrowDownLeft size={14} />
-                    </div>
-                    <span>แต้มที่ได้รับ (Earned)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="shrink-0 rounded-md border bg-red-50 p-1 text-red-500 not-first:border-red-200">
-                      <IconArrowUpRight size={14} />
-                    </div>
-                    <span>แต้มที่ใช้ (Used)</span>
-                  </div>
-                </div>
-              </CardFooter>
-            </Card>
+              </div>
+            </AnalyticsCardShell>
           </div>
         </>
       )}

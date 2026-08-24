@@ -1,6 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 
 import {
+  generateAnalyticsInsightsAi,
   generateBlogAi,
   generateCategoryAi,
   generateProductAi,
@@ -11,6 +12,8 @@ import { BlogFormValues } from '@/zod/blog'
 import { CreateCategoryFormValues } from '@/zod/category'
 import { ProductFormValues } from '@/zod/product'
 import { useMutation } from '@tanstack/react-query'
+
+import { useAnalyticsOverview } from './analytics'
 
 export function useProductAi(
   form: UseFormReturn<ProductFormValues>,
@@ -132,6 +135,18 @@ export function useBlogAi(
           keepDefaultValues: true,
         },
       )
+    },
+  })
+}
+
+type AnalyticsData = NonNullable<
+  ReturnType<typeof useAnalyticsOverview>['data']
+>
+
+export function useAnalyticsAi(storeId: string) {
+  return useMutation({
+    mutationFn: async (data: AnalyticsData) => {
+      return await generateAnalyticsInsightsAi(data, storeId)
     },
   })
 }

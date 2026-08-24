@@ -24,7 +24,7 @@ import {
   IconWallet,
 } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -33,14 +33,6 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import {
   ChartConfig,
   ChartContainer,
@@ -56,6 +48,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { AnalyticsCardShell } from '../analytics/_components/_components/AnalyticsCardShell'
 import { StoreCreditCard } from '../credits/_components/StoreCreditCard'
 
 function pctChange(
@@ -343,17 +336,38 @@ export default function MerchantDashboardPage() {
             </div>
             {canViewCreditCard && <StoreCreditCard />}
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>แนวโน้มยอดขาย</CardTitle>
-                  <CardDescription>ยอดขายสุทธิ 6 เดือนล่าสุด</CardDescription>
-                </CardHeader>
-                <CardContent>
+              <AnalyticsCardShell
+                title="แนวโน้มยอดขาย"
+                description="ยอดขายสุทธิ 6 เดือนล่าสุด"
+                isEmpty={!data?.salesTrend || data.salesTrend.length === 0}
+                emptyMessage="ไม่มีข้อมูลแนวโน้มยอดขาย"
+              >
+                <div className="space-y-4">
                   <ChartContainer config={chartConfig}>
-                    <AreaChart
+                    <BarChart
                       data={data?.salesTrend ?? []}
                       margin={{ left: 12, right: 12 }}
                     >
+                      <defs>
+                        <linearGradient
+                          id="salesBarGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#22c55e"
+                            stopOpacity={1}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#16a34a"
+                            stopOpacity={0.6}
+                          />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid vertical={false} />
                       <XAxis
                         dataKey="name"
@@ -371,142 +385,146 @@ export default function MerchantDashboardPage() {
                         width={60}
                       />
                       <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="line" />}
+                        cursor={{ fill: 'rgba(0, 0, 0, 0.04)' }}
+                        content={<ChartTooltipContent hideLabel />}
                       />
-                      <Area
+                      <Bar
                         dataKey="total"
-                        type="natural"
-                        fill="var(--color-total)"
-                        fillOpacity={0.4}
-                        stroke="var(--color-total)"
+                        fill="url(#salesBarGradient)"
+                        radius={[6, 6, 0, 0]}
                       />
-                    </AreaChart>
+                    </BarChart>
                   </ChartContainer>
-                </CardContent>
-                <CardFooter>
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <IconTrendingUp className="size-4" /> 6 เดือนล่าสุด
+                  <div className="text-muted-foreground border-border/40 flex items-center gap-2 border-t pt-2 text-sm font-medium">
+                    <IconTrendingUp className="size-4 text-emerald-500" /> 6
+                    เดือนล่าสุด
                   </div>
-                </CardFooter>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>รายการขายล่าสุด</CardTitle>
-                  <CardDescription>5 ออเดอร์ล่าสุดของสาขานี้</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {(data?.recentSales ?? []).length === 0 ? (
-                    <ActionRequiredAlert
-                      title="แจ้งเตือน"
-                      description="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
-                    />
-                  ) : (
-                    <div className="space-y-8">
-                      {(data?.recentSales ?? []).map((sale) => (
-                        <div key={sale.id} className="flex items-center">
-                          <Avatar className="size-8 border">
-                            <AvatarFallback>
-                              <IconUser size={16} />
+                </div>
+              </AnalyticsCardShell>
+              <AnalyticsCardShell
+                title="รายการขายล่าสุด"
+                description="5 ออเดอร์ล่าสุดของสาขานี้"
+                isEmpty={(data?.recentSales ?? []).length === 0}
+                emptyMessage="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
+              >
+                <div className="space-y-2.5">
+                  {(data?.recentSales ?? []).map((sale) => {
+                    const initial = sale.name
+                      ? sale.name.charAt(0).toUpperCase()
+                      : 'U'
+
+                    return (
+                      <div
+                        key={sale.id}
+                        className="group hover:bg-muted/50 border-border/40 flex items-center justify-between rounded-xl border p-2.5 transition-all duration-200 hover:shadow-xs"
+                      >
+                        <div className="flex min-w-0 items-center gap-3.5">
+                          <Avatar className="border-border/50 ring-background size-9 border shadow-2xs ring-2 transition-transform group-hover:scale-105">
+                            <AvatarFallback className="from-primary/20 via-primary/10 to-background text-primary bg-linear-to-br text-xs font-bold">
+                              {initial}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="ml-4 max-w-72 space-y-1 wrap-break-word whitespace-pre-line">
-                            <p className="text-sm leading-none font-medium">
-                              {sale.name}
-                            </p>
-                            <p className="text-muted-foreground text-sm">
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <p className="text-foreground group-hover:text-primary truncate text-sm font-semibold transition-colors">
+                                {sale.name}
+                              </p>
+                              <span className="relative flex h-2 w-2">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                              </span>
+                            </div>
+                            <p className="text-muted-foreground truncate text-xs font-normal">
                               {sale.email}
                             </p>
                           </div>
-                          <div className="text-primary ml-auto font-medium">
-                            +{formatCurrency(sale.amount)}
-                          </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              <Card className="h-fit">
-                <CardHeader>
-                  <CardTitle>สินค้าใกล้หมด</CardTitle>
-                  <CardDescription>
-                    รายการสินค้าที่ต้องเติมสต็อกด่วน
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {(data?.lowStock ?? []).length === 0 ? (
-                    <ActionRequiredAlert
-                      title="แจ้งเตือน"
-                      description="ขณะนี้ยังไม่มีสินค้าที่ใกล้หมด"
-                    />
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableCell className="font-medium">
-                            สินค้า / รหัสตัวเลือก / ชื่อตัวเลือก
+                        <div className="shrink-0 pl-3 text-right">
+                          <span className="font-mono text-sm font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+                            +{formatCurrency(sale.amount)}
+                          </span>
+                          <p className="text-muted-foreground text-[10px] font-medium">
+                            สำเร็จ
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </AnalyticsCardShell>
+              <AnalyticsCardShell
+                title="สินค้าใกล้หมด"
+                description="รายการสินค้าที่ต้องเติมสต็อกด่วน"
+                isEmpty={(data?.lowStock ?? []).length === 0}
+                emptyMessage="ขณะนี้ยังไม่มีสินค้าที่ใกล้หมด"
+                className="h-fit"
+              >
+                <div className="space-y-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableCell className="font-medium">
+                          สินค้า / รหัสตัวเลือก / ชื่อตัวเลือก
+                        </TableCell>
+                        <TableCell className="font-medium">สาขา</TableCell>
+                        <TableCell className="text-right font-medium">
+                          คงเหลือ
+                        </TableCell>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {(data?.lowStock ?? []).map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="max-w-72 min-w-72 py-3 wrap-break-word whitespace-pre-line">
+                            <div className="space-y-0.5">
+                              <p className="text-sm font-medium">
+                                {item.productName}
+                              </p>
+                              {item.variantId && (
+                                <span className="text-muted-foreground text-xs">
+                                  ({item.variantId})
+                                  <br />
+                                </span>
+                              )}
+                              {item.variantTitle && (
+                                <span className="text-muted-foreground text-xs">
+                                  ({item.variantTitle})
+                                </span>
+                              )}
+                            </div>
                           </TableCell>
-                          <TableCell className="font-medium">สาขา</TableCell>
-                          <TableCell className="text-right font-medium">
-                            คงเหลือ
+                          <TableCell className="py-3">
+                            <Badge
+                              variant="outline"
+                              className="text-muted-foreground"
+                            >
+                              {item.branchName}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <span
+                              className={`font-bold ${
+                                item.stock === 0
+                                  ? 'text-destructive'
+                                  : 'text-amber-500'
+                              }`}
+                            >
+                              {formatNumber(item.stock)}
+                            </span>
                           </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {(data?.lowStock ?? []).map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell className="max-w-72 min-w-72 py-3 wrap-break-word whitespace-pre-line">
-                              <div className="space-y-0.5">
-                                <p className="text-sm font-medium">
-                                  {item.productName}
-                                </p>
-                                {item.variantId && (
-                                  <span className="text-muted-foreground text-xs">
-                                    ({item.variantId})
-                                    <br />
-                                  </span>
-                                )}
-                                {item.variantTitle && (
-                                  <span className="text-muted-foreground text-xs">
-                                    ({item.variantTitle})
-                                  </span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-3">
-                              <Badge
-                                variant="outline"
-                                className="text-muted-foreground"
-                              >
-                                {item.branchName}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="py-3 text-right">
-                              <span
-                                className={`font-bold ${
-                                  item.stock === 0
-                                    ? 'text-destructive'
-                                    : 'text-amber-500'
-                                }`}
-                              >
-                                {formatNumber(item.stock)}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/merchant/inventory">
-                      ดูคลังสินค้าทั้งหมด <ArrowRight />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="border-border/40 border-t pt-2">
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/merchant/inventory">
+                        ดูคลังสินค้าทั้งหมด <ArrowRight />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </AnalyticsCardShell>
             </div>
           </div>
         )}
