@@ -1,8 +1,5 @@
-const THAILAND_TZ = 'Asia/Bangkok'
+export const THAILAND_TZ = 'Asia/Bangkok'
 
-/**
- * แปลงวันที่เป็นรูปแบบภาษาไทยเต็ม (เช่น 24 สิงหาคม 2026)
- */
 export const formatDate = (date: Date | string | number): string => {
   return new Intl.DateTimeFormat('th-TH', {
     timeZone: THAILAND_TZ,
@@ -12,13 +9,9 @@ export const formatDate = (date: Date | string | number): string => {
   }).format(new Date(date))
 }
 
-/**
- * แปลงวันที่และเวลา UTC เป็นเวลาไทย YYYY-MM-DD HH:mm
- */
 export const formatDateTime = (date: Date | string | number): string => {
   const d = new Date(date)
 
-  // ใช้ sv-SE เพื่อดึง Format ISO (YYYY-MM-DD HH:mm) ตาม Timezone ไทย
   const formatted = new Intl.DateTimeFormat('sv-SE', {
     timeZone: THAILAND_TZ,
     year: 'numeric',
@@ -32,9 +25,6 @@ export const formatDateTime = (date: Date | string | number): string => {
   return formatted.replace(' ', ' ')
 }
 
-/**
- * แปลงวันที่เป็นรูปแบบภาษาไทยย่อ (เช่น 24 ส.ค. 2026)
- */
 export const formatShortDate = (date: Date | string | number): string => {
   return new Intl.DateTimeFormat('th-TH', {
     timeZone: THAILAND_TZ,
@@ -44,9 +34,6 @@ export const formatShortDate = (date: Date | string | number): string => {
   }).format(new Date(date))
 }
 
-/**
- * แปลงเวลา UTC เป็นเวลาไทย HH:mm:ss
- */
 export const formatShortTime = (date: Date | string | number): string => {
   return new Intl.DateTimeFormat('th-TH', {
     timeZone: THAILAND_TZ,
@@ -57,9 +44,6 @@ export const formatShortTime = (date: Date | string | number): string => {
   }).format(new Date(date))
 }
 
-/**
- * ข้อความแจ้งเตือนการระงับบัญชี (คำนวณตามเวลาไทย)
- */
 export const getBlockMessage = (blockedUntil: Date | string | null): string => {
   if (!blockedUntil) {
     return 'บัญชีของคุณถูกระงับการสั่งซื้อถาวรเนื่องจากพบความผิดปกติ'
@@ -105,16 +89,12 @@ export const getBlockMessage = (blockedUntil: Date | string | null): string => {
   return `บัญชีของคุณถูกระงับการสั่งซื้อชั่วคราว ระบบจะปลดล็อกอัตโนมัติในวันที่ ${unlockDateStr} เวลา ${unlockTimeStr} น. (${remainingTimeStr})`
 }
 
-/**
- * ผสานวันที่ระบุ เข้ากับ "เวลาปัจจุบันของประเทศไทย"
- */
 export function parseExpenseDateWithCurrentTime(
   inputDate: string | Date,
 ): Date {
   const targetDate = new Date(inputDate)
   const now = new Date()
 
-  // ดึงเวลาปัจจุบันตาม Timezone ไทย
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: THAILAND_TZ,
     hour: 'numeric',
@@ -137,4 +117,37 @@ export function parseExpenseDateWithCurrentTime(
   targetDate.setHours(hours, minutes, seconds, 0)
 
   return targetDate
+}
+
+export function getThaiDateParts(date: Date) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: THAILAND_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short',
+    hour: 'numeric',
+    hour12: false,
+  })
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(date).map((p) => [p.type, p.value]),
+  )
+
+  const weekdayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  }
+
+  return {
+    year: parts.year,
+    month: parts.month,
+    dayOfWeek: weekdayMap[parts.weekday] ?? 0,
+    hour: parseInt(parts.hour === '24' ? '0' : parts.hour, 10),
+  }
 }

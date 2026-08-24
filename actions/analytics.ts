@@ -3,49 +3,11 @@
 import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { THAILAND_TZ, getThaiDateParts } from '@/utils/date'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-
-const THAILAND_TZ = 'Asia/Bangkok'
-
-/**
- * ดึงส่วนประกอบของวันที่ (ปี, เดือน, วันในสัปดาห์, ชั่วโมง) ตาม Timezone ไทย
- */
-function getThaiDateParts(date: Date) {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: THAILAND_TZ,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    weekday: 'short',
-    hour: 'numeric',
-    hour12: false,
-  })
-
-  const parts = Object.fromEntries(
-    formatter.formatToParts(date).map((p) => [p.type, p.value]),
-  )
-
-  // Map วันในสัปดาห์ Sun-Sat -> 0-6
-  const weekdayMap: Record<string, number> = {
-    Sun: 0,
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
-  }
-
-  return {
-    year: parts.year,
-    month: parts.month,
-    dayOfWeek: weekdayMap[parts.weekday] ?? 0,
-    hour: parseInt(parts.hour === '24' ? '0' : parts.hour, 10),
-  }
-}
 
 export interface FinancialTrendItem {
   period: string
@@ -81,6 +43,24 @@ export interface TopVariantItem {
   totalSales: number
 }
 
+export interface CustomerRetentionStats {
+  totalUniqueCustomers: number
+  newCustomersCount: number
+  returningCustomersCount: number
+  repeatPurchaseRate: number
+}
+
+export interface ProductPairingItem {
+  pair: string
+  count: number
+}
+
+export interface PaymentBreakdownItem {
+  method: string
+  count: number
+  percentage: number
+}
+
 export interface AnalyticsResult {
   financialTrend: FinancialTrendItem[]
   dayOfWeekTrend: DayOfWeekAnalysis[]
@@ -88,6 +68,9 @@ export interface AnalyticsResult {
   topBuyingHours: { hour: string; count: number }[]
   topProducts: TopProductItem[]
   topVariants: TopVariantItem[]
+  customerRetention: CustomerRetentionStats
+  topProductPairs: ProductPairingItem[]
+  paymentBreakdown: PaymentBreakdownItem[]
 }
 
 export async function getAnalyticsOverview(
@@ -97,15 +80,25 @@ export async function getAnalyticsOverview(
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
+  const emptyResult: AnalyticsResult = {
+    financialTrend: [],
+    dayOfWeekTrend: [],
+    heatmap: [],
+    topBuyingHours: [],
+    topProducts: [],
+    topVariants: [],
+    customerRetention: {
+      totalUniqueCustomers: 0,
+      newCustomersCount: 0,
+      returningCustomersCount: 0,
+      repeatPurchaseRate: 0,
+    },
+    topProductPairs: [],
+    paymentBreakdown: [],
+  }
+
   if (!userId || !storeId || storeId === ALL_STORES) {
-    return {
-      financialTrend: [],
-      dayOfWeekTrend: [],
-      heatmap: [],
-      topBuyingHours: [],
-      topProducts: [],
-      topVariants: [],
-    }
+    return emptyResult
   }
 
   const validBranchId =
@@ -119,14 +112,7 @@ export async function getAnalyticsOverview(
   })
 
   if (!authCheck.isAuthorized) {
-    return {
-      financialTrend: [],
-      dayOfWeekTrend: [],
-      heatmap: [],
-      topBuyingHours: [],
-      topProducts: [],
-      topVariants: [],
-    }
+    return emptyResult
   }
 
   const storeFilter = { storeId }
@@ -155,6 +141,13 @@ export async function getAnalyticsOverview(
         id: true,
         totalAmount: true,
         createdAt: true,
+        customerId: true,
+        customer: {
+          select: {
+            phone: true,
+          },
+        },
+        paymentMethod: true,
       },
     }),
     prisma.orderItem.findMany({
@@ -168,6 +161,7 @@ export async function getAnalyticsOverview(
       },
       select: {
         id: true,
+        orderId: true,
         title: true,
         variantTitle: true,
         price: true,
@@ -189,7 +183,6 @@ export async function getAnalyticsOverview(
     }),
   ])
 
-  // 1. ตั้งค่า Financial Trend (ย้อนหลัง 6 เดือน) ตามเวลาไทย
   const monthlyMap: Record<string, FinancialTrendItem> = {}
   for (let i = 5; i >= 0; i--) {
     const d = new Date()
@@ -236,7 +229,6 @@ export async function getAnalyticsOverview(
     netProfit: item.revenue - item.cogs - item.expense,
   }))
 
-  // 2. ตั้งค่า Day of Week และ Heatmap ตามเวลาไทย
   const dayOfWeekMap: Record<number, DayOfWeekAnalysis> = {
     0: { dayName: 'อาทิตย์', dayIndex: 0, orderCount: 0, totalSales: 0 },
     1: { dayName: 'จันทร์', dayIndex: 1, orderCount: 0, totalSales: 0 },
@@ -249,6 +241,8 @@ export async function getAnalyticsOverview(
 
   const hourlyCount: Record<number, number> = {}
   const heatmapMap: Record<string, HeatmapCell> = {}
+  const paymentMap: Record<string, number> = {}
+  const customerOrderCountMap: Record<string, number> = {}
 
   orders.forEach((o) => {
     const { dayOfWeek: day, hour } = getThaiDateParts(o.createdAt)
@@ -265,6 +259,15 @@ export async function getAnalyticsOverview(
     }
     heatmapMap[key].count += 1
     heatmapMap[key].sales += amount
+
+    const method = o.paymentMethod || 'ไม่ระบุ'
+    paymentMap[method] = (paymentMap[method] || 0) + 1
+
+    const customerIdentifier = o.customerId || o.customer?.phone
+    if (customerIdentifier) {
+      customerOrderCountMap[customerIdentifier] =
+        (customerOrderCountMap[customerIdentifier] || 0) + 1
+    }
   })
 
   const topBuyingHours = Object.entries(hourlyCount)
@@ -275,9 +278,39 @@ export async function getAnalyticsOverview(
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
-  // 3. จัดกลุ่มสินค้าและ Variant
+  const customerCounts = Object.values(customerOrderCountMap)
+  const totalUniqueCustomers = customerCounts.length
+  const returningCustomersCount = customerCounts.filter((c) => c > 1).length
+  const newCustomersCount = totalUniqueCustomers - returningCustomersCount
+  const repeatPurchaseRate =
+    totalUniqueCustomers > 0
+      ? Number(
+          ((returningCustomersCount / totalUniqueCustomers) * 100).toFixed(1),
+        )
+      : 0
+
+  const customerRetention: CustomerRetentionStats = {
+    totalUniqueCustomers,
+    newCustomersCount,
+    returningCustomersCount,
+    repeatPurchaseRate,
+  }
+
+  const totalOrdersCount = orders.length
+  const paymentBreakdown: PaymentBreakdownItem[] = Object.entries(paymentMap)
+    .map(([method, count]) => ({
+      method,
+      count,
+      percentage:
+        totalOrdersCount > 0
+          ? Number(((count / totalOrdersCount) * 100).toFixed(1))
+          : 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+
   const productMap: Record<string, TopProductItem> = {}
   const variantMap: Record<string, TopVariantItem> = {}
+  const orderProductsMap: Record<string, Set<string>> = {}
 
   orderItems.forEach((item) => {
     const pName = item.title
@@ -298,7 +331,30 @@ export async function getAnalyticsOverview(
     }
     variantMap[vName].quantity += qty
     variantMap[vName].totalSales += sales
+
+    if (!orderProductsMap[item.orderId]) {
+      orderProductsMap[item.orderId] = new Set()
+    }
+    orderProductsMap[item.orderId].add(pName)
   })
+
+  const pairMap: Record<string, number> = {}
+  Object.values(orderProductsMap).forEach((productSet) => {
+    const productsList = Array.from(productSet).sort()
+    if (productsList.length < 2) return
+
+    for (let i = 0; i < productsList.length; i++) {
+      for (let j = i + 1; j < productsList.length; j++) {
+        const pairKey = `${productsList[i]} + ${productsList[j]}`
+        pairMap[pairKey] = (pairMap[pairKey] || 0) + 1
+      }
+    }
+  })
+
+  const topProductPairs: ProductPairingItem[] = Object.entries(pairMap)
+    .map(([pair, count]) => ({ pair, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 
   const topProducts = Object.values(productMap)
     .sort((a, b) => b.quantity - a.quantity)
@@ -315,5 +371,8 @@ export async function getAnalyticsOverview(
     topBuyingHours,
     topProducts,
     topVariants,
+    customerRetention,
+    topProductPairs,
+    paymentBreakdown,
   }
 }

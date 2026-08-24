@@ -237,3 +237,77 @@ export const BLOG_SCHEMA_PARTS: Record<string, Schema> = {
     required: ['tags'],
   },
 }
+
+export const ANALYTICS_INSIGHTS_SCHEMA = {
+  type: SchemaType.OBJECT,
+  properties: {
+    businessSummary: {
+      type: SchemaType.STRING,
+      description: 'สรุปภาพรวมสุขภาพธุรกิจใน 2-3 ประโยค',
+    },
+    operatingHoursStrategy: {
+      type: SchemaType.OBJECT,
+      properties: {
+        recommendedStartHour: {
+          type: SchemaType.STRING,
+          description: 'เวลาที่ควรเริ่มเปิดร้าน เช่น 10:00 น.',
+        },
+        peakHoursNotice: {
+          type: SchemaType.STRING,
+          description: 'วิเคราะห์ช่วงเวลาขายดีและวิธีเตรียมพร้อม',
+        },
+        actionPlan: {
+          type: SchemaType.STRING,
+          description: 'คำแนะนำการจัดกำลังคน/วัตถุดิบในช่วง Peak',
+        },
+      },
+      required: ['recommendedStartHour', 'peakHoursNotice', 'actionPlan'],
+    },
+    productAndBundlingStrategy: {
+      type: SchemaType.OBJECT,
+      properties: {
+        topProductInsight: {
+          type: SchemaType.STRING,
+          description: 'วิเคราะห์สินค้าขายดีและแนวทางดันยอด',
+        },
+        bundleSuggestions: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              pairName: { type: SchemaType.STRING },
+              promotionIdea: {
+                type: SchemaType.STRING,
+                description: 'ไอเดียจัดโปรโมชั่นเซ็ตคู่',
+              },
+            },
+            required: ['pairName', 'promotionIdea'],
+          },
+        },
+      },
+      required: ['topProductInsight', 'bundleSuggestions'],
+    },
+    retentionAndMarketingStrategy: {
+      type: SchemaType.OBJECT,
+      properties: {
+        customerInsight: {
+          type: SchemaType.STRING,
+          description: 'วิเคราะห์อัตราการซื้อซ้ำ (Repeat Purchase Rate)',
+        },
+        actionableSteps: {
+          type: SchemaType.ARRAY,
+          items: { type: SchemaType.STRING },
+          description:
+            '3-4 สิ่งที่ร้านค้าต้องทำทันทีเพื่อเพิ่มยอดขายและลูกค้าซื้อซ้ำ',
+        },
+      },
+      required: ['customerInsight', 'actionableSteps'],
+    },
+  },
+  required: [
+    'businessSummary',
+    'operatingHoursStrategy',
+    'productAndBundlingStrategy',
+    'retentionAndMarketingStrategy',
+  ],
+}

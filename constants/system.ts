@@ -217,3 +217,13 @@ export const FORBIDDEN_TITLES = [
   'หจก.',
 ]
 export const THAI_NAME_REGEX = /^[ก-ฮะ-์\s]+$/
+export const DAYS = [
+  'อาทิตย์',
+  'จันทร์',
+  'อังคาร',
+  'พุธ',
+  'พฤหัสบดี',
+  'ศุกร์',
+  'เสาร์',
+]
+export const HOURS = Array.from({ length: 24 }, (_, i) => i)

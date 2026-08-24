@@ -1,6 +1,7 @@
 'use server'
 
 import {
+  ANALYTICS_INSIGHTS_SCHEMA,
   BLOG_SCHEMA,
   BLOG_SCHEMA_PARTS,
   CATEGORY_SCHEMA,
@@ -12,6 +13,7 @@ import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan, TransactionType } from '@/generated/prisma/enums'
 import { AiGenTask, CreditUsageType } from '@/types/ai'
 import {
+  buildAnalyticsPrompt,
   buildBlogPrompt,
   buildCategoryPrompt,
   buildProductPrompt,
@@ -21,7 +23,7 @@ import {
 import { BlogFormValues } from '@/zod/blog'
 import { CreateCategoryFormValues } from '@/zod/category'
 import { ProductFormValues } from '@/zod/product'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 import { prisma } from '@/lib/prisma'
 
@@ -293,7 +295,86 @@ export async function generateBlogAi(
       data: JSON.parse(responseText) as Partial<BlogFormValues>,
     }
   } catch (error) {
-    console.error('Error generating blog AI:', error)
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export async function generateAnalyticsInsightsAi(
+  analyticsOverviewData: any,
+  storeId: string,
+) {
+  try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { balance: true, plan: true },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    if (!analyticsOverviewData) {
+      return {
+        success: false,
+        message: 'ไม่พบข้อมูล Analytics สำหรับวิเคราะห์',
+      }
+    }
+
+    const prompt = buildAnalyticsPrompt(analyticsOverviewData)
+
+    const costEstimate = await handleUserPrompt(prompt, store.plan)
+    if (Number(store.balance) < costEstimate.credits) {
+      return {
+        success: false,
+        message: 'เครดิตของคุณไม่เพียงพอสำหรับการวิเคราะห์',
+      }
+    }
+
+    const model = genAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: ANALYTICS_INSIGHTS_SCHEMA as any,
+      },
+    })
+
+    const result = await model.generateContent(prompt)
+    const responseText = result.response.text()
+
+    const usage = result.response.usageMetadata
+    const inputTokens = usage?.promptTokenCount || 0
+    const outputTokens = usage?.candidatesTokenCount || 0
+
+    const actualCost = calculateAiCost(
+      GEMINI_MODEL,
+      inputTokens,
+      outputTokens,
+      PLAN_DETAILS[store.plan].aiUsageMultiplier,
+    )
+
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: storeId },
+        data: { balance: { decrement: actualCost } },
+      }),
+      prisma.transaction.create({
+        data: {
+          storeId,
+          amount: actualCost,
+          type: TransactionType.AI_USAGE,
+          description: `AI วิเคราะห์ข้อมูลสรุปเชิงกลยุทธ์ร้านค้า (Tokens: ${inputTokens}+${outputTokens})`,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      message: 'วิเคราะห์ข้อมูลสำเร็จ',
+      data: JSON.parse(responseText),
+    }
+  } catch (error) {
+    console.error(error)
     return { success: false }
   }
 }
