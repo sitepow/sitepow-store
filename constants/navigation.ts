@@ -62,6 +62,8 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     label: 'โปรไฟล์ส่วนตัว',
     tab: 'profile',
     icon: IconUser,
+    hasSeparatorBefore: true,
+    groupLabel: 'บัญชีและการตั้งค่า',
   },
   {
     value: 'addresses',
@@ -76,6 +78,20 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     icon: IconSettings,
   },
 ]
+
+export interface NavigationItem {
+  value: string
+  label: string
+  tab: string
+  icon: TablerIcon
+  hasSeparatorBefore?: boolean
+  groupLabel?: string
+  items?: {
+    value: string
+    label: string
+    url: string
+  }[]
+}
 
 export const MERCHANT_NAVIGATION: NavigationItem[] = [
   {
@@ -108,6 +124,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'store-settings/products',
     icon: IconPackage,
     hasSeparatorBefore: true,
+    groupLabel: 'สินค้าและคลังสินค้า',
   },
   {
     value: 'store-settings/categories',
@@ -127,6 +144,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'expenses',
     icon: IconReceipt,
     hasSeparatorBefore: true,
+    groupLabel: 'การจัดการและบุคลากร',
   },
   {
     value: 'customers',
@@ -152,6 +170,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'coupons',
     icon: IconTicket,
     hasSeparatorBefore: true,
+    groupLabel: 'การตลาดและโปรโมชัน',
   },
   {
     value: 'loyalty',
@@ -171,6 +190,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'store-settings',
     icon: IconBuildingStore,
     hasSeparatorBefore: true,
+    groupLabel: 'ตั้งค่าร้านค้าและบัญชี',
   },
   {
     value: 'organization-branches',

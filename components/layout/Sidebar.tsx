@@ -25,6 +25,7 @@ import {
   Sidebar as RootSidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -118,7 +119,16 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
               return (
                 <Fragment key={item.value}>
-                  {item.hasSeparatorBefore && <Separator className="my-2" />}
+                  {item.hasSeparatorBefore && (
+                    <>
+                      <Separator className="my-2" />
+                      {item.groupLabel && (
+                        <SidebarGroupLabel className="px-2 text-xs opacity-80">
+                          {item.groupLabel}
+                        </SidebarGroupLabel>
+                      )}
+                    </>
+                  )}
                   {item.items && item.items.length > 0 ? (
                     <Collapsible
                       asChild
