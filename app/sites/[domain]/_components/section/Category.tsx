@@ -125,11 +125,7 @@ export function CategorySection({
                       key={product.id}
                       className="flex-[0_0_160px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                     >
-                      <ProductCard
-                        product={product}
-                        variant="shadow"
-                        className="h-full"
-                      />
+                      <ProductCard product={product} className="h-full" />
                     </div>
                   ))}
               {!isLoading && (
