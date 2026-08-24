@@ -121,7 +121,6 @@ export function PosProductList({
                   key={product.id}
                   className="text-center"
                   onClick={() => handleProductClick(product)}
-                  variant="outline"
                   product={product as unknown as SectionProductItem}
                   quantity={totalStock}
                 />

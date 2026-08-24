@@ -713,6 +713,7 @@ model Store {
   reviewRewardConfig   ReviewRewardConfig?
   expenses             Expense[]
   addresses            Address[]
+  storeThemeConfig     StoreThemeConfig[]
 
   translations Json?
 
@@ -1536,4 +1537,27 @@ model Expense {
 
   @@index([storeId, expenseDate])
   @@index([branchId])
+}
+
+enum ThemeKey {
+  DEFAULT         // 1. ร้านค้าทั่วไป (General Retail / Supermarket)
+  FOOD_BEVERAGE   // 2. อาหาร/เครื่องดื่ม/คาเฟ่/วัตถุดิบ
+  FASHION_LUXURY  // 3. เสื้อผ้า/แฟชั่น/เครื่องประดับ/เครื่องสำอาง (เน้นภาพสวย)
+  TECH_DIGITAL    // 4. ไอที/สินค้าดิจิทัล/ซอฟต์แวร์/คีย์เกม (เน้น Spec & Instant)
+  BOOKING_SERVICE // 5. บริการ/จองคิว/คอร์สเรียน/สปา/คลินิก (เน้นเวลา & นัดหมาย)
+}
+
+model StoreThemeConfig {
+  id      String @id @default(uuid())
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  themeKey ThemeKey @default(DEFAULT)
+
+  layout Json?
+
+  customCss Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

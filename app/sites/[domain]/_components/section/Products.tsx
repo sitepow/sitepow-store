@@ -36,11 +36,7 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
               <Skeleton key={i} className="h-72 w-full rounded-xl" />
             ))
           : products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                variant="outline"
-              />
+              <ProductCard key={product.id} product={product} />
             ))}
       </div>
 

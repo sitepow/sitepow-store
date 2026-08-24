@@ -15,13 +15,10 @@ import { cn } from '@/lib/utils'
 import { EmptyImage } from '../EmptyImage'
 
 const productCardVariants = cva(
-  'h-full rounded-xl transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
+  'h-full rounded-xl shadow-airy transition-all border pb-2.5 dark:bg-foreground/5 text-foreground group hover:border hover:border-primary/50',
   {
     variants: {
-      variant: {
-        outline: 'border border-border',
-        shadow: 'shadow-airy ',
-      },
+      variant: {},
     },
   },
 )

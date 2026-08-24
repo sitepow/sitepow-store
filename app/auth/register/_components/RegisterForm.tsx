@@ -16,6 +16,7 @@ import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
+import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
 import { SectionHeader } from '@/components/SectionHeader'
@@ -111,8 +112,12 @@ export function RegisterForm() {
           style={{
             backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
           }}
-          className="hidden w-1/2 bg-cover bg-center lg:block"
-        />
+          className="relative hidden w-1/2 bg-cover bg-center lg:block"
+        >
+          <div className="absolute bottom-6 left-6 z-10 rounded bg-black/20 p-3 backdrop-blur-md">
+            <LogoBrand className="text-white" />
+          </div>
+        </div>
         <div className="flex w-full flex-col items-center justify-center gap-6 p-6 sm:p-10 md:p-12 lg:w-1/2 dark:bg-neutral-800">
           <SectionHeader
             className="text-center"

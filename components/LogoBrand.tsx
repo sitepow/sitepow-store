@@ -1,15 +1,21 @@
 import { ComponentProps } from 'react'
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { IconPackageImport } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'
 
-type LogoBrandProps = Omit<ComponentProps<typeof Link>, 'href'>
+type LogoBrandProps = Omit<ComponentProps<typeof Link>, 'href'> & {
+  hideLogo?: boolean
+}
 
-export function LogoBrand({ className, ...props }: LogoBrandProps) {
+export function LogoBrand({
+  className,
+  hideLogo = false,
+  ...props
+}: LogoBrandProps) {
   const { store } = useStoreData()
 
   return (
@@ -22,7 +28,15 @@ export function LogoBrand({ className, ...props }: LogoBrandProps) {
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       {...props}
     >
-      <IconPackageImport size={35} stroke={1.5} className="text-primary" />
+      {!hideLogo && (
+        <Image
+          src="/images/logo-brand-gray.png"
+          width={150}
+          height={150}
+          className="size-8.75"
+          alt="sitepow-logo"
+        />
+      )}
       <div className="relative">
         <span>Sitepow</span>
         <span className="absolute -top-2 right-0 text-xs before:content-['Store']"></span>

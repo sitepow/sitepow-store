@@ -9,6 +9,7 @@ import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
 import { getClientAuthUrl } from '@/utils/auth'
+import { IconDownload } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
 
 import { HeroHeader } from '../HeroHeader'
@@ -40,36 +41,37 @@ export function HeroSection() {
           subtitle={
             <>
               ด้วยระบบจัดการร้านค้าออนไลน์ จาก{' '}
-              <LogoBrand className="text-white" />
+              <LogoBrand className="text-white" hideLogo />
             </>
           }
         />
-        {!isAuthenticated && (
-          <div className="flex flex-wrap justify-center gap-2.5 px-10 text-white">
-            <Button variant="secondary" size="lg" asChild>
-              <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
-            </Button>
+        <div className="dark flex flex-wrap justify-center gap-2.5 px-10 text-white">
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/">
+              <IconDownload />
+              ดาวน์โหลดโปรแกรม POS (เร็วๆนี้)
+            </Link>
+          </Button>
+          {!isAuthenticated && (
             <Button size="lg" asChild>
               <Link href={registerHref}>
                 สมัครเปิดร้านฟรี
                 <ArrowRight />
               </Link>
             </Button>
-          </div>
-        )}
-        {isAuthenticated && (
-          <div className="flex flex-wrap justify-center gap-2.5 px-5 text-white">
-            <Button variant="secondary" size="lg" asChild>
-              <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
-            </Button>
+          )}
+          {isAuthenticated && (
             <Button size="lg" asChild>
               <Link href="/merchant/dashboard">
                 จัดการร้านค้าของคุณ
                 <ArrowRight />
               </Link>
             </Button>
-          </div>
-        )}
+          )}
+        </div>
         <div className="absolute -bottom-10 left-1/2">
           <div className="relative md:max-w-[1890px]">
             {AVATARS_SEED.map(({ seed, left, top, size, bg, dur, delay }) => (

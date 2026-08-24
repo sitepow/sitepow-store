@@ -86,7 +86,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
       ) : (
         <div className="grid grid-cols-2 gap-5 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} variant="outline" />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}

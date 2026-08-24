@@ -43,7 +43,7 @@ export function ProductRelated() {
                     key={p.id}
                     className="h-fit min-w-0 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                   >
-                    <ProductCard variant="shadow" product={p} />
+                    <ProductCard product={p} />
                   </div>
                 ))}
             {!isLoading && (
