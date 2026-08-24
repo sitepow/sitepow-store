@@ -1,47 +1,73 @@
-export const formatDate = (date: Date): string => {
+const THAILAND_TZ = 'Asia/Bangkok'
+
+/**
+ * แปลงวันที่เป็นรูปแบบภาษาไทยเต็ม (เช่น 24 สิงหาคม 2026)
+ */
+export const formatDate = (date: Date | string | number): string => {
   return new Intl.DateTimeFormat('th-TH', {
+    timeZone: THAILAND_TZ,
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(date)
+  }).format(new Date(date))
 }
 
+/**
+ * แปลงวันที่และเวลา UTC เป็นเวลาไทย YYYY-MM-DD HH:mm
+ */
 export const formatDateTime = (date: Date | string | number): string => {
   const d = new Date(date)
 
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  const hours = String(d.getHours()).padStart(2, '0')
-  const minutes = String(d.getMinutes()).padStart(2, '0')
+  // ใช้ sv-SE เพื่อดึง Format ISO (YYYY-MM-DD HH:mm) ตาม Timezone ไทย
+  const formatted = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: THAILAND_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(d)
 
-  return `${year}-${month}-${day} ${hours}:${minutes}`
+  return formatted.replace(' ', ' ')
 }
 
-export const formatShortDate = (date: Date): string => {
+/**
+ * แปลงวันที่เป็นรูปแบบภาษาไทยย่อ (เช่น 24 ส.ค. 2026)
+ */
+export const formatShortDate = (date: Date | string | number): string => {
   return new Intl.DateTimeFormat('th-TH', {
+    timeZone: THAILAND_TZ,
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  }).format(date)
+  }).format(new Date(date))
 }
 
-export const formatShortTime = (date: Date): string => {
-  return date.toLocaleTimeString('th-TH', {
+/**
+ * แปลงเวลา UTC เป็นเวลาไทย HH:mm:ss
+ */
+export const formatShortTime = (date: Date | string | number): string => {
+  return new Intl.DateTimeFormat('th-TH', {
+    timeZone: THAILAND_TZ,
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: false,
-  })
+  }).format(new Date(date))
 }
 
-export const getBlockMessage = (blockedUntil: Date | null): string => {
+/**
+ * ข้อความแจ้งเตือนการระงับบัญชี (คำนวณตามเวลาไทย)
+ */
+export const getBlockMessage = (blockedUntil: Date | string | null): string => {
   if (!blockedUntil) {
     return 'บัญชีของคุณถูกระงับการสั่งซื้อถาวรเนื่องจากพบความผิดปกติ'
   }
 
+  const unlockDate = new Date(blockedUntil)
   const now = new Date()
-  const diffMs = blockedUntil.getTime() - now.getTime()
+  const diffMs = unlockDate.getTime() - now.getTime()
 
   if (diffMs <= 0) {
     return 'บัญชีของคุณพ้นกำหนดระงับแล้ว กรุณาลองใหม่อีกครั้ง'
@@ -53,16 +79,19 @@ export const getBlockMessage = (blockedUntil: Date | null): string => {
   )
   const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
 
-  const unlockDateStr = blockedUntil.toLocaleDateString('th-TH', {
+  const unlockDateStr = new Intl.DateTimeFormat('th-TH', {
+    timeZone: THAILAND_TZ,
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-  })
-  const unlockTimeStr = blockedUntil.toLocaleTimeString('th-TH', {
+  }).format(unlockDate)
+
+  const unlockTimeStr = new Intl.DateTimeFormat('th-TH', {
+    timeZone: THAILAND_TZ,
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-  })
+  }).format(unlockDate)
 
   let remainingTimeStr = ''
   if (diffDays > 0) {
@@ -76,18 +105,36 @@ export const getBlockMessage = (blockedUntil: Date | null): string => {
   return `บัญชีของคุณถูกระงับการสั่งซื้อชั่วคราว ระบบจะปลดล็อกอัตโนมัติในวันที่ ${unlockDateStr} เวลา ${unlockTimeStr} น. (${remainingTimeStr})`
 }
 
+/**
+ * ผสานวันที่ระบุ เข้ากับ "เวลาปัจจุบันของประเทศไทย"
+ */
 export function parseExpenseDateWithCurrentTime(
   inputDate: string | Date,
 ): Date {
   const targetDate = new Date(inputDate)
   const now = new Date()
 
-  targetDate.setHours(
-    now.getHours(),
-    now.getMinutes(),
-    now.getSeconds(),
-    now.getMilliseconds(),
+  // ดึงเวลาปัจจุบันตาม Timezone ไทย
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: THAILAND_TZ,
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+  })
+
+  const parts = formatter.formatToParts(now)
+  const hours = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10)
+  const minutes = parseInt(
+    parts.find((p) => p.type === 'minute')?.value || '0',
+    10,
   )
+  const seconds = parseInt(
+    parts.find((p) => p.type === 'second')?.value || '0',
+    10,
+  )
+
+  targetDate.setHours(hours, minutes, seconds, 0)
 
   return targetDate
 }

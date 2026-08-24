@@ -8,6 +8,45 @@ import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
+const THAILAND_TZ = 'Asia/Bangkok'
+
+/**
+ * ดึงส่วนประกอบของวันที่ (ปี, เดือน, วันในสัปดาห์, ชั่วโมง) ตาม Timezone ไทย
+ */
+function getThaiDateParts(date: Date) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: THAILAND_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short',
+    hour: 'numeric',
+    hour12: false,
+  })
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(date).map((p) => [p.type, p.value]),
+  )
+
+  // Map วันในสัปดาห์ Sun-Sat -> 0-6
+  const weekdayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  }
+
+  return {
+    year: parts.year,
+    month: parts.month,
+    dayOfWeek: weekdayMap[parts.weekday] ?? 0,
+    hour: parseInt(parts.hour === '24' ? '0' : parts.hour, 10),
+  }
+}
+
 export interface FinancialTrendItem {
   period: string
   revenue: number
@@ -150,15 +189,20 @@ export async function getAnalyticsOverview(
     }),
   ])
 
+  // 1. ตั้งค่า Financial Trend (ย้อนหลัง 6 เดือน) ตามเวลาไทย
   const monthlyMap: Record<string, FinancialTrendItem> = {}
   for (let i = 5; i >= 0; i--) {
     const d = new Date()
     d.setMonth(d.getMonth() - i)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    const label = d.toLocaleDateString('th-TH', {
+    const { year, month } = getThaiDateParts(d)
+    const key = `${year}-${month}`
+
+    const label = new Intl.DateTimeFormat('th-TH', {
+      timeZone: THAILAND_TZ,
       month: 'short',
       year: '2-digit',
-    })
+    }).format(d)
+
     monthlyMap[key] = {
       period: label,
       revenue: 0,
@@ -169,18 +213,21 @@ export async function getAnalyticsOverview(
   }
 
   orders.forEach((o) => {
-    const key = `${o.createdAt.getFullYear()}-${String(o.createdAt.getMonth() + 1).padStart(2, '0')}`
+    const { year, month } = getThaiDateParts(o.createdAt)
+    const key = `${year}-${month}`
     if (monthlyMap[key]) monthlyMap[key].revenue += Number(o.totalAmount)
   })
 
   orderItems.forEach((item) => {
-    const key = `${item.order.createdAt.getFullYear()}-${String(item.order.createdAt.getMonth() + 1).padStart(2, '0')}`
+    const { year, month } = getThaiDateParts(item.order.createdAt)
+    const key = `${year}-${month}`
     if (monthlyMap[key])
       monthlyMap[key].cogs += Number(item.costPrice ?? 0) * item.quantity
   })
 
   expenses.forEach((e) => {
-    const key = `${e.expenseDate.getFullYear()}-${String(e.expenseDate.getMonth() + 1).padStart(2, '0')}`
+    const { year, month } = getThaiDateParts(e.expenseDate)
+    const key = `${year}-${month}`
     if (monthlyMap[key]) monthlyMap[key].expense += Number(e.amount)
   })
 
@@ -189,6 +236,7 @@ export async function getAnalyticsOverview(
     netProfit: item.revenue - item.cogs - item.expense,
   }))
 
+  // 2. ตั้งค่า Day of Week และ Heatmap ตามเวลาไทย
   const dayOfWeekMap: Record<number, DayOfWeekAnalysis> = {
     0: { dayName: 'อาทิตย์', dayIndex: 0, orderCount: 0, totalSales: 0 },
     1: { dayName: 'จันทร์', dayIndex: 1, orderCount: 0, totalSales: 0 },
@@ -203,8 +251,7 @@ export async function getAnalyticsOverview(
   const heatmapMap: Record<string, HeatmapCell> = {}
 
   orders.forEach((o) => {
-    const day = o.createdAt.getDay()
-    const hour = o.createdAt.getHours()
+    const { dayOfWeek: day, hour } = getThaiDateParts(o.createdAt)
     const amount = Number(o.totalAmount)
 
     dayOfWeekMap[day].orderCount += 1
@@ -228,6 +275,7 @@ export async function getAnalyticsOverview(
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
+  // 3. จัดกลุ่มสินค้าและ Variant
   const productMap: Record<string, TopProductItem> = {}
   const variantMap: Record<string, TopVariantItem> = {}
 
