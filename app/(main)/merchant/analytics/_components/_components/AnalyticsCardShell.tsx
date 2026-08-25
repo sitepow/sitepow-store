@@ -15,7 +15,7 @@ interface AnalyticsCardShellProps {
   description: string
   isEmpty?: boolean
   emptyMessage?: string
-  children: ReactNode
+  children?: ReactNode
   className?: string
 }
 

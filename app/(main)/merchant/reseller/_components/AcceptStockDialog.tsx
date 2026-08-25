@@ -111,9 +111,7 @@ export function AcceptStockDialog({
               </div>
               <div className="mt-1 flex justify-between border-t pt-1">
                 <span className="font-medium">คงเหลือรอยืนยันรับ:</span>
-                <span className="font-medium text-blue-600 dark:text-blue-400">
-                  {pendingQuantity} ชิ้น
-                </span>
+                <span className="font-medium">{pendingQuantity} ชิ้น</span>
               </div>
             </div>
             <div className="space-y-2">

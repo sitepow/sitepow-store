@@ -744,7 +744,7 @@ export interface ReturnResellerStockInput {
   agreementId: string
   variantId: string
   quantity: number
-  targetBranchId?: string
+  targetBranchId: string
 }
 
 export async function returnResellerStock(input: ReturnResellerStockInput) {
@@ -758,17 +758,16 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
       return { success: false, message: 'จำนวนที่ต้องการคืนต้องมากกว่า 0' }
     }
 
+    if (!input.targetBranchId) {
+      return { success: false, message: 'กรุณาระบุสาขาปลายทางที่ต้องการรับคืน' }
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       const resellerStock = await tx.resellerStock.findUnique({
         where: {
           agreementId_variantId: {
             agreementId: input.agreementId,
             variantId: input.variantId,
-          },
-        },
-        include: {
-          agreement: {
-            select: { supplierStoreId: true },
           },
         },
       })
@@ -823,33 +822,29 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
         })
       }
 
-      const mainStock = await tx.productStock.findFirst({
+      await tx.productStock.upsert({
         where: {
+          branchId_variantId: {
+            branchId: input.targetBranchId,
+            variantId: input.variantId,
+          },
+        },
+        update: {
+          quantity: { increment: input.quantity },
+        },
+        create: {
+          branchId: input.targetBranchId,
           variantId: input.variantId,
-          branch: input.targetBranchId
-            ? { id: input.targetBranchId }
-            : {
-                storeId: resellerStock.agreement.supplierStoreId,
-                isMain: true,
-              },
+          quantity: input.quantity,
         },
       })
-
-      if (mainStock) {
-        await tx.productStock.update({
-          where: { id: mainStock.id },
-          data: {
-            quantity: { increment: input.quantity },
-          },
-        })
-      }
 
       return updatedResellerStock
     })
 
     return {
       success: true,
-      message: 'รับคืนสต็อกเข้าคลังหลักเรียบร้อยแล้ว',
+      message: 'รับคืนสต็อกเข้าสาขาเรียบร้อยแล้ว',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {

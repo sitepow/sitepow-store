@@ -12,11 +12,12 @@ import toast from 'react-hot-toast'
 
 import { usePOSProducts } from '@/actions/hooks/pos/product'
 import { useAllocateResellerStock } from '@/actions/hooks/reseller'
+import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency } from '@/utils/pricing'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { Button } from '@/components/ui/button'
@@ -78,6 +79,7 @@ export function AllocateStockDialog({
   } = methods
 
   const selectedVariantId = watch('variantId')
+  const inputQuantity = watch('quantity') || 0
 
   const getStockQuantity = useCallback(
     (variant: (typeof products)[number]['variants'][number]) => {
@@ -94,7 +96,13 @@ export function AllocateStockDialog({
     if (!selectedVariantId) return null
     for (const p of products) {
       const found = p.variants?.find((v) => v.id === selectedVariantId)
-      if (found) return found
+      if (found) {
+        return {
+          ...found,
+          productTitle: p.title,
+          productImage: p.images?.[0]?.url,
+        }
+      }
     }
     return null
   }, [products, selectedVariantId])
@@ -149,117 +157,127 @@ export function AllocateStockDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}>
-      <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
             <DialogTitle>เติม / เพิ่มสต็อกสินค้าให้ตัวแทน</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="bg-muted/20 space-y-3 rounded-lg border p-3">
+              <div className="relative">
+                <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
+                <Input
+                  placeholder="พิมพ์ค้นหาน้องสินค้า หรือ SKU..."
+                  className="bg-background pl-9"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  disabled={isPending}
+                />
+              </div>
+              <BranchSelectField />
+            </div>
             <Field>
-              <FieldLabel>เลือกรายการสินค้า / ตัวเลือก</FieldLabel>
+              <FieldLabel className="text-muted-foreground text-xs">
+                เลือกรายการสินค้า / ตัวเลือก
+              </FieldLabel>
               <Controller
                 control={control}
                 name="variantId"
                 rules={{ required: 'กรุณาเลือกรายการสินค้า' }}
                 render={({ field }) => (
-                  <div className="space-y-2">
-                    <div className="flex flex-col gap-5">
-                      <div className="relative">
-                        <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
-                        <Input
-                          placeholder="พิมพ์ค้นหาน้องสินค้า หรือ SKU..."
-                          className="pl-9"
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                          disabled={isPending}
-                        />
+                  <ScrollArea className="h-64">
+                    {isProductsLoading ? (
+                      <div className="flex h-48 items-center justify-center p-4">
+                        <Spinner />
                       </div>
-                      <BranchSelectField />
-                    </div>
-                    <ScrollArea className="h-52 rounded-md border p-2">
-                      {isProductsLoading ? (
-                        <div className="flex h-full items-center justify-center p-4">
-                          <Spinner />
-                        </div>
-                      ) : products.length === 0 ? (
-                        <p className="text-muted-foreground p-4 text-center text-sm">
-                          ไม่พบรายการสินค้า
-                        </p>
-                      ) : (
-                        <div className="space-y-1">
-                          {products.map((product) =>
-                            product.variants?.map((variant) => {
-                              const isSelected = field.value === variant.id
-                              const stockQty = getStockQuantity(variant)
-                              const isOutOfStock = stockQty <= 0
+                    ) : products.length === 0 ? (
+                      <div className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-2 text-center">
+                        <IconPackage className="size-8 opacity-40" />
+                        <p className="text-sm">ไม่พบรายการสินค้า</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {products.map((product) =>
+                          product.variants?.map((variant) => {
+                            const isSelected = field.value === variant.id
+                            const stockQty = getStockQuantity(variant)
+                            const isOutOfStock = stockQty <= 0
+                            const imageUrl =
+                              variant.image ||
+                              product.images?.find((img) => img.isPrimary)
+                                ?.url ||
+                              product.images?.[0]?.url
 
-                              return (
-                                <button
-                                  key={variant.id}
-                                  type="button"
-                                  disabled={isOutOfStock}
-                                  onClick={() => {
-                                    field.onChange(variant.id)
-                                    setValue('quantity', 1)
-                                  }}
-                                  className={`flex w-full items-center justify-between rounded-lg border p-2 text-left text-sm transition-colors ${
-                                    isSelected
-                                      ? 'border-primary border-dashed font-medium'
-                                      : isOutOfStock
-                                        ? 'cursor-not-allowed opacity-40 hover:bg-transparent'
-                                        : 'hover:bg-accent hover:text-accent-foreground border-transparent'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2 overflow-hidden">
-                                    {variant.image ||
-                                    product.images?.[0]?.url ? (
-                                      <img
-                                        src={
-                                          variant.image ||
-                                          product.images?.[0]?.url
-                                        }
-                                        alt={product.title}
-                                        className="size-8 rounded border object-cover"
-                                      />
-                                    ) : (
-                                      <div className="bg-muted size-8 rounded border" />
-                                    )}
-                                    <div className="truncate">
-                                      <p className="truncate font-medium">
-                                        {product.title}
-                                      </p>
-                                      <p className="text-xs opacity-80">
-                                        {variant.title}{' '}
-                                        {variant.sku ? `(${variant.sku})` : ''}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="shrink-0 text-right">
-                                    <p className="text-xs font-semibold">
-                                      {formatCurrency(
-                                        Number(variant.price || 0),
-                                      )}
+                            return (
+                              <button
+                                key={variant.id}
+                                type="button"
+                                disabled={isOutOfStock}
+                                onClick={() => {
+                                  field.onChange(variant.id)
+                                  setValue('quantity', 1)
+                                }}
+                                className={`group relative flex w-full items-start gap-3 rounded-lg border p-2.5 text-left text-sm transition-all ${
+                                  isSelected
+                                    ? 'border-primary bg-primary/5 ring-primary ring-1'
+                                    : isOutOfStock
+                                      ? 'bg-muted/10 cursor-not-allowed opacity-40'
+                                      : 'hover:border-muted-foreground/30 hover:bg-accent/50'
+                                }`}
+                              >
+                                <div className="size-14 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
+                                  {imageUrl ? (
+                                    <img
+                                      src={imageUrl}
+                                      alt={product.title}
+                                      className="size-full rounded-sm object-cover"
+                                    />
+                                  ) : (
+                                    <EmptyImage className="size-full rounded-sm" />
+                                  )}
+                                </div>
+                                <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
+                                  <div>
+                                    <p className="text-foreground truncate leading-snug font-medium">
+                                      {product.title}
                                     </p>
-                                    <p
-                                      className={`text-[10px] ${
+                                    <p className="text-muted-foreground truncate text-xs">
+                                      {variant.title}{' '}
+                                      {variant.sku && `(${variant.sku})`}
+                                    </p>
+                                  </div>
+                                  <div className="mt-1 flex items-center gap-2">
+                                    <span
+                                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
                                         isOutOfStock
-                                          ? 'text-destructive font-semibold'
-                                          : 'opacity-75'
+                                          ? 'bg-destructive/10 text-destructive'
+                                          : 'bg-muted text-muted-foreground'
                                       }`}
                                     >
                                       {isOutOfStock
                                         ? 'หมดสต็อก'
-                                        : `คงเหลือ: ${stockQty}`}
-                                    </p>
+                                        : `คงเหลือ: ${formatNumber(stockQty)} ชิ้น`}
+                                    </span>
                                   </div>
-                                </button>
-                              )
-                            }),
-                          )}
-                        </div>
-                      )}
-                    </ScrollArea>
-                  </div>
+                                </div>
+                                <div className="flex shrink-0 flex-col items-end justify-between self-stretch">
+                                  <span className="text-primary text-sm font-semibold">
+                                    {formatCurrency(Number(variant.price || 0))}
+                                  </span>
+
+                                  {isSelected && (
+                                    <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full">
+                                      <IconCheck className="size-3.5" />
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            )
+                          }),
+                        )}
+                      </div>
+                    )}
+                  </ScrollArea>
                 )}
               />
               <FieldError>{errors.variantId?.message}</FieldError>
@@ -269,7 +287,7 @@ export function AllocateStockDialog({
                 <FieldLabel>จำนวนที่ต้องการเติม (ชิ้น)</FieldLabel>
                 {selectedVariant && (
                   <span className="text-muted-foreground text-xs">
-                    คงเหลือในระบบ: {maxStock} ชิ้น
+                    คงเหลือในระบบ: {formatNumber(maxStock)} ชิ้น
                   </span>
                 )}
               </div>
@@ -277,7 +295,7 @@ export function AllocateStockDialog({
                 type="number"
                 min={1}
                 max={maxStock > 0 ? maxStock : undefined}
-                placeholder="1"
+                placeholder="กรอกจำนวน..."
                 {...register('quantity', {
                   valueAsNumber: true,
                   required: 'กรุณากรอกจำนวน',
@@ -293,7 +311,27 @@ export function AllocateStockDialog({
               />
               <FieldError>{errors.quantity?.message}</FieldError>
             </Field>
-            <DialogFooter className="gap-2">
+            {selectedVariant && (
+              <div className="bg-muted/20 space-y-1.5 rounded-lg border p-3 text-xs">
+                <div className="text-muted-foreground flex justify-between">
+                  <span>สินค้าที่เลือก:</span>
+                  <span className="text-foreground max-w-50 truncate font-medium">
+                    {selectedVariant.productTitle} ({selectedVariant.title})
+                  </span>
+                </div>
+                <div className="text-muted-foreground flex justify-between">
+                  <span>สต็อกคงเหลือปัจจุบัน:</span>
+                  <span>{formatNumber(maxStock)} ชิ้น</span>
+                </div>
+                <div className="text-foreground flex justify-between border-t pt-1.5 text-sm font-bold">
+                  <span>คงเหลือหลังจัดสรร:</span>
+                  <span className="text-primary">
+                    {formatNumber(Math.max(0, maxStock - inputQuantity))} ชิ้น
+                  </span>
+                </div>
+              </div>
+            )}
+            <DialogFooter className="gap-2 border-t pt-3">
               {isDirty ? (
                 <Button
                   type="button"

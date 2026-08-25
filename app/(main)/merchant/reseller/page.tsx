@@ -11,6 +11,7 @@ import {
   IconFilePlus,
   IconLock,
   IconPlus,
+  IconReceiptRefund,
 } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -92,7 +93,7 @@ export default function ResellerManagementPage() {
               onClick={() => setCreateAgreementOpen(true)}
               disabled={selectedStoreId === ALL_STORES}
             >
-              <IconFilePlus className="size-4" />
+              <IconFilePlus />
               สร้างสัญญาใหม่
             </Button>
             <Button
@@ -100,13 +101,14 @@ export default function ResellerManagementPage() {
               onClick={handleOpenPayout}
               disabled={!selectedAgreementId}
             >
-              บันทึกการเบิกจ่าย (Payout)
+              <IconReceiptRefund />
+              บันทึกการเบิกจ่าย
             </Button>
             <Button
               onClick={handleOpenAllocate}
               disabled={!selectedAgreementId}
             >
-              <IconPlus className="size-4" />
+              <IconPlus />
               เพิ่มสต็อกฝากขาย
             </Button>
           </div>

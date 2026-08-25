@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useReturnResellerStock } from '@/actions/hooks/reseller'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { Loader2 } from 'lucide-react'
 
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -30,14 +32,33 @@ export function ReturnStockDialog({
   setOpen,
 }: ReturnStockDialogProps) {
   const [quantity, setQuantity] = useState<number>(1)
+  const { selectedBranchId } = useBranchFilter()
   const { mutate: returnStock, isPending } = useReturnResellerStock()
 
   const remainingQuantity = stock
     ? stock.allocatedQuantity - stock.soldQuantity
     : 0
 
+  const isBranchSelected = selectedBranchId !== ALL_BRANCHES
+  const isQuantityValid = quantity > 0 && quantity <= remainingQuantity
+  const canSubmit =
+    isBranchSelected && isQuantityValid && !isPending && Boolean(stock)
+
+  useEffect(() => {
+    if (open) {
+      setQuantity(1)
+    }
+  }, [open])
+
   const handleReturn = () => {
-    if (!stock) return
+    if (!stock) {
+      return
+    }
+
+    if (selectedBranchId === ALL_BRANCHES) {
+      toast.error('กรุณาเลือกสาขาปลายทางที่ต้องการนำสต็อกกลับเข้า')
+      return
+    }
 
     if (quantity <= 0) {
       toast.error('จำนวนที่ส่งคืนต้องมากกว่า 0 ชิ้น')
@@ -54,6 +75,7 @@ export function ReturnStockDialog({
         agreementId: stock.agreementId,
         variantId: stock.variantId,
         quantity: Number(quantity),
+        targetBranchId: selectedBranchId,
       },
       {
         onSuccess: (res) => {
@@ -72,7 +94,7 @@ export function ReturnStockDialog({
         <DialogHeader>
           <DialogTitle>ส่งคืนสินค้า / คืนสต็อกให้ร้านค้า</DialogTitle>
           <DialogDescription>
-            ดึงสต็อกสินค้าฝากขายกลับเข้าสู่คลังสินค้าหลักของทางร้าน
+            ดึงสต็อกสินค้าฝากขายกลับเข้าสู่คลังสินค้าของสาขาที่เลือก
           </DialogDescription>
         </DialogHeader>
         {stock && (
@@ -92,6 +114,18 @@ export function ReturnStockDialog({
               </div>
             </div>
             <div className="space-y-2">
+              <Label>
+                สาขาที่รับคืนเข้าคลัง{' '}
+                <span className="text-destructive">*</span>
+              </Label>
+              <BranchSelectField />
+              {!isBranchSelected && (
+                <p className="text-destructive text-[0.8rem]">
+                  * กรุณาเลือกสาขาปลายทางก่อนทำรายการ
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="quantity">จำนวนที่ต้องการส่งคืน (ชิ้น)</Label>
               <Input
                 id="quantity"
@@ -99,11 +133,13 @@ export function ReturnStockDialog({
                 min={1}
                 max={remainingQuantity}
                 value={quantity}
+                disabled={!isBranchSelected || isPending}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 placeholder="ระบุจำนวน"
               />
               <p className="text-muted-foreground text-[0.8rem]">
-                * สต็อกจะถูกตัดออกจากตัวแทนและนำกลับเข้าคลังสินค้าหลักทันที
+                *
+                สต็อกจะถูกตัดออกจากตัวแทนและนำกลับเข้าคลังสินค้าของสาขาที่เลือกทันที
               </p>
             </div>
           </div>
@@ -117,7 +153,7 @@ export function ReturnStockDialog({
           >
             ยกเลิก
           </Button>
-          <Button onClick={handleReturn} disabled={isPending || !stock}>
+          <Button onClick={handleReturn} disabled={!canSubmit}>
             {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             ยืนยันการคืนสต็อก
           </Button>

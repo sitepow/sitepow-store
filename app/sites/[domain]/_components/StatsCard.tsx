@@ -1,8 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-
-import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import { LucideIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -13,7 +10,6 @@ interface StatsCardProps {
   value: string
   description: string
   icon: LucideIcon
-  bgImage?: string
 }
 
 export function StatsCard({
@@ -21,32 +17,23 @@ export function StatsCard({
   value,
   description,
   icon: Icon,
-  bgImage = FALLBACK_MERCHANT_BANNER_IMAGE,
 }: StatsCardProps) {
   return (
-    <Card className="relative overflow-hidden border-white/10 bg-neutral-900 p-3 shadow-sm sm:p-5">
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <Image
-          src={bgImage}
-          alt={title}
-          fill
-          className="object-cover opacity-40"
-        />
-      </div>
-      <div className="relative z-10">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 p-0 pb-2">
-          <CardTitle className="text-sm font-medium text-white">
-            {title}
-          </CardTitle>
-          <Button variant="outline" size="icon-lg" className="dark">
-            <Icon className="size-4 shrink-0 text-white" />
-          </Button>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="font-bold text-white sm:text-2xl">{value}</div>
-          <p className="text-xs text-neutral-300 opacity-80">{description}</p>
-        </CardContent>
-      </div>
+    <Card className="py-3 sm:py-6">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 px-3 sm:px-6">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Button
+          variant="outline"
+          size="icon-lg"
+          className="bg-primary hover:bg-primary shrink-0"
+        >
+          <Icon className="size-4 text-white" />
+        </Button>
+      </CardHeader>
+      <CardContent className="px-3 sm:px-6">
+        <div className="text-lg font-bold sm:text-2xl">{value}</div>
+        <p className="text-muted-foreground text-xs">{description}</p>
+      </CardContent>
     </Card>
   )
 }

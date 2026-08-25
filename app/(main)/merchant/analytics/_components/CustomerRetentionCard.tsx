@@ -19,12 +19,13 @@ export function CustomerRetentionCard({
   retention,
 }: CustomerRetentionCardProps) {
   return (
-    <AnalyticsCardShell
-      title="การวิเคราะห์กลุ่มลูกค้า (Customer Retention)"
-      description="อัตราการซื้อซ้ำและพฤติกรรมระหว่างลูกค้าใหม่กับลูกค้าเดิม"
-      className="lg:col-span-2"
-    >
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div className="flex flex-col gap-5">
+      <AnalyticsCardShell
+        title="การวิเคราะห์กลุ่มลูกค้า (Customer Retention)"
+        description="อัตราการซื้อซ้ำและพฤติกรรมระหว่างลูกค้าใหม่กับลูกค้าเดิม"
+        className="lg:col-span-2"
+      />
+      <div className="grid grid-cols-2 gap-4">
         <StatsCard
           title="ลูกค้าทั้งหมด"
           value={`${formatNumber(retention?.totalUniqueCustomers ?? 0)} ราย`}
@@ -50,6 +51,6 @@ export function CustomerRetentionCard({
           icon={IconArrowUpRight}
         />
       </div>
-    </AnalyticsCardShell>
+    </div>
   )
 }

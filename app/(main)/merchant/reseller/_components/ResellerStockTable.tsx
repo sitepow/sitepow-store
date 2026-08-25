@@ -5,10 +5,12 @@ import {
   useResellerPayoutSummary,
   useResellerStocks,
 } from '@/actions/hooks/reseller'
+import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
+import { IconPackageExport, IconPackageImport } from '@tabler/icons-react'
 import { CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -24,16 +26,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 interface ResellerStockTableProps {
   onAcceptStock?: (stock: any) => void
-  onTransferStock?: (stock: any) => void
   onReturnStock?: (stock: any) => void
 }
 
 export function ResellerStockTable({
   onAcceptStock,
-  onTransferStock,
   onReturnStock,
 }: ResellerStockTableProps) {
   const { selectedStoreId } = useStoreFilter()
@@ -86,155 +87,182 @@ export function ResellerStockTable({
         </div>
       )}
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>สินค้า / ตัวเลือก</TableHead>
-              <TableHead className="text-right">
-                ราคาหน้าร้าน / ราคาส่ง
-              </TableHead>
-              <TableHead className="text-center">
-                สต็อกสินค้า <br />
-                <span className="text-muted-foreground text-[11px] font-normal">
-                  (ส่งมา / รับเข้า / ขาย / เหลือ)
-                </span>
-              </TableHead>
-              <TableHead className="text-right">ยอดขายรวม</TableHead>
-              <TableHead className="text-right">ยอดส่งคืนเจ้าของร้าน</TableHead>
-              <TableHead className="text-center">สถานะรับสินค้า</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isStocksLoading ? (
-              <TableLoadingRow colSpan={7} />
-            ) : !selectedAgreementId ? (
-              <TableEmptyRow
-                colSpan={7}
-                title="โปรดเลือกสัญญาตัวแทนเพื่อดูข้อมูลสต็อกฝากขาย"
-              />
-            ) : stocks.length === 0 ? (
-              <TableEmptyRow
-                colSpan={7}
-                title="ยังไม่มีรายการสินค้าฝากขายในสัญญานี้"
-              />
-            ) : (
-              stocks.map((stock) => {
-                const allocated = stock.allocatedQuantity || 0
-                const accepted = stock.acceptedQuantity || 0
-                const sold = stock.soldQuantity || 0
-                const remaining = accepted - sold
+        <TooltipProvider>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>สินค้า / ตัวเลือก</TableHead>
+                <TableHead className="text-right">ราคาปลีก / ราคาส่ง</TableHead>
+                <TableHead className="text-center">
+                  การเคลื่อนไหวสต็อก
+                </TableHead>
+                <TableHead className="text-center">คงเหลือขาย</TableHead>
+                <TableHead className="text-right">ยอดขายรวม</TableHead>
+                <TableHead className="text-right">
+                  ทุนเคลียร์เจ้าของร้าน
+                </TableHead>
+                <TableHead className="text-center">สถานะรับ</TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isStocksLoading ? (
+                <TableLoadingRow colSpan={8} />
+              ) : !selectedAgreementId ? (
+                <TableEmptyRow
+                  colSpan={8}
+                  title="โปรดเลือกสัญญาตัวแทนเพื่อดูข้อมูลสต็อกฝากขาย"
+                />
+              ) : stocks.length === 0 ? (
+                <TableEmptyRow
+                  colSpan={8}
+                  title="ยังไม่มีรายการสินค้าฝากขายในสัญญานี้"
+                />
+              ) : (
+                stocks.map((stock) => {
+                  const allocated = stock.allocatedQuantity || 0
+                  const accepted = stock.acceptedQuantity || 0
+                  const sold = stock.soldQuantity || 0
+                  const remaining = accepted - sold
 
-                const retailPrice = Number(stock.variant?.price || 0)
-                const customPrice = stock.customPrice
-                  ? Number(stock.customPrice)
-                  : retailPrice
-                const totalRevenue = sold * retailPrice
-                const merchantAmount = sold * customPrice
+                  const retailPrice = Number(stock.variant?.price || 0)
+                  const customPrice = stock.customPrice
+                    ? Number(stock.customPrice)
+                    : retailPrice
+                  const totalRevenue = sold * retailPrice
+                  const merchantAmount = sold * customPrice
 
-                const pendingQuantity = allocated - accepted
-                const isAcceptedAll = pendingQuantity <= 0
+                  const pendingQuantity = allocated - accepted
+                  const isAcceptedAll = pendingQuantity <= 0
 
-                return (
-                  <TableRow key={stock.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="leading-none font-medium">
-                            {stock.variant?.product?.title || '-'}
-                          </p>
-                          <p className="text-muted-foreground mt-1 text-xs">
-                            {stock.variant?.title}
-                          </p>
+                  const imageUrl =
+                    stock.variant?.image ||
+                    stock.variant?.product?.images?.find(
+                      (img: any) => img.isPrimary,
+                    )?.url ||
+                    stock.variant?.product?.images?.[0]?.url
+
+                  return (
+                    <TableRow key={stock.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="size-16 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
+                            {imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={stock.variant?.product?.title || ''}
+                                className="size-full rounded-sm object-cover"
+                              />
+                            ) : (
+                              <EmptyImage className="size-full rounded-sm" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="leading-none font-medium">
+                              {stock.variant?.product?.title || '-'}
+                            </p>
+                            <p className="text-muted-foreground mt-1 text-xs">
+                              {stock.variant?.title}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <p className="font-medium">
-                        ปลีก: {formatCurrency(retailPrice)}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        ส่ง: {formatCurrency(customPrice)}
-                      </p>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1.5 text-sm">
-                        <span
-                          title="จำนวนที่ร้านจัดส่งมาให้"
-                          className="font-medium"
-                        >
-                          {allocated}
-                        </span>
-                        <span className="text-muted-foreground">/</span>
-                        <span
-                          title="จำนวนที่กดยืนยันรับเข้าแล้ว"
-                          className="font-medium text-blue-600 dark:text-blue-400"
-                        >
-                          {accepted}
-                        </span>
-                        <span className="text-muted-foreground">/</span>
-                        <span
-                          title="จำนวนที่ขายออกไปแล้ว"
-                          className="font-medium text-emerald-600 dark:text-emerald-400"
-                        >
-                          {sold}
-                        </span>
-                        <span className="text-muted-foreground">/</span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <p className="font-medium">
+                          {formatCurrency(retailPrice)}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          ส่ง: {formatCurrency(customPrice)}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="mx-auto flex w-36 flex-col gap-1.5">
+                          <div className="bg-muted flex h-2 w-full overflow-hidden rounded-full">
+                            <div
+                              className="bg-orange-500 transition-all"
+                              style={{
+                                width:
+                                  allocated > 0
+                                    ? `${((accepted - sold) / allocated) * 100}%`
+                                    : '0%',
+                              }}
+                              title={`คงเหลือรับเข้า: ${accepted - sold}`}
+                            />
+                            <div
+                              className="bg-emerald-500 transition-all"
+                              style={{
+                                width:
+                                  allocated > 0
+                                    ? `${(sold / allocated) * 100}%`
+                                    : '0%',
+                              }}
+                              title={`ขายแล้ว: ${sold}`}
+                            />
+                          </div>
+                          <div className="text-muted-foreground flex justify-between text-[11px]">
+                            <span>ส่ง: {allocated}</span>
+                            <span className="font-medium text-orange-500">
+                              รับ: {accepted}
+                            </span>
+                            <span className="font-medium text-emerald-500">
+                              ขาย: {sold}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Badge
                           variant={remaining > 0 ? 'outline' : 'secondary'}
-                          className="ml-1"
                         >
-                          เหลือ {remaining}
+                          {remaining} ชิ้น
                         </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {formatCurrency(totalRevenue)}
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {formatCurrency(merchantAmount)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant={isAcceptedAll ? 'default' : 'outline'}>
-                        {isAcceptedAll
-                          ? 'รับครบแล้ว'
-                          : `รอรับ (${pendingQuantity})`}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="space-x-1.5 text-right whitespace-nowrap">
-                      {onTransferStock && (
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {formatCurrency(totalRevenue)}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {formatCurrency(merchantAmount)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant={isAcceptedAll ? 'outline' : 'default'}>
+                          {isAcceptedAll
+                            ? 'รับครบแล้ว'
+                            : `รอรับ (${pendingQuantity})`}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="space-x-1 text-right whitespace-nowrap">
                         <Button
                           variant="outline"
-                          size="sm"
-                          disabled={remaining <= 0}
-                          onClick={() => onTransferStock(stock)}
+                          size="icon-lg"
+                          title="คืนสต็อกกลับให้เจ้าของร้าน"
+                          disabled={allocated - sold <= 0}
+                          onClick={() => onReturnStock?.(stock)}
                         >
-                          โอนต่อ
+                          <IconPackageExport />
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={allocated - sold <= 0}
-                        onClick={() => onReturnStock?.(stock)}
-                      >
-                        คืนสต็อก
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={isAcceptedAll}
-                        onClick={() => onAcceptStock?.(stock)}
-                      >
-                        {isAcceptedAll ? 'รับครบแล้ว' : 'รับสินค้า'}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
+                        {!isAcceptedAll && (
+                          <Button
+                            variant="outline"
+                            size="icon-lg"
+                            title={
+                              isAcceptedAll
+                                ? 'รับครบแล้ว'
+                                : 'กดรับสินค้าเข้าคลัง'
+                            }
+                            disabled={isAcceptedAll}
+                            onClick={() => onAcceptStock?.(stock)}
+                          >
+                            <IconPackageImport />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        </TooltipProvider>
       </div>
     </div>
   )

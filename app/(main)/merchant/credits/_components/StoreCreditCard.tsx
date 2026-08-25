@@ -9,7 +9,6 @@ import { CreditUsageType } from '@/types/ai'
 import { estimateCost } from '@/utils/ai'
 import { formatNumber } from '@/utils/pricing'
 
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -78,9 +77,6 @@ export function StoreCreditCard() {
       </CardContent>
       <CardFooter className="bg-muted/5 flex flex-wrap gap-2.5 border-t pt-3 pb-3">
         <PurchaseCreditDialog />
-        <Button variant="outline" disabled>
-          โอนเครดิตไปให้ร้านค้าอื่น
-        </Button>
       </CardFooter>
     </Card>
   )

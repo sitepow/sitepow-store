@@ -20,12 +20,11 @@ import {
   IconReceiptOff,
   IconTrendingDown,
   IconTrendingUp,
-  IconUser,
   IconUsers,
   IconWallet,
 } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -147,7 +146,7 @@ export default function MerchantDashboardPage() {
         {
           title: 'กำไรขั้นต้นเดือนนี้ (Gross Profit)',
           value: formatCurrency(stats.monthlyGrossProfit),
-          description: `Gross Margin ${stats.monthlyGrossMargin}% (${pctChange(
+          description: `Gross Margin ${stats.monthlyGrossProfit}% (${pctChange(
             stats.monthlyGrossProfit,
             stats.monthlyGrossProfitLastMonth,
             'จากเดือนที่แล้ว',
@@ -291,7 +290,7 @@ export default function MerchantDashboardPage() {
         !isLoading &&
         data && (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
               {primaryStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
@@ -301,8 +300,6 @@ export default function MerchantDashboardPage() {
                   icon={stat.icon}
                 />
               ))}
-            </div>
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {grossStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
@@ -312,8 +309,6 @@ export default function MerchantDashboardPage() {
                   icon={stat.icon}
                 />
               ))}
-            </div>
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {expenseStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
@@ -323,8 +318,6 @@ export default function MerchantDashboardPage() {
                   icon={stat.icon}
                 />
               ))}
-            </div>
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {netProfitStatsData.map((stat, i) => (
                 <StatsCard
                   key={i}
@@ -335,8 +328,8 @@ export default function MerchantDashboardPage() {
                 />
               ))}
             </div>
-            {canViewCreditCard && <StoreCreditCard />}
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+              {canViewCreditCard && <StoreCreditCard />}
               <AnalyticsCardShell
                 title="แนวโน้มยอดขาย"
                 description="ยอดขายสุทธิ 6 เดือนล่าสุด"
@@ -345,30 +338,10 @@ export default function MerchantDashboardPage() {
               >
                 <div className="space-y-4">
                   <ChartContainer config={chartConfig}>
-                    <BarChart
+                    <AreaChart
                       data={data?.salesTrend ?? []}
                       margin={{ left: 12, right: 12 }}
                     >
-                      <defs>
-                        <linearGradient
-                          id="salesBarGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#22c55e"
-                            stopOpacity={1}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#16a34a"
-                            stopOpacity={0.6}
-                          />
-                        </linearGradient>
-                      </defs>
                       <CartesianGrid vertical={false} />
                       <XAxis
                         dataKey="name"
@@ -380,25 +353,26 @@ export default function MerchantDashboardPage() {
                         tickLine={false}
                         axisLine={false}
                         tickMargin={8}
-                        stroke="#888888"
                         fontSize={12}
                         tickFormatter={(v) => formatCurrency(v)}
                         width={60}
                       />
                       <ChartTooltip
-                        cursor={{ fill: 'rgba(0, 0, 0, 0.04)' }}
+                        cursor={{ stroke: 'hsl(var(--muted))', strokeWidth: 1 }}
                         content={<ChartTooltipContent hideLabel />}
                       />
-                      <Bar
+                      <Area
                         dataKey="total"
-                        fill="url(#salesBarGradient)"
-                        radius={[6, 6, 0, 0]}
+                        type="natural"
+                        fill="hsl(var(--primary)/0.2)"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
                       />
-                    </BarChart>
+                    </AreaChart>
                   </ChartContainer>
-                  <div className="text-muted-foreground border-border/40 flex items-center gap-2 border-t pt-2 text-sm font-medium">
-                    <IconTrendingUp className="size-4 text-emerald-500" /> 6
-                    เดือนล่าสุด
+                  <div className="text-muted-foreground flex items-center gap-2 border-t pt-2 text-xs">
+                    <IconTrendingUp className="size-4 text-emerald-500" />
+                    <span>6 เดือนล่าสุด</span>
                   </div>
                 </div>
               </AnalyticsCardShell>
@@ -408,7 +382,7 @@ export default function MerchantDashboardPage() {
                 isEmpty={(data?.recentSales ?? []).length === 0}
                 emptyMessage="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
               >
-                <div className="space-y-2.5">
+                <div className="space-y-4">
                   {(data?.recentSales ?? []).map((sale) => {
                     const initial = sale.name
                       ? sale.name.charAt(0).toUpperCase()
@@ -417,38 +391,27 @@ export default function MerchantDashboardPage() {
                     return (
                       <div
                         key={sale.id}
-                        className="group hover:bg-muted/50 border-border/40 flex items-center justify-between rounded-xl border p-2.5 transition-all duration-200 hover:shadow-xs"
+                        className="flex items-center justify-between"
                       >
-                        <div className="flex min-w-0 items-center gap-3.5">
-                          <Avatar className="border-border/50 ring-background size-9 border shadow-2xs ring-2 transition-transform group-hover:scale-105">
-                            <AvatarFallback className="from-primary/20 via-primary/10 to-background text-primary bg-linear-to-br text-xs font-bold">
-                              {initial}
-                            </AvatarFallback>
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-9 w-9">
+                            <AvatarFallback>{initial}</AvatarFallback>
                           </Avatar>
-                          <div className="min-w-0 flex-1 space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <p className="text-foreground group-hover:text-primary truncate text-sm font-semibold transition-colors">
-                                {sale.name}
-                              </p>
-                              <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-                              </span>
-                            </div>
-                            <p className="text-muted-foreground truncate text-xs font-normal">
+                          <div className="space-y-1">
+                            <p className="text-sm leading-none font-medium">
+                              {sale.name}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
                               {sale.email}
                             </p>
                           </div>
                         </div>
-                        <div className="shrink-0 pl-3 text-right">
-                          <span className="text-sm font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+                        <div className="text-right">
+                          <p className="text-sm font-medium">
                             +{formatCurrency(sale.amount)}
-                          </span>
-                          <p className="text-muted-foreground text-[10px] font-medium">
-                            {formatDateTime(sale.createdAt)}
                           </p>
-                          <p className="text-muted-foreground text-[10px] font-medium">
-                            สำเร็จ
+                          <p className="text-muted-foreground text-xs">
+                            {formatDateTime(sale.createdAt)}
                           </p>
                         </div>
                       </div>
@@ -507,7 +470,7 @@ export default function MerchantDashboardPage() {
                           </TableCell>
                           <TableCell className="py-3 text-right">
                             <span
-                              className={`font-bold ${
+                              className={`font-semibold ${
                                 item.stock === 0
                                   ? 'text-destructive'
                                   : 'text-amber-500'
@@ -520,7 +483,7 @@ export default function MerchantDashboardPage() {
                       ))}
                     </TableBody>
                   </Table>
-                  <div className="border-border/40 border-t pt-2">
+                  <div className="border-t pt-2">
                     <Button variant="outline" className="w-full" asChild>
                       <Link href="/merchant/inventory">
                         ดูคลังสินค้าทั้งหมด <ArrowRight />

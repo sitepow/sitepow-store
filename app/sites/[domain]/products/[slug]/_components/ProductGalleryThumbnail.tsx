@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { cn } from '@/lib/utils'
 
+import { EmptyImage } from '../../../_components/EmptyImage'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductGalleryThumbnail() {
@@ -68,9 +69,7 @@ export function ProductGalleryThumbnail() {
     return (
       <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="border-primary border border-dashed p-1">
-            <div className="bg-foreground/10 size-16 md:size-20" />
-          </div>
+          <EmptyImage hideIcon className="size-16 md:size-20" />
         ))}
       </div>
     )

@@ -58,7 +58,7 @@ export function CartItemCard({
           </h4>
           <p
             className={cn(
-              'text-primary mt-0.5 text-[11px] opacity-60 sm:text-xs',
+              'text-primary mt-0.5 text-[11px] sm:text-xs',
               textClassName,
             )}
           >

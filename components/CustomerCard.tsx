@@ -40,7 +40,7 @@ export function CustomerCard({
   return (
     <div
       className={cn(
-        'from-primary/10 via-primary/2 border-border flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-linear-to-br to-transparent p-3.5',
+        'from-primary/10 via-primary/2 border-border flex items-center justify-between gap-3 rounded-xl border bg-linear-to-br to-transparent p-3.5',
         className,
       )}
       {...props}

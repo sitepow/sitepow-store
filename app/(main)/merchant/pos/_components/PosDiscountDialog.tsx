@@ -193,7 +193,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="dark w-full gap-2">
+        <Button variant="outline" className="w-full gap-2">
           <IconTicket />
           {couponCode || usedPoints > 0
             ? 'แก้ไขส่วนลด/สมาชิก'

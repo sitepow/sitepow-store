@@ -120,7 +120,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>บันทึกการจ่ายเงินค่าคอมมิชชัน (Payout)</DialogTitle>
+            <DialogTitle>บันทึกการจ่ายเงินค่าคอมมิชชัน</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>

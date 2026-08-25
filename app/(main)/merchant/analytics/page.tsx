@@ -4,19 +4,22 @@ import { useState } from 'react'
 
 import { useAnalyticsAi } from '@/actions/hooks/ai'
 import { useAnalyticsOverview } from '@/actions/hooks/analytics'
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconArrowUpRight,
+  IconLock,
   IconReceipt,
   IconShoppingCart,
   IconSparkles,
   IconWallet,
 } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -38,6 +41,9 @@ export default function AnalyticsPage() {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
+  const { canViewDashboard, isLoading: isPermissionLoading } =
+    useEmployeePermission()
+
   const { data, isLoading } = useAnalyticsOverview(
     selectedStoreId,
     selectedBranchId,
@@ -49,7 +55,7 @@ export default function AnalyticsPage() {
     useAnalyticsAi(selectedStoreId)
 
   const handleGenerateAiInsights = () => {
-    if (!selectedStoreId || !data) {
+    if (!selectedStoreId || selectedStoreId === ALL_STORES || !data) {
       return
     }
 
@@ -75,7 +81,7 @@ export default function AnalyticsPage() {
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
               วิเคราะห์ภาพรวม
@@ -85,71 +91,85 @@ export default function AnalyticsPage() {
               และพฤติกรรมลูกค้า
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
             <BranchSelectField />
+            <Button
+              onClick={handleGenerateAiInsights}
+              disabled={isGeneratingAi || isLoading || !data}
+              className="gap-2"
+            >
+              <IconSparkles className="size-4" />
+              {isGeneratingAi
+                ? 'กำลังวิเคราะห์กลยุทธ์...'
+                : 'สรุปกลยุทธ์ด้วย AI'}
+            </Button>
           </div>
         </div>
-        <div className="flex justify-end">
-          <Button
-            onClick={handleGenerateAiInsights}
-            disabled={isGeneratingAi || isLoading || !data}
-            className="gap-2 bg-purple-600 text-white hover:bg-purple-700"
-          >
-            <IconSparkles className="h-4 w-4" />
-            {isGeneratingAi ? 'กำลังวิเคราะห์กลยุทธ์...' : 'สรุปกลยุทธ์ด้วย AI'}
-          </Button>
-        </div>
-        {aiInsights && <AiInsightsCard aiInsights={aiInsights} />}
-        {isLoading ? (
-          <AnalyticsSkeleton />
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <StatsCard
-                title="ยอดขายรวม"
-                value={formatCurrency(totalRevenue)}
-                description="ยอดขายสะสมตามช่วงเวลา"
-                icon={IconWallet}
-              />
-              <StatsCard
-                title="กำไรสุทธิ"
-                value={formatCurrency(totalNetProfit)}
-                description="หักต้นทุนและค่าใช้จ่ายแล้ว"
-                icon={IconArrowUpRight}
-              />
-              <StatsCard
-                title="ออเดอร์ทั้งหมด"
-                value={`${formatNumber(totalOrders)} รายการ`}
-                description="จำนวนคำสั่งซื้อสำเร็จ"
-                icon={IconShoppingCart}
-              />
-              <StatsCard
-                title="ยอดเฉลี่ย/บิล (AOV)"
-                value={formatCurrency(averageOrderValue)}
-                description="ยอดใช้จ่ายต่อออเดอร์"
-                icon={IconReceipt}
-              />
+        {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+        {selectedStoreId !== ALL_STORES &&
+          (isPermissionLoading || isLoading) && <AnalyticsSkeleton />}
+        {selectedStoreId !== ALL_STORES &&
+          !isPermissionLoading &&
+          !canViewDashboard && (
+            <ActionRequiredAlert
+              icon={<IconLock />}
+              title="ไม่มีสิทธิ์เข้าถึง"
+              description="คุณไม่มีสิทธิ์ในการดูข้อมูลการวิเคราะห์ของสาขาหรือร้านค้านี้"
+            />
+          )}
+        {selectedStoreId !== ALL_STORES &&
+          !isPermissionLoading &&
+          canViewDashboard &&
+          !isLoading &&
+          data && (
+            <div className="space-y-6">
+              {aiInsights && <AiInsightsCard aiInsights={aiInsights} />}
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <StatsCard
+                  title="ยอดขายรวม"
+                  value={formatCurrency(totalRevenue)}
+                  description="ยอดขายสะสมตามช่วงเวลา"
+                  icon={IconWallet}
+                />
+                <StatsCard
+                  title="กำไรสุทธิ"
+                  value={formatCurrency(totalNetProfit)}
+                  description="หักต้นทุนและค่าใช้จ่ายแล้ว"
+                  icon={IconArrowUpRight}
+                />
+                <StatsCard
+                  title="ออเดอร์ทั้งหมด"
+                  value={`${formatNumber(totalOrders)} รายการ`}
+                  description="จำนวนคำสั่งซื้อสำเร็จ"
+                  icon={IconShoppingCart}
+                />
+                <StatsCard
+                  title="ยอดเฉลี่ย/บิล (AOV)"
+                  value={formatCurrency(averageOrderValue)}
+                  description="ยอดใช้จ่ายต่อออเดอร์"
+                  icon={IconReceipt}
+                />
+              </div>
+              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+                <FinancialTrendChart data={data?.financialTrend ?? []} />
+                <CustomerRetentionCard retention={data?.customerRetention} />
+                <TopProductsCard topProducts={data?.topProducts ?? []} />
+                <TopVariantsCard topVariants={data?.topVariants ?? []} />
+                <TopProductPairsCard
+                  topProductPairs={data?.topProductPairs ?? []}
+                />
+                <PaymentBreakdownCard
+                  paymentBreakdown={data?.paymentBreakdown ?? []}
+                />
+                <DayOfWeekTrendChart
+                  dayOfWeekTrend={data?.dayOfWeekTrend ?? []}
+                />
+                <HeatmapChart heatmap={data?.heatmap ?? []} />
+                <PeakHoursCard topBuyingHours={data?.topBuyingHours ?? []} />
+              </div>
             </div>
-            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-              <FinancialTrendChart data={data?.financialTrend ?? []} />
-              <CustomerRetentionCard retention={data?.customerRetention} />
-              <TopProductsCard topProducts={data?.topProducts ?? []} />
-              <TopVariantsCard topVariants={data?.topVariants ?? []} />
-              <TopProductPairsCard
-                topProductPairs={data?.topProductPairs ?? []}
-              />
-              <PaymentBreakdownCard
-                paymentBreakdown={data?.paymentBreakdown ?? []}
-              />
-              <DayOfWeekTrendChart
-                dayOfWeekTrend={data?.dayOfWeekTrend ?? []}
-              />
-              <HeatmapChart heatmap={data?.heatmap ?? []} />
-              <PeakHoursCard topBuyingHours={data?.topBuyingHours ?? []} />
-            </div>
-          </div>
-        )}
+          )}
       </div>
     </Sidebar>
   )

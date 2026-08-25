@@ -1,16 +1,14 @@
 'use client'
 
 import { formatCurrency } from '@/utils/pricing'
+import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
+
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 
 import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
 
@@ -24,6 +22,13 @@ interface FinancialTrendChartProps {
   }>
 }
 
+const chartConfig = {
+  revenue: { label: 'ยอดขาย', color: '#22c55e' },
+  cogs: { label: 'ต้นทุนสินค้า', color: '#f97316' },
+  expense: { label: 'ค่าใช้จ่าย', color: '#ef4444' },
+  netProfit: { label: 'กำไรสุทธิ', color: '#3b82f6' },
+} satisfies ChartConfig
+
 export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
   return (
     <AnalyticsCardShell
@@ -34,43 +39,84 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
       className="lg:col-span-2"
     >
       <div className="h-80 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <AreaChart data={data} margin={{ left: 12, right: 12 }}>
+            <defs>
+              <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="fillCogs" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="fillExpense" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="fillNetProfit" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="period" />
-            <YAxis tickFormatter={(v) => formatCurrency(v)} width={80} />
-            <Tooltip
-              formatter={(value) => [
-                formatCurrency(typeof value === 'number' ? value : 0),
-              ]}
+            <XAxis
+              dataKey="period"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(v) => formatCurrency(v)}
+              width={80}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value) =>
+                    formatCurrency(typeof value === 'number' ? value : 0)
+                  }
+                />
+              }
             />
             <Legend />
-            <Bar
+            <Area
+              type="natural"
               dataKey="revenue"
               name="ยอดขาย"
-              fill="#22c55e"
-              radius={[4, 4, 0, 0]}
+              stroke="#22c55e"
+              fill="url(#fillRevenue)"
+              strokeWidth={2}
             />
-            <Bar
+            <Area
+              type="natural"
               dataKey="cogs"
               name="ต้นทุนสินค้า"
-              fill="#f97316"
-              radius={[4, 4, 0, 0]}
+              stroke="#f97316"
+              fill="url(#fillCogs)"
+              strokeWidth={2}
             />
-            <Bar
+            <Area
+              type="natural"
               dataKey="expense"
               name="ค่าใช้จ่าย"
-              fill="#ef4444"
-              radius={[4, 4, 0, 0]}
+              stroke="#ef4444"
+              fill="url(#fillExpense)"
+              strokeWidth={2}
             />
-            <Bar
+            <Area
+              type="natural"
               dataKey="netProfit"
               name="กำไรสุทธิ"
-              fill="#3b82f6"
-              radius={[4, 4, 0, 0]}
+              stroke="#3b82f6"
+              fill="url(#fillNetProfit)"
+              strokeWidth={2}
             />
-          </BarChart>
-        </ResponsiveContainer>
+          </AreaChart>
+        </ChartContainer>
       </div>
     </AnalyticsCardShell>
   )

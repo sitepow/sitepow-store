@@ -3,12 +3,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import Image from 'next/image'
-
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
-import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CartItem } from '@/types/sites/cart'
@@ -24,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
 import { CustomerCard } from '@/components/CustomerCard'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -45,7 +43,6 @@ interface PosCartProps {
   onUpdateQuantity: (cartItemId: string, quantity: number) => void
   onRemoveItem: (cartItemId: string) => void
   onClearCart: () => void
-  bgImage?: string
 }
 
 export function PosCart({
@@ -55,7 +52,6 @@ export function PosCart({
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
-  bgImage = FALLBACK_MERCHANT_BANNER_IMAGE,
 }: PosCartProps) {
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -100,7 +96,6 @@ export function PosCart({
   }, [storeId, branchId, orderItems, setValue])
 
   const customerId = watch('customerId')
-  const customerName = watch('customerName')
   const customerPhone = watch('customerPhone')
   const customerPoints = watch('customerPoints') || 0
 
@@ -165,126 +160,112 @@ export function PosCart({
 
   return (
     <FormProvider {...methods}>
-      <Card className="relative flex flex-col overflow-hidden border-0 bg-neutral-900 **:text-white!">
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <Image
-            src={bgImage || FALLBACK_MERCHANT_BANNER_IMAGE}
-            alt="cart-background"
-            fill
-            className="object-cover opacity-40"
-          />
-        </div>
-        <div className="relative z-10 flex h-full flex-col">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between text-lg text-white">
-              <div className="flex items-center gap-2">
-                <IconShoppingCart className="size-5 text-white" />
-                ตะกร้าสินค้า
-              </div>
-              <div className="flex items-center gap-2">
-                {cart.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="dark"
-                    onClick={handleClearCartAll}
-                  >
-                    <IconTrash className="mr-1 size-3.5" />
-                    ล้างตะกร้า
-                  </Button>
-                )}
-                <span className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-full text-xs font-bold">
-                  {totalItems}
-                </span>
-              </div>
-            </CardTitle>
-            {customerId && (
-              <CustomerCard
-                className="dark from-primary"
-                title="ข้อมูลลูกค้า"
-                content={
-                  <>
-                    รหัสลูกค้า: {customerId} <br />
-                    เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')} <br />
-                    แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
-                  </>
-                }
-                action={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleRemoveCustomer}
-                  >
-                    <IconX />
-                  </Button>
-                }
-              />
-            )}
-          </CardHeader>
-          <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-full px-4">
-              {cart.length === 0 ? (
-                <div className="flex h-40 flex-col items-center justify-center gap-2 text-sm text-neutral-300">
-                  <IconShoppingCart className="size-10 opacity-30" />
-                  ยังไม่มีสินค้าในตะกร้า
-                </div>
-              ) : (
-                <div className="dark flex flex-col gap-2 rounded-lg p-3 text-white!">
-                  {cart.map((item) => {
-                    const stock = item.variant.stocks.reduce(
-                      (sum, s) => sum + s.quantity,
-                      0,
-                    )
-                    const isMaxStock =
-                      item.quantity >=
-                      getRemainingStock(cart, {
-                        variantId: item.variant.id,
-                        stock,
-                        excludeCartItemId: item.cartItemId,
-                      })
-
-                    return (
-                      <CartItemCard
-                        textClassName="sm:max-w-1/2 lg:max-w-full"
-                        key={item.cartItemId}
-                        item={item}
-                        onUpdateQuantity={onUpdateQuantity}
-                        onRemove={onRemoveItem}
-                        isMaxStock={isMaxStock}
-                      />
-                    )
-                  })}
-                </div>
+      <Card className="flex h-full flex-col">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center gap-2">
+              <IconShoppingCart className="size-5" />
+              <span>ตะกร้าสินค้า</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {cart.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearCartAll}
+                >
+                  <IconTrash className="size-3.5" />
+                  ล้างตะกร้า
+                </Button>
               )}
-            </ScrollArea>
-          </CardContent>
-          <CardFooter className="flex-col gap-3 border-t border-white/10 p-4">
-            {orderItems?.length !== 0 && (
-              <PosDiscountDialog subtotal={cartSummary.finalPrice} />
+              <Button size="icon-sm">{totalItems}</Button>
+            </div>
+          </CardTitle>
+          {customerId && (
+            <CustomerCard
+              title="ข้อมูลลูกค้า"
+              content={
+                <>
+                  รหัสลูกค้า: {customerId} <br />
+                  เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')} <br />
+                  แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                </>
+              }
+              action={
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleRemoveCustomer}
+                >
+                  <IconX className="size-4" />
+                </Button>
+              }
+            />
+          )}
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <ScrollArea className="h-full px-4">
+            {cart.length === 0 ? (
+              <div className="text-muted-foreground flex h-40 flex-col items-center justify-center gap-2 text-sm">
+                <IconShoppingCart className="size-10 opacity-30" />
+                ยังไม่มีสินค้าในตะกร้า
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 py-2">
+                {cart.map((item) => {
+                  const stock = item.variant.stocks.reduce(
+                    (sum, s) => sum + s.quantity,
+                    0,
+                  )
+                  const isMaxStock =
+                    item.quantity >=
+                    getRemainingStock(cart, {
+                      variantId: item.variant.id,
+                      stock,
+                      excludeCartItemId: item.cartItemId,
+                    })
+
+                  return (
+                    <CartItemCard
+                      textClassName="sm:max-w-1/2 lg:max-w-full"
+                      key={item.cartItemId}
+                      item={item}
+                      onUpdateQuantity={onUpdateQuantity}
+                      onRemove={onRemoveItem}
+                      isMaxStock={isMaxStock}
+                    />
+                  )
+                })}
+              </div>
             )}
-            <div className="dark w-full px-4 py-2 text-white!">
-              <CartSummary summary={summaryData} />
-            </div>
-            <div className="flex w-full gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-                disabled={cart.length === 0}
-                onClick={handleClearCartAll}
-              >
-                ยกเลิก
-              </Button>
-              <Button
-                size="lg"
-                className="w-full flex-2 text-base font-bold shadow-md transition-transform hover:scale-[1.01]"
-                disabled={cart.length === 0}
-                onClick={() => setIsCheckoutOpen(true)}
-              >
-                ชำระเงิน {formatCurrency(summaryData.finalPrice)}
-              </Button>
-            </div>
-          </CardFooter>
-        </div>
+          </ScrollArea>
+        </CardContent>
+        <CardFooter className="flex-col gap-3 border-t p-4">
+          {orderItems?.length !== 0 && (
+            <PosDiscountDialog subtotal={cartSummary.finalPrice} />
+          )}
+          <div className="w-full">
+            <CartSummary summary={summaryData} />
+          </div>
+          <div className="flex w-full gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              disabled={cart.length === 0}
+              onClick={handleClearCartAll}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              size="lg"
+              className="flex-2 text-base font-semibold"
+              disabled={cart.length === 0}
+              onClick={() => setIsCheckoutOpen(true)}
+            >
+              ชำระเงิน {formatCurrency(summaryData.finalPrice)}
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
       <PosCheckoutModal
         open={isCheckoutOpen}

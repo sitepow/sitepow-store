@@ -1,17 +1,23 @@
 import { ComponentProps } from 'react'
 
+import { IconBox } from '@tabler/icons-react'
+
 import { cn } from '@/lib/utils'
 
-export function EmptyImage({ className, ...props }: ComponentProps<'div'>) {
+type EmptyImageProps = ComponentProps<'div'> & {
+  hideIcon?: boolean
+}
+
+export function EmptyImage({ className, hideIcon, ...props }: EmptyImageProps) {
   return (
     <div
       className={cn(
-        'bg-foreground/10 text-muted-foreground mb-2.5 flex size-full items-center justify-center rounded-none text-center',
+        'bg-muted/30 text-muted-foreground/50 flex size-full items-center justify-center text-center',
         className,
       )}
       {...props}
     >
-      ไม่มีรูปภาพ
+      {!hideIcon && <IconBox className="size-6" />}
     </div>
   )
 }
