@@ -8,7 +8,6 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDateTime } from '@/utils/date'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconBuildingStore,
@@ -23,33 +22,18 @@ import {
   IconUsers,
   IconWallet,
 } from '@tabler/icons-react'
-import { ArrowRight } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 
-import { AnalyticsCardShell } from '../analytics/_components/_components/AnalyticsCardShell'
 import { StoreCreditCard } from '../credits/_components/StoreCreditCard'
+import { LowStockCard } from './_components/LowStockCard'
+import { RecentSalesChart } from './_components/RecentSalesChart'
+import { SalesTrendChart } from './_components/SalesTrendChart'
 
 function pctChange(
   current: number,
@@ -65,10 +49,6 @@ function pctChange(
   const pct = ((current - previous) / Math.abs(previous)) * 100
   return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% ${periodLabel}`
 }
-
-const chartConfig = {
-  total: { label: 'ยอดขาย', color: 'hsl(var(--primary))' },
-} satisfies ChartConfig
 
 export default function MerchantDashboardPage() {
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
@@ -330,168 +310,9 @@ export default function MerchantDashboardPage() {
             </div>
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
               {canViewCreditCard && <StoreCreditCard />}
-              <AnalyticsCardShell
-                title="แนวโน้มยอดขาย"
-                description="ยอดขายสุทธิ 6 เดือนล่าสุด"
-                isEmpty={!data?.salesTrend || data.salesTrend.length === 0}
-                emptyMessage="ไม่มีข้อมูลแนวโน้มยอดขาย"
-              >
-                <div className="space-y-4">
-                  <ChartContainer config={chartConfig}>
-                    <AreaChart
-                      data={data?.salesTrend ?? []}
-                      margin={{ left: 12, right: 12 }}
-                    >
-                      <CartesianGrid vertical={false} />
-                      <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        fontSize={12}
-                        tickFormatter={(v) => formatCurrency(v)}
-                        width={60}
-                      />
-                      <ChartTooltip
-                        cursor={{ stroke: 'hsl(var(--muted))', strokeWidth: 1 }}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Area
-                        dataKey="total"
-                        type="natural"
-                        fill="hsl(var(--primary)/0.2)"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ChartContainer>
-                  <div className="text-muted-foreground flex items-center gap-2 border-t pt-2 text-xs">
-                    <IconTrendingUp className="size-4 text-emerald-500" />
-                    <span>6 เดือนล่าสุด</span>
-                  </div>
-                </div>
-              </AnalyticsCardShell>
-              <AnalyticsCardShell
-                title="รายการขายล่าสุด"
-                description="5 ออเดอร์ล่าสุดของสาขานี้"
-                isEmpty={(data?.recentSales ?? []).length === 0}
-                emptyMessage="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
-              >
-                <div className="space-y-4">
-                  {(data?.recentSales ?? []).map((sale) => {
-                    const initial = sale.name
-                      ? sale.name.charAt(0).toUpperCase()
-                      : 'U'
-
-                    return (
-                      <div
-                        key={sale.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-9 w-9">
-                            <AvatarFallback>{initial}</AvatarFallback>
-                          </Avatar>
-                          <div className="space-y-1">
-                            <p className="text-sm leading-none font-medium">
-                              {sale.name}
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                              {sale.email}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">
-                            +{formatCurrency(sale.amount)}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {formatDateTime(sale.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </AnalyticsCardShell>
-              <AnalyticsCardShell
-                title="สินค้าใกล้หมด"
-                description="รายการสินค้าที่ต้องเติมสต็อกด่วน"
-                isEmpty={(data?.lowStock ?? []).length === 0}
-                emptyMessage="ขณะนี้ยังไม่มีสินค้าที่ใกล้หมด"
-                className="h-fit"
-              >
-                <div className="space-y-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableCell className="font-medium">
-                          สินค้า / รหัสตัวเลือก / ชื่อตัวเลือก
-                        </TableCell>
-                        <TableCell className="font-medium">สาขา</TableCell>
-                        <TableCell className="text-right font-medium">
-                          คงเหลือ
-                        </TableCell>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {(data?.lowStock ?? []).map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="max-w-72 min-w-72 py-3 wrap-break-word whitespace-pre-line">
-                            <div className="space-y-0.5">
-                              <p className="text-sm font-medium">
-                                {item.productName}
-                              </p>
-                              {item.variantId && (
-                                <span className="text-muted-foreground text-xs">
-                                  ({item.variantId})
-                                  <br />
-                                </span>
-                              )}
-                              {item.variantTitle && (
-                                <span className="text-muted-foreground text-xs">
-                                  ({item.variantTitle})
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-3">
-                            <Badge
-                              variant="outline"
-                              className="text-muted-foreground"
-                            >
-                              {item.branchName}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="py-3 text-right">
-                            <span
-                              className={`font-semibold ${
-                                item.stock === 0
-                                  ? 'text-destructive'
-                                  : 'text-amber-500'
-                              }`}
-                            >
-                              {formatNumber(item.stock)}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <div className="border-t pt-2">
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link href="/merchant/inventory">
-                        ดูคลังสินค้าทั้งหมด <ArrowRight />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </AnalyticsCardShell>
+              <SalesTrendChart data={data} />
+              <RecentSalesChart data={data} />
+              <LowStockCard data={data} />
             </div>
           </div>
         )}

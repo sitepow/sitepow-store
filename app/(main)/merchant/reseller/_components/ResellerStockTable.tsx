@@ -10,7 +10,11 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
-import { IconPackageExport, IconPackageImport } from '@tabler/icons-react'
+import {
+  IconPackageExport,
+  IconPackageImport,
+  IconPencil,
+} from '@tabler/icons-react'
 import { CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -31,11 +35,13 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 interface ResellerStockTableProps {
   onAcceptStock?: (stock: any) => void
   onReturnStock?: (stock: any) => void
+  onEditPrice?: (stock: any) => void // 1. เพิ่ม prop สำหรับรับ event การแก้ไขราคา
 }
 
 export function ResellerStockTable({
   onAcceptStock,
   onReturnStock,
+  onEditPrice,
 }: ResellerStockTableProps) {
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId } = useResellerFilter()
@@ -171,9 +177,20 @@ export function ResellerStockTable({
                         <p className="font-medium">
                           {formatCurrency(retailPrice)}
                         </p>
-                        <p className="text-muted-foreground text-xs">
-                          ส่ง: {formatCurrency(customPrice)}
-                        </p>
+                        <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs">
+                          <span>ส่ง: {formatCurrency(customPrice)}</span>
+                          {onEditPrice && (
+                            <Button
+                              variant="ghost"
+                              size="icon-lg"
+                              className="hover:bg-muted size-6"
+                              title="ตั้งราคาส่งเฉพาะรายการ"
+                              onClick={() => onEditPrice(stock)}
+                            >
+                              <IconPencil className="size-3" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="mx-auto flex w-36 flex-col gap-1.5">

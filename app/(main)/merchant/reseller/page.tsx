@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button'
 import { AcceptStockDialog } from './_components/AcceptStockDialog'
 import { AllocateStockDialog } from './_components/AllocateStockDialog'
 import { CreateAgreementDialog } from './_components/CreateAgreementDialog'
+import { EditCustomPriceDialog } from './_components/EditCustomPriceDialog'
 import { PayoutDialog } from './_components/PayoutDialog'
 import { ResellerStockTable } from './_components/ResellerStockTable'
 import { ReturnStockDialog } from './_components/ReturnStockDialog'
@@ -40,6 +41,9 @@ export default function ResellerManagementPage() {
     null,
   )
 
+  const [editPriceOpen, setEditPriceOpen] = useState(false)
+  const [selectedPriceStock, setSelectedPriceStock] = useState<any | null>(null)
+
   const handleOpenAccept = (stock: any) => {
     setSelectedStock(stock)
     setAcceptStockOpen(true)
@@ -48,6 +52,11 @@ export default function ResellerManagementPage() {
   const handleOpenReturn = (stock: any) => {
     setSelectedReturnStock(stock)
     setReturnStockOpen(true)
+  }
+
+  const handleOpenEditPrice = (stock: any) => {
+    setSelectedPriceStock(stock)
+    setEditPriceOpen(true)
   }
 
   const [createAgreementOpen, setCreateAgreementOpen] = useState(false)
@@ -125,6 +134,7 @@ export default function ResellerManagementPage() {
           <ResellerStockTable
             onAcceptStock={handleOpenAccept}
             onReturnStock={handleOpenReturn}
+            onEditPrice={handleOpenEditPrice}
           />
           <CreateAgreementDialog
             open={createAgreementOpen}
@@ -154,6 +164,14 @@ export default function ResellerManagementPage() {
         stock={selectedReturnStock}
         open={returnStockOpen}
         setOpen={setReturnStockOpen}
+      />
+      <EditCustomPriceDialog
+        open={editPriceOpen}
+        setOpen={(open) => {
+          setEditPriceOpen(open)
+          if (!open) setSelectedPriceStock(null)
+        }}
+        stock={selectedPriceStock}
       />
     </Sidebar>
   )
