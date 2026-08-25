@@ -147,6 +147,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     groupLabel: 'การจัดการและบุคลากร',
   },
   {
+    value: 'reseller',
+    label: 'ตัวแทนฝากขาย',
+    tab: 'reseller',
+    icon: IconBuildingStore,
+  },
+  {
     value: 'customers',
     label: 'จัดการลูกค้า',
     tab: 'customers',

@@ -62,7 +62,13 @@ export interface GetDashboardResult {
     yearlyMargin: number
   }
   salesTrend: { name: string; total: number }[]
-  recentSales: { id: string; name: string; email: string; amount: number }[]
+  recentSales: {
+    id: string
+    name: string
+    email: string
+    amount: number
+    createdAt: Date
+  }[]
   lowStock: {
     id: string
     productName: string
@@ -504,6 +510,7 @@ export async function getDashboard(
           customer: {
             select: { firstName: true, lastName: true, email: true },
           },
+          createdAt: true,
         },
       }),
       prisma.productStock.findMany({
@@ -644,6 +651,7 @@ export async function getDashboard(
           name: customerName || 'ลูกค้าไม่ทราบชื่อ',
           email: o.customer?.email ?? '-',
           amount: Number(o.totalAmount),
+          createdAt: o.createdAt,
         }
       }),
       lowStock: lowStockRaw.map((stock) => ({

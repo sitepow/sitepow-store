@@ -8,6 +8,7 @@ import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { formatDateTime } from '@/utils/date'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconBuildingStore,
@@ -440,9 +441,12 @@ export default function MerchantDashboardPage() {
                           </div>
                         </div>
                         <div className="shrink-0 pl-3 text-right">
-                          <span className="font-mono text-sm font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+                          <span className="text-sm font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
                             +{formatCurrency(sale.amount)}
                           </span>
+                          <p className="text-muted-foreground text-[10px] font-medium">
+                            {formatDateTime(sale.createdAt)}
+                          </p>
                           <p className="text-muted-foreground text-[10px] font-medium">
                             สำเร็จ
                           </p>

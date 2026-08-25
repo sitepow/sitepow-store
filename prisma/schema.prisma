@@ -133,14 +133,13 @@ model Customer {
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  stores             CustomerStore[]
-  reviews            Review[]
-  orders             Order[]
-  carts              Cart[]
-  addresses          Address[]
-  slipHistories      SlipVerificationHistory[]
-  resellerAgreements ResellerAgreement[]
-  customerCoupon     CustomerCoupon[]
+  stores         CustomerStore[]
+  reviews        Review[]
+  orders         Order[]
+  carts          Cart[]
+  addresses      Address[]
+  slipHistories  SlipVerificationHistory[]
+  customerCoupon CustomerCoupon[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -304,8 +303,9 @@ model User {
   employee Employee?
   customer Customer?
 
-  accounts Account[]
-  sessions Session[]
+  accounts           Account[]
+  sessions           Session[]
+  resellerAgreements ResellerAgreement[]
 
   activityLogs       ActivityLog[]
   messages           Message[]
@@ -948,6 +948,7 @@ model ProductVariant {
   stockAdjustments StockAdjustment[]
   digitalItems     DigitalItem[]
   resellerPrices   ResellerCustomPrice[]
+  resellerStock    ResellerStock[]
 
   @@index([productId, isAvailable])
 }
@@ -1426,23 +1427,33 @@ model ResellerAgreement {
   resellerStore   Store?  @relation("ResellerAgreements", fields: [resellerStoreId], references: [id], onDelete: Cascade)
 
   resellerCustomerId String?
-  resellerCustomer   Customer? @relation(fields: [resellerCustomerId], references: [id], onDelete: Cascade)
+  resellerUser       User?   @relation(fields: [resellerCustomerId], references: [id])
 
   status AgreementStatus @default(PENDING)
 
   defaultDiscountType   DiscountType?
   defaultDiscountAmount Decimal?      @db.Decimal(10, 2)
 
-  signedAt  DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  contractTitle    String?
+  contractDocument String?   @db.Text
+  signatureUrl     String?
+  signedAt         DateTime?
+
+  startDate DateTime?
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   customPrices ResellerCustomPrice[]
   orders       Order[]
+  stocks       ResellerStock[]
+  payouts      ResellerPayout[]
 
   @@unique([supplierStoreId, resellerStoreId])
   @@unique([supplierStoreId, resellerCustomerId])
   @@index([supplierStoreId])
+  @@index([expiresAt, status])
 }
 
 model ResellerCustomPrice {
@@ -1453,9 +1464,55 @@ model ResellerCustomPrice {
   variantId String
   variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
-  specialPrice Decimal @db.Decimal(10, 2)
+  discountType   DiscountType @default(PERCENTAGE)
+  discountAmount Decimal      @db.Decimal(10, 2)
+  specialPrice   Decimal?     @db.Decimal(10, 2)
 
   @@unique([agreementId, variantId])
+}
+
+model ResellerStock {
+  id          String            @id @default(uuid())
+  agreementId String
+  agreement   ResellerAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  allocatedQuantity Int @default(0)
+  acceptedQuantity  Int @default(0)
+  soldQuantity      Int @default(0)
+
+  acceptedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([agreementId, variantId])
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  REJECTED
+}
+
+model ResellerPayout {
+  id          String            @id @default(uuid())
+  agreementId String
+  agreement   ResellerAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  amount       Decimal      @db.Decimal(10, 2)
+  status       PayoutStatus @default(PENDING)
+  paymentProof String?
+  paidAt       DateTime?
+  note         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agreementId])
 }
 
 enum CountryCode {
@@ -1540,10 +1597,10 @@ model Expense {
 }
 
 enum ThemeKey {
-  DEFAULT         // 1. ร้านค้าทั่วไป (General Retail / Supermarket)
-  FOOD_BEVERAGE   // 2. อาหาร/เครื่องดื่ม/คาเฟ่/วัตถุดิบ
-  FASHION_LUXURY  // 3. เสื้อผ้า/แฟชั่น/เครื่องประดับ/เครื่องสำอาง (เน้นภาพสวย)
-  TECH_DIGITAL    // 4. ไอที/สินค้าดิจิทัล/ซอฟต์แวร์/คีย์เกม (เน้น Spec & Instant)
+  DEFAULT // 1. ร้านค้าทั่วไป (General Retail / Supermarket)
+  FOOD_BEVERAGE // 2. อาหาร/เครื่องดื่ม/คาเฟ่/วัตถุดิบ
+  FASHION_LUXURY // 3. เสื้อผ้า/แฟชั่น/เครื่องประดับ/เครื่องสำอาง (เน้นภาพสวย)
+  TECH_DIGITAL // 4. ไอที/สินค้าดิจิทัล/ซอฟต์แวร์/คีย์เกม (เน้น Spec & Instant)
   BOOKING_SERVICE // 5. บริการ/จองคิว/คอร์สเรียน/สปา/คลินิก (เน้นเวลา & นัดหมาย)
 }
 
