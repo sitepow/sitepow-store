@@ -102,7 +102,9 @@ export function InventoryTable() {
                     <TableCell>{stock.id}</TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
-                        <span>{stock.variant.product.title}</span>
+                        <span className="font-medium">
+                          {stock.variant.product.title}
+                        </span>
                         <span className="text-muted-foreground text-xs">
                           {stock.variant.product.slug}
                         </span>
@@ -110,7 +112,9 @@ export function InventoryTable() {
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
-                        <span>{stock.variant.title}</span>
+                        <span className="font-medium">
+                          {stock.variant.title}
+                        </span>
                         <span className="text-muted-foreground text-xs">
                           รหัสตัวเลือกสินค้า: {stock.variant.id}
                         </span>

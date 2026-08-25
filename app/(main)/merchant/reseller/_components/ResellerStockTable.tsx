@@ -90,13 +90,18 @@ export function ResellerStockTable({
           <TableHeader>
             <TableRow>
               <TableHead>สินค้า / ตัวเลือก</TableHead>
-              <TableHead className="text-right">ราคาปลีก / ทุนส่ง</TableHead>
               <TableHead className="text-right">
-                จำนวน (จัดสรร / รับแล้ว / ขาย / เหลือ)
+                ราคาหน้าร้าน / ราคาส่ง
               </TableHead>
-              <TableHead className="text-right">ยอดรับจากลูกค้า</TableHead>
-              <TableHead className="text-right">ทุนที่ต้องโอนคืนร้าน</TableHead>
-              <TableHead className="text-center">สถานะรับเข้า</TableHead>
+              <TableHead className="text-center">
+                สต็อกสินค้า <br />
+                <span className="text-muted-foreground text-[11px] font-normal">
+                  (ส่งมา / รับเข้า / ขาย / เหลือ)
+                </span>
+              </TableHead>
+              <TableHead className="text-right">ยอดขายรวม</TableHead>
+              <TableHead className="text-right">ยอดส่งคืนเจ้าของร้าน</TableHead>
+              <TableHead className="text-center">สถานะรับสินค้า</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
@@ -130,10 +135,6 @@ export function ResellerStockTable({
                 const pendingQuantity = allocated - accepted
                 const isAcceptedAll = pendingQuantity <= 0
 
-                const imageUrl =
-                  stock.variant?.image ||
-                  stock.variant?.product?.images?.[0]?.url
-
                 return (
                   <TableRow key={stock.id}>
                     <TableCell>
@@ -156,21 +157,33 @@ export function ResellerStockTable({
                         ส่ง: {formatCurrency(customPrice)}
                       </p>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5 text-sm">
-                        <span title="จัดสรรทั้งหมด" className="font-medium">
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1.5 text-sm">
+                        <span
+                          title="จำนวนที่ร้านจัดส่งมาให้"
+                          className="font-medium"
+                        >
                           {allocated}
                         </span>
                         <span className="text-muted-foreground">/</span>
-                        <span title="รับเข้าแล้ว" className="font-medium">
+                        <span
+                          title="จำนวนที่กดยืนยันรับเข้าแล้ว"
+                          className="font-medium text-blue-600 dark:text-blue-400"
+                        >
                           {accepted}
                         </span>
                         <span className="text-muted-foreground">/</span>
-                        <span title="ขายแล้ว" className="font-medium">
+                        <span
+                          title="จำนวนที่ขายออกไปแล้ว"
+                          className="font-medium text-emerald-600 dark:text-emerald-400"
+                        >
                           {sold}
                         </span>
                         <span className="text-muted-foreground">/</span>
-                        <Badge variant="outline" className="ml-1">
+                        <Badge
+                          variant={remaining > 0 ? 'outline' : 'secondary'}
+                          className="ml-1"
+                        >
                           เหลือ {remaining}
                         </Badge>
                       </div>

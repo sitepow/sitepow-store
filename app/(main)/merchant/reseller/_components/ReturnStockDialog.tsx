@@ -40,12 +40,12 @@ export function ReturnStockDialog({
     if (!stock) return
 
     if (quantity <= 0) {
-      toast.error('จำนวนที่คืนต้องมากกว่า 0')
+      toast.error('จำนวนที่ส่งคืนต้องมากกว่า 0 ชิ้น')
       return
     }
 
     if (quantity > remainingQuantity) {
-      toast.error(`ไม่สามารถคืนเกินจำนวนคงเหลือ (${remainingQuantity} ชิ้น)`)
+      toast.error(`ไม่สามารถส่งคืนเกินจำนวนคงเหลือ (${remainingQuantity} ชิ้น)`)
       return
     }
 
@@ -68,11 +68,11 @@ export function ReturnStockDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-width-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>คืนสต็อกเข้าคลังหลัก</DialogTitle>
+          <DialogTitle>ส่งคืนสินค้า / คืนสต็อกให้ร้านค้า</DialogTitle>
           <DialogDescription>
-            ดึงสต็อกฝากขายของตัวแทนกลับเข้าสู่ระบบคลังสินค้าหลักของร้านค้า
+            ดึงสต็อกสินค้าฝากขายกลับเข้าสู่คลังสินค้าหลักของทางร้าน
           </DialogDescription>
         </DialogHeader>
         {stock && (
@@ -81,18 +81,18 @@ export function ReturnStockDialog({
               <p className="text-foreground font-medium">
                 {stock.variant?.product?.title || '-'}
               </p>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 ตัวเลือก: {stock.variant?.title || '-'}
               </p>
               <div className="text-muted-foreground flex justify-between border-t pt-2 text-xs">
-                <span>คงเหลือที่ตัวแทน:</span>
+                <span>จำนวนที่สามารถส่งคืนได้:</span>
                 <span className="text-foreground font-bold">
                   {remainingQuantity} ชิ้น
                 </span>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">จำนวนที่ต้องการรับคืน</Label>
+              <Label htmlFor="quantity">จำนวนที่ต้องการส่งคืน (ชิ้น)</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -102,6 +102,9 @@ export function ReturnStockDialog({
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 placeholder="ระบุจำนวน"
               />
+              <p className="text-muted-foreground text-[0.8rem]">
+                * สต็อกจะถูกตัดออกจากตัวแทนและนำกลับเข้าคลังสินค้าหลักทันที
+              </p>
             </div>
           </div>
         )}
@@ -116,7 +119,7 @@ export function ReturnStockDialog({
           </Button>
           <Button onClick={handleReturn} disabled={isPending || !stock}>
             {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-            ยืนยันการรับคืน
+            ยืนยันการคืนสต็อก
           </Button>
         </DialogFooter>
       </DialogContent>

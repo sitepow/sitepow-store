@@ -84,7 +84,7 @@ export function AcceptStockDialog({
           <DialogHeader>
             <DialogTitle>ยืนยันการรับสินค้าเข้าสต็อก</DialogTitle>
             <DialogDescription>
-              ระบุจำนวนสินค้าที่ตรวจสอบแล้วว่าถูกต้องเพื่อรับเข้าสต็อก
+              ตรวจสอบจำนวนสินค้าจริง แล้วระบุจำนวนที่ต้องการรับเข้าสต็อก
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -98,7 +98,7 @@ export function AcceptStockDialog({
             </div>
             <div className="bg-muted/50 space-y-1 rounded-lg border p-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">จัดสรรทั้งหมด:</span>
+                <span className="text-muted-foreground">จำนวนที่ส่งมา:</span>
                 <span className="font-medium">
                   {stock.allocatedQuantity} ชิ้น
                 </span>
@@ -110,12 +110,14 @@ export function AcceptStockDialog({
                 </span>
               </div>
               <div className="mt-1 flex justify-between border-t pt-1">
-                <span className="font-medium">รอยืนยันรับ:</span>
-                <span className="font-medium">{pendingQuantity} ชิ้น</span>
+                <span className="font-medium">คงเหลือรอยืนยันรับ:</span>
+                <span className="font-medium text-blue-600 dark:text-blue-400">
+                  {pendingQuantity} ชิ้น
+                </span>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">จำนวนที่ต้องการรับเข้า</Label>
+              <Label htmlFor="quantity">จำนวนที่ตรวจรับถูกต้อง (ชิ้น)</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -127,7 +129,7 @@ export function AcceptStockDialog({
                 required
               />
               <p className="text-muted-foreground text-[0.8rem]">
-                * จะบันทึกวันที่รับสินค้าเป็นวันที่ปัจจุบันทันทีเมื่อกดตกลง
+                * ระบบจะบันทึกวันที่รับสินค้าทันทีเมื่อยืนยันรายการ
               </p>
             </div>
           </div>

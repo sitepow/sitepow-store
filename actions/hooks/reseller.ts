@@ -60,6 +60,9 @@ export function useAllocateResellerStock() {
           queryClient.invalidateQueries({
             queryKey: resellerKeys.stockList(variables.agreementId),
           }),
+          queryClient.invalidateQueries({
+            queryKey: posProductKeys.all,
+          }),
         ])
       }
     },
@@ -79,6 +82,9 @@ export function useAcceptResellerStock() {
           }),
           queryClient.invalidateQueries({
             queryKey: resellerKeys.summary(variables.agreementId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: posProductKeys.all,
           }),
         ])
       }

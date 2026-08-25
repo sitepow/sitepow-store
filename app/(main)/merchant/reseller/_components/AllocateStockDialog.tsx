@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Controller,
   FormProvider,
@@ -18,6 +18,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
 import { IconSearch, IconX } from '@tabler/icons-react'
 
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -71,8 +72,37 @@ export function AllocateStockDialog({
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors, isDirty },
   } = methods
+
+  const selectedVariantId = watch('variantId')
+
+  const getStockQuantity = useCallback(
+    (variant: (typeof products)[number]['variants'][number]) => {
+      if (!variant.stocks || variant.stocks.length === 0) return 0
+      const targetStock = variant.stocks.find(
+        (s) => s.branchId === selectedBranchId,
+      )
+      return targetStock ? targetStock.quantity : 0
+    },
+    [selectedBranchId],
+  )
+
+  const selectedVariant = useMemo(() => {
+    if (!selectedVariantId) return null
+    for (const p of products) {
+      const found = p.variants?.find((v) => v.id === selectedVariantId)
+      if (found) return found
+    }
+    return null
+  }, [products, selectedVariantId])
+
+  const maxStock = useMemo(
+    () => (selectedVariant ? getStockQuantity(selectedVariant) : 0),
+    [selectedVariant, getStockQuantity],
+  )
 
   useEffect(() => {
     if (open) {
@@ -93,6 +123,10 @@ export function AllocateStockDialog({
 
     if (!values.variantId) {
       return toast.error('กรุณาเลือกรายการสินค้า')
+    }
+
+    if (values.quantity > maxStock) {
+      return toast.error(`จำนวนคงเหลือไม่พอ (มีคงเหลือ ${maxStock} ชิ้น)`)
     }
 
     allocateStockMutation.mutate(
@@ -129,15 +163,18 @@ export function AllocateStockDialog({
                 rules={{ required: 'กรุณาเลือกรายการสินค้า' }}
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <div className="relative">
-                      <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
-                      <Input
-                        placeholder="พิมพ์ค้นหาน้องสินค้า หรือ SKU..."
-                        className="pl-9"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        disabled={isPending}
-                      />
+                    <div className="flex flex-col gap-5">
+                      <div className="relative">
+                        <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
+                        <Input
+                          placeholder="พิมพ์ค้นหาน้องสินค้า หรือ SKU..."
+                          className="pl-9"
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                          disabled={isPending}
+                        />
+                      </div>
+                      <BranchSelectField />
                     </div>
                     <ScrollArea className="h-52 rounded-md border p-2">
                       {isProductsLoading ? (
@@ -153,16 +190,24 @@ export function AllocateStockDialog({
                           {products.map((product) =>
                             product.variants?.map((variant) => {
                               const isSelected = field.value === variant.id
+                              const stockQty = getStockQuantity(variant)
+                              const isOutOfStock = stockQty <= 0
 
                               return (
                                 <button
                                   key={variant.id}
                                   type="button"
-                                  onClick={() => field.onChange(variant.id)}
-                                  className={`flex w-full items-center justify-between rounded-lg p-2 text-left text-sm transition-colors ${
+                                  disabled={isOutOfStock}
+                                  onClick={() => {
+                                    field.onChange(variant.id)
+                                    setValue('quantity', 1)
+                                  }}
+                                  className={`flex w-full items-center justify-between rounded-lg border p-2 text-left text-sm transition-colors ${
                                     isSelected
-                                      ? 'bg-primary text-primary-foreground font-medium'
-                                      : 'hover:bg-accent hover:text-accent-foreground'
+                                      ? 'border-primary border-dashed font-medium'
+                                      : isOutOfStock
+                                        ? 'cursor-not-allowed opacity-40 hover:bg-transparent'
+                                        : 'hover:bg-accent hover:text-accent-foreground border-transparent'
                                   }`}
                                 >
                                   <div className="flex items-center gap-2 overflow-hidden">
@@ -189,9 +234,24 @@ export function AllocateStockDialog({
                                       </p>
                                     </div>
                                   </div>
-                                  <span className="shrink-0 text-xs font-semibold">
-                                    {formatCurrency(Number(variant.price || 0))}
-                                  </span>
+                                  <div className="shrink-0 text-right">
+                                    <p className="text-xs font-semibold">
+                                      {formatCurrency(
+                                        Number(variant.price || 0),
+                                      )}
+                                    </p>
+                                    <p
+                                      className={`text-[10px] ${
+                                        isOutOfStock
+                                          ? 'text-destructive font-semibold'
+                                          : 'opacity-75'
+                                      }`}
+                                    >
+                                      {isOutOfStock
+                                        ? 'หมดสต็อก'
+                                        : `คงเหลือ: ${stockQty}`}
+                                    </p>
+                                  </div>
                                 </button>
                               )
                             }),
@@ -205,16 +265,31 @@ export function AllocateStockDialog({
               <FieldError>{errors.variantId?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>จำนวนที่ต้องการเติม (ชิ้น)</FieldLabel>
+              <div className="flex items-center justify-between">
+                <FieldLabel>จำนวนที่ต้องการเติม (ชิ้น)</FieldLabel>
+                {selectedVariant && (
+                  <span className="text-muted-foreground text-xs">
+                    คงเหลือในระบบ: {maxStock} ชิ้น
+                  </span>
+                )}
+              </div>
               <Input
                 type="number"
                 min={1}
+                max={maxStock > 0 ? maxStock : undefined}
                 placeholder="1"
                 {...register('quantity', {
                   valueAsNumber: true,
+                  required: 'กรุณากรอกจำนวน',
                   min: { value: 1, message: 'จำนวนต้องอย่างน้อย 1 ชิ้น' },
+                  max: {
+                    value: maxStock,
+                    message: selectedVariant
+                      ? `จำนวนต้องไม่เกินสต็อกคงเหลือ (${maxStock} ชิ้น)`
+                      : 'จำนวนเกินสต็อกคงเหลือ',
+                  },
                 })}
-                disabled={isPending}
+                disabled={isPending || !selectedVariantId || maxStock <= 0}
               />
               <FieldError>{errors.quantity?.message}</FieldError>
             </Field>
@@ -239,7 +314,10 @@ export function AllocateStockDialog({
                   ยกเลิก
                 </Button>
               )}
-              <Button type="submit" disabled={isPending}>
+              <Button
+                type="submit"
+                disabled={isPending || !selectedVariantId || maxStock <= 0}
+              >
                 {isPending ? (
                   <>
                     <Spinner /> กำลังบันทึก...

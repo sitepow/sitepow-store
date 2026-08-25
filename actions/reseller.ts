@@ -2,6 +2,7 @@
 
 import {
   AgreementStatus,
+  DefaultRole,
   DiscountType,
   OrderStatus,
   PayoutStatus,
@@ -69,13 +70,14 @@ export async function createResellerPOSOrder(
           include: { variant: { include: { product: true } } },
         })
 
-        const availableToSell = stock
-          ? stock.acceptedQuantity - stock.soldQuantity
-          : 0
+        if (!stock) {
+          throw new Error('ไม่พบข้อมูลสต็อกสินค้าในสัญญาฝากขาย')
+        }
 
-        if (!stock || availableToSell < item.quantity) {
+        const availableToSell = stock.acceptedQuantity - stock.soldQuantity
+        if (availableToSell < item.quantity) {
           throw new Error(
-            `สต็อกพร้อมขายของสินค้าไม่เพียงพอ (พร้อมขาย: ${availableToSell} ชิ้น)`,
+            `สต็อกพร้อมขายของสินค้า ${stock.variant.title} ไม่เพียงพอ (พร้อมขาย: ${availableToSell} ชิ้น)`,
           )
         }
 
@@ -86,13 +88,31 @@ export async function createResellerPOSOrder(
 
         if (customPrice?.specialPrice) {
           finalPrice = customPrice.specialPrice
-        } else if (customPrice?.discountType === 'FIXED') {
+        } else if (customPrice?.discountType === DiscountType.FIXED) {
           finalPrice = stock.variant.price.sub(customPrice.discountAmount)
-        } else if (customPrice?.discountType === 'PERCENTAGE') {
+        } else if (customPrice?.discountType === DiscountType.PERCENTAGE) {
           const discount = stock.variant.price
             .mul(customPrice.discountAmount)
             .div(100)
           finalPrice = stock.variant.price.sub(discount)
+        } else if (
+          agreement.defaultDiscountType &&
+          agreement.defaultDiscountAmount
+        ) {
+          if (agreement.defaultDiscountType === DiscountType.PERCENTAGE) {
+            const discount = stock.variant.price
+              .mul(agreement.defaultDiscountAmount)
+              .div(100)
+            finalPrice = stock.variant.price.sub(discount)
+          } else if (agreement.defaultDiscountType === DiscountType.FIXED) {
+            finalPrice = stock.variant.price.sub(
+              agreement.defaultDiscountAmount,
+            )
+          }
+        }
+
+        if (finalPrice.lessThan(0)) {
+          finalPrice = new Prisma.Decimal(0)
         }
 
         const itemTotal = finalPrice.mul(item.quantity)
@@ -241,6 +261,10 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
+    if (input.quantity <= 0) {
+      return { success: false, message: 'จำนวนจัดสรรต้องมากกว่า 0' }
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       const agreement = await tx.resellerAgreement.findUnique({
         where: { id: input.agreementId },
@@ -262,18 +286,19 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
         throw new Error('ไม่พบข้อมูลสต็อกสินค้าในคลังหลัก')
       }
 
-      if (mainStock.quantity < input.quantity) {
-        throw new Error(
-          `สต็อกหลักไม่พอสำหรับจัดสรร (คงเหลือในคลัง: ${mainStock.quantity} ชิ้น)`,
-        )
-      }
-
-      await tx.productStock.update({
-        where: { id: mainStock.id },
+      const updatedMainStock = await tx.productStock.updateMany({
+        where: {
+          id: mainStock.id,
+          quantity: { gte: input.quantity },
+        },
         data: {
           quantity: { decrement: input.quantity },
         },
       })
+
+      if (updatedMainStock.count === 0) {
+        throw new Error('สต็อกหลักไม่พอสำหรับจัดสรร (อาจมีรายการตัดสต็อกซ้อน)')
+      }
 
       const resellerStock = await tx.resellerStock.upsert({
         where: {
@@ -562,6 +587,7 @@ export interface CreateResellerAgreementInput {
   resellerStoreId?: string
   resellerCustomerId?: string
   commissionRate: number
+  targetBranchId?: string
 }
 
 export async function createResellerAgreement(
@@ -577,26 +603,131 @@ export async function createResellerAgreement(
       return { success: false, message: 'กรุณาระบุร้านค้าผู้ให้ฝากขาย' }
     }
 
-    const agreement = await prisma.resellerAgreement.create({
-      data: {
-        supplierStoreId: data.supplierStoreId,
-        resellerType: data.resellerType,
-        resellerStoreId:
-          data.resellerType === ResellerType.INTERNAL_STORE
-            ? data.resellerStoreId
-            : null,
-        resellerCustomerId:
-          data.resellerType === ResellerType.EXTERNAL
-            ? data.resellerCustomerId
-            : null,
-        defaultDiscountAmount: data.commissionRate,
-        status: 'ACTIVE',
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const agreement = await tx.resellerAgreement.create({
+        data: {
+          supplierStoreId: data.supplierStoreId,
+          resellerType: data.resellerType,
+          resellerStoreId:
+            data.resellerType === ResellerType.INTERNAL_STORE
+              ? data.resellerStoreId
+              : null,
+          resellerCustomerId:
+            data.resellerType === ResellerType.EXTERNAL
+              ? data.resellerCustomerId
+              : null,
+          defaultDiscountAmount: data.commissionRate,
+          defaultDiscountType: DiscountType.PERCENTAGE,
+          status: AgreementStatus.ACTIVE,
+        },
+      })
+
+      let targetUserId: string | null = null
+
+      if (data.resellerType === ResellerType.EXTERNAL) {
+        targetUserId = data.resellerCustomerId || null
+      } else if (
+        data.resellerType === ResellerType.INTERNAL_STORE &&
+        data.resellerStoreId
+      ) {
+        const resellerStore = await tx.store.findUnique({
+          where: { id: data.resellerStoreId },
+          select: { ownerId: true },
+        })
+        targetUserId = resellerStore?.ownerId || null
+      }
+
+      if (targetUserId) {
+        const user = await tx.user.findUnique({
+          where: { id: targetUserId },
+          include: { employee: true },
+        })
+
+        if (user) {
+          let employeeId = user.employee?.id
+          if (!employeeId) {
+            const newEmployee = await tx.employee.create({
+              data: {
+                userId: user.id,
+                name: user.name || user.email || 'Reseller Partner',
+                email: user.email || `reseller_${user.id}@system.local`,
+              },
+            })
+            employeeId = newEmployee.id
+          }
+
+          const employeeStore = await tx.employeeStore.upsert({
+            where: {
+              storeId_employeeId: {
+                storeId: data.supplierStoreId,
+                employeeId: employeeId,
+              },
+            },
+            update: {},
+            create: {
+              storeId: data.supplierStoreId,
+              employeeId: employeeId,
+            },
+          })
+
+          let resellerRole = await tx.role.findUnique({
+            where: {
+              storeId_name: {
+                storeId: data.supplierStoreId,
+                name: DefaultRole.POS_RESELLER,
+              },
+            },
+          })
+
+          if (!resellerRole) {
+            resellerRole = await tx.role.create({
+              data: {
+                storeId: data.supplierStoreId,
+                name: DefaultRole.POS_RESELLER,
+              },
+            })
+          }
+
+          let targetBranchId = data.targetBranchId
+          if (!targetBranchId) {
+            const mainBranch = await tx.branch.findFirst({
+              where: {
+                storeId: data.supplierStoreId,
+                isMain: true,
+              },
+              select: { id: true },
+            })
+            targetBranchId = mainBranch?.id
+          }
+
+          if (targetBranchId && resellerRole) {
+            await tx.employeeBranch.upsert({
+              where: {
+                employeeStoreId_branchId: {
+                  employeeStoreId: employeeStore.id,
+                  branchId: targetBranchId,
+                },
+              },
+              update: {
+                roleId: resellerRole.id,
+              },
+              create: {
+                employeeStoreId: employeeStore.id,
+                branchId: targetBranchId,
+                roleId: resellerRole.id,
+              },
+            })
+          }
+        }
+      }
+
+      return agreement
     })
 
     return {
       success: true,
-      data: serializeDecimal(agreement),
+      message: 'สร้างสัญญาและเปิดสิทธิ์พนักงาน POS เรียบร้อยแล้ว',
+      data: serializeDecimal(result),
     }
   } catch (error: unknown) {
     return {
@@ -613,6 +744,7 @@ export interface ReturnResellerStockInput {
   agreementId: string
   variantId: string
   quantity: number
+  targetBranchId?: string
 }
 
 export async function returnResellerStock(input: ReturnResellerStockInput) {
@@ -694,7 +826,12 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
       const mainStock = await tx.productStock.findFirst({
         where: {
           variantId: input.variantId,
-          branch: { storeId: resellerStock.agreement.supplierStoreId },
+          branch: input.targetBranchId
+            ? { id: input.targetBranchId }
+            : {
+                storeId: resellerStock.agreement.supplierStoreId,
+                isMain: true,
+              },
         },
       })
 

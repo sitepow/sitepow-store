@@ -130,7 +130,7 @@ export function ProductsTable() {
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex items-center gap-3">
                         <div className="flex flex-col">
-                          <span>{product.title}</span>
+                          <span className="font-medium">{product.title}</span>
                           <span className="text-muted-foreground text-xs">
                             {product.slug}
                           </span>
