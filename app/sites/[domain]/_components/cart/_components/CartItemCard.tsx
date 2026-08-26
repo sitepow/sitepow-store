@@ -34,7 +34,7 @@ export function CartItemCard({
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
       <div
         className={
-          'border-primary relative aspect-square size-16 flex-none cursor-pointer overflow-hidden border border-dashed p-1 md:size-20'
+          'relative aspect-square size-16 flex-none cursor-pointer overflow-hidden md:size-20'
         }
       >
         {item.image ? (
