@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, PropsWithChildren, useEffect, useState } from 'react'
+import { Fragment, PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -54,26 +54,31 @@ interface SidebarProps extends PropsWithChildren {
 }
 
 export function Sidebar({ items, redirectPath, children }: SidebarProps) {
+  const [isSticky, setIsSticky] = useState(false)
+  const observerTargetRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const target = observerTargetRef.current
+    if (!target) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSticky(!entry.isIntersecting)
+      },
+      { threshold: 0 },
+    )
+
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [])
+
   const { isAuthenticated, user } = useSession()
   const userRole = user?.role
 
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
-
-  const [isScrolled, setIsScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 30) {
-        setIsScrolled(true)
-      } else if (window.scrollY < 10) {
-        setIsScrolled(false)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const { data: storeOptions } = useStoreOptions()
 
@@ -191,19 +196,24 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-        <div className="bg-background sticky top-0 z-20 flex min-h-13 flex-wrap items-center gap-2.5 border-b py-3 transition-all">
+
+        <div
+          ref={observerTargetRef}
+          className="pointer-events-none -mb-px h-px w-full"
+        />
+        <div className="bg-background sticky top-0 z-20 flex h-fit flex-wrap items-center gap-2.5 border-b py-3 transition-all">
           <SidebarTrigger />
           <QuickSettingsMenu />
           <UserAvatarDropdown redirectPath="merchant" items={items} />
           <div className="flex flex-wrap items-center gap-2.5 transition-opacity duration-200">
             {isMerchant && <DateTimeBadge />}
-            {!isScrolled && (
-              <>
+            {!isSticky && (
+              <div className="flex items-center gap-2.5 transition-all duration-200">
                 {isMerchant && <CreditBadge />}
                 {isPointsEnabled && (
                   <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>

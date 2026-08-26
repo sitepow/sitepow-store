@@ -21,6 +21,7 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { DigitalPriceDisplay } from './_components/DigitalPriceDisplay'
 import { PosCart } from './_components/PosCart'
 import { PosProductList } from './_components/PosProductList'
 import {
@@ -141,6 +142,11 @@ export default function MerchantPOSPage() {
     })
   }
 
+  const grandTotal = cartItems.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
+    0,
+  )
+
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
@@ -186,7 +192,8 @@ export default function MerchantPOSPage() {
               />
             )}
           </div>
-          <div className="lg:col-span-5 xl:col-span-4">
+          <div className="flex flex-col gap-5 lg:col-span-5 xl:col-span-4">
+            <DigitalPriceDisplay value={grandTotal} size="md" />
             <PosCart
               cart={cartItems}
               storeId={selectedStoreId}

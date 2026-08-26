@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useAcceptResellerStock } from '@/actions/hooks/reseller'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useAlertStore } from '@/stores/use-alert-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
@@ -13,6 +14,7 @@ import {
   IconPlus,
   IconReceiptRefund,
 } from '@tabler/icons-react'
+import { XIcon } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -30,6 +32,10 @@ import { ResellerStockTable } from './_components/ResellerStockTable'
 import { ReturnStockDialog } from './_components/ReturnStockDialog'
 
 export default function ResellerManagementPage() {
+  const alertId = 'reseller-info-alert'
+  const isDismissed = useAlertStore((state) => state.isDismissed(alertId))
+  const dismissAlert = useAlertStore((state) => state.dismissAlert)
+
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
 
@@ -131,6 +137,28 @@ export default function ResellerManagementPage() {
         />
       ) : (
         <div className="space-y-4">
+          {!isDismissed && (
+            <ActionRequiredAlert
+              variant="info"
+              title="สิทธิ์และการจัดการพนักงานสำหรับตัวแทน"
+              description="
+           เมื่อทำสัญญาเรียบร้อยแล้ว
+              ระบบจะเพิ่มตัวแทนรายนี้เข้าเป็นพนักงานในทีมโดยอัตโนมัติ
+              (ไม่ว่าจะเป็นบัญชีส่วนตัวหรือร้านค้า)
+              พร้อมมอบสิทธิ์การขายและตัดสต็อกสินค้าในหน้าแคชเชียร์
+              เพื่อส่งยอดขายคืนให้กับร้านค้า"
+              action={
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => dismissAlert(alertId)}
+                >
+                  <XIcon />
+                  ปิดหน้าต่าง
+                </Button>
+              }
+            />
+          )}
           <ResellerStockTable
             onAcceptStock={handleOpenAccept}
             onReturnStock={handleOpenReturn}

@@ -1,3 +1,5 @@
+'use client'
+
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -24,6 +26,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 import { cn } from '@/lib/utils'
+
+import { DigitalPriceDisplay } from './DigitalPriceDisplay'
 
 interface PosCheckoutModalProps {
   open: boolean
@@ -130,16 +134,13 @@ export function PosCheckoutModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="p-0">
+      <DialogContent showCloseButton={false} className="overflow-hidden p-0">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="bg-primary/10 border-b p-5 text-center">
-            <p className="text-muted-foreground text-xs font-semibold">
-              ยอดรวมที่ต้องชำระ
-            </p>
-            <div className="text-primary mt-1 text-4xl font-extrabold tracking-tight">
-              {formatCurrency(totalAmount)}
-            </div>
-          </div>
+          <DigitalPriceDisplay
+            value={totalAmount}
+            size="lg"
+            className="rounded-none border-x-0 border-t-0"
+          />
           <div className="space-y-5 px-5 pt-4">
             <DialogHeader className="p-0 text-left">
               <DialogTitle className="text-base font-semibold">
