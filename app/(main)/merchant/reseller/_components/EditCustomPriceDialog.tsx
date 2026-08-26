@@ -135,11 +135,11 @@ export function EditCustomPriceDialog({
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="space-y-1">
-                <p className="text-sm font-medium">
+              <div className="min-w-0 space-y-1.5">
+                <p className="text-sm leading-relaxed font-medium break-all whitespace-pre-line">
                   {stock?.variant?.product?.title || '-'}
                 </p>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-xs leading-relaxed break-all whitespace-pre-line">
                   ตัวเลือก: {stock?.variant?.title || '-'}
                 </p>
               </div>

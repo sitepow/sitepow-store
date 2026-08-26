@@ -163,7 +163,7 @@ export function ResellerStockTable({
                               <EmptyImage className="size-full rounded-sm" />
                             )}
                           </div>
-                          <div>
+                          <div className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                             <p className="leading-none font-medium">
                               {stock.variant?.product?.title || '-'}
                             </p>

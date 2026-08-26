@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { Fragment, PropsWithChildren } from 'react'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -13,13 +13,21 @@ import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconChevronRight } from '@tabler/icons-react'
+import { IconChevronRight, IconInfoCircle } from '@tabler/icons-react'
 
+import { Button } from '@/components/ui/button'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
 import {
   Sidebar as RootSidebar,
@@ -54,35 +62,11 @@ interface SidebarProps extends PropsWithChildren {
 }
 
 export function Sidebar({ items, redirectPath, children }: SidebarProps) {
-  const [isSticky, setIsSticky] = useState(false)
-  const observerTargetRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const target = observerTargetRef.current
-    if (!target) {
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsSticky(!entry.isIntersecting)
-      },
-      {
-        threshold: 0,
-        rootMargin: '-16px 0px 0px 0px',
-      },
-    )
-
-    observer.observe(target)
-    return () => observer.disconnect()
-  }, [])
-
   const { isAuthenticated, user } = useSession()
   const userRole = user?.role
 
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
-
   const { data: storeOptions } = useStoreOptions()
 
   const currentStore =
@@ -103,6 +87,8 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const isMerchant =
     userRole === UserRole.MERCHANT && redirectPath === 'merchant'
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
+
+  const hasBadgesToShow = isMerchant || isPointsEnabled
 
   return (
     <SidebarProvider>
@@ -189,8 +175,9 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         </SidebarContent>
         <SidebarFooter />
       </RootSidebar>
+
       <main
-        className="bg-background text-foreground w-full min-w-0 space-y-5 p-5"
+        className="bg-background text-foreground w-full min-w-0 space-y-5 p-3 sm:p-5"
         style={
           {
             '--primary': currentStore?.primaryColor ?? store?.primaryColor,
@@ -200,28 +187,59 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
 
-        <div
-          ref={observerTargetRef}
-          className="pointer-events-none -mb-px h-px w-full"
-        />
-        <div className="bg-background sticky top-0 z-20 flex h-fit flex-wrap items-center gap-2.5 border-b py-3 transition-all">
-          <SidebarTrigger />
-          <QuickSettingsMenu />
-          <UserAvatarDropdown redirectPath="merchant" items={items} />
-          <div className="flex flex-wrap items-center gap-2.5 transition-opacity duration-200">
-            {isMerchant && <DateTimeBadge />}
-            <div
-              className={`flex flex-wrap items-center gap-2.5 transition-all duration-300 ${
-                isSticky
-                  ? 'pointer-events-none hidden max-w-0 scale-95 overflow-hidden opacity-0'
-                  : 'max-w-125 scale-100 opacity-100'
-              }`}
-            >
-              {isMerchant && <CreditBadge />}
-              {isPointsEnabled && (
-                <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
-              )}
-            </div>
+        <div className="bg-background/95 border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5 backdrop-blur-sm">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
+            <QuickSettingsMenu />
+          </div>
+
+          <div className="flex items-center gap-2">
+            {hasBadgesToShow && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 text-xs"
+                  >
+                    <IconInfoCircle className="text-muted-foreground size-4" />
+                    <span>ข้อมูลร้านค้า</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>รายละเอียดและสถานะ</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-3 py-4">
+                    {isMerchant && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">
+                          เวลาปัจจุบัน:
+                        </span>
+                        <DateTimeBadge />
+                      </div>
+                    )}
+                    {isMerchant && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">
+                          เครดิตคงเหลือ:
+                        </span>
+                        <CreditBadge />
+                      </div>
+                    )}
+                    {isPointsEnabled && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">
+                          แต้มสะสม:
+                        </span>
+                        <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+            <UserAvatarDropdown redirectPath="merchant" items={items} />
           </div>
         </div>
         {children}

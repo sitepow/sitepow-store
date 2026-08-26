@@ -99,11 +99,11 @@ export function ReturnStockDialog({
         </DialogHeader>
         {stock && (
           <div className="space-y-4 py-2">
-            <div className="bg-muted/50 space-y-1 rounded-lg border p-3 text-sm">
-              <p className="text-foreground font-medium">
+            <div className="bg-muted/50 min-w-0 space-y-1.5 rounded-lg border p-3 text-sm">
+              <p className="text-foreground leading-relaxed font-medium break-all whitespace-pre-line">
                 {stock.variant?.product?.title || '-'}
               </p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-muted-foreground text-xs leading-relaxed break-all whitespace-pre-line">
                 ตัวเลือก: {stock.variant?.title || '-'}
               </p>
               <div className="text-muted-foreground flex justify-between border-t pt-2 text-xs">

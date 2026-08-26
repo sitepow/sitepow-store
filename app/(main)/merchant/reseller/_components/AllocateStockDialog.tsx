@@ -33,6 +33,8 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 
+import { cn } from '@/lib/utils'
+
 interface AllocateStockFormValues {
   variantId: string
   quantity: number
@@ -93,7 +95,10 @@ export function AllocateStockDialog({
   )
 
   const selectedVariant = useMemo(() => {
-    if (!selectedVariantId) return null
+    if (!selectedVariantId) {
+      return null
+    }
+
     for (const p of products) {
       const found = p.variants?.find((v) => v.id === selectedVariantId)
       if (found) {
@@ -163,7 +168,7 @@ export function AllocateStockDialog({
             <DialogTitle>เติม / เพิ่มสต็อกสินค้าให้ตัวแทน</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="bg-muted/20 space-y-3 rounded-lg border p-3">
+            <div className="bg-muted/40 space-y-3 rounded-lg border p-3">
               <div className="relative">
                 <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
                 <Input
@@ -177,7 +182,7 @@ export function AllocateStockDialog({
               <BranchSelectField />
             </div>
             <Field>
-              <FieldLabel className="text-muted-foreground text-xs">
+              <FieldLabel className="text-muted-foreground text-xs font-semibold">
                 เลือกรายการสินค้า / ตัวเลือก
               </FieldLabel>
               <Controller
@@ -185,7 +190,7 @@ export function AllocateStockDialog({
                 name="variantId"
                 rules={{ required: 'กรุณาเลือกรายการสินค้า' }}
                 render={({ field }) => (
-                  <ScrollArea className="h-64">
+                  <ScrollArea className="h-64 pr-2">
                     {isProductsLoading ? (
                       <div className="flex h-48 items-center justify-center p-4">
                         <Spinner />
@@ -217,38 +222,37 @@ export function AllocateStockDialog({
                                   field.onChange(variant.id)
                                   setValue('quantity', 1)
                                 }}
-                                className={`group relative flex w-full items-start gap-3 rounded-lg border p-2.5 text-left text-sm transition-all ${
+                                className={cn(
+                                  'relative flex w-full items-start gap-3 rounded-lg border p-2.5 text-left text-sm transition-colors',
                                   isSelected
-                                    ? 'border-primary bg-primary/5 ring-primary ring-1'
+                                    ? 'border-primary bg-primary/5'
                                     : isOutOfStock
                                       ? 'bg-muted/10 cursor-not-allowed opacity-40'
-                                      : 'hover:border-muted-foreground/30 hover:bg-accent/50'
-                                }`}
+                                      : 'border-border hover:bg-accent/50',
+                                )}
                               >
-                                <div className="size-14 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
+                                <div className="bg-muted size-14 shrink-0 overflow-hidden rounded">
                                   {imageUrl ? (
                                     <img
                                       src={imageUrl}
                                       alt={product.title}
-                                      className="size-full rounded-sm object-cover"
+                                      className="size-full object-cover"
                                     />
                                   ) : (
-                                    <EmptyImage className="size-full rounded-sm" />
+                                    <EmptyImage className="size-full" />
                                   )}
                                 </div>
-                                <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
-                                  <div>
-                                    <p className="text-foreground truncate leading-snug font-medium">
-                                      {product.title}
-                                    </p>
-                                    <p className="text-muted-foreground truncate text-xs">
-                                      {variant.title}{' '}
-                                      {variant.sku && `(${variant.sku})`}
-                                    </p>
-                                  </div>
-                                  <div className="mt-1 flex items-center gap-2">
+                                <div className="min-w-0 flex-1 space-y-1">
+                                  <p className="text-foreground leading-snug font-medium break-all whitespace-pre-line">
+                                    {product.title}
+                                  </p>
+                                  <p className="text-muted-foreground text-xs leading-normal break-all whitespace-pre-line">
+                                    {variant.title}{' '}
+                                    {variant.sku && `(${variant.sku})`}
+                                  </p>
+                                  <div className="pt-0.5">
                                     <span
-                                      className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
+                                      className={`inline-block rounded px-1.5 py-0.5 text-[11px] font-medium ${
                                         isOutOfStock
                                           ? 'bg-destructive/10 text-destructive'
                                           : 'bg-muted text-muted-foreground'
@@ -260,8 +264,8 @@ export function AllocateStockDialog({
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex shrink-0 flex-col items-end justify-between self-stretch">
-                                  <span className="text-primary text-sm font-semibold">
+                                <div className="flex shrink-0 flex-col items-end justify-between self-stretch pl-1">
+                                  <span className="text-primary text-sm font-semibold whitespace-nowrap">
                                     {formatCurrency(Number(variant.price || 0))}
                                   </span>
 
@@ -312,10 +316,10 @@ export function AllocateStockDialog({
               <FieldError>{errors.quantity?.message}</FieldError>
             </Field>
             {selectedVariant && (
-              <div className="bg-muted/20 space-y-1.5 rounded-lg border p-3 text-xs">
-                <div className="text-muted-foreground flex justify-between">
-                  <span>สินค้าที่เลือก:</span>
-                  <span className="text-foreground max-w-50 truncate font-medium">
+              <div className="bg-muted/30 space-y-1.5 rounded-lg border p-3 text-xs">
+                <div className="text-muted-foreground flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between">
+                  <span className="shrink-0">สินค้าที่เลือก:</span>
+                  <span className="text-foreground font-medium break-all whitespace-pre-line sm:text-right">
                     {selectedVariant.productTitle} ({selectedVariant.title})
                   </span>
                 </div>

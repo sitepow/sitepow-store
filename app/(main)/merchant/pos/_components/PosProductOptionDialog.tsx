@@ -222,8 +222,8 @@ export function PosProductOptionDialog({
           <DialogTitle>ตัวเลือกสินค้า</DialogTitle>
         </DialogHeader>
         {product?.title && (
-          <div className="flex items-center gap-3 border-b pb-3">
-            <span className="line-clamp-2 text-sm font-medium">
+          <div className="border-b pb-3">
+            <span className="text-sm font-medium break-all whitespace-pre-line">
               {product.title}
             </span>
           </div>
@@ -274,37 +274,37 @@ export function PosProductOptionDialog({
                           setSelectedVariantId(variant.id)
                           setQuantity(1)
                         }}
-                        className={`group relative flex w-full items-start gap-3 rounded-lg p-2.5 text-left text-sm transition-all ${
+                        className={cn(
+                          'relative flex w-full items-start gap-3 rounded-lg border p-2.5 text-left text-sm transition-colors',
                           isSelected
-                            ? 'border-primary bg-primary/5 ring-primary ring-1'
+                            ? 'border-primary bg-primary/5'
                             : isOutOfStock
                               ? 'bg-muted/10 cursor-not-allowed opacity-40'
-                              : 'hover:border-muted-foreground/30 hover:bg-accent/50'
-                        }`}
+                              : 'border-border hover:bg-accent/50',
+                        )}
                       >
-                        <div className="size-14 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
+                        {/* ปรับปรุง container รูปภาพ ไม่ใส่ border ซ้อนชั้น */}
+                        <div className="bg-muted size-14 shrink-0 overflow-hidden rounded">
                           {imageUrl ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={imageUrl}
                               alt={variant.title || product.title}
-                              className="size-full rounded-sm object-cover"
+                              className="size-full object-cover"
                             />
                           ) : (
-                            <EmptyImage className="size-full rounded-sm" />
+                            <EmptyImage className="size-full" />
                           )}
                         </div>
-                        <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
-                          <div>
-                            <p className="text-foreground truncate leading-snug font-medium">
-                              {variant.title}
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="text-foreground leading-snug font-medium break-all whitespace-pre-line">
+                            {variant.title}
+                          </p>
+                          {variant.sku && (
+                            <p className="text-muted-foreground text-xs break-all">
+                              SKU: {variant.sku}
                             </p>
-                            {variant.sku && (
-                              <p className="text-muted-foreground truncate text-xs">
-                                SKU: {variant.sku}
-                              </p>
-                            )}
-                          </div>
+                          )}
                           <div className="mt-1 flex flex-wrap items-center gap-1.5">
                             <span
                               className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
@@ -334,18 +334,18 @@ export function PosProductOptionDialog({
                             )}
                           </div>
                         </div>
-                        <div className="flex shrink-0 flex-col items-end justify-between self-stretch">
+                        <div className="flex shrink-0 flex-col items-end justify-between self-stretch pl-1">
                           {hasDiscount ? (
                             <div className="flex flex-col items-end">
-                              <span className="text-primary text-sm font-semibold">
+                              <span className="text-primary text-sm font-semibold whitespace-nowrap">
                                 {formatCurrency(netPrice)}
                               </span>
-                              <span className="text-muted-foreground text-xs line-through">
+                              <span className="text-muted-foreground text-xs whitespace-nowrap line-through">
                                 {formatCurrency(variantPrice)}
                               </span>
                             </div>
                           ) : (
-                            <span className="text-primary text-sm font-semibold">
+                            <span className="text-primary text-sm font-semibold whitespace-nowrap">
                               {formatCurrency(variantPrice)}
                             </span>
                           )}
@@ -379,31 +379,37 @@ export function PosProductOptionDialog({
                   onValueChange={(val) => handleOptionChange(option.title, val)}
                   className="gap-2"
                 >
-                  {option.choices.map((choice) => (
-                    <Label
-                      key={choice.name}
-                      htmlFor={`${option.title}-${choice.name}`}
-                      className={cn(
-                        'hover:bg-accent/50 flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
-                        'has-checked:border-primary has-checked:bg-accent/50',
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem
-                          value={choice.name}
-                          id={`${option.title}-${choice.name}`}
-                        />
-                        <span className="text-sm leading-none font-medium">
-                          {choice.name}
-                        </span>
-                      </div>
-                      {choice.extraPrice > 0 && (
-                        <span className="text-primary text-xs font-medium">
-                          +{formatCurrency(choice.extraPrice)}
-                        </span>
-                      )}
-                    </Label>
-                  ))}
+                  {option.choices.map((choice) => {
+                    const isChecked =
+                      selectedOptions[option.title] === choice.name
+                    return (
+                      <Label
+                        key={choice.name}
+                        htmlFor={`${option.title}-${choice.name}`}
+                        className={cn(
+                          'flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
+                          isChecked
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:bg-accent/50',
+                        )}
+                      >
+                        <div className="flex min-w-0 flex-1 items-center space-x-3 pr-2">
+                          <RadioGroupItem
+                            value={choice.name}
+                            id={`${option.title}-${choice.name}`}
+                          />
+                          <span className="text-sm font-medium break-all whitespace-pre-line">
+                            {choice.name}
+                          </span>
+                        </div>
+                        {choice.extraPrice > 0 && (
+                          <span className="text-primary shrink-0 text-xs font-medium whitespace-nowrap">
+                            +{formatCurrency(choice.extraPrice)}
+                          </span>
+                        )}
+                      </Label>
+                    )
+                  })}
                 </RadioGroup>
               </div>
             ))}
@@ -415,30 +421,33 @@ export function PosProductOptionDialog({
                 <div className="grid gap-2">
                   {product.addons.map((addon) => {
                     const isDisabled = !addon.isAvailable
+                    const isChecked = selectedAddonIds.includes(addon.id)
 
                     return (
                       <Label
                         key={addon.id}
                         htmlFor={addon.id}
                         className={cn(
-                          'hover:bg-accent/50 flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
-                          'has-checked:border-primary has-checked:bg-accent/50',
+                          'flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors',
+                          isChecked
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:bg-accent/50',
                           isDisabled &&
                             'cursor-not-allowed opacity-50 hover:bg-transparent',
                         )}
                       >
-                        <div className="flex items-center space-x-3">
+                        <div className="flex min-w-0 flex-1 items-center space-x-3 pr-2">
                           <Checkbox
                             id={addon.id}
                             disabled={isDisabled}
-                            checked={selectedAddonIds.includes(addon.id)}
+                            checked={isChecked}
                             onCheckedChange={() => handleAddonToggle(addon.id)}
                           />
-                          <span className="text-sm leading-none font-medium">
+                          <span className="text-sm font-medium break-all whitespace-pre-line">
                             {addon.title}
                           </span>
                         </div>
-                        <span className="text-primary font-semibold">
+                        <span className="text-primary shrink-0 font-semibold whitespace-nowrap">
                           + {formatCurrency(addon.price)}
                         </span>
                       </Label>

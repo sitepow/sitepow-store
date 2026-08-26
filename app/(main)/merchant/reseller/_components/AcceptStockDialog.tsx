@@ -77,6 +77,9 @@ export function AcceptStockDialog({
     })
   }
 
+  const productTitle = stock.variant?.product?.title || '-'
+  const variantTitle = stock.variant?.title || '-'
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-106.25">
@@ -88,12 +91,12 @@ export function AcceptStockDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="space-y-1">
-              <p className="text-sm font-medium">
-                {stock.variant?.product?.title || '-'}
+            <div className="min-w-0 space-y-1.5">
+              <p className="text-sm leading-relaxed font-medium wrap-break-word whitespace-pre-line">
+                {productTitle}
               </p>
-              <p className="text-muted-foreground text-xs">
-                ตัวเลือก: {stock.variant?.title || '-'}
+              <p className="text-muted-foreground text-xs leading-relaxed wrap-break-word whitespace-pre-line">
+                ตัวเลือก: {variantTitle}
               </p>
             </div>
             <div className="bg-muted/50 space-y-1 rounded-lg border p-3 text-sm">
