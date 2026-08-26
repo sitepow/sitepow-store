@@ -169,7 +169,7 @@ export function PosCheckoutModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="overflow-hidden p-0">
+      <DialogContent showCloseButton={false} className="overflow-x-hidden p-0">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DigitalPriceDisplay
             value={totalAmount}
