@@ -102,7 +102,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
             {imageUrl ? (
-              <div className="border-primary size-16 shrink-0 overflow-hidden border border-dashed p-1">
+              <div className="size-16 shrink-0 overflow-hidden rounded-md border">
                 <Image
                   src={imageUrl}
                   alt={item.title || 'รูปสินค้า'}
@@ -113,16 +113,16 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                 />
               </div>
             ) : (
-              <div className="border-primary size-16 shrink-0 border border-dashed p-1">
+              <div className="size-16 shrink-0">
                 <EmptyImage className="text-[10px]" />
               </div>
             )}
-            <div className="flex w-full flex-col items-start justify-between gap-2.5 sm:flex-row sm:items-center">
-              <div className="flex flex-1 flex-col gap-0.5">
-                <span className="text-foreground font-medium">
+            <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5 break-all">
+                <span className="text-foreground leading-snug font-medium break-all">
                   {item.title}{' '}
                   {item.variantTitle && (
-                    <span className="text-muted-foreground font-normal">
+                    <span className="text-muted-foreground inline-block font-normal break-all">
                       ({item.variantTitle})
                     </span>
                   )}
@@ -135,7 +135,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                   บาท
                 </span>
                 {item.customerNote && (
-                  <span className="text-primary mt-0.5 text-xs italic">
+                  <span className="text-primary mt-0.5 text-xs wrap-break-word italic">
                     โน้ต: {item.customerNote}
                   </span>
                 )}
@@ -145,7 +145,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                   </span>
                 )}
               </div>
-              <div className="flex flex-col items-center whitespace-nowrap">
+              <div className="flex shrink-0 flex-col items-start whitespace-nowrap sm:items-end">
                 {hasDiscount && (
                   <span className="text-muted-foreground text-xs line-through">
                     {formatCurrency(totalOriginalPrice)}

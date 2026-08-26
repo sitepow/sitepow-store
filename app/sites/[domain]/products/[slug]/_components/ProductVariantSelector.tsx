@@ -161,7 +161,7 @@ export function ProductVariantSelector() {
                       disabled={!isAvaliable || stock <= 0}
                       className="data-checked:text-primary-foreground aria-invalid:aria-checked:border-primary data-checked:border-primary data-checked:bg-primary dark:data-checked:bg-primary"
                     />
-                    <div className="border-primary relative size-12 shrink-0 overflow-hidden border border-dashed p-1">
+                    <div className="relative size-12 shrink-0 overflow-hidden">
                       {variantImageUrl ? (
                         <Image
                           src={variantImageUrl}
@@ -176,7 +176,7 @@ export function ProductVariantSelector() {
                       )}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-medium wrap-break-word whitespace-pre-line">
                         {variant.title}
                       </span>
                       <div className="flex flex-wrap gap-1">

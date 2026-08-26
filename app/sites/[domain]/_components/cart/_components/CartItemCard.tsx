@@ -47,10 +47,10 @@ export function CartItemCard({
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className={cn('min-w-0', productClassName)}>
+        <div className={cn('min-w-0 wrap-break-word', productClassName)}>
           <h4
             className={cn(
-              'text-sm leading-tight font-medium sm:text-base',
+              'text-sm leading-tight font-medium wrap-break-word sm:text-base',
               textClassName,
             )}
           >
@@ -58,7 +58,7 @@ export function CartItemCard({
           </h4>
           <p
             className={cn(
-              'text-primary mt-0.5 text-[11px] sm:text-xs',
+              'text-primary mt-0.5 text-[11px] wrap-break-word sm:text-xs',
               textClassName,
             )}
           >

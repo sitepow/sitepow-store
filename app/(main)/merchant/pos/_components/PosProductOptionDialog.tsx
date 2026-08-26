@@ -283,8 +283,7 @@ export function PosProductOptionDialog({
                               : 'border-border hover:bg-accent/50',
                         )}
                       >
-                        {/* ปรับปรุง container รูปภาพ ไม่ใส่ border ซ้อนชั้น */}
-                        <div className="bg-muted size-14 shrink-0 overflow-hidden rounded">
+                        <div className="bg-muted size-14 shrink-0 overflow-hidden">
                           {imageUrl ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img
