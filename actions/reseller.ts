@@ -88,9 +88,15 @@ export async function createResellerPOSOrder(
 
         if (customPrice?.specialPrice) {
           finalPrice = customPrice.specialPrice
-        } else if (customPrice?.discountType === DiscountType.FIXED) {
+        } else if (
+          customPrice?.discountType === DiscountType.FIXED &&
+          customPrice.discountAmount != null
+        ) {
           finalPrice = stock.variant.price.sub(customPrice.discountAmount)
-        } else if (customPrice?.discountType === DiscountType.PERCENTAGE) {
+        } else if (
+          customPrice?.discountType === DiscountType.PERCENTAGE &&
+          customPrice.discountAmount != null
+        ) {
           const discount = stock.variant.price
             .mul(customPrice.discountAmount)
             .div(100)
@@ -879,5 +885,59 @@ export async function getResellerAgreementInfo(storeId: string) {
   } catch (error) {
     console.error(error)
     return null
+  }
+}
+
+export interface UpsertResellerCustomPriceInput {
+  agreementId: string
+  variantId: string
+  customPrice: number
+}
+
+export async function upsertResellerCustomPrice(
+  input: UpsertResellerCustomPriceInput,
+) {
+  try {
+    const userSession = await getCurrentUser()
+    if (!userSession?.id) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    if (input.customPrice < 0) {
+      return { success: false, message: 'ราคาส่งต้องไม่ติดลบ' }
+    }
+
+    const result = await prisma.resellerCustomPrice.upsert({
+      where: {
+        agreementId_variantId: {
+          agreementId: input.agreementId,
+          variantId: input.variantId,
+        },
+      },
+      update: {
+        specialPrice: new Prisma.Decimal(input.customPrice),
+        discountAmount: new Prisma.Decimal(0),
+      },
+      create: {
+        agreementId: input.agreementId,
+        variantId: input.variantId,
+        specialPrice: new Prisma.Decimal(input.customPrice),
+        discountAmount: new Prisma.Decimal(0),
+      },
+    })
+
+    return {
+      success: true,
+      message: 'บันทึกราคาส่งเฉพาะรายการเรียบร้อยแล้ว',
+      data: serializeDecimal(result),
+    }
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'เกิดข้อผิดพลาดในการบันทึกราคาส่ง',
+    }
   }
 }

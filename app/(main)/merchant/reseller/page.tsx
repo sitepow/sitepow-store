@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 
-import { useAcceptResellerStock } from '@/actions/hooks/reseller'
+import {
+  useAcceptResellerStock,
+  useUpsertResellerCustomPrice,
+} from '@/actions/hooks/reseller'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useAlertStore } from '@/stores/use-alert-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
@@ -80,6 +83,9 @@ export default function ResellerManagementPage() {
   const { mutate: handleAcceptStock, isPending: isAccepting } =
     useAcceptResellerStock()
 
+  const { mutate: handleUpsertCustomPrice, isPending: isSavingPrice } =
+    useUpsertResellerCustomPrice()
+
   const onConfirmAccept = (payload: any) => {
     handleAcceptStock(payload, {
       onSuccess: (res) => {
@@ -89,6 +95,28 @@ export default function ResellerManagementPage() {
         }
       },
     })
+  }
+
+  const onSaveCustomPrice = (variantId: string, customPrice: number) => {
+    if (!selectedAgreementId) {
+      return
+    }
+
+    handleUpsertCustomPrice(
+      {
+        agreementId: selectedAgreementId,
+        variantId,
+        customPrice,
+      },
+      {
+        onSuccess: (res) => {
+          if (res.success) {
+            setEditPriceOpen(false)
+            setSelectedPriceStock(null)
+          }
+        },
+      },
+    )
   }
 
   return (
@@ -200,6 +228,8 @@ export default function ResellerManagementPage() {
           if (!open) setSelectedPriceStock(null)
         }}
         stock={selectedPriceStock}
+        isLoading={isSavingPrice}
+        onSave={onSaveCustomPrice}
       />
     </Sidebar>
   )

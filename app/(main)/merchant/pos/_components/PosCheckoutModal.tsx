@@ -8,6 +8,7 @@ import Link from 'next/link'
 
 import { usePaymentSetting } from '@/actions/hooks/payment'
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
+import { useCreateResellerPOSOrder } from '@/actions/hooks/reseller'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { QUICK_AMOUNTS } from '@/constants/credit'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
@@ -60,7 +61,12 @@ export function PosCheckoutModal({
   const isStripeAvailable =
     !!paymentSetting?.isStripeEnabled && !!paymentSetting?.stripeSecretKey
 
-  const { mutate: createOrder, isPending } = useCreatePOSOrder()
+  const { mutate: createStandardOrder, isPending: isStandardPending } =
+    useCreatePOSOrder()
+  const { mutate: createResellerOrder, isPending: isResellerPending } =
+    useCreateResellerPOSOrder()
+
+  const isPending = isStandardPending || isResellerPending
   const cartItems = useCartStore((state) => state.items)
 
   const paymentMethod = watch('paymentMethod')
@@ -124,23 +130,46 @@ export function PosCheckoutModal({
       }
     }
 
-    const payload = {
+    const handleSuccess = (res: { success: boolean }) => {
+      if (res.success) {
+        clearCart()
+        reset()
+        onSuccess()
+        onOpenChange(false)
+      }
+    }
+
+    if (isResellerMode && agreementId) {
+      const resellerPayload = {
+        agreementId,
+        supplierStoreId: data.storeId,
+        branchId: data.branchId,
+        items: cartItems.map((item) => ({
+          variantId: item.variant.id,
+          quantity: item.quantity,
+        })),
+      }
+
+      createResellerOrder(resellerPayload, {
+        onSuccess: handleSuccess,
+      })
+      return
+    }
+
+    const standardPayload = {
       storeId: data.storeId,
       branchId: data.branchId,
-      agreementId: agreementId,
-      customerId: isResellerMode ? undefined : data.customerId,
+      customerId: data.customerId,
       usedPoints:
-        !isResellerMode && data.usedPoints && data.usedPoints > 0
-          ? data.usedPoints
-          : undefined,
-      earnedPoints: isResellerMode ? 0 : earnedPoints,
+        data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined,
+      earnedPoints,
       status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
       paymentMethod: isCash
         ? PaymentMethod.CASH_ON_DELIVERY
         : PaymentMethod.STRIPE_QR_PROMPTPAY,
       receivedAmount: isCash ? receivedAmount : undefined,
       changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
-      discountAmount: isResellerMode ? 0 : data.discountAmount,
+      discountAmount: data.discountAmount,
       items: cartItems.map((item) => ({
         productId: item.productId,
         variantId: item.variant.id,
@@ -155,15 +184,8 @@ export function PosCheckoutModal({
       })),
     }
 
-    createOrder(payload, {
-      onSuccess: (res) => {
-        if (res.success) {
-          clearCart()
-          reset()
-          onSuccess()
-          onOpenChange(false)
-        }
-      },
+    createStandardOrder(standardPayload, {
+      onSuccess: handleSuccess,
     })
   }
 

@@ -3,8 +3,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import Image from 'next/image'
-
 import { POSProductItem } from '@/actions/pos/product'
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
@@ -12,8 +10,9 @@ import { DiscountType } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
-import { formatCurrency } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
+import { IconCheck } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,7 +20,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -79,6 +77,21 @@ export function PosProductOptionDialog({
   })
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
   const [quantity, setQuantity] = useState<number>(1)
+
+  useEffect(() => {
+    if (product?.variants?.length) {
+      setSelectedVariantId(product.variants[0].id)
+    }
+    setQuantity(1)
+    setSelectedAddonIds([])
+    const initialOptions: Record<string, string> = {}
+    product?.options?.forEach((opt) => {
+      if (opt.choices.length > 0) {
+        initialOptions[opt.title] = opt.choices[0].name
+      }
+    })
+    setSelectedOptions(initialOptions)
+  }, [product])
 
   const getVariantAvailableStock = useCallback(
     (variant: POSProductItem['variants'][number]) => {
@@ -204,7 +217,7 @@ export function PosProductOptionDialog({
 
   return (
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ตัวเลือกสินค้า</DialogTitle>
         </DialogHeader>
@@ -220,14 +233,11 @@ export function PosProductOptionDialog({
             {product.variants.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs font-semibold">
-                  รูปแบบสินค้า
+                  รูปแบบสินค้า / ตัวเลือก
                 </Label>
-                <RadioGroup
-                  value={selectedVariantId}
-                  onValueChange={setSelectedVariantId}
-                  className="gap-2"
-                >
+                <div className="space-y-2">
                   {product.variants.map((variant) => {
+                    const isSelected = selectedVariantId === variant.id
                     const stock = getVariantAvailableStock(variant)
                     const isOutOfStock = stock <= 0
 
@@ -250,66 +260,83 @@ export function PosProductOptionDialog({
                       !!discountConfig && netPrice < variantPrice
                     const hasPoint = variant.pointsActive
 
-                    const variantImageUrl = variant.image || null
+                    const imageUrl =
+                      variant.image ||
+                      product.images?.find((img) => img.isPrimary)?.url ||
+                      product.images?.[0]?.url
 
                     return (
-                      <Label
+                      <button
                         key={variant.id}
-                        htmlFor={variant.id}
-                        className={cn(
-                          'hover:bg-accent/50 flex cursor-pointer flex-col gap-3 rounded-md border p-3 transition-colors sm:flex-row sm:items-center sm:justify-between',
-                          'has-checked:border-primary has-checked:bg-accent/50',
-                          isOutOfStock &&
-                            'cursor-not-allowed opacity-50 hover:bg-transparent',
-                        )}
+                        type="button"
+                        disabled={isOutOfStock}
+                        onClick={() => {
+                          setSelectedVariantId(variant.id)
+                          setQuantity(1)
+                        }}
+                        className={`group relative flex w-full items-start gap-3 rounded-lg p-2.5 text-left text-sm transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/5 ring-primary ring-1'
+                            : isOutOfStock
+                              ? 'bg-muted/10 cursor-not-allowed opacity-40'
+                              : 'hover:border-muted-foreground/30 hover:bg-accent/50'
+                        }`}
                       >
-                        <div className="flex w-full items-start space-x-3 sm:items-center">
-                          <RadioGroupItem
-                            value={variant.id}
-                            id={variant.id}
-                            className="mt-1 sm:mt-0"
-                          />
-                          <div className="border-primary relative size-14 shrink-0 border border-dashed p-1 sm:size-16">
-                            {variantImageUrl ? (
-                              <Image
-                                src={variantImageUrl}
-                                alt={variant.title || product.title}
-                                className="size-full object-cover"
-                                width={48}
-                                height={48}
-                                unoptimized
-                              />
-                            ) : (
-                              <EmptyImage className="text-[8px]" />
+                        <div className="size-14 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
+                          {imageUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={imageUrl}
+                              alt={variant.title || product.title}
+                              className="size-full rounded-sm object-cover"
+                            />
+                          ) : (
+                            <EmptyImage className="size-full rounded-sm" />
+                          )}
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
+                          <div>
+                            <p className="text-foreground truncate leading-snug font-medium">
+                              {variant.title}
+                            </p>
+                            {variant.sku && (
+                              <p className="text-muted-foreground truncate text-xs">
+                                SKU: {variant.sku}
+                              </p>
                             )}
                           </div>
-                          <div className="flex min-w-0 flex-col gap-0.5">
-                            <span className="text-sm leading-tight font-medium wrap-break-word">
-                              {variant.title}
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            <span
+                              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
+                                isOutOfStock
+                                  ? 'bg-destructive/10 text-destructive'
+                                  : 'bg-muted text-muted-foreground'
+                              }`}
+                            >
+                              {isOutOfStock
+                                ? 'หมดสต็อก'
+                                : `คงเหลือ: ${formatNumber(stock)} ชิ้น`}
                             </span>
-                            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                              <span className="text-muted-foreground text-xs">
-                                คงเหลือ: {stock}
-                                {variant?.sku ? ` · SKU: ${variant.sku}` : ''}
-                              </span>
-                              <br />
-                              {hasDiscount &&
-                                variant.discountType ===
-                                  DiscountType.PERCENTAGE && (
-                                  <Badge>ลด {variant.discountAmount}%</Badge>
-                                )}
-                              {hasPoint && (
-                                <Badge>+{variant.pointsAmount} แต้ม</Badge>
+                            {hasDiscount &&
+                              variant.discountType ===
+                                DiscountType.PERCENTAGE && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px]"
+                                >
+                                  ลด {variant.discountAmount}%
+                                </Badge>
                               )}
-                            </div>
+                            {hasPoint && (
+                              <Badge variant="outline" className="text-[10px]">
+                                +{variant.pointsAmount} แต้ม
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <div className="flex shrink-0 items-baseline justify-between border-t pt-2 text-right sm:flex-col sm:items-end sm:border-t-0 sm:pt-0">
-                          <span className="text-muted-foreground mr-2.5 text-xs sm:hidden">
-                            ราคา
-                          </span>
+                        <div className="flex shrink-0 flex-col items-end justify-between self-stretch">
                           {hasDiscount ? (
-                            <div className="flex items-baseline gap-2 sm:flex-col sm:items-end sm:gap-0">
+                            <div className="flex flex-col items-end">
                               <span className="text-primary text-sm font-semibold">
                                 {formatCurrency(netPrice)}
                               </span>
@@ -322,11 +349,17 @@ export function PosProductOptionDialog({
                               {formatCurrency(variantPrice)}
                             </span>
                           )}
+
+                          {isSelected && (
+                            <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full">
+                              <IconCheck className="size-3.5" />
+                            </span>
+                          )}
                         </div>
-                      </Label>
+                      </button>
                     )
                   })}
-                </RadioGroup>
+                </div>
               </div>
             )}
             {product.options?.map((option, idx) => (

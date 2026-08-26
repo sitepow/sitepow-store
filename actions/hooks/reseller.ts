@@ -14,6 +14,7 @@ import {
   getResellerPayoutSummary,
   getResellerStocks,
   returnResellerStock,
+  upsertResellerCustomPrice,
 } from '@/actions/reseller'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -22,10 +23,15 @@ export function useCreateResellerPOSOrder() {
 
   return useMutation({
     mutationFn: createResellerPOSOrder,
-    onSuccess: async (res) => {
+    onSuccess: async (res, variables) => {
       if (res.success) {
         await Promise.all([
-          queryClient.invalidateQueries({ queryKey: resellerKeys.stocks() }),
+          queryClient.invalidateQueries({
+            queryKey: resellerKeys.stockList(variables.agreementId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: resellerKeys.summary(variables.agreementId),
+          }),
           queryClient.invalidateQueries({ queryKey: posProductKeys.all }),
           queryClient.invalidateQueries({ queryKey: orderKeys.all }),
         ])
@@ -159,5 +165,25 @@ export function useResellerAgreementInfo({ storeId }: { storeId?: string }) {
     queryKey: resellerKeys.activeAgreement(storeId!),
     queryFn: () => getResellerAgreementInfo(storeId!),
     enabled: Boolean(storeId),
+  })
+}
+
+export function useUpsertResellerCustomPrice() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: upsertResellerCustomPrice,
+    onSuccess: async (res, variables) => {
+      if (res.success) {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: resellerKeys.stockList(variables.agreementId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: resellerKeys.summary(variables.agreementId),
+          }),
+        ])
+      }
+    },
   })
 }

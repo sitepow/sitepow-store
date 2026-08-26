@@ -1464,9 +1464,9 @@ model ResellerCustomPrice {
   variantId String
   variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
-  discountType   DiscountType @default(PERCENTAGE)
-  discountAmount Decimal      @db.Decimal(10, 2)
-  specialPrice   Decimal?     @db.Decimal(10, 2)
+  discountType   DiscountType? @default(PERCENTAGE)
+  discountAmount Decimal?      @db.Decimal(10, 2)
+  specialPrice   Decimal?      @db.Decimal(10, 2)
 
   @@unique([agreementId, variantId])
 }

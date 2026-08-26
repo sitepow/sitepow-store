@@ -67,7 +67,10 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       ([entry]) => {
         setIsSticky(!entry.isIntersecting)
       },
-      { threshold: 0 },
+      {
+        threshold: 0,
+        rootMargin: '-16px 0px 0px 0px',
+      },
     )
 
     observer.observe(target)
@@ -207,14 +210,18 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
           <UserAvatarDropdown redirectPath="merchant" items={items} />
           <div className="flex flex-wrap items-center gap-2.5 transition-opacity duration-200">
             {isMerchant && <DateTimeBadge />}
-            {!isSticky && (
-              <div className="flex items-center gap-2.5 transition-all duration-200">
-                {isMerchant && <CreditBadge />}
-                {isPointsEnabled && (
-                  <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
-                )}
-              </div>
-            )}
+            <div
+              className={`flex flex-wrap items-center gap-2.5 transition-all duration-300 ${
+                isSticky
+                  ? 'pointer-events-none hidden max-w-0 scale-95 overflow-hidden opacity-0'
+                  : 'max-w-125 scale-100 opacity-100'
+              }`}
+            >
+              {isMerchant && <CreditBadge />}
+              {isPointsEnabled && (
+                <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
+              )}
+            </div>
           </div>
         </div>
         {children}
