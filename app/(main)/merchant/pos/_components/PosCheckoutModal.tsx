@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -34,6 +35,7 @@ interface PosCheckoutModalProps {
   onOpenChange: (open: boolean) => void
   totalAmount: number
   earnedPoints: number
+  agreementId?: string
   onSuccess: () => void
 }
 
@@ -42,11 +44,14 @@ export function PosCheckoutModal({
   onOpenChange,
   totalAmount,
   earnedPoints,
+  agreementId,
   onSuccess,
 }: PosCheckoutModalProps) {
   const clearCart = useCartStore((state) => state.clearCart)
   const { watch, setValue, handleSubmit, reset } =
     useFormContext<POSCheckoutInput>()
+
+  const isResellerMode = Boolean(agreementId)
 
   const storeId = watch('storeId')
 
@@ -61,16 +66,33 @@ export function PosCheckoutModal({
   const paymentMethod = watch('paymentMethod')
   const receivedAmount = watch('receivedAmount') || 0
 
+  useEffect(() => {
+    if (open && isResellerMode) {
+      setValue('paymentMethod', PaymentMethod.STRIPE_QR_PROMPTPAY)
+      setValue('status', OrderStatus.PENDING)
+    }
+  }, [open, isResellerMode, setValue])
+
   const isCash =
-    !isStripeAvailable || paymentMethod === PaymentMethod.CASH_ON_DELIVERY
+    !isResellerMode && paymentMethod === PaymentMethod.CASH_ON_DELIVERY
+
   const changeAmount = receivedAmount - totalAmount
   const isValidCash = isCash ? receivedAmount >= totalAmount : true
+
+  const isCurrentPaymentValid = isCash
+    ? isValidCash
+    : paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY && isStripeAvailable
 
   const handleQuickAmount = (amount: number) => {
     setValue('receivedAmount', amount)
   }
 
   const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    if (isResellerMode && method === PaymentMethod.CASH_ON_DELIVERY) {
+      toast.error('โหมดตัวแทนจำหน่ายต้องโอนเงินชำระตรงเข้าเจ้าของร้านเท่านั้น')
+      return
+    }
+
     if (method !== PaymentMethod.CASH_ON_DELIVERY && !isStripeAvailable) {
       toast.error('กรุณาตั้งค่า Stripe ก่อนเปิดรับชำระด้วย PromptPay')
       return
@@ -86,50 +108,63 @@ export function PosCheckoutModal({
   }
 
   const onSubmit = (data: POSCheckoutInput) => {
-    if (isCash && !isValidCash) {
-      toast.error('จำนวนเงินรับมาไม่เพียงพอ')
-      return
+    if (!isCurrentPaymentValid) {
+      if (
+        !isStripeAvailable &&
+        paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
+      ) {
+        toast.error(
+          'ระบบชำระเงิน PromptPay ยังไม่พร้อมใช้งาน กรุณาตั้งค่า Stripe',
+        )
+        return
+      }
+      if (isCash && !isValidCash) {
+        toast.error('จำนวนเงินรับมาไม่เพียงพอ')
+        return
+      }
     }
 
-    createOrder(
-      {
-        storeId: data.storeId,
-        branchId: data.branchId,
-        customerId: data.customerId,
-        usedPoints:
-          data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined,
-        earnedPoints: earnedPoints,
-        status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
-        paymentMethod: isCash
-          ? PaymentMethod.CASH_ON_DELIVERY
-          : PaymentMethod.STRIPE_QR_PROMPTPAY,
-        receivedAmount: isCash ? receivedAmount : undefined,
-        changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
-        discountAmount: data.discountAmount,
-        items: cartItems.map((item) => ({
-          productId: item.productId,
-          variantId: item.variant.id,
-          title: item.productTitle,
-          variantTitle: item.variant.title || '',
-          quantity: item.quantity,
-          price: item.unitPrice,
-          originalPrice: item.originalPrice ?? item.unitPrice,
-          image: item.image || null,
-          productType: item.productType,
-          branchId: item.branchId || data.branchId,
-        })),
+    const payload = {
+      storeId: data.storeId,
+      branchId: data.branchId,
+      agreementId: agreementId,
+      customerId: isResellerMode ? undefined : data.customerId,
+      usedPoints:
+        !isResellerMode && data.usedPoints && data.usedPoints > 0
+          ? data.usedPoints
+          : undefined,
+      earnedPoints: isResellerMode ? 0 : earnedPoints,
+      status: isCash ? OrderStatus.SHIPPED : OrderStatus.PENDING,
+      paymentMethod: isCash
+        ? PaymentMethod.CASH_ON_DELIVERY
+        : PaymentMethod.STRIPE_QR_PROMPTPAY,
+      receivedAmount: isCash ? receivedAmount : undefined,
+      changeAmount: isCash ? Math.max(0, changeAmount) : undefined,
+      discountAmount: isResellerMode ? 0 : data.discountAmount,
+      items: cartItems.map((item) => ({
+        productId: item.productId,
+        variantId: item.variant.id,
+        title: item.productTitle,
+        variantTitle: item.variant.title || '',
+        quantity: item.quantity,
+        price: item.unitPrice,
+        originalPrice: item.originalPrice ?? item.unitPrice,
+        image: item.image || null,
+        productType: item.productType,
+        branchId: item.branchId || data.branchId,
+      })),
+    }
+
+    createOrder(payload, {
+      onSuccess: (res) => {
+        if (res.success) {
+          clearCart()
+          reset()
+          onSuccess()
+          onOpenChange(false)
+        }
       },
-      {
-        onSuccess: (res) => {
-          if (res.success) {
-            clearCart()
-            reset()
-            onSuccess()
-            onOpenChange(false)
-          }
-        },
-      },
-    )
+    })
   }
 
   return (
@@ -147,22 +182,29 @@ export function PosCheckoutModal({
                 เลือกช่องทางการชำระเงิน
               </DialogTitle>
             </DialogHeader>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() =>
-                  handlePaymentMethodSelect(PaymentMethod.CASH_ON_DELIVERY)
-                }
-                className={cn(
-                  'hover:bg-muted/50 relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
-                  isCash
-                    ? 'border-primary bg-primary/5 text-primary font-semibold shadow-sm'
-                    : 'border-border text-muted-foreground',
-                )}
-              >
-                <IconCash className="size-7" />
-                <span className="text-sm">เงินสด (Cash)</span>
-              </button>
+            <div
+              className={cn(
+                'grid gap-3',
+                isResellerMode ? 'grid-cols-1' : 'sm:grid-cols-2',
+              )}
+            >
+              {!isResellerMode && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handlePaymentMethodSelect(PaymentMethod.CASH_ON_DELIVERY)
+                  }
+                  className={cn(
+                    'hover:bg-muted/50 relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
+                    isCash
+                      ? 'border-primary bg-primary/5 text-primary font-semibold shadow-sm'
+                      : 'border-border text-muted-foreground',
+                  )}
+                >
+                  <IconCash className="size-7" />
+                  <span className="text-sm">เงินสด (Cash)</span>
+                </button>
+              )}
               {isStripeAvailable ? (
                 <button
                   type="button"
@@ -171,13 +213,17 @@ export function PosCheckoutModal({
                   }
                   className={cn(
                     'hover:bg-muted/50 relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all',
-                    !isCash
+                    paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
                       ? 'border-primary bg-primary/5 text-primary font-semibold shadow-sm'
                       : 'border-border text-muted-foreground',
                   )}
                 >
                   <IconQrcode className="size-7" />
-                  <span className="text-sm">พร้อมเพย์ / QR</span>
+                  <span className="text-sm">
+                    {isResellerMode
+                      ? 'โอนเข้าเจ้าของร้าน (พร้อมเพย์ / QR)'
+                      : 'พร้อมเพย์ / QR'}
+                  </span>
                 </button>
               ) : (
                 <div className="border-border text-muted-foreground bg-muted/20 relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center">
@@ -295,7 +341,7 @@ export function PosCheckoutModal({
             <Button
               type="submit"
               size="lg"
-              disabled={isPending || (isCash && !isValidCash)}
+              disabled={isPending || !isCurrentPaymentValid}
               className="w-full min-w-40 font-bold sm:w-auto"
             >
               {isPending ? 'กำลังบันทึก...' : 'ยืนยันการชำระเงิน'}

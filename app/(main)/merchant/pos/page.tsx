@@ -51,6 +51,9 @@ export default function MerchantPOSPage() {
     search: debouncedSearch,
   })
 
+  const isResellerUser = products.length > 0 && Boolean(products[0]?.isReseller)
+  const resellerAgreementId = products[0]?.resellerAgreementId
+
   const handleAddToCart = (
     product: POSProductItem,
     variantId: string,
@@ -76,7 +79,11 @@ export default function MerchantPOSPage() {
     })
 
     if (quantity > remainingStock) {
-      toast.error(`สินค้าในสาขานี้มีไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`)
+      toast.error(
+        isResellerUser
+          ? `สต็อกฝากขายคงเหลือไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`
+          : `สินค้าในสาขานี้มีไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`,
+      )
       return
     }
 
@@ -152,9 +159,13 @@ export default function MerchantPOSPage() {
       <PageTabHeader
         icon={IconCashRegister}
         title="แคชเชียร์"
-        description="เลือกสินค้า สแกนบาร์โค้ด และทำรายการชำระเงิน"
+        description={
+          isResellerUser
+            ? 'บันทึกการขายสินค้าฝากขายและตัดสต็อกตัวแทน'
+            : 'เลือกสินค้า สแกนบาร์โค้ด และทำรายการชำระเงิน'
+        }
         endContent={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <StoreSelectField />
             <BranchSelectField />
           </div>
@@ -189,6 +200,7 @@ export default function MerchantPOSPage() {
                 search={search}
                 onSearchChange={setSearch}
                 onAddToCart={handleAddToCart}
+                isReseller={isResellerUser}
               />
             )}
           </div>
@@ -198,6 +210,7 @@ export default function MerchantPOSPage() {
               cart={cartItems}
               storeId={selectedStoreId}
               branchId={selectedBranchId}
+              agreementId={resellerAgreementId}
               onUpdateQuantity={updateQuantity}
               onClearCart={clearCart}
               onRemoveItem={removeItem}

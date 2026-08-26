@@ -5,7 +5,7 @@ import { SectionProductItem } from '@/actions/storefront/sections'
 import { isVideoUrl } from '@/utils/media'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
-import { IconAlertCircle } from '@tabler/icons-react'
+import { IconAlertCircle, IconBuildingStore } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
 
 import { Badge } from '@/components/ui/badge'
@@ -31,6 +31,7 @@ interface ProductCardProps extends VariantProps<typeof productCardVariants> {
   onClick?: () => void
   href?: string
   quantity?: number
+  isReseller?: boolean
 }
 
 export function ProductCard({
@@ -40,6 +41,7 @@ export function ProductCard({
   onClick,
   href,
   quantity,
+  isReseller,
 }: ProductCardProps) {
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
@@ -94,11 +96,20 @@ export function ProductCard({
           )
         )}
       </div>
-      <div className="flex flex-col gap-1 p-1.5">
+      <div className="flex flex-col items-center gap-1 p-1.5">
         {product.title && (
           <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
             {product.title}
           </h3>
+        )}
+        {isReseller && (
+          <Badge
+            variant="secondary"
+            className="border-primary/20 bg-background/90 text-primary gap-1 text-[10px] font-semibold"
+          >
+            <IconBuildingStore className="size-3" />
+            ตัวแทนจำหน่าย
+          </Badge>
         )}
         <div className="group-hover:text-primary flex flex-col items-center justify-center">
           <data

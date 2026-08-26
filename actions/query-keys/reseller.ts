@@ -3,6 +3,8 @@ export const resellerKeys = {
   agreements: () => [...resellerKeys.all, 'agreements'] as const,
   agreementList: (storeId: string) =>
     [...resellerKeys.agreements(), 'list', { storeId }] as const,
+  activeAgreement: (storeId: string) =>
+    [...resellerKeys.agreements(), 'active', { storeId }] as const,
   agreementDetail: (id: string) =>
     [...resellerKeys.agreements(), 'detail', id] as const,
   stocks: () => [...resellerKeys.all, 'stocks'] as const,

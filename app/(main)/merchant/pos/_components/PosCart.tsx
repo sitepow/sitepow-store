@@ -21,7 +21,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
 import { CustomerCard } from '@/components/CustomerCard'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -39,6 +38,7 @@ interface PosCartProps {
   cart: CartItem[]
   storeId: string
   branchId: string
+  agreementId?: string
   storeSlug?: string
   onUpdateQuantity: (cartItemId: string, quantity: number) => void
   onRemoveItem: (cartItemId: string) => void
@@ -49,6 +49,7 @@ export function PosCart({
   cart,
   storeId,
   branchId,
+  agreementId,
   onUpdateQuantity,
   onRemoveItem,
   onClearCart,
@@ -56,6 +57,8 @@ export function PosCart({
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
+
+  const isResellerMode = Boolean(agreementId)
 
   const orderItems = useMemo(
     () =>
@@ -105,8 +108,10 @@ export function PosCart({
 
   const cartSummary = useMemo(() => calculateCartSummary(cart), [cart])
 
-  const pointsDiscount = usedPoints * (loyalty?.pointRedeemRate ?? 0)
-  const orderDiscount = couponDiscount + manualDiscount
+  const pointsDiscount = isResellerMode
+    ? 0
+    : usedPoints * (loyalty?.pointRedeemRate ?? 0)
+  const orderDiscount = isResellerMode ? 0 : couponDiscount + manualDiscount
 
   const grandTotal = useMemo(() => {
     return calculateGrandTotal({
@@ -122,12 +127,14 @@ export function PosCart({
     return {
       subtotal: cartSummary.subtotal,
       productDiscount: cartSummary.totalDiscount,
-      couponDiscount,
-      manualDiscount,
-      pointsDiscount,
-      totalDiscount: cartSummary.totalDiscount + pointsDiscount + orderDiscount,
+      couponDiscount: isResellerMode ? 0 : couponDiscount,
+      manualDiscount: isResellerMode ? 0 : manualDiscount,
+      pointsDiscount: isResellerMode ? 0 : pointsDiscount,
+      totalDiscount: isResellerMode
+        ? cartSummary.totalDiscount
+        : cartSummary.totalDiscount + pointsDiscount + orderDiscount,
       finalPrice: grandTotal,
-      totalPoints: cartSummary.totalPoints,
+      totalPoints: isResellerMode ? 0 : cartSummary.totalPoints,
     }
   }, [
     cartSummary,
@@ -136,6 +143,7 @@ export function PosCart({
     pointsDiscount,
     orderDiscount,
     grandTotal,
+    isResellerMode,
   ])
 
   const handleClearCartAll = () => {
@@ -181,7 +189,7 @@ export function PosCart({
               <Button size="icon-sm">{totalItems}</Button>
             </div>
           </CardTitle>
-          {customerId && (
+          {!isResellerMode && customerId && (
             <CustomerCard
               title="ข้อมูลลูกค้า"
               content={
@@ -241,7 +249,7 @@ export function PosCart({
           </ScrollArea>
         </CardContent>
         <CardFooter className="flex-col gap-3 border-t p-4">
-          {orderItems?.length !== 0 && (
+          {!isResellerMode && orderItems?.length !== 0 && (
             <PosDiscountDialog subtotal={cartSummary.finalPrice} />
           )}
           <div className="w-full">
@@ -271,7 +279,8 @@ export function PosCart({
         open={isCheckoutOpen}
         onOpenChange={setIsCheckoutOpen}
         totalAmount={summaryData.finalPrice}
-        earnedPoints={cartSummary.totalPoints}
+        earnedPoints={isResellerMode ? 0 : cartSummary.totalPoints}
+        agreementId={agreementId}
         onSuccess={handleClearCartAll}
       />
     </FormProvider>

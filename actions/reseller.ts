@@ -857,3 +857,27 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
     }
   }
 }
+
+export async function getResellerAgreementInfo(storeId: string) {
+  if (!storeId) {
+    return null
+  }
+
+  try {
+    const agreement = await prisma.resellerAgreement.findFirst({
+      where: {
+        resellerStoreId: storeId,
+        status: AgreementStatus.ACTIVE,
+      },
+      include: {
+        stocks: true,
+        customPrices: true,
+      },
+    })
+
+    return agreement
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}

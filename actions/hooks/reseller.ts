@@ -9,6 +9,7 @@ import {
   createResellerAgreement,
   createResellerPOSOrder,
   createResellerPayout,
+  getResellerAgreementInfo,
   getResellerAgreements,
   getResellerPayoutSummary,
   getResellerStocks,
@@ -150,5 +151,13 @@ export function useReturnResellerStock() {
         ])
       }
     },
+  })
+}
+
+export function useResellerAgreementInfo({ storeId }: { storeId?: string }) {
+  return useQuery({
+    queryKey: resellerKeys.activeAgreement(storeId!),
+    queryFn: () => getResellerAgreementInfo(storeId!),
+    enabled: Boolean(storeId),
   })
 }

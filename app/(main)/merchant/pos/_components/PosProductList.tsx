@@ -34,6 +34,7 @@ interface PosProductListProps {
     addons?: SelectedAddonPayload[],
     quantity?: number,
   ) => void
+  isReseller?: boolean
 }
 
 export function PosProductList({
@@ -42,6 +43,7 @@ export function PosProductList({
   search,
   onSearchChange,
   onAddToCart,
+  isReseller = false,
 }: PosProductListProps) {
   const { selectedBranchId } = useBranchFilter()
   const [selectedProduct, setSelectedProduct] = useState<POSProductItem | null>(
@@ -123,6 +125,7 @@ export function PosProductList({
                   onClick={() => handleProductClick(product)}
                   product={product as unknown as SectionProductItem}
                   quantity={totalStock}
+                  isReseller={isReseller}
                 />
               )
             })}
