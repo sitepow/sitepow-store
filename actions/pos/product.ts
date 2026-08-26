@@ -189,9 +189,15 @@ export async function getPOSProducts({
 
             if (customPrice?.specialPrice) {
               finalPrice = customPrice.specialPrice
-            } else if (customPrice?.discountType === DiscountType.FIXED) {
+            } else if (
+              customPrice?.discountType === DiscountType.FIXED &&
+              customPrice.discountAmount != null
+            ) {
               finalPrice = finalPrice.sub(customPrice.discountAmount)
-            } else if (customPrice?.discountType === DiscountType.PERCENTAGE) {
+            } else if (
+              customPrice?.discountType === DiscountType.PERCENTAGE &&
+              customPrice.discountAmount != null
+            ) {
               const discount = finalPrice
                 .mul(customPrice.discountAmount)
                 .div(100)
