@@ -2,16 +2,14 @@
 
 import { useMemo } from 'react'
 
-import Image from 'next/image'
-
 import { GetOrdersItem } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { calculateOrderSummary } from '@/utils/order'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { HighlightText } from '../HighlightText'
+import { ProductImage } from '../ProductImage'
 
 export interface OrderItemsSummaryProps {
   order: GetOrdersItem | GetStorefrontOrderItemSerialized
@@ -101,22 +99,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             key={itemKey}
             className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
-            {imageUrl ? (
-              <div className="size-16 shrink-0 overflow-hidden rounded-md border">
-                <Image
-                  src={imageUrl}
-                  alt={item.title || 'รูปสินค้า'}
-                  className="size-full object-cover"
-                  width={100}
-                  height={100}
-                  unoptimized
-                />
-              </div>
-            ) : (
-              <div className="size-16 shrink-0">
-                <EmptyImage className="text-[10px]" />
-              </div>
-            )}
+            <ProductImage src={imageUrl} />
             <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 break-all">
                 <span className="text-foreground leading-snug font-medium break-all">
@@ -144,16 +127,16 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                     จัดส่งจากสาขา {item.branch.name}
                   </span>
                 )}
-              </div>
-              <div className="flex shrink-0 flex-col items-start whitespace-nowrap sm:items-end">
-                {hasDiscount && (
-                  <span className="text-muted-foreground text-xs line-through">
-                    {formatCurrency(totalOriginalPrice)}
+                <div className="flex shrink-0 flex-col items-start whitespace-nowrap">
+                  {hasDiscount && (
+                    <span className="text-muted-foreground text-xs line-through">
+                      {formatCurrency(totalOriginalPrice)}
+                    </span>
+                  )}
+                  <span className="text-primary font-semibold">
+                    {formatCurrency(totalPrice)}
                   </span>
-                )}
-                <span className="text-primary font-semibold">
-                  {formatCurrency(totalPrice)}
-                </span>
+                </div>
               </div>
             </div>
           </div>

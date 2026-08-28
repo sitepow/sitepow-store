@@ -89,36 +89,6 @@ export const getBlockMessage = (blockedUntil: Date | string | null): string => {
   return `บัญชีของคุณถูกระงับการสั่งซื้อชั่วคราว ระบบจะปลดล็อกอัตโนมัติในวันที่ ${unlockDateStr} เวลา ${unlockTimeStr} น. (${remainingTimeStr})`
 }
 
-export function parseExpenseDateWithCurrentTime(
-  inputDate: string | Date,
-): Date {
-  const targetDate = new Date(inputDate)
-  const now = new Date()
-
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: THAILAND_TZ,
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: false,
-  })
-
-  const parts = formatter.formatToParts(now)
-  const hours = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10)
-  const minutes = parseInt(
-    parts.find((p) => p.type === 'minute')?.value || '0',
-    10,
-  )
-  const seconds = parseInt(
-    parts.find((p) => p.type === 'second')?.value || '0',
-    10,
-  )
-
-  targetDate.setHours(hours, minutes, seconds, 0)
-
-  return targetDate
-}
-
 export function getThaiDateParts(date: Date) {
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: THAILAND_TZ,
@@ -147,7 +117,29 @@ export function getThaiDateParts(date: Date) {
   return {
     year: parts.year,
     month: parts.month,
+    day: parts.day,
     dayOfWeek: weekdayMap[parts.weekday] ?? 0,
     hour: parseInt(parts.hour === '24' ? '0' : parts.hour, 10),
   }
+}
+
+export function buildExpenseDateWithServerTime(inputDate: string | Date): Date {
+  let targetDate: Date
+  if (typeof inputDate === 'string' && inputDate.includes('-')) {
+    const [year, month, day] = inputDate.split('T')[0].split('-').map(Number)
+    targetDate = new Date(year, month - 1, day)
+  } else {
+    targetDate = new Date(inputDate)
+  }
+
+  const now = new Date()
+
+  targetDate.setHours(
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+    now.getMilliseconds(),
+  )
+
+  return targetDate
 }

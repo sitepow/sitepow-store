@@ -16,6 +16,7 @@ import { formatCurrency } from '@/utils/pricing'
 import { IconEdit, IconPackage } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
+import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -104,8 +105,8 @@ export function ProductsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสินค้า</TableHead>
-              <TableHead>ชื่อสินค้า</TableHead>
+              <TableHead>รูปภาพสินค้า</TableHead>
+              <TableHead>ชื่อสินค้า/Slug</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>
               <TableHead>ราคาเริ่มต้น</TableHead>
@@ -126,15 +127,15 @@ export function ProductsTable() {
 
                 return (
                   <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
+                    <TableCell>
+                      <ProductImage src={product.images?.[0]?.url} />
+                    </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col">
-                          <span className="font-medium">{product.title}</span>
-                          <span className="text-muted-foreground text-xs">
-                            {product.slug}
-                          </span>
-                        </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{product.title}</span>
+                        <span className="text-muted-foreground">
+                          {product.slug}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

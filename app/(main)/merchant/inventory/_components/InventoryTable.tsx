@@ -14,6 +14,7 @@ import {
 } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -70,9 +71,9 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสินค้า</TableHead>
-              <TableHead>สินค้า</TableHead>
-              <TableHead>ตัวเลือก</TableHead>
+              <TableHead>รูปภาพสินค้า</TableHead>
+              <TableHead>สินค้า/Slug</TableHead>
+              <TableHead>ตัวเลือก/ราคา</TableHead>
               <TableHead>SKU</TableHead>
               <TableHead>สาขา</TableHead>
               <TableHead className="text-end">คงเหลือ</TableHead>
@@ -99,13 +100,20 @@ export function InventoryTable() {
 
                 return (
                   <TableRow key={stock.id}>
-                    <TableCell>{stock.id}</TableCell>
+                    <TableCell>
+                      <ProductImage
+                        src={
+                          stock.variant.image ??
+                          stock.variant.product.images?.[0]?.url
+                        }
+                      />
+                    </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
                         <span className="font-medium">
                           {stock.variant.product.title}
                         </span>
-                        <span className="text-muted-foreground text-xs">
+                        <span className="text-muted-foreground">
                           {stock.variant.product.slug}
                         </span>
                       </div>
@@ -115,10 +123,7 @@ export function InventoryTable() {
                         <span className="font-medium">
                           {stock.variant.title}
                         </span>
-                        <span className="text-muted-foreground text-xs">
-                          รหัสตัวเลือกสินค้า: {stock.variant.id}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
+                        <span className="text-muted-foreground">
                           ราคา: {formatCurrency(Number(stock.variant.price))}
                         </span>
                       </div>

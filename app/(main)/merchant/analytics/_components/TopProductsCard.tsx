@@ -53,7 +53,7 @@ export function TopProductsCard({ topProducts }: TopProductsCardProps) {
               normalBarClass="bg-orange-500/70"
             >
               <div className="truncate">
-                <p className="text-foreground truncate text-sm font-semibold transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                <p className="text-foreground text-sm font-semibold transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400">
                   {item.name}
                 </p>
                 <p className="text-muted-foreground text-xs">

@@ -12,6 +12,7 @@ import { IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
+import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -127,21 +128,16 @@ export function ExpenseTable({
                         <p className="text-sm">{expense.note}</p>
                       )}
                       {expense.receiptImage ? (
-                        <div className="mt-1 flex gap-1">
-                          <a
-                            href={expense.receiptImage}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="border-primary border border-dashed p-1"
-                            title="คลิกเพื่อดูรูปขนาดเต็ม"
-                          >
-                            <img
-                              src={expense.receiptImage}
-                              alt={expense.title}
-                              className="size-14 object-cover"
-                            />
-                          </a>
-                        </div>
+                        <a
+                          href={expense.receiptImage}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <ProductImage src={expense.receiptImage} />
+                          <span className="text-primary text-xs">
+                            คลิกเพื่อดูรูปหลักฐาน
+                          </span>
+                        </a>
                       ) : (
                         !expense.note && (
                           <span className="text-muted-foreground text-xs">

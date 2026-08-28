@@ -18,12 +18,14 @@ import {
   IconSparkles,
   IconWallet,
 } from '@tabler/icons-react'
+import { format } from 'date-fns'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
 
 import { AiInsightsCard, AiInsightsData } from './_components/AiInsightsCard'
 import { AnalyticsSkeleton } from './_components/AnalyticsSkeleton'
@@ -41,12 +43,20 @@ export default function AnalyticsPage() {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
+  const [startDate, setStartDate] = useState(() => {
+    const now = new Date()
+    return format(new Date(now.getFullYear(), now.getMonth(), 1), 'yyyy-MM-dd')
+  })
+  const [endDate, setEndDate] = useState(() => format(new Date(), 'yyyy-MM-dd'))
+
   const { canViewDashboard, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   const { data, isLoading } = useAnalyticsOverview(
     selectedStoreId,
     selectedBranchId,
+    startDate,
+    endDate,
   )
 
   const [aiInsights, setAiInsights] = useState<AiInsightsData | null>(null)
@@ -92,6 +102,23 @@ export default function AnalyticsPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-end gap-2.5">
+            <div className="flex items-end gap-2">
+              <div className="w-36">
+                <DatePicker
+                  value={startDate}
+                  onChange={setStartDate}
+                  placeholder="เริ่มวันที่"
+                />
+              </div>
+              <span className="text-muted-foreground text-sm">-</span>
+              <div className="w-36">
+                <DatePicker
+                  value={endDate}
+                  onChange={setEndDate}
+                  placeholder="ถึงวันที่"
+                />
+              </div>
+            </div>
             <StoreSelectField />
             <BranchSelectField />
             <Button

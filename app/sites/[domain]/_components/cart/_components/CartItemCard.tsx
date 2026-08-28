@@ -1,14 +1,11 @@
-/* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable @next/next/no-img-element */
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 
+import { ProductImage } from '@/components/ProductImage'
 import { Button } from '@/components/ui/button'
 
 import { cn } from '@/lib/utils'
-
-import { EmptyImage } from '../../EmptyImage'
 
 interface CartItemCardProps {
   item: CartItem
@@ -32,20 +29,7 @@ export function CartItemCard({
 
   return (
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
-      <div
-        className={
-          'relative aspect-square size-16 flex-none cursor-pointer overflow-hidden md:size-20'
-        }
-      >
-        {item.image ? (
-          <img
-            src={item.image}
-            className="size-full object-cover object-center"
-          />
-        ) : (
-          <EmptyImage className="text-[10px]" />
-        )}
-      </div>
+      <ProductImage src={item.image} alt={item.productTitle} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn('min-w-0 wrap-break-word', productClassName)}>
           <h4

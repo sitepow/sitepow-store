@@ -76,6 +76,8 @@ export interface AnalyticsResult {
 export async function getAnalyticsOverview(
   storeId: string,
   branchId?: string,
+  startDate?: string,
+  endDate?: string,
 ): Promise<AnalyticsResult> {
   const userSession = await getCurrentUser()
   const userId = userSession?.id
@@ -124,16 +126,35 @@ export async function getAnalyticsOverview(
     ? { OR: [{ branchId: validBranchId }, { branchId: null }] }
     : {}
 
-  const sixMonthsAgo = new Date()
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
-  sixMonthsAgo.setDate(1)
-  sixMonthsAgo.setHours(0, 0, 0, 0)
+  let startRange: Date
+  let endRange: Date
+
+  if (startDate) {
+    startRange = new Date(startDate)
+    startRange.setHours(0, 0, 0, 0)
+  } else {
+    const now = new Date()
+    startRange = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+  }
+
+  if (endDate) {
+    endRange = new Date(endDate)
+    endRange.setHours(23, 59, 59, 999)
+  } else {
+    endRange = new Date()
+    endRange.setHours(23, 59, 59, 999)
+  }
+
+  const dateRangeFilter = {
+    gte: startRange,
+    lte: endRange,
+  }
 
   const [orders, orderItems, expenses] = await Promise.all([
     prisma.order.findMany({
       where: {
         ...storeFilter,
-        createdAt: { gte: sixMonthsAgo },
+        createdAt: dateRangeFilter,
         status: { not: OrderStatus.CANCELLED },
         ...orderBranchFilter,
       },
@@ -154,7 +175,7 @@ export async function getAnalyticsOverview(
       where: {
         order: {
           ...storeFilter,
-          createdAt: { gte: sixMonthsAgo },
+          createdAt: dateRangeFilter,
           status: { not: OrderStatus.CANCELLED },
         },
         ...orderItemBranchFilter,
@@ -173,7 +194,7 @@ export async function getAnalyticsOverview(
     prisma.expense.findMany({
       where: {
         ...storeFilter,
-        expenseDate: { gte: sixMonthsAgo },
+        expenseDate: dateRangeFilter,
         ...expenseBranchFilter,
       },
       select: {
@@ -183,48 +204,84 @@ export async function getAnalyticsOverview(
     }),
   ])
 
-  const monthlyMap: Record<string, FinancialTrendItem> = {}
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date()
-    d.setMonth(d.getMonth() - i)
-    const { year, month } = getThaiDateParts(d)
-    const key = `${year}-${month}`
+  const diffInDays = Math.ceil(
+    (endRange.getTime() - startRange.getTime()) / (1000 * 60 * 60 * 24),
+  )
+  const isDailyMode = diffInDays <= 31
 
-    const label = new Intl.DateTimeFormat('th-TH', {
-      timeZone: THAILAND_TZ,
-      month: 'short',
-      year: '2-digit',
-    }).format(d)
+  const periodMap: Record<
+    string,
+    { key: string; label: string; item: FinancialTrendItem }
+  > = {}
 
-    monthlyMap[key] = {
-      period: label,
-      revenue: 0,
-      cogs: 0,
-      expense: 0,
-      netProfit: 0,
+  const getPeriodInfo = (date: Date) => {
+    const { year, month, day } = getThaiDateParts(date)
+
+    if (isDailyMode) {
+      const key = `${year}-${month}-${day}`
+      const label = new Intl.DateTimeFormat('th-TH', {
+        timeZone: THAILAND_TZ,
+        day: 'numeric',
+        month: 'short',
+      }).format(date)
+      return { key, label }
+    } else {
+      const key = `${year}-${month}`
+      const label = new Intl.DateTimeFormat('th-TH', {
+        timeZone: THAILAND_TZ,
+        month: 'short',
+        year: '2-digit',
+      }).format(date)
+      return { key, label }
+    }
+  }
+
+  const cursor = new Date(startRange)
+  while (cursor <= endRange) {
+    const { key, label } = getPeriodInfo(cursor)
+    if (!periodMap[key]) {
+      periodMap[key] = {
+        key,
+        label,
+        item: {
+          period: label,
+          revenue: 0,
+          cogs: 0,
+          expense: 0,
+          netProfit: 0,
+        },
+      }
+    }
+
+    if (isDailyMode) {
+      cursor.setDate(cursor.getDate() + 1)
+    } else {
+      cursor.setMonth(cursor.getMonth() + 1)
     }
   }
 
   orders.forEach((o) => {
-    const { year, month } = getThaiDateParts(o.createdAt)
-    const key = `${year}-${month}`
-    if (monthlyMap[key]) monthlyMap[key].revenue += Number(o.totalAmount)
+    const { key } = getPeriodInfo(o.createdAt)
+    if (periodMap[key]) {
+      periodMap[key].item.revenue += Number(o.totalAmount)
+    }
   })
 
   orderItems.forEach((item) => {
-    const { year, month } = getThaiDateParts(item.order.createdAt)
-    const key = `${year}-${month}`
-    if (monthlyMap[key])
-      monthlyMap[key].cogs += Number(item.costPrice ?? 0) * item.quantity
+    const { key } = getPeriodInfo(item.order.createdAt)
+    if (periodMap[key]) {
+      periodMap[key].item.cogs += Number(item.costPrice ?? 0) * item.quantity
+    }
   })
 
   expenses.forEach((e) => {
-    const { year, month } = getThaiDateParts(e.expenseDate)
-    const key = `${year}-${month}`
-    if (monthlyMap[key]) monthlyMap[key].expense += Number(e.amount)
+    const { key } = getPeriodInfo(e.expenseDate)
+    if (periodMap[key]) {
+      periodMap[key].item.expense += Number(e.amount)
+    }
   })
 
-  const financialTrend = Object.values(monthlyMap).map((item) => ({
+  const financialTrend = Object.values(periodMap).map(({ item }) => ({
     ...item,
     netProfit: item.revenue - item.cogs - item.expense,
   }))

@@ -12,7 +12,6 @@ import toast from 'react-hot-toast'
 
 import { usePOSProducts } from '@/actions/hooks/pos/product'
 import { useAllocateResellerStock } from '@/actions/hooks/reseller'
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -20,6 +19,8 @@ import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
+import { ProductImage } from '@/components/ProductImage'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -231,49 +232,32 @@ export function AllocateStockDialog({
                                       : 'border-border hover:bg-accent/50',
                                 )}
                               >
-                                <div className="bg-muted size-14 shrink-0 overflow-hidden rounded">
-                                  {imageUrl ? (
-                                    <img
-                                      src={imageUrl}
-                                      alt={product.title}
-                                      className="size-full object-cover"
-                                    />
-                                  ) : (
-                                    <EmptyImage className="size-full" />
-                                  )}
-                                </div>
+                                <ProductImage src={imageUrl} />
                                 <div className="min-w-0 flex-1 space-y-1">
                                   <p className="text-foreground leading-snug font-medium break-all whitespace-pre-line">
-                                    {product.title}
+                                    {variant.title}
                                   </p>
-                                  <p className="text-muted-foreground text-xs leading-normal break-all whitespace-pre-line">
-                                    {variant.title}{' '}
-                                    {variant.sku && `(${variant.sku})`}
-                                  </p>
-                                  <div className="pt-0.5">
-                                    <span
-                                      className={`inline-block rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                                        isOutOfStock
-                                          ? 'bg-destructive/10 text-destructive'
-                                          : 'bg-muted text-muted-foreground'
-                                      }`}
+                                  {variant.sku && (
+                                    <p className="text-muted-foreground text-xs break-all">
+                                      SKU: {variant.sku}
+                                    </p>
+                                  )}
+                                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                    <Badge
+                                      variant={
+                                        isOutOfStock ? 'outline' : 'default'
+                                      }
                                     >
                                       {isOutOfStock
                                         ? 'หมดสต็อก'
                                         : `คงเหลือ: ${formatNumber(stockQty)} ชิ้น`}
+                                    </Badge>
+                                    <span className="text-primary text-sm font-semibold whitespace-nowrap">
+                                      {formatCurrency(
+                                        Number(variant.price || 0),
+                                      )}
                                     </span>
                                   </div>
-                                </div>
-                                <div className="flex shrink-0 flex-col items-end justify-between self-stretch pl-1">
-                                  <span className="text-primary text-sm font-semibold whitespace-nowrap">
-                                    {formatCurrency(Number(variant.price || 0))}
-                                  </span>
-
-                                  {isSelected && (
-                                    <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full">
-                                      <IconCheck className="size-3.5" />
-                                    </span>
-                                  )}
                                 </div>
                               </button>
                             )

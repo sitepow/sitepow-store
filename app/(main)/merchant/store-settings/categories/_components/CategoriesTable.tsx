@@ -8,6 +8,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
+import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Button } from '@/components/ui/button'
@@ -43,22 +44,31 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสหมวดหมู่</TableHead>
-              <TableHead>ชื่อหมวดหมู่</TableHead>
+              <TableHead>รูปภาพ</TableHead>
+              <TableHead>ชื่อหมวดหมู่/Slug</TableHead>
               <TableHead>คำอธิบาย</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && categories.length === 0 ? (
-              <TableLoadingRow colSpan={4} />
+              <TableLoadingRow colSpan={5} />
             ) : categories.length === 0 ? (
-              <TableEmptyRow colSpan={4} title="ไม่พบรายการหมวดหมู่" />
+              <TableEmptyRow colSpan={5} title="ไม่พบรายการหมวดหมู่" />
             ) : (
               categories.map((category) => (
                 <TableRow key={category.id}>
-                  <TableCell>{category.id}</TableCell>
-                  <TableCell>{category.title}</TableCell>
+                  <TableCell>
+                    <ProductImage src={category.image} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{category.title}</span>
+                      <span className="text-muted-foreground">
+                        {category.slug}
+                      </span>
+                    </div>
+                  </TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <span className="text-muted-foreground text-sm">
                       {category.description || '-'}

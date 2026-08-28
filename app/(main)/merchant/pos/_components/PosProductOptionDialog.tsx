@@ -4,7 +4,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { POSProductItem } from '@/actions/pos/product'
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
@@ -12,8 +11,8 @@ import { CartItem } from '@/types/sites/cart'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
-import { IconCheck } from '@tabler/icons-react'
 
+import { ProductImage } from '@/components/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -283,18 +282,7 @@ export function PosProductOptionDialog({
                               : 'border-border hover:bg-accent/50',
                         )}
                       >
-                        <div className="bg-muted size-14 shrink-0 overflow-hidden">
-                          {imageUrl ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                              src={imageUrl}
-                              alt={variant.title || product.title}
-                              className="size-full object-cover"
-                            />
-                          ) : (
-                            <EmptyImage className="size-full" />
-                          )}
-                        </div>
+                        <ProductImage src={imageUrl} />
                         <div className="min-w-0 flex-1 space-y-1">
                           <p className="text-foreground leading-snug font-medium break-all whitespace-pre-line">
                             {variant.title}
@@ -305,17 +293,13 @@ export function PosProductOptionDialog({
                             </p>
                           )}
                           <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                            <span
-                              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
-                                isOutOfStock
-                                  ? 'bg-destructive/10 text-destructive'
-                                  : 'bg-muted text-muted-foreground'
-                              }`}
+                            <Badge
+                              variant={isOutOfStock ? 'outline' : 'default'}
                             >
                               {isOutOfStock
                                 ? 'หมดสต็อก'
                                 : `คงเหลือ: ${formatNumber(stock)} ชิ้น`}
-                            </span>
+                            </Badge>
                             {hasDiscount &&
                               variant.discountType ===
                                 DiscountType.PERCENTAGE && (
@@ -331,29 +315,21 @@ export function PosProductOptionDialog({
                                 +{variant.pointsAmount} แต้ม
                               </Badge>
                             )}
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 flex-col items-end justify-between self-stretch pl-1">
-                          {hasDiscount ? (
-                            <div className="flex flex-col items-end">
+                            {hasDiscount ? (
+                              <div className="flex flex-col items-end">
+                                <span className="text-primary text-sm font-semibold whitespace-nowrap">
+                                  {formatCurrency(netPrice)}
+                                </span>
+                                <span className="text-muted-foreground text-xs whitespace-nowrap line-through">
+                                  {formatCurrency(variantPrice)}
+                                </span>
+                              </div>
+                            ) : (
                               <span className="text-primary text-sm font-semibold whitespace-nowrap">
-                                {formatCurrency(netPrice)}
-                              </span>
-                              <span className="text-muted-foreground text-xs whitespace-nowrap line-through">
                                 {formatCurrency(variantPrice)}
                               </span>
-                            </div>
-                          ) : (
-                            <span className="text-primary text-sm font-semibold whitespace-nowrap">
-                              {formatCurrency(variantPrice)}
-                            </span>
-                          )}
-
-                          {isSelected && (
-                            <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full">
-                              <IconCheck className="size-3.5" />
-                            </span>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </button>
                     )

@@ -23,7 +23,10 @@ interface SalesTrendChartProps {
 }
 
 const chartConfig = {
-  total: { label: 'ยอดขาย', color: 'hsl(var(--primary))' },
+  total: {
+    label: 'ยอดขาย',
+    color: '#10b981',
+  },
 } satisfies ChartConfig
 
 export function SalesTrendChart({ data }: SalesTrendChartProps) {
@@ -61,8 +64,9 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
             <Area
               dataKey="total"
               type="natural"
-              fill="hsl(var(--primary)/0.2)"
-              stroke="hsl(var(--primary))"
+              fill="var(--color-total)"
+              fillOpacity={0.2}
+              stroke="var(--color-total)"
               strokeWidth={2}
             />
           </AreaChart>

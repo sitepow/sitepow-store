@@ -52,8 +52,8 @@ export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
               firstGradientClass="bg-linear-to-r from-orange-500 to-amber-500"
               normalBarClass="bg-orange-500/70"
             >
-              <div className="truncate">
-                <p className="text-foreground truncate text-sm font-semibold transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400">
+              <div>
+                <p className="text-foreground text-sm font-semibold transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400">
                   {item.name}
                 </p>
                 <p className="text-muted-foreground text-xs">

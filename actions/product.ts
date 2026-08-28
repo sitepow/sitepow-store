@@ -8,6 +8,7 @@ import {
   Prisma,
   ProductType,
 } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
 import { checkCanCreateProduct } from '@/utils/subscription'
@@ -140,7 +141,7 @@ export async function getProducts({
   }
 
   try {
-    if (storeId && storeId !== 'all' && storeId !== '') {
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,

@@ -5,7 +5,6 @@ import {
   useResellerPayoutSummary,
   useResellerStocks,
 } from '@/actions/hooks/reseller'
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -18,6 +17,7 @@ import {
 import { CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -35,7 +35,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 interface ResellerStockTableProps {
   onAcceptStock?: (stock: any) => void
   onReturnStock?: (stock: any) => void
-  onEditPrice?: (stock: any) => void // 1. เพิ่ม prop สำหรับรับ event การแก้ไขราคา
+  onEditPrice?: (stock: any) => void
 }
 
 export function ResellerStockTable({
@@ -152,22 +152,12 @@ export function ResellerStockTable({
                     <TableRow key={stock.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="size-16 shrink-0 overflow-hidden rounded border border-dashed p-0.5">
-                            {imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt={stock.variant?.product?.title || ''}
-                                className="size-full rounded-sm object-cover"
-                              />
-                            ) : (
-                              <EmptyImage className="size-full rounded-sm" />
-                            )}
-                          </div>
-                          <div className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                            <p className="leading-none font-medium">
+                          <ProductImage src={imageUrl} />
+                          <div className="flex max-w-72 min-w-72 flex-col wrap-break-word whitespace-pre-line">
+                            <p className="font-medium">
                               {stock.variant?.product?.title || '-'}
                             </p>
-                            <p className="text-muted-foreground mt-1 text-xs">
+                            <p className="text-muted-foreground">
                               {stock.variant?.title}
                             </p>
                           </div>

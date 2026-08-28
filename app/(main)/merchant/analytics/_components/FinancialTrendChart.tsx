@@ -32,7 +32,7 @@ const chartConfig = {
 export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
   return (
     <AnalyticsCardShell
-      title="สรุปผลประกอบการการเงิน (6 เดือนล่าสุด)"
+      title="สรุปผลประกอบการการเงิน"
       description="แสดงยอดขาย, ต้นทุนสินค้า (COGS), ค่าใช้จ่ายดำเนินงาน และกำไรสุทธิ"
       isEmpty={data.length === 0}
       emptyMessage="ไม่มีข้อมูลผลประกอบการการเงิน"

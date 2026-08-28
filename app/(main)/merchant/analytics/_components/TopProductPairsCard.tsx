@@ -41,7 +41,7 @@ export function TopProductPairsCard({
 
     if (!separator) {
       return (
-        <p className="text-foreground truncate text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
+        <p className="text-foreground text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
           {pairString}
         </p>
       )
@@ -52,13 +52,13 @@ export function TopProductPairsCard({
 
     return (
       <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:flex-nowrap">
-        <span className="text-foreground truncate text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
+        <span className="text-foreground text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
           {item1.trim()}
         </span>
         <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
           <IconLink className="h-2.5 w-2.5" />
         </span>
-        <span className="text-foreground truncate text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
+        <span className="text-foreground text-sm font-semibold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
           {item2.trim()}
         </span>
       </div>

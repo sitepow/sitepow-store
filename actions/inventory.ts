@@ -36,11 +36,19 @@ const inventorySelect = {
       title: true,
       sku: true,
       price: true,
+      image: true,
       product: {
         select: {
           id: true,
           title: true,
           slug: true,
+          images: {
+            where: { isPrimary: true },
+            select: {
+              url: true,
+            },
+            take: 1,
+          },
         },
       },
     },

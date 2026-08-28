@@ -1,14 +1,18 @@
 import { getAnalyticsOverview } from '@/actions/analytics'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { ALL_STORES } from '@/stores/use-store-filter'
+import { useQuery } from '@tanstack/react-query'
 
 import { analyticsKeys } from '../query-keys/analytics'
 
-export function useAnalyticsOverview(storeId: string, branchId?: string) {
-  return useQuery(
-    queryOptions({
-      queryKey: analyticsKeys.overview(storeId, branchId),
-      queryFn: async () => await getAnalyticsOverview(storeId, branchId),
-      enabled: !!storeId && storeId !== 'ALL_STORES',
-    }),
-  )
+export function useAnalyticsOverview(
+  storeId: string,
+  branchId?: string,
+  startDate?: string,
+  endDate?: string,
+) {
+  return useQuery({
+    queryKey: analyticsKeys.overview(storeId, branchId, startDate, endDate),
+    queryFn: () => getAnalyticsOverview(storeId, branchId, startDate, endDate),
+    enabled: !!storeId && storeId !== ALL_STORES,
+  })
 }
