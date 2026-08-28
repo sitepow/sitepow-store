@@ -444,6 +444,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           }
 
           return {
+            id: v.id,
             title: v.title,
             price: v.price,
             costPrice: v.costPrice ?? 0,

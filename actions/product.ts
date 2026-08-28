@@ -30,6 +30,7 @@ export interface CreateProductInput {
   images?: { url: string; isPrimary: boolean }[]
   isPublished?: boolean
   variants: {
+    id?: string
     title: string
     price: number
     costPrice: number
@@ -413,7 +414,7 @@ export async function deleteProduct(id: string) {
         storeId: true,
         store: { select: { slug: true } },
         images: { select: { url: true } },
-        variants: { select: { image: true } },
+        variants: { select: { id: true, title: true, image: true } },
       },
     })
 
@@ -431,6 +432,31 @@ export async function deleteProduct(id: string) {
       return {
         success: false,
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const productVariantIds = product.variants.map((v) => v.id)
+
+    if (productVariantIds.length > 0) {
+      const activeResellerStocks = await prisma.resellerStock.findMany({
+        where: {
+          variantId: { in: productVariantIds },
+          allocatedQuantity: { gt: 0 },
+        },
+        include: {
+          variant: { select: { title: true } },
+        },
+      })
+
+      if (activeResellerStocks.length > 0) {
+        const blockedVariantTitles = Array.from(
+          new Set(activeResellerStocks.map((s) => s.variant.title)),
+        ).join(', ')
+
+        return {
+          success: false,
+          message: `ไม่สามารถลบสินค้านี้ได้ เนื่องจากตัวเลือก (${blockedVariantTitles}) ยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
+        }
       }
     }
 
@@ -475,9 +501,13 @@ export async function deleteProduct(id: string) {
     })
 
     return { success: true, message: 'ลบสินค้าสำเร็จ' }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลบสินค้า',
+    }
   }
 }
 
@@ -541,7 +571,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       select: {
         storeId: true,
         images: { select: { url: true } },
-        variants: { select: { image: true } },
+        variants: { select: { id: true, title: true, image: true } },
       },
     })
 
@@ -572,6 +602,39 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       isPublished,
       ...rest
     } = input
+
+    const inputVariantIds = variants
+      .map((v: any) => v.id)
+      .filter((vid): vid is string => Boolean(vid))
+
+    const existingVariantIds = existingProduct.variants.map((v) => v.id)
+
+    const variantIdsToDelete = existingVariantIds.filter(
+      (vid) => !inputVariantIds.includes(vid),
+    )
+
+    if (variantIdsToDelete.length > 0) {
+      const activeResellerStocks = await prisma.resellerStock.findMany({
+        where: {
+          variantId: { in: variantIdsToDelete },
+          allocatedQuantity: { gt: 0 },
+        },
+        include: {
+          variant: { select: { title: true } },
+        },
+      })
+
+      if (activeResellerStocks.length > 0) {
+        const blockedVariantTitles = Array.from(
+          new Set(activeResellerStocks.map((s) => s.variant.title)),
+        ).join(', ')
+
+        return {
+          success: false,
+          message: `ไม่สามารถลบตัวเลือกสินค้า (${blockedVariantTitles}) ได้ เนื่องจากยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
+        }
+      }
+    }
 
     const oldImageUrls = new Set<string>()
     existingProduct.images.forEach((img) => {
@@ -625,76 +688,136 @@ export async function updateProduct(id: string, input: CreateProductInput) {
         },
       })
 
-      await tx.productVariant.deleteMany({ where: { productId: id } })
       await tx.productAddon.deleteMany({ where: { productId: id } })
       await tx.productTag.deleteMany({ where: { productId: id } })
       await tx.productImage.deleteMany({ where: { productId: id } })
 
-      const product = await tx.product.update({
-        where: { id },
-        data: {
-          tags: { create: tagsArray.map((name) => ({ name })) },
-          images: {
-            create:
-              images?.map((img) => ({
-                url: img.url,
-                isPrimary: img.isPrimary,
-              })) ?? [],
-          },
-          variants: {
-            create: variants.map((v) => ({
-              title: v.title,
-              price: v.price,
-              costPrice: v.costPrice,
-              sku: v.sku ?? '',
-              image: v.image ?? null,
-              digitalUrl: v.digitalUrl ?? '',
-              discountActive: v.discount.active,
-              discountType: v.discount.active ? v.discount.type : null,
-              discountAmount: v.discount.active ? v.discount.amount : null,
-              pointsActive: v.rewardPoints.isActive,
-              pointsAmount: v.rewardPoints.amount,
-              isAvailable: v.isAvailable,
-              digitalItems: {
-                create:
-                  v.digitalItems?.map((item) => ({
-                    content: item.content,
-                    isUsed: item.isUsed,
-                  })) ?? [],
-              },
-              stocks: {
-                create: v.stocks.map((s) => ({
-                  branchId: s.branchId,
-                  quantity: s.quantity,
-                  minStock: s.minStock,
-                })),
-              },
+      if (tagsArray.length > 0) {
+        await tx.productTag.createMany({
+          data: tagsArray.map((name) => ({ productId: id, name })),
+        })
+      }
+
+      if (images && images.length > 0) {
+        await tx.productImage.createMany({
+          data: images.map((img) => ({
+            productId: id,
+            url: img.url,
+            isPrimary: img.isPrimary,
+          })),
+        })
+      }
+
+      if (addons && addons.length > 0) {
+        await tx.productAddon.createMany({
+          data: addons.map((a) => ({
+            productId: id,
+            title: a.title,
+            price: a.price,
+            isAvailable: a.isAvailable,
+          })),
+        })
+      }
+
+      if (variantIdsToDelete.length > 0) {
+        await tx.productVariant.deleteMany({
+          where: { id: { in: variantIdsToDelete } },
+        })
+      }
+
+      for (const v of variants) {
+        const variantId = (v as any).id
+
+        const variantData = {
+          title: v.title,
+          price: v.price,
+          costPrice: v.costPrice,
+          sku: v.sku ?? '',
+          image: v.image ?? null,
+          digitalUrl: v.digitalUrl ?? '',
+          discountActive: v.discount.active,
+          discountType: v.discount.active ? v.discount.type : null,
+          discountAmount: v.discount.active ? v.discount.amount : null,
+          pointsActive: v.rewardPoints.isActive,
+          pointsAmount: v.rewardPoints.amount,
+          isAvailable: v.isAvailable,
+        }
+
+        let currentVariantId = variantId
+
+        if (variantId && existingVariantIds.includes(variantId)) {
+          await tx.productVariant.update({
+            where: { id: variantId },
+            data: variantData,
+          })
+        } else {
+          const newVariant = await tx.productVariant.create({
+            data: {
+              ...variantData,
+              productId: id,
+            },
+          })
+          currentVariantId = newVariant.id
+        }
+
+        if (v.digitalItems && v.digitalItems.length > 0) {
+          await tx.digitalItem.deleteMany({
+            where: { variantId: currentVariantId },
+          })
+          await tx.digitalItem.createMany({
+            data: v.digitalItems.map((item) => ({
+              variantId: currentVariantId,
+              content: item.content,
+              isUsed: item.isUsed,
             })),
-          },
-          addons: {
-            create:
-              addons?.map((a) => ({
-                title: a.title,
-                price: a.price,
-                isAvailable: a.isAvailable,
-              })) ?? [],
-          },
-        },
-        select: {
-          store: { select: { slug: true } },
-        },
+          })
+        }
+
+        for (const s of v.stocks) {
+          await tx.productStock.upsert({
+            where: {
+              branchId_variantId: {
+                branchId: s.branchId,
+                variantId: currentVariantId,
+              },
+            },
+            update: {
+              quantity: s.quantity,
+              minStock: s.minStock,
+            },
+            create: {
+              branchId: s.branchId,
+              variantId: currentVariantId,
+              quantity: s.quantity,
+              minStock: s.minStock,
+            },
+          })
+        }
+      }
+
+      const store = await tx.store.findUnique({
+        where: { id: existingProduct.storeId },
+        select: { slug: true },
       })
 
-      await Promise.all([
-        invalidateStorefrontProductCache(product.store.slug),
-        invalidateStorefrontCategoryCache(product.store.slug),
-      ])
+      if (store) {
+        await Promise.all([
+          invalidateStorefrontProductCache(store.slug),
+          invalidateStorefrontCategoryCache(store.slug),
+        ])
+      }
     })
 
     return { success: true, message: 'อัปเดตสินค้าสำเร็จ' }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'เกิดข้อผิดพลาดในการอัปเดตสินค้า',
+    }
   }
 }
 

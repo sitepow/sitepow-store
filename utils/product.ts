@@ -146,6 +146,7 @@ export const transformProductToFormValues = (
         isPrimary: img.isPrimary ?? false,
       })) || [],
     variants: product.variants.map((v) => ({
+      id: v.id,
       title: v.title,
       price: Number(v.price),
       costPrice: Number(v.costPrice ?? 0),
