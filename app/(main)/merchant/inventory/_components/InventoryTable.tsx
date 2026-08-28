@@ -1,15 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useInventory } from '@/actions/hooks/inventory'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconAlertCircle,
   IconAlertTriangle,
+  IconChevronDown,
+  IconChevronRight,
+  IconCornerDownRight,
   IconLock,
 } from '@tabler/icons-react'
 
@@ -18,6 +22,7 @@ import { ProductImage } from '@/components/ProductImage'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -33,7 +38,11 @@ import { StockTransferDialog } from './StockTransferDialog'
 
 export function InventoryTable() {
   const { selectedStoreId } = useStoreFilter()
+  const { selectedBranchId } = useBranchFilter()
   const [page, setPage] = useState(1)
+  const [expandedProductIds, setExpandedProductIds] = useState<
+    Record<string, boolean>
+  >({})
 
   const {
     canViewInventory,
@@ -42,11 +51,19 @@ export function InventoryTable() {
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
-  const { data: { data: stocks = [], meta } = {}, isLoading } = useInventory({
+  const { data: { data: products = [], meta } = {}, isLoading } = useInventory({
     storeId: selectedStoreId,
+    branchId: selectedBranchId,
     page,
     limit: 10,
   })
+
+  const toggleRow = (productId: string) => {
+    setExpandedProductIds((prev) => ({
+      ...prev,
+      [productId]: !prev[productId],
+    }))
+  }
 
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
@@ -62,8 +79,8 @@ export function InventoryTable() {
     )
   }
 
-  const totalColumns = canViewInventory ? 9 : 8
   const canManageInventory = canDeleteInventory || canUpdateInventory
+  const totalColumns = canManageInventory ? 6 : 5
 
   return (
     <>
@@ -71,116 +88,174 @@ export function InventoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รูปภาพสินค้า</TableHead>
-              <TableHead>สินค้า/Slug</TableHead>
-              <TableHead>ตัวเลือก/ราคา</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>สาขา</TableHead>
-              <TableHead className="text-end">คงเหลือ</TableHead>
-              <TableHead className="text-end">ขั้นต่ำ</TableHead>
-              <TableHead>สถานะ</TableHead>
-              {canManageInventory && (
-                <TableHead className="text-right">จัดการ</TableHead>
-              )}
+              <TableHead className="w-12" />
+              <TableHead>รูปภาพ</TableHead>
+              <TableHead>สินค้า / Slug</TableHead>
+              <TableHead className="text-center">จำนวน Variant</TableHead>
+              <TableHead className="text-end">สต็อกรวม</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLoading || isPermissionLoading) && stocks.length === 0 ? (
+            {(isLoading || isPermissionLoading) && products.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
-            ) : stocks.length === 0 ? (
+            ) : products.length === 0 ? (
               <TableEmptyRow
                 colSpan={totalColumns}
                 title="ไม่พบข้อมูลสต็อกสินค้า"
               />
             ) : (
-              stocks.map((stock) => {
-                const isLow =
-                  stock.quantity <= stock.minStock && stock.minStock > 0
-                const isOut = stock.quantity === 0
+              products.map((product) => {
+                const isExpanded = !!expandedProductIds[product.id]
+                const variants = product.variants || []
+
+                const totalStock = variants.reduce((acc, v) => {
+                  const stockQty = v.stocks?.[0]?.quantity || 0
+                  return acc + stockQty
+                }, 0)
 
                 return (
-                  <TableRow key={stock.id}>
-                    <TableCell>
-                      <ProductImage
-                        src={
-                          stock.variant.image ??
-                          stock.variant.product.images?.[0]?.url
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {stock.variant.product.title}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {stock.variant.product.slug}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {stock.variant.title}
-                        </span>
-                        <span className="text-muted-foreground">
-                          ราคา: {formatCurrency(Number(stock.variant.price))}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-muted-foreground text-sm">
-                        {stock.variant.sku || '-'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={stock.branch.isMain ? 'default' : 'outline'}
-                      >
-                        {stock.branch.name}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-end">
-                      <Badge variant="outline">
-                        {formatNumber(stock.quantity)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-end">
-                      <Badge variant="outline">
-                        {formatNumber(stock.minStock)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {isOut ? (
-                        <Badge variant="destructive">
-                          <IconAlertCircle /> หมด
-                        </Badge>
-                      ) : isLow ? (
-                        <Badge className="bg-yellow-500 hover:bg-yellow-500">
-                          <IconAlertTriangle /> ใกล้หมด
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">ปกติ</Badge>
-                      )}
-                    </TableCell>
-                    {canManageInventory && (
-                      <TableCell className="space-x-2 text-right">
-                        <StockAdjustmentDialog
-                          variantId={stock.variant.id}
-                          variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
-                          branchId={stock.branch.id}
-                          branchName={stock.branch.name}
-                        />
-                        <StockTransferDialog
-                          variantId={stock.variant.id}
-                          variantLabel={`${stock.variant.product.title} · ${stock.variant.title}`}
-                          fromBranchId={stock.branch.id}
-                          fromBranchName={stock.branch.name}
-                        />
-                        <StockEditDialog stock={stock} />
+                  <React.Fragment key={product.id}>
+                    <TableRow
+                      className="hover:bg-muted/50 cursor-pointer"
+                      onClick={() => toggleRow(product.id)}
+                    >
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-6 p-0"
+                        >
+                          {isExpanded ? (
+                            <IconChevronDown size={16} />
+                          ) : (
+                            <IconChevronRight size={16} />
+                          )}
+                        </Button>
                       </TableCell>
-                    )}
-                  </TableRow>
+                      <TableCell>
+                        <ProductImage src={product.images?.[0]?.url} />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{product.title}</span>
+                          <span className="text-muted-foreground">
+                            {product.slug}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge>{variants.length} รายการ</Badge>
+                      </TableCell>
+                      <TableCell className="text-end">
+                        {formatNumber(totalStock)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleRow(product.id)
+                          }}
+                        >
+                          {isExpanded ? 'ซ่อนตัวเลือก' : 'ดูตัวเลือกสินค้า'}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                    {isExpanded &&
+                      variants.map((variant) => {
+                        const stock = variant.stocks?.[0] || {
+                          id: '',
+                          quantity: 0,
+                          minStock: 0,
+                          branch: null,
+                        }
+                        const isLow =
+                          stock.quantity <= stock.minStock && stock.minStock > 0
+                        const isOut = stock.quantity === 0
+
+                        return (
+                          <TableRow
+                            key={variant.id}
+                            className="bg-muted/30 border-l-primary border-l-4"
+                          >
+                            <TableCell />
+                            <TableCell colSpan={2}>
+                              <div className="flex items-center gap-3 pl-4">
+                                <IconCornerDownRight className="size-4 shrink-0" />
+                                <ProductImage
+                                  src={
+                                    variant.image || product.images?.[0]?.url
+                                  }
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">
+                                    {variant.title}
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    SKU: {variant.sku || '-'} | ราคา:{' '}
+                                    {formatCurrency(Number(variant.price))}
+                                  </span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell />
+                            <TableCell className="text-end">
+                              <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground text-xs">
+                                    คงเหลือ:
+                                  </span>
+                                  <Badge variant="outline">
+                                    {formatNumber(stock.quantity)}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground text-xs">
+                                    ขั้นต่ำ:
+                                  </span>
+                                  <Badge variant="outline">
+                                    {formatNumber(stock.minStock)}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {isOut ? (
+                                  <Badge variant="destructive">
+                                    <IconAlertCircle size={12} /> หมด
+                                  </Badge>
+                                ) : isLow ? (
+                                  <Badge className="bg-yellow-500 hover:bg-yellow-500">
+                                    <IconAlertTriangle size={12} /> ใกล้หมด
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline">ปกติ</Badge>
+                                )}
+                                {canManageInventory && stock.branch && (
+                                  <div className="flex items-center space-x-1 pl-2">
+                                    <StockAdjustmentDialog
+                                      variantId={variant.id}
+                                      variantLabel={`${product.title} · ${variant.title}`}
+                                      branchId={stock.branch.id}
+                                      branchName={stock.branch.name}
+                                    />
+                                    <StockTransferDialog
+                                      variantId={variant.id}
+                                      variantLabel={`${product.title} · ${variant.title}`}
+                                      fromBranchId={stock.branch.id}
+                                      fromBranchName={stock.branch.name}
+                                    />
+                                    <StockEditDialog stock={stock} />
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                  </React.Fragment>
                 )
               })
             )}

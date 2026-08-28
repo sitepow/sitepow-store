@@ -24,11 +24,20 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
+type ProductItem = DecimalToNumber<GetInventoryItem>
+type StockItem = ProductItem['variants'][number]['stocks'][number]
+
 interface StockEditDialogProps {
-  stock: DecimalToNumber<GetInventoryItem>
+  stock: StockItem
+  productTitle?: string
+  variantTitle?: string
 }
 
-export function StockEditDialog({ stock }: StockEditDialogProps) {
+export function StockEditDialog({
+  stock,
+  productTitle = '',
+  variantTitle = '',
+}: StockEditDialogProps) {
   const [open, setOpen] = useState(false)
   const updateStockMutation = useUpdateStock()
 
@@ -40,14 +49,14 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
   } = useForm<UpdateStockFormValues>({
     resolver: zodResolver(updateStockSchema),
     defaultValues: {
-      minStock: stock.minStock,
+      minStock: stock?.minStock ?? 0,
     },
   })
 
   useEffect(() => {
     if (open) {
       reset({
-        minStock: stock.minStock,
+        minStock: stock?.minStock ?? 0,
       })
     }
   }, [open, stock, reset])
@@ -58,6 +67,8 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
   }
 
   const onSubmit = (values: UpdateStockFormValues) => {
+    if (!stock?.id) return
+
     updateStockMutation.mutate(
       { id: stock.id, input: values },
       {
@@ -88,11 +99,10 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
         <DialogHeader>
           <DialogTitle>แก้ไขสต็อกสินค้า</DialogTitle>
           <DialogDescription>
-            {stock.variant.product.title} · {stock.variant.title} ·{' '}
-            {stock.branch.name}
+            {productTitle} {variantTitle ? `· ${variantTitle}` : ''}{' '}
+            {stock?.branch?.name ? `· ${stock.branch.name}` : ''}
           </DialogDescription>
         </DialogHeader>
-
         <div className="grid gap-4">
           <Field>
             <FieldLabel>จำนวนขั้นต่ำ (แจ้งเตือนเมื่อสต็อกต่ำกว่า)</FieldLabel>
@@ -105,7 +115,6 @@ export function StockEditDialog({ stock }: StockEditDialogProps) {
             <FieldError>{errors?.minStock?.message}</FieldError>
           </Field>
         </div>
-
         <DialogFooter className="mt-2 flex gap-2 border-t pt-4">
           <Button
             variant="outline"

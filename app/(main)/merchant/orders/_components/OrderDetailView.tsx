@@ -139,6 +139,35 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             </SelectContent>
           </Select>
         </div>
+        <CustomerCard
+          icon={<IconUser />}
+          title="ข้อมูลลูกค้า"
+          content={
+            <>
+              ชื่อลูกค้า: {customerName} <br />
+              อีเมล: {order.customer?.email || '-'} <br />
+              เบอร์โทรศัพท์:{' '}
+              {order.customer?.phone
+                ? formatPromptPay(order.customer.phone)
+                : '-'}
+            </>
+          }
+        />
+        <CustomerCard
+          icon={<IconMapPin />}
+          title="ที่อยู่จัดส่ง"
+          content={
+            <>
+              ชื่อผู้รับ:{' '}
+              {shippingAddr?.receiverName || shippingAddr?.name || '-'} <br />
+              เบอร์โทรศัพท์:{' '}
+              {shippingAddr?.phone ? formatPromptPay(shippingAddr.phone) : '-'}
+              <br />
+              ที่อยู่: {formatFullAddress(shippingAddr) || '-'}
+            </>
+          }
+        />
+        <OrderItemsSummary order={order} />
         {isEnteringTracking && (
           <OrderTrackingForm
             trackingNumber={trackingNumber}
@@ -187,32 +216,15 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             }
           />
         ) : null}
-        <OrderItemsSummary order={order} />
         <CustomerCard
-          icon={<IconUser />}
-          title="ข้อมูลลูกค้า"
+          icon={<IconPackage />}
+          title="ขนาดและน้ำหนักพัสดุ"
           content={
             <>
-              ชื่อลูกค้า: {customerName} <br />
-              อีเมล: {order.customer?.email || '-'} <br />
-              เบอร์โทรศัพท์:{' '}
-              {order.customer?.phone
-                ? formatPromptPay(order.customer.phone)
-                : '-'}
-            </>
-          }
-        />
-        <CustomerCard
-          icon={<IconMapPin />}
-          title="ที่อยู่จัดส่ง"
-          content={
-            <>
-              ชื่อผู้รับ:{' '}
-              {shippingAddr?.receiverName || shippingAddr?.name || '-'} <br />
-              เบอร์โทรศัพท์:{' '}
-              {shippingAddr?.phone ? formatPromptPay(shippingAddr.phone) : '-'}
-              <br />
-              ที่อยู่: {formatFullAddress(shippingAddr) || '-'}
+              น้ำหนัก: {formatNumber(order.totalWeight || 0)} กก. <br />
+              ขนาด (กxยxส): {formatNumber(order.width || 0)} x{' '}
+              {formatNumber(order.length || 0)} x{' '}
+              {formatNumber(order.height || 0)} ซม.
             </>
           }
         />
@@ -233,18 +245,6 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             }
           />
         )}
-        <CustomerCard
-          icon={<IconPackage />}
-          title="ขนาดและน้ำหนักพัสดุ"
-          content={
-            <>
-              น้ำหนัก: {formatNumber(order.totalWeight || 0)} กก. <br />
-              ขนาด (กxยxส): {formatNumber(order.width || 0)} x{' '}
-              {formatNumber(order.length || 0)} x{' '}
-              {formatNumber(order.height || 0)} ซม.
-            </>
-          }
-        />
         {order.isTaxInvoiceRequested && (
           <CustomerCard
             icon={<IconReceipt />}

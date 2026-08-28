@@ -17,46 +17,46 @@ interface GetInventoryParams {
   search?: string
 }
 
-const inventorySelect = {
-  id: true,
-  quantity: true,
-  minStock: true,
-  updatedAt: true,
-  branch: {
-    select: {
-      id: true,
-      name: true,
-      isMain: true,
-      storeId: true,
+const productInventorySelect = (branchId?: string) =>
+  ({
+    id: true,
+    title: true,
+    slug: true,
+    images: {
+      where: { isPrimary: true },
+      select: { url: true },
+      take: 1,
     },
-  },
-  variant: {
-    select: {
-      id: true,
-      title: true,
-      sku: true,
-      price: true,
-      image: true,
-      product: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          images: {
-            where: { isPrimary: true },
-            select: {
-              url: true,
+    variants: {
+      select: {
+        id: true,
+        title: true,
+        sku: true,
+        price: true,
+        image: true,
+        stocks: {
+          where: branchId && branchId !== ALL_STORES ? { branchId } : undefined,
+          select: {
+            id: true,
+            quantity: true,
+            minStock: true,
+            updatedAt: true,
+            branch: {
+              select: {
+                id: true,
+                name: true,
+                isMain: true,
+                storeId: true,
+              },
             },
-            take: 1,
           },
         },
       },
     },
-  },
-} satisfies Prisma.ProductStockSelect
+  }) satisfies Prisma.ProductSelect
 
-export type GetInventoryItem = Prisma.ProductStockGetPayload<{
-  select: typeof inventorySelect
+export type GetInventoryItem = Prisma.ProductGetPayload<{
+  select: ReturnType<typeof productInventorySelect>
 }>
 
 export interface GetInventoryResponse {
@@ -113,7 +113,7 @@ export async function getInventory({
     const sanitizedLimit = Math.max(1, Math.min(20, limit))
     const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.ProductStockWhereInput = {}
+    const whereClause: Prisma.ProductWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
       const authCheck = await verifyEmployeePermission({
@@ -126,7 +126,7 @@ export async function getInventory({
         return emptyResponse
       }
 
-      whereClause.branch = { storeId }
+      whereClause.storeId = storeId
     } else {
       const userStores = await prisma.store.findMany({
         where: {
@@ -139,40 +139,50 @@ export async function getInventory({
       })
 
       const storeIds = userStores.map((s) => s.id)
-      whereClause.branch = { storeId: { in: storeIds } }
+      whereClause.storeId = { in: storeIds }
     }
 
     if (branchId && branchId !== ALL_STORES) {
-      whereClause.branchId = branchId
+      whereClause.variants = {
+        some: {
+          stocks: {
+            some: { branchId },
+          },
+        },
+      }
     }
 
     if (search) {
       whereClause.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
         {
-          variant: {
-            product: { title: { contains: search, mode: 'insensitive' } },
+          variants: {
+            some: { title: { contains: search, mode: 'insensitive' } },
           },
         },
-        { variant: { title: { contains: search, mode: 'insensitive' } } },
-        { variant: { sku: { contains: search, mode: 'insensitive' } } },
+        {
+          variants: {
+            some: { sku: { contains: search, mode: 'insensitive' } },
+          },
+        },
       ]
     }
 
-    const [totalItems, stocks] = await Promise.all([
-      prisma.productStock.count({ where: whereClause }),
-      prisma.productStock.findMany({
+    const [totalItems, products] = await Promise.all([
+      prisma.product.count({ where: whereClause }),
+      prisma.product.findMany({
         where: whereClause,
         skip,
         take: sanitizedLimit,
-        orderBy: [{ branch: { isMain: 'desc' } }, { updatedAt: 'desc' }],
-        select: inventorySelect,
+        orderBy: { updatedAt: 'desc' },
+        select: productInventorySelect(branchId),
       }),
     ])
 
     const totalPages = Math.ceil(totalItems / sanitizedLimit)
 
     return {
-      data: serializeDecimal(stocks),
+      data: serializeDecimal(products),
       meta: {
         currentPage: sanitizedPage,
         limit: sanitizedLimit,
@@ -226,7 +236,10 @@ export async function updateStock(id: string, input: UpdateStockInput) {
       where: { id },
       data: input,
       select: {
-        ...inventorySelect,
+        id: true,
+        quantity: true,
+        minStock: true,
+        updatedAt: true,
         branch: {
           select: { storeId: true, id: true, name: true, isMain: true },
         },
@@ -290,7 +303,15 @@ export async function upsertStock(input: UpsertStockInput) {
       where: { branchId_variantId: { branchId, variantId } },
       update: { quantity, minStock },
       create: { variantId, branchId, quantity, minStock },
-      select: inventorySelect,
+      select: {
+        id: true,
+        quantity: true,
+        minStock: true,
+        updatedAt: true,
+        branch: {
+          select: { id: true, name: true, isMain: true, storeId: true },
+        },
+      },
     })
 
     await createLog({
