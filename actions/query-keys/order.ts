@@ -5,6 +5,7 @@ export const orderKeys = {
   lists: () => [...orderKeys.all, 'list'] as const,
   list: (filters: {
     storeId: string
+    branchId?: string
     page?: number
     limit?: number
     search?: string

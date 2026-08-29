@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useResellerPayoutSummary,
   useResellerStocks,
@@ -46,6 +47,8 @@ export function ResellerStockTable({
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId } = useResellerFilter()
 
+  const { canViewInventory, canUpdateInventory } = useEmployeePermission()
+
   const { data: stocksRes, isLoading: isStocksLoading } =
     useResellerStocks(selectedAgreementId)
   const { data: summaryRes } = useResellerPayoutSummary(selectedAgreementId)
@@ -56,6 +59,19 @@ export function ResellerStockTable({
   if (selectedStoreId === ALL_STORES) {
     return <ActionRequiredAlert />
   }
+
+  const canAccept = canViewInventory || canUpdateInventory
+
+  const hasAnyAction = stocks.some((stock) => {
+    const allocated = stock.allocatedQuantity || 0
+    const accepted = stock.acceptedQuantity || 0
+    const pendingQuantity = allocated - accepted
+    const isAcceptedAll = pendingQuantity <= 0
+
+    return canUpdateInventory || (canAccept && !isAcceptedAll)
+  })
+
+  const showActionColumn = hasAnyAction
 
   return (
     <div className="space-y-4">
@@ -108,20 +124,22 @@ export function ResellerStockTable({
                   ทุนเคลียร์เจ้าของร้าน
                 </TableHead>
                 <TableHead className="text-center">สถานะรับ</TableHead>
-                <TableHead className="text-right">จัดการ</TableHead>
+                {showActionColumn && (
+                  <TableHead className="text-right">จัดการ</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isStocksLoading ? (
-                <TableLoadingRow colSpan={8} />
+                <TableLoadingRow colSpan={showActionColumn ? 8 : 7} />
               ) : !selectedAgreementId ? (
                 <TableEmptyRow
-                  colSpan={8}
+                  colSpan={showActionColumn ? 8 : 7}
                   title="โปรดเลือกสัญญาตัวแทนเพื่อดูข้อมูลสต็อกฝากขาย"
                 />
               ) : stocks.length === 0 ? (
                 <TableEmptyRow
-                  colSpan={8}
+                  colSpan={showActionColumn ? 8 : 7}
                   title="ยังไม่มีรายการสินค้าฝากขายในสัญญานี้"
                 />
               ) : (
@@ -169,7 +187,7 @@ export function ResellerStockTable({
                         </p>
                         <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs">
                           <span>ส่ง: {formatCurrency(customPrice)}</span>
-                          {onEditPrice && (
+                          {canUpdateInventory && onEditPrice && (
                             <Button
                               variant="ghost"
                               size="icon-lg"
@@ -237,32 +255,36 @@ export function ResellerStockTable({
                             : `รอรับ (${pendingQuantity})`}
                         </Badge>
                       </TableCell>
-                      <TableCell className="space-x-1 text-right whitespace-nowrap">
-                        <Button
-                          variant="outline"
-                          size="icon-lg"
-                          title="คืนสต็อกกลับให้เจ้าของร้าน"
-                          disabled={allocated - sold <= 0}
-                          onClick={() => onReturnStock?.(stock)}
-                        >
-                          <IconPackageExport />
-                        </Button>
-                        {!isAcceptedAll && (
-                          <Button
-                            variant="outline"
-                            size="icon-lg"
-                            title={
-                              isAcceptedAll
-                                ? 'รับครบแล้ว'
-                                : 'กดรับสินค้าเข้าคลัง'
-                            }
-                            disabled={isAcceptedAll}
-                            onClick={() => onAcceptStock?.(stock)}
-                          >
-                            <IconPackageImport />
-                          </Button>
-                        )}
-                      </TableCell>
+                      {showActionColumn && (
+                        <TableCell className="space-x-1 text-right whitespace-nowrap">
+                          {canUpdateInventory && (
+                            <Button
+                              variant="outline"
+                              size="icon-lg"
+                              title="คืนสต็อกกลับให้เจ้าของร้าน"
+                              disabled={allocated - sold <= 0}
+                              onClick={() => onReturnStock?.(stock)}
+                            >
+                              <IconPackageExport />
+                            </Button>
+                          )}
+                          {canAccept && !isAcceptedAll && (
+                            <Button
+                              variant="outline"
+                              size="icon-lg"
+                              title={
+                                isAcceptedAll
+                                  ? 'รับครบแล้ว'
+                                  : 'กดรับสินค้าเข้าคลัง'
+                              }
+                              disabled={isAcceptedAll}
+                              onClick={() => onAcceptStock?.(stock)}
+                            >
+                              <IconPackageImport />
+                            </Button>
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
                   )
                 })

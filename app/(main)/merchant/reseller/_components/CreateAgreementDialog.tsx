@@ -103,7 +103,7 @@ export function CreateAgreementDialog({
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            toast.success('สร้างสัญญาตัวแทนฝากขายสำเร็จ')
+            toast.success('สร้างสัญญาตัวแทนจำหน่ายสำเร็จ')
             onSuccess?.(res.data.id)
             handleClose()
           } else {
@@ -121,7 +121,7 @@ export function CreateAgreementDialog({
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>สร้างสัญญาตัวแทนฝากขายใหม่</DialogTitle>
+            <DialogTitle>สร้างสัญญาตัวแทนจำหน่ายใหม่</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>

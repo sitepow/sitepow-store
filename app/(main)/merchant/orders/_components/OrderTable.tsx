@@ -8,6 +8,7 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { UploadSlipDialog } from '@/app/sites/[domain]/user/orders/_components/UploadSlipDialog'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import { useOrderSSE } from '@/hooks/use-order-sse'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
@@ -39,6 +40,8 @@ export function OrderTable() {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
   const [page, setPage] = useState(1)
+
+  useOrderSSE(selectedStoreId)
 
   const { data: { data: orders = [], meta } = {}, isLoading } = useOrders({
     storeId: selectedStoreId,
@@ -254,7 +257,10 @@ export function OrderTable() {
                               disabled={storeCheckoutMutation.isPending}
                               onClick={() => {
                                 storeCheckoutMutation.mutate({
-                                  customerEmail: order.customer?.email || '',
+                                  customerEmail:
+                                    order.customer?.email ||
+                                    resellerInfo?.resellerUser?.email ||
+                                    'guest@checkout.local',
                                   storeId: order.storeId,
                                   orderId: order.id,
                                   description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,

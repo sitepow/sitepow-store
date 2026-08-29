@@ -148,7 +148,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
   },
   {
     value: 'reseller',
-    label: 'ตัวแทนฝากขาย',
+    label: 'ตัวแทนจำหน่าย',
     tab: 'reseller',
     icon: IconBuildingStore,
   },

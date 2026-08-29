@@ -616,22 +616,35 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
 
   const wasPaid =
     order.status === OrderStatus.PAID || order.status === OrderStatus.SHIPPED
+  const isPOSOrder = order.orderNumber.startsWith('RS-POS-')
 
   await prisma.$transaction(async (tx) => {
     if (order.resellerAgreementId) {
-      if (wasPaid) {
+      if (isPOSOrder || wasPaid) {
         for (const item of order.items) {
           if (item.variantId) {
-            await tx.resellerStock.updateMany({
+            const resellerStock = await tx.resellerStock.findUnique({
               where: {
-                agreementId: order.resellerAgreementId,
-                variantId: item.variantId,
-                soldQuantity: { gte: item.quantity },
-              },
-              data: {
-                soldQuantity: { decrement: item.quantity },
+                agreementId_variantId: {
+                  agreementId: order.resellerAgreementId,
+                  variantId: item.variantId,
+                },
               },
             })
+
+            if (resellerStock) {
+              const newSoldQuantity = Math.max(
+                0,
+                resellerStock.soldQuantity - item.quantity,
+              )
+
+              await tx.resellerStock.update({
+                where: { id: resellerStock.id },
+                data: {
+                  soldQuantity: newSoldQuantity,
+                },
+              })
+            }
           }
         }
       }

@@ -12,6 +12,7 @@ import {
 import { serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
+import { OrderEventPayload, chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
 export interface CreateResellerPOSOrderInput {
@@ -78,6 +79,22 @@ export async function createResellerPOSOrder(
         if (availableToSell < item.quantity) {
           throw new Error(
             `สต็อกพร้อมขายของสินค้า ${stock.variant.title} ไม่เพียงพอ (พร้อมขาย: ${availableToSell} ชิ้น)`,
+          )
+        }
+
+        const updatedStock = await tx.resellerStock.updateMany({
+          where: {
+            id: stock.id,
+            acceptedQuantity: { gte: stock.soldQuantity + item.quantity },
+          },
+          data: {
+            soldQuantity: { increment: item.quantity },
+          },
+        })
+
+        if (updatedStock.count === 0) {
+          throw new Error(
+            `ไม่สามารถตัดสต็อกสินค้า ${stock.variant.title} ได้ เนื่องจากสต็อกถูกทำรายการไปก่อนหน้า`,
           )
         }
 
@@ -153,6 +170,11 @@ export async function createResellerPOSOrder(
       })
 
       return order
+    })
+
+    chatEvents.publish<OrderEventPayload>(`order:${input.supplierStoreId}`, {
+      type: 'ORDER_CREATED',
+      orderId: result.id,
     })
 
     return {

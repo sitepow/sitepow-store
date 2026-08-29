@@ -8,6 +8,7 @@ import { earnCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
+import { OrderEventPayload, chatEvents } from '@/lib/events'
 import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
@@ -199,30 +200,65 @@ export async function getOrders({
     const whereClause: Prisma.OrderWhereInput = {}
 
     if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const resellerAgreement = await prisma.resellerAgreement.findFirst({
+        where: {
+          supplierStoreId: storeId,
+          OR: [
+            { resellerCustomerId: userId },
+            { resellerStore: { ownerId: userId } },
+          ],
+        },
+        select: { id: true },
+      })
+
       const authCheck = await verifyEmployeePermission({
         userId,
         storeId,
         permission: 'canViewOrders',
       })
 
-      if (!authCheck.isAuthorized) {
+      const isStoreOwner = await prisma.store.findFirst({
+        where: { id: storeId, ownerId: userId },
+        select: { id: true },
+      })
+
+      if (resellerAgreement && !isStoreOwner) {
+        whereClause.storeId = storeId
+        whereClause.resellerAgreementId = resellerAgreement.id
+      } else if (authCheck.isAuthorized) {
+        whereClause.storeId = storeId
+      } else {
         return emptyResponse
       }
-
-      whereClause.storeId = storeId
     } else {
       const userStores = await prisma.store.findMany({
+        where: { ownerId: userId },
+        select: { id: true },
+      })
+      const storeIds = userStores.map((s) => s.id)
+
+      const resellerAgreements = await prisma.resellerAgreement.findMany({
         where: {
           OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
+            { resellerCustomerId: userId },
+            { resellerStore: { ownerId: userId } },
           ],
         },
         select: { id: true },
       })
 
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+      const resellerAgreementIds = resellerAgreements.map((a) => a.id)
+
+      if (storeIds.length === 0 && resellerAgreementIds.length === 0) {
+        return emptyResponse
+      }
+
+      whereClause.OR = [
+        ...(storeIds.length > 0 ? [{ storeId: { in: storeIds } }] : []),
+        ...(resellerAgreementIds.length > 0
+          ? [{ resellerAgreementId: { in: resellerAgreementIds } }]
+          : []),
+      ]
     }
 
     if (status) {
@@ -231,14 +267,12 @@ export async function getOrders({
 
     if (branchId && branchId !== ALL_STORES) {
       whereClause.items = {
-        some: {
-          branchId,
-        },
+        some: { branchId },
       }
     }
 
     if (search) {
-      whereClause.OR = [
+      const searchConditions: Prisma.OrderWhereInput[] = [
         { orderNumber: { contains: search, mode: 'insensitive' } },
         { customer: { firstName: { contains: search, mode: 'insensitive' } } },
         { customer: { email: { contains: search, mode: 'insensitive' } } },
@@ -259,6 +293,13 @@ export async function getOrders({
           },
         },
       ]
+
+      if (whereClause.OR) {
+        whereClause.AND = [{ OR: whereClause.OR }, { OR: searchConditions }]
+        delete whereClause.OR
+      } else {
+        whereClause.OR = searchConditions
+      }
     }
 
     const [totalItems, orders] = await Promise.all([
@@ -382,6 +423,11 @@ export async function updateOrderStatus(
       },
     })
 
+    chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+      type: 'ORDER_UPDATED',
+      orderId: id,
+    })
+
     return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -407,6 +453,7 @@ export async function cancelOrder(id: string) {
       select: {
         id: true,
         storeId: true,
+        status: true,
         customerId: true,
         customer: {
           select: {
@@ -417,6 +464,16 @@ export async function cancelOrder(id: string) {
         store: {
           select: {
             ownerId: true,
+          },
+        },
+        resellerAgreement: {
+          select: {
+            resellerCustomerId: true,
+            resellerStore: {
+              select: {
+                ownerId: true,
+              },
+            },
           },
         },
       },
@@ -433,9 +490,23 @@ export async function cancelOrder(id: string) {
 
     const isStoreOwner = order.store?.ownerId === currentUserId
 
+    const isResellerOwner =
+      order.resellerAgreement?.resellerCustomerId === currentUserId ||
+      order.resellerAgreement?.resellerStore?.ownerId === currentUserId
+
+    if (
+      order.status === OrderStatus.PAID &&
+      (isResellerOwner || isOrderCustomer)
+    ) {
+      return {
+        success: false,
+        message: 'ออเดอร์ที่ชำระเงินแล้ว ไม่สามารถยกเลิกได้',
+      }
+    }
+
     let actorType: ActorType = ActorType.MERCHANT
 
-    if (!isOrderCustomer && !isStoreOwner) {
+    if (!isOrderCustomer && !isStoreOwner && !isResellerOwner) {
       const authCheck = await verifyEmployeePermission({
         userId: currentUserId,
         storeId: order.storeId,
@@ -448,13 +519,18 @@ export async function cancelOrder(id: string) {
           message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
-    } else if (isOrderCustomer && !isStoreOwner) {
+    } else if ((isOrderCustomer || isResellerOwner) && !isStoreOwner) {
       actorType = ActorType.SYSTEM
     }
 
     await cancelOrderCore({
       orderId: id,
       actorType,
+    })
+
+    chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+      type: 'ORDER_CANCELLED',
+      orderId: id,
     })
 
     return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }

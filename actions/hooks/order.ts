@@ -37,6 +37,7 @@ export function useOrders({
       queryFn: async () => await getOrders(filters),
       enabled: !!storeId,
       placeholderData: (prev) => prev,
+      refetchOnWindowFocus: true,
     }),
   )
 }

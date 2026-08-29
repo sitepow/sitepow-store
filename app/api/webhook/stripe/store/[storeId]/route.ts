@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { OrderStatus } from '@/generated/prisma/enums'
 import Stripe from 'stripe'
 
+import { OrderEventPayload, chatEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 import { getStripeInstance } from '@/lib/stripe'
 
@@ -66,6 +67,7 @@ export async function POST(req: Request, props: RouteParams) {
           },
           select: {
             id: true,
+            orderNumber: true,
             storeId: true,
             resellerAgreementId: true,
             items: {
@@ -89,23 +91,32 @@ export async function POST(req: Request, props: RouteParams) {
                 },
               })
 
-              if (order.resellerAgreementId) {
+              const isPOSOrder = order.orderNumber.startsWith('RS-POS-')
+
+              if (order.resellerAgreementId && !isPOSOrder) {
                 for (const item of order.items) {
                   if (item.variantId) {
-                    await tx.resellerStock.update({
+                    await tx.resellerStock.upsert({
                       where: {
                         agreementId_variantId: {
                           agreementId: order.resellerAgreementId,
                           variantId: item.variantId,
                         },
                       },
-                      data: {
+                      update: {
                         soldQuantity: { increment: item.quantity },
+                      },
+                      create: {
+                        agreementId: order.resellerAgreementId,
+                        variantId: item.variantId,
+                        allocatedQuantity: 0,
+                        acceptedQuantity: 0,
+                        soldQuantity: item.quantity,
                       },
                     })
                   }
                 }
-              } else {
+              } else if (!order.resellerAgreementId) {
                 for (const item of order.items) {
                   if (item.variantId && item.branchId) {
                     await tx.productStock.updateMany({
@@ -122,6 +133,13 @@ export async function POST(req: Request, props: RouteParams) {
               }
             }
           })
+
+          for (const order of ordersToUpdate) {
+            chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+              type: 'ORDER_UPDATED',
+              orderId: order.id,
+            })
+          }
         }
       }
     }

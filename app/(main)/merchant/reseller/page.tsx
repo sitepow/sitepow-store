@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useAcceptResellerStock,
   useUpsertResellerCustomPrice,
@@ -41,6 +42,13 @@ export default function ResellerManagementPage() {
 
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
+
+  const {
+    canViewInventory,
+    canCreateInventory,
+    canUpdateInventory,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const [acceptStockOpen, setAcceptStockOpen] = useState(false)
   const [selectedStock, setSelectedStock] = useState<any | null>(null)
@@ -123,7 +131,7 @@ export default function ResellerManagementPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBuildingStore}
-        title="จัดการตัวแทนฝากขาย"
+        title="จัดการตัวแทนจำหน่าย"
         description="ติดตามสต็อกสินค้าฝากขาย คำนวณยอดขายสะสม และบันทึกการเคลียร์ยอด Payout"
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
@@ -131,29 +139,35 @@ export default function ResellerManagementPage() {
             <ResellerAgreementSelectField
               disabled={selectedStoreId === ALL_STORES}
             />
-            <Button
-              variant="outline"
-              onClick={() => setCreateAgreementOpen(true)}
-              disabled={selectedStoreId === ALL_STORES}
-            >
-              <IconFilePlus />
-              สร้างสัญญาใหม่
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleOpenPayout}
-              disabled={!selectedAgreementId}
-            >
-              <IconReceiptRefund />
-              บันทึกการเบิกจ่าย
-            </Button>
-            <Button
-              onClick={handleOpenAllocate}
-              disabled={!selectedAgreementId}
-            >
-              <IconPlus />
-              เพิ่มสต็อกฝากขาย
-            </Button>
+            {canCreateInventory && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setCreateAgreementOpen(true)}
+                  disabled={selectedStoreId === ALL_STORES}
+                >
+                  <IconFilePlus />
+                  สร้างสัญญาใหม่
+                </Button>
+                <Button
+                  onClick={handleOpenAllocate}
+                  disabled={!selectedAgreementId}
+                >
+                  <IconPlus />
+                  เพิ่มสต็อกฝากขาย
+                </Button>
+              </>
+            )}
+            {canUpdateInventory && (
+              <Button
+                variant="outline"
+                onClick={handleOpenPayout}
+                disabled={!selectedAgreementId}
+              >
+                <IconReceiptRefund />
+                บันทึกการเบิกจ่าย
+              </Button>
+            )}
           </div>
         }
       />
@@ -161,20 +175,21 @@ export default function ResellerManagementPage() {
         <ActionRequiredAlert
           icon={<IconLock />}
           title="กรุณาเลือกร้านค้า"
-          description="โปรดเลือกร้านค้าที่ต้องการจัดการข้อมูลตัวแทนฝากขาย"
+          description="โปรดเลือกร้านค้าที่ต้องการจัดการข้อมูลตัวแทนจำหน่าย"
+        />
+      ) : !isPermissionLoading && !canViewInventory ? (
+        <ActionRequiredAlert
+          icon={<IconLock />}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคลังสินค้าและสต็อกตัวแทนจำหน่ายของร้านค้านี้"
         />
       ) : (
         <div className="space-y-4">
-          {!isDismissed && (
+          {!isDismissed && canUpdateInventory && (
             <ActionRequiredAlert
               variant="info"
               title="สิทธิ์และการจัดการพนักงานสำหรับตัวแทน"
-              description="
-           เมื่อทำสัญญาเรียบร้อยแล้ว
-              ระบบจะเพิ่มตัวแทนรายนี้เข้าเป็นพนักงานในทีมโดยอัตโนมัติ
-              (ไม่ว่าจะเป็นบัญชีส่วนตัวหรือร้านค้า)
-              พร้อมมอบสิทธิ์การขายและตัดสต็อกสินค้าในหน้าแคชเชียร์
-              เพื่อส่งยอดขายคืนให้กับร้านค้า"
+              description="เมื่อทำสัญญาเรียบร้อยแล้ว ระบบจะเพิ่มตัวแทนรายนี้เข้าเป็นพนักงานในทีมโดยอัตโนมัติ (ไม่ว่าจะเป็นบัญชีส่วนตัวหรือร้านค้า) พร้อมมอบสิทธิ์การขายและตัดสต็อกสินค้าในหน้าแคชเชียร์ เพื่อส่งยอดขายคืนให้กับร้านค้า"
               action={
                 <Button
                   size="sm"
