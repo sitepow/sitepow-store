@@ -1,6 +1,10 @@
 'use server'
 
 import {
+  PERMISSION_MAPPING,
+  ROLE_PERMISSION_PRESETS,
+} from '@/constants/permission'
+import {
   AgreementStatus,
   DefaultRole,
   DiscountType,
@@ -9,11 +13,15 @@ import {
   Prisma,
   ResellerType,
 } from '@/generated/prisma/client'
+import { PermissionKey } from '@/types/permission'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { OrderEventPayload, chatEvents } from '@/lib/events'
+import { findOrCreateEmployee } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+
+import { invalidateEmployeePermissionCache } from './query-keys/invalidation/permission'
 
 export interface CreateResellerPOSOrderInput {
   supplierStoreId: string
@@ -632,7 +640,7 @@ export async function createResellerAgreement(
             { email: data.resellerCustomerId },
           ],
         },
-        select: { id: true },
+        select: { id: true, name: true, email: true },
       })
 
       if (!targetUser) {
@@ -662,11 +670,10 @@ export async function createResellerAgreement(
         },
       })
 
-      let targetUserId: string | null = null
+      let targetUserId: string | null =
+        data.resellerType === ResellerType.EXTERNAL ? resellerUserId : null
 
-      if (data.resellerType === ResellerType.EXTERNAL) {
-        targetUserId = resellerUserId
-      } else if (
+      if (
         data.resellerType === ResellerType.INTERNAL_STORE &&
         data.resellerStoreId
       ) {
@@ -678,36 +685,25 @@ export async function createResellerAgreement(
       }
 
       if (targetUserId) {
-        const user = await tx.user.findUnique({
+        const targetUser = await tx.user.findUnique({
           where: { id: targetUserId },
-          include: { employee: true },
+          select: { name: true, email: true },
         })
 
-        if (user) {
-          let employeeId = user.employee?.id
-          if (!employeeId) {
-            const newEmployee = await tx.employee.create({
-              data: {
-                userId: user.id,
-                name: user.name || user.email || 'Reseller Partner',
-                email: user.email || `reseller_${user.id}@system.local`,
-              },
-            })
-            employeeId = newEmployee.id
-          }
+        if (targetUser && targetUser.email) {
+          const { employee } = await findOrCreateEmployee({
+            email: targetUser.email,
+            name: targetUser.name || 'Reseller Partner',
+          })
 
-          const employeeStore = await tx.employeeStore.upsert({
+          const alreadyInStore = await tx.employeeStore.findUnique({
             where: {
               storeId_employeeId: {
+                employeeId: employee.id,
                 storeId: data.supplierStoreId,
-                employeeId: employeeId,
               },
             },
-            update: {},
-            create: {
-              storeId: data.supplierStoreId,
-              employeeId: employeeId,
-            },
+            select: { id: true },
           })
 
           let resellerRole = await tx.role.findUnique({
@@ -740,23 +736,28 @@ export async function createResellerAgreement(
             targetBranchId = mainBranch?.id
           }
 
-          if (targetBranchId && resellerRole) {
-            await tx.employeeBranch.upsert({
-              where: {
-                employeeStoreId_branchId: {
-                  employeeStoreId: employeeStore.id,
-                  branchId: targetBranchId,
+          if (targetBranchId && !alreadyInStore) {
+            await tx.employeeStore.create({
+              data: {
+                employeeId: employee.id,
+                storeId: data.supplierStoreId,
+                branches: {
+                  create: [
+                    {
+                      branchId: targetBranchId,
+                      roleId: resellerRole.id,
+                    },
+                  ],
                 },
               },
-              update: {
-                roleId: resellerRole.id,
-              },
-              create: {
-                employeeStoreId: employeeStore.id,
-                branchId: targetBranchId,
-                roleId: resellerRole.id,
-              },
             })
+
+            if (employee.userId) {
+              await invalidateEmployeePermissionCache(
+                employee.userId,
+                data.supplierStoreId,
+              )
+            }
           }
         }
       }
@@ -766,10 +767,11 @@ export async function createResellerAgreement(
 
     return {
       success: true,
-      message: 'สร้างสัญญาและเปิดสิทธิ์พนักงาน POS เรียบร้อยแล้ว',
+      message: 'สร้างสัญญาและกำหนดสิทธิ์ตัวแทนจำหน่ายสำเร็จ',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
+    console.error(error)
     return {
       success: false,
       message:

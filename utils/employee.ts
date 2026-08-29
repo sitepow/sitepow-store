@@ -23,6 +23,7 @@ export function extractEmployeeStoreData(
   branches: {
     role?: {
       name?: string
+      permissions?: { permission?: EmployeePermissionItem | null }[]
     } | null
     customPermissions?: { permission?: EmployeePermissionItem | null }[]
   }[] = [],
@@ -36,6 +37,12 @@ export function extractEmployeeStoreData(
     if (branchAssignment.role?.name) {
       rolesSet.add(branchAssignment.role.name)
     }
+
+    branchAssignment.role?.permissions?.forEach(({ permission }) => {
+      if (permission) {
+        permissionsMap.set(permission.id, permission)
+      }
+    })
 
     branchAssignment.customPermissions?.forEach(({ permission }) => {
       if (permission) {
@@ -113,6 +120,16 @@ export function mapEmployeeDataToFormValues(
 
       b.customPermissions?.forEach((cp) => {
         const pId = cp.permissionId || cp.permission?.id
+        if (pId) extractedIds.push(pId)
+      })
+
+      b.rolePermissions?.forEach((rp) => {
+        const pId = rp.permissionId || rp.permission?.id
+        if (pId) extractedIds.push(pId)
+      })
+
+      b.role?.permissions?.forEach((pItem) => {
+        const pId = pItem.permissionId || pItem.permission?.id
         if (pId) extractedIds.push(pId)
       })
 

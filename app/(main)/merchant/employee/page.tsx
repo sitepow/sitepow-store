@@ -3,7 +3,10 @@
 import { useState } from 'react'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { useResetStoreRolePermissions } from '@/actions/hooks/permission'
+import {
+  useResetStoreRolePermissions,
+  useSyncStoreRolesAndPermissions,
+} from '@/actions/hooks/permission'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -11,6 +14,7 @@ import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   IconClockRecord,
+  IconRefresh,
   IconShieldLock,
   IconUserCog,
   IconX,
@@ -38,6 +42,7 @@ export default function EmployeePage() {
   const [showPermissions, setShowPermissions] = useState(false)
 
   const resetPermissionMutation = useResetStoreRolePermissions()
+  const syncStoreRolesMutation = useSyncStoreRolesAndPermissions()
 
   const handleEdit = (id: string) => {
     setSelectedEmployeeId(id)
@@ -80,21 +85,41 @@ export default function EmployeePage() {
               </>
             )}
             {isOwner && (
-              <Button
-                variant="outline"
-                disabled={isRoleOwner}
-                onClick={async () => {
-                  await resetPermissionMutation.mutate({
-                    storeId: selectedStoreId,
-                    employeeId: userId!,
-                    roleName: DefaultRole.OWNER,
-                    branchId: selectedBranchId,
-                  })
-                }}
-              >
-                <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน (God
-                Mode)
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  disabled={isRoleOwner}
+                  onClick={async () => {
+                    await resetPermissionMutation.mutate({
+                      storeId: selectedStoreId,
+                      employeeId: userId!,
+                      roleName: DefaultRole.OWNER,
+                      branchId: selectedBranchId,
+                    })
+                  }}
+                >
+                  <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน (God
+                  Mode)
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={syncStoreRolesMutation.isPending}
+                  onClick={async () => {
+                    await syncStoreRolesMutation.mutate({
+                      storeId: selectedStoreId,
+                    })
+                  }}
+                >
+                  <IconRefresh
+                    className={
+                      syncStoreRolesMutation.isPending ? 'animate-spin' : ''
+                    }
+                  />
+                  {syncStoreRolesMutation.isPending
+                    ? 'กำลังซิงค์สิทธิ์...'
+                    : 'ซิงค์สิทธิ์ Role ทั้งหมด'}
+                </Button>
+              </>
             )}
           </div>
         }
