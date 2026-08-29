@@ -114,7 +114,7 @@ export function RegisterForm() {
           }}
           className="relative hidden w-1/2 bg-cover bg-center lg:block"
         >
-          <div className="absolute bottom-6 left-6 z-10 rounded bg-black/20 p-3 backdrop-blur-md">
+          <div className="absolute bottom-6 left-6 z-10 bg-black/20 p-3 backdrop-blur-md">
             <LogoBrand className="text-white" />
           </div>
         </div>
