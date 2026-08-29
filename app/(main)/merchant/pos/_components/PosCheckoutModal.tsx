@@ -13,6 +13,7 @@ import { useCreateResellerPOSOrder } from '@/actions/hooks/reseller'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { QUICK_AMOUNTS } from '@/constants/credit'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import { useSession } from '@/hooks/use-session'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { POSCheckoutInput } from '@/zod/order'
 import { IconCash, IconExternalLink, IconQrcode } from '@tabler/icons-react'
@@ -54,6 +55,7 @@ export function PosCheckoutModal({
     useFormContext<POSCheckoutInput>()
 
   const isResellerMode = Boolean(agreementId)
+  const { user } = useSession()
 
   const storeId = watch('storeId')
 
@@ -146,6 +148,7 @@ export function PosCheckoutModal({
             {
               storeId: data.storeId,
               orderId: createdOrder.id,
+              customerEmail: user?.email || 'guest@checkout.local',
               description: `ชำระเงินคำสั่งซื้อ #${createdOrder.orderNumber}`,
               amount: Number(createdOrder.totalAmount),
               successUrl: `${window.location.origin}/merchant/orders`,

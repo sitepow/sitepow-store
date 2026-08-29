@@ -1,10 +1,6 @@
 'use server'
 
 import {
-  PERMISSION_MAPPING,
-  ROLE_PERMISSION_PRESETS,
-} from '@/constants/permission'
-import {
   AgreementStatus,
   DefaultRole,
   DiscountType,
@@ -13,7 +9,6 @@ import {
   Prisma,
   ResellerType,
 } from '@/generated/prisma/client'
-import { PermissionKey } from '@/types/permission'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
@@ -158,6 +153,7 @@ export async function createResellerPOSOrder(
           variantTitle: stock.variant.title,
           image: stock.variant.image,
           quantity: item.quantity,
+          originalPrice: stock.variant.price,
           price: finalPrice,
           costPrice: stock.variant.costPrice,
         })
@@ -199,7 +195,6 @@ export async function createResellerPOSOrder(
     }
   }
 }
-
 export async function getResellerStocks(agreementId: string) {
   try {
     const userSession = await getCurrentUser()
@@ -444,61 +439,76 @@ export async function getResellerPayoutSummary(agreementId: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
+    if (!agreementId) {
+      return {
+        success: true,
+        data: {
+          commissionRate: null,
+          totalGrossSales: 0,
+          totalCommission: 0,
+          totalPaidAmount: 0,
+          pendingPayoutAmount: 0,
+        },
+      }
+    }
+
     const agreement = await prisma.resellerAgreement.findUnique({
       where: { id: agreementId },
-      include: { customPrices: true },
     })
 
     if (!agreement) {
-      return { success: false, message: 'ไม่พบข้อมูลสัญญา' }
+      return { success: false, message: 'ไม่พบข้อมูลสัญญาฝากขาย' }
     }
 
     const orders = await prisma.order.findMany({
       where: {
         resellerAgreementId: agreementId,
-        status: OrderStatus.PAID,
+        status: { in: [OrderStatus.PAID, OrderStatus.SHIPPED] },
       },
-      include: { items: true },
+      include: {
+        items: true,
+      },
     })
 
+    const stocks = await prisma.resellerStock.findMany({
+      where: { agreementId },
+      include: { variant: { select: { id: true, price: true } } },
+    })
+    const variantPriceMap = new Map(
+      stocks.map((s) => [s.variantId, s.variant.price]),
+    )
+
     let totalGrossSales = new Prisma.Decimal(0)
+    let totalMerchantCost = new Prisma.Decimal(0)
     let totalCommission = new Prisma.Decimal(0)
-    let totalMerchantDue = new Prisma.Decimal(0)
 
     for (const order of orders) {
       for (const item of order.items) {
-        const itemGross = item.price.mul(item.quantity)
+        const actualSoldPrice = new Prisma.Decimal(item.price || 0)
+
+        const variantPrice = item.variantId
+          ? variantPriceMap.get(item.variantId)
+          : null
+
+        const originalRetailPrice = item.originalPrice
+          ? new Prisma.Decimal(item.originalPrice)
+          : variantPrice
+            ? new Prisma.Decimal(variantPrice)
+            : actualSoldPrice
+
+        const qty = new Prisma.Decimal(item.quantity || 0)
+
+        const itemGross = originalRetailPrice.mul(qty)
         totalGrossSales = totalGrossSales.add(itemGross)
 
-        const customPrice = agreement.customPrices.find(
-          (cp) => cp.variantId === item.variantId,
-        )
-        let commission = new Prisma.Decimal(0)
+        const itemMerchantCost = actualSoldPrice.mul(qty)
+        totalMerchantCost = totalMerchantCost.add(itemMerchantCost)
 
-        if (customPrice) {
-          if (customPrice.specialPrice) {
-            const unitCommission = item.price.sub(customPrice.specialPrice)
-            commission = unitCommission.mul(item.quantity)
-          } else if (customPrice.discountAmount) {
-            if (customPrice.discountType === DiscountType.PERCENTAGE) {
-              commission = itemGross.mul(customPrice.discountAmount).div(100)
-            } else if (customPrice.discountType === DiscountType.FIXED) {
-              commission = customPrice.discountAmount.mul(item.quantity)
-            }
-          }
-        } else if (
-          agreement.defaultDiscountType === DiscountType.PERCENTAGE &&
-          agreement.defaultDiscountAmount
-        ) {
-          commission = itemGross.mul(agreement.defaultDiscountAmount).div(100)
+        const discountPerUnit = originalRetailPrice.sub(actualSoldPrice)
+        if (discountPerUnit.greaterThan(0)) {
+          const itemCommission = discountPerUnit.mul(qty)
+          totalCommission = totalCommission.add(itemCommission)
         }
-
-        if (commission.lessThan(0)) commission = new Prisma.Decimal(0)
-
-        const merchantDue = itemGross.sub(commission)
-
-        totalCommission = totalCommission.add(commission)
-        totalMerchantDue = totalMerchantDue.add(merchantDue)
       }
     }
 
@@ -507,11 +517,14 @@ export async function getResellerPayoutSummary(agreementId: string) {
         agreementId,
         status: PayoutStatus.PAID,
       },
-      _sum: { amount: true },
+      _sum: {
+        amount: true,
+      },
     })
 
     const totalPaidAmount = paidPayouts._sum.amount || new Prisma.Decimal(0)
-    const pendingPayoutAmount = totalMerchantDue.sub(totalPaidAmount)
+
+    const pendingPayoutAmount = totalMerchantCost.sub(totalPaidAmount)
 
     const commissionRate =
       agreement.defaultDiscountType === DiscountType.PERCENTAGE
@@ -536,7 +549,7 @@ export async function getResellerPayoutSummary(agreementId: string) {
       message:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการคำนวณยอดสรุป',
+          : 'เกิดข้อผิดพลาดในการคำนวณสรุปยอดเบิกจ่าย',
     }
   }
 }

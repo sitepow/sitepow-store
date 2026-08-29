@@ -63,7 +63,7 @@ export async function POST(req: Request, props: RouteParams) {
         const ordersToUpdate = await prisma.order.findMany({
           where: {
             id: { in: targetOrderIds },
-            status: { not: OrderStatus.PAID },
+            status: { notIn: [OrderStatus.PAID, OrderStatus.SHIPPED] },
           },
           select: {
             id: true,
@@ -83,23 +83,28 @@ export async function POST(req: Request, props: RouteParams) {
         if (ordersToUpdate.length > 0) {
           await prisma.$transaction(async (tx) => {
             for (const order of ordersToUpdate) {
+              const isPOSOrder = order.orderNumber.startsWith('RS-POS-')
+              const isResellerOrder = Boolean(order.resellerAgreementId)
+
+              const targetStatus = isResellerOrder
+                ? OrderStatus.SHIPPED
+                : OrderStatus.PAID
+
               await tx.order.update({
                 where: { id: order.id },
                 data: {
-                  status: OrderStatus.PAID,
+                  status: targetStatus,
                   paidAt: new Date(),
                 },
               })
 
-              const isPOSOrder = order.orderNumber.startsWith('RS-POS-')
-
-              if (order.resellerAgreementId && !isPOSOrder) {
+              if (isResellerOrder && !isPOSOrder) {
                 for (const item of order.items) {
                   if (item.variantId) {
                     await tx.resellerStock.upsert({
                       where: {
                         agreementId_variantId: {
-                          agreementId: order.resellerAgreementId,
+                          agreementId: order.resellerAgreementId!,
                           variantId: item.variantId,
                         },
                       },
@@ -107,7 +112,7 @@ export async function POST(req: Request, props: RouteParams) {
                         soldQuantity: { increment: item.quantity },
                       },
                       create: {
-                        agreementId: order.resellerAgreementId,
+                        agreementId: order.resellerAgreementId!,
                         variantId: item.variantId,
                         allocatedQuantity: 0,
                         acceptedQuantity: 0,
@@ -116,7 +121,7 @@ export async function POST(req: Request, props: RouteParams) {
                     })
                   }
                 }
-              } else if (!order.resellerAgreementId) {
+              } else if (!isResellerOrder) {
                 for (const item of order.items) {
                   if (item.variantId && item.branchId) {
                     await tx.productStock.updateMany({
