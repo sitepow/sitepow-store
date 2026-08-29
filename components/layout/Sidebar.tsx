@@ -5,6 +5,7 @@ import { Fragment, PropsWithChildren } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
@@ -13,7 +14,8 @@ import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconChevronRight, IconInfoCircle } from '@tabler/icons-react'
+import { PermissionKey } from '@/types/permission'
+import { IconChevronRight, IconInfoCircle, IconLock } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +47,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 
+import { cn } from '@/lib/utils'
+
 import { CreditBadge } from '../CreditBadge'
 import { DateTimeBadge } from '../DateTimeBadge'
 import { EmailVerified } from '../EmailVerified'
@@ -69,6 +73,8 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const { selectedStoreId } = useStoreFilter()
   const { data: storeOptions } = useStoreOptions()
 
+  const permissions = useEmployeePermission()
+
   const currentStore =
     storeOptions?.find((s) => s.id === selectedStoreId) || storeOptions?.[0]
 
@@ -89,6 +95,16 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
   const hasBadgesToShow = isMerchant || isPointsEnabled
+
+  const checkMenuPermission = (item: { permissionKey?: PermissionKey }) => {
+    if (!isMerchant) {
+      return true
+    }
+
+    if (!item.permissionKey) return true
+
+    return permissions[item.permissionKey] ?? true
+  }
 
   return (
     <SidebarProvider>
@@ -111,6 +127,8 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
               )
               const isMainActive = pathname === mainUrl || isSubActive
 
+              const hasMainPermission = checkMenuPermission(item)
+
               return (
                 <Fragment key={item.value}>
                   {item.hasSeparatorBefore && (
@@ -131,40 +149,85 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                     >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton isActive={isSubActive}>
+                          <SidebarMenuButton
+                            isActive={isSubActive}
+                            className={cn(
+                              !hasMainPermission &&
+                                'pointer-events-none opacity-40 select-none',
+                            )}
+                          >
                             <item.icon className="size-4" />
-                            <span>{item.label}</span>
-                            <IconChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            <span className="flex-1 text-left">
+                              {item.label}
+                            </span>
+                            {!hasMainPermission ? (
+                              <IconLock className="text-muted-foreground ml-auto size-3.5" />
+                            ) : (
+                              <IconChevronRight className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            )}
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {item.items.map((subItem) => {
-                              const isSubItemActive = pathname === subItem.url
-                              return (
-                                <SidebarMenuSubItem key={subItem.value}>
-                                  <SidebarMenuSubButton
-                                    asChild
-                                    isActive={isSubItemActive}
-                                  >
-                                    <Link href={subItem.url}>
-                                      <span>{subItem.label}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              )
-                            })}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
+                        {hasMainPermission && (
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item.items.map((subItem) => {
+                                const isSubItemActive = pathname === subItem.url
+                                const hasSubPermission =
+                                  checkMenuPermission(subItem)
+
+                                return (
+                                  <SidebarMenuSubItem key={subItem.value}>
+                                    <SidebarMenuSubButton
+                                      asChild={hasSubPermission}
+                                      isActive={isSubItemActive}
+                                      className={cn(
+                                        !hasSubPermission &&
+                                          'pointer-events-none flex items-center justify-between opacity-40 select-none',
+                                      )}
+                                    >
+                                      {hasSubPermission ? (
+                                        <Link href={subItem.url}>
+                                          <span>{subItem.label}</span>
+                                        </Link>
+                                      ) : (
+                                        <div className="flex w-full items-center justify-between">
+                                          <span>{subItem.label}</span>
+                                          <IconLock className="size-3" />
+                                        </div>
+                                      )}
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                )
+                              })}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        )}
                       </SidebarMenuItem>
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={isMainActive}>
-                        <Link href={mainUrl}>
-                          <item.icon className="size-4" />
-                          <span>{item.label}</span>
-                        </Link>
+                      <SidebarMenuButton
+                        asChild={hasMainPermission}
+                        isActive={isMainActive}
+                        className={cn(
+                          !hasMainPermission &&
+                            'pointer-events-none flex items-center justify-between opacity-40 select-none',
+                        )}
+                      >
+                        {hasMainPermission ? (
+                          <Link href={mainUrl}>
+                            <item.icon className="size-4" />
+                            <span>{item.label}</span>
+                          </Link>
+                        ) : (
+                          <div className="flex w-full items-center gap-2">
+                            <item.icon className="size-4" />
+                            <span className="flex-1 text-left">
+                              {item.label}
+                            </span>
+                            <IconLock className="size-3.5" />
+                          </div>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )}
@@ -175,7 +238,6 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         </SidebarContent>
         <SidebarFooter />
       </RootSidebar>
-
       <main
         className="bg-background text-foreground w-full min-w-0 space-y-5 p-3 sm:p-5"
         style={
@@ -186,13 +248,11 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-
         <div className="bg-background/95 border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <QuickSettingsMenu />
           </div>
-
           <div className="flex items-center gap-2">
             {hasBadgesToShow && (
               <Dialog>

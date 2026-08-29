@@ -44,9 +44,10 @@ export default function ResellerManagementPage() {
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
 
   const {
-    canViewInventory,
-    canCreateInventory,
-    canUpdateInventory,
+    canViewReseller,
+    canCreateReseller,
+    canUpdateReseller,
+    canUpdateFinance,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -139,7 +140,7 @@ export default function ResellerManagementPage() {
             <ResellerAgreementSelectField
               disabled={selectedStoreId === ALL_STORES}
             />
-            {canCreateInventory && (
+            {canCreateReseller && (
               <>
                 <Button
                   variant="outline"
@@ -158,7 +159,7 @@ export default function ResellerManagementPage() {
                 </Button>
               </>
             )}
-            {canUpdateInventory && (
+            {canUpdateFinance && (
               <Button
                 variant="outline"
                 onClick={handleOpenPayout}
@@ -177,15 +178,15 @@ export default function ResellerManagementPage() {
           title="กรุณาเลือกร้านค้า"
           description="โปรดเลือกร้านค้าที่ต้องการจัดการข้อมูลตัวแทนจำหน่าย"
         />
-      ) : !isPermissionLoading && !canViewInventory ? (
+      ) : !isPermissionLoading && !canViewReseller ? (
         <ActionRequiredAlert
           icon={<IconLock />}
           title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคลังสินค้าและสต็อกตัวแทนจำหน่ายของร้านค้านี้"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลตัวแทนจำหน่ายของร้านค้านี้"
         />
       ) : (
         <div className="space-y-4">
-          {!isDismissed && canUpdateInventory && (
+          {!isDismissed && canUpdateReseller && (
             <ActionRequiredAlert
               variant="info"
               title="สิทธิ์และการจัดการพนักงานสำหรับตัวแทน"

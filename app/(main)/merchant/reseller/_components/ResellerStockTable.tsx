@@ -47,7 +47,8 @@ export function ResellerStockTable({
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId } = useResellerFilter()
 
-  const { canViewInventory, canUpdateInventory } = useEmployeePermission()
+  const { canViewReseller, canUpdateReseller, canUpdateInventory } =
+    useEmployeePermission()
 
   const { data: stocksRes, isLoading: isStocksLoading } =
     useResellerStocks(selectedAgreementId)
@@ -60,7 +61,7 @@ export function ResellerStockTable({
     return <ActionRequiredAlert />
   }
 
-  const canAccept = canViewInventory || canUpdateInventory
+  const canAccept = canViewReseller || canUpdateReseller
 
   const hasAnyAction = stocks.some((stock) => {
     const allocated = stock.allocatedQuantity || 0

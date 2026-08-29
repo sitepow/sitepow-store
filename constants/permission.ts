@@ -107,6 +107,10 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateExpenses',
     'canUpdateExpenses',
     'canDeleteExpenses',
+    'canViewReseller',
+    'canCreateReseller',
+    'canUpdateReseller',
+    'canDeleteReseller',
   ],
   OWNER_VIEWER: [
     'canViewStore',
@@ -135,6 +139,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewTax',
     'canViewReviews',
     'canViewExpenses',
+    'canViewReseller',
   ],
   MANAGER: [
     'canViewCategory',
@@ -236,7 +241,13 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateCustomers',
     'canUpdateCustomers',
   ],
-  POS_RESELLER: ['canViewOrders', 'canCreateOrder', 'canUpdateOrders'],
+  POS_RESELLER: [
+    'canViewOrders',
+    'canCreateOrder',
+    'canUpdateOrders',
+    'canViewReseller',
+    'canUpdateReseller',
+  ],
   CONTENT_CREATOR: [
     'canViewBlogs',
     'canCreateBlogs',
@@ -264,6 +275,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewPayment',
     'canViewReviews',
     'canViewExpenses',
+    'canViewReseller',
   ],
   SUPPORT: [
     'canViewConversation',
@@ -724,6 +736,22 @@ export const PERMISSION_MAPPING: Record<
     domain: PermissionDomain.EXPENSE,
     action: PermissionAction.DELETE,
   },
+  canViewReseller: {
+    domain: PermissionDomain.RESELLER,
+    action: PermissionAction.READ,
+  },
+  canCreateReseller: {
+    domain: PermissionDomain.RESELLER,
+    action: PermissionAction.CREATE,
+  },
+  canUpdateReseller: {
+    domain: PermissionDomain.RESELLER,
+    action: PermissionAction.UPDATE,
+  },
+  canDeleteReseller: {
+    domain: PermissionDomain.RESELLER,
+    action: PermissionAction.DELETE,
+  },
 }
 
 export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
@@ -890,4 +918,8 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
     'มีสิทธิ์ในการบันทึกและเพิ่มรายการค่าใช้จ่ายใหม่เข้าสู่ระบบ',
   canUpdateExpenses: 'มีสิทธิ์ในการแก้ไขข้อมูลและรายละเอียดรายการค่าใช้จ่าย',
   canDeleteExpenses: 'มีสิทธิ์ในการลบรายการค่าใช้จ่ายออกจากระบบ',
+  canViewReseller: 'มีสิทธิ์ในการเปิดดูรายชื่อและข้อมูลตัวแทนจำหน่ายทั้งหมด',
+  canCreateReseller: 'มีสิทธิ์ในการเพิ่มตัวแทนจำหน่ายใหม่เข้าสู่ระบบ',
+  canUpdateReseller: 'มีสิทธิ์ในการแก้ไขข้อมูลหรือสถานะของตัวแทนจำหน่าย',
+  canDeleteReseller: 'มีสิทธิ์ในการลบข้อมูลตัวแทนจำหน่ายออกจากระบบ',
 }

@@ -8,7 +8,7 @@ import {
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
-import { verifyEmployeePermission } from '@/lib/permission'
+// import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 function getPosProductSelect(branchId: string) {
@@ -101,15 +101,15 @@ export async function getPOSProducts({
     return { success: true, data: [] }
   }
 
-  const authCheck = await verifyEmployeePermission({
-    userId,
-    storeId,
-    permission: 'canViewProducts',
-  })
+  // const authCheck = await verifyEmployeePermission({
+  //   userId,
+  //   storeId,
+  //   permission: 'canViewProducts',
+  // })
 
-  if (!authCheck.isAuthorized) {
-    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึงสินค้า', data: [] }
-  }
+  // if (!authCheck.isAuthorized) {
+  //   return { success: false, message: 'ไม่มีสิทธิ์เข้าถึงสินค้า', data: [] }
+  // }
 
   try {
     const resellerAgreement = await prisma.resellerAgreement.findFirst({

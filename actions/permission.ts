@@ -32,20 +32,24 @@ export async function resetStoreRolePermissions(
 
 export async function syncStoreRolesAndPermissions(storeId: string) {
   const permissionKeys = Object.keys(PERMISSION_MAPPING) as PermissionKey[]
-  const permissionConditions = permissionKeys.map((key) => ({
-    domain: PERMISSION_MAPPING[key].domain,
-    action: PERMISSION_MAPPING[key].action,
-  }))
+
+  for (const key of permissionKeys) {
+    const { domain, action } = PERMISSION_MAPPING[key]
+    await prisma.permission.upsert({
+      where: {
+        domain_action: { domain, action },
+      },
+      update: {},
+      create: { domain, action },
+    })
+  }
 
   const allPermissions = await prisma.permission.findMany({
-    where: { OR: permissionConditions },
     select: { id: true, domain: true, action: true },
   })
 
   const permMap = new Map<string, string>()
-  allPermissions.forEach((p: { id: string; domain: string; action: string }) =>
-    permMap.set(`${p.domain}_${p.action}`, p.id),
-  )
+  allPermissions.forEach((p) => permMap.set(`${p.domain}_${p.action}`, p.id))
 
   const existingRoles = await prisma.role.findMany({
     where: { storeId },
@@ -53,9 +57,7 @@ export async function syncStoreRolesAndPermissions(storeId: string) {
   })
 
   const roleMap = new Map<string, string>()
-  existingRoles.forEach((r: { id: string; name: string }) =>
-    roleMap.set(r.name, r.id),
-  )
+  existingRoles.forEach((r) => roleMap.set(r.name, r.id))
 
   const roleEntries = Object.entries(ROLE_PERMISSION_PRESETS)
 
@@ -65,7 +67,7 @@ export async function syncStoreRolesAndPermissions(storeId: string) {
 
       if (!roleId) {
         const newRole = await prismaTx.role.create({
-          data: { storeId, name: roleName as any },
+          data: { storeId, name: roleName as DefaultRole },
         })
         roleId = newRole.id
       }
@@ -76,6 +78,7 @@ export async function syncStoreRolesAndPermissions(storeId: string) {
         if (!mapping) {
           continue
         }
+
         const permId = permMap.get(`${mapping.domain}_${mapping.action}`)
         if (permId) {
           validPermissionIds.push(permId)
@@ -98,5 +101,8 @@ export async function syncStoreRolesAndPermissions(storeId: string) {
     }
   })
 
-  return { success: true, message: 'ซิงค์สิทธิ์ของ Role ทั้งหมดเรียบร้อยแล้ว' }
+  return {
+    success: true,
+    message: 'รีเซ็ตและซิงค์สิทธิ์ของ Role ทั้งหมดเรียบร้อยแล้ว',
+  }
 }

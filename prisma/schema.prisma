@@ -383,6 +383,7 @@ enum PermissionDomain {
   TAX
   REVIEW
   EXPENSE
+  RESELLER
 }
 
 enum PermissionAction {
