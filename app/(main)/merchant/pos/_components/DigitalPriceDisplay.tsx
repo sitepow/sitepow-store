@@ -74,25 +74,24 @@ export function DigitalPriceDisplay({
             <span className={sizeStyles.label}>{label}</span>
           </div>
         )}
+
         <div className="flex items-baseline justify-end gap-2 overflow-x-auto whitespace-nowrap">
           <div
-            aria-hidden="true"
             className={cn(
-              'text-muted/30 dark:text-muted/20 absolute right-4 z-0 text-right font-bold tracking-widest select-none',
+              'relative inline-block tracking-widest tabular-nums',
               sizeStyles.text,
             )}
           >
-            888,888,888.88
+            <div
+              aria-hidden="true"
+              className="text-muted absolute top-0 right-0 z-0 font-bold select-none"
+            >
+              888,888,888.88
+            </div>
+            <span className="text-primary relative z-10 font-bold drop-shadow-xs">
+              {formattedValue}
+            </span>
           </div>
-          <span
-            className={cn(
-              'text-primary relative z-10 font-bold tracking-tight drop-shadow-xs',
-              sizeStyles.text,
-            )}
-          >
-            {formattedValue}
-          </span>
-
           <span
             className={cn(
               'text-primary/80 relative z-10 font-semibold',

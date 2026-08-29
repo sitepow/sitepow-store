@@ -4,6 +4,7 @@ import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { getThaiBoundary } from '@/utils/date'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -19,38 +20,30 @@ export interface GetDashboardResult {
     dailySalesYesterday: number
     newCustomers: number
     newCustomersLastMonth: number
-
     dailyCOGS: number
     dailyGrossProfit: number
     dailyGrossMargin: number
-
     monthlyCOGS: number
     monthlyGrossProfit: number
     monthlyGrossProfitLastMonth: number
     monthlyGrossMargin: number
-
     yearlyCOGS: number
     yearlyGrossProfit: number
     yearlyGrossProfitLastYear: number
     yearlyGrossMargin: number
-
     dailyExpense: number
     monthlyExpense: number
     monthlyExpenseLastMonth: number
     yearlyExpense: number
     yearlyExpenseLastYear: number
-
     dailyNetProfit: number
     dailyNetProfitYesterday: number
-
     monthlyNetProfit: number
     monthlyNetProfitLastMonth: number
     monthlyNetMargin: number
-
     yearlyNetProfit: number
     yearlyNetProfitLastYear: number
     yearlyNetMargin: number
-
     dailyProfit: number
     dailyProfitYesterday: number
     dailyMargin: number
@@ -90,38 +83,30 @@ const emptyDashboardResult: GetDashboardResult = {
     dailySalesYesterday: 0,
     newCustomers: 0,
     newCustomersLastMonth: 0,
-
     dailyCOGS: 0,
     dailyGrossProfit: 0,
     dailyGrossMargin: 0,
-
     monthlyCOGS: 0,
     monthlyGrossProfit: 0,
     monthlyGrossProfitLastMonth: 0,
     monthlyGrossMargin: 0,
-
     yearlyCOGS: 0,
     yearlyGrossProfit: 0,
     yearlyGrossProfitLastYear: 0,
     yearlyGrossMargin: 0,
-
     dailyExpense: 0,
     monthlyExpense: 0,
     monthlyExpenseLastMonth: 0,
     yearlyExpense: 0,
     yearlyExpenseLastYear: 0,
-
     dailyNetProfit: 0,
     dailyNetProfitYesterday: 0,
-
     monthlyNetProfit: 0,
     monthlyNetProfitLastMonth: 0,
     monthlyNetMargin: 0,
-
     yearlyNetProfit: 0,
     yearlyNetProfitLastYear: 0,
     yearlyNetMargin: 0,
-
     dailyProfit: 0,
     dailyProfitYesterday: 0,
     dailyMargin: 0,
@@ -189,41 +174,76 @@ export async function getDashboard(
     const stockBranchFilter = validBranchId ? { branchId: validBranchId } : {}
 
     const now = new Date()
+    const thaiFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    })
 
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
+    const parts = thaiFormatter.formatToParts(now)
+    const thaiYear = Number(parts.find((p) => p.type === 'year')?.value)
+    const thaiMonth = Number(parts.find((p) => p.type === 'month')?.value) - 1
+    const thaiDay = Number(parts.find((p) => p.type === 'day')?.value)
+
+    const startOfToday = getThaiBoundary(
+      thaiYear,
+      thaiMonth,
+      thaiDay,
+      0,
+      0,
+      0,
+      0,
     )
-    const endOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
+    const endOfToday = getThaiBoundary(
+      thaiYear,
+      thaiMonth,
+      thaiDay,
       23,
       59,
       59,
       999,
     )
-
-    const startOfYesterday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 1,
+    const startOfYesterday = getThaiBoundary(
+      thaiYear,
+      thaiMonth,
+      thaiDay - 1,
+      0,
+      0,
+      0,
+      0,
     )
-    const endOfYesterday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 1,
+    const endOfYesterday = getThaiBoundary(
+      thaiYear,
+      thaiMonth,
+      thaiDay - 1,
       23,
       59,
       59,
       999,
     )
-
-    const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const endOfThisMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
+    const startOfThisMonth = getThaiBoundary(thaiYear, thaiMonth, 1, 0, 0, 0, 0)
+    const endOfThisMonth = getThaiBoundary(
+      thaiYear,
+      thaiMonth + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    )
+    const startOfLastMonth = getThaiBoundary(
+      thaiYear,
+      thaiMonth - 1,
+      1,
+      0,
+      0,
+      0,
+      0,
+    )
+    const endOfLastMonth = getThaiBoundary(
+      thaiYear,
+      thaiMonth,
       0,
       23,
       59,
@@ -231,32 +251,11 @@ export async function getDashboard(
       999,
     )
 
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-    const endOfLastMonth = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      0,
-      23,
-      59,
-      59,
-      999,
-    )
-
-    const startOfThisYear = new Date(now.getFullYear(), 0, 1)
-    const endOfThisYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
-
-    const startOfLastYear = new Date(now.getFullYear() - 1, 0, 1)
-    const endOfLastYear = new Date(
-      now.getFullYear() - 1,
-      11,
-      31,
-      23,
-      59,
-      59,
-      999,
-    )
-
-    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+    const startOfThisYear = getThaiBoundary(thaiYear, 0, 1, 0, 0, 0, 0)
+    const endOfThisYear = getThaiBoundary(thaiYear, 11, 31, 23, 59, 59, 999)
+    const startOfLastYear = getThaiBoundary(thaiYear - 1, 0, 1, 0, 0, 0, 0)
+    const endOfLastYear = getThaiBoundary(thaiYear - 1, 11, 31, 23, 59, 59, 999)
+    const sixMonthsAgo = getThaiBoundary(thaiYear, thaiMonth - 5, 1, 0, 0, 0, 0)
 
     const [
       salesToday,
@@ -269,21 +268,18 @@ export async function getDashboard(
       ordersLastMonth,
       customersThisMonth,
       customersLastMonth,
-
       cogsToday,
       cogsYesterday,
       cogsThisMonth,
       cogsLastMonth,
       cogsThisYear,
       cogsLastYear,
-
       expenseToday,
       expenseYesterday,
       expenseThisMonth,
       expenseLastMonth,
       expenseThisYear,
       expenseLastYear,
-
       salesTrendRaw,
       recentOrdersRaw,
       lowStockRaw,
@@ -370,7 +366,6 @@ export async function getDashboard(
           },
         },
       }),
-
       prisma.orderItem.aggregate({
         where: {
           order: {
@@ -541,48 +536,58 @@ export async function getDashboard(
     const mRevenueLastMonth = Number(revenueLastMonth._sum.totalAmount ?? 0)
     const yRevenue = Number(revenueThisYear._sum.totalAmount ?? 0)
     const yRevenueLastYear = Number(revenueLastYear._sum.totalAmount ?? 0)
-
     const dCOGS = Number(cogsToday._sum.costPrice ?? 0)
     const dCOGSYesterday = Number(cogsYesterday._sum.costPrice ?? 0)
     const mCOGS = Number(cogsThisMonth._sum.costPrice ?? 0)
     const mCOGSLastMonth = Number(cogsLastMonth._sum.costPrice ?? 0)
     const yCOGS = Number(cogsThisYear._sum.costPrice ?? 0)
     const yCOGSLastYear = Number(cogsLastYear._sum.costPrice ?? 0)
-
     const dExpense = Number(expenseToday._sum.amount ?? 0)
     const dExpenseYesterday = Number(expenseYesterday._sum.amount ?? 0)
     const mExpense = Number(expenseThisMonth._sum.amount ?? 0)
     const mExpenseLastMonth = Number(expenseLastMonth._sum.amount ?? 0)
     const yExpense = Number(expenseThisYear._sum.amount ?? 0)
     const yExpenseLastYear = Number(expenseLastYear._sum.amount ?? 0)
-
     const dGrossProfit = dSales - dCOGS
     const mGrossProfit = mRevenue - mCOGS
     const mGrossProfitLastMonth = mRevenueLastMonth - mCOGSLastMonth
     const yGrossProfit = yRevenue - yCOGS
     const yGrossProfitLastYear = yRevenueLastYear - yCOGSLastYear
-
     const dNetProfit = dGrossProfit - dExpense
     const dNetProfitYesterday =
       dSalesYesterday - dCOGSYesterday - dExpenseYesterday
-
     const mNetProfit = mGrossProfit - mExpense
     const mNetProfitLastMonth = mGrossProfitLastMonth - mExpenseLastMonth
-
     const yNetProfit = yGrossProfit - yExpense
     const yNetProfitLastYear = yGrossProfitLastYear - yExpenseLastYear
-
     const trendMap: Record<string, number> = {}
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      trendMap[`${d.getFullYear()}-${d.getMonth()}`] = 0
+      const d = new Date(Date.UTC(thaiYear, thaiMonth - i, 1))
+      trendMap[`${d.getUTCFullYear()}-${d.getUTCMonth()}`] = 0
     }
+
     for (const order of salesTrendRaw) {
-      const key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth()}`
+      const orderDate = new Date(order.createdAt)
+      const orderThaiYear = Number(
+        new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Bangkok',
+          year: 'numeric',
+        }).format(orderDate),
+      )
+      const orderThaiMonth =
+        Number(
+          new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Asia/Bangkok',
+            month: 'numeric',
+          }).format(orderDate),
+        ) - 1
+
+      const key = `${orderThaiYear}-${orderThaiMonth}`
       if (key in trendMap) {
         trendMap[key] += Number(order.totalAmount)
       }
     }
+
     const salesTrend = Object.entries(trendMap).map(([key, total]) => {
       const [, month] = key.split('-').map(Number)
       return { name: THAI_MONTHS[month], total: Math.round(total) }
@@ -598,38 +603,30 @@ export async function getDashboard(
         dailySalesYesterday: dSalesYesterday,
         newCustomers: customersThisMonth,
         newCustomersLastMonth: customersLastMonth,
-
         dailyCOGS: dCOGS,
         dailyGrossProfit: dGrossProfit,
         dailyGrossMargin: calcMargin(dGrossProfit, dSales),
-
         monthlyCOGS: mCOGS,
         monthlyGrossProfit: mGrossProfit,
         monthlyGrossProfitLastMonth: mGrossProfitLastMonth,
         monthlyGrossMargin: calcMargin(mGrossProfit, mRevenue),
-
         yearlyCOGS: yCOGS,
         yearlyGrossProfit: yGrossProfit,
         yearlyGrossProfitLastYear: yGrossProfitLastYear,
         yearlyGrossMargin: calcMargin(yGrossProfit, yRevenue),
-
         dailyExpense: dExpense,
         monthlyExpense: mExpense,
         monthlyExpenseLastMonth: mExpenseLastMonth,
         yearlyExpense: yExpense,
         yearlyExpenseLastYear: yExpenseLastYear,
-
         dailyNetProfit: dNetProfit,
         dailyNetProfitYesterday: dNetProfitYesterday,
-
         monthlyNetProfit: mNetProfit,
         monthlyNetProfitLastMonth: mNetProfitLastMonth,
         monthlyNetMargin: calcMargin(mNetProfit, mRevenue),
-
         yearlyNetProfit: yNetProfit,
         yearlyNetProfitLastYear: yNetProfitLastYear,
         yearlyNetMargin: calcMargin(yNetProfit, yRevenue),
-
         dailyProfit: dNetProfit,
         dailyProfitYesterday: dNetProfitYesterday,
         dailyMargin: calcMargin(dNetProfit, dSales),

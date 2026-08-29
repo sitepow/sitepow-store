@@ -143,3 +143,15 @@ export function buildExpenseDateWithServerTime(inputDate: string | Date): Date {
 
   return targetDate
 }
+
+export function getThaiBoundary(
+  year: number,
+  month: number,
+  day: number,
+  hours = 0,
+  minutes = 0,
+  seconds = 0,
+  ms = 0,
+): Date {
+  return new Date(Date.UTC(year, month, day, hours - 7, minutes, seconds, ms))
+}
