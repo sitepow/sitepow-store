@@ -236,15 +236,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateCustomers',
     'canUpdateCustomers',
   ],
-  POS_RESELLER: [
-    'canViewProducts',
-    'canViewInventory',
-    'canViewOrders',
-    'canCreateOrder',
-    'canUpdateOrders',
-    'canViewCustomers',
-    'canCreateCustomers',
-  ],
+  POS_RESELLER: ['canViewOrders', 'canCreateOrder', 'canUpdateOrders'],
   CONTENT_CREATOR: [
     'canViewBlogs',
     'canCreateBlogs',

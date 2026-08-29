@@ -347,17 +347,6 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
     }
 
-    const isTargetOwner =
-      existingEmployeeStore.employee.userId ===
-      existingEmployeeStore.store.ownerId
-
-    if (isTargetOwner && input.assignments) {
-      return {
-        success: false,
-        message: 'ไม่สามารถแก้ไขบทบาทหรือการเข้าถึงสาขาของเจ้าของร้านได้',
-      }
-    }
-
     const updated = await prisma.$transaction(async (tx) => {
       if (input.name) {
         await tx.employee.update({
@@ -366,7 +355,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
         })
       }
 
-      if (input.assignments && !isTargetOwner) {
+      if (input.assignments) {
         const existingBranches = await tx.employeeBranch.findMany({
           where: { employeeStoreId: id },
           select: { id: true },
