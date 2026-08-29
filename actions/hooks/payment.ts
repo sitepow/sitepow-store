@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 
 import {
+  checkPaymentSettingStatus,
   createBankAccount,
   deleteBankAccount,
   getBankAccount,
@@ -119,6 +120,17 @@ export function useBankAccount(id?: string) {
       queryKey: paymentKeys.bankAccount(id ?? ''),
       queryFn: async () => await getBankAccount(id!),
       enabled: !!id,
+    }),
+  )
+}
+
+export function usePaymentSettingStatus(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: paymentKeys.status(storeId),
+      queryFn: async () => await checkPaymentSettingStatus(storeId),
+      enabled: !!storeId && storeId !== ALL_STORES,
+      placeholderData: (prev) => prev,
     }),
   )
 }

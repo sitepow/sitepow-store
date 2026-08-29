@@ -6,7 +6,8 @@ import toast from 'react-hot-toast'
 
 import Link from 'next/link'
 
-import { usePaymentSetting } from '@/actions/hooks/payment'
+import { useStoreCheckout } from '@/actions/hooks/checkout'
+import { usePaymentSettingStatus } from '@/actions/hooks/payment'
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
 import { useCreateResellerPOSOrder } from '@/actions/hooks/reseller'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
@@ -56,17 +57,18 @@ export function PosCheckoutModal({
 
   const storeId = watch('storeId')
 
-  const { data: paymentSetting } = usePaymentSetting(storeId)
-
-  const isStripeAvailable =
-    !!paymentSetting?.isStripeEnabled && !!paymentSetting?.stripeSecretKey
+  const { data: isStripeAvailable = false } = usePaymentSettingStatus(storeId)
 
   const { mutate: createStandardOrder, isPending: isStandardPending } =
     useCreatePOSOrder()
   const { mutate: createResellerOrder, isPending: isResellerPending } =
     useCreateResellerPOSOrder()
 
-  const isPending = isStandardPending || isResellerPending
+  const storeCheckoutMutation = useStoreCheckout()
+
+  const isPending =
+    isStandardPending || isResellerPending || storeCheckoutMutation.isPending
+
   const cartItems = useCartStore((state) => state.items)
 
   const paymentMethod = watch('paymentMethod')
@@ -130,12 +132,53 @@ export function PosCheckoutModal({
       }
     }
 
-    const handleSuccess = (res: { success: boolean }) => {
-      if (res.success) {
-        clearCart()
-        reset()
-        onSuccess()
-        onOpenChange(false)
+    const handleSuccess = (res: {
+      success: boolean
+      data?: { id: string; orderNumber: string; totalAmount: number }
+    }) => {
+      if (res.success && res.data) {
+        const createdOrder = res.data
+
+        if (paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY) {
+          toast.loading('กำลังนำคุณไปยังหน้าชำระเงิน Stripe...')
+
+          storeCheckoutMutation.mutate(
+            {
+              storeId: data.storeId,
+              orderId: createdOrder.id,
+              description: `ชำระเงินคำสั่งซื้อ #${createdOrder.orderNumber}`,
+              amount: Number(createdOrder.totalAmount),
+              successUrl: `${window.location.origin}/merchant/orders`,
+              cancelUrl: `${window.location.origin}/merchant/orders`,
+            },
+            {
+              onSuccess: (checkoutRes) => {
+                if (checkoutRes?.url) {
+                  clearCart()
+                  reset()
+                  onSuccess()
+                  onOpenChange(false)
+                  window.location.href = checkoutRes.url
+                } else {
+                  toast.error('ไม่สามารถสร้างลิงก์ชำระเงิน Stripe ได้')
+                }
+              },
+              onError: (err) => {
+                toast.error(
+                  err instanceof Error
+                    ? err.message
+                    : 'เกิดข้อผิดพลาดในการเชื่อมต่อ Stripe',
+                )
+              },
+            },
+          )
+        } else {
+          clearCart()
+          reset()
+          onSuccess()
+          onOpenChange(false)
+          toast.success('ทำรายการสำเร็จ')
+        }
       }
     }
 
@@ -366,7 +409,11 @@ export function PosCheckoutModal({
               disabled={isPending || !isCurrentPaymentValid}
               className="w-full min-w-40 font-bold sm:w-auto"
             >
-              {isPending ? 'กำลังบันทึก...' : 'ยืนยันการชำระเงิน'}
+              {isPending
+                ? 'กำลังเชื่อมต่อ...'
+                : paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
+                  ? 'ไปที่หน้าชำระเงิน'
+                  : 'ยืนยันการชำระเงิน'}
             </Button>
           </DialogFooter>
         </form>

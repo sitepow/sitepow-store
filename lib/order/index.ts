@@ -594,6 +594,7 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       usedPoints: true,
       earnedPoints: true,
       couponId: true,
+      resellerAgreementId: true,
       items: {
         select: {
           quantity: true,
@@ -613,44 +614,66 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
     throw new Error('คำสั่งซื้อนี้ถูกยกเลิกไปแล้ว')
   }
 
+  const wasPaid =
+    order.status === OrderStatus.PAID || order.status === OrderStatus.SHIPPED
+
   await prisma.$transaction(async (tx) => {
-    for (const item of order.items) {
-      if (
-        item.productType === ProductType.PHYSICAL &&
-        item.variantId &&
-        item.branchId
-      ) {
-        const variantExists = await tx.productVariant.findUnique({
-          where: { id: item.variantId },
-          select: { id: true },
-        })
+    if (order.resellerAgreementId) {
+      if (wasPaid) {
+        for (const item of order.items) {
+          if (item.variantId) {
+            await tx.resellerStock.updateMany({
+              where: {
+                agreementId: order.resellerAgreementId,
+                variantId: item.variantId,
+                soldQuantity: { gte: item.quantity },
+              },
+              data: {
+                soldQuantity: { decrement: item.quantity },
+              },
+            })
+          }
+        }
+      }
+    } else {
+      for (const item of order.items) {
+        if (
+          item.productType === ProductType.PHYSICAL &&
+          item.variantId &&
+          item.branchId
+        ) {
+          const variantExists = await tx.productVariant.findUnique({
+            where: { id: item.variantId },
+            select: { id: true },
+          })
 
-        const branchExists = await tx.branch.findUnique({
-          where: { id: item.branchId },
-          select: { id: true },
-        })
+          const branchExists = await tx.branch.findUnique({
+            where: { id: item.branchId },
+            select: { id: true },
+          })
 
-        if (variantExists && branchExists) {
-          await tx.productStock.upsert({
-            where: {
-              branchId_variantId: {
+          if (variantExists && branchExists) {
+            await tx.productStock.upsert({
+              where: {
+                branchId_variantId: {
+                  branchId: item.branchId,
+                  variantId: item.variantId,
+                },
+              },
+              update: {
+                quantity: { increment: item.quantity },
+              },
+              create: {
                 branchId: item.branchId,
                 variantId: item.variantId,
+                quantity: item.quantity,
               },
-            },
-            update: {
-              quantity: { increment: item.quantity },
-            },
-            create: {
-              branchId: item.branchId,
-              variantId: item.variantId,
-              quantity: item.quantity,
-            },
-          })
-        } else {
-          console.warn(
-            `[CancelOrder] Cannot restore stock for variant ${item.variantId} in branch ${item.branchId} because it no longer exists.`,
-          )
+            })
+          } else {
+            console.warn(
+              `[CancelOrder] Cannot restore stock for variant ${item.variantId} in branch ${item.branchId} because it no longer exists.`,
+            )
+          }
         }
       }
     }

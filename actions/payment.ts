@@ -367,3 +367,26 @@ export async function getBankAccount(id: string) {
     return null
   }
 }
+
+export async function checkPaymentSettingStatus(
+  storeId: string,
+): Promise<boolean> {
+  if (!storeId) {
+    return false
+  }
+
+  try {
+    const setting = await prisma.paymentSetting.findUnique({
+      where: { storeId },
+      select: {
+        isStripeEnabled: true,
+        stripeSecretKey: true,
+      },
+    })
+
+    return Boolean(setting?.isStripeEnabled && setting?.stripeSecretKey)
+  } catch (error) {
+    console.error(error)
+    return false
+  }
+}

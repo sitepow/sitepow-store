@@ -136,18 +136,6 @@ export async function createResellerPOSOrder(
           price: finalPrice,
           costPrice: stock.variant.costPrice,
         })
-
-        await tx.resellerStock.update({
-          where: {
-            agreementId_variantId: {
-              agreementId: input.agreementId,
-              variantId: item.variantId,
-            },
-          },
-          data: {
-            soldQuantity: { increment: item.quantity },
-          },
-        })
       }
 
       const order = await tx.order.create({
@@ -156,7 +144,7 @@ export async function createResellerPOSOrder(
           orderNumber: `RS-POS-${Date.now()}`,
           totalAmount: orderTotal,
           totalAmountBase: orderTotal,
-          status: OrderStatus.PAID,
+          status: OrderStatus.PENDING,
           resellerAgreementId: input.agreementId,
           items: {
             create: orderItemsData,
@@ -169,7 +157,7 @@ export async function createResellerPOSOrder(
 
     return {
       success: true,
-      message: 'ทำรายการขายสต็อกฝากขายสำเร็จ',
+      message: 'สร้างคำสั่งซื้อฝากขายสำเร็จ รอการชำระเงิน',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {

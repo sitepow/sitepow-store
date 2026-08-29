@@ -54,6 +54,25 @@ const orderSelect = {
   length: true,
   customerCurrency: true,
   totalAmountBase: true,
+  resellerAgreementId: true,
+  resellerAgreement: {
+    select: {
+      id: true,
+      resellerStore: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      resellerUser: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  },
   coupon: {
     select: {
       id: true,
@@ -224,6 +243,21 @@ export async function getOrders({
         { customer: { firstName: { contains: search, mode: 'insensitive' } } },
         { customer: { email: { contains: search, mode: 'insensitive' } } },
         { customer: { phone: { contains: search, mode: 'insensitive' } } },
+        {
+          resellerAgreement: {
+            resellerStore: { name: { contains: search, mode: 'insensitive' } },
+          },
+        },
+        {
+          resellerAgreement: {
+            resellerUser: { name: { contains: search, mode: 'insensitive' } },
+          },
+        },
+        {
+          resellerAgreement: {
+            resellerUser: { email: { contains: search, mode: 'insensitive' } },
+          },
+        },
       ]
     }
 

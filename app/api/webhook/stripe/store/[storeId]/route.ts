@@ -67,6 +67,14 @@ export async function POST(req: Request, props: RouteParams) {
           select: {
             id: true,
             storeId: true,
+            resellerAgreementId: true,
+            items: {
+              select: {
+                variantId: true,
+                branchId: true,
+                quantity: true,
+              },
+            },
           },
         })
 
@@ -80,6 +88,38 @@ export async function POST(req: Request, props: RouteParams) {
                   paidAt: new Date(),
                 },
               })
+
+              if (order.resellerAgreementId) {
+                for (const item of order.items) {
+                  if (item.variantId) {
+                    await tx.resellerStock.update({
+                      where: {
+                        agreementId_variantId: {
+                          agreementId: order.resellerAgreementId,
+                          variantId: item.variantId,
+                        },
+                      },
+                      data: {
+                        soldQuantity: { increment: item.quantity },
+                      },
+                    })
+                  }
+                }
+              } else {
+                for (const item of order.items) {
+                  if (item.variantId && item.branchId) {
+                    await tx.productStock.updateMany({
+                      where: {
+                        branchId: item.branchId,
+                        variantId: item.variantId,
+                      },
+                      data: {
+                        quantity: { decrement: item.quantity },
+                      },
+                    })
+                  }
+                }
+              }
             }
           })
         }

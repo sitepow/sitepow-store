@@ -29,6 +29,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { cn } from '@/lib/utils'
+
 import { StorePagination } from '../../../_components/Pagination'
 import { OrderDetailView } from './OrderDetailView'
 import { UploadSlipDialog } from './UploadSlipDialog'
@@ -74,6 +76,7 @@ export function OrderTable({ search }: OrderTableProps) {
               <TableEmptyRow colSpan={7} title="ไม่พบประวัติคำสั่งซื้อของคุณ" />
             ) : (
               orders.map((order) => {
+                const isCancelled = order.status === OrderStatus.CANCELLED
                 const isPOSOrder = order.orderNumber?.startsWith('POS-')
 
                 const isStripePayment =
@@ -81,11 +84,30 @@ export function OrderTable({ search }: OrderTableProps) {
                   order.paymentMethod !== PaymentMethod.MANUAL_QR_PROMPTPAY
 
                 return (
-                  <TableRow key={order.id}>
-                    <TableCell>#{order.orderNumber}</TableCell>
+                  <TableRow
+                    key={order.id}
+                    className={cn(
+                      'transition-colors',
+                      isCancelled &&
+                        'bg-muted/40 text-muted-foreground hover:bg-muted/60 opacity-60',
+                    )}
+                  >
+                    <TableCell
+                      className={cn(
+                        'font-medium',
+                        isCancelled && 'decoration-destructive/60 line-through',
+                      )}
+                    >
+                      #{order.orderNumber}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col items-start gap-1">
-                        <Badge>{order.store.name}</Badge>
+                        <Badge
+                          variant={isCancelled ? 'outline' : 'default'}
+                          className={cn(isCancelled && 'opacity-70')}
+                        >
+                          {order.store.name}
+                        </Badge>
                         {isPOSOrder && (
                           <Badge
                             variant="outline"
@@ -96,21 +118,30 @@ export function OrderTable({ search }: OrderTableProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    <TableCell
+                      className={cn(
+                        'max-w-72 min-w-72 wrap-break-word whitespace-pre-line',
+                        isCancelled && 'line-through',
+                      )}
+                    >
                       {getItemsSummary(order.items)}
                     </TableCell>
-                    <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+                    <TableCell className={cn(isCancelled && 'line-through')}>
+                      {formatCurrency(order.totalAmount)}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={
-                          (
-                            [
-                              OrderStatus.PAID,
-                              OrderStatus.SHIPPED,
-                            ] as OrderStatus[]
-                          ).includes(order.status)
-                            ? 'default'
-                            : 'outline'
+                          isCancelled
+                            ? 'destructive'
+                            : (
+                                  [
+                                    OrderStatus.PAID,
+                                    OrderStatus.SHIPPED,
+                                  ] as OrderStatus[]
+                                ).includes(order.status)
+                              ? 'default'
+                              : 'outline'
                         }
                       >
                         {ORDER_STATUS_TH[order.status]}

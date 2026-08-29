@@ -30,6 +30,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+import { cn } from '@/lib/utils'
+
 import { OrderDetailView } from './OrderDetailView'
 import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
 
@@ -73,9 +75,19 @@ export function OrderTable() {
               <TableEmptyRow colSpan={7} title="ยังไม่มีออเดอร์" />
             ) : (
               orders.map((order) => {
+                const isCancelled = order.status === OrderStatus.CANCELLED
+
+                const isResellerPOS =
+                  order.orderNumber?.startsWith('RS-POS-') ||
+                  Boolean(
+                    (order as { resellerAgreementId?: string })
+                      .resellerAgreementId,
+                  )
+
                 const isPOSOrder =
-                  order.orderNumber?.startsWith('POS-') ||
-                  (order as { isPOS?: boolean }).isPOS
+                  !isResellerPOS &&
+                  (order.orderNumber?.startsWith('POS-') ||
+                    (order as { isPOS?: boolean }).isPOS)
 
                 const registeredCustomerName = order.customer
                   ? [order.customer.firstName, order.customer.lastName]
@@ -98,10 +110,26 @@ export function OrderTable() {
                       .join(' ')
                   : null
 
+                const resellerInfo = (
+                  order as {
+                    resellerAgreement?: {
+                      resellerStore?: { name?: string }
+                      resellerUser?: { name?: string; email?: string }
+                    }
+                  }
+                ).resellerAgreement
+
                 let displayName = registeredCustomerName
                 let displaySubtext = order.customer?.email || null
 
-                if (isPOSOrder) {
+                if (isResellerPOS) {
+                  displayName =
+                    resellerInfo?.resellerStore?.name ||
+                    resellerInfo?.resellerUser?.name ||
+                    resellerInfo?.resellerUser?.email ||
+                    'ตัวแทนจำหน่าย (Reseller)'
+                  displaySubtext = 'รายการขายฝาก (Reseller POS)'
+                } else if (isPOSOrder) {
                   if (!displayName) {
                     displayName = 'ลูกค้าหน้าร้าน (Walk-in)'
                   }
@@ -124,13 +152,34 @@ export function OrderTable() {
                   order.paymentMethod !== PaymentMethod.MANUAL_QR_PROMPTPAY
 
                 return (
-                  <TableRow key={order.id}>
-                    <TableCell>#{order.orderNumber}</TableCell>
+                  <TableRow
+                    key={order.id}
+                    className={cn(
+                      'transition-colors',
+                      isCancelled &&
+                        'bg-muted/40 text-muted-foreground hover:bg-muted/60 opacity-60',
+                    )}
+                  >
+                    <TableCell
+                      className={cn(
+                        'font-medium',
+                        isCancelled && 'decoration-destructive/60 line-through',
+                      )}
+                    >
+                      #{order.orderNumber}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="size-8 border">
+                        <Avatar
+                          className={cn(
+                            'size-8 border',
+                            isCancelled && 'opacity-60 grayscale',
+                          )}
+                        >
                           <AvatarFallback className="bg-muted text-muted-foreground">
-                            {isPOSOrder && !registeredCustomerName ? (
+                            {isResellerPOS ? (
+                              <Store size={15} />
+                            ) : isPOSOrder && !registeredCustomerName ? (
                               <Store size={15} />
                             ) : (
                               <User2 size={15} />
@@ -139,14 +188,23 @@ export function OrderTable() {
                         </Avatar>
                         <div className="max-w-64 space-y-0.5">
                           <div className="flex items-center gap-1.5">
-                            <p className="text-sm leading-none font-medium">
+                            <p
+                              className={cn(
+                                'text-sm leading-none font-medium',
+                                isCancelled && 'line-through',
+                              )}
+                            >
                               {displayName}
                             </p>
-                            {isPOSOrder && (
+                            {isResellerPOS ? (
+                              <Badge className="px-1.5 py-0 text-[10px] font-normal">
+                                ตัวแทนจำหน่าย
+                              </Badge>
+                            ) : isPOSOrder ? (
                               <Badge className="px-1.5 py-0 text-[10px] font-normal">
                                 POS
                               </Badge>
-                            )}
+                            ) : null}
                           </div>
                           <p className="text-muted-foreground text-xs">
                             {displaySubtext}
@@ -154,25 +212,32 @@ export function OrderTable() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
+                    <TableCell
+                      className={cn(
+                        'max-w-72 min-w-72 wrap-break-word whitespace-pre-line',
+                        isCancelled && 'line-through',
+                      )}
+                    >
                       {order.items
                         .map((item) => `${item.title} x${item.quantity}`)
                         .join(', ')}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className={cn(isCancelled && 'line-through')}>
                       {formatCurrency(Number(order.totalAmount))}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant={
-                          (
-                            [
-                              OrderStatus.PAID,
-                              OrderStatus.SHIPPED,
-                            ] as OrderStatus[]
-                          ).includes(order.status)
-                            ? 'default'
-                            : 'outline'
+                          isCancelled
+                            ? 'destructive'
+                            : (
+                                  [
+                                    OrderStatus.PAID,
+                                    OrderStatus.SHIPPED,
+                                  ] as OrderStatus[]
+                                ).includes(order.status)
+                              ? 'default'
+                              : 'outline'
                         }
                       >
                         {ORDER_STATUS_TH[order.status]}
