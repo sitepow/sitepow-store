@@ -185,49 +185,40 @@ export async function getPOSProducts({
             const customPrice = resellerAgreement.customPrices.find(
               (cp) => cp.variantId === variant.id,
             )
-            let finalPrice = new Prisma.Decimal(variant.price)
+
+            const originalPrice = new Prisma.Decimal(variant.price)
+            let calculatedDiscountAmount: Prisma.Decimal | null = null
+            let calculatedDiscountType: DiscountType | null = null
 
             if (customPrice?.specialPrice) {
-              finalPrice = customPrice.specialPrice
+              calculatedDiscountAmount = originalPrice.sub(
+                customPrice.specialPrice,
+              )
+              calculatedDiscountType = DiscountType.FIXED
             } else if (
-              customPrice?.discountType === DiscountType.FIXED &&
+              customPrice?.discountType &&
               customPrice.discountAmount != null
             ) {
-              finalPrice = finalPrice.sub(customPrice.discountAmount)
-            } else if (
-              customPrice?.discountType === DiscountType.PERCENTAGE &&
-              customPrice.discountAmount != null
-            ) {
-              const discount = finalPrice
-                .mul(customPrice.discountAmount)
-                .div(100)
-              finalPrice = finalPrice.sub(discount)
+              calculatedDiscountAmount = customPrice.discountAmount
+              calculatedDiscountType = customPrice.discountType
             } else if (
               resellerAgreement.defaultDiscountType &&
               resellerAgreement.defaultDiscountAmount
             ) {
-              if (
-                resellerAgreement.defaultDiscountType ===
-                DiscountType.PERCENTAGE
-              ) {
-                const discount = finalPrice
-                  .mul(resellerAgreement.defaultDiscountAmount)
-                  .div(100)
-                finalPrice = finalPrice.sub(discount)
-              } else if (
-                resellerAgreement.defaultDiscountType === DiscountType.FIXED
-              ) {
-                finalPrice = finalPrice.sub(
-                  resellerAgreement.defaultDiscountAmount,
-                )
-              }
+              calculatedDiscountAmount = resellerAgreement.defaultDiscountAmount
+              calculatedDiscountType = resellerAgreement.defaultDiscountType
             }
 
-            if (finalPrice.lessThan(0)) finalPrice = new Prisma.Decimal(0)
+            const hasDiscount =
+              calculatedDiscountAmount !== null &&
+              calculatedDiscountAmount.greaterThan(0)
 
             return {
               ...variant,
-              price: finalPrice,
+              price: originalPrice,
+              discountActive: hasDiscount,
+              discountType: calculatedDiscountType,
+              discountAmount: calculatedDiscountAmount,
               stocks: [
                 {
                   quantity: availableQuantity,
