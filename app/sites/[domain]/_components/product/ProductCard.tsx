@@ -103,11 +103,8 @@ export function ProductCard({
           </h3>
         )}
         {isReseller && (
-          <Badge
-            variant="secondary"
-            className="border-primary/20 bg-background/90 text-primary gap-1 text-[10px] font-semibold"
-          >
-            <IconBuildingStore className="size-3" />
+          <Badge>
+            <IconBuildingStore className="size-4" />
             ตัวแทนจำหน่าย
           </Badge>
         )}

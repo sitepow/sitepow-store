@@ -609,6 +609,32 @@ export async function createResellerAgreement(
       return { success: false, message: 'กรุณาระบุร้านค้าผู้ให้ฝากขาย' }
     }
 
+    let resellerUserId: string | null = null
+
+    if (
+      data.resellerType === ResellerType.EXTERNAL &&
+      data.resellerCustomerId
+    ) {
+      const targetUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: data.resellerCustomerId },
+            { email: data.resellerCustomerId },
+          ],
+        },
+        select: { id: true },
+      })
+
+      if (!targetUser) {
+        return {
+          success: false,
+          message: 'ไม่พบข้อมูลผู้ใช้งานที่ตรงกับ Email หรือ ID ที่ระบุ',
+        }
+      }
+
+      resellerUserId = targetUser.id
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       const agreement = await tx.resellerAgreement.create({
         data: {
@@ -619,9 +645,7 @@ export async function createResellerAgreement(
               ? data.resellerStoreId
               : null,
           resellerCustomerId:
-            data.resellerType === ResellerType.EXTERNAL
-              ? data.resellerCustomerId
-              : null,
+            data.resellerType === ResellerType.EXTERNAL ? resellerUserId : null,
           defaultDiscountAmount: data.commissionRate,
           defaultDiscountType: DiscountType.PERCENTAGE,
           status: AgreementStatus.ACTIVE,
@@ -631,7 +655,7 @@ export async function createResellerAgreement(
       let targetUserId: string | null = null
 
       if (data.resellerType === ResellerType.EXTERNAL) {
-        targetUserId = data.resellerCustomerId || null
+        targetUserId = resellerUserId
       } else if (
         data.resellerType === ResellerType.INTERNAL_STORE &&
         data.resellerStoreId
