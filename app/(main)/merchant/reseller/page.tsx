@@ -246,6 +246,7 @@ export default function ResellerManagementPage() {
         stock={selectedPriceStock}
         isLoading={isSavingPrice}
         onSave={onSaveCustomPrice}
+        defaultCommissionRate={selectedPriceStock?.defaultCommissionRate || 0}
       />
     </Sidebar>
   )

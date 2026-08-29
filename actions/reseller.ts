@@ -214,6 +214,12 @@ export async function getResellerStocks(agreementId: string) {
     const stocks = await prisma.resellerStock.findMany({
       where: { agreementId },
       include: {
+        agreement: {
+          select: {
+            defaultDiscountType: true,
+            defaultDiscountAmount: true,
+          },
+        },
         variant: {
           include: {
             product: {
@@ -251,9 +257,15 @@ export async function getResellerStocks(agreementId: string) {
         }
       }
 
+      const defaultCommissionRate =
+        stock.agreement?.defaultDiscountType === DiscountType.PERCENTAGE
+          ? Number(stock.agreement?.defaultDiscountAmount || 0)
+          : 0
+
       return {
         ...stock,
         customPrice,
+        defaultCommissionRate,
       }
     })
 

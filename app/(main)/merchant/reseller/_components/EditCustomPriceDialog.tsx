@@ -29,6 +29,7 @@ interface EditCustomPriceDialogProps {
   open: boolean
   setOpen: (v: boolean) => void
   stock: any
+  defaultCommissionRate?: number
   isLoading?: boolean
   onSave?: (variantId: string, customPrice: number) => void
 }
@@ -37,6 +38,7 @@ export function EditCustomPriceDialog({
   open,
   setOpen,
   stock,
+  defaultCommissionRate = 0,
   isLoading = false,
   onSave,
 }: EditCustomPriceDialogProps) {
@@ -64,25 +66,34 @@ export function EditCustomPriceDialog({
 
   useEffect(() => {
     if (open && stock) {
-      const initialCustomPrice = stock?.customPrice
-        ? Number(stock.customPrice)
-        : retailPrice
-      const initialPercent =
-        retailPrice > 0
-          ? Number(
-              (
-                ((retailPrice - initialCustomPrice) / retailPrice) *
-                100
-              ).toFixed(2),
-            )
-          : 0
+      let initialCustomPrice: number
+      let initialPercent: number
+
+      if (stock?.customPrice !== undefined && stock?.customPrice !== null) {
+        initialCustomPrice = Number(stock.customPrice)
+        initialPercent =
+          retailPrice > 0
+            ? Number(
+                (
+                  ((retailPrice - initialCustomPrice) / retailPrice) *
+                  100
+                ).toFixed(2),
+              )
+            : 0
+      } else {
+        initialPercent = Number(defaultCommissionRate || 0)
+        initialCustomPrice =
+          retailPrice > 0
+            ? Number((retailPrice * (1 - initialPercent / 100)).toFixed(2))
+            : 0
+      }
 
       reset({
         customPrice: initialCustomPrice,
         discountPercent: initialPercent,
       })
     }
-  }, [open, stock, retailPrice, reset])
+  }, [open, stock, retailPrice, defaultCommissionRate, reset])
 
   const handlePercentChange = (percent: number) => {
     setValue('discountPercent', percent, {
