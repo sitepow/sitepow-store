@@ -27,6 +27,10 @@ export interface CartItem {
   branchId: string
   branchName: string
   productType: ProductType
+  isReseller?: boolean
+  agreementId?: string
+  storeId?: string
+  supplierStoreId?: string
 }
 
 export interface CartSummary {

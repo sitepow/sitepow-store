@@ -5,7 +5,7 @@ import { serializeDecimal } from '@/utils/decimal'
 import { earnCustomerPoints } from '@/utils/points'
 
 import { getCurrentUser } from '@/lib/auth-server'
-import { chatEvents } from '@/lib/events'
+import { OrderEventPayload, appEvents } from '@/lib/events'
 import { createOrderCore } from '@/lib/order'
 import { CreateOrderCoreInput } from '@/lib/order/types'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -74,7 +74,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
     }
 
     if (orders.length > 0) {
-      chatEvents.publish(`order:${input.storeId}`, {
+      appEvents.publish<OrderEventPayload>(`order:${input.storeId}`, {
         type: 'ORDER_CREATED',
         orderId: orders[0].id,
       })

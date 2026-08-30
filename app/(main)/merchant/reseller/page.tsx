@@ -5,9 +5,11 @@ import { useState } from 'react'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useAcceptResellerStock,
+  useResellerAgreements,
   useUpsertResellerCustomPrice,
 } from '@/actions/hooks/reseller'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useResellerSSE } from '@/hooks/use-reseller-sse'
 import { useAlertStore } from '@/stores/use-alert-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -42,6 +44,18 @@ export default function ResellerManagementPage() {
 
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
+
+  const storeId = selectedStoreId !== ALL_STORES ? selectedStoreId : undefined
+  useResellerSSE(storeId)
+
+  const { data: response } = useResellerAgreements(storeId!)
+
+  const agreements = response?.data || []
+  const selectedAgreement = agreements.find((a) => a.id === selectedAgreementId)
+
+  const isSupplier = Boolean(
+    selectedAgreement && selectedAgreement.supplierStoreId === selectedStoreId,
+  )
 
   const {
     canViewReseller,
@@ -141,25 +155,25 @@ export default function ResellerManagementPage() {
               disabled={selectedStoreId === ALL_STORES}
             />
             {canCreateReseller && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setCreateAgreementOpen(true)}
-                  disabled={selectedStoreId === ALL_STORES}
-                >
-                  <IconFilePlus />
-                  สร้างสัญญาใหม่
-                </Button>
-                <Button
-                  onClick={handleOpenAllocate}
-                  disabled={!selectedAgreementId}
-                >
-                  <IconPlus />
-                  เพิ่มสต็อกฝากขาย
-                </Button>
-              </>
+              <Button
+                variant="outline"
+                onClick={() => setCreateAgreementOpen(true)}
+                disabled={selectedStoreId === ALL_STORES}
+              >
+                <IconFilePlus />
+                สร้างสัญญาใหม่
+              </Button>
             )}
-            {canUpdateFinance && (
+            {canCreateReseller && isSupplier && (
+              <Button
+                onClick={handleOpenAllocate}
+                disabled={!selectedAgreementId}
+              >
+                <IconPlus />
+                เพิ่มสต็อกฝากขาย
+              </Button>
+            )}
+            {canUpdateFinance && isSupplier && (
               <Button
                 variant="outline"
                 onClick={handleOpenPayout}

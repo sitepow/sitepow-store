@@ -100,11 +100,17 @@ export function useDeleteEmployee() {
   })
 }
 
-export function useEmployeePermission() {
+export function useEmployeePermission(
+  customStoreId?: string,
+  customBranchId?: string,
+) {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
-  const isNoStoreContext = !selectedStoreId || selectedStoreId === ALL_STORES
+  const storeId = customStoreId ?? selectedStoreId
+  const branchId = customBranchId ?? selectedBranchId
+
+  const isNoStoreContext = !storeId || storeId === ALL_STORES
 
   const {
     data: employee,
@@ -112,8 +118,8 @@ export function useEmployeePermission() {
     error,
   } = useQuery(
     queryOptions({
-      queryKey: employeeKeys.currentStore(selectedStoreId, selectedBranchId),
-      queryFn: () => getEmployeePermission(selectedStoreId, selectedBranchId),
+      queryKey: employeeKeys.currentStore(storeId, branchId),
+      queryFn: () => getEmployeePermission(storeId, branchId),
       enabled: !isNoStoreContext,
     }),
   )

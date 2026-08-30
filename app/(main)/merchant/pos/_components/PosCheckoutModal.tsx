@@ -51,15 +51,22 @@ export function PosCheckoutModal({
   onSuccess,
 }: PosCheckoutModalProps) {
   const clearCart = useCartStore((state) => state.clearCart)
+  const cartItems = useCartStore((state) => state.items)
   const { watch, setValue, handleSubmit, reset } =
     useFormContext<POSCheckoutInput>()
 
   const isResellerMode = Boolean(agreementId)
   const { user } = useSession()
 
-  const storeId = watch('storeId')
+  const currentStoreId = watch('storeId')
 
-  const { data: isStripeAvailable = false } = usePaymentSettingStatus(storeId)
+  const supplierStoreId = cartItems[0]?.supplierStoreId || cartItems[0]?.storeId
+
+  const targetCheckStoreId =
+    isResellerMode && supplierStoreId ? supplierStoreId : currentStoreId
+
+  const { data: isStripeAvailable = false } =
+    usePaymentSettingStatus(targetCheckStoreId)
 
   const { mutate: createStandardOrder, isPending: isStandardPending } =
     useCreatePOSOrder()
@@ -70,8 +77,6 @@ export function PosCheckoutModal({
 
   const isPending =
     isStandardPending || isResellerPending || storeCheckoutMutation.isPending
-
-  const cartItems = useCartStore((state) => state.items)
 
   const paymentMethod = watch('paymentMethod')
   const receivedAmount = watch('receivedAmount') || 0
@@ -104,7 +109,11 @@ export function PosCheckoutModal({
     }
 
     if (method !== PaymentMethod.CASH_ON_DELIVERY && !isStripeAvailable) {
-      toast.error('กรุณาตั้งค่า Stripe ก่อนเปิดรับชำระด้วย PromptPay')
+      toast.error(
+        isResellerMode
+          ? 'ร้านค้าเจ้าของสินค้านี้ยังไม่ได้เปิดใช้งาน Stripe'
+          : 'กรุณาตั้งค่า Stripe ก่อนเปิดรับชำระด้วย PromptPay',
+      )
       return
     }
 
@@ -124,7 +133,9 @@ export function PosCheckoutModal({
         paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
       ) {
         toast.error(
-          'ระบบชำระเงิน PromptPay ยังไม่พร้อมใช้งาน กรุณาตั้งค่า Stripe',
+          isResellerMode
+            ? 'ระบบชำระเงินของร้านค้าเจ้าของสินค้ายังไม่พร้อมใช้งาน'
+            : 'ระบบชำระเงิน PromptPay ยังไม่พร้อมใช้งาน กรุณาตั้งค่า Stripe',
         )
         return
       }
@@ -144,9 +155,10 @@ export function PosCheckoutModal({
         if (paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY) {
           toast.loading('กำลังนำคุณไปยังหน้าชำระเงิน Stripe...')
 
+          // ส่ง storeId ของร้านค้าที่เป็นเจ้าของสินค้าเข้า checkout mutation
           storeCheckoutMutation.mutate(
             {
-              storeId: data.storeId,
+              storeId: targetCheckStoreId,
               orderId: createdOrder.id,
               customerEmail: user?.email || 'guest@checkout.local',
               description: `ชำระเงินคำสั่งซื้อ #${createdOrder.orderNumber}`,
@@ -297,16 +309,20 @@ export function PosCheckoutModal({
                 <div className="border-border text-muted-foreground bg-muted/20 relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center">
                   <IconQrcode className="text-muted-foreground/60 size-6" />
                   <span className="text-xs font-medium">
-                    พร้อมเพย์ (ยังไม่พร้อมใช้)
+                    {isResellerMode
+                      ? 'ร้านค้ายังไม่เปิดระบบชำระเงิน (ยังไม่พร้อมใช้)'
+                      : 'พร้อมเพย์ (ยังไม่พร้อมใช้)'}
                   </span>
-                  <Link
-                    href="http://lvh.me:3000/merchant/settings?tab=settings-payment"
-                    target="_blank"
-                    className="text-primary flex items-center gap-1 text-xs font-semibold hover:underline"
-                  >
-                    ตั้งค่าระบบชำระเงิน
-                    <IconExternalLink className="size-3" />
-                  </Link>
+                  {!isResellerMode && (
+                    <Link
+                      href="http://lvh.me:3000/merchant/settings?tab=settings-payment"
+                      target="_blank"
+                      className="text-primary flex items-center gap-1 text-xs font-semibold hover:underline"
+                    >
+                      ตั้งค่าระบบชำระเงิน
+                      <IconExternalLink className="size-3" />
+                    </Link>
+                  )}
                 </div>
               )}
             </div>

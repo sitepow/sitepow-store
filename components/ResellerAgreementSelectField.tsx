@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { useResellerAgreements } from '@/actions/hooks/reseller'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconFileText } from '@tabler/icons-react'
 
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -32,26 +32,28 @@ export function ResellerAgreementSelectField({
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
 
-  const { data: agreementsRes, isLoading } =
-    useResellerAgreements(selectedStoreId)
+  const storeId = selectedStoreId !== ALL_STORES ? selectedStoreId : ''
 
+  const { data: agreementsRes, isLoading } = useResellerAgreements(storeId)
   const agreements = agreementsRes?.data || []
 
   const currentValue = value ?? selectedAgreementId
   const handleValueChange = onValueChange ?? setSelectedAgreementId
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading) {
+      return
+    }
 
     if (agreements.length > 0) {
       const isValid = agreements.some((item) => item.id === currentValue)
       if (!isValid) {
         handleValueChange(agreements[0].id)
       }
-    } else if (currentValue !== '') {
+    } else {
       handleValueChange('')
     }
-  }, [agreementsRes?.data, isLoading])
+  }, [selectedStoreId, agreementsRes?.data, isLoading])
 
   if (!isMounted) {
     return null
@@ -64,12 +66,14 @@ export function ResellerAgreementSelectField({
         เลือกสัญญาตัวแทน
       </FieldLabel>
       <Select
-        value={currentValue}
+        value={currentValue || undefined}
         onValueChange={handleValueChange}
-        disabled={isLoading || disabled}
+        disabled={isLoading || disabled || agreements.length === 0}
       >
         <SelectTrigger className="w-full sm:w-64">
-          <SelectValue placeholder="เลือกสัญญาตัวแทน" />
+          <SelectValue
+            placeholder={isLoading ? 'กำลังโหลด...' : 'เลือกสัญญาตัวแทน'}
+          />
         </SelectTrigger>
         <SelectContent>
           {agreements.length === 0 ? (

@@ -8,6 +8,8 @@ import { productKeys } from '@/actions/query-keys/product'
 import { storefrontOrderKeys } from '@/actions/query-keys/storefront/order'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { OrderEventPayload } from '@/lib/events'
+
 export function useOrderSSE(storeId?: string) {
   const queryClient = useQueryClient()
 
@@ -16,11 +18,11 @@ export function useOrderSSE(storeId?: string) {
       return
     }
 
-    const eventSource = new EventSource(`/api/orders/${storeId}`)
+    const eventSource = new EventSource(`/api/sse/order/${storeId}`)
 
     eventSource.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data)
+        const data: OrderEventPayload = JSON.parse(event.data)
 
         if (
           ['ORDER_CREATED', 'ORDER_CANCELLED', 'ORDER_UPDATED'].includes(
@@ -33,7 +35,7 @@ export function useOrderSSE(storeId?: string) {
           queryClient.invalidateQueries({ queryKey: productKeys.all })
         }
       } catch (err) {
-        console.error(err)
+        console.error('SSE Order Error:', err)
       }
     }
 

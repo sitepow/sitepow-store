@@ -1,6 +1,6 @@
 'use server'
 
-import { checkAccessWithCache } from '@/app/api/chat/stream/[conversationId]/route'
+import { checkAccessWithCache } from '@/app/api/sse/chat/[conversationId]/route'
 import { GEMINI_MODEL } from '@/constants/ai'
 import { BAD_WORD_LISTS } from '@/constants/badwords'
 import { PLAN_DETAILS } from '@/constants/plan'
@@ -24,7 +24,7 @@ import { queryKeyToRedisKey } from '@/utils/cache'
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { invalidateCacheByPattern, withCache } from '@/lib/cache'
-import { chatEvents } from '@/lib/events'
+import { appEvents } from '@/lib/events'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
@@ -398,7 +398,7 @@ export async function sendMessage(
 
   const newMessage = result as Message
 
-  chatEvents.publish(`message:${conversationId}`, newMessage)
+  appEvents.publish(`message:${conversationId}`, newMessage)
 
   const invalidateTasks: Promise<unknown>[] = [
     appendMessageToLatestCache(conversationId, newMessage),
@@ -579,7 +579,8 @@ async function handleAiResponse(
       where: { conversationId, userId: { not: AI_BOT_ID } },
       data: { unreadCount: { increment: 1 } },
     })
-    chatEvents.publish(`message:${conversationId}`, aiMessage)
+
+    appEvents.publish(`message:${conversationId}`, aiMessage)
     await appendMessageToLatestCache(conversationId, aiMessage)
 
     if (storeId && aiResult.usage) {

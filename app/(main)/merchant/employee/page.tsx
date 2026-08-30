@@ -98,8 +98,7 @@ export default function EmployeePage() {
                     })
                   }}
                 >
-                  <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน (God
-                  Mode)
+                  <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน
                 </Button>
                 <Button
                   variant="outline"

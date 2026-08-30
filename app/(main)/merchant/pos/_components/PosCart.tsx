@@ -20,6 +20,7 @@ import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { CustomerCard } from '@/components/CustomerCard'
 import { Button } from '@/components/ui/button'
 import {
@@ -59,6 +60,21 @@ export function PosCart({
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
 
   const isResellerMode = Boolean(agreementId)
+
+  const hasMixedProducts = useMemo(() => {
+    if (cart.length === 0) {
+      return false
+    }
+
+    const hasResellerItems = cart.some(
+      (item) => item.isReseller || Boolean(item.agreementId),
+    )
+    const hasOwnItems = cart.some(
+      (item) => !item.isReseller && !Boolean(item.agreementId),
+    )
+
+    return hasResellerItems && hasOwnItems
+  }, [cart])
 
   const orderItems = useMemo(
     () =>
@@ -220,6 +236,13 @@ export function PosCart({
               </div>
             ) : (
               <div className="flex flex-col gap-2 py-2">
+                {hasMixedProducts && (
+                  <ActionRequiredAlert
+                    title="ไม่สามารถชำระเงินรวมกันได้"
+                    description="พบสินค้าตัวแทนจำหน่ายรวมกับสินค้าหน้าร้าน โปรดลบรายการออกเพื่อชำระเงินทีละประเภท"
+                  />
+                )}
+
                 {cart.map((item) => {
                   const stock = item.variant.stocks.reduce(
                     (sum, s) => sum + s.quantity,
@@ -249,7 +272,7 @@ export function PosCart({
           </ScrollArea>
         </CardContent>
         <CardFooter className="flex-col gap-3 border-t p-4">
-          {!isResellerMode && orderItems?.length !== 0 && (
+          {!isResellerMode && orderItems?.length !== 0 && !hasMixedProducts && (
             <PosDiscountDialog subtotal={cartSummary.finalPrice} />
           )}
           <div className="w-full">
@@ -267,7 +290,7 @@ export function PosCart({
             <Button
               size="lg"
               className="flex-2 text-base font-semibold"
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || hasMixedProducts}
               onClick={() => setIsCheckoutOpen(true)}
             >
               ชำระเงิน {formatCurrency(summaryData.finalPrice)}

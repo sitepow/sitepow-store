@@ -142,6 +142,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewReseller',
   ],
   MANAGER: [
+    'canViewStore',
     'canViewCategory',
     'canCreateCategory',
     'canUpdateCategory',
@@ -195,6 +196,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateExpenses',
   ],
   CASHIER: [
+    'canViewStore',
     'canViewDashboard',
     'canViewProducts',
     'canViewOrders',
@@ -211,6 +213,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateExpenses',
   ],
   STAFF: [
+    'canViewStore',
     'canViewDashboard',
     'canViewProducts',
     'canViewInventory',
@@ -240,6 +243,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewCustomers',
     'canCreateCustomers',
     'canUpdateCustomers',
+    'canViewStore',
   ],
   POS_RESELLER: [
     'canViewOrders',
@@ -247,6 +251,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateOrders',
     'canViewReseller',
     'canUpdateReseller',
+    'canViewStore',
   ],
   CONTENT_CREATOR: [
     'canViewBlogs',
@@ -260,6 +265,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewProducts',
     'canViewStoreProfile',
     'canViewReviews',
+    'canViewStore',
   ],
   AUDITOR: [
     'canViewStore',
@@ -278,6 +284,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewReseller',
   ],
   SUPPORT: [
+    'canViewStore',
     'canViewConversation',
     'canCreateConversation',
     'canUpdateConversation',
@@ -292,6 +299,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateReviews',
   ],
   MARKETING: [
+    'canViewStore',
     'canViewCoupons',
     'canCreateCoupons',
     'canUpdateCoupons',
@@ -308,6 +316,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canUpdateReviews',
   ],
   FULFILLMENT: [
+    'canViewStore',
     'canViewOrders',
     'canUpdateOrders',
     'canViewInventory',

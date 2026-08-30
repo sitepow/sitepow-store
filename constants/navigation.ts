@@ -91,7 +91,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'แดชบอร์ด',
     tab: 'dashboard',
     icon: IconLayoutDashboard,
-    permissionKey: 'canViewDashboard',
   },
   {
     value: 'analytics',
@@ -204,7 +203,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconBuildingStore,
     hasSeparatorBefore: true,
     groupLabel: 'ตั้งค่าร้านค้าและบัญชี',
-    permissionKey: 'canViewStoreSettings',
   },
   {
     value: 'organization-branches',

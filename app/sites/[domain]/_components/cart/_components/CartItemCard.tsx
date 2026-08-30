@@ -1,8 +1,11 @@
+'use client'
+
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 
 import { ProductImage } from '@/components/ProductImage'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 import { cn } from '@/lib/utils'
@@ -26,20 +29,28 @@ export function CartItemCard({
 }: CartItemCardProps) {
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
+  const isResellerItem = item.isReseller || Boolean(item.agreementId)
 
   return (
     <div className="flex gap-3 border-b py-3 last:border-0 sm:gap-4">
       <ProductImage src={item.image} alt={item.productTitle} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn('min-w-0 wrap-break-word', productClassName)}>
-          <h4
-            className={cn(
-              'text-sm leading-tight font-medium wrap-break-word sm:text-base',
-              textClassName,
+          <div className="flex flex-wrap items-start gap-1.5">
+            <h4
+              className={cn(
+                'text-sm leading-tight font-medium wrap-break-word sm:text-base',
+                textClassName,
+              )}
+            >
+              {item.productTitle}
+            </h4>
+            {isResellerItem && (
+              <Badge className="shrink-0 border-amber-500/20 bg-amber-500/10 px-1.5 py-0 text-[10px] font-normal text-amber-700 hover:bg-amber-500/20 dark:text-amber-400">
+                ตัวแทนจำหน่าย
+              </Badge>
             )}
-          >
-            {item.productTitle}
-          </h4>
+          </div>
           <p
             className={cn(
               'text-primary mt-0.5 text-[11px] wrap-break-word sm:text-xs',
@@ -49,7 +60,7 @@ export function CartItemCard({
             {item.variant.title}
             {item.selectedOptions.length > 0 &&
               ` | ${item.selectedOptions.map((o) => o.choiceName).join(', ')}`}
-            , {item.branchName}{' '}
+            {!isResellerItem && `, ${item.branchName}`}{' '}
             {item.selectedAddons.length > 0 &&
               `+ ${item.selectedAddons.map((a) => a.title).join(', ')}`}
           </p>

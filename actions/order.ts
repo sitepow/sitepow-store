@@ -8,7 +8,7 @@ import { earnCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
-import { OrderEventPayload, chatEvents } from '@/lib/events'
+import { OrderEventPayload, appEvents } from '@/lib/events'
 import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
@@ -423,7 +423,7 @@ export async function updateOrderStatus(
       },
     })
 
-    chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+    appEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
       type: 'ORDER_UPDATED',
       orderId: id,
     })
@@ -528,7 +528,7 @@ export async function cancelOrder(id: string) {
       actorType,
     })
 
-    chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+    appEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
       type: 'ORDER_CANCELLED',
       orderId: id,
     })

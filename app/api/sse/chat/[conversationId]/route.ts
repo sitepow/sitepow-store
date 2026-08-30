@@ -5,7 +5,7 @@ import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { withCache } from '@/lib/cache'
-import { chatEvents } from '@/lib/events'
+import { appEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
@@ -32,7 +32,7 @@ export async function GET(
     start(controller) {
       const encoder = new TextEncoder()
 
-      const unsubscribe = chatEvents.subscribe(
+      const unsubscribe = appEvents.subscribe(
         `message:${conversationId}`,
         (msg) => {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(msg)}\n\n`))

@@ -12,11 +12,47 @@ import {
 import { serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
-import { OrderEventPayload, chatEvents } from '@/lib/events'
+import {
+  OrderEventPayload,
+  ResellerEventPayload,
+  appEvents,
+} from '@/lib/events'
 import { findOrCreateEmployee } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
 import { invalidateEmployeePermissionCache } from './query-keys/invalidation/permission'
+
+async function notifyResellerEvent(
+  agreementId: string,
+  payload: Omit<ResellerEventPayload, 'agreementId' | 'supplierStoreId'>,
+) {
+  try {
+    const agreement = await prisma.resellerAgreement.findUnique({
+      where: { id: agreementId },
+      select: { supplierStoreId: true, resellerStoreId: true },
+    })
+
+    if (!agreement) {
+      return
+    }
+
+    const fullPayload: ResellerEventPayload = {
+      ...payload,
+      agreementId,
+      supplierStoreId: agreement.supplierStoreId,
+      resellerStoreId: agreement.resellerStoreId || undefined,
+      updatedAt: new Date().toISOString(),
+    }
+
+    appEvents.publish(`reseller:${agreement.supplierStoreId}`, fullPayload)
+
+    if (agreement.resellerStoreId) {
+      appEvents.publish(`reseller:${agreement.resellerStoreId}`, fullPayload)
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 export interface CreateResellerPOSOrderInput {
   supplierStoreId: string
@@ -176,9 +212,13 @@ export async function createResellerPOSOrder(
       return order
     })
 
-    chatEvents.publish<OrderEventPayload>(`order:${input.supplierStoreId}`, {
+    appEvents.publish<OrderEventPayload>(`order:${input.supplierStoreId}`, {
       type: 'ORDER_CREATED',
       orderId: result.id,
+    })
+
+    await notifyResellerEvent(input.agreementId, {
+      type: 'STOCK_UPDATED',
     })
 
     return {
@@ -195,6 +235,7 @@ export async function createResellerPOSOrder(
     }
   }
 }
+
 export async function getResellerStocks(agreementId: string) {
   try {
     const userSession = await getCurrentUser()
@@ -211,6 +252,9 @@ export async function getResellerStocks(agreementId: string) {
       include: {
         agreement: {
           select: {
+            supplierStoreId: true,
+            resellerStoreId: true,
+            resellerCustomerId: true,
             defaultDiscountType: true,
             defaultDiscountAmount: true,
           },
@@ -354,6 +398,11 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
       return resellerStock
     })
 
+    await notifyResellerEvent(input.agreementId, {
+      type: 'STOCK_ADDED',
+      variantId: input.variantId,
+    })
+
     return {
       success: true,
       message: 'เพิ่มสต็อกฝากขายเรียบร้อยแล้ว (รอตัวแทนกดรับสินค้า)',
@@ -414,6 +463,11 @@ export async function acceptResellerStock(input: AcceptResellerStockInput) {
       })
 
       return updatedStock
+    })
+
+    await notifyResellerEvent(input.agreementId, {
+      type: 'STOCK_ACCEPTED',
+      variantId: input.variantId,
     })
 
     return {
@@ -579,6 +633,10 @@ export async function createResellerPayout(input: CreateResellerPayoutInput) {
       },
     })
 
+    await notifyResellerEvent(input.agreementId, {
+      type: 'AGREEMENT_UPDATED',
+    })
+
     return {
       success: true,
       message: input.paymentProof
@@ -604,13 +662,28 @@ export async function getResellerAgreements(storeId: string) {
       return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
+    if (!storeId) {
+      return { success: true, data: [] }
+    }
+
     const agreements = await prisma.resellerAgreement.findMany({
       where: {
-        supplierStoreId: storeId,
+        OR: [
+          { supplierStoreId: storeId },
+          { resellerStoreId: storeId },
+          { resellerCustomerId: userSession.id },
+        ],
       },
       include: {
-        resellerStore: true,
-        resellerUser: true,
+        supplierStore: {
+          select: { id: true, name: true },
+        },
+        resellerStore: {
+          select: { id: true, name: true },
+        },
+        resellerUser: {
+          select: { id: true, name: true, email: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     })
@@ -790,6 +863,10 @@ export async function createResellerAgreement(
       return agreement
     })
 
+    await notifyResellerEvent(result.id, {
+      type: 'AGREEMENT_UPDATED',
+    })
+
     return {
       success: true,
       message: 'สร้างสัญญาและกำหนดสิทธิ์ตัวแทนจำหน่ายสำเร็จ',
@@ -909,6 +986,11 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
       return updatedResellerStock
     })
 
+    await notifyResellerEvent(input.agreementId, {
+      type: 'STOCK_UPDATED',
+      variantId: input.variantId,
+    })
+
     return {
       success: true,
       message: 'รับคืนสต็อกเข้าสาขาเรียบร้อยแล้ว',
@@ -931,10 +1013,15 @@ export async function getResellerAgreementInfo(storeId: string) {
   }
 
   try {
+    const userSession = await getCurrentUser()
+
     const agreement = await prisma.resellerAgreement.findFirst({
       where: {
-        resellerStoreId: storeId,
         status: AgreementStatus.ACTIVE,
+        OR: [
+          { resellerStoreId: storeId },
+          ...(userSession?.id ? [{ resellerCustomerId: userSession.id }] : []),
+        ],
       },
       include: {
         stocks: true,
@@ -985,6 +1072,11 @@ export async function upsertResellerCustomPrice(
         specialPrice: new Prisma.Decimal(input.customPrice),
         discountAmount: new Prisma.Decimal(0),
       },
+    })
+
+    await notifyResellerEvent(input.agreementId, {
+      type: 'PRICE_CHANGED',
+      variantId: input.variantId,
     })
 
     return {

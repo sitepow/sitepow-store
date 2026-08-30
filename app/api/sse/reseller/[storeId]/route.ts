@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 
 import { getCurrentUser } from '@/lib/auth-server'
-import { OrderEventPayload, chatEvents } from '@/lib/events'
+import { ResellerEventPayload, appEvents } from '@/lib/events'
 
 export async function GET(
   req: NextRequest,
@@ -21,8 +21,18 @@ export async function GET(
 
       controller.enqueue(encoder.encode(': connected\n\n'))
 
-      const unsubscribe = chatEvents.subscribe<OrderEventPayload>(
-        `order:${storeId}`,
+      const keepAliveInterval = setInterval(() => {
+        if (!isClosed) {
+          try {
+            controller.enqueue(encoder.encode(': keepalive\n\n'))
+          } catch {
+            clearInterval(keepAliveInterval)
+          }
+        }
+      }, 15000)
+
+      const unsubscribe = appEvents.subscribe<ResellerEventPayload>(
+        `reseller:${storeId}`,
         (data) => {
           if (isClosed) {
             return
@@ -40,6 +50,7 @@ export async function GET(
 
       req.signal.addEventListener('abort', () => {
         isClosed = true
+        clearInterval(keepAliveInterval)
         unsubscribe()
         try {
           controller.close()

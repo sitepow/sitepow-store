@@ -8,12 +8,31 @@ export type OrderEventPayload = {
   orderId: string
 }
 
-export const chatEvents = {
-  publish: <T = Message>(channel: string, message: T) => {
+export type ResellerEventType =
+  | 'STOCK_ADDED'
+  | 'STOCK_ACCEPTED'
+  | 'STOCK_UPDATED'
+  | 'PRICE_CHANGED'
+  | 'AGREEMENT_UPDATED'
+
+export type ResellerEventPayload = {
+  type: ResellerEventType
+  agreementId: string
+  supplierStoreId: string
+  resellerStoreId?: string
+  variantId?: string
+  updatedAt?: string
+}
+
+export const appEvents = {
+  publish: <T = Message | OrderEventPayload | ResellerEventPayload>(
+    channel: string,
+    message: T,
+  ) => {
     redis.publish(channel, JSON.stringify(message))
   },
 
-  subscribe: <T = Message>(
+  subscribe: <T = Message | OrderEventPayload | ResellerEventPayload>(
     channel: string,
     onMessage: (message: T) => void,
   ) => {
@@ -26,14 +45,13 @@ export const chatEvents = {
         try {
           onMessage(JSON.parse(msg) as T)
         } catch (err) {
-          console.error('Redis Message Parse Error:', err)
+          console.error(`Redis Message Parse Error on channel [${ch}]:`, err)
         }
       }
     }
 
     sub.on('message', handler)
-
-    sub.on('error', (err) => console.error(err))
+    sub.on('error', (err) => console.error('Redis Event Error:', err))
 
     return () => {
       sub.off('message', handler)

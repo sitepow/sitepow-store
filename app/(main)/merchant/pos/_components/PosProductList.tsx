@@ -51,8 +51,17 @@ export function PosProductList({
   )
 
   const getVariantAvailableStock = (
+    product: POSProductItem,
     variant: POSProductItem['variants'][number],
   ) => {
+    if (product.isReseller) {
+      const resellerStock = variant.stocks[0]?.quantity ?? 0
+      return getRemainingStock(cartItems, {
+        variantId: variant.id,
+        stock: resellerStock,
+      })
+    }
+
     if (!selectedBranchId) {
       return 0
     }
@@ -68,7 +77,7 @@ export function PosProductList({
 
   const getProductTotalStock = (product: POSProductItem) => {
     return product.variants.reduce(
-      (sum, v) => sum + getVariantAvailableStock(v),
+      (sum, v) => sum + getVariantAvailableStock(product, v),
       0,
     )
   }
@@ -80,7 +89,7 @@ export function PosProductList({
 
     const singleVariantStock =
       product.variants.length > 0
-        ? getVariantAvailableStock(product.variants[0])
+        ? getVariantAvailableStock(product, product.variants[0])
         : 0
 
     if (
@@ -117,15 +126,16 @@ export function PosProductList({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
               const totalStock = getProductTotalStock(product)
+              const isItemReseller = product.isReseller ?? isReseller
 
               return (
                 <ProductCard
-                  key={product.id}
+                  key={`${isItemReseller ? 'reseller' : 'own'}-${product.id}`}
                   className="text-center"
                   onClick={() => handleProductClick(product)}
                   product={product as unknown as SectionProductItem}
                   quantity={totalStock}
-                  isReseller={isReseller}
+                  isReseller={isItemReseller}
                 />
               )
             })}

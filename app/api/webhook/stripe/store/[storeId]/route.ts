@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 import { OrderStatus } from '@/generated/prisma/enums'
 import Stripe from 'stripe'
 
-import { OrderEventPayload, chatEvents } from '@/lib/events'
+import { OrderEventPayload, appEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 import { getStripeInstance } from '@/lib/stripe'
 
@@ -140,7 +140,7 @@ export async function POST(req: Request, props: RouteParams) {
           })
 
           for (const order of ordersToUpdate) {
-            chatEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
+            appEvents.publish<OrderEventPayload>(`order:${order.storeId}`, {
               type: 'ORDER_UPDATED',
               orderId: order.id,
             })

@@ -15,7 +15,7 @@ export function useChatStream(conversationId: string) {
       return
     }
 
-    const eventSource = new EventSource(`/api/chat/stream/${conversationId}`)
+    const eventSource = new EventSource(`/api/sse/chat/${conversationId}`)
 
     eventSource.onmessage = (event) => {
       const newMessage = JSON.parse(event.data)

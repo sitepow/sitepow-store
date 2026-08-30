@@ -9,6 +9,8 @@ import {
   ActorType,
   InvoiceStatus,
   LogAction,
+  PermissionAction,
+  PermissionDomain,
   Plan,
   StoreStatus,
   SubStatus,
@@ -251,14 +253,57 @@ export async function getStores({
       }
     }
 
+    const userId = userSession.id
+
     const whereClause: Prisma.StoreWhereInput = {
-      ownerId: userSession.id,
+      OR: [
+        { ownerId: userId },
+        {
+          employeeStores: {
+            some: {
+              employee: { userId },
+              branches: {
+                some: {
+                  OR: [
+                    {
+                      role: {
+                        permissions: {
+                          some: {
+                            permission: {
+                              domain: PermissionDomain.STORE,
+                              action: PermissionAction.READ,
+                            },
+                          },
+                        },
+                      },
+                    },
+                    {
+                      customPermissions: {
+                        some: {
+                          permission: {
+                            domain: PermissionDomain.STORE,
+                            action: PermissionAction.READ,
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      ],
     }
 
     if (search) {
-      whereClause.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { slug: { contains: search, mode: 'insensitive' } },
+      whereClause.AND = [
+        {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { slug: { contains: search, mode: 'insensitive' } },
+          ],
+        },
       ]
     }
 
@@ -323,23 +368,53 @@ export async function getStoreOptions(filters?: {
 
     const userId = userSession.id
 
-    const whereClause: Prisma.StoreWhereInput = {
-      OR: [
-        { ownerId: userId },
-        { employeeStores: { some: { employee: { userId } } } },
-      ],
-    }
-
-    if (filters?.search) {
-      whereClause.name = { contains: filters.search, mode: 'insensitive' }
-    }
-
-    if (filters?.status) {
-      whereClause.status = filters.status
-    }
-
     return await prisma.store.findMany({
-      where: whereClause,
+      where: {
+        OR: [
+          { ownerId: userId },
+          {
+            employeeStores: {
+              some: {
+                employee: { userId },
+                branches: {
+                  some: {
+                    OR: [
+                      {
+                        role: {
+                          permissions: {
+                            some: {
+                              permission: {
+                                domain: PermissionDomain.STORE,
+                                action: PermissionAction.READ,
+                              },
+                            },
+                          },
+                        },
+                      },
+                      {
+                        customPermissions: {
+                          some: {
+                            permission: {
+                              domain: PermissionDomain.STORE,
+                              action: PermissionAction.READ,
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        ],
+        ...(filters?.search && {
+          name: { contains: filters.search, mode: 'insensitive' },
+        }),
+        ...(filters?.status && {
+          status: filters.status,
+        }),
+      },
       select: storeDropdownSelect,
       orderBy: {
         name: 'asc',

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useDeleteStore, useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
@@ -35,10 +36,82 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function StoreTable() {
-  const { setSelectedStoreId } = useStoreFilter()
-  const [page, setPage] = useState(1)
+function StoreRowActions({
+  storeId,
+  onDelete,
+}: {
+  storeId: string
+  onDelete: () => void
+}) {
   const router = useRouter()
+  const { setSelectedStoreId } = useStoreFilter()
+
+  const {
+    canUpdateStore,
+    canViewBranches,
+    canViewSubscription,
+    canViewProducts,
+    canDeleteStore,
+  } = useEmployeePermission(storeId)
+
+  return (
+    <div className="space-x-2 text-right">
+      {canUpdateStore && (
+        <Button
+          variant="outline"
+          size="icon-lg"
+          onClick={() => {
+            setSelectedStoreId(storeId)
+            router.push('/merchant/settings')
+          }}
+        >
+          <IconSettings />
+        </Button>
+      )}
+      {canViewBranches && (
+        <Button
+          variant="outline"
+          size="icon-lg"
+          onClick={() => {
+            setSelectedStoreId(storeId)
+            router.push('/merchant/organization-branches')
+          }}
+        >
+          <IconHierarchy2 />
+        </Button>
+      )}
+      {canViewSubscription && (
+        <Button
+          variant="outline"
+          size="icon-lg"
+          onClick={() => {
+            setSelectedStoreId(storeId)
+            router.push('/merchant/billing-subscription')
+          }}
+        >
+          <IconCreditCard />
+        </Button>
+      )}
+      {canViewProducts && (
+        <Button
+          variant="outline"
+          size="icon-lg"
+          onClick={() => {
+            setSelectedStoreId(storeId)
+            router.push('/merchant/store-settings/products')
+          }}
+        >
+          <IconPackage />
+        </Button>
+      )}
+
+      {canDeleteStore && <DeleteButton isPending={false} onDelete={onDelete} />}
+    </div>
+  )
+}
+
+export function StoreTable() {
+  const [page, setPage] = useState(1)
 
   const { data: { data: stores = [], meta } = {}, isLoading } = useStores({
     page,
@@ -63,10 +136,10 @@ export function StoreTable() {
           </TableHeader>
           <TableBody>
             {isLoading && stores.length === 0 && (
-              <TableLoadingRow colSpan={6} />
+              <TableLoadingRow colSpan={8} />
             )}
             {!isLoading && stores.length === 0 && (
-              <TableEmptyRow colSpan={6} title="ไม่พบข้อมูลร้านค้าของคุณ" />
+              <TableEmptyRow colSpan={8} title="ไม่พบข้อมูลร้านค้าของคุณ" />
             )}
             {stores.length !== 0 &&
               stores.map((store) => {
@@ -137,48 +210,9 @@ export function StoreTable() {
                       {PLAN_DETAILS[store.plan].features.join(', ')}
                     </TableCell>
                     <TableCell>{formattedDate}</TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => {
-                          setSelectedStoreId(store.id)
-                          router.push('/merchant/settings')
-                        }}
-                      >
-                        <IconSettings />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => {
-                          setSelectedStoreId(store.id)
-                          router.push('/merchant/organization-branches')
-                        }}
-                      >
-                        <IconHierarchy2 />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() => {
-                          setSelectedStoreId(store.id)
-                          router.push('/merchant/billing-subscription')
-                        }}
-                      >
-                        <IconCreditCard />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        onClick={() =>
-                          router.push('/merchant/store-settings/products')
-                        }
-                      >
-                        <IconPackage />
-                      </Button>
-                      <DeleteButton
-                        isPending={false}
+                    <TableCell>
+                      <StoreRowActions
+                        storeId={store.id}
                         onDelete={() => deleteStoreMutation.mutate(store.id)}
                       />
                     </TableCell>

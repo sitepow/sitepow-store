@@ -41,6 +41,7 @@ export const useCartStore = create<CartStore>()(
       usedPoints: 0,
       addItem: (newItem) => {
         const { items } = get()
+
         const getAvailableStock = () => {
           if (
             newItem.productType === ProductType.DIGITAL_LINK ||
@@ -48,32 +49,48 @@ export const useCartStore = create<CartStore>()(
           ) {
             return 999999
           }
+          if (newItem.isReseller) {
+            return newItem.variant.stocks[0]?.quantity ?? 0
+          }
           return getStockQuantity(
             newItem.variant,
             newItem.productType,
             newItem.branchId,
           )
         }
+
         const branchStock = getAvailableStock()
-        const itemsInSameBranch = items.filter(
-          (i) => i.branchId === newItem.branchId,
-        )
-        const remaining = getRemainingStock(itemsInSameBranch, {
+
+        const itemsToCompare = newItem.isReseller
+          ? items.filter((i) => i.isReseller)
+          : items.filter((i) => i.branchId === newItem.branchId)
+
+        const remaining = getRemainingStock(itemsToCompare, {
           variantId: newItem.variant.id,
           stock: branchStock,
         })
+
         if (
           newItem.productType !== ProductType.DIGITAL_LINK &&
           newItem.productType !== ProductType.DIGITAL_SERVICE &&
           remaining <= 0
         ) {
-          toast.error('สินค้าในสาขานี้หมดแล้ว')
+          toast.error(
+            newItem.isReseller
+              ? 'สต็อกฝากขายหมดแล้ว'
+              : 'สินค้าในสาขานี้หมดแล้ว',
+          )
           return
         }
+
         const existingIndex = items.findIndex(
           (item) =>
-            isSameCartItem(item, newItem) && item.branchId === newItem.branchId,
+            isSameCartItem(item, newItem) &&
+            (newItem.isReseller
+              ? item.isReseller
+              : item.branchId === newItem.branchId),
         )
+
         const finalQty =
           newItem.productType === ProductType.DIGITAL_LINK ||
           newItem.productType === ProductType.DIGITAL_SERVICE
@@ -117,14 +134,23 @@ export const useCartStore = create<CartStore>()(
         if (!target) {
           return
         }
-        const branchStock = getStockByBranch(target.variant, target.branchId)
-        const itemsInSameBranch = items.filter(
-          (i) => i.branchId === target.branchId && i.cartItemId !== cartItemId,
-        )
-        const remaining = getRemainingStock(itemsInSameBranch, {
+
+        const branchStock = target.isReseller
+          ? (target.variant.stocks[0]?.quantity ?? 0)
+          : getStockByBranch(target.variant, target.branchId)
+
+        const itemsToCompare = target.isReseller
+          ? items.filter((i) => i.isReseller && i.cartItemId !== cartItemId)
+          : items.filter(
+              (i) =>
+                i.branchId === target.branchId && i.cartItemId !== cartItemId,
+            )
+
+        const remaining = getRemainingStock(itemsToCompare, {
           variantId: target.variant.id,
           stock: branchStock,
         })
+
         const validatedQty = Math.max(1, Math.min(qty, remaining))
         set({
           items: items.map((item) =>
