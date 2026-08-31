@@ -26,33 +26,16 @@ const dancingScript = Dancing_Script({
 })
 
 export const metadata: Metadata = {
-  title: 'FAOS Olive Oil & Honey | Premium Greek Extra Virgin Olive Oil & Organic Honey',
+  title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
   description:
-    'Discover FAOS premium Greek Extra Virgin Olive Oil, pure organic fir & chestnut honey. Authentic Mediterranean diet products for healthy living and fine dining.',
+    'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
   keywords: [
-    // แบรนด์ & จุดขายหลัก
-    'FAOS',
-    'FAOS Siam',
-    'FAOS Olive Oil',
-    'FAOS Honey',
-    'FAOS Olive Oil and Honey',
-    // ภาษาอังกฤษ (Global & Expat Search)
-    'Greek Extra Virgin Olive Oil',
-    'Organic Greek Honey',
-    'Greek Fir Honey',
-    'Chestnut Honey',
-    'Mediterranean Diet Products',
-    'Healthy Cooking Oil',
-    'Premium Cold Pressed Olive Oil',
-    // ภาษาไทย (Thai Local Search Target)
-    'น้ำมันมะกอกกรีก',
-    'น้ำมันมะกอก Extra Virgin',
-    'น้ำมันมะกอกเพื่อสุขภาพ',
-    'น้ำผึ้งกรีก',
-    'น้ำผึ้งออร์แกนิค',
-    'น้ำผึ้งดอกสนกรีก',
-    'อาหารเมดิเตอร์เรเนียน',
-    'น้ำมันมะกอกพรีเมียม',
+    'Sitepow',
+    'ระบบจัดการร้านค้าออนไลน์',
+    'จัดการสต็อกสินค้า',
+    'ระบบหลังบ้านร้านค้า',
+    'ขายของออนไลน์',
+    'โปรแกรมสต็อกสินค้า',
   ],
 }
 

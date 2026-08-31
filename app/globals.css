@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -84,10 +86,6 @@
   --sidebar-ring: oklch(0.708 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  
-  /* ตัวแปรภาษาไทย */
-  --thai-line-height: 1.6;
-  --thai-heading-line-height: 1.4;
 }
 
 .dark {
@@ -126,30 +124,44 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 tracking-tighter;
+    @apply border-border outline-ring/50;
+    @apply tracking-tighter;
   }
-  
+  body {
+    @apply bg-background text-foreground;
+  }
   html {
     @apply font-sans;
+  }
+
+  :root {
+    --thai-line-height: 1.6;
+    --thai-heading-line-height: 1.4;
+  }
+
+  html,
+  body {
     line-height: var(--thai-line-height);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    background-color: #ffffff;
+    color: var(--mauve-12);
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    line-height: var(--thai-heading-line-height);
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     padding-top: 0.2em;
   }
 }
 
-/* Animations */
 @keyframes gentle-bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(-50%) translateY(0);
   }
   50% {
@@ -169,27 +181,11 @@
   }
 }
 
-@keyframes ken-burns-right {
-  0% {
-    transform-origin: 0% 50%;
-    transform: scale(1) translateX(0);
-  }
-  100% {
-    transform-origin: 100% 50%;
-    transform: scale(1.3) translateX(5%);
-  }
-}
-
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-move 20s ease infinite;
 }
 
-.animate-ken-burns {
-  animation: ken-burns-right 15s ease-in-out infinite alternate;
-}
-
-/* Article Typography Overrides */
 article.prose h1 {
   font-weight: bold;
   font-size: 2.25rem !important;
@@ -235,7 +231,20 @@ article.prose li {
   display: list-item !important;
 }
 
-/* Custom Editor Containers */
+@keyframes ken-burns-right {
+  0% {
+    transform-origin: 0% 50%;
+    transform: scale(1) translateX(0);
+  }
+  100% {
+    transform-origin: 100% 50%;
+    transform: scale(1.3) translateX(5%);
+  }
+}
+.animate-ken-burns {
+  animation: ken-burns-right 15s ease-in-out infinite alternate;
+}
+
 .bn-container,
 .bn-container * {
   font-family: var(--font-sans), sans-serif !important;
