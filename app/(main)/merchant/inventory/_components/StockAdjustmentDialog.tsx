@@ -51,6 +51,11 @@ export function StockAdjustmentDialog({
 }: StockAdjustmentDialogProps) {
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
+
+  const [adjustmentType, setAdjustmentType] = useState<'ADD' | 'SUBTRACT'>(
+    'SUBTRACT',
+  )
+
   const createStockAdjustmentMutation = useCreateStockAdjustment()
 
   const {
@@ -64,21 +69,34 @@ export function StockAdjustmentDialog({
     defaultValues: {
       variantId,
       branchId,
-      quantity: -1,
-      reason: '',
+      quantity: 1,
+      reason: StockAdjustmentReason.CORRECTION,
       note: '',
     },
   })
 
   const handleClose = () => {
-    reset()
+    reset({
+      variantId,
+      branchId,
+      quantity: 1,
+      reason: StockAdjustmentReason.CORRECTION,
+      note: '',
+    })
+    setAdjustmentType('SUBTRACT')
     setOpen(false)
   }
 
   const onSubmit = (values: CreateStockAdjustmentFormValues) => {
+    const finalQuantity =
+      adjustmentType === 'SUBTRACT'
+        ? -Math.abs(Number(values.quantity))
+        : Math.abs(Number(values.quantity))
+
     createStockAdjustmentMutation.mutate(
       {
         ...values,
+        quantity: finalQuantity,
         storeId: selectedStoreId,
         reason: values.reason as StockAdjustmentReason,
       },
@@ -113,26 +131,57 @@ export function StockAdjustmentDialog({
             {variantLabel} · {branchName}
           </DialogDescription>
         </DialogHeader>
-
         <div className="grid gap-4">
           <Field>
             <FieldLabel>สาขา</FieldLabel>
             <Input value={branchName} disabled />
           </Field>
-
           <Field>
-            <FieldLabel>จำนวน (ติดลบ = ตัดออก, บวก = เพิ่มเข้า)</FieldLabel>
+            <FieldLabel>ประเภทการปรับสต็อก</FieldLabel>
+            <div className="grid grid-cols-2 gap-2 text-white">
+              <Button
+                type="button"
+                variant={adjustmentType === 'SUBTRACT' ? 'default' : 'outline'}
+                className={
+                  adjustmentType === 'SUBTRACT'
+                    ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                    : ''
+                }
+                onClick={() => setAdjustmentType('SUBTRACT')}
+                disabled={createStockAdjustmentMutation.isPending}
+              >
+                ตัดออก (- ลดลง)
+              </Button>
+              <Button
+                type="button"
+                variant={adjustmentType === 'ADD' ? 'default' : 'outline'}
+                className={
+                  adjustmentType === 'ADD'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : ''
+                }
+                onClick={() => setAdjustmentType('ADD')}
+                disabled={createStockAdjustmentMutation.isPending}
+              >
+                เพิ่มเข้า (+ เพิ่มขึ้น)
+              </Button>
+            </div>
+          </Field>
+          <Field>
+            <FieldLabel>จำนวน</FieldLabel>
             <Input
               type="number"
+              min="1"
+              placeholder="0"
               {...register('quantity', { valueAsNumber: true })}
               disabled={createStockAdjustmentMutation.isPending}
             />
             <FieldError>{errors?.quantity?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>เหตุผล</FieldLabel>
             <Select
+              defaultValue={StockAdjustmentReason.CORRECTION}
               onValueChange={(v) =>
                 setValue('reason', v, { shouldValidate: true })
               }
@@ -151,7 +200,6 @@ export function StockAdjustmentDialog({
             </Select>
             <FieldError>{errors?.reason?.message}</FieldError>
           </Field>
-
           <Field>
             <FieldLabel>หมายเหตุ</FieldLabel>
             <Textarea
@@ -163,7 +211,6 @@ export function StockAdjustmentDialog({
             <FieldError>{errors?.note?.message}</FieldError>
           </Field>
         </div>
-
         <DialogFooter className="mt-2 flex gap-2 border-t pt-4">
           <Button
             variant="outline"

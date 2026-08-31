@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { usePOSProducts } from '@/actions/hooks/pos/product'
+import {
+  usePOSProducts,
+  useResellerPOSProducts,
+} from '@/actions/hooks/pos/product'
 import { POSProductItem } from '@/actions/pos/product'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
@@ -45,11 +48,30 @@ export default function MerchantPOSPage() {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search, 400)
 
-  const { data: products = [], isLoading: isProductsLoading } = usePOSProducts({
-    storeId: selectedStoreId,
-    branchId: selectedBranchId,
-    search: debouncedSearch,
-  })
+  useEffect(() => {
+    clearCart()
+  }, [selectedStoreId, selectedBranchId, clearCart])
+
+  const { data: ownProducts = [], isLoading: isOwnProductsLoading } =
+    usePOSProducts({
+      storeId: selectedStoreId,
+      branchId: selectedBranchId,
+      search: debouncedSearch,
+    })
+
+  const { data: resellerProducts = [], isLoading: isResellerProductsLoading } =
+    useResellerPOSProducts({
+      supplierStoreId: selectedStoreId,
+      branchId: selectedBranchId,
+      search: debouncedSearch,
+    })
+
+  const products = [
+    ...(ownProducts as POSProductItem[]),
+    ...(resellerProducts as unknown as POSProductItem[]),
+  ]
+
+  const isProductsLoading = isOwnProductsLoading || isResellerProductsLoading
 
   const resellerAgreementId = products.find(
     (p) => p.isReseller,
