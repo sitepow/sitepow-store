@@ -1,6 +1,7 @@
 import Image from 'next/image'
 
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
+import { isVideoUrl } from '@/utils/media'
 
 import { cn } from '@/lib/utils'
 
@@ -15,6 +16,8 @@ export function ProductImage({
   alt = 'Image',
   className,
 }: ProductImageProps) {
+  const isVideo = isVideoUrl(src)
+
   return (
     <div
       className={cn(
@@ -23,13 +26,24 @@ export function ProductImage({
       )}
     >
       {src ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="(max-width: 768px) 64px, 80px"
-          className="object-cover object-center"
-        />
+        isVideo ? (
+          <video
+            src={src}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 size-full object-cover object-center"
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 64px, 80px"
+            className="object-cover object-center"
+          />
+        )
       ) : (
         <EmptyImage className="text-[10px]" />
       )}

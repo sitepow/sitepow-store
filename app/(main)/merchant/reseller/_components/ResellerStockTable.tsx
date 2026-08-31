@@ -73,6 +73,8 @@ export function ResellerStockTable({
   })
 
   const showActionColumn = hasAnyAction
+  // เพิ่มจำนวนคอลัมน์รวมอีก 1 เนื่องจากเราแยกรูปภาพออกมาเป็นอีกคอลัมน์ต่างหาก
+  const totalColumns = (showActionColumn ? 8 : 7) + 1
 
   return (
     <div className="space-y-4">
@@ -109,11 +111,14 @@ export function ResellerStockTable({
           />
         </div>
       )}
-      <div className="rounded-md border">
+      <div className="overflow-x-auto rounded-md border">
         <TooltipProvider>
-          <Table>
+          <Table className="min-w-250 border-separate border-spacing-0">
             <TableHeader>
               <TableRow>
+                <TableHead className="bg-background sticky left-0 z-20 w-16 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                  รูปภาพ
+                </TableHead>
                 <TableHead>สินค้า / ตัวเลือก</TableHead>
                 <TableHead className="text-right">ราคาปลีก / ราคาส่ง</TableHead>
                 <TableHead className="text-center">
@@ -132,15 +137,15 @@ export function ResellerStockTable({
             </TableHeader>
             <TableBody>
               {isStocksLoading ? (
-                <TableLoadingRow colSpan={showActionColumn ? 8 : 7} />
+                <TableLoadingRow colSpan={totalColumns} />
               ) : !selectedAgreementId ? (
                 <TableEmptyRow
-                  colSpan={showActionColumn ? 8 : 7}
+                  colSpan={totalColumns}
                   title="โปรดเลือกสัญญาตัวแทนเพื่อดูข้อมูลสต็อกฝากขาย"
                 />
               ) : stocks.length === 0 ? (
                 <TableEmptyRow
-                  colSpan={showActionColumn ? 8 : 7}
+                  colSpan={totalColumns}
                   title="ยังไม่มีรายการสินค้าฝากขายในสัญญานี้"
                 />
               ) : (
@@ -168,18 +173,18 @@ export function ResellerStockTable({
                     stock.variant?.product?.images?.[0]?.url
 
                   return (
-                    <TableRow key={stock.id}>
+                    <TableRow key={stock.id} className="hover:bg-muted/50">
+                      <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                        <ProductImage src={imageUrl} />
+                      </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <ProductImage src={imageUrl} />
-                          <div className="flex max-w-72 min-w-72 flex-col wrap-break-word whitespace-pre-line">
-                            <p className="font-medium">
-                              {stock.variant?.product?.title || '-'}
-                            </p>
-                            <p className="text-muted-foreground">
-                              {stock.variant?.title}
-                            </p>
-                          </div>
+                        <div className="flex max-w-72 min-w-72 flex-col wrap-break-word whitespace-pre-line">
+                          <p className="font-medium">
+                            {stock.variant?.product?.title || '-'}
+                          </p>
+                          <p className="text-muted-foreground">
+                            {stock.variant?.title}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">

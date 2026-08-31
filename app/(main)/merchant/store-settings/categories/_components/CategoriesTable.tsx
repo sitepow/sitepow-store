@@ -40,11 +40,13 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-175 border-separate border-spacing-0">
           <TableHeader>
             <TableRow>
-              <TableHead>รูปภาพ</TableHead>
+              <TableHead className="bg-background sticky left-0 z-25 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                รูปภาพ
+              </TableHead>
               <TableHead>ชื่อหมวดหมู่/Slug</TableHead>
               <TableHead>คำอธิบาย</TableHead>
               <TableHead className="text-right">จัดการ</TableHead>
@@ -52,13 +54,13 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
           </TableHeader>
           <TableBody>
             {isLoading && categories.length === 0 ? (
-              <TableLoadingRow colSpan={5} />
+              <TableLoadingRow colSpan={4} />
             ) : categories.length === 0 ? (
-              <TableEmptyRow colSpan={5} title="ไม่พบรายการหมวดหมู่" />
+              <TableEmptyRow colSpan={4} title="ไม่พบรายการหมวดหมู่" />
             ) : (
               categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>
+                <TableRow key={category.id} className="hover:bg-muted/50">
+                  <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                     <ProductImage src={category.image} />
                   </TableCell>
                   <TableCell>

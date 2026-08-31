@@ -84,12 +84,14 @@ export function InventoryTable() {
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-200">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12" />
-              <TableHead>รูปภาพ</TableHead>
+              <TableHead className="bg-background sticky left-0 z-20 w-12" />
+              <TableHead className="bg-background sticky left-12 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                รูปภาพ
+              </TableHead>
               <TableHead>สินค้า / Slug</TableHead>
               <TableHead className="text-center">จำนวน Variant</TableHead>
               <TableHead className="text-end">สต็อกรวม</TableHead>
@@ -120,7 +122,7 @@ export function InventoryTable() {
                       className="hover:bg-muted/50 cursor-pointer"
                       onClick={() => toggleRow(product.id)}
                     >
-                      <TableCell>
+                      <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -133,7 +135,7 @@ export function InventoryTable() {
                           )}
                         </Button>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="bg-background hover:bg-muted/50 sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                         <ProductImage src={product.images?.[0]?.url} />
                       </TableCell>
                       <TableCell>
@@ -175,12 +177,9 @@ export function InventoryTable() {
                         const isOut = stock.quantity === 0
 
                         return (
-                          <TableRow
-                            key={variant.id}
-                            className="bg-muted/30 border-l-primary border-l-4"
-                          >
+                          <TableRow key={variant.id} className="bg-muted/30">
                             <TableCell />
-                            <TableCell colSpan={2}>
+                            <TableCell>
                               <div className="flex items-center gap-3 pl-4">
                                 <IconCornerDownRight className="size-4 shrink-0" />
                                 <ProductImage
@@ -188,15 +187,17 @@ export function InventoryTable() {
                                     variant.image || product.images?.[0]?.url
                                   }
                                 />
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium">
-                                    {variant.title}
-                                  </span>
-                                  <span className="text-muted-foreground">
-                                    SKU: {variant.sku || '-'} | ราคา:{' '}
-                                    {formatCurrency(Number(variant.price))}
-                                  </span>
-                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium">
+                                  {variant.title}
+                                </span>
+                                <span className="text-muted-foreground">
+                                  SKU: {variant.sku || '-'} | ราคา:{' '}
+                                  {formatCurrency(Number(variant.price))}
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell />

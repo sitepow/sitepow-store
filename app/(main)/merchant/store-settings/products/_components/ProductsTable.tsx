@@ -101,11 +101,13 @@ export function ProductsTable() {
           )}
         </Card>
       )}
-      <div className="rounded-md border">
-        <Table>
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-225 border-separate border-spacing-0">
           <TableHeader>
             <TableRow>
-              <TableHead>รูปภาพสินค้า</TableHead>
+              <TableHead className="bg-background sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                รูปภาพสินค้า
+              </TableHead>
               <TableHead>ชื่อสินค้า/Slug</TableHead>
               <TableHead>ร้านค้า</TableHead>
               <TableHead>หมวดหมู่</TableHead>
@@ -126,8 +128,8 @@ export function ProductsTable() {
                   : 0
 
                 return (
-                  <TableRow key={product.id}>
-                    <TableCell>
+                  <TableRow key={product.id} className="hover:bg-muted/50">
+                    <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       <ProductImage src={product.images?.[0]?.url} />
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
