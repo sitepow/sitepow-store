@@ -94,56 +94,28 @@ export async function getPOSProducts({
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
-  if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบ', data: [] }
-  }
-
-  if (!storeId || !branchId) {
+  if (!userId || !storeId || !branchId) {
     return { success: true, data: [] }
   }
 
   try {
-    const targetStore = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: {
-        ownerId: true,
-        employeeStores: {
-          where: { employee: { userId } },
-          select: { id: true },
-        },
-      },
-    })
-
-    const isDirectOwner = targetStore?.ownerId === userId
-    const isDirectEmployee = (targetStore?.employeeStores?.length ?? 0) > 0
-
-    if (!isDirectOwner && !isDirectEmployee) {
-      return {
-        success: false,
-        message: 'คุณไม่มีสิทธิ์เข้าถึงสินค้าร้านนี้',
-        data: [],
-      }
-    }
-
-    const whereCondition: Prisma.ProductWhereInput = {
-      storeId,
-      ...(categoryId ? { categoryId } : {}),
-      ...(search
-        ? {
-            OR: [
-              { title: { contains: search, mode: 'insensitive' } },
-              {
-                variants: {
-                  some: { sku: { contains: search, mode: 'insensitive' } },
-                },
-              },
-            ],
-          }
-        : {}),
-    }
-
     const products = await prisma.product.findMany({
-      where: whereCondition,
+      where: {
+        storeId: storeId,
+        ...(categoryId ? { categoryId } : {}),
+        ...(search
+          ? {
+              OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                {
+                  variants: {
+                    some: { sku: { contains: search, mode: 'insensitive' } },
+                  },
+                },
+              ],
+            }
+          : {}),
+      },
       select: getPosProductSelect(branchId),
       orderBy: { title: 'asc' },
     })
@@ -229,154 +201,111 @@ export type ResellerPOSProductItem = DecimalToNumber<
 }
 
 export async function getResellerPOSProducts({
-  supplierStoreId,
+  agreementId,
   branchId,
-  search,
-  categoryId,
 }: {
-  supplierStoreId: string
+  agreementId: string
   branchId: string
   search?: string
   categoryId?: string
 }) {
-  const userSession = await getCurrentUser()
-  const userId = userSession?.id
-
-  if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบ', data: [] }
+  if (!agreementId || !branchId) {
+    return { success: true, data: [] }
   }
 
   try {
-    const resellerAgreement = await prisma.resellerAgreement.findFirst({
+    const agreement = await prisma.resellerAgreement.findUnique({
       where: {
-        supplierStoreId,
+        id: agreementId,
         status: AgreementStatus.ACTIVE,
-        OR: [
-          { resellerCustomerId: userId },
-          { resellerStore: { ownerId: userId } },
-          {
-            resellerStore: {
-              employeeStores: {
-                some: { employee: { userId } },
-              },
-            },
-          },
-        ],
       },
       include: {
         customPrices: true,
         stocks: {
-          include: { variant: true },
-        },
-      },
-    })
-
-    if (!resellerAgreement) {
-      return { success: true, data: [] }
-    }
-
-    const allowedVariantIds = resellerAgreement.stocks
-      .filter((s) => s.acceptedQuantity - s.soldQuantity > 0)
-      .map((s) => s.variantId)
-
-    if (allowedVariantIds.length === 0) {
-      return { success: true, data: [] }
-    }
-
-    const products = await prisma.product.findMany({
-      where: {
-        storeId: supplierStoreId,
-        variants: {
-          some: {
-            id: { in: allowedVariantIds },
-            isAvailable: true,
-          },
-        },
-        ...(categoryId ? { categoryId } : {}),
-        ...(search
-          ? {
-              OR: [
-                { title: { contains: search, mode: 'insensitive' } },
-                {
-                  variants: {
-                    some: {
-                      id: { in: allowedVariantIds },
-                      sku: { contains: search, mode: 'insensitive' },
-                    },
+          include: {
+            variant: {
+              include: {
+                product: {
+                  include: {
+                    images: true,
                   },
                 },
-              ],
-            }
-          : {}),
+              },
+            },
+          },
+        },
       },
-      select: getResellerProductSelect(branchId, allowedVariantIds),
-      orderBy: { title: 'asc' },
     })
 
-    const resellerProducts = products
-      .map((product) => {
-        if (!product.variants || product.variants.length === 0) return null
+    if (!agreement || !agreement.stocks.length) {
+      return { success: true, data: [] }
+    }
 
-        const formattedVariants = product.variants.map((variant) => {
-          const resellerStock = resellerAgreement.stocks.find(
-            (s) => s.variantId === variant.id,
-          )
-          const availableQuantity = resellerStock
-            ? resellerStock.acceptedQuantity - resellerStock.soldQuantity
-            : 0
+    const resellerProductsMap = new Map()
 
-          const customPrice = resellerAgreement.customPrices.find(
-            (cp) => cp.variantId === variant.id,
-          )
+    agreement.stocks.forEach((stock) => {
+      const availableQty = stock.acceptedQuantity - stock.soldQuantity
+      if (availableQty <= 0) {
+        return
+      }
 
-          const originalPriceNum = Number(variant.price)
-          let calculatedDiscountAmountNum: number | null = null
-          let calculatedDiscountType: DiscountType | null = null
+      const variant = stock.variant
+      const product = variant.product
 
-          if (customPrice?.specialPrice) {
-            calculatedDiscountAmountNum =
-              originalPriceNum - Number(customPrice.specialPrice)
-            calculatedDiscountType = DiscountType.FIXED
-          } else if (
-            customPrice?.discountType &&
-            customPrice.discountAmount != null
-          ) {
-            calculatedDiscountAmountNum = Number(customPrice.discountAmount)
-            calculatedDiscountType = customPrice.discountType
-          } else if (
-            resellerAgreement.defaultDiscountType &&
-            resellerAgreement.defaultDiscountAmount
-          ) {
-            calculatedDiscountAmountNum = Number(
-              resellerAgreement.defaultDiscountAmount,
-            )
-            calculatedDiscountType = resellerAgreement.defaultDiscountType
-          }
+      const customPrice = agreement.customPrices.find(
+        (cp) => cp.variantId === variant.id,
+      )
 
-          return {
-            ...variant,
-            price: originalPriceNum,
-            discountActive: (calculatedDiscountAmountNum ?? 0) > 0,
-            discountType: calculatedDiscountType,
-            discountAmount: calculatedDiscountAmountNum,
-            stocks: [
-              {
-                quantity: availableQuantity,
-                branchId,
-                branch: { name: 'สต็อกฝากขาย' },
-              },
-            ],
-          }
-        })
+      const originalPriceNum = Number(variant.price)
+      let calculatedDiscountAmountNum: number | null = null
+      let calculatedDiscountType: DiscountType | null = null
 
-        return {
+      if (customPrice?.specialPrice) {
+        calculatedDiscountAmountNum =
+          originalPriceNum - Number(customPrice.specialPrice)
+        calculatedDiscountType = DiscountType.FIXED
+      } else if (
+        customPrice?.discountType &&
+        customPrice.discountAmount != null
+      ) {
+        calculatedDiscountAmountNum = Number(customPrice.discountAmount)
+        calculatedDiscountType = customPrice.discountType
+      } else if (
+        agreement.defaultDiscountType &&
+        agreement.defaultDiscountAmount
+      ) {
+        calculatedDiscountAmountNum = Number(agreement.defaultDiscountAmount)
+        calculatedDiscountType = agreement.defaultDiscountType
+      }
+
+      const formattedVariant = {
+        ...variant,
+        price: originalPriceNum,
+        discountActive: (calculatedDiscountAmountNum ?? 0) > 0,
+        discountType: calculatedDiscountType,
+        discountAmount: calculatedDiscountAmountNum,
+        stocks: [
+          {
+            quantity: availableQty,
+            branchId,
+            branch: { name: 'สต็อกฝากขาย' },
+          },
+        ],
+      }
+
+      if (!resellerProductsMap.has(product.id)) {
+        resellerProductsMap.set(product.id, {
           ...product,
-          variants: formattedVariants,
+          variants: [formattedVariant],
           isReseller: true,
-          resellerAgreementId: resellerAgreement.id,
-        }
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null)
+          resellerAgreementId: agreement.id,
+        })
+      } else {
+        resellerProductsMap.get(product.id).variants.push(formattedVariant)
+      }
+    })
+
+    const resellerProducts = Array.from(resellerProductsMap.values())
 
     return {
       success: true,

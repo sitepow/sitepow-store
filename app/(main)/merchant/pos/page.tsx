@@ -13,6 +13,7 @@ import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
+import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { IconCashRegister, IconLock } from '@tabler/icons-react'
@@ -20,6 +21,7 @@ import { IconCashRegister, IconLock } from '@tabler/icons-react'
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { ResellerAgreementSelectField } from '@/components/ResellerAgreementSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -35,6 +37,7 @@ import {
 export default function MerchantPOSPage() {
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
+  const { selectedAgreementId } = useResellerFilter()
 
   const { canCreateOrder, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -50,7 +53,7 @@ export default function MerchantPOSPage() {
 
   useEffect(() => {
     clearCart()
-  }, [selectedStoreId, selectedBranchId, clearCart])
+  }, [selectedStoreId, selectedBranchId, selectedAgreementId, clearCart])
 
   const { data: ownProducts = [], isLoading: isOwnProductsLoading } =
     usePOSProducts({
@@ -59,23 +62,40 @@ export default function MerchantPOSPage() {
       search: debouncedSearch,
     })
 
-  const { data: resellerProducts = [], isLoading: isResellerProductsLoading } =
-    useResellerPOSProducts({
-      supplierStoreId: selectedStoreId,
-      branchId: selectedBranchId,
-      search: debouncedSearch,
-    })
+  const isAllAgreement =
+    !selectedAgreementId || selectedAgreementId === ALL_STORES
+
+  const {
+    data: rawResellerProducts = [],
+    isLoading: isResellerProductsLoading,
+  } = useResellerPOSProducts({
+    agreementId: isAllAgreement ? '' : selectedAgreementId,
+    branchId: selectedBranchId,
+    search: debouncedSearch,
+  })
+
+  const resellerProducts = isAllAgreement ? [] : rawResellerProducts
+
+  const resellerMap = new Map(
+    (resellerProducts as unknown as POSProductItem[]).map((p) => [p.id, p]),
+  )
+
+  const filteredOwnProducts = (ownProducts as POSProductItem[]).filter(
+    (p) => !resellerMap.has(p.id),
+  )
 
   const products = [
-    ...(ownProducts as POSProductItem[]),
+    ...filteredOwnProducts,
     ...(resellerProducts as unknown as POSProductItem[]),
   ]
 
-  const isProductsLoading = isOwnProductsLoading || isResellerProductsLoading
+  const isProductsLoading =
+    isOwnProductsLoading || (!isAllAgreement && isResellerProductsLoading)
 
-  const resellerAgreementId = products.find(
-    (p) => p.isReseller,
-  )?.resellerAgreementId
+  const resellerAgreementId = isAllAgreement
+    ? undefined
+    : selectedAgreementId ||
+      products.find((p) => p.isReseller)?.resellerAgreementId
 
   const handleAddToCart = (
     product: POSProductItem,
@@ -191,6 +211,7 @@ export default function MerchantPOSPage() {
           <div className="flex flex-wrap items-center gap-2">
             <StoreSelectField />
             <BranchSelectField />
+            <ResellerAgreementSelectField />
           </div>
         }
       />

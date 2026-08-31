@@ -37,7 +37,7 @@ export function ResellerAgreementSelectField({
   const { data: agreementsRes, isLoading } = useResellerAgreements(storeId)
   const agreements = agreementsRes?.data || []
 
-  const currentValue = value ?? selectedAgreementId
+  const currentValue = value ?? (selectedAgreementId || ALL_STORES)
   const handleValueChange = onValueChange ?? setSelectedAgreementId
 
   useEffect(() => {
@@ -45,13 +45,11 @@ export function ResellerAgreementSelectField({
       return
     }
 
-    if (agreements.length > 0) {
+    if (currentValue !== ALL_STORES) {
       const isValid = agreements.some((item) => item.id === currentValue)
       if (!isValid) {
-        handleValueChange(agreements[0].id)
+        handleValueChange(ALL_STORES)
       }
-    } else {
-      handleValueChange('')
     }
   }, [selectedStoreId, agreementsRes?.data, isLoading])
 
@@ -66,9 +64,9 @@ export function ResellerAgreementSelectField({
         เลือกสัญญาตัวแทน
       </FieldLabel>
       <Select
-        value={currentValue || undefined}
+        value={currentValue}
         onValueChange={handleValueChange}
-        disabled={isLoading || disabled || agreements.length === 0}
+        disabled={isLoading || disabled}
       >
         <SelectTrigger className="w-full sm:w-64">
           <SelectValue
@@ -76,27 +74,22 @@ export function ResellerAgreementSelectField({
           />
         </SelectTrigger>
         <SelectContent>
-          {agreements.length === 0 ? (
-            <SelectItem value="none" disabled>
-              ไม่พบสัญญาตัวแทน
-            </SelectItem>
-          ) : (
-            agreements.map((agreement) => {
-              const userName =
-                agreement.resellerUser?.name || agreement.resellerUser?.email
+          <SelectItem value={ALL_STORES}>ไม่เลือกสัญญา</SelectItem>
+          {agreements.map((agreement) => {
+            const userName =
+              agreement.resellerUser?.name || agreement.resellerUser?.email
 
-              const resellerName =
-                agreement.resellerStore?.name ||
-                userName ||
-                `สัญญา ID: ${agreement.id.slice(0, 8)}...`
+            const resellerName =
+              agreement.resellerStore?.name ||
+              userName ||
+              `สัญญา ID: ${agreement.id.slice(0, 8)}...`
 
-              return (
-                <SelectItem key={agreement.id} value={agreement.id}>
-                  {resellerName}
-                </SelectItem>
-              )
-            })
-          )}
+            return (
+              <SelectItem key={agreement.id} value={agreement.id}>
+                {resellerName}
+              </SelectItem>
+            )
+          })}
         </SelectContent>
       </Select>
     </Field>
