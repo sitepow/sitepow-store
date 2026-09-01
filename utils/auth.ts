@@ -17,7 +17,16 @@ export const getClientAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
     ? `http://accounts.lvh.me:${window.location.port || '3000'}`
     : 'https://accounts.sitepow.store'
 
-  const finalCallbackUrl = callbackUrl || window.location.href
+  let targetOrigin = window.location.origin
+
+  if (!hostname.includes('.') && !isDev) {
+    targetOrigin = 'https://sitepow.store'
+  }
+
+  const currentPathAndSearch = `${window.location.pathname}${window.location.search}`
+  const defaultCallbackUrl = `${targetOrigin}${currentPathAndSearch}`
+
+  const finalCallbackUrl = callbackUrl || defaultCallbackUrl
 
   return `${baseUrl}/${path}?callbackUrl=${encodeURIComponent(finalCallbackUrl)}&role=${role}`
 }
