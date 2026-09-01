@@ -8,20 +8,39 @@ const isProd = process.env.NODE_ENV === 'production'
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
-  trustedOrigins: [
-    'http://localhost:3000',
-    'http://lvh.me:3000',
-    'http://*.lvh.me:3000',
-    'http://store.lvh.me:3000',
-    'http://accounts.lvh.me:3000',
-    ...(isProd
-      ? [
-          'https://sitepow.store',
-          'https://*.sitepow.store',
-          'https://accounts.sitepow.store',
-        ]
-      : []),
-  ],
+
+  trustedOrigins: async (request) => {
+    if (!request) {
+      return []
+    }
+
+    const origin = request.headers.get('origin')
+
+    if (!origin) {
+      return []
+    }
+
+    const baseOrigins = [
+      'http://localhost:3000',
+      'http://lvh.me:3000',
+      'http://*.lvh.me:3000',
+      'http://store.lvh.me:3000',
+      'http://accounts.lvh.me:3000',
+      ...(isProd
+        ? [
+            'https://sitepow.store',
+            'https://*.sitepow.store',
+            'https://accounts.sitepow.store',
+          ]
+        : []),
+    ]
+
+    if (isProd) {
+      return [...baseOrigins, origin]
+    }
+
+    return baseOrigins
+  },
 
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -36,11 +55,10 @@ export const auth = betterAuth({
 
   advanced: {
     crossSubDomainCookies: {
-      enabled: true,
-      domain: isProd ? '.sitepow.store' : '.lvh.me',
+      enabled: false,
     },
     defaultCookieAttributes: {
-      sameSite: 'lax',
+      sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
     },
   },
