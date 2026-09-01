@@ -9,7 +9,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
 
-  trustedOrigins: async (request) => {
+  trustedOrigins: async () => {
     const baseOrigins = [
       'http://localhost:3000',
       'http://lvh.me:3000',
@@ -25,36 +25,31 @@ export const auth = betterAuth({
         : []),
     ]
 
-    if (!request) return baseOrigins
-
-    const origin = request.headers.get('origin')
-
-    const referer = request.headers.get('referer')
-    let refererOrigin = ''
-    if (referer) {
-      try {
-        refererOrigin = new URL(referer).origin
-      } catch (e) {}
-    }
-
-    let callbackOrigin = ''
     try {
-      const reqUrl = new URL(request.url)
-      const callbackUrl = reqUrl.searchParams.get('callbackUrl')
-      if (callbackUrl) {
-        callbackOrigin = new URL(callbackUrl).origin
-      }
-    } catch (e) {}
+      const stores = await prisma.store.findMany({
+        where: {
+          customDomain: {
+            not: null,
+          },
+        },
+        select: {
+          customDomain: true,
+        },
+      })
 
-    const dynamicOrigins = [origin, refererOrigin, callbackOrigin].filter(
-      Boolean,
-    ) as string[]
+      const customDomainOrigins = stores
+        .map((s) => s.customDomain)
+        .filter((domain): domain is string => Boolean(domain))
+        .map((domain) => {
+          const cleanDomain = domain.replace(/^https?:\/\//, '').trim()
+          return isProd ? `https://${cleanDomain}` : `http://${cleanDomain}`
+        })
 
-    if (isProd) {
-      return Array.from(new Set([...baseOrigins, ...dynamicOrigins]))
+      return Array.from(new Set([...baseOrigins, ...customDomainOrigins]))
+    } catch (error) {
+      console.error(error)
+      return baseOrigins
     }
-
-    return baseOrigins
   },
 
   database: prismaAdapter(prisma, {
@@ -69,12 +64,10 @@ export const auth = betterAuth({
   },
 
   advanced: {
-    crossSubDomainCookies: {
-      enabled: false,
-    },
     defaultCookieAttributes: {
       sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
+      domain: isProd ? '.sitepow.store' : '.lvh.me',
     },
   },
 
