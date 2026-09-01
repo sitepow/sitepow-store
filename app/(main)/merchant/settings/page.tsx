@@ -17,6 +17,7 @@ import {
   IconSettings,
   IconStar,
   IconTruck,
+  IconWorld,
 } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -26,6 +27,7 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
+import { DomainSettingsForm } from './DomainSettingsForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PaymentSettingsForm } from './_components/PaymentSettingsForm'
 import { ReviewRewardSettingsForm } from './_components/ReviewRewardSettingsForm'
@@ -46,6 +48,7 @@ function MerchantSettingsContent() {
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewStoreProfile,
+    canViewDomain,
     canViewSecurity,
     canViewNotifications,
     canViewTransferStore,
@@ -82,6 +85,9 @@ function MerchantSettingsContent() {
             <TabsTrigger value={SettingsTab.STORE_PROFILE}>
               <IconBuildingStore size={14} /> ตั้งค่าข้อมูลร้านค้า
             </TabsTrigger>
+            <TabsTrigger value={SettingsTab.DOMAIN}>
+              <IconWorld size={14} /> โดเมนร้านค้า (Domain)
+            </TabsTrigger>
             <TabsTrigger value={SettingsTab.SECURITY}>
               <IconLock size={14} /> ความปลอดภัยบัญชี
             </TabsTrigger>
@@ -113,6 +119,17 @@ function MerchantSettingsContent() {
               />
             ) : (
               <StoreProfileForm />
+            )}
+          </TabsContent>
+          <TabsContent value={SettingsTab.DOMAIN} className="flex-1">
+            {!isPermissionLoading && !canViewDomain ? (
+              <ActionRequiredAlert
+                icon={<IconLock />}
+                title="ไม่มีสิทธิ์เข้าถึง"
+                description="คุณไม่มีสิทธิ์ในการดูหรือจัดการโดเมนของสาขาหรือร้านค้านี้"
+              />
+            ) : (
+              <DomainSettingsForm />
             )}
           </TabsContent>
           <TabsContent value={SettingsTab.SECURITY} className="flex-1">

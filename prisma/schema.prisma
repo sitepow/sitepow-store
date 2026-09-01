@@ -384,6 +384,7 @@ enum PermissionDomain {
   REVIEW
   EXPENSE
   RESELLER
+  DOMAIN
 }
 
 enum PermissionAction {
@@ -624,7 +625,14 @@ model BankAccount {
 
 enum DomainStatus {
   PENDING
+  VERIFIED
   ACTIVE
+  FAILED
+}
+
+enum SslStatus {
+  PENDING
+  ISSUED
   FAILED
 }
 
@@ -635,14 +643,25 @@ model StoreDomain {
   storeId String
   store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
-  status DomainStatus @default(PENDING)
+  isPrimary Boolean @default(false)
+
+  status    DomainStatus @default(PENDING)
+  sslStatus SslStatus    @default(PENDING)
 
   verificationRecord Json?
+  failureReason      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([storeId])
+  @@index([domain, status])
+}
+
+enum CustomDomainStatus {
+  PENDING
+  ACTIVE
+  FAILED
 }
 
 model Store {
@@ -717,6 +736,9 @@ model Store {
   storeThemeConfig     StoreThemeConfig[]
 
   translations Json?
+
+  customDomain       String?             @unique
+  customDomainStatus CustomDomainStatus?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

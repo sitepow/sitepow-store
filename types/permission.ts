@@ -107,3 +107,5 @@ export type PermissionKey =
   | 'canCreateReseller'
   | 'canUpdateReseller'
   | 'canDeleteReseller'
+  | 'canViewDomain'
+  | 'canManageDomain'

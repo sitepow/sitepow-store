@@ -3,6 +3,8 @@ import { PermissionKey } from '@/types/permission'
 
 export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
   OWNER: [
+    'canViewDomain',
+    'canManageDomain',
     'canViewStore',
     'canCreateStore',
     'canUpdateStore',
@@ -113,6 +115,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canDeleteReseller',
   ],
   OWNER_VIEWER: [
+    'canViewDomain',
     'canViewStore',
     'canViewCategory',
     'canViewCreditCard',
@@ -142,6 +145,8 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewReseller',
   ],
   MANAGER: [
+    'canViewDomain',
+    'canManageDomain',
     'canViewStore',
     'canViewCategory',
     'canCreateCategory',
@@ -268,6 +273,7 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewStore',
   ],
   AUDITOR: [
+    'canViewDomain',
     'canViewStore',
     'canViewDashboard',
     'canViewFinance',
@@ -329,6 +335,14 @@ export const PERMISSION_MAPPING: Record<
   PermissionKey,
   { domain: PermissionDomain; action: PermissionAction }
 > = {
+  canViewDomain: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.READ,
+  },
+  canManageDomain: {
+    domain: PermissionDomain.SETTING,
+    action: PermissionAction.UPDATE,
+  },
   canViewStore: {
     domain: PermissionDomain.STORE,
     action: PermissionAction.READ,
@@ -764,6 +778,9 @@ export const PERMISSION_MAPPING: Record<
 }
 
 export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
+  canViewDomain: 'มีสิทธิ์ในการเปิดดูการตั้งค่าและสถานะโดเมนเนมของร้านค้า',
+  canManageDomain:
+    'มีสิทธิ์ในการเพิ่ม ลบ และยืนยันการเชื่อมต่อโดเมนเนมของร้านค้า',
   canViewStore: 'มีสิทธิ์ในการเปิดดูข้อมูลและรายละเอียดของร้านค้าทั้งหมดในระบบ',
   canCreateStore: 'มีสิทธิ์ในการสร้างร้านค้าใหม่ในระบบ',
   canUpdateStore: 'มีสิทธิ์ในการแก้ไขข้อมูลและการตั้งค่าของร้านค้า',

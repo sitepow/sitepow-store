@@ -13,6 +13,9 @@ export const config = {
   ],
 }
 
+const ROOT_DOMAINS = ['sitepow.store', 'lvh.me', 'localhost']
+const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
+
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
@@ -33,7 +36,6 @@ export default async function middleware(req: NextRequest) {
   ) {
     return NextResponse.next()
   }
-
   const sessionToken =
     req.cookies.get('better-auth.session_token')?.value ||
     req.cookies.get('__Secure-better-auth.session_token')?.value ||
@@ -41,7 +43,7 @@ export default async function middleware(req: NextRequest) {
 
   const isAuthenticated = !!sessionToken
 
-  if (hostname === 'accounts.sitepow.store' || hostname === 'accounts.lvh.me') {
+  if (AUTH_DOMAINS.includes(hostname)) {
     if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {
       return NextResponse.next()
     }
@@ -80,22 +82,57 @@ export default async function middleware(req: NextRequest) {
     )
   }
 
-  const rootDomains = ['localhost', 'sitepow.store', 'lvh.me']
-  const isRootDomain = rootDomains.includes(hostname)
+  const isRootDomain = ROOT_DOMAINS.includes(hostname)
 
-  if (!isRootDomain) {
-    const slug = hostname.split('.')[0]
-
-    if (url.pathname.startsWith('/user') && !isAuthenticated) {
-      const loginUrl = new URL('https://accounts.sitepow.store/login', req.url)
-      loginUrl.searchParams.set('callbackUrl', req.url)
-      return NextResponse.redirect(loginUrl)
-    }
-
-    return NextResponse.rewrite(
-      new URL(`/sites/${slug}${url.pathname}${url.search}`, req.url),
-    )
+  if (isRootDomain) {
+    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  let storeSlug = ''
+
+  const isSubdomain = ROOT_DOMAINS.some((rootDomain) =>
+    hostname.endsWith(`.${rootDomain}`),
+  )
+
+  if (isSubdomain) {
+    storeSlug = hostname.split('.')[0]
+  } else {
+    try {
+      const resolveRes = await fetch(
+        `${url.origin}/api/internal/resolve-domain?domain=${hostname}`,
+        {
+          headers: {
+            'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
+          },
+          next: { revalidate: 300 },
+        },
+      )
+
+      if (resolveRes.ok) {
+        const data = await resolveRes.json()
+        storeSlug = data.slug
+      }
+    } catch (error) {
+      console.error('Failed to resolve custom domain:', error)
+    }
+
+    if (!storeSlug) {
+      return NextResponse.rewrite(new URL('/404', req.url))
+    }
+  }
+
+  if (url.pathname.startsWith('/user') && !isAuthenticated) {
+    const authHost =
+      hostname.includes('lvh.me') || hostname.includes('localhost')
+        ? 'http://accounts.lvh.me:3000'
+        : 'https://accounts.sitepow.store'
+
+    const loginUrl = new URL(`${authHost}/login`)
+    loginUrl.searchParams.set('callbackUrl', req.url)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  return NextResponse.rewrite(
+    new URL(`/sites/${storeSlug}${url.pathname}${url.search}`, req.url),
+  )
 }
