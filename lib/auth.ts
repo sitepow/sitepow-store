@@ -10,16 +10,6 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
 
   trustedOrigins: async (request) => {
-    if (!request) {
-      return []
-    }
-
-    const origin = request.headers.get('origin')
-
-    if (!origin) {
-      return []
-    }
-
     const baseOrigins = [
       'http://localhost:3000',
       'http://lvh.me:3000',
@@ -35,8 +25,33 @@ export const auth = betterAuth({
         : []),
     ]
 
+    if (!request) return baseOrigins
+
+    const origin = request.headers.get('origin')
+
+    const referer = request.headers.get('referer')
+    let refererOrigin = ''
+    if (referer) {
+      try {
+        refererOrigin = new URL(referer).origin
+      } catch (e) {}
+    }
+
+    let callbackOrigin = ''
+    try {
+      const reqUrl = new URL(request.url)
+      const callbackUrl = reqUrl.searchParams.get('callbackUrl')
+      if (callbackUrl) {
+        callbackOrigin = new URL(callbackUrl).origin
+      }
+    } catch (e) {}
+
+    const dynamicOrigins = [origin, refererOrigin, callbackOrigin].filter(
+      Boolean,
+    ) as string[]
+
     if (isProd) {
-      return [...baseOrigins, origin]
+      return Array.from(new Set([...baseOrigins, ...dynamicOrigins]))
     }
 
     return baseOrigins
