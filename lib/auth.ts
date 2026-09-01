@@ -26,6 +26,7 @@ export const auth = betterAuth({
           ]
         : []),
     ]
+
     try {
       const stores = await prisma.store.findMany({
         where: {
@@ -37,17 +38,18 @@ export const auth = betterAuth({
           customDomain: true,
         },
       })
+
       const customDomainOrigins = stores
         .map((s) => s.customDomain)
         .filter((domain): domain is string => Boolean(domain))
-        .map((domain) => {
+        .flatMap((domain) => {
           const cleanDomain = domain.replace(/^https?:\/\//, '').trim()
-          return isProd ? `https://${cleanDomain}` : `http://${cleanDomain}`
+          return [`https://${cleanDomain}`, `http://${cleanDomain}`]
         })
 
       return Array.from(new Set([...baseOrigins, ...customDomainOrigins]))
     } catch (error) {
-      console.error(error)
+      console.error('Error fetching custom domains for trustedOrigins:', error)
       return baseOrigins
     }
   },

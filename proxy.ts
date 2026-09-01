@@ -167,8 +167,11 @@ export default async function middleware(req: NextRequest) {
         ? 'http://accounts.lvh.me:3000'
         : 'https://accounts.sitepow.store'
 
-    const proto = req.headers.get('x-forwarded-proto') || 'https'
     const publicHost = req.headers.get('x-forwarded-host') || host
+
+    const isDevEnv =
+      publicHost.includes('lvh.me') || publicHost.includes('localhost')
+    const proto = isDevEnv ? 'http' : 'https'
 
     const publicCurrentUrl = `${proto}://${publicHost}${url.pathname}${url.search}`
 
