@@ -655,6 +655,59 @@ export async function createResellerPayout(input: CreateResellerPayoutInput) {
   }
 }
 
+export async function getAllResellerAgreements(storeId: string) {
+  try {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    if (!storeId) {
+      return { success: true, data: [] }
+    }
+
+    const agreements = await prisma.resellerAgreement.findMany({
+      where: {
+        status: AgreementStatus.ACTIVE,
+        OR: [
+          { supplierStoreId: storeId },
+          {
+            resellerStoreId: storeId,
+            resellerType: ResellerType.INTERNAL_STORE,
+          },
+        ],
+      },
+      include: {
+        supplierStore: {
+          select: { id: true, name: true },
+        },
+        resellerStore: {
+          select: { id: true, name: true },
+        },
+        resellerUser: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    return {
+      success: true,
+      data: serializeDecimal(agreements),
+    }
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'เกิดข้อผิดพลาดในการดึงข้อมูลสัญญาทั้งหมด',
+    }
+  }
+}
+
 export async function getResellerAgreements(storeId: string) {
   try {
     const userSession = await getCurrentUser()
@@ -668,45 +721,19 @@ export async function getResellerAgreements(storeId: string) {
       return { success: true, data: [] }
     }
 
-    const storeAccess = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: {
-        ownerId: true,
-        employeeStores: {
-          where: { employee: { userId } },
-          select: { id: true },
-        },
-      },
-    })
-
-    const isOwnerOrEmployee =
-      storeAccess?.ownerId === userId ||
-      (storeAccess?.employeeStores?.length ?? 0) > 0
-
-    let whereCondition: Prisma.ResellerAgreementWhereInput
-
-    if (isOwnerOrEmployee) {
-      whereCondition = {
-        OR: [
-          { supplierStoreId: storeId },
-          {
-            resellerStoreId: storeId,
-            resellerType: 'INTERNAL_STORE',
-          },
-        ],
-      }
-    } else {
-      whereCondition = {
-        supplierStoreId: storeId,
-        resellerCustomerId: userId,
-        resellerType: 'EXTERNAL',
-      }
-    }
-
     const agreements = await prisma.resellerAgreement.findMany({
       where: {
         status: AgreementStatus.ACTIVE,
-        ...whereCondition,
+        OR: [
+          {
+            supplierStoreId: storeId,
+            resellerType: ResellerType.EXTERNAL,
+          },
+          {
+            resellerStoreId: storeId,
+            resellerType: ResellerType.INTERNAL_STORE,
+          },
+        ],
       },
       include: {
         supplierStore: {

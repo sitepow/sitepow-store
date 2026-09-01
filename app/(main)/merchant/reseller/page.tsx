@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useAcceptResellerStock,
-  useResellerAgreements,
+  useAllResellerAgreements,
   useUpsertResellerCustomPrice,
 } from '@/actions/hooks/reseller'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
@@ -48,7 +48,7 @@ export default function ResellerManagementPage() {
   const storeId = selectedStoreId !== ALL_STORES ? selectedStoreId : undefined
   useResellerSSE(storeId)
 
-  const { data: response } = useResellerAgreements(storeId!)
+  const { data: response } = useAllResellerAgreements(storeId!)
 
   const agreements = response?.data || []
   const selectedAgreement = agreements.find((a) => a.id === selectedAgreementId)
@@ -95,7 +95,10 @@ export default function ResellerManagementPage() {
   const [allocateDialogOpen, setAllocateDialogOpen] = useState(false)
   const [payoutDialogOpen, setPayoutDialogOpen] = useState(false)
 
-  const handleOpenAllocate = () => {
+  const handleOpenAllocate = (stock?: any) => {
+    if (stock) {
+      setSelectedStock(stock)
+    }
     setAllocateDialogOpen(true)
   }
 
@@ -152,6 +155,7 @@ export default function ResellerManagementPage() {
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
             <ResellerAgreementSelectField
+              mode="all"
               disabled={selectedStoreId === ALL_STORES}
             />
             {canCreateReseller && (
@@ -166,7 +170,7 @@ export default function ResellerManagementPage() {
             )}
             {canCreateReseller && isSupplier && (
               <Button
-                onClick={handleOpenAllocate}
+                onClick={() => handleOpenAllocate()}
                 disabled={!selectedAgreementId}
               >
                 <IconPlus />
@@ -231,7 +235,10 @@ export default function ResellerManagementPage() {
           />
           <AllocateStockDialog
             open={allocateDialogOpen}
-            setOpen={setAllocateDialogOpen}
+            setOpen={(open) => {
+              setAllocateDialogOpen(open)
+              if (!open) setSelectedStock(null)
+            }}
           />
           <PayoutDialog open={payoutDialogOpen} setOpen={setPayoutDialogOpen} />
         </div>

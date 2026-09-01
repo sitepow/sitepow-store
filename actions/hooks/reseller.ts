@@ -9,6 +9,7 @@ import {
   createResellerAgreement,
   createResellerPOSOrder,
   createResellerPayout,
+  getAllResellerAgreements,
   getResellerAgreementInfo,
   getResellerAgreements,
   getResellerPayoutSummary,
@@ -17,6 +18,8 @@ import {
   upsertResellerCustomPrice,
 } from '@/actions/reseller'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { useSession } from '@/lib/auth-client'
 
 export function useCreateResellerPOSOrder() {
   const queryClient = useQueryClient()
@@ -120,10 +123,24 @@ export function useCreateResellerPayout() {
 }
 
 export function useResellerAgreements(storeId: string) {
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+
   return useQuery({
-    queryKey: resellerKeys.agreementList(storeId),
+    queryKey: resellerKeys.agreementList(storeId, userId),
     queryFn: () => getResellerAgreements(storeId),
-    enabled: !!storeId,
+    enabled: !!storeId && !!userId,
+  })
+}
+
+export function useAllResellerAgreements(storeId: string) {
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+
+  return useQuery({
+    queryKey: resellerKeys.allAgreementList(storeId, userId),
+    queryFn: () => getAllResellerAgreements(storeId),
+    enabled: !!storeId && !!userId,
   })
 }
 

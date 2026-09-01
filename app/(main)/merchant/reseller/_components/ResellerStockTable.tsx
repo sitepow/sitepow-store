@@ -73,7 +73,6 @@ export function ResellerStockTable({
   })
 
   const showActionColumn = hasAnyAction
-  // เพิ่มจำนวนคอลัมน์รวมอีก 1 เนื่องจากเราแยกรูปภาพออกมาเป็นอีกคอลัมน์ต่างหาก
   const totalColumns = (showActionColumn ? 8 : 7) + 1
 
   return (

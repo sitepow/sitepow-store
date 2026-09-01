@@ -126,7 +126,7 @@ export function InventoryTable() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="size-6 p-0"
+                          className="text-muted-foreground size-6 p-0"
                         >
                           {isExpanded ? (
                             <IconChevronDown size={16} />
@@ -150,7 +150,14 @@ export function InventoryTable() {
                         <Badge>{variants.length} รายการ</Badge>
                       </TableCell>
                       <TableCell className="text-end">
-                        {formatNumber(totalStock)}
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-xs">
+                            รวม:
+                          </span>
+                          <Badge variant="outline">
+                            {formatNumber(totalStock)}
+                          </Badge>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -181,7 +188,7 @@ export function InventoryTable() {
                             <TableCell />
                             <TableCell>
                               <div className="flex items-center gap-3 pl-4">
-                                <IconCornerDownRight className="size-4 shrink-0" />
+                                <IconCornerDownRight className="text-muted-foreground size-4 shrink-0" />
                                 <ProductImage
                                   src={
                                     variant.image || product.images?.[0]?.url
