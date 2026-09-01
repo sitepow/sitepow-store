@@ -12,6 +12,10 @@ const ROOT_DOMAINS = ['sitepow.store', 'lvh.me', 'localhost']
 const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
 
 export default async function middleware(req: NextRequest) {
+  if (req.method === 'OPTIONS') {
+    return NextResponse.next()
+  }
+
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
 

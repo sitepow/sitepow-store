@@ -11,7 +11,7 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
 
   plugins: [bearer()],
-  trustedOrigins: async () => {
+  trustedOrigins: async (request) => {
     const baseOrigins = [
       'http://localhost:3000',
       'http://lvh.me:3000',
@@ -43,13 +43,34 @@ export const auth = betterAuth({
         .map((s) => s.customDomain)
         .filter((domain): domain is string => Boolean(domain))
         .flatMap((domain) => {
-          const cleanDomain = domain.replace(/^https?:\/\//, '').trim()
-          return [`https://${cleanDomain}`, `http://${cleanDomain}`]
+          const cleanDomain = domain
+            .replace(/^https?:\/\//, '')
+            .replace(/\/$/, '')
+            .trim()
+          const nakedDomain = cleanDomain.replace(/^www\./, '')
+          return [
+            `https://${nakedDomain}`,
+            `http://${nakedDomain}`,
+            `https://www.${nakedDomain}`,
+            `http://www.${nakedDomain}`,
+          ]
         })
 
-      return Array.from(new Set([...baseOrigins, ...customDomainOrigins]))
+      const requestOrigin =
+        request?.headers.get('origin') || request?.headers.get('referer')
+
+      let dynamicOrigins: string[] = []
+      if (requestOrigin) {
+        try {
+          dynamicOrigins = [new URL(requestOrigin).origin]
+        } catch (err) {}
+      }
+
+      return Array.from(
+        new Set([...baseOrigins, ...customDomainOrigins, ...dynamicOrigins]),
+      )
     } catch (error) {
-      console.error('Error fetching custom domains for trustedOrigins:', error)
+      console.error(error)
       return baseOrigins
     }
   },
