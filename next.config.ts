@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '100mb',
+      allowedOrigins: [
+        '*.sitepow.store',
+        'sitepow.store',
+        '*.lvh.me',
+        'lvh.me:3000',
+      ],
     },
   },
   allowedDevOrigins: ['lvh.me', '*.lvh.me'],

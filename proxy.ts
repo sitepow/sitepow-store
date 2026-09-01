@@ -167,8 +167,14 @@ export default async function middleware(req: NextRequest) {
         ? 'http://accounts.lvh.me:3000'
         : 'https://accounts.sitepow.store'
 
+    const proto = req.headers.get('x-forwarded-proto') || 'https'
+    const publicHost = req.headers.get('x-forwarded-host') || host
+
+    const publicCurrentUrl = `${proto}://${publicHost}${url.pathname}${url.search}`
+
     const loginUrl = new URL(`${authHost}/login`)
-    loginUrl.searchParams.set('callbackUrl', req.url)
+    loginUrl.searchParams.set('callbackUrl', publicCurrentUrl)
+
     return NextResponse.redirect(loginUrl)
   }
 
