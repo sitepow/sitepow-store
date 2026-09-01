@@ -9,22 +9,15 @@ interface AuthUrlProps {
 export const getClientAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
   if (typeof window === 'undefined') return '#'
 
-  const hostname = window.location.hostname
-
+  const { hostname, port, pathname, search } = window.location
   const isDev = hostname.includes('lvh.me') || hostname.includes('localhost')
 
   const baseUrl = isDev
-    ? `http://accounts.lvh.me:${window.location.port || '3000'}`
+    ? `http://accounts.lvh.me:${port || '3000'}`
     : 'https://accounts.sitepow.store'
 
-  let targetOrigin = window.location.origin
-
-  if (!hostname.includes('.') && !isDev) {
-    targetOrigin = 'https://sitepow.store'
-  }
-
-  const currentPathAndSearch = `${window.location.pathname}${window.location.search}`
-  const defaultCallbackUrl = `${targetOrigin}${currentPathAndSearch}`
+  const currentOrigin = `${window.location.protocol}//${window.location.host}`
+  const defaultCallbackUrl = `${currentOrigin}${pathname}${search}`
 
   const finalCallbackUrl = callbackUrl || defaultCallbackUrl
 

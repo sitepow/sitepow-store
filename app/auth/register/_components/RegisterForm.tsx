@@ -74,13 +74,31 @@ export function RegisterForm() {
       const response = await authClient.signIn.email({
         email: variables.email,
         password: variables.password,
-        callbackURL: callbackUrl,
       })
 
       if (response.error) {
         toast.error('เข้าสู่ระบบอัตโนมัติติดขัด กรุณาเข้าสู่ระบบอีกครั้ง')
         window.location.href = loginHref
         return
+      }
+
+      const token = response.data?.token
+
+      if (token && callbackUrl) {
+        try {
+          const targetUrl = new URL(callbackUrl, window.location.origin)
+
+          if (
+            !targetUrl.hostname.endsWith('sitepow.store') &&
+            !targetUrl.hostname.includes('lvh.me')
+          ) {
+            targetUrl.searchParams.set('auth_token', token)
+            window.location.href = targetUrl.toString()
+            return
+          }
+        } catch (err) {
+          console.error(err)
+        }
       }
 
       window.location.href = callbackUrl

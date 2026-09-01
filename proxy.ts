@@ -4,13 +4,6 @@ import { redis } from '@/lib/redis'
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except for:
-     * 1. /api routes
-     * 2. /_next (Next.js internals)
-     * 3. /_static (inside /public)
-     * 4. all root files inside /public (e.g. /favicon.ico)
-     */
     '/((?!_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)).*)',
   ],
 }
@@ -38,12 +31,21 @@ export default async function middleware(req: NextRequest) {
   ) {
     return NextResponse.next()
   }
-  const sessionToken =
+
+  const authHeader = req.headers.get('authorization')
+  const bearerToken = authHeader?.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : null
+
+  const cookieToken =
     req.cookies.get('better-auth.session_token')?.value ||
     req.cookies.get('__Secure-better-auth.session_token')?.value ||
     req.cookies.get('__Host-better-auth.session_token')?.value
 
-  const isAuthenticated = !!sessionToken
+  const hasUrlAuthToken = url.searchParams.has('auth_token')
+
+  const sessionToken = cookieToken || bearerToken
+  const isAuthenticated = !!sessionToken || hasUrlAuthToken
 
   if (AUTH_DOMAINS.includes(hostname)) {
     if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {

@@ -55,7 +55,6 @@ export function LoginForm() {
       return await authClient.signIn.email({
         email,
         password,
-        callbackURL: callbackUrl,
       })
     },
     onSuccess: (response) => {
@@ -63,6 +62,26 @@ export function LoginForm() {
         toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
         return
       }
+
+      const token = response.data?.token
+
+      if (token && callbackUrl) {
+        try {
+          const targetUrl = new URL(callbackUrl, window.location.origin)
+
+          if (
+            !targetUrl.hostname.endsWith('sitepow.store') &&
+            !targetUrl.hostname.includes('lvh.me')
+          ) {
+            targetUrl.searchParams.set('auth_token', token)
+            window.location.href = targetUrl.toString()
+            return
+          }
+        } catch (err) {
+          console.error('Invalid callbackUrl:', err)
+        }
+      }
+
       window.location.href = callbackUrl
     },
   })

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { bearer } from 'better-auth/plugins'
 
 import { prisma } from './prisma'
 
@@ -9,6 +10,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
 
+  plugins: [bearer()],
   trustedOrigins: async () => {
     const baseOrigins = [
       'http://localhost:3000',
@@ -24,7 +26,6 @@ export const auth = betterAuth({
           ]
         : []),
     ]
-
     try {
       const stores = await prisma.store.findMany({
         where: {
@@ -36,7 +37,6 @@ export const auth = betterAuth({
           customDomain: true,
         },
       })
-
       const customDomainOrigins = stores
         .map((s) => s.customDomain)
         .filter((domain): domain is string => Boolean(domain))
@@ -51,26 +51,26 @@ export const auth = betterAuth({
       return baseOrigins
     }
   },
-
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
-
   account: {
     accountLinking: {
       enabled: true,
       trustedProviders: ['google', 'line'],
     },
   },
-
   advanced: {
-    defaultCookieAttributes: {
-      sameSite: isProd ? 'none' : 'lax',
-      secure: isProd,
+    crossSubDomainCookies: {
+      enabled: true,
       domain: isProd ? '.sitepow.store' : '.lvh.me',
     },
+    defaultCookieAttributes: {
+      sameSite: 'none',
+      secure: isProd,
+      httpOnly: true,
+    },
   },
-
   emailAndPassword: {
     enabled: true,
     password: {
@@ -82,7 +82,6 @@ export const auth = betterAuth({
       },
     },
   },
-
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -93,7 +92,6 @@ export const auth = betterAuth({
       clientSecret: process.env.AUTH_LINE_SECRET!,
     },
   },
-
   user: {
     additionalFields: {
       role: {
