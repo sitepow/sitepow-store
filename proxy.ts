@@ -13,7 +13,15 @@ const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
 
 export default async function middleware(req: NextRequest) {
   if (req.method === 'OPTIONS') {
-    return NextResponse.next()
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': req.headers.get('origin') || '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Credentials': 'true',
+      },
+    })
   }
 
   const url = req.nextUrl
@@ -74,7 +82,17 @@ export default async function middleware(req: NextRequest) {
       (url.pathname.startsWith('/login') ||
         url.pathname.startsWith('/register'))
     ) {
-      return NextResponse.redirect(new URL(callbackUrl))
+      const redirectTarget = new URL(callbackUrl)
+
+      const isCustomDomain =
+        !redirectTarget.hostname.includes('sitepow.store') &&
+        !redirectTarget.hostname.includes('lvh.me')
+
+      if (isCustomDomain && sessionToken) {
+        redirectTarget.searchParams.set('auth_token', sessionToken as string)
+      }
+
+      return NextResponse.redirect(redirectTarget)
     }
 
     if (
