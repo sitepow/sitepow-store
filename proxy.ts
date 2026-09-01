@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { redis } from '@/lib/redis'
+
 export const config = {
   matcher: [
     /*
@@ -97,23 +99,41 @@ export default async function middleware(req: NextRequest) {
   if (isSubdomain) {
     storeSlug = hostname.split('.')[0]
   } else {
+    const cacheKey = `domain:slug:${hostname}`
     try {
-      const resolveRes = await fetch(
-        `${url.origin}/api/internal/resolve-domain?domain=${hostname}`,
-        {
-          headers: {
-            'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
-          },
-          next: { revalidate: 300 },
-        },
-      )
-
-      if (resolveRes.ok) {
-        const data = await resolveRes.json()
-        storeSlug = data.slug
+      const cachedSlug = await redis.get(cacheKey)
+      if (cachedSlug) {
+        storeSlug = cachedSlug
       }
-    } catch (error) {
-      console.error('Failed to resolve custom domain:', error)
+    } catch (err) {
+      console.error('Redis error in middleware:', err)
+    }
+
+    if (!storeSlug) {
+      try {
+        const resolveRes = await fetch(
+          `${url.origin}/api/internal/resolve-domain?domain=${hostname}`,
+          {
+            headers: {
+              'x-internal-secret': process.env.INTERNAL_API_SECRET || '',
+            },
+            next: { revalidate: 300 },
+          },
+        )
+
+        if (resolveRes.ok) {
+          const data = await resolveRes.json()
+          storeSlug = data.slug
+
+          if (storeSlug) {
+            await redis
+              .setex(cacheKey, 3600, storeSlug)
+              .catch((err) => console.error('Failed to set redis cache:', err))
+          }
+        }
+      } catch (error) {
+        console.error('Failed to resolve custom domain:', error)
+      }
     }
 
     if (!storeSlug) {

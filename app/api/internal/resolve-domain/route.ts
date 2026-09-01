@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { DomainStatus } from '@/generated/prisma/enums'
+
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
@@ -16,21 +18,17 @@ export async function GET(request: Request) {
   }
 
   try {
-    const storeDomain = await prisma.storeDomain.findFirst({
+    const store = await prisma.store.findFirst({
       where: {
-        domain: domain.toLowerCase(),
-        status: 'ACTIVE',
+        customDomain: domain.toLowerCase(),
+        customDomainStatus: DomainStatus.ACTIVE,
       },
       select: {
-        store: {
-          select: {
-            slug: true,
-          },
-        },
+        slug: true,
       },
     })
 
-    if (!storeDomain) {
+    if (!store) {
       return NextResponse.json(
         { error: 'Store domain not found' },
         { status: 404 },
@@ -38,7 +36,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(
-      { slug: storeDomain.store.slug },
+      { slug: store.slug },
       {
         headers: {
           'Cache-Control': 's-maxage=300, stale-while-revalidate=59',
@@ -46,7 +44,7 @@ export async function GET(request: Request) {
       },
     )
   } catch (error) {
-    console.error('Error resolving domain:', error)
+    console.error(error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

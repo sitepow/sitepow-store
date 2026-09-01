@@ -75,10 +75,6 @@ export function DomainSettingsForm() {
             alert(res.message)
           }
         },
-        onError: (err) => {
-          console.error('Mutation Failed:', err)
-          alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
-        },
       },
     )
   }
@@ -88,14 +84,23 @@ export function DomainSettingsForm() {
       return
     }
 
-    verifyDomainMutation.mutate(selectedStoreId, {
-      onSuccess: (res) => alert(res.message),
-    })
+    verifyDomainMutation.mutate(selectedStoreId)
   }
 
   const defaultSubdomain = selectedStoreSlug
     ? `${selectedStoreSlug}.sitepow.store`
     : ''
+
+  const getCnameHostName = (domainName: string) => {
+    const clean = domainName.trim().toLowerCase()
+    const parts = clean.split('.')
+
+    if (parts.length > 2) {
+      return parts[0]
+    }
+
+    return '@'
+  }
 
   return (
     <Card>
@@ -262,7 +267,7 @@ export function DomainSettingsForm() {
                     </DeleteButton>
                   </div>
                 </div>
-                {customDomain.status !== 'ACTIVE' && (
+                {customDomain.status !== DomainStatus.ACTIVE && (
                   <div className="bg-muted/50 space-y-3 rounded-lg border p-4 text-sm">
                     <div className="flex items-start gap-2">
                       <IconInfoCircle className="mt-0.5 size-4 shrink-0 text-blue-500" />
@@ -276,7 +281,6 @@ export function DomainSettingsForm() {
                         </p>
                       </div>
                     </div>
-
                     <div className="grid gap-2 text-xs sm:grid-cols-3">
                       <div className="bg-background rounded border p-2">
                         <span className="text-muted-foreground block text-[10px]">
@@ -288,9 +292,7 @@ export function DomainSettingsForm() {
                         <span className="text-muted-foreground block text-[10px]">
                           NAME / HOST
                         </span>
-                        {customDomain.domain.includes('.')
-                          ? customDomain.domain.split('.')[0]
-                          : '@'}
+                        {getCnameHostName(customDomain.domain)}
                       </div>
                       <div className="bg-background flex items-center justify-between rounded border p-2">
                         <div>
