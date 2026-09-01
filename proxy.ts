@@ -98,6 +98,23 @@ export default async function middleware(req: NextRequest) {
 
   if (isSubdomain) {
     storeSlug = hostname.split('.')[0]
+
+    const slugToDomainKey = `slug:domain:${storeSlug}`
+    let customDomain = ''
+
+    try {
+      customDomain = (await redis.get(slugToDomainKey)) || ''
+    } catch (err) {
+      console.error('Redis error fetching custom domain by slug:', err)
+    }
+
+    if (customDomain) {
+      const redirectUrl = new URL(
+        `${url.pathname}${url.search}`,
+        `https://${customDomain}`,
+      )
+      return NextResponse.redirect(redirectUrl, { status: 301 })
+    }
   } else {
     const cacheKey = `domain:slug:${hostname}`
     try {
@@ -126,9 +143,10 @@ export default async function middleware(req: NextRequest) {
           storeSlug = data.slug
 
           if (storeSlug) {
-            await redis
-              .setex(cacheKey, 3600, storeSlug)
-              .catch((err) => console.error('Failed to set redis cache:', err))
+            await Promise.all([
+              redis.setex(cacheKey, 3600, storeSlug),
+              redis.setex(`slug:domain:${storeSlug}`, 3600, hostname),
+            ]).catch((err) => console.error('Failed to set redis cache:', err))
           }
         }
       } catch (error) {
