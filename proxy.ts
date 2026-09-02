@@ -41,15 +41,36 @@ export default async function middleware(req: NextRequest) {
 
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
-
-  if (url.pathname.startsWith('/api')) {
-    return applyCors(req, NextResponse.next())
-  }
-
   const hostname = host
     .replace(/^www\./, '')
     .split(':')[0]
     .toLowerCase()
+
+  const isProd = process.env.NODE_ENV === 'production'
+
+  if (url.pathname.startsWith('/api/auth')) {
+    const authTargetDomain = isProd
+      ? 'https://accounts.sitepow.store'
+      : 'http://accounts.lvh.me:3000'
+
+    const targetUrl = new URL(`${url.pathname}${url.search}`, authTargetDomain)
+
+    const requestHeaders = new Headers(req.headers)
+    requestHeaders.set('x-forwarded-host', host)
+
+    return applyCors(
+      req,
+      NextResponse.rewrite(targetUrl, {
+        request: {
+          headers: requestHeaders,
+        },
+      }),
+    )
+  }
+
+  if (url.pathname.startsWith('/api')) {
+    return applyCors(req, NextResponse.next())
+  }
 
   if (
     url.pathname.match(
@@ -72,7 +93,6 @@ export default async function middleware(req: NextRequest) {
     const redirectUrl = new URL(`${url.pathname}${url.search}`, req.url)
     const response = NextResponse.redirect(redirectUrl)
 
-    const isProd = process.env.NODE_ENV === 'production'
     const cookieName = isProd
       ? '__Secure-better-auth.session_token'
       : 'better-auth.session_token'
@@ -91,7 +111,7 @@ export default async function middleware(req: NextRequest) {
   const isAuthenticated = !!sessionToken
 
   if (AUTH_DOMAINS.includes(hostname)) {
-    if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {
+    if (url.pathname.startsWith('/auth')) {
       return applyCors(req, NextResponse.next())
     }
 
@@ -114,15 +134,6 @@ export default async function middleware(req: NextRequest) {
         url.pathname.startsWith('/register'))
     ) {
       const redirectTarget = new URL(callbackUrl)
-
-      const isCustomDomain =
-        !redirectTarget.hostname.includes('sitepow.store') &&
-        !redirectTarget.hostname.includes('lvh.me')
-
-      if (isCustomDomain && sessionToken) {
-        redirectTarget.searchParams.set('auth_token', sessionToken as string)
-      }
-
       return applyCors(req, NextResponse.redirect(redirectTarget))
     }
 

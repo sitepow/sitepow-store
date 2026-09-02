@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
@@ -9,7 +8,6 @@ import { Dancing_Script, IBM_Plex_Sans_Thai, Inter } from 'next/font/google'
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
 
-import { AuthSync } from '@/components/AuthSync'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
@@ -72,9 +70,6 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          <Suspense>
-            <AuthSync />
-          </Suspense>
           {/* <NextIntlClientProvider locale={lng} messages={messages}> */}
           <QueryProviders>{children}</QueryProviders>
           {/* </NextIntlClientProvider> */}

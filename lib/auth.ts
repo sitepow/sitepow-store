@@ -38,6 +38,7 @@ export const auth = betterAuth({
       return false
     }
   },
+
   trustedOrigins: async (request) => {
     const baseOrigins = [
       'http://localhost:3000',
@@ -67,26 +68,27 @@ export const auth = betterAuth({
       return baseOrigins
     }
   },
+
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
+
   account: {
     accountLinking: {
       enabled: true,
       trustedProviders: ['google', 'line'],
     },
   },
+
   advanced: {
-    crossSubDomainCookies: {
-      enabled: true,
-      domain: isProd ? '.sitepow.store' : '.lvh.me',
-    },
     defaultCookieAttributes: {
-      sameSite: 'none',
+      sameSite: 'lax',
       secure: isProd,
       httpOnly: true,
+      path: '/',
     },
   },
+
   emailAndPassword: {
     enabled: true,
     password: {
@@ -98,6 +100,7 @@ export const auth = betterAuth({
       },
     },
   },
+
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -108,6 +111,7 @@ export const auth = betterAuth({
       clientSecret: process.env.AUTH_LINE_SECRET!,
     },
   },
+
   user: {
     additionalFields: {
       role: {
