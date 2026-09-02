@@ -10,8 +10,12 @@ export function AuthSync() {
     if (authToken) {
       const maxAge = 60 * 60 * 24 * 7
       const isSecure = window.location.protocol === 'https:'
+      const isProd = process.env.NODE_ENV === 'production'
+      const cookieName = isProd
+        ? '__Secure-better-auth.session_token'
+        : 'better-auth.session_token'
 
-      document.cookie = `better-auth.session_token=${authToken}; path=/; max-age=${maxAge}; SameSite=Lax; ${isSecure ? 'Secure' : ''}`
+      document.cookie = `${cookieName}=${authToken}; path=/; max-age=${maxAge}; SameSite=Lax; ${isSecure ? 'Secure' : ''}`
 
       params.delete('auth_token')
       const newSearch = params.toString()
@@ -27,9 +31,12 @@ export function AuthSync() {
     }
 
     const checkAndFixSession = async () => {
-      const hasSessionCookie = document.cookie.includes(
-        'better-auth.session_token',
-      )
+      const isProd = process.env.NODE_ENV === 'production'
+      const cookieName = isProd
+        ? '__Secure-better-auth.session_token'
+        : 'better-auth.session_token'
+
+      const hasSessionCookie = document.cookie.includes(cookieName)
 
       if (
         !hasSessionCookie &&
