@@ -3,8 +3,6 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { bearer } from 'better-auth/plugins'
 
-import { redis } from '@/lib/redis'
-
 import { prisma } from './prisma'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -37,25 +35,9 @@ export const auth = betterAuth({
 
     try {
       const originUrl = new URL(requestOrigin)
-      const hostname = originUrl.hostname
       const cleanOrigin = originUrl.origin
 
-      if (
-        hostname.includes('sitepow.store') ||
-        hostname.includes('lvh.me') ||
-        hostname === 'localhost'
-      ) {
-        return Array.from(new Set([...baseOrigins, cleanOrigin]))
-      }
-
-      const cacheKey = `domain:slug:${hostname.replace(/^www\./, '')}`
-      const storeSlug = await redis.get(cacheKey)
-
-      if (storeSlug) {
-        return Array.from(new Set([...baseOrigins, cleanOrigin]))
-      }
-
-      return baseOrigins
+      return Array.from(new Set([...baseOrigins, cleanOrigin]))
     } catch (error) {
       console.error(error)
       return baseOrigins
