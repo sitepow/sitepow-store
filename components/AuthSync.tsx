@@ -14,8 +14,6 @@ export function AuthSync() {
     if (authToken) {
       localStorage.setItem('bearer_token', authToken)
 
-      document.cookie = `better-auth.session_token=${authToken}; path=/; max-age=604800; secure; samesite=lax`
-
       const newParams = new URLSearchParams(searchParams.toString())
       newParams.delete('auth_token')
       const query = newParams.toString()
