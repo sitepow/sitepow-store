@@ -70,7 +70,6 @@ export default async function middleware(req: NextRequest) {
   if (urlAuthToken && !AUTH_DOMAINS.includes(hostname)) {
     url.searchParams.delete('auth_token')
     const redirectUrl = new URL(`${url.pathname}${url.search}`, req.url)
-
     const response = NextResponse.redirect(redirectUrl)
 
     const isProd = process.env.NODE_ENV === 'production'
@@ -79,11 +78,11 @@ export default async function middleware(req: NextRequest) {
       : 'better-auth.session_token'
 
     response.cookies.set(cookieName, urlAuthToken, {
-      domain: hostname,
       httpOnly: true,
       secure: isProd,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
+      path: '/',
     })
 
     return applyCors(req, response)
