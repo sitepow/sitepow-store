@@ -17,7 +17,7 @@ export function LogoBrandText({ className, ...props }: LogoBrandTextProps) {
     <Link
       href="/"
       className={cn(
-        'group relative flex items-center font-extrabold tracking-tight transition-opacity select-none hover:opacity-90',
+        'group text-foreground relative flex items-center font-extrabold tracking-tight transition-opacity select-none hover:opacity-90',
         className,
       )}
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}

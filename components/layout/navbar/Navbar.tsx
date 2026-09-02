@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { getClientAuthUrl } from '@/utils/auth'
 import { IconLogin } from '@tabler/icons-react'
 import { Menu, X } from 'lucide-react'
 
@@ -34,7 +33,8 @@ import { MobileMenuItems } from './_components/MobileMenuItems'
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user, userRole } = useSession()
-  const isMounted = useIsMounted()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const navbarItems = (
     [UserRole.SUPPORT, UserRole.CUSTOMER] as UserRole[]
@@ -42,12 +42,16 @@ export function Navbar() {
     ? SUPPORT_NAVIGATION
     : MERCHANT_NAVIGATION
 
-  const loginHref = isMounted
-    ? getClientAuthUrl({ path: 'login', role: UserRole.MERCHANT })
-    : '#'
-  const registerHref = isMounted
-    ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
-    : '#'
+  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+
+  const authParams = new URLSearchParams()
+  authParams.set('role', UserRole.MERCHANT)
+  if (currentUrl && currentUrl !== '/') {
+    authParams.set('callbackUrl', currentUrl)
+  }
+
+  const loginHref = `/login?${authParams.toString()}`
+  const registerHref = `/register?${authParams.toString()}`
 
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
 

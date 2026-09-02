@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
 
+import { LoginForm } from '@/components/LoginForm'
+
 import { getCurrentUser } from '@/lib/auth-server'
 
-import { LoginForm } from './_components/LoginForm'
-
-export default async function LoginPage() {
+export default async function TenantLoginPage() {
   const userSession = await getCurrentUser()
 
   if (userSession) {

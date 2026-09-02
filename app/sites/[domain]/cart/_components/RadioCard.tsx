@@ -31,7 +31,7 @@ export function RadioCard({
       <Label
         htmlFor={id}
         className={cn(
-          'dark:bg-foreground/5 border-border flex justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
+          'border-border flex justify-between gap-5 rounded-xl border p-4 text-start font-normal transition-all select-none',
           'has-data-[state=checked]:border-primary/35',
           disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
         )}

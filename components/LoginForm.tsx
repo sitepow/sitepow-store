@@ -7,10 +7,8 @@ import { useSearchParams } from 'next/navigation'
 
 import { LOGIN_PROVIDERS } from '@/constants/login'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { LoginFormInputs } from '@/types/login'
-import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
@@ -28,16 +26,22 @@ import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'
 
 export function LoginForm() {
-  const isMounted = useIsMounted()
   const searchParams = useSearchParams()
   const role = searchParams.get('role') as UserRole
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const { currentImage } = useLandingImages()
 
-  const registerHref = isMounted
-    ? getClientAuthUrl({ path: 'register', role, callbackUrl })
-    : '#'
+  const registerParams = new URLSearchParams()
+  if (role) {
+    registerParams.set('role', role)
+  }
+
+  if (callbackUrl && callbackUrl !== '/') {
+    registerParams.set('callbackUrl', callbackUrl)
+  }
+
+  const registerHref = `/register${registerParams.toString() ? `?${registerParams.toString()}` : ''}`
 
   const {
     register,
@@ -63,43 +67,18 @@ export function LoginForm() {
         return
       }
 
-      const token = response.data?.token
-
-      if (token && callbackUrl) {
-        try {
-          const targetUrl = new URL(callbackUrl, window.location.origin)
-
-          if (
-            !targetUrl.hostname.endsWith('sitepow.store') &&
-            !targetUrl.hostname.includes('lvh.me')
-          ) {
-            targetUrl.searchParams.set('auth_token', token)
-            window.location.href = targetUrl.toString()
-            return
-          }
-        } catch (err) {
-          console.error('Invalid callbackUrl:', err)
-        }
-      }
-
       window.location.href = callbackUrl
     },
   })
 
   const handleSSO = async (providerId: string) => {
     try {
-      if (callbackUrl) {
-        document.cookie = `post_login_redirect=${encodeURIComponent(
-          callbackUrl,
-        )}; path=/; max-age=300; secure; samesite=lax`
-      }
-
       await authClient.signIn.social({
         provider: providerId as 'google' | 'line',
-        callbackURL: '/auth/success',
+        callbackURL: callbackUrl,
       })
     } catch (err) {
-      console.error('SSO Error:', err)
+      console.error(err)
       toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
   }

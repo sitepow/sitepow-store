@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { getClientAuthUrl } from '@/utils/auth'
 import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
@@ -37,11 +36,18 @@ export function StoreNavbar() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user } = useSession()
-  const isMounted = useIsMounted()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-  const loginHref = isMounted
-    ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
-    : '#'
+  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+
+  const loginParams = new URLSearchParams()
+  loginParams.set('role', UserRole.CUSTOMER)
+  if (currentUrl && currentUrl !== '/') {
+    loginParams.set('callbackUrl', currentUrl)
+  }
+
+  const loginHref = `/login?${loginParams.toString()}`
 
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
@@ -72,11 +78,7 @@ export function StoreNavbar() {
                 <StoreSearchInput />
               </div>
               {!isAuthenticated && (
-                <Link
-                  href={loginHref}
-                  suppressHydrationWarning
-                  className="hidden lg:block"
-                >
+                <Link href={loginHref} className="hidden lg:block">
                   <Button variant="secondary" size="lg">
                     <LockKeyholeIcon className="mr-2" />
                     เข้าสู่ระบบ

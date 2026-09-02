@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import { MainLayout } from '@/components/layout/Layout'
 import { AiVerificationSection } from '@/components/section/AiVerificationSection'
 import { ChatSection } from '@/components/section/ChatSection'
@@ -22,7 +24,9 @@ import { StoresSection } from '@/components/section/StoresSection'
 export default function HomePage() {
   return (
     <MainLayout className="-mt-12.5">
-      <HeroSection />
+      <Suspense>
+        <HeroSection />
+      </Suspense>
       <FeatureSection />
       <ProductTypeSection />
       <POSSection />

@@ -1,103 +1,66 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import Link from 'next/link'
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation'
 
+import { useStoreCheckout } from '@/actions/hooks/checkout'
+import { useAddressOptions } from '@/actions/hooks/storefront/address'
+import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
+import { useCreateOrder } from '@/actions/hooks/storefront/order'
+import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
+import {
+  useShippingCalculation,
+  useStorefrontShippingOptions,
+} from '@/actions/hooks/storefront/shipping'
+import {
+  BankAccountType,
+  PaymentMethod,
+  ProductType,
+  UserRole,
+} from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
+import { formatCurrency } from '@/utils/pricing'
+import { formatBankAccount, formatPromptPay } from '@/utils/slip'
+import {
+  IconAlertCircle,
+  IconArrowRight,
+  IconCreditCard,
+  IconLock,
+  IconMapPin,
+  IconShoppingCartCheck,
+  IconTruckDelivery,
+} from '@tabler/icons-react'
+import { ChevronLeftIcon } from 'lucide-react'
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { HighlightText } from '@/components/HighlightText'
+import { SectionContainer } from '@/components/SectionContainer'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { RadioGroup } from '@/components/ui/radio-group'
 
-
-
-import { useStoreCheckout } from '@/actions/hooks/checkout';
-import { useAddressOptions } from '@/actions/hooks/storefront/address';
-import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount';
-import { useCreateOrder } from '@/actions/hooks/storefront/order';
-import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment';
-import { useShippingCalculation, useStorefrontShippingOptions } from '@/actions/hooks/storefront/shipping';
-import { FALLBACK_MERCHANT_BANNER_IMAGE } from '@/constants/system';
-import { BankAccountType, PaymentMethod, ProductType, UserRole } from '@/generated/prisma/enums';
-import { useIsMounted } from '@/hooks/use-is-mounted';
-import { useSession } from '@/hooks/use-session';
-import { useStoreData } from '@/stores/sites/use-store-data';
-import { getClientAuthUrl } from '@/utils/auth';
-import { calculateGrandTotal, getRemainingStock } from '@/utils/cart';
-import { formatCurrency } from '@/utils/pricing';
-import { formatBankAccount, formatPromptPay } from '@/utils/slip';
-import { IconAlertCircle, IconArrowRight, IconCreditCard, IconLock, IconMapPin, IconShoppingCartCheck, IconTruckDelivery } from '@tabler/icons-react';
-import { ChevronLeftIcon } from 'lucide-react';
-
-
-
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert';
-import { HighlightText } from '@/components/HighlightText';
-import { SectionContainer } from '@/components/SectionContainer';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { RadioGroup } from '@/components/ui/radio-group';
-
-
-
-import { CircularProgress } from '../_components/CircularProgress';
-import { CartItemCard } from '../_components/cart/_components/CartItemCard';
-import { CartSummary } from '../_components/cart/_components/CartSummary';
-import { SummaryRow } from '../_components/cart/_components/SummaryRow';
-import { SummaryTotal } from '../_components/cart/_components/SummaryTotal';
-import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout';
-import { CheckoutSection } from './_components/CheckoutSection';
-import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog';
-import { DiscountForm } from './_components/DiscountForm';
-import { RadioCard } from './_components/RadioCard';
-import { useCartStore } from './store';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { CircularProgress } from '../_components/CircularProgress'
+import { CartItemCard } from '../_components/cart/_components/CartItemCard'
+import { CartSummary } from '../_components/cart/_components/CartSummary'
+import { SummaryRow } from '../_components/cart/_components/SummaryRow'
+import { SummaryTotal } from '../_components/cart/_components/SummaryTotal'
+import { StoreLayoutCheckout } from '../_components/layout/checkout/Layout'
+import { CheckoutSection } from './_components/CheckoutSection'
+import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog'
+import { DiscountForm } from './_components/DiscountForm'
+import { RadioCard } from './_components/RadioCard'
+import { useCartStore } from './store'
 
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
@@ -106,14 +69,22 @@ export default function StoreCartPage() {
   const isMounted = useIsMounted()
   const router = useRouter()
   const params = useParams()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const storeSlug = params.domain as string
   const { isAuthenticated, user } = useSession()
 
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
-  const loginHref = isMounted
-    ? getClientAuthUrl({ path: 'login', role: UserRole.CUSTOMER })
-    : '#'
+  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+
+  const loginParams = new URLSearchParams()
+  loginParams.set('role', UserRole.CUSTOMER)
+  if (currentUrl && currentUrl !== '/') {
+    loginParams.set('callbackUrl', currentUrl)
+  }
+
+  const loginHref = `/login?${loginParams.toString()}`
 
   const {
     items,
@@ -534,8 +505,8 @@ export default function StoreCartPage() {
                 </Button>
               </Link>
             </div>
-            <div className="border-border dark:bg-foreground/5 bg-foreground/1 flex flex-col rounded-xl border">
-              <div className="bg-foreground/5 rounded-xl px-5 py-2.5 text-start font-bold">
+            <div className="border-border flex flex-col rounded-xl border">
+              <div className="rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>
                   ตะกร้าสินค้า{' '}
                   {physicalGroups.length > 0 && (
@@ -589,29 +560,21 @@ export default function StoreCartPage() {
             </div>
           </div>
           <div className="space-y-4 lg:sticky lg:top-28 lg:col-span-4">
-            <div className="relative overflow-hidden rounded-xl bg-neutral-900/80 px-5 py-2.5 text-start shadow-sm backdrop-blur-md">
-              <div className="absolute inset-0 z-0 overflow-hidden">
-                <Image
-                  src={FALLBACK_MERCHANT_BANNER_IMAGE}
-                  alt="progress-background"
-                  fill
-                  className="object-cover opacity-30"
-                />
-              </div>
-              <div className="relative z-10 flex items-center gap-5 text-white">
+            <div className="border-border relative overflow-hidden rounded-xl border px-5 py-2.5 text-start shadow-sm">
+              <div className="relative z-10 flex items-center gap-5">
                 <CircularProgress
                   size={60}
                   value={progressValue}
                   icon={stepIcons[activeSection]}
                 />
                 <div className="space-y-0.5">
-                  <h3 className="font-bold text-white" suppressHydrationWarning>
+                  <h3 className="font-bold" suppressHydrationWarning>
                     ยอดที่ต้องชำระ{' '}
                     <span className="font-extrabold">
                       {formatCurrency(grandTotal)}
                     </span>
                   </h3>
-                  <p className="text-xs text-neutral-300 opacity-80">
+                  <p className="text-muted-foreground text-xs">
                     {sectionDescription}
                   </p>
                 </div>
@@ -821,17 +784,9 @@ export default function StoreCartPage() {
               style={
                 { '--primary': store?.primaryColor } as React.CSSProperties
               }
-              className="dark relative overflow-hidden rounded-xl bg-neutral-900 p-5 **:text-white!"
+              className="border-border relative overflow-hidden rounded-xl border p-5"
             >
-              <div className="absolute inset-0 z-0 overflow-hidden">
-                <Image
-                  src={FALLBACK_MERCHANT_BANNER_IMAGE}
-                  alt="summary-background"
-                  fill
-                  className="object-cover opacity-40"
-                />
-              </div>
-              <div className="relative z-10 text-white">
+              <div className="relative z-10">
                 <SummaryRow
                   className="mb-5"
                   label="ส่วนลด"
@@ -841,11 +796,11 @@ export default function StoreCartPage() {
                   label="ค่าจัดส่งรวม"
                   value={formatCurrency(shippingFee)}
                 />
-                <div className="dark text-white!">
+                <div>
                   <CartSummary summary={summary} />
                 </div>
                 {(pointsDiscount > 0 || couponDiscount > 0) && (
-                  <div className="mt-2 space-y-1 border-t border-white/10 pt-2">
+                  <div className="border-border mt-2 space-y-1 border-t pt-2">
                     {pointsDiscount > 0 && (
                       <SummaryRow
                         label="ส่วนลดจากแต้มสะสม"
@@ -868,7 +823,7 @@ export default function StoreCartPage() {
                     )}
                   </div>
                 )}
-                <div className="mt-4 border-t border-white/10 pt-2">
+                <div className="border-border mt-4 border-t pt-2">
                   <SummaryTotal
                     label="ยอดที่ต้องชำระ"
                     value={formatCurrency(grandTotal)}
@@ -896,12 +851,13 @@ export default function StoreCartPage() {
                 {!isAuthenticated && (
                   <Button
                     className="mt-6 h-12 w-full text-lg font-bold shadow-md"
-                    onClick={() => {
-                      router.push(loginHref)
-                    }}
+                    size="lg"
+                    asChild
                   >
-                    <IconLock />
-                    เข้าสู่ระบบเพื่อสั่งสินค้า
+                    <Link href={loginHref}>
+                      เข้าสู่ระบบเพื่อสั่งซื้อ{' '}
+                      <IconLock className="ml-1 size-5" />
+                    </Link>
                   </Button>
                 )}
               </div>

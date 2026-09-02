@@ -9,10 +9,8 @@ import { useSearchParams } from 'next/navigation'
 import { registerUser } from '@/actions/auth'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { RegisterFormInputs } from '@/types/register'
-import { getClientAuthUrl } from '@/utils/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/ContentDivider'
@@ -34,7 +32,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'
 
 export function RegisterForm() {
-  const isMounted = useIsMounted()
   const searchParams = useSearchParams()
   const roleParam = searchParams.get('role') as UserRole
   const currentRole = roleParam || UserRole.MERCHANT
@@ -42,9 +39,16 @@ export function RegisterForm() {
 
   const { currentImage } = useLandingImages()
 
-  const loginHref = isMounted
-    ? getClientAuthUrl({ path: 'login', role: currentRole, callbackUrl })
-    : '#'
+  const loginParams = new URLSearchParams()
+  if (roleParam) {
+    loginParams.set('role', roleParam)
+  }
+
+  if (callbackUrl && callbackUrl !== '/') {
+    loginParams.set('callbackUrl', callbackUrl)
+  }
+
+  const loginHref = `/login${loginParams.toString() ? `?${loginParams.toString()}` : ''}`
 
   const {
     register,
@@ -82,25 +86,6 @@ export function RegisterForm() {
         return
       }
 
-      const token = response.data?.token
-
-      if (token && callbackUrl) {
-        try {
-          const targetUrl = new URL(callbackUrl, window.location.origin)
-
-          if (
-            !targetUrl.hostname.endsWith('sitepow.store') &&
-            !targetUrl.hostname.includes('lvh.me')
-          ) {
-            targetUrl.searchParams.set('auth_token', token)
-            window.location.href = targetUrl.toString()
-            return
-          }
-        } catch (err) {
-          console.error(err)
-        }
-      }
-
       window.location.href = callbackUrl
     },
     onError: () => {
@@ -110,18 +95,12 @@ export function RegisterForm() {
 
   const handleSSO = async (providerId: string) => {
     try {
-      if (callbackUrl) {
-        document.cookie = `post_login_redirect=${encodeURIComponent(
-          callbackUrl,
-        )}; path=/; max-age=300; secure; samesite=lax`
-      }
-
       await authClient.signIn.social({
         provider: providerId as 'google' | 'line',
-        callbackURL: '/auth/success',
+        callbackURL: callbackUrl,
       })
     } catch (err) {
-      console.error('SSO Register Error:', err)
+      console.error(err)
       toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
   }

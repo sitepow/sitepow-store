@@ -6,10 +6,8 @@ import Link from 'next/link'
 import { useLandingStores } from '@/actions/hooks/store'
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
-import { getClientAuthUrl } from '@/utils/auth'
 import { IconArrowUpRight, IconPlus } from '@tabler/icons-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
@@ -21,15 +19,16 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ActionRequiredAlert } from '../ActionRequiredAlert'
 
 export function StoresSection() {
-  const isMounted = useIsMounted()
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
   const { data: stores = [], isLoading } = useLandingStores()
   const { isAuthenticated } = useSession()
 
-  const registerHref = isMounted
-    ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
-    : '#'
+  const registerParams = new URLSearchParams()
+  registerParams.set('role', UserRole.MERCHANT)
+  registerParams.set('callbackUrl', '/merchant/store-settings')
+
+  const registerHref = `/register?${registerParams.toString()}`
 
   if (isLoading && stores?.length === 0) {
     return (

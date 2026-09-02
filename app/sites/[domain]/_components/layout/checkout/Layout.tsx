@@ -1,40 +1,16 @@
 'use client'
 
-import { ComponentProps } from 'react';
+import { ComponentProps } from 'react'
 
+import { useSession } from '@/hooks/use-session'
+import { useStoreData } from '@/stores/sites/use-store-data'
 
+import { EmailVerified } from '@/components/EmailVerified'
+import { SectionContainer } from '@/components/SectionContainer'
 
-import { useSession } from '@/hooks/use-session';
-import { useStoreData } from '@/stores/sites/use-store-data';
+import { cn } from '@/lib/utils'
 
-
-
-import { EmailVerified } from '@/components/EmailVerified';
-import { SectionContainer } from '@/components/SectionContainer';
-
-
-
-import { cn } from '@/lib/utils';
-
-
-
-import { StoreNavbarCheckout } from './Navbar';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { StoreNavbarCheckout } from './Navbar'
 
 export function StoreLayoutCheckout({
   children,

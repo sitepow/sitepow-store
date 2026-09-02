@@ -5,10 +5,8 @@ import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
 import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
-import { getClientAuthUrl } from '@/utils/auth'
 import { IconDownload } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
 
@@ -18,12 +16,13 @@ import { Button } from '../ui/button'
 
 export function HeroSection() {
   const { isAuthenticated } = useSession()
-  const isMounted = useIsMounted()
   const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
 
-  const registerHref = isMounted
-    ? getClientAuthUrl({ path: 'register', role: UserRole.MERCHANT })
-    : '#'
+  const registerParams = new URLSearchParams()
+  registerParams.set('role', UserRole.MERCHANT)
+  registerParams.set('callbackUrl', '/merchant/dashboard')
+
+  const registerHref = `/register?${registerParams.toString()}`
 
   return (
     <section className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">

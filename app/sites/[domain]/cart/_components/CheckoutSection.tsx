@@ -24,14 +24,9 @@ export function CheckoutSection({
   return (
     <div
       className={cn(
-        'overflow-hidden border transition-all duration-300',
-        isDisabled
-          ? 'bg-foreground/5 border opacity-60'
-          : isActive && 'border-primary/35',
-        !isActive &&
-          !isCompleted &&
-          !isDisabled &&
-          'dark:bg-foreground/5 border-border',
+        'overflow-hidden rounded-xl border transition-all duration-300',
+        isDisabled ? 'border opacity-60' : isActive && 'border-primary/35',
+        !isActive && !isCompleted && !isDisabled && 'border-border',
       )}
     >
       <div
@@ -63,7 +58,7 @@ export function CheckoutSection({
         <>
           <div
             className={cn(
-              'dark:bg-foreground/5 transition-all duration-300',
+              'transition-all duration-300',
               isActive
                 ? 'px-5 py-3 opacity-100'
                 : 'h-0 overflow-hidden opacity-0',
@@ -72,7 +67,7 @@ export function CheckoutSection({
             {isActive && editView}
           </div>
           {!isActive && isCompleted && (
-            <div className="border-border dark:bg-foreground/5 border-t px-5 py-3">
+            <div className="border-border border-t px-5 py-3">
               {summaryView}
             </div>
           )}

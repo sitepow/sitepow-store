@@ -4,68 +4,22 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { bearer } from 'better-auth/plugins'
 
 import { prisma } from './prisma'
-import { redis } from './redis'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
-
   plugins: [bearer()],
 
-  trustedCallbacks: async (url: string, request: Request) => {
-    try {
-      const callbackUrl = new URL(url)
-      const hostname = callbackUrl.hostname
-
-      if (
-        hostname.includes('sitepow.store') ||
-        hostname.includes('lvh.me') ||
-        hostname === 'localhost'
-      ) {
-        return true
-      }
-
-      const cacheKey = `domain:slug:${hostname.replace(/^www\./, '')}`
-      const storeSlug = await redis.get(cacheKey)
-
-      if (storeSlug) {
-        return true
-      }
-
-      return true
-    } catch (err) {
-      return false
-    }
-  },
-
   trustedOrigins: async (request) => {
-    const baseOrigins = [
-      'http://localhost:3000',
-      'http://lvh.me:3000',
-      'http://*.lvh.me:3000',
-      'http://store.lvh.me:3000',
-      'http://accounts.lvh.me:3000',
-      ...(isProd
-        ? [
-            'https://sitepow.store',
-            'https://*.sitepow.store',
-            'https://accounts.sitepow.store',
-          ]
-        : []),
-    ]
-
     const requestOrigin =
       request?.headers.get('origin') || request?.headers.get('referer')
-
-    if (!requestOrigin) return baseOrigins
+    if (!requestOrigin) return []
 
     try {
       const originUrl = new URL(requestOrigin)
-      const cleanOrigin = originUrl.origin
-      return Array.from(new Set([...baseOrigins, cleanOrigin]))
+      return [originUrl.origin]
     } catch (error) {
-      return baseOrigins
+      return []
     }
   },
 

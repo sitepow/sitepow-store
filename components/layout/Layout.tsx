@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentProps } from 'react'
+import { ComponentProps, Suspense } from 'react'
 
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -22,16 +22,23 @@ export function MainLayout({
 
   return (
     <div className="bg-background flex flex-col gap-10">
-      <Navbar />
+      <Suspense>
+        <Navbar />
+      </Suspense>
+
       <main className={cn(className)} {...props}>
         {children}
       </main>
+
       <Footer />
-      {userRole === UserRole.SUPPORT ? (
-        <SupportWidget />
-      ) : (
-        <ChatWidget conversationType={ConversationType.SUPPORT} />
-      )}
+
+      <Suspense>
+        {userRole === UserRole.SUPPORT ? (
+          <SupportWidget />
+        ) : (
+          <ChatWidget conversationType={ConversationType.SUPPORT} />
+        )}
+      </Suspense>
     </div>
   )
 }

@@ -84,7 +84,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           description="ไม่พบสินค้าที่คุณกำลังมองหา"
         />
       ) : (
-        <div className="grid grid-cols-2 gap-5 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

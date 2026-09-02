@@ -46,7 +46,7 @@ const CircularProgress = React.forwardRef<
             cy={size / 2}
           />
           <circle
-            className="stroke-current text-white transition-all duration-500 ease-in-out"
+            className="text-primary stroke-current transition-all duration-500 ease-in-out"
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             style={{ strokeDashoffset: offset }}
@@ -59,7 +59,7 @@ const CircularProgress = React.forwardRef<
         </svg>
         <div className="absolute flex items-center justify-center">
           {Icon ? (
-            <Icon className="text-white" size={size * 0.4} />
+            <Icon className="text-primary" size={size * 0.4} />
           ) : (
             <span className="text-sm font-medium">{percent}%</span>
           )}
