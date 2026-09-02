@@ -19,22 +19,45 @@ export function AuthSync() {
         window.location.pathname + (newSearch ? `?${newSearch}` : '')
       window.history.replaceState({}, '', newUrl)
 
-      window.location.reload()
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
+
       return
     }
 
-    const hasSessionCookie = document.cookie.includes(
-      'better-auth.session_token',
-    )
+    const checkAndFixSession = async () => {
+      const hasSessionCookie = document.cookie.includes(
+        'better-auth.session_token',
+      )
 
-    if (!hasSessionCookie && !window.location.pathname.startsWith('/login')) {
-      const currentUrl = window.location.href
-      const accountsLoginUrl = `https://accounts.sitepow.store/login?callbackUrl=${encodeURIComponent(currentUrl)}`
+      if (
+        !hasSessionCookie &&
+        localStorage.getItem('is_logged_in') === 'true'
+      ) {
+        try {
+          const res = await fetch(
+            'https://accounts.sitepow.store/api/auth/get-session',
+            {
+              credentials: 'include',
+            },
+          )
 
-      if (!document.referrer.includes('accounts.sitepow.store')) {
-        window.location.href = accountsLoginUrl
+          if (res.ok) {
+            const data = await res.json()
+            if (data?.session) {
+              window.location.reload()
+            } else {
+              localStorage.removeItem('is_logged_in')
+            }
+          }
+        } catch (err) {
+          console.error(err)
+        }
       }
     }
+
+    checkAndFixSession()
   }, [])
 
   return null
