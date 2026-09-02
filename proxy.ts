@@ -57,6 +57,7 @@ export default async function middleware(req: NextRequest) {
 
     const requestHeaders = new Headers(req.headers)
     requestHeaders.set('x-forwarded-host', host)
+    requestHeaders.delete('host')
 
     return applyCors(
       req,
