@@ -189,6 +189,7 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         taxId: true,
         slug: true,
         ownerId: true,
+        customDomain: true,
       },
     })
   })

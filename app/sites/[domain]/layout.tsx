@@ -22,7 +22,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound()
   }
 
-  const url = `https://${domain}.sitepow.store`
+  const storeDomain = store.customDomain || domain
+  const url = storeDomain.includes('.')
+    ? `https://${storeDomain}`
+    : `https://${storeDomain}.sitepow.store`
+
   const storeName = store.name
 
   return {
