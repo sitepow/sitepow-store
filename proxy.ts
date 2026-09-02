@@ -11,6 +11,12 @@ export const config = {
 
 const ROOT_DOMAINS = ['sitepow.store', 'lvh.me', 'localhost']
 
+const SESSION_COOKIE_NAMES = [
+  'next-auth.session-token',
+  '__Secure-next-auth.session-token',
+  'session',
+]
+
 export default async function middleware(req: NextRequest) {
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
@@ -18,6 +24,21 @@ export default async function middleware(req: NextRequest) {
     .replace(/^www\./, '')
     .split(':')[0]
     .toLowerCase()
+
+  const isProtectedPath =
+    url.pathname.startsWith('/user') || url.pathname.startsWith('/merchant')
+
+  if (isProtectedPath) {
+    const hasSession = SESSION_COOKIE_NAMES.some((cookieName) =>
+      req.cookies.has(cookieName),
+    )
+
+    if (!hasSession) {
+      const loginUrl = new URL('/login', req.url)
+      loginUrl.searchParams.set('callbackUrl', `${url.pathname}${url.search}`)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
 
   if (url.pathname.startsWith('/api')) {
     return NextResponse.next()
