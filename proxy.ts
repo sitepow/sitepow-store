@@ -11,28 +11,39 @@ export const config = {
 const ROOT_DOMAINS = ['sitepow.store', 'lvh.me', 'localhost']
 const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
 
+function applyCors(req: NextRequest, res: NextResponse) {
+  const origin = req.headers.get('origin')
+
+  if (origin) {
+    res.headers.set('Access-Control-Allow-Origin', origin)
+    res.headers.set('Access-Control-Allow-Credentials', 'true')
+  } else {
+    res.headers.set('Access-Control-Allow-Origin', '*')
+  }
+
+  res.headers.set(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, OPTIONS',
+  )
+  res.headers.set(
+    'Access-Control-Allow-Headers',
+    req.headers.get('access-control-request-headers') ||
+      'Content-Type, Authorization, next-router-prefetch, next-url',
+  )
+
+  return res
+}
+
 export default async function middleware(req: NextRequest) {
   if (req.method === 'OPTIONS') {
-    const requestHeaders =
-      req.headers.get('access-control-request-headers') ||
-      'Content-Type, Authorization, next-router-prefetch, next-url'
-
-    return new NextResponse(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': req.headers.get('origin') || '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': requestHeaders,
-        'Access-Control-Allow-Credentials': 'true',
-      },
-    })
+    return applyCors(req, new NextResponse(null, { status: 200 }))
   }
 
   const url = req.nextUrl
   const host = req.headers.get('host') || ''
 
   if (url.pathname.startsWith('/api')) {
-    return NextResponse.next()
+    return applyCors(req, NextResponse.next())
   }
 
   const hostname = host
@@ -45,27 +56,44 @@ export default async function middleware(req: NextRequest) {
       /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)$/,
     )
   ) {
-    return NextResponse.next()
+    return applyCors(req, NextResponse.next())
   }
-
-  const authHeader = req.headers.get('authorization')
-  const bearerToken = authHeader?.startsWith('Bearer ')
-    ? authHeader.split(' ')[1]
-    : null
 
   const cookieToken =
     req.cookies.get('better-auth.session_token')?.value ||
     req.cookies.get('__Secure-better-auth.session_token')?.value ||
     req.cookies.get('__Host-better-auth.session_token')?.value
 
-  const hasUrlAuthToken = url.searchParams.has('auth_token')
+  const urlAuthToken = url.searchParams.get('auth_token')
+  const sessionToken = cookieToken || urlAuthToken
 
-  const sessionToken = cookieToken || bearerToken
-  const isAuthenticated = !!sessionToken || hasUrlAuthToken
+  if (urlAuthToken && !AUTH_DOMAINS.includes(hostname)) {
+    url.searchParams.delete('auth_token')
+    const redirectUrl = new URL(`${url.pathname}${url.search}`, req.url)
+
+    const response = NextResponse.redirect(redirectUrl)
+
+    const isProd = process.env.NODE_ENV === 'production'
+    const cookieName = isProd
+      ? '__Secure-better-auth.session_token'
+      : 'better-auth.session_token'
+
+    response.cookies.set(cookieName, urlAuthToken, {
+      domain: hostname,
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
+    return applyCors(req, response)
+  }
+
+  const isAuthenticated = !!sessionToken
 
   if (AUTH_DOMAINS.includes(hostname)) {
     if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {
-      return NextResponse.next()
+      return applyCors(req, NextResponse.next())
     }
 
     const defaultTarget = hostname.includes('sitepow.store')
@@ -76,9 +104,9 @@ export default async function middleware(req: NextRequest) {
 
     if (url.pathname === '/') {
       if (isAuthenticated) {
-        return NextResponse.redirect(new URL(callbackUrl))
+        return applyCors(req, NextResponse.redirect(new URL(callbackUrl)))
       }
-      return NextResponse.redirect(new URL('/login', req.url))
+      return applyCors(req, NextResponse.redirect(new URL('/login', req.url)))
     }
 
     if (
@@ -96,7 +124,7 @@ export default async function middleware(req: NextRequest) {
         redirectTarget.searchParams.set('auth_token', sessionToken as string)
       }
 
-      return NextResponse.redirect(redirectTarget)
+      return applyCors(req, NextResponse.redirect(redirectTarget))
     }
 
     if (
@@ -104,18 +132,24 @@ export default async function middleware(req: NextRequest) {
       !url.pathname.startsWith('/login') &&
       !url.pathname.startsWith('/register')
     ) {
-      return NextResponse.redirect(new URL(`/login${url.search}`, req.url))
+      return applyCors(
+        req,
+        NextResponse.redirect(new URL(`/login${url.search}`, req.url)),
+      )
     }
 
-    return NextResponse.rewrite(
-      new URL(`/auth${url.pathname}${url.search}`, req.url),
+    return applyCors(
+      req,
+      NextResponse.rewrite(
+        new URL(`/auth${url.pathname}${url.search}`, req.url),
+      ),
     )
   }
 
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
 
   if (isRootDomain) {
-    return NextResponse.next()
+    return applyCors(req, NextResponse.next())
   }
 
   let storeSlug = ''
@@ -141,7 +175,7 @@ export default async function middleware(req: NextRequest) {
         `${url.pathname}${url.search}`,
         `https://${customDomain}`,
       )
-      return NextResponse.redirect(redirectUrl, { status: 301 })
+      return applyCors(req, NextResponse.redirect(redirectUrl, { status: 301 }))
     }
   } else {
     const cacheKey = `domain:slug:${hostname}`
@@ -183,7 +217,7 @@ export default async function middleware(req: NextRequest) {
     }
 
     if (!storeSlug) {
-      return NextResponse.rewrite(new URL('/404', req.url))
+      return applyCors(req, NextResponse.rewrite(new URL('/404', req.url)))
     }
   }
 
@@ -204,10 +238,13 @@ export default async function middleware(req: NextRequest) {
     const loginUrl = new URL(`${authHost}/login`)
     loginUrl.searchParams.set('callbackUrl', publicCurrentUrl)
 
-    return NextResponse.redirect(loginUrl)
+    return applyCors(req, NextResponse.redirect(loginUrl))
   }
 
-  return NextResponse.rewrite(
-    new URL(`/sites/${storeSlug}${url.pathname}${url.search}`, req.url),
+  return applyCors(
+    req,
+    NextResponse.rewrite(
+      new URL(`/sites/${storeSlug}${url.pathname}${url.search}`, req.url),
+    ),
   )
 }

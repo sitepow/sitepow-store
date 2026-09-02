@@ -3,6 +3,8 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { bearer } from 'better-auth/plugins'
 
+import { redis } from '@/lib/redis'
+
 import { prisma } from './prisma'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -11,6 +13,7 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || 'http://accounts.lvh.me:3000',
 
   plugins: [bearer()],
+
   trustedOrigins: async (request) => {
     const baseOrigins = [
       'http://localhost:3000',
@@ -27,53 +30,38 @@ export const auth = betterAuth({
         : []),
     ]
 
+    const requestOrigin =
+      request?.headers.get('origin') || request?.headers.get('referer')
+
+    if (!requestOrigin) return baseOrigins
+
     try {
-      const stores = await prisma.store.findMany({
-        where: {
-          customDomain: {
-            not: null,
-          },
-        },
-        select: {
-          customDomain: true,
-        },
-      })
+      const originUrl = new URL(requestOrigin)
+      const hostname = originUrl.hostname
+      const cleanOrigin = originUrl.origin
 
-      const customDomainOrigins = stores
-        .map((s) => s.customDomain)
-        .filter((domain): domain is string => Boolean(domain))
-        .flatMap((domain) => {
-          const cleanDomain = domain
-            .replace(/^https?:\/\//, '')
-            .replace(/\/$/, '')
-            .trim()
-          const nakedDomain = cleanDomain.replace(/^www\./, '')
-          return [
-            `https://${nakedDomain}`,
-            `http://${nakedDomain}`,
-            `https://www.${nakedDomain}`,
-            `http://www.${nakedDomain}`,
-          ]
-        })
-
-      const requestOrigin =
-        request?.headers.get('origin') || request?.headers.get('referer')
-
-      let dynamicOrigins: string[] = []
-      if (requestOrigin) {
-        try {
-          dynamicOrigins = [new URL(requestOrigin).origin]
-        } catch (err) {}
+      if (
+        hostname.includes('sitepow.store') ||
+        hostname.includes('lvh.me') ||
+        hostname === 'localhost'
+      ) {
+        return Array.from(new Set([...baseOrigins, cleanOrigin]))
       }
 
-      return Array.from(
-        new Set([...baseOrigins, ...customDomainOrigins, ...dynamicOrigins]),
-      )
+      const cacheKey = `domain:slug:${hostname.replace(/^www\./, '')}`
+      const storeSlug = await redis.get(cacheKey)
+
+      if (storeSlug) {
+        return Array.from(new Set([...baseOrigins, cleanOrigin]))
+      }
+
+      return baseOrigins
     } catch (error) {
       console.error(error)
       return baseOrigins
     }
   },
+
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
