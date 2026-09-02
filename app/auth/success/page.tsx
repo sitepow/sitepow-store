@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { Spinner } from '@/components/ui/spinner'
+
 export default function AuthSuccessPage() {
   useEffect(() => {
     const cookies = document.cookie.split(';')
@@ -22,9 +24,10 @@ export default function AuthSuccessPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-muted-foreground text-sm">
+      <div className="flex flex-col items-center justify-center gap-1.5">
+        <Spinner />
         กำลังเข้าสู่ระบบ กรุณารอสักครู่...
-      </p>
+      </div>
     </div>
   )
 }
