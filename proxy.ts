@@ -12,9 +12,8 @@ export const config = {
 const ROOT_DOMAINS = ['sitepow.store', 'lvh.me', 'localhost']
 
 const SESSION_COOKIE_NAMES = [
-  'next-auth.session-token',
-  '__Secure-next-auth.session-token',
-  'session',
+  'better-auth.session_token',
+  '__Secure-better-auth.session_token',
 ]
 
 export default async function middleware(req: NextRequest) {
