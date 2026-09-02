@@ -109,7 +109,7 @@ export function CategorySection({
             ref={emblaRef}
             className="w-full min-w-0 cursor-grab overflow-hidden p-1 active:cursor-grabbing"
           >
-            <div className="flex items-stretch gap-4 sm:gap-5">
+            <div className="flex items-stretch gap-2.5">
               {isLoading
                 ? Array.from({ length: 4 }).map((_, i) => (
                     <Skeleton
