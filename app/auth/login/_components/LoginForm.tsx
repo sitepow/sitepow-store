@@ -88,11 +88,18 @@ export function LoginForm() {
 
   const handleSSO = async (providerId: string) => {
     try {
+      if (callbackUrl) {
+        document.cookie = `post_login_redirect=${encodeURIComponent(
+          callbackUrl,
+        )}; path=/; max-age=300; secure; samesite=lax`
+      }
+
       await authClient.signIn.social({
         provider: providerId as 'google' | 'line',
-        callbackURL: callbackUrl,
+        callbackURL: '/auth/success',
       })
-    } catch {
+    } catch (err) {
+      console.error('SSO Error:', err)
       toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
   }
