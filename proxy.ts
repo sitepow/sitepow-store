@@ -13,12 +13,16 @@ const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
 
 export default async function middleware(req: NextRequest) {
   if (req.method === 'OPTIONS') {
+    const requestHeaders =
+      req.headers.get('access-control-request-headers') ||
+      'Content-Type, Authorization, next-router-prefetch, next-url'
+
     return new NextResponse(null, {
       status: 200,
       headers: {
         'Access-Control-Allow-Origin': req.headers.get('origin') || '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': requestHeaders,
         'Access-Control-Allow-Credentials': 'true',
       },
     })
