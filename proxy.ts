@@ -13,12 +13,14 @@ const AUTH_DOMAINS = ['accounts.sitepow.store', 'accounts.lvh.me']
 
 function applyCors(req: NextRequest, res: NextResponse) {
   const origin = req.headers.get('origin')
+
   if (origin) {
     res.headers.set('Access-Control-Allow-Origin', origin)
     res.headers.set('Access-Control-Allow-Credentials', 'true')
   } else {
     res.headers.set('Access-Control-Allow-Origin', '*')
   }
+
   res.headers.set(
     'Access-Control-Allow-Methods',
     'GET, POST, PUT, DELETE, OPTIONS',
@@ -28,6 +30,7 @@ function applyCors(req: NextRequest, res: NextResponse) {
     req.headers.get('access-control-request-headers') ||
       'Content-Type, Authorization, next-router-prefetch, next-url',
   )
+
   return res
 }
 
@@ -58,7 +61,8 @@ export default async function middleware(req: NextRequest) {
 
   const cookieToken =
     req.cookies.get('better-auth.session_token')?.value ||
-    req.cookies.get('__Secure-better-auth.session_token')?.value
+    req.cookies.get('__Secure-better-auth.session_token')?.value ||
+    req.cookies.get('__Host-better-auth.session_token')?.value
 
   const urlAuthToken = url.searchParams.get('auth_token')
   const sessionToken = cookieToken || urlAuthToken
@@ -79,7 +83,6 @@ export default async function middleware(req: NextRequest) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
-      domain: undefined,
     })
 
     return applyCors(req, response)
@@ -111,6 +114,7 @@ export default async function middleware(req: NextRequest) {
         url.pathname.startsWith('/register'))
     ) {
       const redirectTarget = new URL(callbackUrl)
+
       const isCustomDomain =
         !redirectTarget.hostname.includes('sitepow.store') &&
         !redirectTarget.hostname.includes('lvh.me')
@@ -142,24 +146,27 @@ export default async function middleware(req: NextRequest) {
   }
 
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
+
   if (isRootDomain) {
     return applyCors(req, NextResponse.next())
   }
 
   let storeSlug = ''
+
   const isSubdomain = ROOT_DOMAINS.some((rootDomain) =>
     hostname.endsWith(`.${rootDomain}`),
   )
 
   if (isSubdomain) {
     storeSlug = hostname.split('.')[0]
+
     const slugToDomainKey = `slug:domain:${storeSlug}`
     let customDomain = ''
 
     try {
       customDomain = (await redis.get(slugToDomainKey)) || ''
     } catch (err) {
-      console.error('Redis error:', err)
+      console.error('Redis error fetching custom domain by slug:', err)
     }
 
     if (customDomain) {
@@ -173,9 +180,11 @@ export default async function middleware(req: NextRequest) {
     const cacheKey = `domain:slug:${hostname}`
     try {
       const cachedSlug = await redis.get(cacheKey)
-      if (cachedSlug) storeSlug = cachedSlug
+      if (cachedSlug) {
+        storeSlug = cachedSlug
+      }
     } catch (err) {
-      console.error('Redis error:', err)
+      console.error('Redis error in middleware:', err)
     }
 
     if (!storeSlug) {
@@ -193,11 +202,12 @@ export default async function middleware(req: NextRequest) {
         if (resolveRes.ok) {
           const data = await resolveRes.json()
           storeSlug = data.slug
+
           if (storeSlug) {
             await Promise.all([
               redis.setex(cacheKey, 3600, storeSlug),
               redis.setex(`slug:domain:${storeSlug}`, 3600, hostname),
-            ]).catch(() => {})
+            ]).catch((err) => console.error('Failed to set redis cache:', err))
           }
         }
       } catch (error) {
@@ -217,11 +227,13 @@ export default async function middleware(req: NextRequest) {
         : 'https://accounts.sitepow.store'
 
     const publicHost = req.headers.get('x-forwarded-host') || host
+
     const isDevEnv =
       publicHost.includes('lvh.me') || publicHost.includes('localhost')
     const proto = isDevEnv ? 'http' : 'https'
 
     const publicCurrentUrl = `${proto}://${publicHost}${url.pathname}${url.search}`
+
     const loginUrl = new URL(`${authHost}/login`)
     loginUrl.searchParams.set('callbackUrl', publicCurrentUrl)
 

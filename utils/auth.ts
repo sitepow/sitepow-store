@@ -18,6 +18,7 @@ export const getClientAuthUrl = ({ path, role, callbackUrl }: AuthUrlProps) => {
 
   const currentOrigin = `${window.location.protocol}//${window.location.host}`
   const defaultCallbackUrl = `${currentOrigin}${pathname}${search}`
+
   const finalCallbackUrl = callbackUrl || defaultCallbackUrl
 
   return `${baseUrl}/${path}?callbackUrl=${encodeURIComponent(finalCallbackUrl)}&role=${role}`

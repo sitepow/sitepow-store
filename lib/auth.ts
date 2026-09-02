@@ -13,7 +13,7 @@ export const auth = betterAuth({
 
   plugins: [bearer()],
 
-  trustedCallbacks: async (url: string) => {
+  trustedCallbacks: async (url: string, request: Request) => {
     try {
       const callbackUrl = new URL(url)
       const hostname = callbackUrl.hostname
@@ -34,16 +34,16 @@ export const auth = betterAuth({
       }
 
       return true
-    } catch {
+    } catch (err) {
       return false
     }
   },
-
   trustedOrigins: async (request) => {
     const baseOrigins = [
       'http://localhost:3000',
       'http://lvh.me:3000',
       'http://*.lvh.me:3000',
+      'http://store.lvh.me:3000',
       'http://accounts.lvh.me:3000',
       ...(isProd
         ? [
@@ -61,24 +61,32 @@ export const auth = betterAuth({
 
     try {
       const originUrl = new URL(requestOrigin)
-      return Array.from(new Set([...baseOrigins, originUrl.origin]))
-    } catch {
+      const cleanOrigin = originUrl.origin
+      return Array.from(new Set([...baseOrigins, cleanOrigin]))
+    } catch (error) {
       return baseOrigins
     }
   },
-
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
-
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ['google', 'line'],
+    },
+  },
   advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: isProd ? '.sitepow.store' : '.lvh.me',
+    },
     defaultCookieAttributes: {
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: isProd,
       httpOnly: true,
     },
   },
-
   emailAndPassword: {
     enabled: true,
     password: {
@@ -90,7 +98,6 @@ export const auth = betterAuth({
       },
     },
   },
-
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -101,7 +108,6 @@ export const auth = betterAuth({
       clientSecret: process.env.AUTH_LINE_SECRET!,
     },
   },
-
   user: {
     additionalFields: {
       role: {
