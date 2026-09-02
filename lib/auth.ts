@@ -4,22 +4,54 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { bearer } from 'better-auth/plugins'
 
 import { prisma } from './prisma'
+import { redis } from './redis'
 
 const isProd = process.env.NODE_ENV === 'production'
+const mainDomain =
+  process.env.BETTER_AUTH_URL ||
+  (isProd ? 'https://sitepow.store' : 'http://localhost:3000')
 
 export const auth = betterAuth({
+  baseURL: mainDomain,
+
   plugins: [bearer()],
 
   trustedOrigins: async (request) => {
+    const baseOrigins = [
+      mainDomain,
+      'http://localhost:3000',
+      'http://lvh.me:3000',
+    ]
+
     const requestOrigin =
       request?.headers.get('origin') || request?.headers.get('referer')
-    if (!requestOrigin) return []
+
+    if (!requestOrigin) {
+      return baseOrigins
+    }
 
     try {
       const originUrl = new URL(requestOrigin)
-      return [originUrl.origin]
+      const hostname = originUrl.hostname.replace(/^www\./, '')
+
+      if (
+        hostname.endsWith('sitepow.store') ||
+        hostname.endsWith('lvh.me') ||
+        hostname === 'localhost'
+      ) {
+        return Array.from(new Set([...baseOrigins, originUrl.origin]))
+      }
+
+      const cacheKey = `domain:slug:${hostname}`
+      const storeSlug = await redis.get(cacheKey)
+
+      if (storeSlug) {
+        return Array.from(new Set([...baseOrigins, originUrl.origin]))
+      }
+
+      return baseOrigins
     } catch (error) {
-      return []
+      return baseOrigins
     }
   },
 
