@@ -9,15 +9,19 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const returnTo = searchParams.get('returnTo') || 'https://sitepow.store'
 
-  let session = await auth.api.getSession({ headers: req.headers })
+  const session = await auth.api.getSession({ headers: req.headers })
 
-  const sessionTokenFromCookie = req.cookies.get(
-    'better-auth.session_token',
-  )?.value
+  let rawToken = session?.session?.token
 
-  const sessionToken = session?.session?.token || sessionTokenFromCookie
+  if (!rawToken) {
+    const rawCookie = req.headers.get('cookie') || ''
+    const match = rawCookie.match(/better-auth\.session_token=([^;]+)/)
+    if (match) {
+      rawToken = decodeURIComponent(match[1])
+    }
+  }
 
-  if (!sessionToken) {
+  if (!rawToken) {
     return NextResponse.redirect(new URL('/login?error=no_session', req.url))
   }
 
@@ -32,7 +36,7 @@ export async function GET(req: NextRequest) {
   }
 
   const ticket = crypto.randomBytes(32).toString('hex')
-  await redis.set(`auth:ticket:${ticket}`, sessionToken, 'EX', 60)
+  await redis.set(`auth:ticket:${ticket}`, rawToken, 'EX', 60)
 
   const claimUrl = new URL(
     `https://${targetUrl.hostname}/api/auth/claim-ticket`,
