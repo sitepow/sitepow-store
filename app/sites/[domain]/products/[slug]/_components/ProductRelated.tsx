@@ -30,7 +30,7 @@ export function ProductRelated() {
       </div>
       <div className="w-full overflow-hidden">
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-2.5">
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton
