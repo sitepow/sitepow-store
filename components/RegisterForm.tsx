@@ -97,11 +97,24 @@ export function RegisterForm() {
     try {
       const currentOrigin =
         typeof window !== 'undefined' ? window.location.origin : ''
-
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
       const returnTo = `${currentOrigin}${targetPath}`
+
+      const isCentralDomain =
+        window.location.hostname.endsWith('sitepow.store') ||
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === 'lvh.me'
+
+      if (!isCentralDomain) {
+        const centralLoginUrl = new URL('https://sitepow.store/login')
+        centralLoginUrl.searchParams.set('sso_provider', providerId)
+        centralLoginUrl.searchParams.set('returnTo', returnTo)
+
+        window.location.href = centralLoginUrl.toString()
+        return
+      }
 
       const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
 

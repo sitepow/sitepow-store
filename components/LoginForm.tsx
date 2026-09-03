@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -43,6 +44,20 @@ export function LoginForm() {
 
   const registerHref = `/register${registerParams.toString() ? `?${registerParams.toString()}` : ''}`
 
+  useEffect(() => {
+    const autoProvider = searchParams.get('sso_provider')
+    const returnTo = searchParams.get('returnTo')
+
+    if (autoProvider && returnTo) {
+      const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
+
+      authClient.signIn.social({
+        provider: autoProvider as 'google' | 'line',
+        callbackURL: centralCallback,
+      })
+    }
+  }, [searchParams])
+
   const {
     register,
     handleSubmit,
@@ -75,11 +90,24 @@ export function LoginForm() {
     try {
       const currentOrigin =
         typeof window !== 'undefined' ? window.location.origin : ''
-
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
       const returnTo = `${currentOrigin}${targetPath}`
+
+      const isCentralDomain =
+        window.location.hostname.endsWith('sitepow.store') ||
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === 'lvh.me'
+
+      if (!isCentralDomain) {
+        const centralLoginUrl = new URL('https://sitepow.store/login')
+        centralLoginUrl.searchParams.set('sso_provider', providerId)
+        centralLoginUrl.searchParams.set('returnTo', returnTo)
+
+        window.location.href = centralLoginUrl.toString()
+        return
+      }
 
       const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
 
