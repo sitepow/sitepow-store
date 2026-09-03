@@ -73,9 +73,19 @@ export function LoginForm() {
 
   const handleSSO = async (providerId: string) => {
     try {
+      const currentOrigin =
+        typeof window !== 'undefined' ? window.location.origin : ''
+
+      const targetPath = callbackUrl.startsWith('/')
+        ? callbackUrl
+        : `/${callbackUrl}`
+      const returnTo = `${currentOrigin}${targetPath}`
+
+      const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
+
       await authClient.signIn.social({
         provider: providerId as 'google' | 'line',
-        callbackURL: callbackUrl,
+        callbackURL: centralCallback,
       })
     } catch (err) {
       console.error(err)

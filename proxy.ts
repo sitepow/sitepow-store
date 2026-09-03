@@ -24,6 +24,18 @@ export default async function middleware(req: NextRequest) {
     .split(':')[0]
     .toLowerCase()
 
+  if (url.pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
+  if (
+    url.pathname.match(
+      /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)$/,
+    )
+  ) {
+    return NextResponse.next()
+  }
+
   const isProtectedPath =
     url.pathname.startsWith('/user') || url.pathname.startsWith('/merchant')
 
@@ -37,18 +49,6 @@ export default async function middleware(req: NextRequest) {
       loginUrl.searchParams.set('callbackUrl', `${url.pathname}${url.search}`)
       return NextResponse.redirect(loginUrl)
     }
-  }
-
-  if (url.pathname.startsWith('/api')) {
-    return NextResponse.next()
-  }
-
-  if (
-    url.pathname.match(
-      /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|webmanifest)$/,
-    )
-  ) {
-    return NextResponse.next()
   }
 
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
