@@ -115,10 +115,14 @@ export function LoginForm() {
 
       const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
 
-      await authClient.signIn.social({
-        provider: providerId as 'google' | 'line',
-        callbackURL: centralCallback,
-      })
+      const oauthUrl = new URL(
+        '/api/auth/sign-in/social',
+        'https://sitepow.store',
+      )
+      oauthUrl.searchParams.set('provider', providerId)
+      oauthUrl.searchParams.set('callbackURL', centralCallback)
+
+      window.location.href = oauthUrl.toString()
     } catch (err) {
       console.error(err)
       toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
