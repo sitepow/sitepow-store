@@ -88,9 +88,6 @@ export function RegisterForm() {
 
       window.location.href = callbackUrl
     },
-    onError: () => {
-      toast.error('เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง')
-    },
   })
 
   const handleSSO = async (providerId: string) => {
@@ -100,6 +97,7 @@ export function RegisterForm() {
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
+
       const returnTo = `${currentOrigin}${targetPath}`
 
       const isCentralDomain =
@@ -111,6 +109,9 @@ export function RegisterForm() {
         const centralLoginUrl = new URL('https://sitepow.store/login')
         centralLoginUrl.searchParams.set('sso_provider', providerId)
         centralLoginUrl.searchParams.set('returnTo', returnTo)
+        if (roleParam) {
+          centralLoginUrl.searchParams.set('role', roleParam)
+        }
 
         window.location.href = centralLoginUrl.toString()
         return

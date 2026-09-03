@@ -6,22 +6,28 @@ import { redis } from '@/lib/redis'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const returnTo = searchParams.get('returnTo') || 'https://sitepow.store'
+  const returnTo = searchParams.get('returnTo')
+
+  if (!returnTo) {
+    return NextResponse.redirect(
+      new URL('/login?error=missing_return', req.url),
+    )
+  }
 
   const rawCookieHeader = req.headers.get('cookie') || ''
-
   const match = rawCookieHeader.match(/better-auth\.session_token=([^;]+)/)
 
   if (!match) {
-    return NextResponse.redirect(new URL('/login?error=no_session', req.url))
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('redirectTo', returnTo)
+    return NextResponse.redirect(loginUrl)
   }
 
   const fullCookieValue = decodeURIComponent(match[1])
-
   const targetUrl = new URL(returnTo)
 
   if (
-    targetUrl.hostname.endsWith('sitepow.store') ||
+    targetUrl.hostname === 'sitepow.store' ||
     targetUrl.hostname === 'localhost' ||
     targetUrl.hostname === 'lvh.me'
   ) {
