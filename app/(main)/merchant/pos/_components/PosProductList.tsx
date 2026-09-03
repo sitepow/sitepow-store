@@ -123,7 +123,7 @@ export function PosProductList({
             description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
           />
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => {
               const totalStock = getProductTotalStock(product)
               const isItemReseller = product.isReseller ?? isReseller

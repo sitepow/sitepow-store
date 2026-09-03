@@ -62,10 +62,6 @@ export function DigitalPriceDisplay({
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-40"
-        style={{
-          backgroundImage: `radial-gradient(currentColor 1px, transparent 0)`,
-          backgroundSize: '8px 8px',
-        }}
       />
 
       <div className="relative z-10 flex flex-col justify-between gap-1">
@@ -82,12 +78,6 @@ export function DigitalPriceDisplay({
               sizeStyles.text,
             )}
           >
-            <div
-              aria-hidden="true"
-              className="text-muted absolute top-0 right-0 z-0 font-bold select-none"
-            >
-              888,888,888.88
-            </div>
             <span className="text-primary relative z-10 font-bold drop-shadow-xs">
               {formattedValue}
             </span>
