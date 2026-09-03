@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
 
   if (
     targetUrl.hostname.endsWith('sitepow.store') ||
-    targetUrl.hostname === 'localhost'
+    targetUrl.hostname === 'localhost' ||
+    targetUrl.hostname === 'lvh.me'
   ) {
     return NextResponse.redirect(returnTo)
   }
@@ -26,9 +27,11 @@ export async function GET(req: NextRequest) {
   const ticket = crypto.randomBytes(32).toString('hex')
   await redis.set(`auth:ticket:${ticket}`, session.session.token, 'EX', 30)
 
-  targetUrl.pathname = '/api/auth/claim-ticket'
-  targetUrl.searchParams.set('ticket', ticket)
-  targetUrl.searchParams.set('redirect', returnTo)
+  const claimUrl = new URL(
+    `https://${targetUrl.hostname}/api/auth/claim-ticket`,
+  )
+  claimUrl.searchParams.set('ticket', ticket)
+  claimUrl.searchParams.set('redirect', returnTo)
 
-  return NextResponse.redirect(targetUrl.toString())
+  return NextResponse.redirect(claimUrl.toString())
 }
