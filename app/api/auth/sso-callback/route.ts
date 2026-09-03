@@ -33,11 +33,15 @@ export async function GET(req: NextRequest) {
   const fullCookieValue = decodeURIComponent(match[1])
   const targetUrl = new URL(returnTo)
 
-  if (
+  const isSitepowDomain =
     targetUrl.hostname === 'sitepow.store' ||
+    targetUrl.hostname.endsWith('.sitepow.store') ||
     targetUrl.hostname === 'localhost' ||
-    targetUrl.hostname === 'lvh.me'
-  ) {
+    targetUrl.hostname.endsWith('.localhost') ||
+    targetUrl.hostname === 'lvh.me' ||
+    targetUrl.hostname.endsWith('.lvh.me')
+
+  if (isSitepowDomain) {
     return NextResponse.redirect(returnTo)
   }
 

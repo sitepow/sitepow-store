@@ -73,6 +73,7 @@ export const auth = betterAuth({
       secure: isProd,
       httpOnly: true,
       path: '/',
+      domain: isProd ? '.sitepow.store' : undefined,
     },
   },
 
