@@ -9,8 +9,17 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const returnTo = searchParams.get('returnTo') || 'https://sitepow.store'
 
-  const session = await auth.api.getSession({ headers: req.headers })
-  if (!session) {
+  let session = await auth.api.getSession({ headers: req.headers })
+
+  const isProd = process.env.NODE_ENV === 'production'
+  const cookieName = isProd
+    ? '__Secure-better-auth.session_token'
+    : 'better-auth.session_token'
+  const sessionTokenFromCookie = req.cookies.get(cookieName)?.value
+
+  const sessionToken = session?.session?.token || sessionTokenFromCookie
+
+  if (!sessionToken) {
     return NextResponse.redirect(new URL('/login?error=no_session', req.url))
   }
 
@@ -25,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 
   const ticket = crypto.randomBytes(32).toString('hex')
-  await redis.set(`auth:ticket:${ticket}`, session.session.token, 'EX', 30)
+  await redis.set(`auth:ticket:${ticket}`, sessionToken, 'EX', 60)
 
   const claimUrl = new URL(
     `https://${targetUrl.hostname}/api/auth/claim-ticket`,
