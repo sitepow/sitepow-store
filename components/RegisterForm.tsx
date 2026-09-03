@@ -97,7 +97,6 @@ export function RegisterForm() {
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
-
       const returnTo = `${currentOrigin}${targetPath}`
 
       const isCentralDomain =
@@ -106,14 +105,13 @@ export function RegisterForm() {
         window.location.hostname === 'lvh.me'
 
       if (!isCentralDomain) {
-        const centralLoginUrl = new URL('https://sitepow.store/login')
-        centralLoginUrl.searchParams.set('sso_provider', providerId)
-        centralLoginUrl.searchParams.set('returnTo', returnTo)
-        if (roleParam) {
-          centralLoginUrl.searchParams.set('role', roleParam)
-        }
+        const centralSsoUrl = new URL(
+          'https://sitepow.store/api/auth/sso-callback',
+        )
+        centralSsoUrl.searchParams.set('returnTo', returnTo)
+        centralSsoUrl.searchParams.set('provider', providerId)
 
-        window.location.href = centralLoginUrl.toString()
+        window.location.href = centralSsoUrl.toString()
         return
       }
 

@@ -7,6 +7,7 @@ import { redis } from '@/lib/redis'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const returnTo = searchParams.get('returnTo')
+  const provider = searchParams.get('provider')
 
   if (!returnTo) {
     return NextResponse.redirect(
@@ -19,7 +20,12 @@ export async function GET(req: NextRequest) {
 
   if (!match) {
     const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('redirectTo', returnTo)
+    loginUrl.searchParams.set('returnTo', returnTo)
+
+    if (provider) {
+      loginUrl.searchParams.set('sso_provider', provider)
+    }
+
     return NextResponse.redirect(loginUrl)
   }
 

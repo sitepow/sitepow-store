@@ -93,7 +93,6 @@ export function LoginForm() {
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
-
       const returnTo = `${currentOrigin}${targetPath}`
 
       const isCentralDomain =
@@ -106,12 +105,9 @@ export function LoginForm() {
           'https://sitepow.store/api/auth/sso-callback',
         )
         centralSsoUrl.searchParams.set('returnTo', returnTo)
+        centralSsoUrl.searchParams.set('provider', providerId)
 
-        const centralLoginUrl = new URL('https://sitepow.store/login')
-        centralLoginUrl.searchParams.set('sso_provider', providerId)
-        centralLoginUrl.searchParams.set('returnTo', returnTo)
-
-        window.location.href = centralLoginUrl.toString()
+        window.location.href = centralSsoUrl.toString()
         return
       }
 
