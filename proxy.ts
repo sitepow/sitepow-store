@@ -89,7 +89,14 @@ export default async function middleware(req: NextRequest) {
     }
   }
 
+  const requestHeaders = new Headers(req.headers)
+
   return NextResponse.rewrite(
     new URL(`/sites/${storeSlug}${url.pathname}${url.search}`, req.url),
+    {
+      request: {
+        headers: requestHeaders,
+      },
+    },
   )
 }

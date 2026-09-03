@@ -23,11 +23,8 @@ export async function GET(req: NextRequest) {
   const response = NextResponse.redirect(new URL(redirectUrl, req.url))
 
   const isProd = process.env.NODE_ENV === 'production'
-  const cookieName = isProd
-    ? '__Secure-better-auth.session_token'
-    : 'better-auth.session_token'
 
-  response.cookies.set(cookieName, sessionToken, {
+  response.cookies.set('better-auth.session_token', sessionToken, {
     httpOnly: true,
     secure: isProd,
     sameSite: 'lax',
