@@ -51,14 +51,10 @@ export function LoginForm() {
     if (autoProvider && returnTo) {
       const centralCallback = `https://sitepow.store/api/auth/sso-callback?returnTo=${encodeURIComponent(returnTo)}`
 
-      const oauthUrl = new URL(
-        `/api/auth/sign-in/social`,
-        'https://sitepow.store',
-      )
-      oauthUrl.searchParams.set('provider', autoProvider)
-      oauthUrl.searchParams.set('callbackURL', centralCallback)
-
-      window.location.href = oauthUrl.toString()
+      authClient.signIn.social({
+        provider: autoProvider as 'google' | 'line',
+        callbackURL: centralCallback,
+      })
     }
   }, [searchParams])
 
