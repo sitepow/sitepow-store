@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { INVENTORY_FEATURES } from '@/constants/inventory'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function InventorySection() {
+  const t = useTranslations('home.inventory')
+
+  const featuresList = INVENTORY_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function InventorySection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="บริหารสต็อกและโอนย้ายสินค้าระหว่างสาขาอย่างสมบูรณ์แบบ"
-          description="จัดการคลังสินค้าแบบ Multi-Branch เช็กสต็อกรายสาขา โอนย้ายสินค้า และบันทึกการปรับสต็อกเมื่อชำรุดหรือหมดอายุได้อย่างมีประสิทธิภาพ"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={INVENTORY_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

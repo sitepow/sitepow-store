@@ -1,1 +1,630 @@
-{}
+{
+  "hero": {
+    "title": "Turn Complex Online Selling into Simplicity",
+    "subtitlePrefix": "With an all-in-one store management platform from",
+    "pricingBtn": "View Pricing & Packages",
+    "downloadPosBtn": "Download POS (Coming Soon)",
+    "registerBtn": "Start Selling for Free",
+    "manageStoreBtn": "Manage Your Store"
+  },
+  "features": {
+    "title": "Receive & Manage All Orders in One Place: Cut Redundancy, Workload & Paperwork",
+    "description": "Accept orders from all sales channels with an intuitive store management system, freeing you to focus entirely on driving sales.",
+    "items": [
+      {
+        "title": "Smart AI Product Listing",
+        "description": "Just upload an image, and AI crafts compelling product titles and descriptions to close sales instantly <hilight>without typing each one manually.</hilight>"
+      },
+      {
+        "title": "0% GP Commission-Free Selling",
+        "description": "Keep 100% of your hard-earned profits. <hilight>No per-item commission cuts like on marketplaces, helping you earn significantly more.</hilight>"
+      },
+      {
+        "title": "Intelligent Inventory Control",
+        "description": "Accurately oversee stock across all branches in one place, complete with automatic deductions and low-stock alerts <hilight>so you can plan ahead.</hilight>"
+      },
+      {
+        "title": "Professional Online Storefront",
+        "description": "Create a trustworthy custom store with a smart cart that automatically calculates prices and shipping fees <hilight>to close sales effortlessly.</hilight>"
+      },
+      {
+        "title": "Centralized Order Management",
+        "description": "Consolidate orders from every channel in one place. Update statuses rapidly <hilight>so you prepare and dispatch packages on time without missing a single order.</hilight>"
+      },
+      {
+        "title": "In-Depth Sales Analytics",
+        "description": "Review revenue trends and top-selling products through a clear dashboard <hilight>that gives you actionable business visibility in every situation.</hilight>"
+      },
+      {
+        "title": "Flexible & Direct Payouts",
+        "description": "Customers transfer directly into your account for immediate cash flow with no payout delays, <hilight>coupled with automatic slip verification that speeds up workflows.</hilight>"
+      },
+      {
+        "title": "Membership & CRM System",
+        "description": "Nurture loyal customers with reward points and tailored promotions <hilight>that drive repeat purchases and build sustainable revenue.</hilight>"
+      },
+      {
+        "title": "Sales-Boosting Coupons & Promos",
+        "description": "Create discount codes, flash sales, or Buy-1-Get-1 deals as you wish <hilight>to encourage faster customer purchasing decisions.</hilight>"
+      },
+      {
+        "title": "Rapid Product Import & Export",
+        "description": "Migrate large product catalogs from Lazada or Shopee quickly via CSV/JSON files, <hilight>launching or updating your store in minutes.</hilight>"
+      },
+      {
+        "title": "Complete Logistics Management",
+        "description": "Manage shipment statuses professionally, enter tracking numbers, and send automated notifications directly to customers <hilight>reducing status inquiries.</hilight>"
+      },
+      {
+        "title": "Shipping Label Printing System",
+        "description": "Generate shipping labels with complete order details instantly. Compatible with thermal printers <hilight>to eliminate handwriting and fulfillment errors.</hilight>"
+      }
+    ]
+  },
+  "productTypes": {
+    "title": "Supports Every Business Model, Whatever You Sell",
+    "description": "Designed for maximum flexibility—supporting both physical store inventory and all digital product formats without switching between different systems.",
+    "items": [
+      {
+        "title": "Physical Goods",
+        "description": "Manage tangible inventory with <hilight>accurate multi-branch warehouse tracking and standard shipping workflows you fully control.</hilight>"
+      },
+      {
+        "title": "Digital Items & Keys",
+        "description": "Sell top-up cards, game keys, or software licenses with <hilight>automatic randomized key dispatch and instant usage status verification.</hilight>"
+      },
+      {
+        "title": "Digital Download Links",
+        "description": "Deliver digital content via private download links with heightened security through <hilight>granular access control for files and courses.</hilight>"
+      },
+      {
+        "title": "Digital Services & Top-ups",
+        "description": "Connect directly to your backend logic via Webhooks, ideal for <hilight>commissioned work, ranking boosts, or custom API-driven services.</hilight>"
+      }
+    ]
+  },
+  "pos": {
+    "title": "Effortless Counter Sales with Built-in POS",
+    "description": "Whether you operate a physical storefront or a pickup point, our POS connects directly to your online inventory, automatically deducting stock and eliminating count discrepancies.",
+    "items": [
+      {
+        "title": "Point-of-Sale Support",
+        "description": "Turn your device into a smart cashier system supporting barcode scanning and <hilight>real-time warehouse stock deductions on every sale.</hilight>"
+      },
+      {
+        "title": "Comprehensive Payment Options",
+        "description": "Accept both cash and QR code transfers with <hilight>automated payment slip verification to eliminate human error and fraud.</hilight>"
+      },
+      {
+        "title": "Smart Sales Insights",
+        "description": "Access real-time daily sales summaries and <hilight>best-selling product analytics to optimize your purchasing and inventory decisions.</hilight>"
+      },
+      {
+        "title": "Instant Receipt Printing",
+        "description": "Connect seamlessly with thermal printers to issue professional customer receipts on the spot, <hilight>enhancing your store's credibility.</hilight>"
+      },
+      {
+        "title": "Customer Profile Tracking",
+        "description": "Log customer purchase history at checkout to build loyalty programs that <hilight>retain regulars and encourage recurring visits.</hilight>"
+      }
+    ]
+  },
+  "inventory": {
+    "title": "Seamless Inventory Control & Inter-Branch Stock Transfers",
+    "description": "Multi-branch warehouse management: check branch inventory, transfer items seamlessly, and log stock adjustments for damaged or expired goods.",
+    "items": [
+      {
+        "title": "Branch-Specific Inventory Management",
+        "description": "Check item stock and set minimum stock levels (Min Stock) per branch <hilight>to prevent stockouts across all retail locations.</hilight>"
+      },
+      {
+        "title": "Inter-Branch Stock Transfer",
+        "description": "Submit transfer requests and record movements from one branch to another, <hilight>tracking inventory in transit in real time.</hilight>"
+      },
+      {
+        "title": "Reason-Based Stock Adjustments",
+        "description": "Record inventory adjustments with explicit reasons like Damaged, Lost, or Expired <hilight>to pinpoint loss and control costs.</hilight>"
+      },
+      {
+        "title": "Low Stock Alerts",
+        "description": "Receive automated notifications when stock drops to threshold levels, <hilight>helping you plan replenishment before items run out.</hilight>"
+      },
+      {
+        "title": "Multi-Branch Architecture",
+        "description": "Manage branch addresses, operating hours, and warehouse-POS associations <hilight>for frictionless multi-location retail.</hilight>"
+      }
+    ]
+  },
+  "permissions": {
+    "title": "Granular & Secure Employee Permission Management",
+    "description": "Decisive access control for your team: segregate permissions by role and branch for safer, organized, and compliant collaboration.",
+    "items": [
+      {
+        "title": "Granular Permissions",
+        "description": "Precisely control access by domain and action: <hilight>independently configure read, create, edit, delete, approve, or cancel rights.</hilight>"
+      },
+      {
+        "title": "Role & Branch Allocation",
+        "description": "Assign staff to specific branches they are responsible for, <hilight>restricting data visibility to prevent sensitive leaks.</hilight>"
+      },
+      {
+        "title": "Pre-Configured Default Roles",
+        "description": "Ready-to-use roles such as Owner, Manager, Cashier, Auditor, and Support <hilight>for immediate and frictionless onboarding.</hilight>"
+      },
+      {
+        "title": "Custom Individual Permissions",
+        "description": "Flexibly grant or restrict specific rights per employee <hilight>to fit diverse organizational workflows.</hilight>"
+      },
+      {
+        "title": "Comprehensive Activity Logs",
+        "description": "Audit every administrative action with timestamps and user identifiers <hilight>ensuring full transparency across the board.</hilight>"
+      }
+    ]
+  },
+  "expenses": {
+    "title": "Track and Manage Store Expenses All in One System",
+    "description": "Eliminate bookkeeping chaos: control every store expense, categorize effortlessly, attach receipts, and instantly calculate true net profit.",
+    "items": [
+      {
+        "title": "Clear Expense Categorization",
+        "description": "Categorize expenses into rent, utilities, payroll, or marketing <hilight>for precise operational cost analysis.</hilight>"
+      },
+      {
+        "title": "Receipt & Slip Attachments",
+        "description": "Upload photos of receipts and proof of payment directly to the system <hilight>for transparent and hassle-free audits.</hilight>"
+      },
+      {
+        "title": "Branch-Specific Expenses",
+        "description": "Attribute costs to the exact branch where they occurred, <hilight>ensuring accurate net profit calculations per location.</hilight>"
+      },
+      {
+        "title": "Real-Time Income & Expense Reports",
+        "description": "Correlate sales and overhead instantaneously <hilight>to see true net profit and make confident financial decisions.</hilight>"
+      },
+      {
+        "title": "Detailed Notes & Date Tracking",
+        "description": "Record transaction dates alongside explanatory notes <hilight>to monitor long-term spending patterns.</hilight>"
+      }
+    ]
+  },
+  "reseller": {
+    "title": "Scale Your Business with Built-in Reseller & B2B Tools",
+    "description": "Professionally manage reseller networks and wholesale pricing: digital agreements, custom tier rates, and centralized bulk inventory deduction.",
+    "items": [
+      {
+        "title": "Reseller Agreements",
+        "description": "Form agreements and approve reseller authorizations for both internal platform merchants and external agents <hilight>in a unified workflow.</hilight>"
+      },
+      {
+        "title": "Custom Wholesale Pricing",
+        "description": "Set tier discounts or specialized wholesale prices down to the variant level <hilight>to match multi-tier agent structures.</hilight>"
+      },
+      {
+        "title": "Multi-Type Agent Support",
+        "description": "Accommodate both connected internal stores and external agency orders, <hilight>expanding your distribution channels without limits.</hilight>"
+      },
+      {
+        "title": "Wholesale Order Tracking",
+        "description": "Link reseller purchase orders to your warehouse stock, <hilight>accurately tracking margins and aggregate agent volume.</hilight>"
+      },
+      {
+        "title": "Contract Lifecycle Management",
+        "description": "Govern contract states (Pending, Active, Terminated) with start dates <hilight>for clear, compliant trade partnerships.</hilight>"
+      }
+    ]
+  },
+  "customerLoyalty": {
+    "title": "Retain Customers with Loyalty Points & Turn Reviews into Revenue",
+    "description": "Build a loyal customer base with memberships, reward points, dynamic coupons, and smart reward incentives for photo/video product reviews.",
+    "items": [
+      {
+        "title": "Reward Points on Purchases",
+        "description": "Customers earn points on every order to redeem as discounts on their next purchase, <hilight>effectively driving repeat conversions.</hilight>"
+      },
+      {
+        "title": "Review-for-Points Incentives",
+        "description": "Award bonus points when customers submit detailed reviews with photos or videos, <hilight>boosting authentic social proof.</hilight>"
+      },
+      {
+        "title": "Dynamic Promo Codes & Coupons",
+        "description": "Issue percentage or fixed-amount discount codes, enforce minimum spends, and set per-user usage limits flexibly."
+      },
+      {
+        "title": "Customer Segmentation & Merchant Notes",
+        "description": "Track lifetime spend, apply custom customer tags, and log personal merchant notes to deliver attentive VIP care."
+      },
+      {
+        "title": "Branch-Specific Promotions",
+        "description": "Tie reward coupons and points campaigns to specific branches <hilight>to drive targeted local foot traffic.</hilight>"
+      }
+    ]
+  },
+  "storeCustomization": {
+    "title": "Build a Storefront in Your Unique Style",
+    "description": "Every square inch of your storefront reflects your brand identity—customize colors, banners, videos, and layouts to stand out from the crowd.",
+    "items": [
+      {
+        "title": "Custom Brand Colors",
+        "description": "Establish a distinctive brand presence by matching store color schemes to your identity, <hilight>creating immediate customer recognition.</hilight>"
+      },
+      {
+        "title": "Image & Video Media Support",
+        "description": "Showcase high-resolution promotional imagery and videos up to 10MB per file <hilight>to convey product highlights vividly.</hilight>"
+      },
+      {
+        "title": "Header & Navbar Customization",
+        "description": "Freely adjust navigation bars and hero layouts, giving your digital store <hilight>a professional, intuitive layout.</hilight>"
+      },
+      {
+        "title": "Category Image Showcases",
+        "description": "Assign vibrant cover photos to each product collection to guide visitors and <hilight>enhance the aesthetic appeal of your store.</hilight>"
+      }
+    ]
+  },
+  "payments": {
+    "title": "Fast Payouts Directly to Your Account via QR PromptPay & Bank Transfer",
+    "description": "Start selling immediately with zero waiting! Funds go straight to your bank account with no middleman, backed by automated slip verification.",
+    "items": [
+      {
+        "title": "Direct Bank Account Deposits",
+        "description": "Ultimate financial freedom! Customer payments <hilight>arrive in your account immediately without marketplace payout holding periods.</hilight>"
+      },
+      {
+        "title": "Automated Slip Verification",
+        "description": "Verify bank transfer QR slips instantly. <hilight>Detect forged slips and mismatching amounts so you can fulfill orders even while asleep.</hilight>"
+      },
+      {
+        "title": "PromptPay & All Thai Banks",
+        "description": "Generate exact payment QR codes for effortless mobile banking checkout, <hilight>accelerating order completion.</hilight>"
+      },
+      {
+        "title": "International Credit Card Support",
+        "description": "As your business expands, connect Stripe to <hilight>accept major credit/debit cards and installment plans</hilight> (subject to provider verification)."
+      },
+      {
+        "title": "0% GP Commission Cost Savings",
+        "description": "Keep full profit margins because <hilight>we never take a cut of your sales revenue,</hilight> ensuring healthier operating cash flow."
+      },
+      {
+        "title": "Agile Business Cash Flow",
+        "description": "With direct bank receipts, you can <hilight>reinvest funds or purchase inventory immediately without waiting for billing cycles.</hilight>"
+      }
+    ]
+  },
+  "aiVerification": {
+    "title": "Automate with AI: Fraud-Proof Slip Check & 24/7 Chat Assistant",
+    "description": "Cut admin workload and maximize security with AI-driven slip verification that detects fraud, plus an AI chatbot assisting customers around the clock.",
+    "items": [
+      {
+        "title": "AI Payment Slip Verification",
+        "description": "Verify slip validity, transferred amounts, and recipient details the moment customers upload, <hilight>blocking forged and duplicate slips 100%.</hilight>"
+      },
+      {
+        "title": "Slip Verification Audit History",
+        "description": "Retain a comprehensive log of every scanned slip and detect repeat fraudsters to trigger alerts or ban bad actors."
+      },
+      {
+        "title": "24/7 AI Customer Assistant",
+        "description": "Enable AI assistants inside chat threads to answer queries, supply product specs, and assist buyers 24/7 <hilight>closing sales while you are away.</hilight>"
+      },
+      {
+        "title": "Unified Conversation Inbox",
+        "description": "Centralize all buyer messages—both support inquiries and storefront purchase queries—so your team can manage threads efficiently."
+      },
+      {
+        "title": "Real-Time Fast Processing",
+        "description": "Confirm balances and respond to shoppers within seconds, <hilight>massively reducing administrative response delays.</hilight>"
+      }
+    ]
+  },
+  "chat": {
+    "title": "Seamless Customer Engagement with Built-in Live Chat",
+    "description": "Manage customer conversations for sales and post-purchase support. Collaborate with team members and let AI assist customers 24/7.",
+    "items": [
+      {
+        "title": "Centralized Chat Inbox",
+        "description": "Consolidate shopper communications across sales and post-purchase care in one place, <hilight>so your team never misses an inquiry.</hilight>"
+      },
+      {
+        "title": "Clear Conversation Categorization",
+        "description": "Segment chats by intent (Store vs. Support) to route cases accurately, <hilight>improving customer issue resolution speed.</hilight>"
+      },
+      {
+        "title": "24/7 AI Smart Responder",
+        "description": "Toggle AI assistants per chat to answer inquiries, share product catalogs, <hilight>and secure sales around the clock.</hilight>"
+      },
+      {
+        "title": "Multi-Agent Team Collaboration",
+        "description": "Assign multiple staff members to join the same thread, <hilight>backed by per-agent unread message tracking.</hilight>"
+      },
+      {
+        "title": "Rich Media & System Messages",
+        "description": "Seamlessly send product photos, transfer slips, and automated order alerts <hilight>for clear, professional buyer communication.</hilight>"
+      }
+    ]
+  },
+  "logistics": {
+    "title": "Effortless Logistics with End-to-End Automation",
+    "description": "Connect with leading courier partners: manage orders, calculate shipping rates, and notify tracking numbers in one place. Save over 50% of packing time.",
+    "items": [
+      {
+        "title": "Big Data Shipping Matrix",
+        "description": "Apply standard shipping rate matrices calculated from real-world regional delivery data <hilight>so you price shipping fairly without absorbing losses.</hilight>"
+      },
+      {
+        "title": "Flexible Shipping Rules",
+        "description": "Configure rates by weight, piece count, or offer free delivery on qualifying order amounts <hilight>to accurately manage logistics costs.</hilight>"
+      },
+      {
+        "title": "All Major Couriers Supported",
+        "description": "Whether shipping with Flash, J&T, Thailand Post, or local couriers, <hilight>manage all fulfillments inside a single platform.</hilight>"
+      },
+      {
+        "title": "Standard Shipping Label Printing",
+        "description": "Generate clean labels with recipient addresses and embedded packing lists <hilight>for rapid, error-free packaging.</hilight>"
+      },
+      {
+        "title": "Tracking Number Management",
+        "description": "Publish tracking numbers to customer order portals automatically, <hilight>complete with historical dispatch tracking logs.</hilight>"
+      },
+      {
+        "title": "Shipment Status Workflow",
+        "description": "Transition orders from \"Preparing\" to \"Shipped\" smoothly, <hilight>giving your entire fulfillment team complete operational clarity.</hilight>"
+      },
+      {
+        "title": "Customer Parcel Tracking Portal",
+        "description": "Customers check parcel tracking directly on your store's website, <hilight>drastically reducing status inquiry messages.</hilight>"
+      }
+    ]
+  },
+  "infrastructure": {
+    "title": "Enterprise-Grade Infrastructure You Can Rely On",
+    "description": "Sitepow runs on an infrastructure engineered specifically for commerce: powered by high-performance AMD EPYC™ CPUs and modern cloud-native architecture, ensuring your store is always ready for high traffic.",
+    "items": [
+      {
+        "title": "Redis Distributed Caching",
+        "description": "Redis caches frequently queried data to offload primary database reads, <hilight>delivering near-instant page loads for your visitors.</hilight>"
+      },
+      {
+        "title": "AMD EPYC™ Enterprise Processors",
+        "description": "Every store is powered by enterprise-grade AMD EPYC™ CPUs hosted at top-tier Thai data center ReadyIDC, <hilight>reliably handling heavy traffic surges.</hilight>"
+      },
+      {
+        "title": "Next.js App Router",
+        "description": "Constructed with the modern Next.js App Router featuring Server Components and Streaming <hilight>for faster load times than competitors.</hilight>"
+      },
+      {
+        "title": "PostgreSQL & Prisma ORM",
+        "description": "Core data is secured within PostgreSQL via Prisma ORM supporting complex transactions <hilight>for 100% integrity of products and orders.</hilight>"
+      },
+      {
+        "title": "Multi-Tenant Architecture",
+        "description": "Each store is partitioned into a secure, distinct namespace, <hilight>concurrently powering tens of thousands of storefronts.</hilight>"
+      },
+      {
+        "title": "Enterprise SSL & Security",
+        "description": "Automated SSL certificates encrypt all communications end-to-end, <hilight>shielding customer information against unauthorized interception.</hilight>"
+      },
+      {
+        "title": "Domestic Data Center in Thailand",
+        "description": "Local servers offer sub-10ms latency for domestic shoppers, <hilight>ensuring snappy storefront experiences across all devices.</hilight>"
+      }
+    ]
+  },
+  "securityTrust": {
+    "title": "Safer and More Reliable: Never Risk Your Business with Pirated Software",
+    "description": "We eliminate the risks of cracked plugins and vulnerable software with a secure, verified cloud SaaS built to protect your business.",
+    "items": [
+      {
+        "title": "Cloud-Native Protection",
+        "description": "Your business data lives in encrypted servers adhering to <hilight>bank-level security standards, completely preventing unauthorized access.</hilight>"
+      },
+      {
+        "title": "Real-Time Vulnerability Patches",
+        "description": "No manual patching required—our platform rolls out security updates <hilight>continuously, closing attack vectors before exploits occur.</hilight>"
+      },
+      {
+        "title": "Immune to Cracked Code Exploits",
+        "description": "With pure SaaS architecture, all core business logic is safeguarded server-side, <hilight>making unauthorized tampering or reverse engineering impossible.</hilight>"
+      },
+      {
+        "title": "Customer Privacy Protection",
+        "description": "We enforce rigorous privacy protocols and transparent audit logs, <hilight>free from spyware or backdoors prevalent in pirated tools.</hilight>"
+      },
+      {
+        "title": "Automated Redundant Backups",
+        "description": "Never fear data loss—instant backups capture your business records as orders transition, <hilight>storing redundant copies across multiple data centers.</hilight>"
+      },
+      {
+        "title": "Individual Access Governance",
+        "description": "Grant granular staff permissions on what records they can view or modify <hilight>all managed centrally from your control panel.</hilight>"
+      },
+      {
+        "title": "Proactive Threat Detection",
+        "description": "Automated behavioral monitors detect anomalous activity: <hilight>suspicious login attempts or abnormal queries prompt instant security alerts.</hilight>"
+      },
+      {
+        "title": "Consistent Cloud Performance",
+        "description": "Never worry about hardware limitations—cloud processing ensures <hilight>your store runs at peak responsiveness from any device.</hilight>"
+      }
+    ]
+  },
+  "comparison": {
+    "titlePrefix": "Comparison Table:",
+    "titleHilight": "Selling on Online Platforms",
+    "description": "See exactly how much profit remains after fees and compare the real realities of selling across platforms.",
+    "columns": [
+      "Comparison Metric",
+      "Marketplaces",
+      "Other Store SaaS",
+      "Sitepow Store"
+    ],
+    "categories": [
+      {
+        "name": "Costs & Financials",
+        "features": [
+          {
+            "label": "Commission Fees (GP / Transaction)",
+            "values": [
+              "15% - 25% (on every order)",
+              "Hidden transaction charges",
+              "0% (zero commission)"
+            ]
+          },
+          {
+            "label": "Pricing Structure",
+            "values": [
+              "Revenue percentage cut",
+              "Fixed monthly/yearly subscription",
+              "No sales, no fees (fairest)"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "AI & Technology Capabilities",
+        "features": [
+          {
+            "label": "AI-Powered Product Creation",
+            "values": [
+              "Type everything manually",
+              "Manual form data entry",
+              "AI Vision snaps photo, auto-generates description"
+            ]
+          },
+          {
+            "label": "Visual Search",
+            "values": [
+              "None",
+              "None",
+              "Included (snap photo to find product in stock)"
+            ]
+          },
+          {
+            "label": "Underlying Infrastructure",
+            "values": [
+              "Standard",
+              "Shared Hosting",
+              "Enterprise (Cloud-Native + Redis Caching)"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Store & Frontline POS Management",
+        "features": [
+          {
+            "label": "Point-of-Sale (POS) System",
+            "values": [
+              "None",
+              "Basic POS",
+              "All-in-one (POS + Real-time stock sync)"
+            ]
+          },
+          {
+            "label": "Storefront Customization",
+            "values": [
+              "Strict platform template",
+              "Limited styling",
+              "100% Free (colors, media, header)"
+            ]
+          },
+          {
+            "label": "Platform Security",
+            "values": [
+              "Platform standard",
+              "Generic standard",
+              "Bank-grade + automated daily backups"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Smart Marketing & Logistics",
+        "features": [
+          {
+            "label": "Shipping Rate Control",
+            "values": [
+              "Marketplace fixed rates",
+              "Rigid carrier rates",
+              "Smart Rate Matrix (zero loss on delivery)"
+            ]
+          },
+          {
+            "label": "CRM & Promotional Tools",
+            "values": [
+              "Limited",
+              "Basic features",
+              "Full loyalty system + sales-driving coupons"
+            ]
+          },
+          {
+            "label": "Order Management",
+            "values": [
+              "In-platform only",
+              "Basic order list",
+              "Multi-channel centralized + standard label print"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Case Study: Professional Merchant (฿500,000/month sales)",
+        "features": [
+          {
+            "label": "Annual Fees Paid Out",
+            "values": [
+              "~฿1,200,000 / year",
+              "Annual SaaS fee + partial GP",
+              "฿0 (just standard SaaS subscription)"
+            ]
+          },
+          {
+            "label": "Actual Retained Net Profit",
+            "values": ["Low", "Moderate", "Highest (keep full ฿500k/month)"]
+          }
+        ]
+      }
+    ]
+  },
+  "pricingPhilosophy": {
+    "title": "Pricing Built for Merchants: We Grow as You Grow",
+    "description": "As developers, we know starting out is tough. We designed our pricing so you can breathe easily without recurring overhead when you're just getting started.",
+    "items": [
+      {
+        "title": "One-Time Setup Fee",
+        "description": "Subscribe for the first month so we can configure everything for you to sell immediately <hilight>without large upfront capital requirements.</hilight>"
+      },
+      {
+        "title": "Sales-Aligned Billing",
+        "description": "Whenever your store generates sales, standard package rates apply <hilight>ensuring your business cash flow always stays resilient.</hilight>"
+      },
+      {
+        "title": "No Sales, No Fees",
+        "description": "If your store records zero sales in a period, rental charges halt and renew automatically <hilight>giving you breathing room without fixed overhead.</hilight>"
+      },
+      {
+        "title": "Exceptional Value on Annual Plans",
+        "description": "Select annual subscriptions to lock in discount pricing and <hilight>guarantee 12 months of uninterrupted service without monthly sales worries.</hilight>"
+      },
+      {
+        "title": "Plans That Adapt with You",
+        "description": "We adapt plans to fit your growth: <hilight>as sales expand, the system recommends tier upgrades for maximum cost-efficiency.</hilight>"
+      },
+      {
+        "title": "Ready to Scale With Your Growth",
+        "description": "When your business takes off, we unlock enterprise capabilities instantly <hilight>ensuring your storefront effortlessly handles heavy buyer traffic.</hilight>"
+      }
+    ]
+  },
+  "stores": {
+    "title": "Stores That Trust Us",
+    "description": "Experience real stores running on our high-performance infrastructure",
+    "searchAlertTitle": "Search Indexing Disabled",
+    "searchAlertDesc": "As these are demo showcase stores, search engine indexing is disabled to prevent sample items from appearing in public search results.",
+    "visitWebsite": "Visit Website",
+    "createStoreTitle": "Create Your Store",
+    "createStoreDesc": "Start building an outstanding shopping experience with Sitepow Store",
+    "startFreeBtn": "Start for Free"
+  }
+}

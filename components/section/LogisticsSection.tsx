@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { LOGISTICS_FEATURES } from '@/constants/logistics'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function LogisticsSection() {
+  const t = useTranslations('home.logistics')
+
+  const featuresList = LOGISTICS_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={true}
@@ -13,11 +23,11 @@ export function LogisticsSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="จัดการขนส่ง ได้ง่ายกว่าที่เคย ด้วยระบบ อัตโนมัติ ครบวงจร"
-          description="เชื่อมต่อกับผู้ให้บริการขนส่งชั้นนำ ช่วยให้คุณจัดการออเดอร์ คำนวณค่าส่ง และแจ้งเลขพัสดุได้ในที่เดียว ประหยัดเวลาแพ็คและส่งของได้มากกว่า 50%"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={LOGISTICS_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

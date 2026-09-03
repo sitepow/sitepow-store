@@ -1,8 +1,8 @@
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata } from 'next'
-// import { NextIntlClientProvider } from 'next-intl'
-// import { getMessages } from 'next-intl/server'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import {
   Dancing_Script,
   IBM_Plex_Sans_Thai_Looped,
@@ -41,21 +41,27 @@ export const metadata: Metadata = {
     'ขายของออนไลน์',
     'โปรแกรมสต็อกสินค้า',
   ],
+  alternates: {
+    canonical: '/',
+    languages: {
+      th: '/?lang=th',
+      en: '/?lang=en',
+      zh: '/?lang=cn',
+    },
+  },
 }
 
 export default async function RootLayout({
   children,
-  // params,
 }: Readonly<{
   children: React.ReactNode
-  // params: Promise<{ lng: string }>
 }>) {
-  // const { lng } = await params
-  // const messages = await getMessages({ locale: lng })
+  const locale = await getLocale()
+  const messages = await getMessages()
 
   return (
     <html
-      // lang={lng}
+      lang={locale}
       className={cn(
         'h-full',
         'antialiased',
@@ -74,9 +80,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          {/* <NextIntlClientProvider locale={lng} messages={messages}> */}
-          <QueryProviders>{children}</QueryProviders>
-          {/* </NextIntlClientProvider> */}
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <QueryProviders>{children}</QueryProviders>
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

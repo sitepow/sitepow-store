@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PRODUCT_TYPE_FEATURES } from '@/constants/product-types'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function ProductTypeSection() {
+  const t = useTranslations('home.productTypes')
+
+  const featuresList = PRODUCT_TYPE_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function ProductTypeSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="รองรับทุกโมเดลธุรกิจ ไม่ว่าคุณจะขายของแบบไหน"
-          description="เราออกแบบระบบมาให้ยืดหยุ่นที่สุด รองรับทั้งสินค้าหน้าร้านและสินค้าดิจิทัลทุกรูปแบบ เพื่อให้คุณโฟกัสกับการขายได้โดยไม่ต้องเปลี่ยนระบบไปมา"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={PRODUCT_TYPE_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

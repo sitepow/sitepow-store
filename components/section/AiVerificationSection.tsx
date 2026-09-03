@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { AI_VERIFICATION_FEATURES } from '@/constants/aiVerification'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function AiVerificationSection() {
+  const t = useTranslations('home.aiVerification')
+
+  const featuresList = AI_VERIFICATION_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={true}
@@ -13,11 +23,11 @@ export function AiVerificationSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="ทำงานอัตโนมัติด้วย AI ตรวจสลิปกันโกง & ตอบแชท 24 ชม."
-          description="ลดงานแอดมินและเพิ่มความปลอดภัยสูงสุด ด้วยระบบ AI ตรวจสอบสลิปโอนเงินอัตโนมัติ ป้องกันสลิปปลอม พร้อมผู้ช่วย AI ช่วยดูแลและตอบแชทลูกค้าตลอดเวลา"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={AI_VERIFICATION_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

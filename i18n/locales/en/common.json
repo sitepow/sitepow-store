@@ -1,1 +1,73 @@
-{}
+{
+  "navbar": {
+    "features": "Features & Benefits",
+    "pricing": "Pricing & Packages",
+    "downloadPos": "Download POS",
+    "contact": "Contact Us",
+    "login": "Log In",
+    "register": "Open Store",
+    "manageStore": "Manage Your Store"
+  },
+  "settings": {
+    "title": "General Settings",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language"
+  },
+  "footer": {
+    "description": "Crafting the best digital experience for you. Connecting every possibility with modern technology.",
+    "contactInfo": "Email: - Tax ID: -",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "rights": "All rights reserved."
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "close": "Close",
+    "loading": "Loading...",
+    "deleting": "Deleting...",
+    "saving": "Saving...",
+    "search": "Search...",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "deleteModal": {
+    "title": "Confirm Deletion?",
+    "description": "This action cannot be undone. Your data will be permanently removed from the system."
+  },
+  "empty": {
+    "title": "No Data Found",
+    "description": "No data matches your current search criteria or filters"
+  },
+  "loadingRow": {
+    "title": "Loading data...",
+    "description": "Please wait, the system is retrieving your records"
+  },
+  "support": {
+    "phone": "Contact Sitepow Support: 06-4707-0943",
+    "hours": "Monday - Friday, 8:00 AM - 5:00 PM"
+  },
+  "order": {
+    "items": "Order Items",
+    "quantity": "Qty",
+    "pieces": "pcs",
+    "perPiece": "each",
+    "currency": "THB",
+    "note": "Note",
+    "taxInvoiceRequested": "Tax Invoice Requested",
+    "statusLabel": "Order Status",
+    "paymentLabel": "Payment Method",
+    "paidAt": "Paid at",
+    "trackingRequiredTitle": "Please enter shipment tracking number",
+    "trackingRequiredDesc": "Tracking number is required before changing status to Shipped",
+    "trackingPlaceholder": "Enter tracking number e.g. TH123456789..."
+  }
+}

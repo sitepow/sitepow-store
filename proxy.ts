@@ -53,6 +53,16 @@ export default async function middleware(req: NextRequest) {
 
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
   if (isRootDomain) {
+    const langParam = url.searchParams.get('lang')
+    if (langParam && (langParam === 'th' || langParam === 'en')) {
+      const response = NextResponse.next()
+      response.cookies.set('NEXT_LOCALE', langParam, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: 'lax',
+      })
+      return response
+    }
     return NextResponse.next()
   }
 

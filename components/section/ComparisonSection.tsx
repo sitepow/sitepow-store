@@ -1,6 +1,8 @@
+'use client'
+
 import React from 'react'
 
-import { PROFIT_COMPARISON } from '@/constants/pricing'
+import { useTranslations } from 'next-intl'
 
 import { CheckCircleIcon } from '@/components/icon/CheckCircle'
 import { CloseCircleIcon } from '@/components/icon/CloseCircle'
@@ -18,34 +20,45 @@ import { SectionContainer } from '../SectionContainer'
 import { SectionHeader } from '../SectionHeader'
 
 export function ComparisonSection() {
+  const t = useTranslations('home.comparison')
+
+  const columns: string[] = t.raw('columns')
+  const categories: Array<{
+    name: string
+    features: Array<{
+      label: string
+      values: string[]
+    }>
+  }> = t.raw('categories')
+
   return (
     <SectionContainer>
       <SectionHeader
         title={
           <span>
-            ตารางเปรียบเทียบ{' '}
+            {t.raw('titlePrefix') as string}{' '}
             <HighlightParser
               className="text-white"
-              text="<hilight>การขายสินค้าในแพลตฟอร์มออนไลน์</hilight>"
+              text={`<hilight>${t.raw('titleHilight') as string}</hilight>`}
             />
           </span>
         }
-        description="ลองเช็คให้ชัดว่ากำไรเหลือเท่าไหร่หลังหักค่าธรรมเนียม และมาดูเหตุการณ์จริงที่คุณอาจต้องเจอเมื่อขายผ่านแพลตฟอร์ม"
+        description={t.raw('description') as string}
       />
       <Table className="border text-start">
         <TableHeader>
           <TableRow>
-            {PROFIT_COMPARISON.columns.map((col) => (
+            {columns.map((col) => (
               <TableHead key={col}>{col}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {PROFIT_COMPARISON.categories.map((category) => (
+          {categories.map((category) => (
             <React.Fragment key={category.name}>
               <TableRow>
                 <TableCell
-                  colSpan={PROFIT_COMPARISON.columns.length}
+                  colSpan={columns.length}
                   className="bg-primary font-semibold text-white"
                 >
                   {category.name}

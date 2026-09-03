@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { CHAT_FEATURES } from '@/constants/chat'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function ChatSection() {
+  const t = useTranslations('home.chat')
+
+  const featuresList = CHAT_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function ChatSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="เชื่อมต่อและดูแลลูกค้าไร้รอยต่อ ด้วยระบบแชทในตัว"
-          description="บริหารข้อความสนทนา ทั้งแชทซื้อขายและงานบริการหลังการขาย ดึงทีมงานร่วมดูแล พร้อม AI ผู้ช่วยตอบแชทคอยดูแลลูกค้าของคุณตลอด 24 ชั่วโมง"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={CHAT_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

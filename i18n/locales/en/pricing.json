@@ -1,0 +1,139 @@
+{
+  "hero": {
+    "title": "Choose the Right Package for Your Store Size & Business Goals"
+  },
+  "tabs": {
+    "1month": "1 Month",
+    "3months": "3 Months",
+    "6months": "6 Months",
+    "12months": "12 Months",
+    "discountBadge": "Save {percent}%"
+  },
+  "card": {
+    "from": "From",
+    "averagePerMonth": "Average {price} / month"
+  },
+  "plans": [
+    {
+      "title": "Free",
+      "description": "Start your online store today, free forever. No credit card required, never expires.",
+      "buttonText": "Get Started Free",
+      "features": [
+        "List up to 5 products",
+        "Smart AI access (1.35 THB/credit)",
+        "Automated slip check (4.00 credits/slip)"
+      ]
+    },
+    {
+      "title": "Starter",
+      "description": "Start selling professionally with 100% full profit and zero GP commission cuts.",
+      "buttonText": "Start Earning Profit",
+      "features": [
+        "List up to 50 products",
+        "Stripe integration (Credit cards / PromptPay)",
+        "Connect your custom domain (.com, .net, .co, etc.)",
+        "Smart AI access (1.15 THB/credit)",
+        "Automated slip check (2.50 credits/slip)",
+        "Remove Sitepow Store footer watermark"
+      ]
+    },
+    {
+      "title": "Pro",
+      "description": "Unlock the full power of AI and automatic slip verification for faster conversions.",
+      "buttonText": "Try Pro Plan",
+      "features": [
+        "Unlimited product listings",
+        "Stripe integration (Credit cards / PromptPay)",
+        "Connect your custom domain (.com, .net, .co, etc.)",
+        "Smart AI access (1.00 THB/credit)",
+        "Automated slip check (1.80 credits/slip)",
+        "Remove Sitepow Store footer watermark"
+      ]
+    },
+    {
+      "title": "Ultimate",
+      "description": "Connect every sales channel and advanced membership systems for sustainable growth.",
+      "buttonText": "Get Full Ultimate",
+      "features": [
+        "Unlimited product listings",
+        "Stripe integration (Credit cards / PromptPay)",
+        "Connect your custom domain (.com, .net, .co, etc.)",
+        "Smart AI access (0.85 THB/credit)",
+        "Automated slip check (1.50 credits/slip)",
+        "Remove Sitepow Store footer watermark",
+        "Dedicated 24/7 VIP personal support"
+      ]
+    }
+  ],
+  "commonFeatures": {
+    "title": "Features Included in All Packages",
+    "items": [
+      "Personal online storefront (customizable to match your brand style)",
+      "Bank transfer support (manual slip verification)",
+      "0% commission on every order",
+      "Daily profit & loss analytics dashboard",
+      "Logistics management & standard shipping label printing",
+      "Export product data to Lazada/Shopee (CSV/JSON)",
+      "Membership & loyalty rewards points (CRM)",
+      "Bank-grade security, Cloud-Native architecture & automated backups",
+      "Full product type support: physical goods, digital keys, download links & services",
+      "All-in-one POS system: counter sales with real-time stock sync",
+      "Enterprise-grade infrastructure (Thailand domestic data center)",
+      "Sales-boosting promotion and discount coupon tools",
+      "Smart shipping fee calculation (Rate Matrix)",
+      "Flexible storefront customization (colors, media, header)",
+      "Store expense tracking with category and branch segmentation",
+      "Employee permission management (Granular Permissions & Activity Log)",
+      "Unified conversation inbox supporting sales chats and customer support"
+    ]
+  },
+  "tables": {
+    "title": "Compare Feature Capabilities Across Packages",
+    "choosePackage": "Choose the package that suits you",
+    "tiers": ["Free", "Starter", "Pro", "Ultimate"],
+    "categories": [
+      {
+        "name": "Usage Limits",
+        "features": ["Unlimited product listings"]
+      },
+      {
+        "name": "Smart AI Features (Credit access rates)",
+        "features": ["AI-assisted chat replies and product copywriting"]
+      },
+      {
+        "name": "Payment & Slip Verification",
+        "features": [
+          "Stripe connection (Cards/PromptPay)",
+          "Automated payment slip check",
+          "0% commission on all orders"
+        ]
+      },
+      {
+        "name": "Store & Inventory Management",
+        "features": [
+          "Inventory management & frontline POS",
+          "Daily profit-loss analytics",
+          "Product export (CSV/JSON)"
+        ]
+      },
+      {
+        "name": "Marketing & Logistics",
+        "features": [
+          "Membership & loyalty points (CRM)",
+          "Shipment workflow & label printing",
+          "Smart shipping rate matrix",
+          "Promotions & coupon creator"
+        ]
+      },
+      {
+        "name": "Customization & Professionalism",
+        "features": [
+          "Custom storefront design & header",
+          "Custom domain connection (.com, .net, ...)",
+          "Remove Sitepow Store watermark",
+          "Dedicated 24/7 personal support"
+        ]
+      }
+    ]
+  }
+}

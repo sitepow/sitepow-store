@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PHILOSOPHY_FEATURES } from '@/constants/pricing-philosophy'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function PricingPhilosophySection() {
+  const t = useTranslations('home.pricingPhilosophy')
+
+  const featuresList = PHILOSOPHY_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function PricingPhilosophySection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="โมเดลราคาที่ เข้าใจคนทำธุรกิจ เราเติบโตไปพร้อมกับยอดขายของคุณ"
-          description="ในฐานะนักพัฒนา เราเข้าใจดีว่าช่วงเริ่มต้นธุรกิจนั้นยากแค่ไหน เราจึงออกแบบระบบที่ให้คุณหายใจได้ ไม่ต้องแบกรับค่าเช่าหากยังไม่มีออเดอร์"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={PHILOSOPHY_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

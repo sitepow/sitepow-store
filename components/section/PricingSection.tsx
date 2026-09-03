@@ -1,10 +1,16 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { HeroHeader } from '../HeroHeader'
 import { SectionContainer } from '../SectionContainer'
 
 export function PricingSection() {
+  const t = useTranslations('pricing.hero')
+
   return (
     <SectionContainer>
-      <HeroHeader title="เลือก Package ที่เหมาะกับ ขนาดร้านค้าและธุรกิจของคุณ" />
+      <HeroHeader title={t.raw('title') as string} />
     </SectionContainer>
   )
 }

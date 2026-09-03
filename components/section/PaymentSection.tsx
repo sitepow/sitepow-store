@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PAYMENTS_FEATURES } from '@/constants/payment'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function PaymentSection() {
+  const t = useTranslations('home.payments')
+
+  const featuresList = PAYMENTS_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function PaymentSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="รับเงินไว เงินเข้าบัญชีโดยตรง ด้วยระบบ QR PromptPay และโอนผ่านธนาคาร"
-          description="เริ่มขายได้ทันทีไม่ต้องรออนุมัติ! รับเงินเข้าบัญชีร้านค้าโดยตรง ไม่ต้องผ่านคนกลาง พร้อมระบบเช็คสลิปอัตโนมัติที่ช่วยให้คุณทำงานง่ายขึ้น"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={PAYMENTS_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

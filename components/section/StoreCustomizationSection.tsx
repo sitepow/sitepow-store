@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { CUSTOMIZATION_FEATURES } from '@/constants/store-customization'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function StoreCustomizationSection() {
+  const t = useTranslations('home.storeCustomization')
+
+  const featuresList = CUSTOMIZATION_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={true}
@@ -13,11 +23,11 @@ export function StoreCustomizationSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="สร้างร้านค้าในสไตล์ที่เป็นคุณ"
-          description="ทุกตารางนิ้วบนหน้าร้านค้าของคุณสามารถปรับเปลี่ยนได้ตามตัวตนของแบรนด์ ไม่ว่าจะเป็นภาพ วิดีโอ หรือโทนสี ช่วยให้ร้านค้าของคุณแตกต่างและโดดเด่นกว่าใคร"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={CUSTOMIZATION_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

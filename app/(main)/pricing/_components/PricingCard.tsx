@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { PRICING_VALUE } from '@/constants/pricing'
@@ -23,6 +24,7 @@ export function PricingCard({
   isPopular,
   seed,
 }: PricingPlanProps) {
+  const t = useTranslations('pricing.card')
   const isMounted = useIsMounted()
   const fallbackGradient = useRandomGradient()
   const selectedTab = usePricingStore((state) => state.selectedTab)
@@ -64,7 +66,7 @@ export function PricingCard({
       <div className="flex flex-col items-center gap-1">
         {discountPercent > 0 && basePrice > 0 && (
           <span className="text-muted-foreground text-sm line-through">
-            จาก {formatCurrency(totalPriceBeforeDiscount)}{' '}
+            {t('from')} {formatCurrency(totalPriceBeforeDiscount)}{' '}
             {currency.split(' ')[0]}
           </span>
         )}
@@ -78,7 +80,7 @@ export function PricingCard({
         </div>
         {basePrice > 0 && selectedTab !== PRICING_VALUE.ONE_MONTH && (
           <span className="text-primary text-xs font-medium">
-            เฉลี่ย {formatCurrency(averagePerMonth)} / เดือน
+            {t('averagePerMonth', { price: formatCurrency(averagePerMonth) })}
           </span>
         )}
       </div>

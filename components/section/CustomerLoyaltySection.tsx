@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { CUSTOMER_LOYALTY_FEATURES } from '@/constants/customerLoyalty'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function CustomerLoyaltySection() {
+  const t = useTranslations('home.customerLoyalty')
+
+  const featuresList = CUSTOMER_LOYALTY_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function CustomerLoyaltySection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="มัดใจลูกค้าให้อยู่หมัด ด้วยระบบสะสมแต้ม & เปลี่ยนรีวิวเป็นยอดขาย"
-          description="สร้างฐานลูกค้าประจำด้วยระบบสมาชิก สะสมคะแนน คูปองโปรโมชัน และระบบแจกแต้มอัจฉริยะเมื่อลูกค้าเขียนรีวิวพร้อมรูปภาพหรือวิดีโอ"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={CUSTOMER_LOYALTY_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

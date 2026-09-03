@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -15,6 +16,7 @@ import { LogoBrand } from '../LogoBrand'
 import { Button } from '../ui/button'
 
 export function HeroSection() {
+  const t = useTranslations('home.hero')
   const { isAuthenticated } = useSession()
   const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
 
@@ -36,28 +38,28 @@ export function HeroSection() {
       <div className="z-10 space-y-5">
         <HeroHeader
           className="text-white"
-          title="เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย ของการขายสินค้าออนไลน์"
+          title={t('title')}
           subtitle={
             <>
-              ด้วยระบบจัดการร้านค้าออนไลน์ จาก{' '}
+              {t('subtitlePrefix')}{' '}
               <LogoBrand className="text-white" hideLogo />
             </>
           }
         />
         <div className="dark flex flex-wrap justify-center gap-2.5 px-10 text-white">
           <Button variant="outline" size="lg" asChild>
-            <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
+            <Link href="/pricing">{t('pricingBtn')}</Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
             <Link href="/">
               <IconDownload />
-              ดาวน์โหลดโปรแกรม POS (เร็วๆนี้)
+              {t('downloadPosBtn')}
             </Link>
           </Button>
           {!isAuthenticated && (
             <Button size="lg" asChild>
               <Link href={registerHref}>
-                สมัครเปิดร้านฟรี
+                {t('registerBtn')}
                 <ArrowRight />
               </Link>
             </Button>
@@ -65,7 +67,7 @@ export function HeroSection() {
           {isAuthenticated && (
             <Button size="lg" asChild>
               <Link href="/merchant/dashboard">
-                จัดการร้านค้าของคุณ
+                {t('manageStoreBtn')}
                 <ArrowRight />
               </Link>
             </Button>

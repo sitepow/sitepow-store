@@ -1,4 +1,8 @@
+'use client'
+
 import React from 'react'
+
+import { useTranslations } from 'next-intl'
 
 import { PRICING_TABLES } from '@/constants/pricing'
 
@@ -16,43 +20,62 @@ import {
 } from '@/components/ui/table'
 
 export function PricingTables() {
+  const t = useTranslations('pricing.tables')
+
+  const tiers: string[] = (t.raw('tiers') as string[]) || PRICING_TABLES.tiers
+
   return (
     <SectionContainer>
-      <SectionHeader title="เปรียบเทียบ ความสามารถของแต่ละ Package" />
+      <SectionHeader title={t.raw('title') as string} />
       <Table className="border">
         <TableHeader>
           <TableRow>
-            <TableHead>เลือก Package ที่เหมาะกับคุณ</TableHead>
-            {PRICING_TABLES.tiers.map((tier) => (
+            <TableHead>{t.raw('choosePackage') as string}</TableHead>
+            {tiers.map((tier) => (
               <TableHead key={tier}>{tier}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {PRICING_TABLES.categories.map((category) => (
-            <React.Fragment key={category.name}>
-              <TableRow>
-                <TableCell
-                  colSpan={PRICING_TABLES.tiers.length + 1}
-                  className="bg-primary text-start font-semibold text-white"
-                >
-                  {category.name}
-                </TableCell>
-              </TableRow>
-              {category.features.map((feature, idx) => (
-                <TableRow key={idx}>
-                  <TableCell className="text-foreground text-start">
-                    {feature.label}
+          {PRICING_TABLES.categories.map((category, catIdx) => {
+            const categoryName =
+              (t.raw(`categories.${catIdx}.name`) as string) || category.name
+
+            return (
+              <React.Fragment key={category.name}>
+                <TableRow>
+                  <TableCell
+                    colSpan={tiers.length + 1}
+                    className="bg-primary text-start font-semibold text-white"
+                  >
+                    {categoryName}
                   </TableCell>
-                  {feature.access.map((hasAccess, i) => (
-                    <TableCell key={i} className="text-center">
-                      {hasAccess ? <CheckCircleIcon /> : <CloseCircleIcon />}
-                    </TableCell>
-                  ))}
                 </TableRow>
-              ))}
-            </React.Fragment>
-          ))}
+                {category.features.map((feature, idx) => {
+                  const featureLabel =
+                    (t.raw(`categories.${catIdx}.features.${idx}`) as string) ||
+                    feature.label
+
+                  return (
+                    <TableRow key={idx}>
+                      <TableCell className="text-foreground text-start">
+                        {featureLabel}
+                      </TableCell>
+                      {feature.access.map((hasAccess, i) => (
+                        <TableCell key={i} className="text-center">
+                          {hasAccess ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <CloseCircleIcon />
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })}
+              </React.Fragment>
+            )
+          })}
         </TableBody>
       </Table>
     </SectionContainer>

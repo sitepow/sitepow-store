@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { SECURITY_FEATURES } from '@/constants/security-trust'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function SecurityTrustSection() {
+  const t = useTranslations('home.securityTrust')
+
+  const featuresList = SECURITY_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={true}
@@ -13,11 +23,11 @@ export function SecurityTrustSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="ปลอดภัยกว่า มั่นใจได้มากกว่า การเป็นเจ้าของธุรกิจไม่ต้องเสี่ยงกับซอฟต์แวร์เถื่อน"
-          description="เราเปลี่ยนความเสี่ยงจากช่องโหว่ของโปรแกรม Crack มาเป็นระบบ SaaS ที่ถูกออกแบบมาเพื่อปกป้องธุรกิจของคุณโดยเฉพาะ"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={SECURITY_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

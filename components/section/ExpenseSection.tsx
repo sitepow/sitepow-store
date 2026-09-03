@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { EXPENSE_FEATURES } from '@/constants/expenses'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function ExpenseSection() {
+  const t = useTranslations('home.expenses')
+
+  const featuresList = EXPENSE_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={false}
@@ -13,11 +23,11 @@ export function ExpenseSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="บันทึกและบริหารค่าใช้จ่ายร้านค้า ครบจบในระบบเดียว"
-          description="หมดปัญหาเรื่องบัญชีชีวต ควบคุมทุกรายจ่ายของร้านค้า จัดหมวดหมู่ง่าย แนบใบเสร็จได้ และสรุปผลกำไรสุทธิที่แท้จริงให้คุณทันที"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={EXPENSE_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

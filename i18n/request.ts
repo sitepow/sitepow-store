@@ -1,5 +1,6 @@
 import { hasLocale } from 'next-intl'
 import { getRequestConfig } from 'next-intl/server'
+import { cookies } from 'next/headers'
 
 import { routing } from './routing'
 
@@ -16,9 +17,19 @@ const MESSAGE_LOADERS: Record<SupportedLocale, MessageLoader> = {
 export default getRequestConfig(async ({ requestLocale }) => {
   const requestedLocale = await requestLocale
 
-  const locale: SupportedLocale = hasLocale(routing.locales, requestedLocale)
-    ? requestedLocale
-    : routing.defaultLocale
+  let locale: SupportedLocale = routing.defaultLocale
+
+  if (requestedLocale && hasLocale(routing.locales, requestedLocale)) {
+    locale = requestedLocale as SupportedLocale
+  } else {
+    try {
+      const cookieStore = await cookies()
+      const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value
+      if (cookieLocale && hasLocale(routing.locales, cookieLocale)) {
+        locale = cookieLocale as SupportedLocale
+      }
+    } catch {}
+  }
 
   const loadMessages =
     MESSAGE_LOADERS[locale] ?? MESSAGE_LOADERS[routing.defaultLocale]

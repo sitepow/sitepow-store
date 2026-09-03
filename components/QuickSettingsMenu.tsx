@@ -1,7 +1,9 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 
+import { setUserLocale } from '@/actions/locale'
 import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
 import {
   IconCheck,
@@ -38,20 +40,19 @@ export function QuickSettingsMenu({
   buttonVariant = 'outline',
 }: QuickSettingsMenuProps) {
   const { theme, setTheme } = useTheme()
-  const pathname = usePathname()
-  // const router = useRouter()
+  const router = useRouter()
+  const currentLocale = useLocale()
+  const t = useTranslations('common.settings')
 
-  const currentLocale = pathname.split('/')[1]
+  const switchLocale = async (locale: string) => {
+    if (currentLocale === locale) {
+      return
+    }
 
-  //   const switchLocale = (locale: string) => {
-  //     if (currentLocale === locale) {
-  //       return
-  //     }
-
-  //     const segments = pathname.split('/')
-  //     segments[1] = locale
-  //     router.push(segments.join('/'))
-  //   }
+    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`
+    await setUserLocale(locale)
+    router.refresh()
+  }
 
   return (
     <DropdownMenu>
@@ -62,28 +63,28 @@ export function QuickSettingsMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>ตั้งค่าทั่วไป</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('title')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <IconSunMoon className="mr-2 size-4" />
-            <span>ธีมเว็บไซต์</span>
+            <span>{t('theme')}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme('light')}>
                 <IconSun className="mr-2 size-4" />
-                <span>สว่าง</span>
+                <span>{t('light')}</span>
                 {theme === 'light' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('dark')}>
                 <IconMoon className="mr-2 size-4" />
-                <span>มืด</span>
+                <span>{t('dark')}</span>
                 {theme === 'dark' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('system')}>
                 <IconSunMoon className="mr-2 size-4" />
-                <span>ระบบ</span>
+                <span>{t('system')}</span>
                 {theme === 'system' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
@@ -92,15 +93,12 @@ export function QuickSettingsMenu({
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <IconLanguage className="mr-2 size-4" />
-            <span>ภาษา</span>
+            <span>{t('language')}</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               {SUPPORTED_LNGS.map((lng) => (
-                <DropdownMenuItem
-                  key={lng}
-                  // onClick={() => switchLocale(lng)}
-                >
+                <DropdownMenuItem key={lng} onClick={() => switchLocale(lng)}>
                   <span>{LANGUAGE_NAMES[lng] || lng}</span>
                   {currentLocale === lng && (
                     <IconCheck className="ml-auto size-4" />

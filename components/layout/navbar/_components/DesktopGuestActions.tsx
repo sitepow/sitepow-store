@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
@@ -12,15 +15,17 @@ export function DesktopGuestActions({
   loginHref,
   registerHref,
 }: DesktopGuestActionsProps) {
+  const t = useTranslations('common.navbar')
+
   return (
     <>
       <Link href={loginHref}>
         <Button variant="secondary" className="font-bold">
-          เข้าสู่ระบบ
+          {t('login')}
         </Button>
       </Link>
       <Link href={registerHref}>
-        <Button className="font-bold">สมัครเปิดร้าน</Button>
+        <Button className="font-bold">{t('register')}</Button>
       </Link>
       <QuickSettingsMenu buttonVariant="secondary" />
     </>

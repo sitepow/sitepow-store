@@ -1,11 +1,21 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PERMISSION_FEATURES } from '@/constants/permissions'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'
 
 export function PermissionSection() {
+  const t = useTranslations('home.permissions')
+
+  const featuresList = PERMISSION_FEATURES.map((item, idx) => ({
+    ...item,
+    title: t.raw(`items.${idx}.title`) as string,
+    description: t.raw(`items.${idx}.description`) as string,
+  }))
+
   return (
     <FeatureDisplay
       isLeft={true}
@@ -13,11 +23,11 @@ export function PermissionSection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="บริหารจัดการสิทธิ์พนักงาน ปลอดภัยระดับ Granular"
-          description="ควบคุมการเข้าถึงข้อมูลของทีมงานได้อย่างเด็ดขาด แยกสิทธิ์ตามบทบาทและรายสาขา ช่วยให้การทำงานร่วมกันปลอดภัยและเป็นระบบมากยิ่งขึ้น"
+          title={t.raw('title') as string}
+          description={t.raw('description') as string}
         />
       }
-      featuresList={PERMISSION_FEATURES}
+      featuresList={featuresList}
     />
   )
 }

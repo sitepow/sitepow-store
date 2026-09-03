@@ -1,9 +1,13 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { LogoBrand } from '../LogoBrand'
 
 export function Footer() {
+  const t = useTranslations('common.footer')
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
@@ -31,18 +35,6 @@ export function Footer() {
       href: 'https://www.instagram.com/sitepow.store',
       label: 'Instagram',
     },
-    // {
-    //   icon: (
-    //     <Image
-    //       src="https://thesvg.org/icons/tiktok/default.svg"
-    //       alt="Tiktok"
-    //       width={34}
-    //       height={34}
-    //     />
-    //   ),
-    //   href: '/',
-    //   label: 'Tiktok',
-    // },
     {
       icon: (
         <Image
@@ -67,18 +59,6 @@ export function Footer() {
       href: 'https://line.me/ti/p/~@830sdfow',
       label: 'Line',
     },
-    // {
-    //   icon: (
-    //     <Image
-    //       src="https://thesvg.org/icons/discord/default.svg"
-    //       alt="Discord"
-    //       width={34}
-    //       height={34}
-    //     />
-    //   ),
-    //   href: '/',
-    //   label: 'Discord',
-    // },
   ]
 
   return (
@@ -88,11 +68,10 @@ export function Footer() {
           <div className="max-w-sm">
             <LogoBrand />
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              สร้างสรรค์ประสบการณ์ดิจิทัลที่ดีที่สุดสำหรับคุณ
-              เชื่อมต่อทุกความเป็นไปได้ด้วยเทคโนโลยีที่ทันสมัย
+              {t.raw('description') as string}
             </p>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              อีเมล: {'-'} เลขประจำตัวผู้เสียภาษี: {'-'}
+              {t.raw('contactInfo') as string}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-5">
               {socialLinks.map((social) => (
@@ -112,16 +91,16 @@ export function Footer() {
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
           <div className="order-2 md:order-1">
             <p className="text-sm">
-              © {currentYear} Sitepow. All rights reserved.
+              © {currentYear} Sitepow. {t.raw('rights') as string}
             </p>
           </div>
           <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
             <div className="flex flex-wrap justify-center gap-5 text-sm sm:gap-6">
               <Link href="/" className="hover:underline">
-                นโยบายความเป็นส่วนตัว
+                {t.raw('privacyPolicy') as string}
               </Link>
               <Link href="/" className="hover:underline">
-                ข้อตกลง และเงื่อนไข
+                {t.raw('terms') as string}
               </Link>
             </div>
           </div>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -19,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ActionRequiredAlert } from '../ActionRequiredAlert'
 
 export function StoresSection() {
+  const t = useTranslations('home.stores')
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
   const { data: stores = [], isLoading } = useLandingStores()
@@ -33,10 +35,7 @@ export function StoresSection() {
   if (isLoading && stores?.length === 0) {
     return (
       <SectionContainer>
-        <SectionHeader
-          title="ร้านค้าที่ไว้วางใจเรา"
-          description="สัมผัสประสบการณ์ร้านค้าที่รันบนโครงสร้างพื้นฐานระดับสูง"
-        />
+        <SectionHeader title={t('title')} description={t('description')} />
         <div className="grid w-full gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="flex flex-col overflow-hidden p-0">
@@ -50,10 +49,7 @@ export function StoresSection() {
 
   return (
     <SectionContainer>
-      <SectionHeader
-        title="ร้านค้าที่ไว้วางใจเรา"
-        description="สัมผัสประสบการณ์ร้านค้าที่รันบนโครงสร้างพื้นฐานระดับสูง"
-      />
+      <SectionHeader title={t('title')} description={t('description')} />
 
       <div className="grid w-full gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {stores.map((store) => (
@@ -76,9 +72,8 @@ export function StoresSection() {
                 {store.name}
               </h3>
               <ActionRequiredAlert
-                title="ปิดการค้นหา"
-                description="เนื่องจากเป็นร้านค้าตัวอย่าง เราจึงปิดการทำงานของ Search Engine
-                  เพื่อป้องกันไม่ให้ข้อมูลสินค้าในร้านตัวอย่างไปปรากฏในการค้นหาจริงของลูกค้า"
+                title={t('searchAlertTitle')}
+                description={t('searchAlertDesc')}
               />
               <div className="mt-6 flex items-end justify-end">
                 <Button variant="outline" asChild>
@@ -86,7 +81,7 @@ export function StoresSection() {
                     href={`https://${store.slug}.sitepow.store`}
                     target="_blank"
                   >
-                    เยี่ยมชมเว็บไซต์
+                    {t('visitWebsite')}
                     <IconArrowUpRight className="size-4" />
                   </Link>
                 </Button>
@@ -124,11 +119,9 @@ export function StoresSection() {
                 <IconPlus className="size-10 stroke-1" />
               </div>
               <h3 className="mt-6 text-xl font-bold sm:text-2xl">
-                สร้างร้านค้าของคุณ
+                {t('createStoreTitle')}
               </h3>
-              <p className="mt-2 text-lg opacity-60">
-                เริ่มต้นสร้างประสบการณ์การช้อปปิ้งที่ยอดเยี่ยมด้วย Sitepow Store
-              </p>
+              <p className="mt-2 text-lg opacity-60">{t('createStoreDesc')}</p>
               <div className="mt-8">
                 <Button size="lg" className="px-10" asChild>
                   <Link
@@ -138,7 +131,7 @@ export function StoresSection() {
                         : registerHref
                     }
                   >
-                    เริ่มใช้งานฟรี
+                    {t('startFreeBtn')}
                   </Link>
                 </Button>
               </div>
