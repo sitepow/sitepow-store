@@ -5,11 +5,11 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import {
   useStoreProfile,
   useUpdateStoreProfile,
 } from '@/actions/hooks/store-profile'
-import { r2DeleteImage, r2UploadImage } from '@/actions/r2'
 import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
@@ -44,6 +44,12 @@ export function StoreProfileForm() {
   const { selectedStoreId } = useStoreFilter()
   const { data: storeProfile } = useStoreProfile(selectedStoreId as string)
   const profileMutation = useUpdateStoreProfile()
+
+  const uploadLogoMutation = useR2UploadImage(`store/${selectedStoreId}/logo`)
+  const uploadBannerMutation = useR2UploadImage(
+    `store/${selectedStoreId}/banner`,
+  )
+  const deleteMutation = useR2DeleteImage()
 
   const logoInputRef = useRef<HTMLInputElement>(null)
   const bannerInputRef = useRef<HTMLInputElement>(null)
@@ -132,14 +138,13 @@ export function StoreProfileForm() {
     if (values.logo instanceof File) {
       if (storeProfile?.logo) {
         const oldKey = getPathR2FromUrl(storeProfile.logo)
-        await r2DeleteImage(oldKey)
+        if (oldKey) {
+          await deleteMutation.mutateAsync(oldKey)
+        }
       }
 
-      const formData = new FormData()
-      formData.append('file', values.logo)
-
-      const res = await r2UploadImage(formData, `store/${selectedStoreId}/logo`)
-      if (res.success) {
+      const res = await uploadLogoMutation.mutateAsync(values.logo)
+      if (res?.success && res?.url) {
         logoUrl = res.url
       }
     }
@@ -147,17 +152,13 @@ export function StoreProfileForm() {
     if (values.coverImage instanceof File) {
       if (storeProfile?.coverImage) {
         const oldKey = getPathR2FromUrl(storeProfile.coverImage)
-        await r2DeleteImage(oldKey)
+        if (oldKey) {
+          await deleteMutation.mutateAsync(oldKey)
+        }
       }
 
-      const formData = new FormData()
-      formData.append('file', values.coverImage)
-
-      const res = await r2UploadImage(
-        formData,
-        `store/${selectedStoreId}/banner`,
-      )
-      if (res.success) {
+      const res = await uploadBannerMutation.mutateAsync(values.coverImage)
+      if (res?.success && res?.url) {
         bannerUrl = res.url
       }
     }
@@ -174,6 +175,12 @@ export function StoreProfileForm() {
       { onSuccess: () => reset(values) },
     )
   }
+
+  const isPending =
+    profileMutation.isPending ||
+    uploadLogoMutation.isPending ||
+    uploadBannerMutation.isPending ||
+    deleteMutation.isPending
 
   return (
     <Card>
@@ -260,7 +267,9 @@ export function StoreProfileForm() {
                     className="hidden"
                     accept="image/*,video/*"
                     onChange={(e) =>
-                      setValue('coverImage', e.target.files?.[0])
+                      setValue('coverImage', e.target.files?.[0], {
+                        shouldDirty: true,
+                      })
                     }
                   />
                 </div>
@@ -310,7 +319,7 @@ export function StoreProfileForm() {
                 <Input
                   placeholder="ระบุชื่อเต็มของร้านค้า"
                   {...register('name')}
-                  disabled={profileMutation.isPending}
+                  disabled={isPending}
                 />
                 <FieldError>{errors?.name?.message}</FieldError>
               </Field>
@@ -334,7 +343,7 @@ export function StoreProfileForm() {
                   type="email"
                   placeholder="example@store.com"
                   {...register('email')}
-                  disabled={profileMutation.isPending}
+                  disabled={isPending}
                 />
                 <FieldError>{errors?.email?.message}</FieldError>
               </Field>
@@ -344,7 +353,7 @@ export function StoreProfileForm() {
                   maxLength={13}
                   placeholder="เลขประจำตัวผู้เสียภาษีสำหรับระบุบนใบเสร็จเต็มรูปแบบ"
                   {...register('taxId')}
-                  disabled={profileMutation.isPending}
+                  disabled={isPending}
                 />
                 <FieldError>{errors?.taxId?.message}</FieldError>
               </Field>
@@ -353,7 +362,7 @@ export function StoreProfileForm() {
                 <Textarea
                   placeholder="ร้านค้านี้ขายเกี่ยวกับอะไร"
                   {...register('description')}
-                  disabled={profileMutation.isPending}
+                  disabled={isPending}
                 />
                 <FieldError>{errors?.taxId?.message}</FieldError>
               </Field>
@@ -365,17 +374,17 @@ export function StoreProfileForm() {
                 type="button"
                 variant="outline"
                 onClick={resetForm}
-                disabled={profileMutation.isPending}
+                disabled={isPending}
               >
                 ล้างค่าการตั้งค่า
               </Button>
             )}
             <Button
               size="sm"
-              disabled={profileMutation.isPending}
+              disabled={isPending}
               onClick={handleSubmit(onSubmit)}
             >
-              {profileMutation.isPending ? (
+              {isPending ? (
                 <>
                   <Spinner /> กำลังบันทึก...
                 </>
