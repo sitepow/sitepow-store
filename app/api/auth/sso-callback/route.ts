@@ -11,11 +11,9 @@ export async function GET(req: NextRequest) {
 
   let session = await auth.api.getSession({ headers: req.headers })
 
-  const isProd = process.env.NODE_ENV === 'production'
-  const cookieName = isProd
-    ? '__Secure-better-auth.session_token'
-    : 'better-auth.session_token'
-  const sessionTokenFromCookie = req.cookies.get(cookieName)?.value
+  const sessionTokenFromCookie = req.cookies.get(
+    'better-auth.session_token',
+  )?.value
 
   const sessionToken = session?.session?.token || sessionTokenFromCookie
 

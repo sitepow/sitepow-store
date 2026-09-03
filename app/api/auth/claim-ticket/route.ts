@@ -22,11 +22,11 @@ export async function GET(req: NextRequest) {
 
   const response = NextResponse.redirect(new URL(redirectUrl, req.url))
 
-  const isProd = process.env.NODE_ENV === 'production'
+  response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate')
 
   response.cookies.set('better-auth.session_token', sessionToken, {
     httpOnly: true,
-    secure: isProd,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
   })
