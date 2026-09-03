@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   if (!returnTo) {
     return NextResponse.redirect(
-      new URL('/login?error=missing_return', req.url),
+      'https://sitepow.store/login?error=missing_return',
     )
   }
 
@@ -19,14 +19,15 @@ export async function GET(req: NextRequest) {
   const match = rawCookieHeader.match(/better-auth\.session_token=([^;]+)/)
 
   if (!match) {
-    const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('returnTo', returnTo)
+    const cleanReturnTo = decodeURIComponent(returnTo)
+    const loginUrl = new URL('https://sitepow.store/login')
+    loginUrl.searchParams.set('returnTo', cleanReturnTo)
 
     if (provider) {
       loginUrl.searchParams.set('sso_provider', provider)
     }
 
-    return NextResponse.redirect(loginUrl)
+    return NextResponse.redirect(loginUrl.toString())
   }
 
   const fullCookieValue = decodeURIComponent(match[1])

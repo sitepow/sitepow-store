@@ -36,13 +36,19 @@ export function UserAvatarDropdown({
   const { user } = useSession()
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          window.location.href = window.location.href
-        },
-      },
-    })
+    const isCentralDomain =
+      window.location.hostname.endsWith('sitepow.store') ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === 'lvh.me'
+
+    if (!isCentralDomain) {
+      await fetch('/api/auth/custom-logout', { method: 'POST' })
+      window.location.href = '/login'
+      return
+    }
+
+    await authClient.signOut()
+    window.location.href = '/login'
   }
 
   return (
