@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useCreateResellerPayout } from '@/actions/hooks/reseller'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
@@ -35,6 +37,7 @@ interface PayoutDialogProps {
 }
 
 export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
+  const t = useTranslations('merchant.reseller.payout')
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId: agreementId } = useResellerFilter()
 
@@ -73,7 +76,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
 
   const onSubmit: SubmitHandler<PayoutFormValues> = async (values) => {
     if (!agreementId) {
-      return toast.error('ไม่พบข้อมูลสัญญาตัวแทน')
+      return toast.error(t('toastNoAgreement'))
     }
 
     let imageUrl = ''
@@ -84,7 +87,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       const res = await uploadMutation.mutateAsync(formData)
 
       if (!res.success) {
-        return toast.error('อัปโหลดหลักฐานการโอนเงินไม่สำเร็จ')
+        return toast.error(t('toastUploadError'))
       }
 
       imageUrl = res.url ?? ''
@@ -100,10 +103,10 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success(res.message || 'บันทึกรายการ Payout สำเร็จ')
+            toast.success(res.message || t('toastSuccess'))
             handleClose()
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาดในการบันทึก Payout')
+            toast.error(res.message || t('toastError'))
           }
         },
       },
@@ -120,32 +123,32 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>บันทึกการจ่ายเงินค่าคอมมิชชัน</DialogTitle>
+            <DialogTitle>{t('title')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>
-              <FieldLabel>จำนวนเงินที่เคลียร์ / โอน (บาท)</FieldLabel>
+              <FieldLabel>{t('amountLabel')}</FieldLabel>
               <Input
                 type="number"
                 step="0.01"
-                placeholder="0.00"
+                placeholder={t('amountPlaceholder')}
                 {...register('amount', {
                   valueAsNumber: true,
-                  min: { value: 0.01, message: 'จำนวนเงินต้องมากกว่า 0' },
+                  min: { value: 0.01, message: t('amountMin') },
                 })}
                 disabled={isPending}
               />
               <FieldError>{errors.amount?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>แนบหลักฐานการโอนเงิน (สลิป)</FieldLabel>
+              <FieldLabel>{t('proofLabel')}</FieldLabel>
               <FileUpload name="paymentProof" />
               <FieldError>{errors.paymentProof?.message as string}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>หมายเหตุเพิ่มเติม</FieldLabel>
+              <FieldLabel>{t('noteLabel')}</FieldLabel>
               <Input
-                placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับการโอนเงิน..."
+                placeholder={t('notePlaceholder')}
                 {...register('note')}
                 disabled={isPending}
               />
@@ -159,7 +162,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  ล้างข้อมูล
+                  {t('reset')}
                 </Button>
               ) : (
                 <Button
@@ -168,16 +171,16 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  ยกเลิก
+                  {t('cancel')}
                 </Button>
               )}
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> กำลังบันทึก...
+                    <Spinner /> {t('submitting')}
                   </>
                 ) : (
-                  'ยืนยันชำระเงิน'
+                  t('submit')
                 )}
               </Button>
             </DialogFooter>

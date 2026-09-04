@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useResellerPayoutSummary,
@@ -44,6 +46,7 @@ export function ResellerStockTable({
   onReturnStock,
   onEditPrice,
 }: ResellerStockTableProps) {
+  const t = useTranslations('merchant.reseller')
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId } = useResellerFilter()
 
@@ -80,32 +83,34 @@ export function ResellerStockTable({
       {selectedAgreementId && summary && (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatsCard
-            title="ยอดขายรวมหน้าร้าน"
+            title={t('stats.totalGrossSales')}
             value={formatCurrency(Number(summary.totalGrossSales || 0))}
-            description="ยอดเงินเต็มที่รับจากลูกค้า"
+            description={t('stats.totalGrossSalesDesc')}
             icon={DollarSign}
           />
           <StatsCard
-            title="กำไรสะสมตัวแทน"
+            title={t('stats.totalCommission')}
             value={formatCurrency(Number(summary.totalCommission || 0))}
             description={
               summary.commissionRate !== null &&
               summary.commissionRate !== undefined
-                ? `อัตราส่วนแบ่งสัญญา ${summary.commissionRate}%`
-                : 'ส่วนแบ่งตามรายการสินค้า'
+                ? t('stats.commissionRateDesc', {
+                    rate: summary.commissionRate,
+                  })
+                : t('stats.productCommissionDesc')
             }
             icon={TrendingUp}
           />
           <StatsCard
-            title="โอนเคลียร์ร้านแล้ว"
+            title={t('stats.totalPaidAmount')}
             value={formatCurrency(Number(summary.totalPaidAmount || 0))}
-            description="ทุนสินค้าที่โอนคืนร้านแล้ว"
+            description={t('stats.totalPaidAmountDesc')}
             icon={CheckCircle2}
           />
           <StatsCard
-            title="ยอดค้างส่งคืนร้านค้า"
+            title={t('stats.pendingPayoutAmount')}
             value={formatCurrency(Number(summary.pendingPayoutAmount || 0))}
-            description="ทุนสินค้าที่ต้องโอนเคลียร์"
+            description={t('stats.pendingPayoutAmountDesc')}
             icon={Clock}
           />
         </div>
@@ -116,21 +121,31 @@ export function ResellerStockTable({
             <TableHeader>
               <TableRow>
                 <TableHead className="bg-background sticky left-0 z-20 w-16 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                  รูปภาพ
+                  {t('columns.image')}
                 </TableHead>
-                <TableHead>สินค้า / ตัวเลือก</TableHead>
-                <TableHead className="text-right">ราคาปลีก / ราคาส่ง</TableHead>
-                <TableHead className="text-center">
-                  การเคลื่อนไหวสต็อก
-                </TableHead>
-                <TableHead className="text-center">คงเหลือขาย</TableHead>
-                <TableHead className="text-right">ยอดขายรวม</TableHead>
+                <TableHead>{t('columns.productVariant')}</TableHead>
                 <TableHead className="text-right">
-                  ทุนเคลียร์เจ้าของร้าน
+                  {t('columns.retailAndWholesale')}
                 </TableHead>
-                <TableHead className="text-center">สถานะรับ</TableHead>
+                <TableHead className="text-center">
+                  {t('columns.stockMovement')}
+                </TableHead>
+                <TableHead className="text-center">
+                  {t('columns.remainingForSale')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('columns.grossSales')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('columns.costToClear')}
+                </TableHead>
+                <TableHead className="text-center">
+                  {t('columns.acceptStatus')}
+                </TableHead>
                 {showActionColumn && (
-                  <TableHead className="text-right">จัดการ</TableHead>
+                  <TableHead className="text-right">
+                    {t('columns.actions')}
+                  </TableHead>
                 )}
               </TableRow>
             </TableHeader>
@@ -140,12 +155,12 @@ export function ResellerStockTable({
               ) : !selectedAgreementId ? (
                 <TableEmptyRow
                   colSpan={totalColumns}
-                  title="โปรดเลือกสัญญาตัวแทนเพื่อดูข้อมูลสต็อกฝากขาย"
+                  title={t('table.selectAgreementPrompt')}
                 />
               ) : stocks.length === 0 ? (
                 <TableEmptyRow
                   colSpan={totalColumns}
-                  title="ยังไม่มีรายการสินค้าฝากขายในสัญญานี้"
+                  title={t('table.noStocks')}
                 />
               ) : (
                 stocks.map((stock) => {
@@ -191,13 +206,17 @@ export function ResellerStockTable({
                           {formatCurrency(retailPrice)}
                         </p>
                         <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs">
-                          <span>ส่ง: {formatCurrency(customPrice)}</span>
+                          <span>
+                            {t('table.wholesaleLabel', {
+                              price: formatCurrency(customPrice),
+                            })}
+                          </span>
                           {canUpdateInventory && onEditPrice && (
                             <Button
                               variant="ghost"
                               size="icon-lg"
                               className="hover:bg-muted size-6"
-                              title="ตั้งราคาส่งเฉพาะรายการ"
+                              title={t('table.customPriceTooltip')}
                               onClick={() => onEditPrice(stock)}
                             >
                               <IconPencil className="size-3" />
@@ -216,7 +235,9 @@ export function ResellerStockTable({
                                     ? `${((accepted - sold) / allocated) * 100}%`
                                     : '0%',
                               }}
-                              title={`คงเหลือรับเข้า: ${accepted - sold}`}
+                              title={t('table.tooltipRemaining', {
+                                count: accepted - sold,
+                              })}
                             />
                             <div
                               className="bg-emerald-500 transition-all"
@@ -226,16 +247,18 @@ export function ResellerStockTable({
                                     ? `${(sold / allocated) * 100}%`
                                     : '0%',
                               }}
-                              title={`ขายแล้ว: ${sold}`}
+                              title={t('table.tooltipSold', { count: sold })}
                             />
                           </div>
                           <div className="text-muted-foreground flex justify-between text-[11px]">
-                            <span>ส่ง: {allocated}</span>
+                            <span>
+                              {t('table.movementSent', { count: allocated })}
+                            </span>
                             <span className="font-medium text-orange-500">
-                              รับ: {accepted}
+                              {t('table.movementAccepted', { count: accepted })}
                             </span>
                             <span className="font-medium text-emerald-500">
-                              ขาย: {sold}
+                              {t('table.movementSold', { count: sold })}
                             </span>
                           </div>
                         </div>
@@ -244,7 +267,7 @@ export function ResellerStockTable({
                         <Badge
                           variant={remaining > 0 ? 'outline' : 'secondary'}
                         >
-                          {remaining} ชิ้น
+                          {t('table.unitPieces', { count: remaining })}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
@@ -256,8 +279,10 @@ export function ResellerStockTable({
                       <TableCell className="text-center">
                         <Badge variant={isAcceptedAll ? 'outline' : 'default'}>
                           {isAcceptedAll
-                            ? 'รับครบแล้ว'
-                            : `รอรับ (${pendingQuantity})`}
+                            ? t('table.statusAcceptedAll')
+                            : t('table.statusPendingAccept', {
+                                count: pendingQuantity,
+                              })}
                         </Badge>
                       </TableCell>
                       {showActionColumn && (
@@ -266,7 +291,7 @@ export function ResellerStockTable({
                             <Button
                               variant="outline"
                               size="icon-lg"
-                              title="คืนสต็อกกลับให้เจ้าของร้าน"
+                              title={t('table.returnStockTooltip')}
                               disabled={allocated - sold <= 0}
                               onClick={() => onReturnStock?.(stock)}
                             >
@@ -279,8 +304,8 @@ export function ResellerStockTable({
                               size="icon-lg"
                               title={
                                 isAcceptedAll
-                                  ? 'รับครบแล้ว'
-                                  : 'กดรับสินค้าเข้าคลัง'
+                                  ? t('table.statusAcceptedAll')
+                                  : t('table.acceptStockTooltip')
                               }
                               disabled={isAcceptedAll}
                               onClick={() => onAcceptStock?.(stock)}

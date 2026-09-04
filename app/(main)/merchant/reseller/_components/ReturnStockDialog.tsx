@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useReturnResellerStock } from '@/actions/hooks/reseller'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { Loader2 } from 'lucide-react'
@@ -31,6 +33,8 @@ export function ReturnStockDialog({
   open,
   setOpen,
 }: ReturnStockDialogProps) {
+  const t = useTranslations('merchant.reseller.return')
+  const tReseller = useTranslations('merchant.reseller')
   const [quantity, setQuantity] = useState<number>(1)
   const { selectedBranchId } = useBranchFilter()
   const { mutate: returnStock, isPending } = useReturnResellerStock()
@@ -56,17 +60,17 @@ export function ReturnStockDialog({
     }
 
     if (selectedBranchId === ALL_BRANCHES) {
-      toast.error('กรุณาเลือกสาขาปลายทางที่ต้องการนำสต็อกกลับเข้า')
+      toast.error(t('toastSelectBranch'))
       return
     }
 
     if (quantity <= 0) {
-      toast.error('จำนวนที่ส่งคืนต้องมากกว่า 0 ชิ้น')
+      toast.error(t('toastMinQuantity'))
       return
     }
 
     if (quantity > remainingQuantity) {
-      toast.error(`ไม่สามารถส่งคืนเกินจำนวนคงเหลือ (${remainingQuantity} ชิ้น)`)
+      toast.error(t('toastOverQuantity', { count: remainingQuantity }))
       return
     }
 
@@ -92,10 +96,8 @@ export function ReturnStockDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>ส่งคืนสินค้า / คืนสต็อกให้ร้านค้า</DialogTitle>
-          <DialogDescription>
-            ดึงสต็อกสินค้าฝากขายกลับเข้าสู่คลังสินค้าของสาขาที่เลือก
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         {stock && (
           <div className="space-y-4 py-2">
@@ -104,29 +106,29 @@ export function ReturnStockDialog({
                 {stock.variant?.product?.title || '-'}
               </p>
               <p className="text-muted-foreground text-xs leading-relaxed break-all whitespace-pre-line">
-                ตัวเลือก: {stock.variant?.title || '-'}
+                {t('variantPrefix', { variant: stock.variant?.title || '-' })}
               </p>
               <div className="text-muted-foreground flex justify-between border-t pt-2 text-xs">
-                <span>จำนวนที่สามารถส่งคืนได้:</span>
+                <span>{t('canReturn')}</span>
                 <span className="text-foreground font-bold">
-                  {remainingQuantity} ชิ้น
+                  {tReseller('table.unitPieces', { count: remainingQuantity })}
                 </span>
               </div>
             </div>
             <div className="space-y-2">
               <Label>
-                สาขาที่รับคืนเข้าคลัง{' '}
+                {t('targetBranchLabel')}{' '}
                 <span className="text-destructive">*</span>
               </Label>
               <BranchSelectField />
               {!isBranchSelected && (
                 <p className="text-destructive text-[0.8rem]">
-                  * กรุณาเลือกสาขาปลายทางก่อนทำรายการ
+                  {t('selectBranchWarning')}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">จำนวนที่ต้องการส่งคืน (ชิ้น)</Label>
+              <Label htmlFor="quantity">{t('quantityLabel')}</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -135,12 +137,9 @@ export function ReturnStockDialog({
                 value={quantity}
                 disabled={!isBranchSelected || isPending}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                placeholder="ระบุจำนวน"
+                placeholder={t('quantityPlaceholder')}
               />
-              <p className="text-muted-foreground text-[0.8rem]">
-                *
-                สต็อกจะถูกตัดออกจากตัวแทนและนำกลับเข้าคลังสินค้าของสาขาที่เลือกทันที
-              </p>
+              <p className="text-muted-foreground text-[0.8rem]">{t('note')}</p>
             </div>
           </div>
         )}
@@ -151,11 +150,11 @@ export function ReturnStockDialog({
             onClick={() => setOpen(false)}
             disabled={isPending}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button onClick={handleReturn} disabled={!canSubmit}>
             {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-            ยืนยันการคืนสต็อก
+            {t('submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -13,6 +15,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { CustomerTable } from './_components/CustomerTable'
 
 export default function CustomerPage() {
+  const t = useTranslations('merchant.customers')
   const { selectedStoreId } = useStoreFilter()
   const { canViewCustomers, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -21,8 +24,8 @@ export default function CustomerPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUserCog}
-        title="จัดการลูกค้า"
-        description="รายชื่อลูกค้าทั้งหมดของร้านค้า"
+        title={t('title')}
+        description={t('description')}
         endContent={<StoreSelectField />}
       />
       {selectedStoreId !== ALL_STORES &&
@@ -30,8 +33,8 @@ export default function CustomerPage() {
       !canViewCustomers ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <CustomerTable />

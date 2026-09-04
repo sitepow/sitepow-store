@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useAcceptResellerStock,
@@ -38,6 +40,7 @@ import { ResellerStockTable } from './_components/ResellerStockTable'
 import { ReturnStockDialog } from './_components/ReturnStockDialog'
 
 export default function ResellerManagementPage() {
+  const t = useTranslations('merchant.reseller')
   const alertId = 'reseller-info-alert'
   const isDismissed = useAlertStore((state) => state.isDismissed(alertId))
   const dismissAlert = useAlertStore((state) => state.dismissAlert)
@@ -149,8 +152,8 @@ export default function ResellerManagementPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBuildingStore}
-        title="จัดการตัวแทนจำหน่าย"
-        description="ติดตามสต็อกสินค้าฝากขาย คำนวณยอดขายสะสม และบันทึกการเคลียร์ยอด Payout"
+        title={t('title')}
+        description={t('description')}
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
@@ -165,7 +168,7 @@ export default function ResellerManagementPage() {
                 disabled={selectedStoreId === ALL_STORES}
               >
                 <IconFilePlus />
-                สร้างสัญญาใหม่
+                {t('newAgreement')}
               </Button>
             )}
             {canCreateReseller && isSupplier && (
@@ -174,7 +177,7 @@ export default function ResellerManagementPage() {
                 disabled={!selectedAgreementId}
               >
                 <IconPlus />
-                เพิ่มสต็อกฝากขาย
+                {t('allocateStock')}
               </Button>
             )}
             {canUpdateFinance && isSupplier && (
@@ -184,7 +187,7 @@ export default function ResellerManagementPage() {
                 disabled={!selectedAgreementId}
               >
                 <IconReceiptRefund />
-                บันทึกการเบิกจ่าย
+                {t('recordPayout')}
               </Button>
             )}
           </div>
@@ -193,22 +196,22 @@ export default function ResellerManagementPage() {
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="กรุณาเลือกร้านค้า"
-          description="โปรดเลือกร้านค้าที่ต้องการจัดการข้อมูลตัวแทนจำหน่าย"
+          title={t('selectStoreTitle')}
+          description={t('selectStoreDesc')}
         />
       ) : !isPermissionLoading && !canViewReseller ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลตัวแทนจำหน่ายของร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <div className="space-y-4">
           {!isDismissed && canUpdateReseller && (
             <ActionRequiredAlert
               variant="info"
-              title="สิทธิ์และการจัดการพนักงานสำหรับตัวแทน"
-              description="เมื่อทำสัญญาเรียบร้อยแล้ว ระบบจะเพิ่มตัวแทนรายนี้เข้าเป็นพนักงานในทีมโดยอัตโนมัติ (ไม่ว่าจะเป็นบัญชีส่วนตัวหรือร้านค้า) พร้อมมอบสิทธิ์การขายและตัดสต็อกสินค้าในหน้าแคชเชียร์ เพื่อส่งยอดขายคืนให้กับร้านค้า"
+              title={t('infoAlertTitle')}
+              description={t('infoAlertDesc')}
               action={
                 <Button
                   size="sm"
@@ -216,7 +219,7 @@ export default function ResellerManagementPage() {
                   onClick={() => dismissAlert(alertId)}
                 >
                   <XIcon />
-                  ปิดหน้าต่าง
+                  {t('closeAlert')}
                 </Button>
               }
             />

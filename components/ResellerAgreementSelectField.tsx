@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useAllResellerAgreements,
   useResellerAgreements,
@@ -33,6 +35,7 @@ export function ResellerAgreementSelectField({
   disabled = false,
   mode = 'default',
 }: ResellerAgreementSelectFieldProps) {
+  const t = useTranslations('merchant.reseller.selectField')
   const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
@@ -70,7 +73,7 @@ export function ResellerAgreementSelectField({
     <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconFileText size={14} />
-        เลือกสัญญาตัวแทน
+        {t('label')}
       </FieldLabel>
       <Select
         value={currentValue}
@@ -79,11 +82,11 @@ export function ResellerAgreementSelectField({
       >
         <SelectTrigger className="w-full sm:w-64">
           <SelectValue
-            placeholder={isLoading ? 'กำลังโหลด...' : 'เลือกสัญญาตัวแทน'}
+            placeholder={isLoading ? t('loading') : t('placeholder')}
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_STORES}>ไม่เลือกสัญญา</SelectItem>
+          <SelectItem value={ALL_STORES}>{t('all')}</SelectItem>
           {agreements.map((agreement) => {
             const isSupplier = agreement.supplierStoreId === storeId
             const userName =
@@ -92,9 +95,9 @@ export function ResellerAgreementSelectField({
             const displayName = isSupplier
               ? agreement.resellerStore?.name ||
                 userName ||
-                `สัญญา ID: ${agreement.id.slice(0, 8)}...`
+                t('agreementIdFallback', { id: agreement.id.slice(0, 8) })
               : agreement.supplierStore?.name ||
-                `สัญญา ID: ${agreement.id.slice(0, 8)}...`
+                t('agreementIdFallback', { id: agreement.id.slice(0, 8) })
 
             return (
               <SelectItem key={agreement.id} value={agreement.id}>

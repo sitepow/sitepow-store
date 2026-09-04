@@ -10,6 +10,8 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { usePOSProducts } from '@/actions/hooks/pos/product'
 import { useAllocateResellerStock } from '@/actions/hooks/reseller'
 import { useBranchFilter } from '@/stores/use-branch-filter'
@@ -50,6 +52,8 @@ export function AllocateStockDialog({
   open,
   setOpen,
 }: AllocateStockDialogProps) {
+  const t = useTranslations('merchant.reseller.allocate')
+  const tReseller = useTranslations('merchant.reseller')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
   const { selectedAgreementId: agreementId } = useResellerFilter()
@@ -132,15 +136,15 @@ export function AllocateStockDialog({
 
   const onSubmit: SubmitHandler<AllocateStockFormValues> = async (values) => {
     if (!agreementId) {
-      return toast.error('ไม่พบสัญญาฝากขายที่ต้องการเติมสต็อก')
+      return toast.error(t('toastNoAgreement'))
     }
 
     if (!values.variantId) {
-      return toast.error('กรุณาเลือกรายการสินค้า')
+      return toast.error(t('toastNoProduct'))
     }
 
     if (values.quantity > maxStock) {
-      return toast.error(`จำนวนคงเหลือไม่พอ (มีคงเหลือ ${maxStock} ชิ้น)`)
+      return toast.error(t('toastStockNotEnough', { count: maxStock }))
     }
 
     allocateStockMutation.mutate(
@@ -166,14 +170,14 @@ export function AllocateStockDialog({
       <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>เติม / เพิ่มสต็อกสินค้าให้ตัวแทน</DialogTitle>
+            <DialogTitle>{t('title')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="bg-muted/40 space-y-3 rounded-lg border p-3">
               <div className="relative">
                 <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
                 <Input
-                  placeholder="พิมพ์ค้นหาน้องสินค้า หรือ SKU..."
+                  placeholder={t('searchPlaceholder')}
                   className="bg-background pl-9"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -184,12 +188,12 @@ export function AllocateStockDialog({
             </div>
             <Field>
               <FieldLabel className="text-muted-foreground text-xs font-semibold">
-                เลือกรายการสินค้า / ตัวเลือก
+                {t('selectProductLabel')}
               </FieldLabel>
               <Controller
                 control={control}
                 name="variantId"
-                rules={{ required: 'กรุณาเลือกรายการสินค้า' }}
+                rules={{ required: t('toastNoProduct') }}
                 render={({ field }) => (
                   <ScrollArea className="h-64 pr-2">
                     {isProductsLoading ? (
@@ -199,7 +203,7 @@ export function AllocateStockDialog({
                     ) : products.length === 0 ? (
                       <div className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-2 text-center">
                         <IconPackage className="size-8 opacity-40" />
-                        <p className="text-sm">ไม่พบรายการสินค้า</p>
+                        <p className="text-sm">{t('noProducts')}</p>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -249,8 +253,10 @@ export function AllocateStockDialog({
                                       }
                                     >
                                       {isOutOfStock
-                                        ? 'หมดสต็อก'
-                                        : `คงเหลือ: ${formatNumber(stockQty)} ชิ้น`}
+                                        ? t('outOfStock')
+                                        : t('remaining', {
+                                            count: formatNumber(stockQty),
+                                          })}
                                     </Badge>
                                     <span className="text-primary text-sm font-semibold whitespace-nowrap">
                                       {formatCurrency(
@@ -272,10 +278,10 @@ export function AllocateStockDialog({
             </Field>
             <Field>
               <div className="flex items-center justify-between">
-                <FieldLabel>จำนวนที่ต้องการเติม (ชิ้น)</FieldLabel>
+                <FieldLabel>{t('quantityLabel')}</FieldLabel>
                 {selectedVariant && (
                   <span className="text-muted-foreground text-xs">
-                    คงเหลือในระบบ: {formatNumber(maxStock)} ชิ้น
+                    {t('systemStock', { count: formatNumber(maxStock) })}
                   </span>
                 )}
               </div>
@@ -283,16 +289,16 @@ export function AllocateStockDialog({
                 type="number"
                 min={1}
                 max={maxStock > 0 ? maxStock : undefined}
-                placeholder="กรอกจำนวน..."
+                placeholder={t('quantityPlaceholder')}
                 {...register('quantity', {
                   valueAsNumber: true,
-                  required: 'กรุณากรอกจำนวน',
-                  min: { value: 1, message: 'จำนวนต้องอย่างน้อย 1 ชิ้น' },
+                  required: t('quantityRequired'),
+                  min: { value: 1, message: t('quantityMin') },
                   max: {
                     value: maxStock,
                     message: selectedVariant
-                      ? `จำนวนต้องไม่เกินสต็อกคงเหลือ (${maxStock} ชิ้น)`
-                      : 'จำนวนเกินสต็อกคงเหลือ',
+                      ? t('quantityMax', { count: maxStock })
+                      : t('quantityOver'),
                   },
                 })}
                 disabled={isPending || !selectedVariantId || maxStock <= 0}
@@ -302,19 +308,27 @@ export function AllocateStockDialog({
             {selectedVariant && (
               <div className="bg-muted/30 space-y-1.5 rounded-lg border p-3 text-xs">
                 <div className="text-muted-foreground flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between">
-                  <span className="shrink-0">สินค้าที่เลือก:</span>
+                  <span className="shrink-0">{t('selectedProduct')}</span>
                   <span className="text-foreground font-medium break-all whitespace-pre-line sm:text-right">
                     {selectedVariant.productTitle} ({selectedVariant.title})
                   </span>
                 </div>
                 <div className="text-muted-foreground flex justify-between">
-                  <span>สต็อกคงเหลือปัจจุบัน:</span>
-                  <span>{formatNumber(maxStock)} ชิ้น</span>
+                  <span>{t('currentStock')}</span>
+                  <span>
+                    {tReseller('table.unitPieces', {
+                      count: formatNumber(maxStock),
+                    })}
+                  </span>
                 </div>
                 <div className="text-foreground flex justify-between border-t pt-1.5 text-sm font-bold">
-                  <span>คงเหลือหลังจัดสรร:</span>
+                  <span>{t('afterAllocation')}</span>
                   <span className="text-primary">
-                    {formatNumber(Math.max(0, maxStock - inputQuantity))} ชิ้น
+                    {tReseller('table.unitPieces', {
+                      count: formatNumber(
+                        Math.max(0, maxStock - inputQuantity),
+                      ),
+                    })}
                   </span>
                 </div>
               </div>
@@ -328,7 +342,7 @@ export function AllocateStockDialog({
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  ล้างข้อมูล
+                  {t('reset')}
                 </Button>
               ) : (
                 <Button
@@ -337,7 +351,7 @@ export function AllocateStockDialog({
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  ยกเลิก
+                  {t('cancel')}
                 </Button>
               )}
               <Button
@@ -346,10 +360,10 @@ export function AllocateStockDialog({
               >
                 {isPending ? (
                   <>
-                    <Spinner /> กำลังบันทึก...
+                    <Spinner /> {t('submitting')}
                   </>
                 ) : (
-                  'บันทึกเติมสต็อก'
+                  t('submit')
                 )}
               </Button>
             </DialogFooter>

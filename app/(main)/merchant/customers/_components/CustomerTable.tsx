@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useBlockCustomer,
   useCustomers,
@@ -29,6 +31,7 @@ import {
 } from '@/components/ui/table'
 
 export function CustomerTable() {
+  const t = useTranslations('merchant.customers')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -57,8 +60,8 @@ export function CustomerTable() {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title="ไม่มีสิทธิ์เข้าถึง"
-        description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
+        title={t('noAccessTitle')}
+        description={t('noAccessDescription')}
       />
     )
   }
@@ -72,16 +75,22 @@ export function CustomerTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสลูกค้า</TableHead>
-              <TableHead>ชื่อลูกค้า</TableHead>
-              <TableHead>อีเมล</TableHead>
-              <TableHead>เบอร์โทร</TableHead>
-              <TableHead>สถานะบล็อกสลิป</TableHead>
-              <TableHead>กำหนดปลดล็อก</TableHead>
-              <TableHead className="text-right">แต้มสะสม</TableHead>
-              <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
+              <TableHead>{t('columns.customerId')}</TableHead>
+              <TableHead>{t('columns.name')}</TableHead>
+              <TableHead>{t('columns.email')}</TableHead>
+              <TableHead>{t('columns.phone')}</TableHead>
+              <TableHead>{t('columns.blockStatus')}</TableHead>
+              <TableHead>{t('columns.unblockDate')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.points')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('columns.totalSpent')}
+              </TableHead>
               {showManageColumn && (
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -89,10 +98,7 @@ export function CustomerTable() {
             {(isLoading || isPermissionLoading) && customers.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : customers.length === 0 ? (
-              <TableEmptyRow
-                colSpan={totalColumns}
-                title="ยังไม่มีข้อมูลลูกค้า"
-              />
+              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
             ) : (
               customers.map((item) => (
                 <TableRow key={item.customer.id}>
@@ -113,7 +119,9 @@ export function CustomerTable() {
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.isBlocked ? (
                       <span className="text-destructive">
-                        โดนบล็อก ({getBlockMessage(item.blockedUntil)})
+                        {t('blockedReason', {
+                          reason: getBlockMessage(item.blockedUntil),
+                        })}
                       </span>
                     ) : (
                       '-'
@@ -136,8 +144,8 @@ export function CustomerTable() {
                         <DeleteButton
                           isPending={unblockMutation.isPending}
                           icon={<IconLockOpen />}
-                          title="ยืนยันการปลดล็อกลูกค้า?"
-                          description="คุณต้องการปลดล็อกการอัปโหลดสลิปให้กับลูกค้ารายนี้ใช่หรือไม่?"
+                          title={t('unblockConfirmTitle')}
+                          description={t('unblockConfirmDescription')}
                           onDelete={() =>
                             unblockMutation.mutate({
                               customerId: item.customer.id,
@@ -149,8 +157,8 @@ export function CustomerTable() {
                         <DeleteButton
                           isPending={blockMutation.isPending}
                           icon={<IconLock />}
-                          title="ยืนยันการบล็อกลูกค้า?"
-                          description="คุณต้องการบล็อกการอัปโหลดสลิปของลูกค้ารายนี้ใช่หรือไม่?"
+                          title={t('blockConfirmTitle')}
+                          description={t('blockConfirmDescription')}
                           onDelete={() =>
                             blockMutation.mutate({
                               customerId: item.customer.id,

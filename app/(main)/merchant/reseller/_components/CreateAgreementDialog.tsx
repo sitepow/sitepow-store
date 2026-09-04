@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useCreateResellerAgreement } from '@/actions/hooks/reseller'
 import { ResellerType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -46,6 +48,7 @@ export function CreateAgreementDialog({
   setOpen,
   onSuccess,
 }: CreateAgreementDialogProps) {
+  const t = useTranslations('merchant.reseller.createAgreement')
   const { selectedStoreId } = useStoreFilter()
   const createAgreementMutation = useCreateResellerAgreement()
 
@@ -103,11 +106,11 @@ export function CreateAgreementDialog({
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            toast.success('สร้างสัญญาตัวแทนจำหน่ายสำเร็จ')
+            toast.success(t('success'))
             onSuccess?.(res.data.id)
             handleClose()
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาดในการสร้างสัญญา')
+            toast.error(res.message || t('error'))
           }
         },
       },
@@ -121,11 +124,11 @@ export function CreateAgreementDialog({
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>สร้างสัญญาตัวแทนจำหน่ายใหม่</DialogTitle>
+            <DialogTitle>{t('title')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>
-              <FieldLabel>ประเภทตัวแทน</FieldLabel>
+              <FieldLabel>{t('resellerType')}</FieldLabel>
               <Select
                 value={resellerType}
                 onValueChange={(val: ResellerType) =>
@@ -134,25 +137,25 @@ export function CreateAgreementDialog({
                 disabled={isPending}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="เลือกประเภทตัวแทน" />
+                  <SelectValue placeholder={t('selectType')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ResellerType.EXTERNAL}>
-                    บุคคลธรรมดา / ตัวแทนภายนอก (Customer)
+                    {t('typeExternal')}
                   </SelectItem>
                   <SelectItem value={ResellerType.INTERNAL_STORE}>
-                    ร้านค้าในระบบ (Store)
+                    {t('typeInternal')}
                   </SelectItem>
                 </SelectContent>
               </Select>
             </Field>
             {resellerType === ResellerType.EXTERNAL ? (
               <Field>
-                <FieldLabel>รหัสลูกค้า (Customer ID)</FieldLabel>
+                <FieldLabel>{t('customerId')}</FieldLabel>
                 <Input
-                  placeholder="ระบุ Customer ID"
+                  placeholder={t('customerIdPlaceholder')}
                   {...register('resellerCustomerId', {
-                    required: 'กรุณาระบุ Customer ID',
+                    required: t('customerIdRequired'),
                   })}
                   disabled={isPending}
                 />
@@ -160,11 +163,11 @@ export function CreateAgreementDialog({
               </Field>
             ) : (
               <Field>
-                <FieldLabel>รหัสร้านค้าตัวแทน (Store ID)</FieldLabel>
+                <FieldLabel>{t('storeId')}</FieldLabel>
                 <Input
-                  placeholder="ระบุ Store ID ของตัวแทน"
+                  placeholder={t('storeIdPlaceholder')}
                   {...register('resellerStoreId', {
-                    required: 'กรุณาระบุ Store ID',
+                    required: t('storeIdRequired'),
                   })}
                   disabled={isPending}
                 />
@@ -172,15 +175,15 @@ export function CreateAgreementDialog({
               </Field>
             )}
             <Field>
-              <FieldLabel>ส่วนลด / คอมมิชชัน (%)</FieldLabel>
+              <FieldLabel>{t('commissionRate')}</FieldLabel>
               <Input
                 type="number"
                 step="0.01"
-                placeholder="10"
+                placeholder={t('commissionRatePlaceholder')}
                 {...register('commissionRate', {
                   valueAsNumber: true,
-                  min: { value: 0, message: 'ต้องไม่ติดลบ' },
-                  max: { value: 100, message: 'ต้องไม่เกิน 100%' },
+                  min: { value: 0, message: t('commissionNonNegative') },
+                  max: { value: 100, message: t('commissionMax') },
                 })}
                 disabled={isPending}
               />
@@ -195,7 +198,7 @@ export function CreateAgreementDialog({
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  ล้างข้อมูล
+                  {t('reset')}
                 </Button>
               ) : (
                 <Button
@@ -204,16 +207,16 @@ export function CreateAgreementDialog({
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  ยกเลิก
+                  {t('cancel')}
                 </Button>
               )}
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> กำลังสร้าง...
+                    <Spinner /> {t('submitting')}
                   </>
                 ) : (
-                  'สร้างสัญญา'
+                  t('submit')
                 )}
               </Button>
             </DialogFooter>
