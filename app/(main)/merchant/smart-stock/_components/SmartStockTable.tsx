@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { MOCK_SMART_STOCK_ITEMS, SmartStockItem } from '@/constants/smart-stock'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
@@ -47,6 +49,7 @@ interface SmartStockTableProps {
 }
 
 export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
+  const t = useTranslations('merchant.smartStock')
   const [items, setItems] = useState<SmartStockItem[]>(MOCK_SMART_STOCK_ITEMS)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
@@ -97,19 +100,19 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                 ...item.channels.shopee,
                 quantity: newLocal,
                 status: newLocal === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
               lazada: {
                 ...item.channels.lazada,
                 quantity: newLocal,
                 status: newLocal === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
               facebook: {
                 ...item.channels.facebook,
                 quantity: newLocal,
                 status: newLocal === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
             },
           }
@@ -120,7 +123,10 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
 
     const updated = items.find((i) => i.id === id)
     toast.success(
-      `อัปเดตสต็อก ${updated?.sku || ''} เป็น ${Math.max(0, (updated?.localStock || 0) + delta)} ชิ้น`,
+      t('toast.stockUpdated', {
+        sku: updated?.sku || '',
+        quantity: Math.max(0, (updated?.localStock || 0) + delta),
+      }),
     )
   }
 
@@ -137,19 +143,19 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                   ...i.channels.shopee,
                   quantity: i.localStock,
                   status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                  lastSyncedAt: 'เมื่อสักครู่',
+                  lastSyncedAt: t('justNow'),
                 },
                 lazada: {
                   ...i.channels.lazada,
                   quantity: i.localStock,
                   status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                  lastSyncedAt: 'เมื่อสักครู่',
+                  lastSyncedAt: t('justNow'),
                 },
                 facebook: {
                   ...i.channels.facebook,
                   quantity: i.localStock,
                   status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                  lastSyncedAt: 'เมื่อสักครู่',
+                  lastSyncedAt: t('justNow'),
                 },
               },
             }
@@ -158,7 +164,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
         }),
       )
       setSyncingId(null)
-      toast.success(`ซิงค์สต็อก ${item.sku} ไปยังทุกแพลตฟอร์มสำเร็จ`)
+      toast.success(t('toast.syncSingleSuccess', { sku: item.sku }))
       onMismatchResolved?.()
     }, 500)
   }
@@ -174,25 +180,25 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
               ...i.channels.shopee,
               quantity: i.localStock,
               status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-              lastSyncedAt: 'เมื่อสักครู่',
+              lastSyncedAt: t('justNow'),
             },
             lazada: {
               ...i.channels.lazada,
               quantity: i.localStock,
               status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-              lastSyncedAt: 'เมื่อสักครู่',
+              lastSyncedAt: t('justNow'),
             },
             facebook: {
               ...i.channels.facebook,
               quantity: i.localStock,
               status: i.localStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-              lastSyncedAt: 'เมื่อสักครู่',
+              lastSyncedAt: t('justNow'),
             },
           },
         })),
       )
       setIsSyncingAll(false)
-      toast.success('ซิงค์สต็อกสินค้าทุกช่องทางเรียบร้อยแล้ว')
+      toast.success(t('toast.syncAllSuccess'))
       onMismatchResolved?.()
     }, 800)
   }
@@ -203,7 +209,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
     const qty = simQty
 
     if (item.localStock < qty) {
-      toast.error('สต็อกในคลังมีไม่เพียงพอ')
+      toast.error(t('toast.insufficientStock'))
       return
     }
 
@@ -221,19 +227,19 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                 ...i.channels.shopee,
                 quantity: newStock,
                 status: newStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
               lazada: {
                 ...i.channels.lazada,
                 quantity: newStock,
                 status: newStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
               facebook: {
                 ...i.channels.facebook,
                 quantity: newStock,
                 status: newStock === 0 ? 'OUT_OF_STOCK' : 'IN_SYNC',
-                lastSyncedAt: 'เมื่อสักครู่',
+                lastSyncedAt: t('justNow'),
               },
             },
           }
@@ -242,16 +248,23 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
       }),
     )
 
-    const channelNames = {
-      local: 'หน้าร้าน POS',
-      shopee: 'Shopee',
-      lazada: 'Lazada',
-      facebook: 'Facebook Marketplace',
+    const channelNames: Record<
+      'local' | 'shopee' | 'lazada' | 'facebook',
+      string
+    > = {
+      local: t('channels.local'),
+      shopee: t('channels.shopee'),
+      lazada: t('channels.lazada'),
+      facebook: t('channels.facebook'),
     }
 
     setSimulationTarget(null)
     toast.success(
-      `จำลองขายผ่าน ${channelNames[channel]} จำนวน ${qty} ชิ้นสำเร็จ (สต็อกคงเหลือ ${newStock} ชิ้น)`,
+      t('toast.simulateSuccess', {
+        channel: channelNames[channel],
+        quantity: qty,
+        remaining: newStock,
+      }),
     )
   }
 
@@ -262,7 +275,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
           <div className="relative w-full sm:w-72">
             <IconSearch className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              placeholder="ค้นหาชื่อสินค้า หรือ SKU..."
+              placeholder={t('searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 pl-9"
@@ -270,15 +283,15 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="h-9 w-full sm:w-52">
-              <SelectValue placeholder="กรองสถานะ" />
+              <SelectValue placeholder={t('filter.placeholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">แสดงสินค้าทั้งหมด</SelectItem>
-              <SelectItem value="MISMATCH">
-                พบสต็อกไม่ตรงกัน (Mismatch)
+              <SelectItem value="ALL">{t('filter.all')}</SelectItem>
+              <SelectItem value="MISMATCH">{t('filter.mismatch')}</SelectItem>
+              <SelectItem value="LOW_STOCK">{t('filter.lowStock')}</SelectItem>
+              <SelectItem value="OUT_OF_STOCK">
+                {t('filter.outOfStock')}
               </SelectItem>
-              <SelectItem value="LOW_STOCK">สต็อกใกล้หมด</SelectItem>
-              <SelectItem value="OUT_OF_STOCK">สินค้าหมด</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -293,7 +306,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
           ) : (
             <IconRefresh className="mr-1.5 h-3.5 w-3.5" />
           )}
-          ซิงค์สต็อกทั้งหมด
+          {t('syncAll')}
         </Button>
       </div>
       <div className="bg-background overflow-x-auto rounded-md border">
@@ -301,15 +314,27 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 z-20 w-16 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                รูปภาพ
+                {t('columns.image')}
               </TableHead>
-              <TableHead>สินค้า / SKU</TableHead>
-              <TableHead className="text-center">Local (HQ)</TableHead>
-              <TableHead className="text-center">Shopee</TableHead>
-              <TableHead className="text-center">Lazada</TableHead>
-              <TableHead className="text-center">Facebook</TableHead>
-              <TableHead className="text-center">สถานะ</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.productSku')}</TableHead>
+              <TableHead className="text-center">
+                {t('columns.localHq')}
+              </TableHead>
+              <TableHead className="text-center">
+                {t('columns.shopee')}
+              </TableHead>
+              <TableHead className="text-center">
+                {t('columns.lazada')}
+              </TableHead>
+              <TableHead className="text-center">
+                {t('columns.facebook')}
+              </TableHead>
+              <TableHead className="text-center">
+                {t('columns.status')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -319,7 +344,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                   colSpan={8}
                   className="text-muted-foreground h-28 text-center"
                 >
-                  ไม่พบข้อมูลสินค้าที่ค้นหา
+                  {t('empty')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -360,7 +385,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                           className="size-6 p-0"
                           disabled={item.localStock <= 0}
                           onClick={() => handleAdjustLocalStock(item.id, -1)}
-                          title="ลดสต็อก"
+                          title={t('decreaseStock')}
                         >
                           <IconMinus size={12} />
                         </Button>
@@ -372,7 +397,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                           size="icon"
                           className="size-6 p-0"
                           onClick={() => handleAdjustLocalStock(item.id, +1)}
-                          title="เพิ่มสต็อก"
+                          title={t('increaseStock')}
                         >
                           <IconPlus size={12} />
                         </Button>
@@ -383,7 +408,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                         {formatNumber(item.channels.shopee.quantity)}
                       </div>
                       <Badge className="mt-0.5 text-[10px] font-normal">
-                        In-Sync
+                        {t('badges.inSync')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
@@ -395,13 +420,13 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                           variant="destructive"
                           className="mt-0.5 cursor-pointer text-[10px] font-normal"
                           onClick={() => handleSyncRow(item)}
-                          title="กดเพื่อซิงค์ให้ตรงกัน"
+                          title={t('badges.mismatchTooltip')}
                         >
-                          ไม่ตรงกัน
+                          {t('badges.mismatch')}
                         </Badge>
                       ) : (
                         <Badge className="mt-0.5 text-[10px] font-normal">
-                          In-Sync
+                          {t('badges.inSync')}
                         </Badge>
                       )}
                     </TableCell>
@@ -410,16 +435,20 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                         {formatNumber(item.channels.facebook.quantity)}
                       </div>
                       <Badge className="mt-0.5 text-[10px] font-normal">
-                        In-Sync
+                        {t('badges.inSync')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center">
                       {hasMismatch ? (
-                        <Badge variant="destructive">รอซิงค์</Badge>
+                        <Badge variant="destructive">
+                          {t('badges.pendingSync')}
+                        </Badge>
                       ) : item.localStock === 0 ? (
-                        <Badge variant="destructive">หมด</Badge>
+                        <Badge variant="destructive">
+                          {t('badges.outOfStock')}
+                        </Badge>
                       ) : (
-                        <Badge variant="outline">สมบูรณ์</Badge>
+                        <Badge variant="outline">{t('badges.complete')}</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -429,14 +458,14 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                           size="sm"
                           disabled={isSyncing}
                           onClick={() => handleSyncRow(item)}
-                          title="ซิงค์สินค้านี้"
+                          title={t('actions.syncTooltip')}
                         >
                           {isSyncing ? (
                             <Spinner className="mr-1 h-3.5 w-3.5" />
                           ) : (
                             <IconRefresh size={13} className="mr-1" />
                           )}
-                          ซิงค์
+                          {t('actions.sync')}
                         </Button>
                         <Button
                           variant="ghost"
@@ -445,10 +474,10 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                             setSimulationTarget({ item, channel: 'shopee' })
                             setSimQty(1)
                           }}
-                          title="จำลองคำสั่งซื้อ"
+                          title={t('actions.simulateTooltip')}
                         >
                           <IconPlayerPlay size={13} className="mr-1" />
-                          จำลองขาย
+                          {t('actions.simulate')}
                         </Button>
                       </div>
                     </TableCell>
@@ -465,10 +494,8 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>จำลองการขายตัดสต็อก</DialogTitle>
-            <DialogDescription>
-              ทดสอบจำลองคำสั่งซื้อเพื่อดูการตัดสต็อกคลังกลางและซิงค์ไปยังช่องทางอื่นๆ
-            </DialogDescription>
+            <DialogTitle>{t('dialog.title')}</DialogTitle>
+            <DialogDescription>{t('dialog.description')}</DialogDescription>
           </DialogHeader>
 
           {simulationTarget && (
@@ -482,13 +509,15 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                   SKU: {simulationTarget.item.sku}
                 </div>
                 <div>
-                  สต็อกปัจจุบัน: {simulationTarget.item.localStock} ชิ้น
+                  {t('dialog.currentStock', {
+                    quantity: simulationTarget.item.localStock,
+                  })}
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-medium">
-                  ช่องทางที่เกิดคำสั่งซื้อ
+                  {t('dialog.channelLabel')}
                 </label>
                 <Select
                   value={simulationTarget.channel}
@@ -500,18 +529,22 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="shopee">Shopee</SelectItem>
-                    <SelectItem value="lazada">Lazada</SelectItem>
-                    <SelectItem value="facebook">
-                      Facebook Marketplace
+                    <SelectItem value="shopee">
+                      {t('channels.shopee')}
                     </SelectItem>
-                    <SelectItem value="local">หน้าร้าน POS</SelectItem>
+                    <SelectItem value="lazada">
+                      {t('channels.lazada')}
+                    </SelectItem>
+                    <SelectItem value="facebook">
+                      {t('channels.facebook')}
+                    </SelectItem>
+                    <SelectItem value="local">{t('channels.local')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium">
-                  จำนวนที่ขายออก (ชิ้น)
+                  {t('dialog.quantityLabel')}
                 </label>
                 <Input
                   type="number"
@@ -526,9 +559,11 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSimulationTarget(null)}>
-              ยกเลิก
+              {t('dialog.cancel')}
             </Button>
-            <Button onClick={handleConfirmSimulation}>ยืนยันการจำลอง</Button>
+            <Button onClick={handleConfirmSimulation}>
+              {t('dialog.confirm')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

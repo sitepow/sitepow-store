@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl'
+
 import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconCategory } from '@tabler/icons-react'
@@ -21,6 +23,8 @@ export function ExpenseCategorySelectField({
   value,
   onValueChange,
 }: ExpenseCategorySelectFieldProps) {
+  const t = useTranslations('merchant.expenses')
+  const tCategories = useTranslations('merchant.expenses.categories')
   const isMounted = useIsMounted()
 
   if (!isMounted) {
@@ -31,17 +35,17 @@ export function ExpenseCategorySelectField({
     <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconCategory size={14} />
-        เลือกหมวดหมู่
+        {t('categoryFilterLabel')}
       </FieldLabel>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full sm:w-48">
-          <SelectValue placeholder="หมวดหมู่ทั้งหมด" />
+          <SelectValue placeholder={t('allCategories')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="ALL">หมวดหมู่ทั้งหมด</SelectItem>
+          <SelectItem value="ALL">{t('allCategories')}</SelectItem>
           {Object.entries(EXPENSE_CATEGORY_TH).map(([key, label]) => (
             <SelectItem key={key} value={key}>
-              {label}
+              {tCategories.has(key as any) ? tCategories(key as any) : label}
             </SelectItem>
           ))}
         </SelectContent>

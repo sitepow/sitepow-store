@@ -7,6 +7,7 @@
     "store-settings/products": "จัดการสินค้า",
     "store-settings/categories": "หมวดหมู่สินค้า",
     "inventory": "คลังสินค้า",
+    "smart-stock": "สต็อกสินค้าอัจฉริยะ",
     "expenses": "จัดการค่าใช้จ่าย",
     "reseller": "ตัวแทนจำหน่าย",
     "customers": "จัดการลูกค้า",
@@ -494,6 +495,93 @@
       "confirm": "ยืนยันการโอนย้าย"
     }
   },
+  "smartStock": {
+    "title": "สต็อกสินค้าอัจฉริยะ",
+    "description": "ตรวจสอบและจัดการสต็อกสินค้าแบบซิงค์อัตโนมัติระหว่างคลังหน้าร้าน (Local), Shopee, Lazada และ Facebook Marketplace",
+    "apiSettings": "ตั้งค่าเชื่อมต่อ API",
+    "noAccessTitle": "ไม่มีสิทธิ์เข้าถึง",
+    "noAccessDescription": "คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้",
+    "acknowledged": "รับทราบแล้ว",
+    "mismatchAlert": {
+      "title": "พบสินค้าสต็อกไม่ตรงกัน {count} รายการ",
+      "description": "สินค้า '{product}' บน Lazada มียอดสต็อกไม่ตรงกับคลังหลัก กรุณากดปุ่มซิงค์เพื่อปรับให้ตรงกัน"
+    },
+    "sharedPoolAlert": {
+      "title": "ระบบซิงค์สต็อกรวมศูนย์อัตโนมัติ (Shared Pool Stock)",
+      "description": "เมื่อมีการขายสินค้าเกิดขึ้นผ่านหน้าร้าน POS หรือมาร์เก็ตเพลสใดๆ ยอดสต็อกในคลังหลักจะถูกตัด และกระจายยอดใหม่ไปยัง Shopee, Lazada และ Facebook Marketplace แบบเรียลไทม์เพื่อป้องกันการขายเกินสต็อก"
+    },
+    "cards": {
+      "totalStock": "สต็อกรวมทุกช่องทาง",
+      "pieces": "ชิ้น",
+      "totalSkus": "ครอบคลุมทั้งหมด {count} รายการสินค้า",
+      "mainWarehouse": "คลังหลักหน้าร้าน (HQ)",
+      "mainWarehouseDesc": "สต็อกตั้งต้นสำหรับตัดขาย POS & หน้าเว็บ",
+      "connectedChannels": "ช่องทางที่เชื่อมต่อ",
+      "platforms": "{count} แพลตฟอร์ม",
+      "connectedChannelsDesc": "Shopee, Lazada, Facebook Marketplace",
+      "stockAccuracy": "ความถูกต้องของสต็อก",
+      "stockAccuracyDesc": "ตรงกัน {synced} รายการ, ต้องตรวจสอบ {mismatch} รายการ"
+    },
+    "searchPlaceholder": "ค้นหาชื่อสินค้า หรือ SKU...",
+    "filter": {
+      "placeholder": "กรองสถานะ",
+      "all": "แสดงสินค้าทั้งหมด",
+      "mismatch": "พบสต็อกไม่ตรงกัน (Mismatch)",
+      "lowStock": "สต็อกใกล้หมด",
+      "outOfStock": "สินค้าหมด"
+    },
+    "syncAll": "ซิงค์สต็อกทั้งหมด",
+    "columns": {
+      "image": "รูปภาพ",
+      "productSku": "สินค้า / SKU",
+      "localHq": "Local (HQ)",
+      "shopee": "Shopee",
+      "lazada": "Lazada",
+      "facebook": "Facebook",
+      "status": "สถานะ",
+      "actions": "จัดการ"
+    },
+    "empty": "ไม่พบข้อมูลสินค้าที่ค้นหา",
+    "decreaseStock": "ลดสต็อก",
+    "increaseStock": "เพิ่มสต็อก",
+    "badges": {
+      "inSync": "In-Sync",
+      "mismatch": "ไม่ตรงกัน",
+      "mismatchTooltip": "กดเพื่อซิงค์ให้ตรงกัน",
+      "pendingSync": "รอซิงค์",
+      "outOfStock": "หมด",
+      "complete": "สมบูรณ์"
+    },
+    "actions": {
+      "sync": "ซิงค์",
+      "syncTooltip": "ซิงค์สินค้านี้",
+      "simulate": "จำลองขาย",
+      "simulateTooltip": "จำลองคำสั่งซื้อ"
+    },
+    "channels": {
+      "local": "หน้าร้าน POS",
+      "shopee": "Shopee",
+      "lazada": "Lazada",
+      "facebook": "Facebook Marketplace"
+    },
+    "toast": {
+      "stockUpdated": "อัปเดตสต็อก {sku} เป็น {quantity} ชิ้น",
+      "syncSingleSuccess": "ซิงค์สต็อก {sku} ไปยังทุกแพลตฟอร์มสำเร็จ",
+      "syncAllSuccess": "ซิงค์สต็อกสินค้าทุกช่องทางเรียบร้อยแล้ว",
+      "insufficientStock": "สต็อกในคลังมีไม่เพียงพอ",
+      "simulateSuccess": "จำลองขายผ่าน {channel} จำนวน {quantity} ชิ้นสำเร็จ (สต็อกคงเหลือ {remaining} ชิ้น)"
+    },
+    "justNow": "เมื่อสักครู่",
+    "dialog": {
+      "title": "จำลองการขายตัดสต็อก",
+      "description": "ทดสอบจำลองคำสั่งซื้อเพื่อดูการตัดสต็อกคลังกลางและซิงค์ไปยังช่องทางอื่นๆ",
+      "currentStock": "สต็อกปัจจุบัน: {quantity} ชิ้น",
+      "channelLabel": "ช่องทางที่เกิดคำสั่งซื้อ",
+      "quantityLabel": "จำนวนที่ขายออก (ชิ้น)",
+      "cancel": "ยกเลิก",
+      "confirm": "ยืนยันการจำลอง"
+    }
+  },
   "expenses": {
     "title": "จัดการค่าใช้จ่าย",
     "description": "บันทึกและติดตามรายการค่าใช้จ่ายของร้านค้า",
@@ -502,7 +590,11 @@
     "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูข้อมูลค่าใช้จ่ายของสาขาหรือร้านค้านี้",
     "empty": "ยังไม่มีรายการค่าใช้จ่าย",
     "allBranches": "ทุกสาขา",
+    "allCategories": "หมวดหมู่ทั้งหมด",
+    "categoryFilterLabel": "เลือกหมวดหมู่",
     "viewReceiptImage": "คลิกเพื่อดูรูปหลักฐาน",
+    "deleteConfirmTitle": "ยืนยันการลบค่าใช้จ่าย?",
+    "deleteConfirmDescription": "คุณต้องการลบรายการค่าใช้จ่ายนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้",
     "edit": "แก้ไข",
     "delete": "ลบ",
     "columns": {
@@ -514,6 +606,36 @@
       "receipt": "หลักฐาน / หมายเหตุ",
       "recordedBy": "ผู้บันทึก",
       "actions": "จัดการ"
+    },
+    "categories": {
+      "UTILITIES": "ค่าน้ำ/ค่าไฟ/อินเทอร์เน็ต",
+      "RENT": "ค่าเช่าสถานที่",
+      "SALARY": "เงินเดือน/ค่าจ้าง",
+      "SUPPLIES": "อุปกรณ์/วัตถุดิบ",
+      "MARKETING": "การตลาด/โฆษณา",
+      "MAINTENANCE": "ซ่อมแซม/บำรุงรักษา",
+      "TRANSPORT": "ค่าเดินทาง/ขนส่ง",
+      "OTHER": "อื่นๆ"
+    },
+    "dialog": {
+      "editTitle": "แก้ไขรายการค่าใช้จ่าย",
+      "createTitle": "เพิ่มรายการค่าใช้จ่าย",
+      "titleLabel": "รายการ / ชื่อค่าใช้จ่าย",
+      "titlePlaceholder": "เช่น ค่าไฟประจำเดือน ม.ค.",
+      "amountLabel": "จำนวนเงิน (บาท)",
+      "amountPlaceholder": "0.00",
+      "expenseDateLabel": "วันที่จ่าย",
+      "categoryLabel": "หมวดหมู่",
+      "selectCategory": "เลือกหมวดหมู่",
+      "branchLabel": "สาขาที่รับผิดชอบ (ตัวเลือก)",
+      "receiptImageLabel": "แนบรูปสลิป / ใบเสร็จ (ขนาดไฟล์สูงสุด 10 MB)",
+      "imageUploadError": "อัพโหลดรูปภาพไม่สำเร็จ",
+      "noteLabel": "หมายเหตุ",
+      "notePlaceholder": "รายละเอียดเพิ่มเติม...",
+      "reset": "ล้างการตั้งค่า",
+      "cancel": "ยกเลิก",
+      "save": "บันทึกข้อมูล",
+      "saving": "กำลังบันทึก..."
     }
   },
   "customers": {

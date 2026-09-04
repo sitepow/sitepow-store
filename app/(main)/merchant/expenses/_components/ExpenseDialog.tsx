@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranchOptions } from '@/actions/hooks/branch'
 import {
   useCreateExpense,
@@ -63,6 +65,8 @@ export function ExpenseDialog({
   open: boolean
   setOpen: (v: boolean) => void
 }) {
+  const t = useTranslations('merchant.expenses')
+  const tCategories = useTranslations('merchant.expenses.categories')
   const { selectedStoreId } = useStoreFilter()
   const createExpenseMutation = useCreateExpense()
   const updateExpenseMutation = useUpdateExpense()
@@ -144,7 +148,7 @@ export function ExpenseDialog({
       const res = await uploadMutation.mutateAsync(formData)
 
       if (!res.success) {
-        return toast.error('อัพโหลดรูปภาพไม่สำเร็จ')
+        return toast.error(t('dialog.imageUploadError'))
       }
 
       imageUrl = res.url
@@ -190,14 +194,14 @@ export function ExpenseDialog({
         <FormProvider {...methods}>
           <DialogHeader>
             <DialogTitle>
-              {expenseId ? 'แก้ไขรายการค่าใช้จ่าย' : 'เพิ่มรายการค่าใช้จ่าย'}
+              {expenseId ? t('dialog.editTitle') : t('dialog.createTitle')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>
-              <FieldLabel>รายการ / ชื่อค่าใช้จ่าย</FieldLabel>
+              <FieldLabel>{t('dialog.titleLabel')}</FieldLabel>
               <Textarea
-                placeholder="เช่น ค่าไฟประจำเดือน ม.ค."
+                placeholder={t('dialog.titlePlaceholder')}
                 {...register('title')}
                 disabled={isPending}
               />
@@ -205,18 +209,18 @@ export function ExpenseDialog({
             </Field>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field>
-                <FieldLabel>จำนวนเงิน (บาท)</FieldLabel>
+                <FieldLabel>{t('dialog.amountLabel')}</FieldLabel>
                 <Input
                   type="number"
                   step="0.01"
-                  placeholder="0.00"
+                  placeholder={t('dialog.amountPlaceholder')}
                   {...register('amount', { valueAsNumber: true })}
                   disabled={isPending}
                 />
                 <FieldError>{errors.amount?.message}</FieldError>
               </Field>
               <Field className="flex flex-col">
-                <FieldLabel>วันที่จ่าย</FieldLabel>
+                <FieldLabel>{t('dialog.expenseDateLabel')}</FieldLabel>
                 <DatePicker
                   value={currentExpenseDate}
                   onChange={(val) =>
@@ -231,7 +235,7 @@ export function ExpenseDialog({
               </Field>
             </div>
             <Field>
-              <FieldLabel>หมวดหมู่</FieldLabel>
+              <FieldLabel>{t('dialog.categoryLabel')}</FieldLabel>
               <Select
                 value={currentCategory}
                 disabled={isPending}
@@ -243,12 +247,14 @@ export function ExpenseDialog({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="เลือกหมวดหมู่" />
+                  <SelectValue placeholder={t('dialog.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(EXPENSE_CATEGORY_TH).map(([key, label]) => (
                     <SelectItem key={key} value={key}>
-                      {label}
+                      {tCategories.has(key as any)
+                        ? tCategories(key as any)
+                        : label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -257,7 +263,7 @@ export function ExpenseDialog({
             </Field>
             {branches.length > 0 && (
               <Field>
-                <FieldLabel>สาขาที่รับผิดชอบ (ตัวเลือก)</FieldLabel>
+                <FieldLabel>{t('dialog.branchLabel')}</FieldLabel>
                 <Select
                   value={currentBranchId || ALL_BRANCHES}
                   disabled={isPending}
@@ -268,10 +274,12 @@ export function ExpenseDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="ทุกสาขา" />
+                    <SelectValue placeholder={t('allBranches')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={ALL_BRANCHES}>ทุกสาขา</SelectItem>
+                    <SelectItem value={ALL_BRANCHES}>
+                      {t('allBranches')}
+                    </SelectItem>
                     {branches.map((branch) => (
                       <SelectItem key={branch.id} value={branch.id}>
                         {branch.name}
@@ -282,16 +290,14 @@ export function ExpenseDialog({
               </Field>
             )}
             <Field>
-              <FieldLabel>
-                แนบรูปสลิป / ใบเสร็จ (ขนาดไฟล์สูงสุด 10 MB)
-              </FieldLabel>
+              <FieldLabel>{t('dialog.receiptImageLabel')}</FieldLabel>
               <FileUpload name="receiptImage" />
               <FieldError>{errors.receiptImage?.message as string}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>หมายเหตุ</FieldLabel>
+              <FieldLabel>{t('dialog.noteLabel')}</FieldLabel>
               <Input
-                placeholder="รายละเอียดเพิ่มเติม..."
+                placeholder={t('dialog.notePlaceholder')}
                 {...register('note')}
                 disabled={isPending}
               />
@@ -305,7 +311,7 @@ export function ExpenseDialog({
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  ล้างการตั้งค่า
+                  {t('dialog.reset')}
                 </Button>
               ) : (
                 <Button
@@ -314,16 +320,16 @@ export function ExpenseDialog({
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  ยกเลิก
+                  {t('dialog.cancel')}
                 </Button>
               )}
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> กำลังบันทึก...
+                    <Spinner /> {t('dialog.saving')}
                   </>
                 ) : (
-                  'บันทึกข้อมูล'
+                  t('dialog.save')
                 )}
               </Button>
             </DialogFooter>

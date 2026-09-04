@@ -7,6 +7,7 @@
     "store-settings/products": "商品管理",
     "store-settings/categories": "商品分类",
     "inventory": "库存管理",
+    "smart-stock": "智能库存",
     "expenses": "支出费用",
     "reseller": "分销代理",
     "customers": "客户管理",
@@ -494,6 +495,93 @@
       "confirm": "确认调拨"
     }
   },
+  "smartStock": {
+    "title": "智能库存",
+    "description": "监控并管理门店本地仓库 (Local)、Shopee、Lazada 与 Facebook Marketplace 之间的自动同步库存",
+    "apiSettings": "API 连接设置",
+    "noAccessTitle": "无访问权限",
+    "noAccessDescription": "您没有权限管理此分店或店铺的库存数据",
+    "acknowledged": "知道了",
+    "mismatchAlert": {
+      "title": "发现 {count} 件商品库存不一致",
+      "description": "商品 '{product}' 在 Lazada 上的库存与总仓不一致，请点击同步按钮进行校准。"
+    },
+    "sharedPoolAlert": {
+      "title": "全渠道自动共享库存池系统 (Shared Pool Stock)",
+      "description": "无论是通过 POS 门店收银还是任意电商平台售出，总仓库存均会即时扣减，并实时同步到 Shopee、Lazada 和 Facebook Marketplace，以防止超卖。"
+    },
+    "cards": {
+      "totalStock": "全渠道总库存",
+      "pieces": "件",
+      "totalSkus": "共涵盖 {count} 款商品",
+      "mainWarehouse": "门店总仓 (HQ)",
+      "mainWarehouseDesc": "用于 POS 收银与线上商城的基准库存",
+      "connectedChannels": "已连接渠道",
+      "platforms": "{count} 个平台",
+      "connectedChannelsDesc": "Shopee、Lazada、Facebook Marketplace",
+      "stockAccuracy": "库存准确率",
+      "stockAccuracyDesc": "{synced} 款一致，{mismatch} 款需核对"
+    },
+    "searchPlaceholder": "搜索商品名称或 SKU...",
+    "filter": {
+      "placeholder": "状态筛选",
+      "all": "显示全部商品",
+      "mismatch": "库存不一致 (Mismatch)",
+      "lowStock": "库存预警",
+      "outOfStock": "缺货售罄"
+    },
+    "syncAll": "同步所有库存",
+    "columns": {
+      "image": "图片",
+      "productSku": "商品 / SKU",
+      "localHq": "Local (HQ)",
+      "shopee": "Shopee",
+      "lazada": "Lazada",
+      "facebook": "Facebook",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "empty": "未找到符合条件的商品",
+    "decreaseStock": "减少库存",
+    "increaseStock": "增加库存",
+    "badges": {
+      "inSync": "已同步",
+      "mismatch": "不一致",
+      "mismatchTooltip": "点击以校准同步",
+      "pendingSync": "待同步",
+      "outOfStock": "已售罄",
+      "complete": "正常"
+    },
+    "actions": {
+      "sync": "同步",
+      "syncTooltip": "同步此商品",
+      "simulate": "模拟销售",
+      "simulateTooltip": "模拟订单"
+    },
+    "channels": {
+      "local": "门店 POS",
+      "shopee": "Shopee",
+      "lazada": "Lazada",
+      "facebook": "Facebook Marketplace"
+    },
+    "toast": {
+      "stockUpdated": "已将 {sku} 库存更新为 {quantity} 件",
+      "syncSingleSuccess": "{sku} 库存已成功同步至所有平台",
+      "syncAllSuccess": "所有渠道库存已同步完成",
+      "insufficientStock": "总仓库存不足",
+      "simulateSuccess": "已成功模拟在 {channel} 售出 {quantity} 件（剩余库存 {remaining} 件）"
+    },
+    "justNow": "刚刚",
+    "dialog": {
+      "title": "模拟销售扣减库存",
+      "description": "测试模拟下单，查看中心仓库扣减并即时广播同步至各渠道的流程",
+      "currentStock": "当前库存: {quantity} 件",
+      "channelLabel": "下单渠道",
+      "quantityLabel": "销售数量（件）",
+      "cancel": "取消",
+      "confirm": "确认模拟"
+    }
+  },
   "expenses": {
     "title": "费用管理",
     "description": "记录并跟踪店铺的各项日常支出费用",
@@ -502,7 +590,11 @@
     "noAccessDescription": "您没有权限查看此分店或店铺的费用数据",
     "empty": "暂无费用记录",
     "allBranches": "所有分店",
+    "allCategories": "所有分类",
+    "categoryFilterLabel": "选择分类",
     "viewReceiptImage": "查看凭证图片",
+    "deleteConfirmTitle": "确认删除此费用？",
+    "deleteConfirmDescription": "确定要删除此支出记录吗？此操作无法撤销。",
     "edit": "编辑",
     "delete": "删除",
     "columns": {
@@ -514,6 +606,36 @@
       "receipt": "凭证 / 备注",
       "recordedBy": "记录人",
       "actions": "操作"
+    },
+    "categories": {
+      "UTILITIES": "水电网络费",
+      "RENT": "租金",
+      "SALARY": "薪资 / 工资",
+      "SUPPLIES": "设备 / 耗材",
+      "MARKETING": "市场推广 / 广告",
+      "MAINTENANCE": "维修 / 保养",
+      "TRANSPORT": "交通 / 运输",
+      "OTHER": "其他"
+    },
+    "dialog": {
+      "editTitle": "编辑支出记录",
+      "createTitle": "添加支出记录",
+      "titleLabel": "项目 / 费用名称",
+      "titlePlaceholder": "例如：一月份电费",
+      "amountLabel": "金额 (泰铢)",
+      "amountPlaceholder": "0.00",
+      "expenseDateLabel": "支付日期",
+      "categoryLabel": "费用分类",
+      "selectCategory": "选择分类",
+      "branchLabel": "归属分店 (可选)",
+      "receiptImageLabel": "上传凭条 / 收据 (文件上限 10 MB)",
+      "imageUploadError": "图片上传失败",
+      "noteLabel": "备注",
+      "notePlaceholder": "更多详细说明...",
+      "reset": "重置设置",
+      "cancel": "取消",
+      "save": "保存信息",
+      "saving": "保存中..."
     }
   },
   "customers": {
