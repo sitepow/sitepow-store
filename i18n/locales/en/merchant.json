@@ -1362,8 +1362,13 @@
     "createStore": "Create New Store",
     "noAccessTitle": "Access Denied",
     "noAccessDescription": "You do not have permission to view this store, but you can create a new store of your own",
+    "empty": "No stores registered in the system",
     "empty": "No stores found",
     "columns": {
+      "name": "Store Name",
+      "slug": "Domain (Slug)",
+      "role": "Your Role",
+      "branches": "Branches Count",
       "id": "Store ID",
       "name": "Store",
       "plan": "Plan",

@@ -1362,8 +1362,13 @@
     "createStore": "创建新店铺",
     "noAccessTitle": "无访问权限",
     "noAccessDescription": "您没有权限查看此店铺，但您可以创建属于自己的新店铺",
+    "empty": "系统中暂无店铺记录",
     "empty": "未找到您的店铺信息",
     "columns": {
+      "name": "店铺名称",
+      "slug": "域名别名 (Slug)",
+      "role": "您的角色",
+      "branches": "分店数量",
       "id": "店铺编号",
       "name": "店铺",
       "plan": "套餐方案",

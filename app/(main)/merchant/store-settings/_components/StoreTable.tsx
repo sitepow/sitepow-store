@@ -75,6 +75,7 @@ function StoreRowActions({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon-lg">
             <IconDotsVertical size={18} />
+            <span className="sr-only">เปิดเมนูจัดการ</span>
             <span className="sr-only">{t('openMenu')}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -87,6 +88,7 @@ function StoreRowActions({
               }}
             >
               <IconSettings size={16} className="mr-2" />
+              <span>ตั้งค่าร้านค้า</span>
               <span>{t('settings')}</span>
             </DropdownMenuItem>
           )}
@@ -98,6 +100,7 @@ function StoreRowActions({
               }}
             >
               <IconWorld size={16} className="mr-2" />
+              <span>โดเมน (Custom Domain)</span>
               <span>{t('domain')}</span>
             </DropdownMenuItem>
           )}
@@ -109,6 +112,7 @@ function StoreRowActions({
               }}
             >
               <IconHierarchy2 size={16} className="mr-2" />
+              <span>จัดการสาขา</span>
               <span>{t('branches')}</span>
             </DropdownMenuItem>
           )}
@@ -120,6 +124,7 @@ function StoreRowActions({
               }}
             >
               <IconCreditCard size={16} className="mr-2" />
+              <span>แพ็กเกจและการชำระเงิน</span>
               <span>{t('billing')}</span>
             </DropdownMenuItem>
           )}
@@ -131,6 +136,7 @@ function StoreRowActions({
               }}
             >
               <IconPackage size={16} className="mr-2" />
+              <span>จัดการสินค้า</span>
               <span>{t('products')}</span>
             </DropdownMenuItem>
           )}
@@ -143,6 +149,7 @@ function StoreRowActions({
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
                 <IconTrash size={16} className="mr-2" />
+                <span>ลบร้านค้า</span>
                 <span>{t('delete')}</span>
               </DropdownMenuItem>
             </>
@@ -168,6 +175,14 @@ export function StoreTable() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>รหัสร้านค้า</TableHead>
+              <TableHead>ร้านค้า</TableHead>
+              <TableHead>แพลน</TableHead>
+              <TableHead>สถานะ</TableHead>
+              <TableHead>สถานะและระยะเวลาคงเหลือ</TableHead>
+              <TableHead>สิทธิ์การใช้งาน (ปัจจุบัน)</TableHead>
+              <TableHead>วันที่สร้างร้านค้า</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
               <TableHead>{t('columns.id')}</TableHead>
               <TableHead>{t('columns.name')}</TableHead>
               <TableHead>{t('columns.plan')}</TableHead>
@@ -185,6 +200,7 @@ export function StoreTable() {
               <TableLoadingRow colSpan={8} />
             )}
             {!isLoading && stores.length === 0 && (
+              <TableEmptyRow colSpan={8} title="ไม่พบข้อมูลร้านค้าของคุณ" />
               <TableEmptyRow colSpan={8} title={t('empty')} />
             )}
             {stores.length !== 0 &&
@@ -226,8 +242,11 @@ export function StoreTable() {
                     <TableCell>
                       <Badge variant={isActive ? 'default' : 'outline'}>
                         {isActive
+                          ? 'เปิดใช้งานอยู่'
                           ? t('status.active')
                           : isMaintenance
+                            ? 'ปิดปรับปรุงชั่วคราว'
+                            : 'ถูกระงับการใช้งาน'}
                             ? t('status.maintenance')
                             : t('status.suspended')}
                       </Badge>
@@ -237,6 +256,7 @@ export function StoreTable() {
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-destructive flex items-center gap-1 text-sm">
                             <IconAlertTriangle size={16} />
+                            <span>เกินกำหนดชำระ ({daysRemaining} วัน)</span>
                             <span>
                               {t('subscription.pastDue', {
                                 days: daysRemaining,
@@ -248,11 +268,13 @@ export function StoreTable() {
                       ) : (
                         <div className="flex flex-col">
                           <span className="text-sm font-medium">
+                            {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
                             {isCanceled
                               ? t('subscription.canceled')
                               : t('subscription.normal')}
                           </span>
                           <span className="text-muted-foreground text-xs">
+                            คงเหลือ {daysRemaining} วัน
                             {t('subscription.daysRemaining', {
                               days: daysRemaining,
                             })}

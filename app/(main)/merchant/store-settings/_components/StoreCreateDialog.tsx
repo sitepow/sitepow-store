@@ -113,17 +113,23 @@ export function StoreCreateDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" disabled={!user?.emailVerified}>
           <IconPlus />
+          สร้างร้านค้าใหม่
           {t('createStore')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader className="space-y-2">
+          <DialogTitle>เริ่มต้นสร้างร้านค้าใหม่</DialogTitle>
+          <DialogDescription>
+            กรอกข้อมูลพื้นฐานและตั้งค่าระบบของร้านค้าเพื่อเริ่มต้นขายสินค้าออนไลน์
+          </DialogDescription>
           <DialogTitle>{tDialog('title')}</DialogTitle>
           <DialogDescription>{tDialog('description')}</DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="text-muted-foreground border-b pb-1 text-sm font-semibold sm:col-span-2">
+              1. เลือกแพลนการใช้งานของคุณ
               {tDialog('step1')}
             </div>
             <div className="flex flex-col items-center gap-5 sm:col-span-2">
@@ -131,6 +137,7 @@ export function StoreCreateDialog() {
               <PlanSelector isPending={createStoreMutation.isPending} />
             </div>
             <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
+              2. ข้อมูลทั่วไปของร้านค้า
               {tDialog('step2')}
             </div>
             <StoreNameField isPending={createStoreMutation.isPending} />
@@ -143,6 +150,7 @@ export function StoreCreateDialog() {
             onClick={handleClose}
             disabled={createStoreMutation.isPending}
           >
+            ยกเลิก
             {tDialog('cancel')}
           </Button>
           <Button
@@ -151,9 +159,11 @@ export function StoreCreateDialog() {
           >
             {createStoreMutation.isPending ? (
               <>
+                <Spinner /> กำลังสร้างร้านค้า...
                 <Spinner /> {tDialog('creating')}
               </>
             ) : (
+              'สร้างร้านค้าของคุณ'
               tDialog('submit')
             )}
           </Button>
