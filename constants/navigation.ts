@@ -139,7 +139,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
   },
   {
     value: 'smart-stock',
-    label: 'Smart Stock',
+    label: 'สต็อกสินค้าอัจฉริยะ',
     tab: 'smart-stock',
     icon: IconCpu,
     permissionKey: 'canViewInventory',

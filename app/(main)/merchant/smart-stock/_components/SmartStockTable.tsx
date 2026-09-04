@@ -346,7 +346,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                         <div className="text-muted-foreground mt-0.5 flex items-center gap-2 text-xs">
                           <span>{item.variantTitle}</span>
                           <span>•</span>
-                          <span className="font-mono">{item.sku}</span>
+                          <span className="">{item.sku}</span>
                           <span>•</span>
                           <span>{formatCurrency(item.price)}</span>
                         </div>
@@ -478,7 +478,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                   {simulationTarget.item.title} (
                   {simulationTarget.item.variantTitle})
                 </div>
-                <div className="text-muted-foreground font-mono">
+                <div className="text-muted-foreground">
                   SKU: {simulationTarget.item.sku}
                 </div>
                 <div>

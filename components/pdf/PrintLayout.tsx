@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { type ComponentType, useEffect, useRef, useState } from 'react'
 
 import { GetOrdersItem } from '@/actions/order'
 import {
@@ -22,6 +22,52 @@ import { ShippingLabelDoc } from './ShippingLabelDoc'
 import { TaxInvoiceDoc } from './TaxInvoiceDoc'
 import { DOC_TYPES, OrderDocType } from './types'
 
+const DOC_COMPONENTS: Record<
+  OrderDocType,
+  ComponentType<{ order: GetOrdersItem }>
+> = {
+  receipt: ReceiptDoc,
+  'receipt-slip': ReceiptSlipDoc,
+  'tax-invoice': TaxInvoiceDoc,
+  'delivery-note': DeliveryNoteDoc,
+  'shipping-label': ShippingLabelDoc,
+  'packing-slip': PackingSlipDoc,
+}
+
+const NAV_TABS = [
+  { id: 'receipt', label: 'ใบเสร็จรับเงิน (A4)', icon: IconReceipt },
+  { id: 'receipt-slip', label: 'ใบเสร็จอย่างย่อ (80mm)', icon: IconReceipt },
+  { id: 'tax-invoice', label: 'ใบกำกับภาษี', icon: IconFileInvoice },
+  { id: 'delivery-note', label: 'ใบส่งสินค้า', icon: IconPackageExport },
+  { id: 'shipping-label', label: 'ใบปะหน้าพัสดุ', icon: IconPrinter },
+  { id: 'packing-slip', label: 'ใบจัดสินค้า', icon: IconFileDescription },
+] as const satisfies ReadonlyArray<{
+  id: OrderDocType
+  label: string
+  icon: typeof IconReceipt
+}>
+
+const PAGE_SIZE_STYLES: Record<
+  string,
+  { wrapper: string; printSize: string; printMargin: string }
+> = {
+  Slip: {
+    wrapper: 'max-w-[85mm] rounded-lg p-3 shadow-md',
+    printSize: '80mm auto',
+    printMargin: '2mm',
+  },
+  Label: {
+    wrapper: 'max-w-[120mm] rounded-lg p-3 shadow-md',
+    printSize: '100mm 150mm',
+    printMargin: '4mm',
+  },
+  Default: {
+    wrapper: 'min-h-[297mm] max-w-[210mm] rounded-lg p-8 shadow-md sm:p-12',
+    printSize: 'A4 portrait',
+    printMargin: '8mm',
+  },
+}
+
 interface PrintLayoutProps {
   order: GetOrdersItem
   initialDocType?: OrderDocType
@@ -34,128 +80,54 @@ export function PrintLayout({
   autoPrint = true,
 }: PrintLayoutProps) {
   const [docType, setDocType] = useState<OrderDocType>(initialDocType)
-  const [hasAutoPrinted, setHasAutoPrinted] = useState(false)
+  const hasAutoPrinted = useRef(false)
 
   const docConfig = DOC_TYPES[docType] || DOC_TYPES.receipt
+  const pageStyle =
+    PAGE_SIZE_STYLES[docConfig.pageSize] ?? PAGE_SIZE_STYLES.Default
+  const ActiveDocument = DOC_COMPONENTS[docType] ?? DOC_COMPONENTS.receipt
 
   useEffect(() => {
-    if (autoPrint && !hasAutoPrinted) {
-      const timer = setTimeout(() => {
-        window.print()
-        setHasAutoPrinted(true)
-      }, 600)
-      return () => clearTimeout(timer)
-    }
-  }, [autoPrint, hasAutoPrinted])
+    if (!autoPrint || hasAutoPrinted.current) return
 
-  const handlePrint = () => {
-    window.print()
-  }
+    hasAutoPrinted.current = true
+    const timer = setTimeout(() => {
+      window.print()
+    }, 600)
 
-  const handleClose = () => {
-    window.close()
-  }
-
-  const renderDocument = () => {
-    switch (docType) {
-      case 'receipt':
-        return <ReceiptDoc order={order} />
-      case 'receipt-slip':
-        return <ReceiptSlipDoc order={order} />
-      case 'tax-invoice':
-        return <TaxInvoiceDoc order={order} />
-      case 'delivery-note':
-        return <DeliveryNoteDoc order={order} />
-      case 'shipping-label':
-        return <ShippingLabelDoc order={order} />
-      case 'packing-slip':
-        return <PackingSlipDoc order={order} />
-      default:
-        return <ReceiptDoc order={order} />
-    }
-  }
+    return () => clearTimeout(timer)
+  }, [autoPrint])
 
   return (
     <div className="min-h-screen bg-neutral-100 text-neutral-900 print:bg-white print:p-0">
       <header className="no-print sticky top-0 z-50 border-b border-neutral-200 bg-white/95 shadow-xs backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setDocType('receipt')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'receipt'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconReceipt size={14} />
-              <span>ใบเสร็จรับเงิน (A4)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDocType('receipt-slip')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'receipt-slip'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconReceipt size={14} />
-              <span>ใบเสร็จอย่างย่อ (80mm)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDocType('tax-invoice')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'tax-invoice'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconFileInvoice size={14} />
-              <span>ใบกำกับภาษี</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDocType('delivery-note')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'delivery-note'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconPackageExport size={14} />
-              <span>ใบส่งสินค้า</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDocType('shipping-label')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'shipping-label'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconPrinter size={14} />
-              <span>ใบปะหน้าพัสดุ</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setDocType('packing-slip')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                docType === 'packing-slip'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <IconFileDescription size={14} />
-              <span>ใบจัดสินค้า</span>
-            </button>
-          </div>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3">
+          <nav
+            className="flex flex-wrap items-center gap-1"
+            aria-label="Document Types"
+          >
+            {NAV_TABS.map(({ id, label, icon: Icon }) => {
+              const isActive = docType === id
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setDocType(id)}
+                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary text-white'
+                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  }`}
+                >
+                  <Icon size={14} />
+                  <span>{label}</span>
+                </button>
+              )
+            })}
+          </nav>
           <div className="flex items-center gap-2">
             <Button
-              onClick={handlePrint}
+              onClick={() => window.print()}
               size="sm"
               className="bg-primary text-primary-foreground gap-1.5 shadow-sm"
             >
@@ -165,7 +137,7 @@ export function PrintLayout({
             <Button
               variant="outline"
               size="sm"
-              onClick={handleClose}
+              onClick={() => window.close()}
               className="shrink-0 gap-1"
             >
               <IconX size={16} />
@@ -176,34 +148,17 @@ export function PrintLayout({
       </header>
       <main className="p-4 sm:p-8 print:p-0">
         <div
-          className={`mx-auto bg-white transition-all ${
-            docConfig.pageSize === 'Slip'
-              ? 'max-w-[85mm] rounded-lg p-3 shadow-md print:m-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
-              : docConfig.pageSize === 'Label'
-                ? 'max-w-[120mm] rounded-lg p-3 shadow-md print:m-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
-                : 'min-h-[297mm] max-w-[210mm] rounded-lg p-8 shadow-md sm:p-12 print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
-          }`}
+          className={`mx-auto bg-white transition-all print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none ${pageStyle.wrapper}`}
         >
-          {renderDocument()}
+          <ActiveDocument order={order} />
         </div>
       </main>
+
       <style jsx global>{`
         @media print {
           @page {
-            size: ${
-              docConfig.pageSize === 'Slip'
-                ? '80mm auto'
-                : docConfig.pageSize === 'Label'
-                  ? '100mm 150mm'
-                  : 'A4 portrait'
-            };
-            margin: ${
-              docConfig.pageSize === 'Slip'
-                ? '2mm'
-                : docConfig.pageSize === 'Label'
-                  ? '4mm'
-                  : '8mm'
-            };
+            size: ${pageStyle.printSize};
+            margin: ${pageStyle.printMargin};
           }
           body {
             background-color: white !important;

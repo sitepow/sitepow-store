@@ -287,7 +287,7 @@ export function WebhookSettingsForm() {
                           onClick={() => setSelectedEndpointId(endpoint.id)}
                         >
                           <TableCell className="max-w-xs">
-                            <div className="font-mono text-sm font-semibold">
+                            <div className="text-sm font-semibold">
                               {endpoint.url}
                             </div>
                             {endpoint.description && (
@@ -315,7 +315,7 @@ export function WebhookSettingsForm() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-1.5 font-mono text-xs">
+                            <div className="flex items-center gap-1.5 text-xs">
                               <span>
                                 {isRevealed
                                   ? endpoint.secret
@@ -445,7 +445,7 @@ export function WebhookSettingsForm() {
           </div>
           <CardDescription className="text-xs">
             Sitepow จะส่ง Header{' '}
-            <code className="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono">
+            <code className="bg-muted text-foreground rounded px-1.5 py-0.5">
               X-Sitepow-Signature: t=1725414162,v1=hash_value
             </code>{' '}
             มาพร้อมทุก Request ฝั่งเซิร์ฟเวอร์ของคุณควรตรวจสอบ Signature
@@ -491,7 +491,7 @@ export function WebhookSettingsForm() {
 
             {/* Node.js */}
             <TabsContent value="nodejs" className="mt-0">
-              <pre className="bg-background overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+              <pre className="bg-background overflow-x-auto rounded-lg border p-3 text-xs leading-relaxed">
                 {`// Node.js / Express / Next.js
 import crypto from 'crypto'
 
@@ -527,7 +527,7 @@ export async function POST(req) {
 
             {/* PHP */}
             <TabsContent value="php" className="mt-0">
-              <pre className="bg-background overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+              <pre className="bg-background overflow-x-auto rounded-lg border p-3 text-xs leading-relaxed">
                 {`<?php
 // PHP Native / Laravel
 $secret = getenv('SITEPOW_WEBHOOK_SECRET'); // whsec_...
@@ -568,7 +568,7 @@ echo json_encode(['received' => true]);`}
 
             {/* Java */}
             <TabsContent value="java" className="mt-0">
-              <pre className="bg-background overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+              <pre className="bg-background overflow-x-auto rounded-lg border p-3 text-xs leading-relaxed">
                 {`// Java (Spring Boot)
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -627,7 +627,7 @@ public class WebhookController {
 
             {/* Python */}
             <TabsContent value="python" className="mt-0">
-              <pre className="bg-background overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+              <pre className="bg-background overflow-x-auto rounded-lg border p-3 text-xs leading-relaxed">
                 {`# Python (FastAPI / Flask)
 import hmac
 import hashlib
@@ -671,7 +671,7 @@ async def handle_webhook(request: Request):
 
             {/* Go */}
             <TabsContent value="go" className="mt-0">
-              <pre className="bg-background overflow-x-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+              <pre className="bg-background overflow-x-auto rounded-lg border p-3 text-xs leading-relaxed">
                 {`// Go (net/http)
 package main
 
@@ -735,7 +735,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                 {activeEndpointId ? (
                   <>
                     แสดงประวัติของ{' '}
-                    <span className="text-foreground font-mono font-medium">
+                    <span className="text-foreground font-medium">
                       {endpoints.find((e) => e.id === activeEndpointId)?.url}
                     </span>
                   </>
@@ -793,7 +793,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="font-mono text-xs font-semibold">
+                          <span className="text-xs font-semibold">
                             {log.event}
                           </span>
                         </TableCell>

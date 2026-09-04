@@ -1,7 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { formatDateTime } from '@/utils/date'
 
+import { ProductImage } from '../ProductImage'
 import { OrderDocComponentProps } from './types'
 import { getCustomerInfoFromOrder, getStoreInfoFromOrder } from './utils'
 
@@ -9,192 +12,192 @@ export function PackingSlipDoc({ order }: OrderDocComponentProps) {
   const store = getStoreInfoFromOrder(order)
   const customer = getCustomerInfoFromOrder(order)
 
-  const totalQuantity = order.items.reduce(
-    (sum, item) => sum + item.quantity,
-    0,
+  const totalQuantity = useMemo(
+    () => order.items.reduce((sum, item) => sum + item.quantity, 0),
+    [order.items],
+  )
+
+  const formattedOrderDate = useMemo(
+    () => (order.createdAt ? formatDateTime(order.createdAt) : '-'),
+    [order.createdAt],
   )
 
   return (
-    <div className="mx-auto flex flex-col justify-between bg-white text-sm text-black print:p-0">
+    <div className="mx-auto flex w-full flex-col justify-between bg-white text-xs leading-normal text-neutral-900 print:text-black">
       <div>
-        <div className="flex items-start justify-between border-b pb-4">
+        <header className="flex flex-col gap-4 border-b border-neutral-300 pb-5 sm:flex-row sm:items-start sm:justify-between print:flex-row print:items-start print:justify-between">
           <div className="flex items-start gap-4">
             {store.logo && (
               <img
                 src={store.logo}
                 alt={store.name}
-                className="h-14 w-14 rounded object-cover"
+                className="h-16 w-16 border border-neutral-200 object-contain p-1 print:border-none"
               />
             )}
-            <div>
-              <h1 className="text-lg font-bold text-neutral-900">
+            <div className="space-y-0.5">
+              <h1 className="text-base font-semibold text-neutral-950">
                 {store.name}
               </h1>
-              <p className="text-xs text-neutral-500">
+              <p className="text-neutral-600 print:text-neutral-800">
                 ฝ่ายคลังสินค้าและจัดเตรียมพัสดุ (Warehouse & Fulfillment)
               </p>
+              {store.phone && (
+                <p className="text-neutral-500 print:text-neutral-700">
+                  โทรศัพท์: {store.phone}
+                </p>
+              )}
             </div>
           </div>
-          <div className="text-right">
-            <div className="inline-block rounded bg-amber-500 px-3 py-1 text-base font-bold text-white">
+          <div className="text-left sm:text-right print:text-right">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-950">
               ใบจัดสินค้า
-            </div>
-            <p className="text-xs font-medium tracking-wider text-neutral-500 uppercase">
-              PACKING SLIP / PICK LIST
+            </h2>
+            <p className="text-[11px] font-semibold tracking-widest text-neutral-500 uppercase">
+              Packing Slip / Pick List
             </p>
-            <div className="mt-2 space-y-0.5 text-xs">
+            <div className="mt-3 space-y-1">
               <p>
-                <span className="text-neutral-500">เลขที่ออเดอร์: </span>
-                <span className="font-bold text-neutral-900">
+                <span className="text-neutral-500">เลขที่คำสั่งซื้อ: </span>
+                <span className="font-semibold text-neutral-950">
                   #{order.orderNumber}
                 </span>
               </p>
               <p>
                 <span className="text-neutral-500">วันที่สั่งซื้อ: </span>
-                <span>{formatDateTime(order.createdAt)}</span>
+                <span className="text-neutral-900">{formattedOrderDate}</span>
               </p>
             </div>
           </div>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-4 rounded-md border border-neutral-200 bg-neutral-50/60 p-3 text-xs">
+        </header>
+        <section className="mt-5 grid grid-cols-1 gap-3 border border-neutral-300 p-4 sm:grid-cols-3 print:grid-cols-3">
           <div>
-            <p className="text-neutral-500">ลูกค้าปลายทาง:</p>
-            <p className="font-semibold text-neutral-900">{customer.name}</p>
+            <span className="text-neutral-500">ลูกค้าปลายทาง:</span>
+            <p className="pt-0.5 font-semibold text-neutral-950">
+              {customer.name}
+            </p>
             {customer.phone && customer.phone !== '-' && (
-              <p className="text-neutral-600">โทร: {customer.phone}</p>
+              <p className="text-neutral-700">โทร: {customer.phone}</p>
             )}
           </div>
-          <div className="border-l border-neutral-200 pl-4">
-            <p className="text-neutral-500">ช่องทางการจัดส่ง:</p>
-            <p className="font-semibold text-neutral-900">
-              {order.shippingMethod || 'มาตรฐาน'}
+          <div className="border-t border-neutral-200 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4 print:border-t-0 print:border-l print:pt-0 print:pl-4">
+            <span className="text-neutral-500">การจัดส่ง:</span>
+            <p className="pt-0.5 font-semibold text-neutral-950">
+              {order.shippingMethod || 'จัดส่งพัสดุมาตรฐาน'}
             </p>
-            {order.trackingNumber && (
-              <p className="text-neutral-600">
-                เลขพัสดุ: {order.trackingNumber}
-              </p>
-            )}
-          </div>
-          <div className="border-l border-neutral-200 pl-4">
-            <p className="text-neutral-500">สรุปการจัดเตรียม:</p>
-            <p className="font-semibold text-neutral-900">
-              {order.items.length} รายการ ({totalQuantity} ชิ้น)
+            <p className="text-neutral-700">
+              เลขพัสดุ: {order.trackingNumber || 'รอสร้างเลขพัสดุ'}
             </p>
           </div>
-        </div>
-        <div className="mt-5">
-          <table className="w-full border-collapse text-left text-xs">
+          <div className="border-t border-neutral-200 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4 print:border-t-0 print:border-l print:pt-0 print:pl-4">
+            <span className="text-neutral-500">สรุปการจัดเตรียม:</span>
+            <p className="pt-0.5 font-semibold text-neutral-950">
+              {order.items.length} รายการ
+            </p>
+            <p className="text-neutral-700">
+              จำนวนสินค้ารวม: {totalQuantity} ชิ้น
+            </p>
+          </div>
+        </section>
+        <section className="mt-5 overflow-x-auto print:overflow-visible">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-neutral-300 bg-neutral-100 font-semibold text-neutral-700">
-                <th className="w-12 py-2 pr-2 pl-3 text-center">ตรวจ [✓]</th>
-                <th className="w-12 py-2 pr-3 text-center">รูป</th>
-                <th className="py-2 pr-4">สินค้า / รหัส</th>
-                <th className="py-2 pr-4 text-center">ตัวเลือก</th>
-                <th className="py-2 pr-4 text-center">คลัง/สาขา</th>
-                <th className="w-20 py-2 pr-4 text-center">จำนวนที่จัด</th>
-                <th className="py-2 pr-3">บันทึกพิเศษ</th>
+              <tr className="border-y border-neutral-400 bg-neutral-100 font-semibold text-neutral-800 print:bg-neutral-50">
+                <th className="w-12 px-2 py-2.5 text-center">ตรวจ</th>
+                <th className="w-14 px-2 py-2.5 text-center">รูป</th>
+                <th className="px-3 py-2.5">สินค้า / รายละเอียด</th>
+                <th className="w-28 px-3 py-2.5 text-center">ตัวเลือก</th>
+                <th className="w-28 px-3 py-2.5 text-center">คลัง/สาขา</th>
+                <th className="w-24 px-3 py-2.5 text-center">จำนวนหยิบ</th>
+                <th className="w-36 px-3 py-2.5">หมายเหตุ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200">
               {order.items.map((item) => (
                 <tr key={item.id} className="align-middle">
-                  <td className="py-2.5 pr-2 pl-3 text-center">
-                    <div className="mx-auto h-5 w-5 rounded border-2 border-neutral-400 bg-white" />
+                  <td className="px-2 py-2 text-center">
+                    <div className="mx-auto h-4 w-4 border border-neutral-500 bg-white" />
                   </td>
-                  <td className="py-2.5 pr-3 text-center">
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="mx-auto h-9 w-9 rounded border object-cover"
-                      />
-                    ) : (
-                      <div className="mx-auto flex h-9 w-9 items-center justify-center rounded border bg-neutral-100 text-[10px] text-neutral-400">
-                        ไม่มีรูป
-                      </div>
-                    )}
+                  <td className="px-2 py-2 text-center">
+                    <ProductImage className="size-10 md:size-10" />
                   </td>
-                  <td className="py-2.5 pr-4">
-                    <p className="text-sm font-semibold text-neutral-900">
+                  <td className="max-w-40 min-w-40 px-3 py-2 wrap-break-word whitespace-pre-line">
+                    <p className="font-semibold text-neutral-950">
                       {item.title}
                     </p>
-                    <p className="text-[11px] text-neutral-400">
-                      ID: {item.productId.slice(0, 12)}...
+                    <p className="text-[11px] text-neutral-500">
+                      ID: {item.productId}
                     </p>
                   </td>
-                  <td className="py-2.5 pr-4 text-center">
-                    {item.variantTitle ? (
-                      <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">
-                        {item.variantTitle}
-                      </span>
-                    ) : (
-                      <span className="text-neutral-400">-</span>
-                    )}
+                  <td className="max-w-20 min-w-20 px-3 py-2 text-center wrap-break-word whitespace-pre-line text-neutral-700">
+                    {item.variantTitle || '-'}
                   </td>
-                  <td className="py-2.5 pr-4 text-center text-neutral-600">
+                  <td className="max-w-32 min-w-32 px-3 py-2 text-center wrap-break-word whitespace-pre-line text-neutral-700">
                     {item.branch?.name || 'คลังหลัก'}
                   </td>
-                  <td className="py-2.5 pr-4 text-center">
-                    <span className="inline-block rounded bg-amber-100 px-3 py-1 text-base font-bold text-amber-900">
-                      {item.quantity}
-                    </span>
+                  <td className="max-w-20 min-w-20 px-3 py-2 text-center font-bold wrap-break-word whitespace-pre-line text-neutral-950">
+                    {item.quantity}
                   </td>
-                  <td className="py-2.5 pr-3">
-                    {item.customerNote ? (
-                      <span className="font-medium text-red-600">
-                        {item.customerNote}
-                      </span>
-                    ) : (
-                      <span className="text-neutral-400">-</span>
-                    )}
+                  <td className="max-w-20 min-w-20 px-3 py-2 wrap-break-word whitespace-pre-line text-neutral-700">
+                    {item.customerNote || '-'}
                   </td>
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-neutral-400 font-semibold text-neutral-900">
+                <td colSpan={5} className="px-3 py-2.5 text-right">
+                  จำนวนหยิบรวมทั้งสิ้น:
+                </td>
+                <td className="px-3 py-2.5 text-center text-sm font-bold">
+                  {totalQuantity}
+                </td>
+                <td className="px-3 py-2.5" />
+              </tr>
+            </tfoot>
           </table>
-        </div>
-        <div className="mt-6 rounded border border-neutral-200 bg-neutral-50 p-3 text-xs">
-          <p className="font-bold text-neutral-800">
+        </section>
+        <section className="mt-5 border border-neutral-300 p-3 print:bg-transparent">
+          <p className="font-semibold text-neutral-900">
             รายการตรวจสอบคุณภาพก่อนปิดกล่อง (Quality Inspection):
           </p>
-          <div className="mt-2 grid grid-cols-3 gap-3">
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded border-2 border-neutral-400" />
-              <span>สินค้าครบตามจำนวน</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded border-2 border-neutral-400" />
-              <span>สินค้าไม่มีรอยตำหนิ/ชำรุด</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded border-2 border-neutral-400" />
-              <span>ห่อกันกระแทกเรียบร้อย</span>
-            </div>
+          <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 print:grid-cols-3">
+            <label className="flex items-center gap-2">
+              <div className="h-3.5 w-3.5 border border-neutral-500 bg-white" />
+              <span>สินค้าถูกต้องและครบตามจำนวน</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <div className="h-3.5 w-3.5 border border-neutral-500 bg-white" />
+              <span>สินค้าไม่มีรอยตำหนิและไม่ชำรุด</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <div className="h-3.5 w-3.5 border border-neutral-500 bg-white" />
+              <span>ห่อหุ้มกันกระแทกตามเกณฑ์มาตรฐาน</span>
+            </label>
           </div>
-        </div>
+        </section>
       </div>
-      <div className="mt-12 border-t pt-6">
-        <div className="grid grid-cols-2 gap-8 text-center text-xs">
+      <footer className="mt-14 break-inside-avoid pt-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-12 print:grid-cols-2 print:gap-12">
           <div className="flex flex-col items-center">
-            <div className="h-12 w-52 border-b border-neutral-400" />
-            <p className="mt-1.5 font-medium text-neutral-700">
+            <div className="h-16 w-48 border-b border-neutral-400" />
+            <p className="mt-2 font-medium text-neutral-900">
               ผู้หยิบสินค้า / Picked By
             </p>
-            <p className="text-xs text-neutral-400">
-              วันที่: ____/____/________
+            <p className="text-[11px] text-neutral-500">
+              วันที่: _____/_____/_________
             </p>
           </div>
           <div className="flex flex-col items-center">
-            <div className="h-12 w-52 border-b border-neutral-400" />
-            <p className="mt-1.5 font-medium text-neutral-700">
+            <div className="h-16 w-48 border-b border-neutral-400" />
+            <p className="mt-2 font-medium text-neutral-900">
               ผู้ตรวจสอบและบรรจุ / Packed By
             </p>
-            <p className="text-xs text-neutral-400">
-              วันที่: ____/____/________
+            <p className="text-[11px] text-neutral-500">
+              วันที่: _____/_____/_________
             </p>
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   )
 }

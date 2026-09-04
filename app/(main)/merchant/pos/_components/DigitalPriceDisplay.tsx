@@ -54,7 +54,7 @@ export function DigitalPriceDisplay({
   return (
     <div
       className={cn(
-        'border-border bg-card text-card-foreground relative overflow-hidden rounded-xl border font-mono shadow-sm',
+        'border-border bg-card text-card-foreground relative overflow-hidden rounded-xl border shadow-sm',
         sizeStyles.padding,
         className,
       )}

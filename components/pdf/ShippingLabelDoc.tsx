@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
@@ -10,17 +10,30 @@ import QRCode from 'qrcode'
 import { OrderDocComponentProps } from './types'
 import { getCustomerInfoFromOrder, getStoreInfoFromOrder } from './utils'
 
+interface ExtendedOrderProps {
+  paymentMethod?: string
+}
+
 export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
   const store = getStoreInfoFromOrder(order)
   const customer = getCustomerInfoFromOrder(order)
+  const extendedOrder = order as typeof order & ExtendedOrderProps
 
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
 
   const isCOD =
     order.paymentMethod === PaymentMethod.CASH_ON_DELIVERY ||
-    (order as any).paymentMethod === PaymentMethod.CASH_ON_DELIVERY
+    extendedOrder.paymentMethod === 'CASH_ON_DELIVERY'
 
-  const trackingVal = order.trackingNumber || `ORD-${order.orderNumber}`
+  const trackingVal = useMemo(
+    () => order.trackingNumber || `ORD-${order.orderNumber}`,
+    [order.trackingNumber, order.orderNumber],
+  )
+
+  const postalCode = useMemo(
+    () => customer.shippingAddr?.postalCode || '',
+    [customer.shippingAddr?.postalCode],
+  )
 
   useEffect(() => {
     let isMounted = true
@@ -32,121 +45,119 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
       .then((url) => {
         if (isMounted) setQrCodeUrl(url)
       })
-      .catch((err) => console.error(err))
+      .catch((err) => console.error('Error generating shipping QR:', err))
 
     return () => {
       isMounted = false
     }
   }, [trackingVal])
 
-  const postalCode = customer.shippingAddr?.postalCode || ''
-
   return (
-    <div className="mx-auto w-full max-w-105 rounded-lg border-2 border-dashed border-neutral-400 bg-white p-4 text-xs text-black print:m-0 print:max-w-none print:rounded-none print:border-2 print:border-black print:p-3">
-      <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-2">
+    <div className="mx-auto w-full max-w-[105mm] border-2 border-dashed border-neutral-900 bg-white p-4 text-xs leading-normal text-neutral-900 print:m-0 print:w-[100mm] print:border-2 print:border-black print:p-2.5 print:text-black">
+      <header className="flex items-start justify-between border-b-2 border-neutral-900 pb-2.5">
         <div>
-          <div className="inline-block rounded bg-black px-2.5 py-0.5 text-sm font-black text-white">
-            {order.shippingMethod || 'STANDARD EXPRESS'}
+          <div className="inline-block border border-neutral-900 bg-neutral-950 px-2.5 py-1 text-xs font-bold text-white print:bg-black">
+            {order.shippingMethod || 'STANDARD DELIVERY'}
           </div>
-          <p className="mt-1 text-xs font-bold text-neutral-800">
-            ออเดอร์: #{order.orderNumber}
+          <p className="mt-1.5 text-xs font-semibold text-neutral-950">
+            คำสั่งซื้อ: #{order.orderNumber}
           </p>
         </div>
-
         {qrCodeUrl ? (
-          <div className="text-center">
-            <img
-              src={qrCodeUrl}
-              alt="QR Tracking"
-              className="h-16 w-16 object-contain"
-            />
-          </div>
+          <img
+            src={qrCodeUrl}
+            alt="Tracking QR"
+            className="h-16 w-16 object-contain"
+          />
         ) : (
           <div className="flex h-16 w-16 items-center justify-center border border-neutral-300 text-[10px] text-neutral-400">
             QR CODE
           </div>
         )}
-      </div>
-      <div className="mt-2 rounded bg-neutral-100 p-1.5 text-center font-mono text-base font-bold tracking-wider text-neutral-900">
-        {order.trackingNumber ? (
-          <span>{order.trackingNumber}</span>
-        ) : (
-          <span className="text-neutral-500">#{order.orderNumber}</span>
-        )}
-      </div>
-      <div className="mt-2.5 border-b border-neutral-300 pb-2">
-        <p className="text-[11px] font-bold text-neutral-500 uppercase">
-          ผู้ส่ง (FROM):
+      </header>
+      <section className="mt-2 border border-neutral-300 bg-neutral-50 py-1.5 text-center print:bg-transparent">
+        <p className="text-[10px] font-semibold text-neutral-500 uppercase print:text-neutral-700">
+          หมายเลขติดตามพัสดุ (Tracking No.)
         </p>
-        <p className="text-xs font-bold text-neutral-900">{store.name}</p>
+        <p className="text-base font-bold tracking-wider text-neutral-950">
+          {order.trackingNumber || `#${order.orderNumber}`}
+        </p>
+      </section>
+      <section className="mt-2.5 border-b border-neutral-300 pb-2 text-[11px]">
+        <span className="font-bold text-neutral-500 uppercase print:text-neutral-700">
+          ผู้ส่ง (From):
+        </span>
+        <p className="font-semibold text-neutral-950">{store.name}</p>
         {store.phone && (
-          <p className="font-semibold text-neutral-800">โทร: {store.phone}</p>
+          <p className="text-neutral-800">โทรศัพท์: {store.phone}</p>
         )}
         {store.address && (
-          <p className="text-xs leading-snug text-neutral-600">
+          <p className="leading-snug text-neutral-700 print:text-neutral-900">
             {store.address}
           </p>
         )}
-      </div>
-      <div className="mt-2.5 rounded border border-neutral-900 bg-neutral-50/50 p-2.5">
+      </section>
+      <section className="mt-2.5 border-2 border-neutral-900 p-2.5">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-black tracking-wide text-neutral-900 uppercase">
-            ผู้รับ (TO):
-          </p>
+          <span className="text-xs font-bold text-neutral-950 uppercase">
+            ผู้รับ (To):
+          </span>
           {postalCode && (
-            <div className="rounded bg-black px-2 py-0.5 font-mono text-base font-black text-white">
+            <div className="border border-neutral-900 bg-neutral-950 px-2 py-0.5 text-sm font-bold text-white print:bg-black">
               {postalCode}
             </div>
           )}
         </div>
-        <p className="mt-1 text-base font-black text-neutral-900">
+        <p className="mt-1 text-sm font-bold text-neutral-950">
           {customer.name}
         </p>
-        <p className="text-sm font-bold text-neutral-900">
-          โทร: {customer.phone}
+        <p className="text-xs font-semibold text-neutral-950">
+          โทรศัพท์: {customer.phone}
         </p>
-        <p className="mt-1 text-xs leading-relaxed font-medium text-neutral-800">
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-900">
           {customer.fullAddress}
         </p>
-      </div>
-      <div className="mt-2.5">
+      </section>
+      <section className="mt-2.5">
         {isCOD ? (
-          <div className="rounded border-2 border-red-600 bg-red-50 p-2 text-center">
-            <p className="text-sm font-black text-red-600">
-              เก็บเงินปลายทาง (COD)
+          <div className="border-2 border-neutral-900 bg-neutral-100 p-2 text-center print:bg-transparent">
+            <p className="text-xs font-bold text-neutral-950 uppercase">
+              เก็บเงินปลายทาง (Cash on Delivery)
             </p>
-            <p className="text-lg font-black text-red-700">
+            <p className="text-lg font-bold text-neutral-950">
               {formatCurrency(Number(order.totalAmount))}
             </p>
           </div>
         ) : (
-          <div className="rounded border border-emerald-500 bg-emerald-50 p-1.5 text-center">
-            <span className="text-xs font-bold text-emerald-800">
-              ✓ ชำระเงินแล้ว ไม่ต้องเก็บเงิน (PAID)
+          <div className="border border-neutral-900 p-1.5 text-center">
+            <span className="text-xs font-bold text-neutral-950">
+              ชำระเงินแล้ว / ไม่ต้องเก็บเงิน (PAID)
             </span>
           </div>
         )}
-      </div>
-      <div className="mt-2.5 border-t border-neutral-300 pt-2 text-[11px]">
-        <p className="font-semibold text-neutral-600">รายการสินค้าในกล่อง:</p>
-        <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-neutral-700">
+      </section>
+      <section className="mt-2.5 border-t border-neutral-300 pt-2 text-[10px]">
+        <p className="font-semibold text-neutral-600 print:text-neutral-800">
+          รายการสินค้าในพัสดุ:
+        </p>
+        <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-neutral-800 print:text-neutral-900">
           {order.items.slice(0, 4).map((item) => (
             <li key={item.id} className="truncate">
-              {item.title} {item.variantTitle ? `(${item.variantTitle})` : ''} x
+              {item.title} {item.variantTitle && `(${item.variantTitle})`} x
               {item.quantity}
             </li>
           ))}
           {order.items.length > 4 && (
-            <li className="text-neutral-500">
-              และอื่นๆ อีก {order.items.length - 4} รายการ
+            <li className="list-none pt-0.5 text-neutral-500 print:text-neutral-700">
+              ...และรายการอื่นๆ อีก {order.items.length - 4} รายการ
             </li>
           )}
         </ul>
-      </div>
-      <div className="mt-2 flex items-center justify-between border-t border-neutral-200 pt-1.5 text-[10px] text-neutral-400">
-        <span>วันที่สั่งซื้อ: {formatDateTime(order.createdAt)}</span>
+      </section>
+      <footer className="mt-2 flex items-center justify-between border-t border-neutral-300 pt-1.5 text-[9px] text-neutral-500 print:text-neutral-700">
+        <span>วันที่: {formatDateTime(order.createdAt)}</span>
         {order.totalWeight && <span>น้ำหนัก: {order.totalWeight} กก.</span>}
-      </div>
+      </footer>
     </div>
   )
 }

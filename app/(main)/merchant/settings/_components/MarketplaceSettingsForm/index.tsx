@@ -444,7 +444,7 @@ export function MarketplaceSettingsForm() {
                         <TableCell className="font-medium">
                           {m.variant?.product?.title} - {m.variant?.title}
                         </TableCell>
-                        <TableCell className="text-muted-foreground font-mono text-xs">
+                        <TableCell className="text-muted-foreground text-xs">
                           {m.variant?.sku || '-'}
                         </TableCell>
                         <TableCell>
@@ -452,7 +452,7 @@ export function MarketplaceSettingsForm() {
                             {m.connection?.platform}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-xs">
+                        <TableCell className="text-xs">
                           {m.marketplaceSku}
                         </TableCell>
                         <TableCell className="text-center font-bold">
@@ -559,7 +559,7 @@ export function MarketplaceSettingsForm() {
                       <TableCell>
                         <Badge variant="outline">{log.platform}</Badge>
                       </TableCell>
-                      <TableCell className="font-mono text-xs font-medium">
+                      <TableCell className="text-xs font-medium">
                         {log.action}
                       </TableCell>
                       <TableCell>{log.itemsCount} ชิ้น</TableCell>

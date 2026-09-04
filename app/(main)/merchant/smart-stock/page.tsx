@@ -8,6 +8,7 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCpu, IconExternalLink, IconLock } from '@tabler/icons-react'
+import { XIcon } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -30,7 +31,7 @@ export default function MerchantSmartStockPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCpu}
-        title="Smart Stock"
+        title="สต็อกสินค้าอัจฉริยะ"
         description="ตรวจสอบและจัดการสต็อกสินค้าแบบซิงค์อัตโนมัติระหว่างคลังหน้าร้าน (Local), Shopee, Lazada และ Facebook Marketplace"
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
@@ -76,6 +77,11 @@ export default function MerchantSmartStockPage() {
             variant="info"
             title="ระบบซิงค์สต็อกรวมศูนย์อัตโนมัติ (Shared Pool Stock)"
             description="เมื่อมีการขายสินค้าเกิดขึ้นผ่านหน้าร้าน POS หรือมาร์เก็ตเพลสใดๆ ยอดสต็อกในคลังหลักจะถูกตัด และกระจายยอดใหม่ไปยัง Shopee, Lazada และ Facebook Marketplace แบบเรียลไทม์เพื่อป้องกันการขายเกินสต็อก"
+            action={
+              <Button size="sm" variant="outline">
+                รับทราบแล้ว
+              </Button>
+            }
           />
           <SmartStockTable onMismatchResolved={() => setHasMismatch(false)} />
         </div>

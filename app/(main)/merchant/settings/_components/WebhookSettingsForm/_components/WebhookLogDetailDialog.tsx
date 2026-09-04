@@ -56,8 +56,8 @@ export function WebhookLogDetailDialog({
             </Badge>
           </div>
           <DialogDescription>
-            Event: <span className="font-mono font-medium">{log.event}</span> •{' '}
-            ใช้เวลา: {log.executionTimeMs}ms • วันที่:{' '}
+            Event: <span className="font-medium">{log.event}</span> • ใช้เวลา:{' '}
+            {log.executionTimeMs}ms • วันที่:{' '}
             {new Date(log.createdAt).toLocaleString('th-TH')}
           </DialogDescription>
         </DialogHeader>
@@ -92,7 +92,7 @@ export function WebhookLogDetailDialog({
                 )}
               </Button>
             </div>
-            <pre className="bg-muted/60 max-h-64 overflow-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+            <pre className="bg-muted/60 max-h-64 overflow-auto rounded-lg border p-3 text-xs leading-relaxed">
               {payloadString}
             </pre>
           </div>
@@ -100,7 +100,7 @@ export function WebhookLogDetailDialog({
             <span className="text-sm font-semibold">
               Response Body (ข้อความตอบกลับจากเซิร์ฟเวอร์ของคุณ)
             </span>
-            <pre className="bg-muted/60 mt-1.5 max-h-40 overflow-auto rounded-lg border p-3 font-mono text-xs leading-relaxed">
+            <pre className="bg-muted/60 mt-1.5 max-h-40 overflow-auto rounded-lg border p-3 text-xs leading-relaxed">
               {log.responseBody || '(ไม่มีข้อมูลตอบกลับ)'}
             </pre>
           </div>
