@@ -85,7 +85,7 @@ export default async function middleware(req: NextRequest) {
     if (customDomain) {
       return NextResponse.redirect(
         new URL(`${url.pathname}${url.search}`, `https://${customDomain}`),
-        { status: 301 },
+        { status: 307 },
       )
     }
   } else {

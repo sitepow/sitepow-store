@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import {
   useAddStoreDomain,
@@ -70,8 +71,6 @@ export function DomainSettingsForm() {
         onSuccess: (res) => {
           if (res.success) {
             setCustomDomainInput('')
-          } else {
-            alert(res.message)
           }
         },
       },
@@ -83,7 +82,7 @@ export function DomainSettingsForm() {
       return
     }
 
-    verifyDomainMutation.mutate(selectedStoreId)
+    verifyDomainMutation.mutate(selectedStoreId, {})
   }
 
   const defaultSubdomain = selectedStoreSlug
@@ -244,7 +243,7 @@ export function DomainSettingsForm() {
                       isPending={removeDomainMutation.isPending}
                       onDelete={() => {
                         if (selectedStoreId) {
-                          removeDomainMutation.mutate(selectedStoreId)
+                          removeDomainMutation.mutate(selectedStoreId, {})
                         }
                       }}
                     >

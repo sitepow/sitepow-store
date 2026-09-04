@@ -86,6 +86,7 @@ async function getStoreIdBySlug(storeSlug?: string) {
     where: {
       OR: [
         { slug: storeSlug },
+        { customDomain: storeSlug, customDomainStatus: 'ACTIVE' },
         { StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } } },
       ],
     },

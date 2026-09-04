@@ -500,6 +500,7 @@ export async function getPurchasableProductsForReview(storeSlug?: string) {
           store: {
             OR: [
               { slug: storeSlug },
+              { customDomain: storeSlug, customDomainStatus: 'ACTIVE' },
               {
                 StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } },
               },
