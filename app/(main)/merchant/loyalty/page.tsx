@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -14,6 +16,7 @@ import { CustomerPointsTable } from './_components/CustomerPointsTable'
 import { LoyaltySettingsCard } from './_components/LoyaltySettingsCard'
 
 export default function MerchantLoyaltyPage() {
+  const t = useTranslations('merchant.loyalty')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewStoreSettings,
@@ -25,8 +28,8 @@ export default function MerchantLoyaltyPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCoin}
-        title="ระบบแต้มสะสม"
-        description="ตั้งค่าเงื่อนไขการแจกแต้ม และบริหารจัดการคะแนนสมาชิกของแต่ละร้านค้า"
+        title={t('title')}
+        description={t('description')}
         endContent={<StoreSelectField />}
       />
       {selectedStoreId === ALL_STORES ? (
@@ -34,8 +37,8 @@ export default function MerchantLoyaltyPage() {
       ) : !isPermissionLoading && !canViewCustomers ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลระบบแต้มสะสมและสมาชิกของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-12">

@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranches } from '@/actions/hooks/branch'
 import { useCreateCoupon } from '@/actions/hooks/coupon'
 import { DiscountType } from '@/generated/prisma/enums'
@@ -35,6 +37,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
 export function CouponCreateDialog() {
+  const t = useTranslations('merchant.marketing')
+  const tDialog = useTranslations('merchant.marketing.dialog')
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
   const createCouponMutation = useCreateCoupon()
@@ -98,21 +102,19 @@ export function CouponCreateDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">
           <IconPlus />
-          สร้างคูปองใหม่
+          {t('createCoupon')}
         </Button>
       </DialogTrigger>
       <DialogContent className="overflow-x-hidden sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>สร้างคูปองส่วนลดใหม่</DialogTitle>
-          <DialogDescription>
-            กำหนดเงื่อนไขและมูลค่าส่วนลดสำหรับคูปองโปรโมชันของร้านค้าคุณ
-          </DialogDescription>
+          <DialogTitle>{tDialog('title')}</DialogTitle>
+          <DialogDescription>{tDialog('description')}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field className="sm:col-span-2">
-            <FieldLabel>รหัสคูปอง</FieldLabel>
+            <FieldLabel>{tDialog('codeLabel')}</FieldLabel>
             <Input
-              placeholder="เช่น OPENING20, SUMMER50"
+              placeholder={tDialog('codePlaceholder')}
               className="uppercase"
               {...register('code', {
                 onChange: (e) => {
@@ -124,9 +126,9 @@ export function CouponCreateDialog() {
             <FieldError>{errors?.code?.message}</FieldError>
           </Field>
           <Field className="sm:col-span-2">
-            <FieldLabel>คำอธิบาย</FieldLabel>
+            <FieldLabel>{tDialog('descriptionLabel')}</FieldLabel>
             <Textarea
-              placeholder="อธิบายเงื่อนไขหรือรายละเอียดของคูปอง"
+              placeholder={tDialog('descriptionPlaceholder')}
               rows={2}
               {...register('description')}
               disabled={createCouponMutation.isPending}
@@ -134,7 +136,7 @@ export function CouponCreateDialog() {
             <FieldError>{errors?.description?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>ประเภทส่วนลด</FieldLabel>
+            <FieldLabel>{tDialog('discountTypeLabel')}</FieldLabel>
             <Select
               defaultValue={DiscountType.FIXED}
               onValueChange={(v) =>
@@ -149,10 +151,10 @@ export function CouponCreateDialog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={DiscountType.FIXED}>
-                  ลดแบบจำนวนเงิน (฿)
+                  {tDialog('discountTypeFixed')}
                 </SelectItem>
                 <SelectItem value={DiscountType.PERCENTAGE}>
-                  ลดแบบเปอร์เซ็นต์ (%)
+                  {tDialog('discountTypePercentage')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -160,15 +162,18 @@ export function CouponCreateDialog() {
           </Field>
           <Field>
             <FieldLabel>
-              มูลค่าส่วนลด{' '}
-              {discountType === DiscountType.PERCENTAGE ? '(%)' : '(฿)'}
+              {tDialog('discountAmountLabel', {
+                unit: discountType === DiscountType.PERCENTAGE ? '(%)' : '(฿)',
+              })}
             </FieldLabel>
             <Input
               type="number"
               min={0}
               max={discountType === DiscountType.PERCENTAGE ? 100 : undefined}
               placeholder={
-                discountType === DiscountType.PERCENTAGE ? 'เช่น 10' : 'เช่น 50'
+                discountType === DiscountType.PERCENTAGE
+                  ? tDialog('discountAmountPlaceholderPercent')
+                  : tDialog('discountAmountPlaceholderFixed')
               }
               {...register('discountAmount', { valueAsNumber: true })}
               disabled={createCouponMutation.isPending}
@@ -176,11 +181,11 @@ export function CouponCreateDialog() {
             <FieldError>{errors?.discountAmount?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>ยอดสั่งซื้อขั้นต่ำ (฿)</FieldLabel>
+            <FieldLabel>{tDialog('minOrderAmountLabel')}</FieldLabel>
             <Input
               type="number"
               min={0}
-              placeholder="0 = ไม่มีขั้นต่ำ"
+              placeholder={tDialog('minOrderAmountPlaceholder')}
               {...register('minOrderAmount', { valueAsNumber: true })}
               disabled={createCouponMutation.isPending}
             />
@@ -188,11 +193,11 @@ export function CouponCreateDialog() {
           </Field>
           {discountType === DiscountType.PERCENTAGE && (
             <Field>
-              <FieldLabel>ส่วนลดสูงสุด (฿)</FieldLabel>
+              <FieldLabel>{tDialog('maxDiscountLabel')}</FieldLabel>
               <Input
                 type="number"
                 min={0}
-                placeholder="เว้นว่าง = ไม่จำกัด"
+                placeholder={tDialog('unlimitedPlaceholder')}
                 {...register('maxDiscount', { valueAsNumber: true })}
                 disabled={createCouponMutation.isPending}
               />
@@ -200,40 +205,40 @@ export function CouponCreateDialog() {
             </Field>
           )}
           <Field>
-            <FieldLabel>วันเริ่มต้น</FieldLabel>
+            <FieldLabel>{tDialog('startDateLabel')}</FieldLabel>
             <DatePicker
               value={watch('startDate')}
               onChange={(v) =>
                 setValue('startDate', v, { shouldValidate: true })
               }
-              placeholder="เลือกวันเริ่มต้น"
+              placeholder={tDialog('startDatePlaceholder')}
               disabled={createCouponMutation.isPending}
             />
             <FieldError>{errors?.startDate?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>วันสิ้นสุด</FieldLabel>
+            <FieldLabel>{tDialog('endDateLabel')}</FieldLabel>
             <DatePicker
               value={watch('endDate')}
               onChange={(v) => setValue('endDate', v, { shouldValidate: true })}
-              placeholder="เลือกวันสิ้นสุด"
+              placeholder={tDialog('endDatePlaceholder')}
               disabled={createCouponMutation.isPending}
             />
             <FieldError>{errors?.endDate?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>จำนวนสิทธิ์</FieldLabel>
+            <FieldLabel>{tDialog('usageLimitLabel')}</FieldLabel>
             <Input
               type="number"
               min={1}
-              placeholder="เว้นว่าง = ไม่จำกัด"
+              placeholder={tDialog('unlimitedPlaceholder')}
               {...register('usageLimit', { valueAsNumber: true })}
               disabled={createCouponMutation.isPending}
             />
             <FieldError>{errors?.usageLimit?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>สาขาที่เข้าร่วม</FieldLabel>
+            <FieldLabel>{tDialog('branchLabel')}</FieldLabel>
             <Select
               onValueChange={(v) =>
                 setValue('branchId', v === 'all' ? null : v, {
@@ -243,10 +248,10 @@ export function CouponCreateDialog() {
               disabled={createCouponMutation.isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="ทุกสาขา" />
+                <SelectValue placeholder={tDialog('allBranches')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">ทุกสาขา</SelectItem>
+                <SelectItem value="all">{tDialog('allBranches')}</SelectItem>
                 {branches.map((branch) => (
                   <SelectItem key={branch.id} value={branch.id}>
                     {branch.name}
@@ -263,7 +268,7 @@ export function CouponCreateDialog() {
             onClick={handleClose}
             disabled={createCouponMutation.isPending}
           >
-            ยกเลิก
+            {tDialog('cancel')}
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -271,10 +276,10 @@ export function CouponCreateDialog() {
           >
             {createCouponMutation.isPending ? (
               <>
-                <Spinner /> กำลังบันทึก...
+                <Spinner /> {tDialog('saving')}
               </>
             ) : (
-              'สร้างคูปอง'
+              tDialog('createSubmit')
             )}
           </Button>
         </DialogFooter>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/table'
 
 export function BlogTable() {
+  const t = useTranslations('merchant.blog')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -49,12 +51,14 @@ export function BlogTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสบทความ</TableHead>
-              <TableHead>ชื่อบทความ</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>แท็ก</TableHead>
+              <TableHead>{t('columns.id')}</TableHead>
+              <TableHead>{t('columns.title')}</TableHead>
+              <TableHead>{t('columns.slug')}</TableHead>
+              <TableHead>{t('columns.tags')}</TableHead>
               {(canUpdateBlogs || canDeleteBlogs) && (
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -62,7 +66,7 @@ export function BlogTable() {
             {isLoading && blogs.length === 0 ? (
               <TableLoadingRow colSpan={5} />
             ) : blogs.length === 0 ? (
-              <TableEmptyRow colSpan={5} title="ยังไม่มีบทความ" />
+              <TableEmptyRow colSpan={5} title={t('empty')} />
             ) : (
               blogs.map((blog) => (
                 <TableRow key={blog.id}>

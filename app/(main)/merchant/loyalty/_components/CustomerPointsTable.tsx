@@ -2,6 +2,8 @@
 
 import { ComponentProps, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -35,6 +37,7 @@ export function CustomerPointsTable({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
+  const t = useTranslations('merchant.loyalty')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -53,10 +56,8 @@ export function CustomerPointsTable({
   return (
     <Card className={cn('h-fit', className)} {...props}>
       <CardHeader>
-        <CardTitle>ฐานข้อมูลสมาชิกและคะแนนคงเหลือ</CardTitle>
-        <CardDescription>
-          รายชื่อลูกค้าที่เป็นสมาชิกของร้านค้านี้ และประวัติคะแนนสะสม
-        </CardDescription>
+        <CardTitle>{t('table.title')}</CardTitle>
+        <CardDescription>{t('table.description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative">
@@ -65,7 +66,7 @@ export function CustomerPointsTable({
             size={16}
           />
           <Input
-            placeholder="ค้นหาสมาชิกด้วยชื่อ หรือเบอร์โทรศัพท์..."
+            placeholder={t('table.searchPlaceholder')}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -79,26 +80,26 @@ export function CustomerPointsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ชื่อลูกค้า</TableHead>
-                <TableHead>เบอร์โทรศัพท์</TableHead>
-                <TableHead className="text-right">แต้มปัจจุบัน</TableHead>
-                <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead>{t('columns.customer')}</TableHead>
+                <TableHead>{t('columns.phone')}</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.points')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('columns.totalSpent')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {!isEnabled ? (
-                <TableEmptyRow
-                  title="ระบบแต้มสะสมของร้านค้านี้ถูกปิดการใช้งานอยู่"
-                  colSpan={5}
-                />
+                <TableEmptyRow title={t('table.disabledMessage')} colSpan={5} />
               ) : isLoading && customers.length === 0 ? (
                 <TableLoadingRow colSpan={5} />
               ) : customers.length === 0 ? (
-                <TableEmptyRow
-                  title="ไม่พบข้อมูลสมาชิกในระบบของแบรนด์นี้"
-                  colSpan={5}
-                />
+                <TableEmptyRow title={t('table.empty')} colSpan={5} />
               ) : (
                 customers.map((item) => (
                   <TableRow key={item.id}>

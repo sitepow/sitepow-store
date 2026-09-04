@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
@@ -21,6 +22,8 @@ interface BlogCreateClientProps {
 }
 
 export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
+  const t = useTranslations('merchant.blog')
+  const tCommon = useTranslations('common.actions')
   const { selectedStoreId } = useStoreFilter()
   const isMounted = useIsMounted()
 
@@ -34,13 +37,13 @@ export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={isEditMode ? IconEdit : IconPlus}
-        title={isEditMode ? 'แก้ไขบทความ' : 'เพิ่มบทความใหม่'}
-        description="จัดการเนื้อหาบทความ ภาพปก และการแสดงผลบทความในบล็อก"
+        title={isEditMode ? t('editBlog') : t('addBlog')}
+        description={t('formDescription')}
         endContent={
           <div className="flex flex-wrap items-end gap-3">
             <Button asChild variant="outline">
               <Link href="/merchant/blog">
-                <ArrowLeftIcon className="mr-1 size-4" /> ย้อนกลับ
+                <ArrowLeftIcon className="mr-1 size-4" /> {tCommon('back')}
               </Link>
             </Button>
             <StoreSelectField />

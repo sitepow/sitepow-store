@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
@@ -10,6 +11,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
 export function BlogPreviewContent() {
+  const t = useTranslations('merchant.blog.preview')
   const { control } = useFormContext()
   const { selectedStoreSlug } = useStoreFilter()
 
@@ -18,7 +20,7 @@ export function BlogPreviewContent() {
     name: ['title', 'slug', 'tags', 'image', 'content'],
   })
 
-  const displayTitle = title || 'หัวข้อบทความจะแสดงตรงนี้'
+  const displayTitle = title || t('titlePlaceholder')
   const displaySlug = slug || 'blog-post-slug-example'
   const formattedTags = arrayToString(stringToArray(tags))
 
@@ -45,15 +47,14 @@ export function BlogPreviewContent() {
   }, [content])
 
   const tagText = formattedTags ? `[${formattedTags}] ` : ''
-  const contentSnippet =
-    cleanContent || 'อ่านบทความน่าสนใจ และอัปเดตสาระดีๆ ได้ที่บล็อกของเรา...'
+  const contentSnippet = cleanContent || t('contentPlaceholder')
   const description = `${tagText}${contentSnippet}`
 
   return (
     <div className="text-foreground space-y-6">
       <div className="dark:bg-foreground/5 rounded-lg border p-4">
         <p className="mb-2 text-xs font-semibold uppercase opacity-60">
-          Google Search (ตัวอย่าง)
+          {t('googleSearch')}
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
@@ -67,7 +68,7 @@ export function BlogPreviewContent() {
       </div>
       <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
-          Social Share (ตัวอย่าง)
+          {t('socialShare')}
         </p>
         <Image
           src={coverImage}

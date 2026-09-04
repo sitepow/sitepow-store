@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
@@ -79,6 +80,8 @@ interface CreateBlogFormProps {
 }
 
 export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
+  const t = useTranslations('merchant.blog.form')
+  const tCommon = useTranslations('common.actions')
   const { store } = useStoreData()
   const router = useRouter()
   const { selectedStoreId } = useStoreFilter()
@@ -237,7 +240,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
   const handleResetForm = () => {
     localStorage.removeItem(DRAFT_KEY)
     reset(defaultFormValues)
-    toast.success('ล้างข้อมูลร่างบทความเรียบร้อยแล้ว')
+    toast.success(t('resetDraftSuccess'))
   }
 
   const isPending =
@@ -325,17 +328,17 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 ) : (
                   <IconWand className="mr-2 size-4" />
                 )}
-                เครื่องมือ AI ช่วยเขียน
+                {t('aiTool')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>สร้างเนื้อหาด้วย AI</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('aiGenerateLabel')}</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() =>
                   handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
                 }
               >
-                ให้ AI คิดเนื้อหาบทความทั้งหมด
+                {t('aiGenAll')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -343,21 +346,21 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                   handleAiTrigger(AiGenTask.TITLE, () => genAi(AiGenTask.TITLE))
                 }
               >
-                สร้างชื่อบทความด้วย AI
+                {t('aiGenTitle')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
                   handleAiTrigger(AiGenTask.SLUG, () => genAi(AiGenTask.SLUG))
                 }
               >
-                สร้าง Slug จากชื่อบทความ
+                {t('aiGenSlug')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
                   handleAiTrigger(AiGenTask.TAGS, () => genAi(AiGenTask.TAGS))
                 }
               >
-                ให้ AI ช่วยคิด แท็ก (Tags)
+                {t('aiGenTags')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -369,14 +372,14 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
               variant="outline"
               onClick={handleResetForm}
             >
-              <IconX className="mr-1 size-4" /> ล้างการเปลี่ยนแปลง
+              <IconX className="mr-1 size-4" /> {t('resetChanges')}
             </Button>
           )}
 
           {isDirty && (
             <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
               {isPending && <Spinner className="mr-2" />}
-              บันทึกบทความ
+              {t('saveBlog')}
             </Button>
           )}
         </CardContent>
@@ -386,10 +389,10 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
           <FieldSet disabled={isPending}>
             <FieldGroup className="grid gap-6">
               <Field>
-                <FieldLabel className="required">ชื่อบทความ</FieldLabel>
+                <FieldLabel className="required">{t('title')}</FieldLabel>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="เช่น 10 เทคนิคการดูแลสุขภาพในปี 2026"
+                    placeholder={t('titlePlaceholder')}
                     {...register('title')}
                   />
                   <Button
@@ -413,7 +416,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 )}
               </Field>
               <Field>
-                <FieldLabel className="required">Slug (URL)</FieldLabel>
+                <FieldLabel className="required">{t('slug')}</FieldLabel>
                 <div className="flex gap-2">
                   <Input
                     placeholder="10-health-tips-2026"
@@ -440,7 +443,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 )}
               </Field>
               <Field>
-                <FieldLabel>รูปภาพปกบทความ</FieldLabel>
+                <FieldLabel>{t('coverImage')}</FieldLabel>
                 <div className="space-y-3">
                   {previewImageUrl ? (
                     <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
@@ -469,14 +472,13 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     <label className="border-muted-foreground/25 hover:bg-muted/50 flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors">
                       <IconUpload className="text-muted-foreground mb-2 size-8" />
                       <div className="text-sm">
-                        <span>คลิกเพื่ออัปโหลด หรือลากไฟล์มาวาง</span>
+                        <span>{t('uploadText')}</span>
                       </div>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        แนะนำสัดส่วน 16:9 (เช่น 1920x1080px หรือ 1280x720px
-                        ขึ้นไป)
+                        {t('uploadRecommendation')}
                       </p>
                       <p className="text-muted-foreground/70 text-[11px]">
-                        รองรับไฟล์ PNG, JPG, WEBP
+                        {t('uploadFormats')}
                       </p>
                       <input
                         type="file"
@@ -495,7 +497,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
               </Field>
               <Field>
                 <div className="mb-2 flex items-center justify-between">
-                  <FieldLabel>เนื้อหาบทความ</FieldLabel>
+                  <FieldLabel>{t('content')}</FieldLabel>
                   <Button
                     type="button"
                     variant="outline"
@@ -510,7 +512,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     ) : (
                       <IconWand className="mr-2 size-4" />
                     )}
-                    ให้ AI เขียนเนื้อหาให้
+                    {t('aiWriteContent')}
                   </Button>
                 </div>
                 <Controller
@@ -530,10 +532,10 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 )}
               </Field>
               <Field>
-                <FieldLabel>แท็ก (คั่นด้วยเครื่องหมายจุลภาค ,)</FieldLabel>
+                <FieldLabel>{t('tags')}</FieldLabel>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="สุขภาพ, ไลฟ์สไตล์, ออกกำลังกาย"
+                    placeholder={t('tagsPlaceholder')}
                     {...register('tags')}
                   />
                   <Button
@@ -564,17 +566,18 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>ยืนยันการใช้ AI</AlertDialogTitle>
+            <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
-              <span className="text-primary font-bold">
-                {aiTaskConfirm?.cost} เครดิต
-              </span>{' '}
-              คุณต้องการดำเนินการต่อหรือไม่?
+              {t.rich('aiConfirmDescription', {
+                cost: aiTaskConfirm?.cost || 0,
+                b: (chunks) => (
+                  <span className="text-primary font-bold">{chunks}</span>
+                ),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (aiTaskConfirm) {
@@ -583,7 +586,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                 }
               }}
             >
-              ยืนยัน
+              {tCommon('confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

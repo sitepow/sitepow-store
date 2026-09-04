@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useCoupons, useDeleteCoupon } from '@/actions/hooks/coupon'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -23,6 +25,7 @@ import {
 } from '@/components/ui/table'
 
 export function CouponListTable() {
+  const t = useTranslations('merchant.marketing')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -40,15 +43,17 @@ export function CouponListTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสคูปอง</TableHead>
+              <TableHead>{t('columns.code')}</TableHead>
               <TableHead className="max-w-72 min-w-72">
-                รายละเอียด / เงื่อนไข
+                {t('columns.descriptionConditions')}
               </TableHead>
-              <TableHead>มูลค่าส่วนลด</TableHead>
-              <TableHead>สาขาที่เข้าร่วม</TableHead>
-              <TableHead className="w-48">สถิติการใช้งาน</TableHead>
-              <TableHead>วันหมดอายุ</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.discount')}</TableHead>
+              <TableHead>{t('columns.branch')}</TableHead>
+              <TableHead className="w-48">{t('columns.usage')}</TableHead>
+              <TableHead>{t('columns.validity')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -57,8 +62,8 @@ export function CouponListTable() {
             ) : coupons.length === 0 ? (
               <TableEmptyRow
                 colSpan={7}
-                title="ยังไม่มีโปรโมชันคูปองในขณะนี้"
-                description="เริ่มต้นขับเคลื่อนยอดขายด้วยการคลิกปุ่มสร้างคูปองส่วนลด"
+                title={t('emptyTitle')}
+                description={t('emptyDescription')}
               />
             ) : (
               coupons.map((coupon) => {
@@ -74,7 +79,7 @@ export function CouponListTable() {
                           {coupon.code}
                         </Badge>
                         <span className="text-xs opacity-60">
-                          {isFull ? 'สิทธิ์เต็มแล้ว' : 'เปิดใช้งานอยู่'}
+                          {isFull ? t('statusFull') : t('statusActive')}
                         </span>
                       </div>
                     </TableCell>
@@ -84,8 +89,11 @@ export function CouponListTable() {
                           {coupon.description || '-'}
                         </span>
                         <span className="text-muted-foreground text-xs">
-                          เมื่อสั่งซื้อขั้นต่ำ ฿
-                          {Number(coupon.minOrderAmount).toLocaleString()}
+                          {t('minOrderAmount', {
+                            amount: Number(
+                              coupon.minOrderAmount,
+                            ).toLocaleString(),
+                          })}
                         </span>
                       </div>
                     </TableCell>
@@ -99,8 +107,11 @@ export function CouponListTable() {
                         {coupon.discountType === 'PERCENTAGE' &&
                           coupon.maxDiscount && (
                             <span className="text-xs opacity-60">
-                              ลดสูงสุด ฿
-                              {Number(coupon.maxDiscount).toLocaleString()}
+                              {t('maxDiscount', {
+                                amount: Number(
+                                  coupon.maxDiscount,
+                                ).toLocaleString(),
+                              })}
                             </span>
                           )}
                       </div>
@@ -112,7 +123,7 @@ export function CouponListTable() {
                           size={18}
                         />
                         <span className="text-muted-foreground max-w-45 truncate text-sm">
-                          {coupon.branch?.name ?? 'ทุกสาขาภายในแบรนด์'}
+                          {coupon.branch?.name ?? t('allBranchesInBrand')}
                         </span>
                       </div>
                     </TableCell>
@@ -120,14 +131,16 @@ export function CouponListTable() {
                       <div className="flex flex-col space-y-1.5">
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">
-                            ใช้ไปแล้ว
+                            {t('used')}
                           </span>
                           <span className="font-medium">
                             {coupon.usedCount}{' '}
                             <span className="text-muted-foreground font-normal">
                               {isLimitless
-                                ? 'ครั้ง'
-                                : `/ ${coupon.usageLimit} ครั้ง`}
+                                ? t('times')
+                                : t('timesWithLimit', {
+                                    limit: coupon.usageLimit ?? 0,
+                                  })}
                             </span>
                           </span>
                         </div>
