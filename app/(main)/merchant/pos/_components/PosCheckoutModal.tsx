@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -16,9 +16,19 @@ import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { POSCheckoutInput } from '@/zod/order'
-import { IconCash, IconExternalLink, IconQrcode } from '@tabler/icons-react'
+import {
+  IconCash,
+  IconExternalLink,
+  IconFileInvoice,
+  IconPackageExport,
+  IconPrinter,
+  IconQrcode,
+  IconReceipt,
+} from '@tabler/icons-react'
 
+import { OrderDocType } from '@/components/pdf/types'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -59,6 +69,9 @@ export function PosCheckoutModal({
   const { user } = useSession()
 
   const currentStoreId = watch('storeId')
+  const [shouldPrintReceipt, setShouldPrintReceipt] = useState(true)
+  const [selectedDocType, setSelectedDocType] =
+    useState<OrderDocType>('receipt')
 
   const supplierStoreId = cartItems[0]?.supplierStoreId || cartItems[0]?.storeId
 
@@ -155,7 +168,10 @@ export function PosCheckoutModal({
         if (paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY) {
           toast.loading('กำลังนำคุณไปยังหน้าชำระเงิน Stripe...')
 
-          // ส่ง storeId ของร้านค้าที่เป็นเจ้าของสินค้าเข้า checkout mutation
+          const successUrl = shouldPrintReceipt
+            ? `${window.location.origin}/merchant/orders/${createdOrder.id}/print?type=${selectedDocType}`
+            : `${window.location.origin}/merchant/orders`
+
           storeCheckoutMutation.mutate(
             {
               storeId: targetCheckStoreId,
@@ -163,7 +179,7 @@ export function PosCheckoutModal({
               customerEmail: user?.email || 'guest@checkout.local',
               description: `ชำระเงินคำสั่งซื้อ #${createdOrder.orderNumber}`,
               amount: Number(createdOrder.totalAmount),
-              successUrl: `${window.location.origin}/merchant/orders`,
+              successUrl,
               cancelUrl: `${window.location.origin}/merchant/orders`,
             },
             {
@@ -192,7 +208,31 @@ export function PosCheckoutModal({
           reset()
           onSuccess()
           onOpenChange(false)
-          toast.success('ทำรายการสำเร็จ')
+
+          if (shouldPrintReceipt) {
+            const printUrl = `/merchant/orders/${createdOrder.id}/print?type=${selectedDocType}`
+            window.open(printUrl, '_blank')
+            toast.success(
+              (t) => (
+                <div className="flex items-center justify-between gap-3">
+                  <span>ทำรายการสำเร็จ (#{createdOrder.orderNumber})</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.open(printUrl, '_blank')
+                      toast.dismiss(t.id)
+                    }}
+                    className="bg-primary text-primary-foreground rounded px-2.5 py-1 text-xs font-semibold hover:opacity-90"
+                  >
+                    เปิดเอกสาร
+                  </button>
+                </div>
+              ),
+              { duration: 6000 },
+            )
+          } else {
+            toast.success('ทำรายการสำเร็จ')
+          }
         }
       }
     }
@@ -411,6 +451,79 @@ export function PosCheckoutModal({
                 </div>
               </div>
             )}
+            <div className="bg-muted/30 border-border/80 space-y-3 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="print-receipt-toggle"
+                  className="text-foreground flex cursor-pointer items-center gap-2.5 text-sm font-semibold select-none"
+                >
+                  <Checkbox
+                    id="print-receipt-toggle"
+                    checked={shouldPrintReceipt}
+                    onCheckedChange={(checked) =>
+                      setShouldPrintReceipt(Boolean(checked))
+                    }
+                  />
+                  <div className="flex items-center gap-1.5">
+                    <IconPrinter className="text-primary size-4" />
+                    <span>ออกเอกสาร / พิมพ์ใบเสร็จทันที</span>
+                  </div>
+                </label>
+                {shouldPrintReceipt && (
+                  <span className="text-muted-foreground text-[11px]">
+                    เปิดหน้าพิมพ์อัตโนมัติ
+                  </span>
+                )}
+              </div>
+              {shouldPrintReceipt && (
+                <div className="border-border/60 space-y-1.5 border-t pt-2.5">
+                  <span className="text-muted-foreground text-xs font-medium">
+                    เลือกประเภทเอกสาร:
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDocType('receipt')}
+                      className={cn(
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        selectedDocType === 'receipt'
+                          ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
+                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
+                      )}
+                    >
+                      <IconReceipt className="size-3.5" />
+                      <span>ใบเสร็จรับเงิน</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDocType('tax-invoice')}
+                      className={cn(
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        selectedDocType === 'tax-invoice'
+                          ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
+                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
+                      )}
+                    >
+                      <IconFileInvoice className="size-3.5" />
+                      <span>ใบกำกับภาษี</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDocType('delivery-note')}
+                      className={cn(
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        selectedDocType === 'delivery-note'
+                          ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
+                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
+                      )}
+                    >
+                      <IconPackageExport className="size-3.5" />
+                      <span>ใบส่งสินค้า</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <DialogFooter className="bg-muted/20 mt-5 gap-2 border-t p-4 sm:flex-row sm:justify-end">
             <Button
@@ -426,13 +539,22 @@ export function PosCheckoutModal({
               type="submit"
               size="lg"
               disabled={isPending || !isCurrentPaymentValid}
-              className="w-full min-w-40 font-bold sm:w-auto"
+              className="w-full min-w-40 gap-1.5 font-bold sm:w-auto"
             >
-              {isPending
-                ? 'กำลังเชื่อมต่อ...'
-                : paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY
-                  ? 'ไปที่หน้าชำระเงิน'
-                  : 'ยืนยันการชำระเงิน'}
+              {isPending ? (
+                'กำลังเชื่อมต่อ...'
+              ) : paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY ? (
+                'ไปที่หน้าชำระเงิน'
+              ) : (
+                <>
+                  {shouldPrintReceipt && <IconPrinter className="size-4" />}
+                  <span>
+                    {shouldPrintReceipt
+                      ? 'ยืนยันและพิมพ์เอกสาร'
+                      : 'ยืนยันการชำระเงิน'}
+                  </span>
+                </>
+              )}
             </Button>
           </DialogFooter>
         </form>
