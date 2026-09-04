@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useUpdateOrderStatus } from '@/actions/hooks/order'
 import { GetOrdersItem, ShippingAddressSnapshot } from '@/actions/order'
-import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatFullAddress } from '@/utils/address'
@@ -50,6 +51,8 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
+  const t = useTranslations('merchant.orders.detail')
+  const tStatuses = useTranslations('merchant.orders.statuses')
   const { copied, copy } = useCopyToClipboard()
   const [open, setOpen] = useState(false)
   const [trackingNumber, setTrackingNumber] = useState(
@@ -109,9 +112,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
+          <DialogTitle>
+            {t('orderTitle', { orderNumber: order.orderNumber })}
+          </DialogTitle>
           <DialogDescription>
-            วันที่สั่งซื้อ: {formatDateTime(order.createdAt)}
+            {t('orderDate', { date: formatDateTime(order.createdAt) })}
           </DialogDescription>
           <OrderStatusBadges
             status={order.status}
@@ -121,7 +126,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           />
         </DialogHeader>
         <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
-          <span className="text-sm font-medium">อัปเดตสถานะออเดอร์</span>
+          <span className="text-sm font-medium">{t('updateStatus')}</span>
           <Select
             value={order.status}
             disabled={isCancelled || isPending}
@@ -133,7 +138,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             <SelectContent>
               {Object.values(OrderStatus).map((status) => (
                 <SelectItem key={status} value={status}>
-                  {ORDER_STATUS_TH[status]}
+                  {tStatuses(status)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -141,12 +146,12 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         </div>
         <CustomerCard
           icon={<IconUser />}
-          title="ข้อมูลลูกค้า"
+          title={t('customerInfo')}
           content={
             <>
-              ชื่อลูกค้า: {customerName} <br />
-              อีเมล: {order.customer?.email || '-'} <br />
-              เบอร์โทรศัพท์:{' '}
+              {t('customerName')} {customerName} <br />
+              {t('email')} {order.customer?.email || '-'} <br />
+              {t('phone')}{' '}
               {order.customer?.phone
                 ? formatPromptPay(order.customer.phone)
                 : '-'}
@@ -155,15 +160,15 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         />
         <CustomerCard
           icon={<IconMapPin />}
-          title="ที่อยู่จัดส่ง"
+          title={t('shippingAddress')}
           content={
             <>
-              ชื่อผู้รับ:{' '}
+              {t('receiverName')}{' '}
               {shippingAddr?.receiverName || shippingAddr?.name || '-'} <br />
-              เบอร์โทรศัพท์:{' '}
+              {t('phone')}{' '}
               {shippingAddr?.phone ? formatPromptPay(shippingAddr.phone) : '-'}
               <br />
-              ที่อยู่: {formatFullAddress(shippingAddr) || '-'}
+              {t('address')} {formatFullAddress(shippingAddr) || '-'}
             </>
           }
         />
@@ -179,11 +184,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         {order.trackingNumber ? (
           <CustomerCard
             icon={<IconCubeSend />}
-            title="เลขพัสดุ (Tracking Number)"
+            title={t('trackingNumber')}
             content={
               <>
-                เลขติดตามขนส่ง: {order.trackingNumber} <br />
-                วิธีการจัดส่ง: {order.shippingMethod || '-'}
+                {t('carrierTracking')} {order.trackingNumber} <br />
+                {t('shippingMethod')} {order.shippingMethod || '-'}
               </>
             }
             action={
@@ -194,11 +199,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               >
                 {copied ? (
                   <>
-                    <IconCheck size={16} /> คัดลอกแล้ว
+                    <IconCheck size={16} /> {t('copied')}
                   </>
                 ) : (
                   <>
-                    <IconCopy size={16} /> คัดลอก
+                    <IconCopy size={16} /> {t('copy')}
                   </>
                 )}
               </Button>
@@ -208,39 +213,40 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           order.status !== OrderStatus.SHIPPED ? (
           <CustomerCard
             icon={<IconCubeSend />}
-            title="สถานะการจัดส่ง"
+            title={t('shippingStatus')}
             content={
               order.status === OrderStatus.PENDING
-                ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
-                : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ'
+                ? t('pendingShipping')
+                : t('processingShipping')
             }
           />
         ) : null}
         <CustomerCard
           icon={<IconPackage />}
-          title="ขนาดและน้ำหนักพัสดุ"
+          title={t('dimensionsWeight')}
           content={
             <>
-              น้ำหนัก: {formatNumber(order.totalWeight || 0)} กก. <br />
-              ขนาด (กxยxส): {formatNumber(order.width || 0)} x{' '}
+              {t('weight')} {formatNumber(order.totalWeight || 0)} {t('kgUnit')}{' '}
+              <br />
+              {t('dimensions')} {formatNumber(order.width || 0)} x{' '}
               {formatNumber(order.length || 0)} x{' '}
-              {formatNumber(order.height || 0)} ซม.
+              {formatNumber(order.height || 0)} {t('cmUnit')}
             </>
           }
         />
         {isDirectPayment && (
           <CustomerCard
             icon={<IconCreditCardPay />}
-            title="ข้อมูลการชำระเงิน"
+            title={t('paymentInfo')}
             content={
               <>
-                ธนาคาร: {order.bankAccount?.bankName || '-'} <br />
-                เลขที่บัญชี:{' '}
+                {t('bank')} {order.bankAccount?.bankName || '-'} <br />
+                {t('accountNumber')}{' '}
                 {order.bankAccount?.accountNumber
                   ? formatBankAccount(order.bankAccount.accountNumber)
                   : '-'}{' '}
                 <br />
-                ชื่อบัญชี: {order.bankAccount?.accountName || '-'}
+                {t('accountName')} {order.bankAccount?.accountName || '-'}
               </>
             }
           />
@@ -248,17 +254,16 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         {order.isTaxInvoiceRequested && (
           <CustomerCard
             icon={<IconReceipt />}
-            title="ข้อมูลใบกำกับภาษี"
+            title={t('taxInvoiceInfo')}
             content={
               <>
-                ชื่อ/บริษัท: {order.taxName || '-'}
+                {t('taxName')} {order.taxName || '-'}
                 <br />
-                เลขประจำตัวผู้เสียภาษี:{' '}
-                {order.taxId ? formatPromptPay(order.taxId) : '-'}
+                {t('taxId')} {order.taxId ? formatPromptPay(order.taxId) : '-'}
                 <br />
-                สาขา: {order.taxBranchCode || 'สำนักงานใหญ่'}
+                {t('branch')} {order.taxBranchCode || t('headquarters')}
                 <br />
-                ที่อยู่จดทะเบียน: {order.taxAddress || '-'}
+                {t('registeredAddress')} {order.taxAddress || '-'}
               </>
             }
           />

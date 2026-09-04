@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
@@ -53,6 +55,8 @@ import { OrderDetailView } from './OrderDetailView'
 import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
 
 function OrderRowActions({ order }: { order: any }) {
+  const t = useTranslations('merchant.orders')
+
   const handleDownloadDoc = (docType: string) => {
     window.open(`/merchant/orders/${order.id}/print?type=${docType}`, '_blank')
   }
@@ -62,35 +66,35 @@ function OrderRowActions({ order }: { order: any }) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon-lg">
           <IconDotsVertical size={18} />
-          <span className="sr-only">เปิดเมนูจัดการ</span>
+          <span className="sr-only">{t('openMenu')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>เอกสารคำสั่งซื้อ</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('orderDocuments')}</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => handleDownloadDoc('receipt')}>
             <IconReceipt size={16} />
-            <span>ใบเสร็จรับเงิน (Receipt A4)</span>
+            <span>{t('receiptA4')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('receipt-slip')}>
             <IconReceipt size={16} />
-            <span>ใบเสร็จอย่างย่อ (Slip 80mm)</span>
+            <span>{t('receiptSlip')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('tax-invoice')}>
             <IconFileInvoice size={16} />
-            <span>ใบกำกับภาษี (Tax Invoice)</span>
+            <span>{t('taxInvoice')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('delivery-note')}>
             <IconPackageExport size={16} />
-            <span>ใบส่งสินค้า (Delivery Note)</span>
+            <span>{t('deliveryNote')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('shipping-label')}>
             <IconPrinter size={16} />
-            <span>ใบปะหน้าพัสดุ (Shipping Label)</span>
+            <span>{t('shippingLabel')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('packing-slip')}>
             <IconFileDescription size={16} />
-            <span>ใบจัดสินค้า (Packing Slip)</span>
+            <span>{t('packingSlip')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
@@ -99,6 +103,7 @@ function OrderRowActions({ order }: { order: any }) {
 }
 
 export function OrderTable() {
+  const t = useTranslations('merchant.orders')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
   const [page, setPage] = useState(1)
@@ -124,20 +129,22 @@ export function OrderTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
-              <TableHead>ลูกค้า / ช่องทาง</TableHead>
-              <TableHead>รายการสินค้า</TableHead>
-              <TableHead>ยอดรวม</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>วันที่</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.orderId')}</TableHead>
+              <TableHead>{t('columns.customer')}</TableHead>
+              <TableHead>{t('columns.items')}</TableHead>
+              <TableHead>{t('columns.total')}</TableHead>
+              <TableHead>{t('columns.status')}</TableHead>
+              <TableHead>{t('columns.createdAt')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && orders.length === 0 ? (
               <TableLoadingRow colSpan={7} />
             ) : orders.length === 0 ? (
-              <TableEmptyRow colSpan={7} title="ยังไม่มีออเดอร์" />
+              <TableEmptyRow colSpan={7} title={t('noOrders')} />
             ) : (
               orders.map((order) => {
                 const isCancelled = order.status === OrderStatus.CANCELLED
@@ -192,20 +199,20 @@ export function OrderTable() {
                     resellerInfo?.resellerStore?.name ||
                     resellerInfo?.resellerUser?.name ||
                     resellerInfo?.resellerUser?.email ||
-                    'ตัวแทนจำหน่าย (Reseller)'
-                  displaySubtext = 'รายการขายฝาก (Reseller POS)'
+                    t('resellerFallback')
+                  displaySubtext = t('resellerPosSubtext')
                 } else if (isPOSOrder) {
                   if (!displayName) {
-                    displayName = 'ลูกค้าหน้าร้าน (Walk-in)'
+                    displayName = t('walkInCustomer')
                   }
                   if (employeeName) {
-                    displaySubtext = `พนักงาน: ${employeeName}`
+                    displaySubtext = t('staffPrefix', { name: employeeName })
                   } else if (!displaySubtext) {
                     displaySubtext = ''
                   }
                 } else {
                   if (!displayName) {
-                    displayName = 'ลูกค้าไม่ระบุชื่อ'
+                    displayName = t('guestCustomer')
                   }
                   if (!displaySubtext) {
                     displaySubtext = '-'
@@ -263,7 +270,7 @@ export function OrderTable() {
                             </p>
                             {isResellerPOS ? (
                               <Badge className="px-1.5 py-0 text-[10px] font-normal">
-                                ตัวแทนจำหน่าย
+                                {t('resellerBadge')}
                               </Badge>
                             ) : isPOSOrder ? (
                               <Badge className="px-1.5 py-0 text-[10px] font-normal">
@@ -305,7 +312,7 @@ export function OrderTable() {
                               : 'outline'
                         }
                       >
-                        {ORDER_STATUS_TH[order.status]}
+                        {t(`statuses.${order.status}` as any)}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
@@ -325,7 +332,9 @@ export function OrderTable() {
                                     'guest@checkout.local',
                                   storeId: order.storeId,
                                   orderId: order.id,
-                                  description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,
+                                  description: t('stripePaymentDesc', {
+                                    orderNumber: order.orderNumber,
+                                  }),
                                   amount: order.totalAmount,
                                   successUrl: `${window.location.origin}/merchant/orders`,
                                   cancelUrl: `${window.location.origin}/merchant/orders`,
@@ -334,8 +343,8 @@ export function OrderTable() {
                             >
                               <IconCreditCard className="mr-1 size-4" />
                               {storeCheckoutMutation.isPending
-                                ? 'กำลังเชื่อมต่อ...'
-                                : 'ชำระเงิน'}
+                                ? t('connectingStripe')
+                                : t('payWithStripe')}
                             </Button>
                           ) : (
                             <UploadSlipDialog

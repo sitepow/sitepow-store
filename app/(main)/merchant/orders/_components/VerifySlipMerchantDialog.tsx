@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { useApproveSlipManual } from '@/actions/hooks/verify-slip'
@@ -40,6 +41,7 @@ interface VerifySlipMerchantDialogProps {
 export function VerifySlipMerchantDialog({
   order,
 }: VerifySlipMerchantDialogProps) {
+  const t = useTranslations('merchant.orders.verifySlip')
   const [isOpen, setIsOpen] = useState(false)
   const { mutate: handleVerifySlip, isPending } = useApproveSlipManual()
 
@@ -60,24 +62,28 @@ export function VerifySlipMerchantDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconSearch size={16} /> ตรวจสอบสลิป
+          <IconSearch size={16} /> {t('button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>ตรวจสอบสลิปการชำระเงิน #{order.orderNumber}</DialogTitle>
+          <DialogTitle>
+            {t('title', { orderNumber: order.orderNumber })}
+          </DialogTitle>
           <DialogDescription className="space-y-1">
             <span className="text-foreground block font-medium">
-              ยอดที่ต้องชำระ:{' '}
+              {t('amountDue')}{' '}
               <span className="text-primary">
                 {formatCurrency(order.totalAmount)}
               </span>
             </span>
             {order.bankAccount && (
               <span className="text-foreground block font-medium">
-                ธนาคารที่ลูกค้าเลือกโอน: {order.bankAccount.bankName} (เลขบัญชี:{' '}
-                {formatBankAccount(order.bankAccount.accountNumber)}) ชื่อบัญชี:{' '}
-                {order.bankAccount.accountName}
+                {t('bankInfo', {
+                  bank: order.bankAccount.bankName,
+                  account: formatBankAccount(order.bankAccount.accountNumber),
+                  name: order.bankAccount.accountName,
+                })}
               </span>
             )}
           </DialogDescription>
@@ -94,8 +100,8 @@ export function VerifySlipMerchantDialog({
             </div>
           ) : (
             <ActionRequiredAlert
-              description="ยังไม่มีการแนบสลิปสำหรับออเดอร์นี้"
-              title="แจ้งเตือน"
+              description={t('noSlipDesc')}
+              title={t('noSlipTitle')}
             />
           )}
         </div>
@@ -105,13 +111,13 @@ export function VerifySlipMerchantDialog({
             variant="outline"
             onClick={() => onAction(SlipVerificationAction.REJECT)}
           >
-            {isPending ? <Spinner /> : <IconX />} ปฏิเสธสลิป
+            {isPending ? <Spinner /> : <IconX />} {t('reject')}
           </Button>
           <Button
             type="button"
             onClick={() => onAction(SlipVerificationAction.APPROVE)}
           >
-            {isPending ? <Spinner /> : <IconCheck />} สลิปถูกต้อง
+            {isPending ? <Spinner /> : <IconCheck />} {t('approve')}
           </Button>
         </DialogFooter>
       </DialogContent>
