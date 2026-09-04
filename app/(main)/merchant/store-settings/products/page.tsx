@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { ProductsTable } from './_components/ProductsTable'
 
 export default function MerchantStoreSettingsProductsPage() {
+  const t = useTranslations('merchant.products')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewProducts,
@@ -27,8 +29,8 @@ export default function MerchantStoreSettingsProductsPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBox}
-        title="สินค้าทั้งหมด"
-        description="จัดการข้อมูลสินค้า ตรวจสอบสถานะ และอัปเดตสต็อกสินค้าของร้านค้าคุณ"
+        title={t('title')}
+        description={t('description')}
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
@@ -36,7 +38,7 @@ export default function MerchantStoreSettingsProductsPage() {
               <Button asChild variant="outline">
                 <Link href={'/merchant/store-settings/products/create'}>
                   <IconPlus />
-                  เพิ่มสินค้าใหม่
+                  {t('addProduct')}
                 </Link>
               </Button>
             )}
@@ -48,8 +50,8 @@ export default function MerchantStoreSettingsProductsPage() {
       ) : !isPermissionLoading && !canViewProducts ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลสินค้าของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <ProductsTable />
