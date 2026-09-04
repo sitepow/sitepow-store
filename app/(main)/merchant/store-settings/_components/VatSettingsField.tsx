@@ -28,15 +28,12 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
   return (
     <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        4. ข้อมูลระบบภาษี (Tax & VAT)
         {t('step4')}
       </div>
 
       <Field>
-        <FieldLabel>เลขผู้เสียภาษีร้านค้า (Tax ID)</FieldLabel>
         <FieldLabel>{t('taxIdLabel')}</FieldLabel>
         <Input
-          placeholder="เลข 13 หลัก (ถ้ามี)"
           placeholder={t('taxIdPlaceholder')}
           maxLength={13}
           {...register('taxId', {

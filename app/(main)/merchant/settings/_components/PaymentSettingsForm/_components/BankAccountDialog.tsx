@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useBankAccount,
   useCreateBankAccount,
@@ -71,6 +73,7 @@ export function BankAccountDialog({
   open: boolean
   setOpen: (v: boolean) => void
 }) {
+  const t = useTranslations('merchant.settings.payment.dialog')
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateBankAccount()
   const updateMutation = useUpdateBankAccount()
@@ -140,23 +143,21 @@ export function BankAccountDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {bankAccountId ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}
+            {bankAccountId ? t('editTitle') : t('addTitle')}
           </DialogTitle>
-          <DialogDescription>
-            กรอกข้อมูลบัญชีธนาคารหรือพร้อมเพย์สำหรับรับชำระเงินจากลูกค้า
-          </DialogDescription>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         {isLoadingAccount && bankAccountId ? (
           <div className="flex justify-center py-8">
-            <Spinner /> กำลังโหลดข้อมูล...
+            <Spinner /> {t('loading')}
           </div>
         ) : (
           <div className="grid min-w-0 gap-4 py-2">
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
-                <span className="text-sm font-medium">ตั้งเป็นบัญชีหลัก</span>
+                <span className="text-sm font-medium">{t('defaultLabel')}</span>
                 <span className="text-muted-foreground block text-xs">
-                  บัญชีนี้จะถูกเลือกเป็นค่าเริ่มต้นในการรับเงิน
+                  {t('defaultDesc')}
                 </span>
               </div>
               <Controller
@@ -171,7 +172,7 @@ export function BankAccountDialog({
               />
             </div>
             <Field className="min-w-0">
-              <FieldLabel>ประเภทบัญชี *</FieldLabel>
+              <FieldLabel>{t('typeLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="type"
@@ -184,14 +185,14 @@ export function BankAccountDialog({
                     }}
                   >
                     <SelectTrigger className="w-full truncate">
-                      <SelectValue placeholder="เลือกประเภท..." />
+                      <SelectValue placeholder={t('typePlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={BankAccountType.STANDARD_TRANSFER}>
-                        โอนผ่านธนาคาร
+                        {t('typeBank')}
                       </SelectItem>
                       <SelectItem value={BankAccountType.PROMPTPAY}>
-                        พร้อมเพย์ (PromptPay)
+                        {t('typePromptPay')}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -199,7 +200,7 @@ export function BankAccountDialog({
               />
             </Field>
             <Field className="min-w-0">
-              <FieldLabel>ธนาคาร/ผู้ให้บริการ *</FieldLabel>
+              <FieldLabel>{t('bankLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="bankName"
@@ -220,7 +221,7 @@ export function BankAccountDialog({
                             {field.value
                               ? bankOptions.find((b) => b.name === field.value)
                                   ?.name || field.value
-                              : 'เลือกธนาคาร...'}
+                              : t('bankPlaceholder')}
                           </span>
                           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
                         </button>
@@ -230,9 +231,11 @@ export function BankAccountDialog({
                         align="start"
                       >
                         <Command>
-                          <CommandInput placeholder="ค้นหาธนาคารหรือผู้ให้บริการ..." />
+                          <CommandInput
+                            placeholder={t('searchBankPlaceholder')}
+                          />
                           <CommandList>
-                            <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
+                            <CommandEmpty>{t('noBankFound')}</CommandEmpty>
                             <CommandGroup>
                               {bankOptions.map((bank) => (
                                 <CommandItem
@@ -265,7 +268,7 @@ export function BankAccountDialog({
             </Field>
             {accountType === BankAccountType.PROMPTPAY ? (
               <Field className="min-w-0">
-                <FieldLabel>หมายเลขพร้อมเพย์ *</FieldLabel>
+                <FieldLabel>{t('promptPayIdLabel')}</FieldLabel>
                 <Controller
                   control={control}
                   name="promptPayId"
@@ -276,7 +279,7 @@ export function BankAccountDialog({
                         const rawValue = e.target.value.replace(/\D/g, '')
                         field.onChange(rawValue)
                       }}
-                      placeholder="เบอร์โทรศัพท์ หรือ เลขบัตรประชาชน"
+                      placeholder={t('promptPayIdPlaceholder')}
                       inputMode="numeric"
                     />
                   )}
@@ -285,7 +288,7 @@ export function BankAccountDialog({
               </Field>
             ) : (
               <Field className="min-w-0">
-                <FieldLabel>เลขบัญชี *</FieldLabel>
+                <FieldLabel>{t('accountNumberLabel')}</FieldLabel>
                 <Controller
                   control={control}
                   name="accountNumber"
@@ -296,7 +299,7 @@ export function BankAccountDialog({
                         const rawValue = e.target.value.replace(/\D/g, '')
                         field.onChange(rawValue)
                       }}
-                      placeholder="เลขบัญชีธนาคาร"
+                      placeholder={t('accountNumberPlaceholder')}
                       inputMode="numeric"
                     />
                   )}
@@ -305,13 +308,10 @@ export function BankAccountDialog({
               </Field>
             )}
             <Field className="min-w-0">
-              <FieldLabel>
-                ชื่อบัญชี *สำคัญชื่อต้องตรงและพิมพ์ให้ถูกต้องเท่านั้น
-                ไม่เช่นนั้นตรวจสลิปอัตโนมัติอาจจะไม่ผ่าน
-              </FieldLabel>
+              <FieldLabel>{t('accountNameLabel')}</FieldLabel>
               <Input
                 {...register('accountName')}
-                placeholder="ชื่อ-นามสกุล หรือชื่อบริษัท"
+                placeholder={t('accountNamePlaceholder')}
               />
               <FieldError>{errors.accountName?.message}</FieldError>
             </Field>
@@ -324,14 +324,14 @@ export function BankAccountDialog({
             onClick={handleClose}
             disabled={isPending}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
           >
-            {isPending ? <Spinner /> : 'บันทึกข้อมูล'}
+            {isPending ? <Spinner /> : t('save')}
           </Button>
         </DialogFooter>
       </DialogContent>

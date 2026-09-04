@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { ACTOR_TYPE_TH, LOG_ACTION_TH } from '@/constants/translate'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconFilter, IconSearch } from '@tabler/icons-react'
@@ -32,15 +34,17 @@ export function AuditLogFilters({
   actionFilter,
   onActionFilterChange,
 }: AuditLogFiltersProps) {
+  const t = useTranslations('merchant.auditLogs')
+
   return (
     <Card>
       <CardContent className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
         <Field>
           <FieldLabel>
-            <IconSearch size={14} /> ค้นหาพนักงาน / Entity ID
+            <IconSearch size={14} /> {t('filters.searchLabel')}
           </FieldLabel>
           <Input
-            placeholder="พิมพ์ค้นหาชื่อ, รหัสเป้าหมาย..."
+            placeholder={t('filters.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
           />
@@ -48,17 +52,19 @@ export function AuditLogFilters({
 
         <Field>
           <FieldLabel>
-            <IconFilter size={14} /> กรองผู้ดำเนินการ (Actor Group)
+            <IconFilter size={14} /> {t('filters.actorGroupLabel')}
           </FieldLabel>
           <Select value={actorFilter} onValueChange={onActorFilterChange}>
             <SelectTrigger>
-              <SelectValue placeholder="ทั้งหมดทุกประเภท" />
+              <SelectValue placeholder={t('filters.allActors')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">ทั้งหมดทุกประเภท</SelectItem>
+              <SelectItem value="all">{t('filters.allActors')}</SelectItem>
               {(Object.keys(ACTOR_TYPE_TH) as ActorType[]).map((key) => (
                 <SelectItem key={key} value={key}>
-                  {ACTOR_TYPE_TH[key]}
+                  {t.has(`actorTypes.${key}`)
+                    ? t(`actorTypes.${key}`)
+                    : ACTOR_TYPE_TH[key]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -67,17 +73,19 @@ export function AuditLogFilters({
 
         <Field>
           <FieldLabel>
-            <IconFilter size={14} /> กรองตามประเภทเหตุการณ์ (Action)
+            <IconFilter size={14} /> {t('filters.actionTypeLabel')}
           </FieldLabel>
           <Select value={actionFilter} onValueChange={onActionFilterChange}>
             <SelectTrigger>
-              <SelectValue placeholder="ทุกเหตุการณ์" />
+              <SelectValue placeholder={t('filters.allActions')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">ทุกเหตุการณ์</SelectItem>
+              <SelectItem value="all">{t('filters.allActions')}</SelectItem>
               {(Object.keys(LOG_ACTION_TH) as LogAction[]).map((key) => (
                 <SelectItem key={key} value={key}>
-                  {LOG_ACTION_TH[key]}
+                  {t.has(`actions.${key}`)
+                    ? t(`actions.${key}`)
+                    : LOG_ACTION_TH[key]}
                 </SelectItem>
               ))}
             </SelectContent>

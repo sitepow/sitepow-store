@@ -3,6 +3,8 @@
 import { useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useTaxSetting, useUpdateTaxSetting } from '@/actions/hooks/tax'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { TaxSettingFormValues, taxSettingSchema } from '@/zod/tax'
@@ -19,6 +21,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function TaxSettingsForm() {
+  const t = useTranslations('merchant.settings.tax')
   const { selectedStoreId } = useStoreFilter()
   const { data: taxSetting } = useTaxSetting(selectedStoreId)
 
@@ -69,8 +72,8 @@ export function TaxSettingsForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconReceiptTax}
-          title="ภาษีและใบกำกับ"
-          description="ตั้งค่าการคำนวณภาษีของร้านค้าเพื่อเปิดตัวเลือกให้ลูกค้าขอใบกำกับภาษีเต็มรูปแบบในขั้นตอนเช็คเอาท์ออเดอร์"
+          title={t('title')}
+          description={t('description')}
         />
       </CardHeader>
       {selectedStoreId !== ALL_STORES && (
@@ -89,7 +92,7 @@ export function TaxSettingsForm() {
                       />
                     )}
                   />
-                  <FieldLabel>อัตราภาษีมูลค่าเพิ่มประจำร้าน (VAT %)</FieldLabel>
+                  <FieldLabel>{t('vatRate')}</FieldLabel>
                 </div>
                 <div className="mt-1 flex items-center">
                   <Input
@@ -105,16 +108,12 @@ export function TaxSettingsForm() {
                     %
                   </span>
                 </div>
-                <FieldDescription>
-                  เปิดเมื่อร้านค้าของคุณจดทะเบียนภาษีมูลค่าเพิ่มแล้ว
-                  ระบบจะทำการเก็บข้อมูลเลขผู้เสียภาษี 13 หลัก
-                  และรหัสสาขาของลูกค้าตอนสั่งซื้อสินค้า
-                </FieldDescription>
+                <FieldDescription>{t('vatRateDesc')}</FieldDescription>
               </Field>
               <Field>
-                <FieldLabel>เลขประจำตัวผู้เสียภาษี (13 หลัก)</FieldLabel>
+                <FieldLabel>{t('taxId')}</FieldLabel>
                 <Input
-                  placeholder="เลขประจำตัวของคุณ"
+                  placeholder={t('taxIdPlaceholder')}
                   {...form.register('taxId')}
                   maxLength={13}
                 />
@@ -128,7 +127,7 @@ export function TaxSettingsForm() {
                 variant="outline"
                 onClick={() => resetForm()}
               >
-                ล้างค่าการตั้งค่า
+                {t('reset')}
               </Button>
             )}
             <Button
@@ -138,11 +137,11 @@ export function TaxSettingsForm() {
             >
               {isSaving ? (
                 <>
-                  <Spinner /> กำลังอัปเดตระบบภาษี...
+                  <Spinner /> {t('saving')}
                 </>
               ) : (
                 <>
-                  <IconDeviceFloppy size={14} /> บันทึกการตั้งค่าภาษี
+                  <IconDeviceFloppy size={14} /> {t('save')}
                 </>
               )}
             </Button>

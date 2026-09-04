@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
 
@@ -36,6 +38,7 @@ export function WebhookLogDetailDialog({
   setOpen,
   log,
 }: WebhookLogDetailDialogProps) {
+  const t = useTranslations('merchant.settings.webhook.logDetail')
   const { copied, copy } = useCopyToClipboard()
 
   if (!log) {
@@ -49,29 +52,29 @@ export function WebhookLogDetailDialog({
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <DialogTitle>รายละเอียดการส่ง Webhook</DialogTitle>
+            <DialogTitle>{t('title')}</DialogTitle>
             <Badge variant={log.isSuccess ? 'default' : 'destructive'}>
               {log.isSuccess ? 'Success' : 'Failed'}
               {log.statusCode ? ` (${log.statusCode})` : ''}
             </Badge>
           </div>
           <DialogDescription>
-            Event: <span className="font-medium">{log.event}</span> • ใช้เวลา:{' '}
-            {log.executionTimeMs}ms • วันที่:{' '}
-            {new Date(log.createdAt).toLocaleString('th-TH')}
+            {t('event')}: <span className="font-medium">{log.event}</span> •{' '}
+            {t('duration')}: {log.executionTimeMs}ms • {t('date')}:{' '}
+            {new Date(log.createdAt).toLocaleString()}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           {log.errorMessage && (
             <div className="border-destructive/20 bg-destructive/10 text-destructive rounded-lg border p-3 text-sm">
-              <span className="font-semibold">ข้อผิดพลาด: </span>
+              <span className="font-semibold">{t('error')}</span>
               {log.errorMessage}
             </div>
           )}
           <div>
             <div className="flex items-center justify-between pb-1.5">
               <span className="text-sm font-semibold">
-                Request Payload (ข้อมูลที่ส่งไป)
+                {t('requestPayload')}
               </span>
               <Button
                 variant="ghost"
@@ -82,12 +85,12 @@ export function WebhookLogDetailDialog({
                 {copied ? (
                   <>
                     <IconCheck size={14} className="text-emerald-500" />
-                    <span>คัดลอกแล้ว</span>
+                    <span>{t('copied')}</span>
                   </>
                 ) : (
                   <>
                     <IconCopy size={14} />
-                    <span>คัดลอก JSON</span>
+                    <span>{t('copyJson')}</span>
                   </>
                 )}
               </Button>
@@ -97,11 +100,9 @@ export function WebhookLogDetailDialog({
             </pre>
           </div>
           <div>
-            <span className="text-sm font-semibold">
-              Response Body (ข้อความตอบกลับจากเซิร์ฟเวอร์ของคุณ)
-            </span>
+            <span className="text-sm font-semibold">{t('responseBody')}</span>
             <pre className="bg-muted/60 mt-1.5 max-h-40 overflow-auto rounded-lg border p-3 text-xs leading-relaxed">
-              {log.responseBody || '(ไม่มีข้อมูลตอบกลับ)'}
+              {log.responseBody || t('noResponse')}
             </pre>
           </div>
         </div>

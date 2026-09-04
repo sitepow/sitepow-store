@@ -150,7 +150,6 @@ export function StoreCreateDialog() {
             onClick={handleClose}
             disabled={createStoreMutation.isPending}
           >
-            ยกเลิก
             {tDialog('cancel')}
           </Button>
           <Button
@@ -159,11 +158,9 @@ export function StoreCreateDialog() {
           >
             {createStoreMutation.isPending ? (
               <>
-                <Spinner /> กำลังสร้างร้านค้า...
                 <Spinner /> {tDialog('creating')}
               </>
             ) : (
-              'สร้างร้านค้าของคุณ'
               tDialog('submit')
             )}
           </Button>

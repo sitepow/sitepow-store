@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useSecuritySettings,
   useUpdateSecuritySettings,
@@ -28,6 +30,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function SecuritySettingsForm() {
+  const t = useTranslations('merchant.settings.security')
   const { user } = useSession()
   const { selectedStoreId } = useStoreFilter()
   const { data: securitySettings } = useSecuritySettings(user?.id ?? '')
@@ -100,8 +103,8 @@ export function SecuritySettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconLock}
-            title="เปลี่ยนรหัสผ่าน"
-            description="ปรับเปลี่ยนรหัสผ่านเพื่อการเข้าถึงฐานระบบหลัก มีผลบังคับใช้ครอบคลุมทุกแบรนด์ภายใต้สัญญานี้"
+            title={t('passwordTitle')}
+            description={t('passwordDesc')}
           />
         </CardHeader>
 
@@ -109,7 +112,7 @@ export function SecuritySettingsForm() {
           <>
             <CardContent className="space-y-5">
               <Field>
-                <FieldLabel>รหัสผ่านปัจจุบัน</FieldLabel>
+                <FieldLabel>{t('currentPassword')}</FieldLabel>
                 <Input
                   type="password"
                   placeholder="••••••••••••"
@@ -123,10 +126,10 @@ export function SecuritySettingsForm() {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field>
-                  <FieldLabel>รหัสผ่านใหม่</FieldLabel>
+                  <FieldLabel>{t('newPassword')}</FieldLabel>
                   <Input
                     type="password"
-                    placeholder="ความยาวขั้นต่ำ 8 ตัวอักษร"
+                    placeholder={t('newPasswordPlaceholder')}
                     {...register('newPassword')}
                     disabled={passwordMutation.isPending}
                   />
@@ -135,10 +138,10 @@ export function SecuritySettingsForm() {
                   </FieldError>
                 </Field>
                 <Field>
-                  <FieldLabel>ยืนยันรหัสผ่านใหม่</FieldLabel>
+                  <FieldLabel>{t('confirmPassword')}</FieldLabel>
                   <Input
                     type="password"
-                    placeholder="กรอกให้ตรงกับช่องด้านซ้าย"
+                    placeholder={t('confirmPasswordPlaceholder')}
                     {...register('confirmPassword')}
                     disabled={passwordMutation.isPending}
                   />
@@ -157,7 +160,7 @@ export function SecuritySettingsForm() {
                   onClick={() => resetPassword()}
                   disabled={passwordMutation.isPending}
                 >
-                  ล้างค่าการตั้งค่า
+                  {t('reset')}
                 </Button>
               )}
 
@@ -168,10 +171,10 @@ export function SecuritySettingsForm() {
               >
                 {passwordMutation.isPending ? (
                   <>
-                    <Spinner /> กำลังบันทึก...
+                    <Spinner /> {t('saving')}
                   </>
                 ) : (
-                  'อัปเดตรหัสผ่าน'
+                  t('updatePassword')
                 )}
               </Button>
             </CardFooter>
@@ -184,8 +187,8 @@ export function SecuritySettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconShield}
-            title="การยืนยันตัวตน 2 ชั้น (2FA)"
-            description="เพิ่มความปลอดภัยโดยให้ระบบส่งรหัส OTP ผ่านอีเมลทุกครั้งที่มีการล็อกอินจากอุปกรณ์ใหม่"
+            title={t('twoFactorTitle')}
+            description={t('twoFactorDesc')}
           />
         </CardHeader>
 
@@ -193,11 +196,10 @@ export function SecuritySettingsForm() {
           <div className="border-input bg-muted/20 flex flex-wrap items-center justify-between gap-5 rounded-xl border border-dashed p-4">
             <div className="pr-4">
               <span className="block text-sm font-medium">
-                เปิดใช้งานการยืนยันตัวตน 2 ชั้น
+                {t('enableTwoFactor')}
               </span>
               <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                ระบบจะบังคับส่งรหัส OTP
-                ผ่านอีเมลทุกครั้งที่มีการล็อกอินจากอุปกรณ์ใหม่
+                {t('twoFactorHint')}
               </span>
             </div>
             <Switch
@@ -220,7 +222,7 @@ export function SecuritySettingsForm() {
               onClick={() => resetTwoFactor()}
               disabled={twoFactorMutation.isPending}
             >
-              ล้างค่าการตั้งค่า
+              {t('reset')}
             </Button>
           )}
           <Button
@@ -230,10 +232,10 @@ export function SecuritySettingsForm() {
           >
             {twoFactorMutation.isPending ? (
               <>
-                <Spinner /> กำลังบันทึก...
+                <Spinner /> {t('saving')}
               </>
             ) : (
-              'บันทึกการตั้งค่า'
+              t('saveSettings')
             )}
           </Button>
         </CardFooter>

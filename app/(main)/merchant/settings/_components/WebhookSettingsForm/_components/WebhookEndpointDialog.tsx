@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useCreateWebhookEndpoint,
   useUpdateWebhookEndpoint,
@@ -40,6 +42,8 @@ export function WebhookEndpointDialog({
   setOpen,
   endpoint,
 }: WebhookEndpointDialogProps) {
+  const t = useTranslations('merchant.settings.webhook.dialog')
+  const tEvents = useTranslations('merchant.settings.webhook.events')
   const { selectedStoreId } = useStoreFilter()
   const isEditing = !!endpoint
 
@@ -87,7 +91,7 @@ export function WebhookEndpointDialog({
 
   const onSubmit = (values: WebhookEndpointFormValues) => {
     if (!selectedStoreId || selectedStoreId === ALL_STORES) {
-      toast.error('กรุณาเลือกร้านค้าก่อนทำรายการ')
+      toast.error(t('selectStoreError'))
       return
     }
 
@@ -101,10 +105,10 @@ export function WebhookEndpointDialog({
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success('อัปเดต Webhook Endpoint สำเร็จ')
+              toast.success(t('updateSuccess'))
               setOpen(false)
             } else {
-              toast.error(res.message || 'เกิดข้อผิดพลาด')
+              toast.error(res.message || t('error'))
             }
           },
           onError: (err) => {
@@ -121,10 +125,10 @@ export function WebhookEndpointDialog({
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success('สร้าง Webhook Endpoint สำเร็จ')
+              toast.success(t('createSuccess'))
               setOpen(false)
             } else {
-              toast.error(res.message || 'เกิดข้อผิดพลาด')
+              toast.error(res.message || t('error'))
             }
           },
           onError: (err) => {
@@ -140,17 +144,14 @@ export function WebhookEndpointDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'แก้ไข Webhook Endpoint' : 'เพิ่ม Webhook Endpoint'}
+            {isEditing ? t('editTitle') : t('addTitle')}
           </DialogTitle>
-          <DialogDescription>
-            กำหนด URL ปลายทางที่ต้องการให้ระบบส่ง Event
-            แจ้งเตือนเมื่อเกิดเหตุการณ์ในร้านค้า
-          </DialogDescription>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
           <Field>
             <FieldLabel>
-              Endpoint URL <span className="text-destructive">*</span>
+              {t('urlLabel')} <span className="text-destructive">*</span>
             </FieldLabel>
             <Controller
               name="url"
@@ -158,20 +159,17 @@ export function WebhookEndpointDialog({
               render={({ field }) => (
                 <Input
                   {...field}
-                  placeholder="https://api.yourshop.com/webhooks/sitepow"
+                  placeholder={t('urlPlaceholder')}
                   autoComplete="off"
                 />
               )}
             />
             {errors.url && <FieldError>{errors.url.message}</FieldError>}
-            <p className="text-muted-foreground text-xs">
-              ระบบจะส่ง HTTP POST พร้อม Header ลายเซ็นดิจิทัล (HMAC-SHA256)
-              ไปยัง URL นี้
-            </p>
+            <p className="text-muted-foreground text-xs">{t('urlDesc')}</p>
           </Field>
 
           <Field>
-            <FieldLabel>คำอธิบาย / โน้ตกำกับ (ไม่บังคับ)</FieldLabel>
+            <FieldLabel>{t('descriptionLabel')}</FieldLabel>
             <Controller
               name="description"
               control={control}
@@ -179,15 +177,14 @@ export function WebhookEndpointDialog({
                 <Input
                   {...field}
                   value={field.value || ''}
-                  placeholder="เช่น ระบบเติมเกม RoV / FreeFire อัตโนมัติ"
+                  placeholder={t('descriptionPlaceholder')}
                 />
               )}
             />
           </Field>
           <Field>
             <FieldLabel>
-              Events ที่ต้องการดักฟัง{' '}
-              <span className="text-destructive">*</span>
+              {t('eventsLabel')} <span className="text-destructive">*</span>
             </FieldLabel>
             <Controller
               name="events"
@@ -196,6 +193,14 @@ export function WebhookEndpointDialog({
                 <div className="space-y-2.5 rounded-lg border p-3">
                   {WEBHOOK_EVENTS.map((event) => {
                     const isChecked = field.value?.includes(event.id)
+                    const label = tEvents.has(`${event.id}.label` as any)
+                      ? tEvents(`${event.id}.label` as any)
+                      : event.label
+                    const description = tEvents.has(
+                      `${event.id}.description` as any,
+                    )
+                      ? tEvents(`${event.id}.description` as any)
+                      : event.description
                     return (
                       <div
                         key={event.id}
@@ -219,10 +224,10 @@ export function WebhookEndpointDialog({
                             htmlFor={`event-${event.id}`}
                             className="cursor-pointer text-sm font-medium"
                           >
-                            {event.label}
+                            {label}
                           </label>
                           <p className="text-muted-foreground text-xs">
-                            {event.description}
+                            {description}
                           </p>
                         </div>
                       </div>
@@ -235,10 +240,8 @@ export function WebhookEndpointDialog({
           </Field>
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div className="space-y-0.5">
-              <span className="text-sm font-medium">เปิดใช้งาน (Active)</span>
-              <p className="text-muted-foreground text-xs">
-                หากปิดไว้ ระบบจะไม่ยิงส่ง Event ไปยัง URL นี้
-              </p>
+              <span className="text-sm font-medium">{t('activeLabel')}</span>
+              <p className="text-muted-foreground text-xs">{t('activeDesc')}</p>
             </div>
             <Controller
               name="isActive"
@@ -258,11 +261,11 @@ export function WebhookEndpointDialog({
               onClick={() => setOpen(false)}
               disabled={isPending}
             >
-              ยกเลิก
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending && <Spinner className="mr-2 h-4 w-4" />}
-              {isEditing ? 'บันทึกการแก้ไข' : 'สร้าง Endpoint'}
+              {isEditing ? t('saveEdit') : t('create')}
             </Button>
           </DialogFooter>
         </form>

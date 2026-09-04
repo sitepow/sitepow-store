@@ -9,6 +9,8 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useStoreShippingSettings,
   useUpdateShippingSettings,
@@ -35,6 +37,7 @@ import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
 export function ShippingSettingsForm() {
+  const t = useTranslations('merchant.settings.shipping')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
@@ -84,7 +87,7 @@ export function ShippingSettingsForm() {
 
   const onFormSubmit = (data: ShippingFormValues) => {
     if (!selectedStoreId) {
-      toast.error('ไม่พบข้อมูลร้านค้า')
+      toast.error(t('storeNotFound'))
       return
     }
 
@@ -103,8 +106,8 @@ export function ShippingSettingsForm() {
             <PageTabHeader
               variant="secondary"
               icon={IconTruck}
-              title="ระบบขนส่งสินค้า"
-              description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
+              title={t('title')}
+              description={t('description')}
               endContent={
                 selectedStoreId !== ALL_STORES &&
                 selectedBranchId !== ALL_BRANCHES && <ApplyGlobalRatesDialog />
@@ -130,12 +133,10 @@ export function ShippingSettingsForm() {
                               />
                             )}
                           />
-                          <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
+                          <FieldLabel>{t('freeShipMin')}</FieldLabel>
                         </div>
                         <FieldDescription className="text-muted-foreground mt-1.5 text-xs">
-                          กำหนดเงื่อนไขยอดซื้อขั้นต่ำ
-                          หากลูกค้าซื้อสินค้าถึงจำนวนเงินนี้
-                          จะได้รับสิทธิ์จัดส่งฟรีทันที
+                          {t('freeShipMinDesc')}
                         </FieldDescription>
                         <div className="mt-2 flex items-center">
                           <Input
@@ -148,7 +149,7 @@ export function ShippingSettingsForm() {
                             className="rounded-r-none"
                           />
                           <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                            บาท
+                            {t('currencyBaht')}
                           </span>
                         </div>
                       </Field>
@@ -159,11 +160,10 @@ export function ShippingSettingsForm() {
                   <div className="space-y-5 py-5">
                     <div>
                       <span className="block text-sm font-semibold">
-                        ตัวเลือกผู้ให้บริการจัดส่งและบริการย่อย (Courier &
-                        Services)
+                        {t('couriersTitle')}
                       </span>
                       <span className="text-muted-foreground mt-0.5 block text-xs leading-relaxed">
-                        เปิด-ปิด และระบุอัตราค่าบริการของแต่ละบริการย่อย
+                        {t('couriersDesc')}
                       </span>
                     </div>
                     <div className="grid gap-4 space-y-6 pt-2 lg:grid-cols-2 2xl:grid-cols-3">
@@ -206,7 +206,9 @@ export function ShippingSettingsForm() {
                                       {service.name}
                                     </span>
                                     <span className="text-muted-foreground block text-xs">
-                                      ระยะเวลาโดยประมาณ {service.estimatedDays}
+                                      {t('estimatedDays', {
+                                        days: service.estimatedDays || '',
+                                      })}
                                     </span>
                                   </div>
                                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
@@ -217,7 +219,9 @@ export function ShippingSettingsForm() {
                                     />
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm font-medium">
-                                        {isEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                                        {isEnabled
+                                          ? t('enabled')
+                                          : t('disabled')}
                                       </span>
                                       <Switch
                                         checked={!!isEnabled}
@@ -247,18 +251,18 @@ export function ShippingSettingsForm() {
                       variant="outline"
                       onClick={() => resetForm()}
                     >
-                      ล้างค่าการตั้งค่า
+                      {t('reset')}
                     </Button>
                   )}
                   <Button type="submit" disabled={isUpdating}>
                     {isUpdating ? (
                       <>
                         <Spinner />
-                        กำลังบันทึกเกณฑ์ขนส่งระบบ...
+                        {t('saving')}
                       </>
                     ) : (
                       <>
-                        <IconDeviceFloppy size={14} /> บันทึกเกณฑ์การส่งสินค้า
+                        <IconDeviceFloppy size={14} /> {t('save')}
                       </>
                     )}
                   </Button>

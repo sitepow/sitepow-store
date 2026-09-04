@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useDeleteWebhookEndpoint,
   useRegenerateWebhookSecret,
@@ -59,6 +61,7 @@ import {
 } from './_components/WebhookLogDetailDialog'
 
 export function WebhookSettingsForm() {
+  const t = useTranslations('merchant.settings.webhook')
   const { selectedStoreId } = useStoreFilter()
   const { data: endpoints = [], isLoading } =
     useStoreWebhookEndpoints(selectedStoreId)
@@ -98,8 +101,8 @@ export function WebhookSettingsForm() {
   if (!selectedStoreId || selectedStoreId === ALL_STORES) {
     return (
       <ActionRequiredAlert
-        title="กรุณาเลือกร้านค้า"
-        description="กรุณาเลือกร้านค้าที่ต้องการตั้งค่า Webhook จากเมนูด้านบน"
+        title={t('storeRequiredTitle')}
+        description={t('storeRequiredDesc')}
       />
     )
   }
@@ -107,7 +110,7 @@ export function WebhookSettingsForm() {
   const handleCopySecret = (id: string, secret: string) => {
     copy(secret)
     setCopiedId(id)
-    toast.success('คัดลอก Signing Secret เรียบร้อยแล้ว')
+    toast.success(t('copySecretSuccess'))
     setTimeout(() => setCopiedId(null), 2000)
   }
 
@@ -136,13 +139,9 @@ export function WebhookSettingsForm() {
       {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success(
-              checked
-                ? 'เปิดใช้งาน Webhook เรียบร้อยแล้ว'
-                : 'ปิดใช้งาน Webhook ชั่วคราวแล้ว',
-            )
+            toast.success(checked ? t('enabledSuccess') : t('disabledSuccess'))
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาด')
+            toast.error(res.message || t('error'))
           }
         },
       },
@@ -150,16 +149,16 @@ export function WebhookSettingsForm() {
   }
 
   const handleDelete = (id: string) => {
-    if (confirm('คุณต้องการลบ Webhook Endpoint นี้ใช่หรือไม่?')) {
+    if (confirm(t('deleteConfirm'))) {
       deleteEndpoint(id, {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success('ลบ Webhook Endpoint สำเร็จ')
+            toast.success(t('deleteSuccess'))
             if (selectedEndpointId === id) {
               setSelectedEndpointId(undefined)
             }
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาด')
+            toast.error(res.message || t('error'))
           }
         },
         onError: (err) => toast.error(err.message),
@@ -168,17 +167,13 @@ export function WebhookSettingsForm() {
   }
 
   const handleRegenerate = (id: string) => {
-    if (
-      confirm(
-        'การสร้าง Signing Secret ใหม่จะทำให้ระบบเดิมที่ใช้ Secret เก่า Verify ไม่ผ่านทันที คุณต้องการทำต่อหรือไม่?',
-      )
-    ) {
+    if (confirm(t('regenerateConfirm'))) {
       regenerateSecret(id, {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success('สร้าง Secret ใหม่สำเร็จ')
+            toast.success(t('regenerateSuccess'))
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาด')
+            toast.error(res.message || t('error'))
           }
         },
       })
@@ -225,13 +220,12 @@ export function WebhookSettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconWebhook}
-            title="Webhooks (Outbound API)"
-            description="ส่งข้อมูล Event คำสั่งซื้อแบบ Real-time ไปยังเซิร์ฟเวอร์ของคุณ
-              เหมาะสำหรับเชื่อมต่อระบบเติมเกม เติมเงินอัตโนมัติ หรือ ERP ภายนอก"
+            title={t('title')}
+            description={t('description')}
             endContent={
               <Button onClick={handleOpenAdd} className="shrink-0">
                 <IconPlus size={16} />
-                <span>เพิ่ม Webhook Endpoint</span>
+                <span>{t('addEndpoint')}</span>
               </Button>
             }
           />
@@ -247,15 +241,14 @@ export function WebhookSettingsForm() {
                 <IconWebhook className="text-muted-foreground size-8" />
               </div>
               <h3 className="mt-3 text-base font-semibold">
-                ยังไม่มี Webhook Endpoint
+                {t('emptyTitle')}
               </h3>
               <p className="text-muted-foreground mt-1 max-w-sm text-sm">
-                เพิ่ม Endpoint URL
-                ของคุณเพื่อเริ่มรับการแจ้งเตือนเมื่อลูกค้าทำรายการสั่งซื้อหรือชำระเงินสำเร็จ
+                {t('emptyDesc')}
               </p>
               <Button onClick={handleOpenAdd} className="mt-4 gap-1.5">
                 <IconPlus size={16} />
-                <span>เพิ่ม Endpoint แรกของคุณ</span>
+                <span>{t('emptyButton')}</span>
               </Button>
             </div>
           ) : (
@@ -264,11 +257,15 @@ export function WebhookSettingsForm() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Endpoint URL / รายละเอียด</TableHead>
-                      <TableHead>Events</TableHead>
-                      <TableHead>Signing Secret</TableHead>
-                      <TableHead className="text-center">สถานะ</TableHead>
-                      <TableHead className="text-right">การจัดการ</TableHead>
+                      <TableHead>{t('urlCol')}</TableHead>
+                      <TableHead>{t('eventsCol')}</TableHead>
+                      <TableHead>{t('secretCol')}</TableHead>
+                      <TableHead className="text-center">
+                        {t('statusCol')}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t('actionsCol')}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -329,7 +326,7 @@ export function WebhookSettingsForm() {
                                   e.stopPropagation()
                                   toggleRevealSecret(endpoint.id)
                                 }}
-                                title={isRevealed ? 'ซ่อน Secret' : 'ดู Secret'}
+                                title={isRevealed ? t('hide') : t('reveal')}
                               >
                                 {isRevealed ? (
                                   <IconEyeOff size={13} />
@@ -345,7 +342,7 @@ export function WebhookSettingsForm() {
                                   e.stopPropagation()
                                   handleCopySecret(endpoint.id, endpoint.secret)
                                 }}
-                                title="คัดลอก Secret"
+                                title={t('copy')}
                               >
                                 {copiedId === endpoint.id ? (
                                   <IconCheck
@@ -365,7 +362,7 @@ export function WebhookSettingsForm() {
                                   handleRegenerate(endpoint.id)
                                 }}
                                 disabled={isRegenerating}
-                                title="สร้าง Secret ใหม่"
+                                title={t('regenerate')}
                               >
                                 <IconRefresh size={13} />
                               </Button>
@@ -402,14 +399,14 @@ export function WebhookSettingsForm() {
                                 ) : (
                                   <IconSend size={13} />
                                 )}
-                                <span>ทดสอบส่ง</span>
+                                <span>{t('testPing')}</span>
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="size-8"
                                 onClick={() => handleOpenEdit(endpoint)}
-                                title="แก้ไข"
+                                title={t('edit')}
                               >
                                 <IconEdit size={15} />
                               </Button>
@@ -419,7 +416,7 @@ export function WebhookSettingsForm() {
                                 className="text-destructive hover:bg-destructive/10 size-8"
                                 onClick={() => handleDelete(endpoint.id)}
                                 disabled={isDeleting}
-                                title="ลบ"
+                                title={t('delete')}
                               >
                                 <IconTrash size={15} />
                               </Button>
@@ -439,17 +436,16 @@ export function WebhookSettingsForm() {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <IconCode className="text-primary h-5 w-5" />
-            <CardTitle className="text-base">
-              คู่มือความปลอดภัยสำหรับนักพัฒนา (Signature Verification)
-            </CardTitle>
+            <CardTitle className="text-base">{t('guideTitle')}</CardTitle>
           </div>
           <CardDescription className="text-xs">
-            Sitepow จะส่ง Header{' '}
-            <code className="bg-muted text-foreground rounded px-1.5 py-0.5">
-              X-Sitepow-Signature: t=1725414162,v1=hash_value
-            </code>{' '}
-            มาพร้อมทุก Request ฝั่งเซิร์ฟเวอร์ของคุณควรตรวจสอบ Signature
-            เพื่อป้องกันการปลอม Request
+            {t.rich('guideDesc', {
+              header: () => (
+                <code className="bg-muted text-foreground rounded px-1.5 py-0.5">
+                  X-Sitepow-Signature: t=1725414162,v1=hash_value
+                </code>
+              ),
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -516,8 +512,8 @@ export async function POST(req) {
 
   const { event, data } = JSON.parse(rawBody)
   if (event === 'order.paid') {
-    // เติมเงินอัตโนมัติ / ตัดสต็อก
-    console.log('ชำระเงินสำเร็จ:', data.orderNumber, data.totalAmount)
+    // Automated top-up / Deduct stock
+    console.log('Payment successful:', data.orderNumber, data.totalAmount)
   }
 
   return new Response(JSON.stringify({ received: true }), { status: 200 })
@@ -550,7 +546,7 @@ if (!isset($parts['t']) || !isset($parts['v1'])) {
 $payloadToSign = $parts['t'] . '.' . $rawBody;
 $expectedHash = hash_hmac('sha256', $payloadToSign, $secret);
 
-// hash_equals เพื่อป้องกัน Timing attacks
+// hash_equals to prevent timing attacks
 if (!hash_equals($expectedHash, $parts['v1'])) {
     http_response_code(400);
     exit('Invalid Signature');
@@ -558,7 +554,7 @@ if (!hash_equals($expectedHash, $parts['v1'])) {
 
 $eventData = json_decode($rawBody, true);
 if ($eventData['event'] === 'order.paid') {
-    // ดำเนินการเติมเงิน / บันทึก Order
+    // Process top-up / Record order
 }
 
 http_response_code(200);
@@ -614,7 +610,7 @@ public class WebhookController {
                 return ResponseEntity.status(400).body("Invalid Signature");
             }
 
-            // TODO: ประมวลผล Event JSON ต่อไป
+            // TODO: Process Event JSON
             return ResponseEntity.ok("{\\"received\\": true}");
 
         } catch (Exception e) {
@@ -662,7 +658,7 @@ async def handle_webhook(request: Request):
 
     payload = json.loads(raw_body)
     if payload.get("event") == "order.paid":
-        # ดำเนินการ Fulfillment
+        # Process Fulfillment
         pass
 
     return {"received": True}`}
@@ -728,19 +724,17 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
-              <CardTitle className="text-base">
-                ประวัติการส่ง Webhook ล่าสุด (Delivery Logs)
-              </CardTitle>
+              <CardTitle className="text-base">{t('logsTitle')}</CardTitle>
               <CardDescription className="text-xs">
                 {activeEndpointId ? (
                   <>
-                    แสดงประวัติของ{' '}
+                    {t('logsDescPrefix')}
                     <span className="text-foreground font-medium">
                       {endpoints.find((e) => e.id === activeEndpointId)?.url}
                     </span>
                   </>
                 ) : (
-                  'เลือก Endpoint ด้านบนเพื่อดูประวัติ'
+                  t('logsDescSelect')
                 )}
               </CardDescription>
             </div>
@@ -753,7 +747,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                 disabled={isTesting}
               >
                 <IconSend size={13} />
-                <span>ส่งทดสอบ (Ping)</span>
+                <span>{t('logsTestPing')}</span>
               </Button>
             )}
           </CardHeader>
@@ -765,19 +759,20 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
             ) : logs.length === 0 ? (
               <div className="text-muted-foreground flex h-24 flex-col items-center justify-center rounded-lg border border-dashed text-center text-sm">
                 <IconAlertCircle className="mb-1 h-5 w-5" />
-                ยังไม่มีประวัติการส่ง Webhook สำหรับ Endpoint นี้ (ลองกดปุ่ม
-                &quot;ทดสอบส่ง&quot; ด้านบน)
+                {t('logsEmpty')}
               </div>
             ) : (
               <div className="overflow-x-auto rounded-lg border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>สถานะ</TableHead>
-                      <TableHead>Event</TableHead>
-                      <TableHead>เวลาที่ใช้</TableHead>
-                      <TableHead>วัน-เวลาที่ส่ง</TableHead>
-                      <TableHead className="text-right">ดูข้อมูล</TableHead>
+                      <TableHead>{t('logStatusCol')}</TableHead>
+                      <TableHead>{t('logEventCol')}</TableHead>
+                      <TableHead>{t('logDurationCol')}</TableHead>
+                      <TableHead>{t('logDateCol')}</TableHead>
+                      <TableHead className="text-right">
+                        {t('logActionsCol')}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -801,7 +796,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                           {log.executionTimeMs}ms
                         </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
-                          {new Date(log.createdAt).toLocaleString('th-TH')}
+                          {new Date(log.createdAt).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button
@@ -810,7 +805,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                             className="h-7 text-xs"
                             onClick={() => handleViewLog(log)}
                           >
-                            ดู Payload
+                            {t('viewPayload')}
                           </Button>
                         </TableCell>
                       </TableRow>

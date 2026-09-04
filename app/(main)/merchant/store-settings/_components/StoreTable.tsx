@@ -200,7 +200,6 @@ export function StoreTable() {
               <TableLoadingRow colSpan={8} />
             )}
             {!isLoading && stores.length === 0 && (
-              <TableEmptyRow colSpan={8} title="ไม่พบข้อมูลร้านค้าของคุณ" />
               <TableEmptyRow colSpan={8} title={t('empty')} />
             )}
             {stores.length !== 0 &&
@@ -242,11 +241,8 @@ export function StoreTable() {
                     <TableCell>
                       <Badge variant={isActive ? 'default' : 'outline'}>
                         {isActive
-                          ? 'เปิดใช้งานอยู่'
                           ? t('status.active')
                           : isMaintenance
-                            ? 'ปิดปรับปรุงชั่วคราว'
-                            : 'ถูกระงับการใช้งาน'}
                             ? t('status.maintenance')
                             : t('status.suspended')}
                       </Badge>
@@ -256,7 +252,6 @@ export function StoreTable() {
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-destructive flex items-center gap-1 text-sm">
                             <IconAlertTriangle size={16} />
-                            <span>เกินกำหนดชำระ ({daysRemaining} วัน)</span>
                             <span>
                               {t('subscription.pastDue', {
                                 days: daysRemaining,
@@ -268,13 +263,11 @@ export function StoreTable() {
                       ) : (
                         <div className="flex flex-col">
                           <span className="text-sm font-medium">
-                            {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
                             {isCanceled
                               ? t('subscription.canceled')
                               : t('subscription.normal')}
                           </span>
                           <span className="text-muted-foreground text-xs">
-                            คงเหลือ {daysRemaining} วัน
                             {t('subscription.daysRemaining', {
                               days: daysRemaining,
                             })}

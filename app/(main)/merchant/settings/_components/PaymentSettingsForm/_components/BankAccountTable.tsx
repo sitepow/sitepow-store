@@ -2,6 +2,8 @@
 
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useDeleteBankAccount } from '@/actions/hooks/payment'
 import { PaymentSettingPayload } from '@/actions/payment'
 import { BankAccountType } from '@/generated/prisma/enums'
@@ -28,6 +30,7 @@ interface BankAccountTableProps {
 }
 
 export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
+  const t = useTranslations('merchant.settings.payment.table')
   const { selectedStoreId } = useStoreFilter()
   const { mutate: deleteAccount, isPending } = useDeleteBankAccount()
 
@@ -35,7 +38,7 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
     deleteAccount(
       { id, storeId: selectedStoreId },
       {
-        onSuccess: () => toast.success('ลบบัญชีธนาคารเรียบร้อยแล้ว'),
+        onSuccess: () => toast.success(t('deleteSuccess')),
         onError: (err) => toast.error(err.message),
       },
     )
@@ -44,8 +47,8 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
   if (accounts.length === 0) {
     return (
       <ActionRequiredAlert
-        title="แจ้งเตือน"
-        description="ยังไม่มีบัญชีธนาคาร กดปุ่มเพิ่มบัญชีธนาคารด้านบน"
+        title={t('emptyTitle')}
+        description={t('emptyDesc')}
       />
     )
   }
@@ -55,12 +58,12 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ประเภท</TableHead>
-            <TableHead>ธนาคาร/ผู้ให้บริการ</TableHead>
-            <TableHead>ข้อมูลบัญชี</TableHead>
-            <TableHead>ชื่อบัญชี</TableHead>
-            <TableHead>สถานะ</TableHead>
-            <TableHead className="w-28 text-right">จัดการ</TableHead>
+            <TableHead>{t('type')}</TableHead>
+            <TableHead>{t('bank')}</TableHead>
+            <TableHead>{t('accountInfo')}</TableHead>
+            <TableHead>{t('accountName')}</TableHead>
+            <TableHead>{t('status')}</TableHead>
+            <TableHead className="w-28 text-right">{t('actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,8 +72,8 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
               <TableCell>
                 <Badge variant="outline">
                   {account.type === BankAccountType.PROMPTPAY
-                    ? 'PromptPay'
-                    : 'โอนผ่านธนาคาร'}
+                    ? t('promptPay')
+                    : t('bankTransfer')}
                 </Badge>
               </TableCell>
               <TableCell>{account.bankName}</TableCell>
@@ -82,7 +85,9 @@ export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
               <TableCell>{account.accountName}</TableCell>
               <TableCell>
                 <Badge variant={account.isDefault ? 'default' : 'outline'}>
-                  {account.isDefault ? 'บัญชีหลัก' : 'บัญชีรอง'}
+                  {account.isDefault
+                    ? t('defaultAccount')
+                    : t('secondaryAccount')}
                 </Badge>
               </TableCell>
               <TableCell className="space-x-1 text-right">

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useTransactions } from '@/actions/hooks/transaction'
@@ -36,6 +37,7 @@ const INCOME_TYPES = [
 ] as const
 
 export function CreditHistoryTable() {
+  const t = useTranslations('merchant.credits')
   const { selectedStoreId } = useStoreFilter()
   const router = useRouter()
 
@@ -61,17 +63,19 @@ export function CreditHistoryTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสธุรกรรม</TableHead>
-              <TableHead>รายละเอียดรายการ</TableHead>
-              <TableHead>วัน-เวลา ทำรายการ</TableHead>
-              <TableHead className="text-right">จำนวนเครดิต</TableHead>
+              <TableHead>{t('columns.id')}</TableHead>
+              <TableHead>{t('columns.details')}</TableHead>
+              <TableHead>{t('columns.date')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.amount')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && transactions.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : transactions.length === 0 ? (
-              <TableEmptyRow colSpan={4} title="ยังไม่มีประวัติเครดิต" />
+              <TableEmptyRow colSpan={4} title={t('emptyHistory')} />
             ) : (
               transactions.map((tx) => {
                 const isIncome = (
@@ -97,7 +101,11 @@ export function CreditHistoryTable() {
                               <IconHistory size={14} />
                             )}
                         </div>
-                        <span>{getLabel.transactionType(tx.type)}</span>
+                        <span>
+                          {t.has(`transactionTypes.${tx.type}`)
+                            ? t(`transactionTypes.${tx.type}`)
+                            : getLabel.transactionType(tx.type)}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

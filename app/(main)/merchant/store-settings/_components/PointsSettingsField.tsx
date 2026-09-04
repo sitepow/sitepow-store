@@ -76,11 +76,9 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
       {isPointsEnabled && currentPlan === Plan.ULTIMATE && (
         <div className="bg-muted/40 animate-in slide-in-from-top-2 grid gap-5 rounded-lg border p-4 duration-200 sm:col-span-2 sm:grid-cols-2">
           <Field>
-            <FieldLabel>ยอดซื้อเพื่อรับ 1 แต้ม (บาท)</FieldLabel>
             <FieldLabel>{t('pointEarningRateLabel')}</FieldLabel>
             <Input
               type="number"
-              placeholder="เช่น ซื้อครบ 100 บาท ได้ 1 แต้ม"
               placeholder={t('pointEarningRatePlaceholder')}
               {...register('pointEarningRate', { valueAsNumber: true })}
               disabled={isPending}
@@ -89,11 +87,9 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
           </Field>
 
           <Field>
-            <FieldLabel>มูลค่าส่วนลดต่อ 1 แต้ม (บาท)</FieldLabel>
             <FieldLabel>{t('pointRedeemRateLabel')}</FieldLabel>
             <Input
               type="number"
-              placeholder="เช่น 1 แต้ม มีค่าเท่ากับ 1 บาท"
               placeholder={t('pointRedeemRatePlaceholder')}
               {...register('pointRedeemRate', { valueAsNumber: true })}
               disabled={isPending}

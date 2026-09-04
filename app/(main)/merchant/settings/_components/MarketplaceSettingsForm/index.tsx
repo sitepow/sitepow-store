@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranchOptions } from '@/actions/hooks/branch'
 import {
   useAutoMapProductsBySku,
@@ -73,12 +75,12 @@ import {
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-const PLATFORMS_METADATA = [
+const getPlatformsMetadata = (t: any) => [
   {
     platform: MarketplacePlatform.SHOPEE,
     name: 'Shopee',
     logoUrl: '/images/marketplaces/shopee.png',
-    description: 'ซิงค์สต็อกสินค้าอัตโนมัติกับร้านค้าบน Shopee (Open API v2)',
+    description: t('platforms.shopeeDesc'),
     appKeyLabel: 'Partner ID',
     appSecretLabel: 'Partner Key',
     shopIdLabel: 'Shop ID',
@@ -88,7 +90,7 @@ const PLATFORMS_METADATA = [
     platform: MarketplacePlatform.LAZADA,
     name: 'Lazada',
     logoUrl: '/images/marketplaces/lazada.png',
-    description: 'เชื่อมต่อและอัปเดตสต็อกสินค้าไปยัง Lazada Seller Center',
+    description: t('platforms.lazadaDesc'),
     appKeyLabel: 'App Key',
     appSecretLabel: 'App Secret',
     shopIdLabel: 'Seller ID',
@@ -98,15 +100,17 @@ const PLATFORMS_METADATA = [
     platform: MarketplacePlatform.FACEBOOK,
     name: 'Facebook Marketplace',
     logoUrl: '/images/marketplaces/facebook.png',
-    description: 'ซิงค์สต็อกกับ Meta Commerce Manager และ Catalog Batch API',
-    appKeyLabel: 'App ID (ไม่บังคับ)',
-    appSecretLabel: 'App Secret (ไม่บังคับ)',
+    description: t('platforms.facebookDesc'),
+    appKeyLabel: 'App ID (Optional)',
+    appSecretLabel: 'App Secret (Optional)',
     shopIdLabel: 'Catalog ID',
     hasAccessToken: true,
   },
 ]
 
 export function MarketplaceSettingsForm() {
+  const t = useTranslations('merchant.settings.marketplace')
+  const platformsMetadata = getPlatformsMetadata(t)
   const { selectedStoreId } = useStoreFilter()
   const { data: connections = [], isLoading: isConnectionsLoading } =
     useMarketplaceConnections(selectedStoreId)
@@ -154,32 +158,41 @@ export function MarketplaceSettingsForm() {
   })
 
   const openEditDialog = (platformMeta: any) => {
+    setEditingPlatform(platformMeta)
     const existing = connections.find(
       (c) => c.platform === platformMeta.platform,
     )
-    setEditingPlatform(platformMeta)
-    setFormData({
-      shopId: existing?.shopId || '',
-      shopName: existing?.shopName || `${platformMeta.name} Store`,
-      appKey: existing?.appKey || '',
-      appSecret: existing?.appSecret || '',
-      accessToken: existing?.accessToken || '',
-      isSimulator: existing?.isSimulator ?? false,
-      defaultBranchId: existing?.defaultBranchId || '',
-    })
+    if (existing) {
+      setFormData({
+        shopId: existing.shopId || '',
+        shopName: existing.shopName || '',
+        appKey: existing.appKey || '',
+        appSecret: existing.appSecret || '',
+        accessToken: existing.accessToken || '',
+        isSimulator: existing.isSimulator || false,
+        defaultBranchId: existing.defaultBranchId || '',
+      })
+    } else {
+      setFormData({
+        shopId: '',
+        shopName: '',
+        appKey: '',
+        appSecret: '',
+        accessToken: '',
+        isSimulator: false,
+        defaultBranchId: '',
+      })
+    }
   }
 
   const handleSaveConnection = () => {
-    if (!editingPlatform) {
-      return
-    }
-
+    if (!editingPlatform) return
     saveConnectionMutation.mutate(
       {
         storeId: selectedStoreId,
         data: {
-          platform: editingPlatform.platform,
           ...formData,
+          platform: editingPlatform.platform,
         },
       },
       {
@@ -189,9 +202,7 @@ export function MarketplaceSettingsForm() {
   }
 
   const handleSimulateOrder = () => {
-    if (!simulatingConnection || !simulateSku) {
-      return
-    }
+    if (!simulatingConnection || !simulateSku) return
     simulateOrderMutation.mutate(
       {
         storeId: selectedStoreId,
@@ -210,8 +221,8 @@ export function MarketplaceSettingsForm() {
       <PageTabHeader
         variant="secondary"
         icon={IconShare}
-        title="เชื่อมต่อมาร์เก็ตเพลส (Shopee, Lazada, Facebook)"
-        description="ระบบซิงค์และตัดสต็อกหลายช่องทางอัตโนมัติ ตัดสต็อกทันทีเมื่อมีรายการขายเกิดขึ้น"
+        title={t('title')}
+        description={t('description')}
       />
       <Tabs defaultValue="connections" className="space-y-6">
         <div className="overflow-x-auto pb-1">
@@ -220,26 +231,26 @@ export function MarketplaceSettingsForm() {
               value="connections"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
             >
-              1. การเชื่อมต่อช่องทาง
+              {t('tabs.connections')}
             </TabsTrigger>
             <TabsTrigger
               value="mappings"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
             >
-              2. จับคู่สินค้า (SKU Mapping){' '}
+              {t('tabs.mappings')}{' '}
               {mappings.length > 0 && `(${mappings.length})`}
             </TabsTrigger>
             <TabsTrigger
               value="logs"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
             >
-              3. ประวัติการซิงค์ (Logs)
+              {t('tabs.logs')}
             </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="connections" className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {PLATFORMS_METADATA.map((meta) => {
+            {platformsMetadata.map((meta) => {
               const conn = connections.find((c) => c.platform === meta.platform)
               const isConnected = conn?.status === 'CONNECTED'
 
@@ -260,10 +271,10 @@ export function MarketplaceSettingsForm() {
                       </div>
                       {isConnected ? (
                         <Badge variant="default" className="bg-emerald-600">
-                          <IconCheck className="mr-1 size-3" /> เชื่อมต่อแล้ว
+                          <IconCheck className="mr-1 size-3" /> {t('connected')}
                         </Badge>
                       ) : (
-                        <Badge variant="outline">ยังไม่ได้เชื่อม</Badge>
+                        <Badge variant="outline">{t('notConnected')}</Badge>
                       )}
                     </div>
                     <CardDescription className="text-xs">
@@ -275,7 +286,7 @@ export function MarketplaceSettingsForm() {
                       <div className="bg-muted/50 space-y-2 rounded-lg p-3 text-xs">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            ชื่อร้าน:
+                            {t('shopName')}
                           </span>
                           <span className="font-medium">
                             {conn.shopName || '-'}
@@ -283,7 +294,7 @@ export function MarketplaceSettingsForm() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            Shop / ID:
+                            {t('shopId')}
                           </span>
                           <span className="font-medium">
                             {conn.shopId || '-'}
@@ -291,19 +302,19 @@ export function MarketplaceSettingsForm() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
-                            สินค้าที่ผูก:
+                            {t('linkedProducts')}
                           </span>
                           <span className="font-medium">
-                            {conn._count?.mappings ?? 0} รายการ
+                            {conn._count?.mappings ?? 0} {t('itemsUnit')}
                           </span>
                         </div>
                         {conn.isSimulator && (
                           <div className="font-medium text-amber-600">
-                            * โหมดจำลอง (Simulator Mode)
+                            {t('simulatorMode')}
                           </div>
                         )}
                         <div className="flex items-center justify-between border-t pt-2">
-                          <span>Auto-Sync สต็อก:</span>
+                          <span>{t('autoSync')}</span>
                           <Switch
                             checked={conn.isAutoSync}
                             onCheckedChange={(checked) =>
@@ -326,15 +337,15 @@ export function MarketplaceSettingsForm() {
                       >
                         <IconLink className="mr-1 size-3" />
                         {isConnected
-                          ? 'ตั้งค่าการเชื่อมต่อ'
-                          : 'เชื่อมต่อร้านค้า'}
+                          ? t('configConnection')
+                          : t('connectStore')}
                       </Button>
                       {isConnected && (
                         <>
                           <Button
                             variant="secondary"
                             size="sm"
-                            title="ซิงค์สต็อกทุกรายการเดี๋ยวนี้"
+                            title={t('syncAllNow')}
                             disabled={triggerSyncMutation.isPending}
                             onClick={() =>
                               triggerSyncMutation.mutate({
@@ -348,7 +359,7 @@ export function MarketplaceSettingsForm() {
                           <Button
                             variant="outline"
                             size="sm"
-                            title="ทดสอบจำลองคำสั่งซื้อ (Simulator Order)"
+                            title={t('simulatorOrder')}
                             onClick={() => {
                               setSimulatingConnection(conn)
                               setSimulateSku('')
@@ -369,12 +380,9 @@ export function MarketplaceSettingsForm() {
         <TabsContent value="mappings" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-semibold">
-                การจับคู่รหัสสินค้า (SKU Mapping)
-              </h3>
+              <h3 className="text-base font-semibold">{t('mappingTitle')}</h3>
               <p className="text-muted-foreground text-xs">
-                จับคู่รหัส Variant ในระบบ กับ SKU บน Marketplace
-                เพื่อให้สต็อกตัดพร้อมกัน
+                {t('mappingDesc')}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -394,7 +402,7 @@ export function MarketplaceSettingsForm() {
                   }}
                 >
                   <IconRefresh className="mr-1 size-3.5" />
-                  จับคู่อัตโนมัติด้วย SKU
+                  {t('autoMapSku')}
                 </Button>
               )}
             </div>
@@ -403,15 +411,19 @@ export function MarketplaceSettingsForm() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>สินค้าในร้าน</TableHead>
+                  <TableHead>{t('mappingTable.product')}</TableHead>
                   <TableHead>SKU</TableHead>
-                  <TableHead>แพลตฟอร์ม</TableHead>
+                  <TableHead>{t('mappingTable.platform')}</TableHead>
                   <TableHead>Marketplace SKU</TableHead>
-                  <TableHead className="text-center">สต็อกปัจจุบัน</TableHead>
                   <TableHead className="text-center">
-                    สต็อกที่ซิงค์ล่าสุด
+                    {t('mappingTable.currentStock')}
                   </TableHead>
-                  <TableHead className="text-right">จัดการ</TableHead>
+                  <TableHead className="text-center">
+                    {t('mappingTable.lastSyncedStock')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('mappingTable.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -427,8 +439,7 @@ export function MarketplaceSettingsForm() {
                       colSpan={7}
                       className="text-muted-foreground h-24 text-center"
                     >
-                      ยังไม่มีการจับคู่สินค้า กรุณากด "จับคู่อัตโนมัติด้วย SKU"
-                      ด้านบน
+                      {t('mappingTable.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -472,7 +483,7 @@ export function MarketplaceSettingsForm() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              title="ซิงค์สต็อกชิ้นนี้เดี๋ยวนี้"
+                              title={t('mappingTable.syncItemNow')}
                               onClick={() =>
                                 triggerSyncMutation.mutate({
                                   connectionId: m.connectionId,
@@ -508,24 +519,20 @@ export function MarketplaceSettingsForm() {
         </TabsContent>
         <TabsContent value="logs" className="space-y-4">
           <div>
-            <h3 className="text-base font-semibold">
-              ประวัติกิจกรรมการซิงค์สต็อก (Sync Logs)
-            </h3>
-            <p className="text-muted-foreground text-xs">
-              บันทึกการตัด/อัปเดตสต็อกระหว่างระบบกับ Shopee, Lazada และ Facebook
-            </p>
+            <h3 className="text-base font-semibold">{t('logsTitle')}</h3>
+            <p className="text-muted-foreground text-xs">{t('logsDesc')}</p>
           </div>
 
           <div className="bg-card rounded-xl border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>วันเวลา</TableHead>
-                  <TableHead>ช่องทาง</TableHead>
-                  <TableHead>การกระทำ</TableHead>
-                  <TableHead>จำนวนชิ้น</TableHead>
-                  <TableHead>สถานะ</TableHead>
-                  <TableHead>รายละเอียด / ข้อความ</TableHead>
+                  <TableHead>{t('logsTable.dateTime')}</TableHead>
+                  <TableHead>{t('logsTable.channel')}</TableHead>
+                  <TableHead>{t('logsTable.action')}</TableHead>
+                  <TableHead>{t('logsTable.quantity')}</TableHead>
+                  <TableHead>{t('logsTable.status')}</TableHead>
+                  <TableHead>{t('logsTable.details')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -541,7 +548,7 @@ export function MarketplaceSettingsForm() {
                       colSpan={6}
                       className="text-muted-foreground h-24 text-center"
                     >
-                      ยังไม่มีประวัติการซิงค์
+                      {t('logsTable.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -562,12 +569,18 @@ export function MarketplaceSettingsForm() {
                       <TableCell className="text-xs font-medium">
                         {log.action}
                       </TableCell>
-                      <TableCell>{log.itemsCount} ชิ้น</TableCell>
+                      <TableCell>
+                        {t('logsTable.pieces', { count: log.itemsCount })}
+                      </TableCell>
                       <TableCell>
                         {log.status === 'SUCCESS' ? (
-                          <Badge className="bg-emerald-600">สำเร็จ</Badge>
+                          <Badge className="bg-emerald-600">
+                            {t('logsTable.success')}
+                          </Badge>
                         ) : (
-                          <Badge variant="destructive">ล้มเหลว</Badge>
+                          <Badge variant="destructive">
+                            {t('logsTable.failed')}
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground max-w-xs truncate text-xs">
@@ -589,22 +602,20 @@ export function MarketplaceSettingsForm() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              ตั้งค่าการเชื่อมต่อ {editingPlatform?.name}
+              {t('dialog.title', { platform: editingPlatform?.name })}
             </DialogTitle>
-            <DialogDescription>
-              กรอก API Credentials จากผู้ให้บริการ หรือเปิดโหมดจำลองเพื่อทดสอบ
-            </DialogDescription>
+            <DialogDescription>{t('dialog.description')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1">
-              <Label>ชื่อร้านค้าที่แสดง</Label>
+              <Label>{t('dialog.shopNameLabel')}</Label>
               <Input
                 value={formData.shopName}
                 onChange={(e) =>
                   setFormData({ ...formData, shopName: e.target.value })
                 }
-                placeholder="เช่น My Official Store"
+                placeholder={t('dialog.shopNamePlaceholder')}
               />
             </div>
             <div className="space-y-1">
@@ -614,7 +625,7 @@ export function MarketplaceSettingsForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, shopId: e.target.value })
                 }
-                placeholder="ระบุรหัสร้านค้า"
+                placeholder={t('dialog.shopIdPlaceholder')}
               />
             </div>
             <div className="space-y-1">
@@ -640,19 +651,19 @@ export function MarketplaceSettingsForm() {
             </div>
             {editingPlatform?.hasAccessToken && (
               <div className="space-y-1">
-                <Label>Access Token (สำหรับเรียก API)</Label>
+                <Label>{t('dialog.accessTokenLabel')}</Label>
                 <Input
                   type="password"
                   value={formData.accessToken}
                   onChange={(e) =>
                     setFormData({ ...formData, accessToken: e.target.value })
                   }
-                  placeholder="Bearer / Access Token"
+                  placeholder={t('dialog.accessTokenPlaceholder')}
                 />
               </div>
             )}
             <div className="space-y-1">
-              <Label>สาขาหลักที่ใช้ตัดสต็อก</Label>
+              <Label>{t('dialog.defaultBranchLabel')}</Label>
               <Select
                 value={formData.defaultBranchId}
                 onValueChange={(val) =>
@@ -660,12 +671,14 @@ export function MarketplaceSettingsForm() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="เลือกสาขาคลังสินค้าหลัก" />
+                  <SelectValue
+                    placeholder={t('dialog.defaultBranchPlaceholder')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {branches.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
-                      {b.name} {b.isMain ? '(สาขาหลัก)' : ''}
+                      {b.name} {b.isMain ? t('dialog.mainBranchSuffix') : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -674,11 +687,10 @@ export function MarketplaceSettingsForm() {
             <div className="bg-muted/30 flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
                 <Label className="text-sm font-medium">
-                  โหมดจำลอง (Simulator Mode)
+                  {t('dialog.simulatorMode')}
                 </Label>
                 <p className="text-muted-foreground text-xs">
-                  ทดสอบการตัดและซิงค์สต็อกโดยไม่ต้องรออนุมัติ API Key
-                  จากแพลตฟอร์ม
+                  {t('dialog.simulatorModeDesc')}
                 </p>
               </div>
               <Switch
@@ -691,14 +703,14 @@ export function MarketplaceSettingsForm() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingPlatform(null)}>
-              ยกเลิก
+              {t('dialog.cancel')}
             </Button>
             <Button
               onClick={handleSaveConnection}
               disabled={saveConnectionMutation.isPending}
             >
               {saveConnectionMutation.isPending && <Spinner className="mr-2" />}
-              บันทึกข้อมูล
+              {t('dialog.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -710,25 +722,28 @@ export function MarketplaceSettingsForm() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              ทดสอบจำลองคำสั่งซื้อจาก {simulatingConnection?.platform}
+              {t('simulateDialog.title', {
+                platform: simulatingConnection?.platform,
+              })}
             </DialogTitle>
             <DialogDescription>
-              จำลองว่ามีลูกค้าซื้อสินค้าบน {simulatingConnection?.platform}{' '}
-              เพื่อดูว่าสต็อกในระบบถูกตัดอัตโนมัติจริง
+              {t('simulateDialog.description', {
+                platform: simulatingConnection?.platform,
+              })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1">
-              <Label>รหัสสินค้า / SKU ที่ถูกสั่งซื้อ</Label>
+              <Label>{t('simulateDialog.skuLabel')}</Label>
               <Input
                 value={simulateSku}
                 onChange={(e) => setSimulateSku(e.target.value)}
-                placeholder="เช่น SKU-001 หรือเลือกจากตารางด้านบน"
+                placeholder={t('simulateDialog.skuPlaceholder')}
               />
             </div>
             <div className="space-y-1">
-              <Label>จำนวนที่สั่งซื้อ (ชิ้น)</Label>
+              <Label>{t('simulateDialog.quantityLabel')}</Label>
               <Input
                 type="number"
                 min={1}
@@ -744,14 +759,14 @@ export function MarketplaceSettingsForm() {
               variant="outline"
               onClick={() => setSimulatingConnection(null)}
             >
-              ปิด
+              {t('simulateDialog.close')}
             </Button>
             <Button
               onClick={handleSimulateOrder}
               disabled={simulateOrderMutation.isPending || !simulateSku}
             >
               {simulateOrderMutation.isPending && <Spinner className="mr-2" />}
-              ยิงคำสั่งซื้อจำลอง
+              {t('simulateDialog.submit')}
             </Button>
           </DialogFooter>
         </DialogContent>

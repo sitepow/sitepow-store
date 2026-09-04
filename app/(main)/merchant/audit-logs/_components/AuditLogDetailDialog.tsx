@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { GetActivityLogItem } from '@/actions/activity-log'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconTerminal } from '@tabler/icons-react'
@@ -36,23 +38,24 @@ export function AuditLogDetailDialog({
   isOpen,
   onOpenChange,
 }: AuditLogDetailDialogProps) {
+  const t = useTranslations('merchant.auditLogs.detailDialog')
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
             <IconTerminal size={18} className="text-muted-foreground" />
-            ข้อมูลโครงสร้างกิจกรรมเชิงลึก (Metadata)
+            {t('title')}
           </DialogTitle>
           <DialogDescription className="text-xs">
-            ชุดข้อมูลดิบ (Payload Details) ในรูปแบบ JSON
-            ที่ระบบหลังบ้านบันทึกเก็บไว้ขณะเกิดรายการนี้
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
         <div className="bg-foreground/5 text-foreground max-h-90 overflow-x-auto rounded-md border p-4 text-[11px] leading-relaxed">
           <pre>
             {JSON.stringify(
-              logItem?.details || { message: 'ไม่มีข้อมูลรายละเอียดเพิ่มเติม' },
+              logItem?.details || { message: t('noDetails') },
               null,
               2,
             )}

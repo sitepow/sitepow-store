@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import {
   DEFAULT_SHIPPING_FEE,
   DEFAULT_WEIGHT_STEP,
@@ -37,6 +39,8 @@ export function ServiceConfigDialog({
   serviceName,
   serviceIndex,
 }: ServiceConfigDialogProps) {
+  const t = useTranslations('merchant.settings.shipping.serviceConfig')
+  const tZones = useTranslations('merchant.settings.shipping.zones')
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<string>(
     ShippingZoneType.SAME_PROVINCE,
@@ -78,16 +82,13 @@ export function ServiceConfigDialog({
           size="sm"
           className="h-8 gap-1"
         >
-          <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
+          <IconSettings size={14} /> {t('trigger')}
         </Button>
       </DialogTrigger>
       <DialogContent className="lg:min-w-lg" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>ตั้งค่าอัตราค่าบริการ: {serviceName}</DialogTitle>
-          <DialogDescription>
-            ตรวจสอบและปรับแต่งขั้นบันไดราคาแยกตามโซนความสัมพันธ์ระยะทาง
-            (กวาดข้อมูลจากระบบอัตโนมัติแล้ว)
-          </DialogDescription>
+          <DialogTitle>{t('title', { serviceName })}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         <Tabs
           value={activeTab}
@@ -96,13 +97,13 @@ export function ServiceConfigDialog({
           className="flex flex-col gap-6"
         >
           <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1">
-            {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => (
+            {Object.entries(ZONE_LABELS).map(([zoneKey]) => (
               <TabsTrigger key={zoneKey} value={zoneKey} className="text-xs">
-                {zoneMeta.title}
+                {tZones(`${zoneKey}.title` as any)}
               </TabsTrigger>
             ))}
           </TabsList>
-          {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => {
+          {Object.entries(ZONE_LABELS).map(([zoneKey]) => {
             const targetZone = zoneKey as ShippingZoneType
 
             return (
@@ -114,10 +115,10 @@ export function ServiceConfigDialog({
                 <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
-                      {zoneMeta.title}
+                      {tZones(`${targetZone}.title` as any)}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {zoneMeta.description}
+                      {tZones(`${targetZone}.description` as any)}
                     </span>
                   </div>
                   <Button
@@ -127,7 +128,10 @@ export function ServiceConfigDialog({
                     onClick={() => addWeightRowForZone(targetZone)}
                     className="h-7 gap-1 px-2 text-xs"
                   >
-                    <IconPlus size={14} /> เพิ่มช่วงน้ำหนัก ({zoneMeta.title})
+                    <IconPlus size={14} />{' '}
+                    {t('addWeight', {
+                      zone: tZones(`${targetZone}.title` as any),
+                    })}
                   </Button>
                 </div>
                 <div className="w-0 min-w-full overflow-x-auto">
@@ -149,7 +153,7 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 text-right text-sm"
                             />
                             <span className="text-muted-foreground text-xs select-none">
-                              ถึง
+                              {t('to')}
                             </span>
                             <Input
                               type="number"
@@ -161,13 +165,13 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 text-right text-sm"
                             />
                             <span className="text-muted-foreground w-12 shrink-0 text-xs select-none">
-                              กรัม (g)
+                              {t('gram')}
                             </span>
                           </div>
                           <div className="flex shrink-0 items-center">
                             <Input
                               type="number"
-                              placeholder="ราคา"
+                              placeholder={t('price')}
                               {...register(
                                 `services.${serviceIndex}.weightRates.${globalIndex}.fee` as const,
                                 { valueAsNumber: true },
@@ -175,7 +179,7 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 rounded-r-none text-right text-sm font-medium"
                             />
                             <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
-                              บาท
+                              {t('baht')}
                             </span>
                           </div>
                           <Button
@@ -203,10 +207,10 @@ export function ServiceConfigDialog({
             onClick={() => setOpen(false)}
             size="sm"
           >
-            ปิดหน้าต่าง
+            {t('close')}
           </Button>
           <Button type="button" onClick={() => setOpen(false)} size="sm">
-            เสร็จสิ้นการตั้งค่าโซน
+            {t('done')}
           </Button>
         </DialogFooter>
       </DialogContent>

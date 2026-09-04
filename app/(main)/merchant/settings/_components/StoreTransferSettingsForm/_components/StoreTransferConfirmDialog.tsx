@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useCreateTransferRequest } from '@/actions/hooks/store-transfer'
 import { useSession } from '@/hooks/use-session'
 import { IconAlertTriangle } from '@tabler/icons-react'
@@ -27,6 +29,7 @@ export function StoreTransferConfirmDialog({
   storeId,
   onClose,
 }: StoreTransferConfirmDialogProps) {
+  const t = useTranslations('merchant.settings.transfer')
   const { user } = useSession()
   const createMutation = useCreateTransferRequest()
 
@@ -48,14 +51,12 @@ export function StoreTransferConfirmDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <IconAlertTriangle size={18} className="text-destructive" />
-            ยืนยันการส่งคำขอโอนร้านค้า
+            {t('confirmTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <p className="text-muted-foreground text-sm">
-          คุณกำลังจะส่งคำขอโอนความเป็นเจ้าของร้านค้าให้กับ{' '}
-          <span className="text-foreground font-medium">{toEmail}</span>{' '}
-          ผู้รับจะต้องยืนยันการรับโอนภายใน 24 ชั่วโมง
+          {t('confirmDesc', { email: toEmail })}
         </p>
 
         <DialogFooter className="flex gap-2 border-t pt-4">
@@ -64,7 +65,7 @@ export function StoreTransferConfirmDialog({
             onClick={onClose}
             disabled={createMutation.isPending}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -73,10 +74,10 @@ export function StoreTransferConfirmDialog({
           >
             {createMutation.isPending ? (
               <>
-                <Spinner /> กำลังส่งคำขอ...
+                <Spinner /> {t('sending')}
               </>
             ) : (
-              'ยืนยันส่งคำขอ'
+              t('confirm')
             )}
           </Button>
         </DialogFooter>

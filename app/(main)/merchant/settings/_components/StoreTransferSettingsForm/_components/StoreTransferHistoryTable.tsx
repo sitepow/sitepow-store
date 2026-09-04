@@ -1,8 +1,9 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useTransferRequests } from '@/actions/hooks/store-transfer'
 import { useCancelTransferRequest } from '@/actions/hooks/store-transfer'
-import { TRANSFER_STATUS_TH } from '@/constants/translate'
 import { TransferStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/table'
 
 export function StoreTransferHistoryTable() {
+  const t = useTranslations('merchant.settings.transfer')
   const { selectedStoreId } = useStoreFilter()
   const { user } = useSession()
   const cancelMutation = useCancelTransferRequest()
@@ -35,25 +37,25 @@ export function StoreTransferHistoryTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>อีเมลผู้รับ</TableHead>
-            <TableHead>สถานะ</TableHead>
-            <TableHead>หมดอายุ</TableHead>
-            <TableHead>วันที่ส่ง</TableHead>
-            <TableHead className="text-right">จัดการ</TableHead>
+            <TableHead>{t('recipientEmail')}</TableHead>
+            <TableHead>{t('status')}</TableHead>
+            <TableHead>{t('expiresAt')}</TableHead>
+            <TableHead>{t('sentAt')}</TableHead>
+            <TableHead className="text-right">{t('actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableLoadingRow colSpan={5} />
           ) : requests.length === 0 ? (
-            <TableEmptyRow colSpan={5} title="ยังไม่มีประวัติการโอนร้านค้า" />
+            <TableEmptyRow colSpan={5} title={t('empty')} />
           ) : (
             requests.map((req) => (
               <TableRow key={req.id}>
                 <TableCell className="font-medium">{req.toEmail}</TableCell>
                 <TableCell>
                   <Badge variant="outline">
-                    {TRANSFER_STATUS_TH[req.status]}
+                    {t(`statuses.${req.status}` as any)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">

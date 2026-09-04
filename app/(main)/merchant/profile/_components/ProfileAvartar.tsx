@@ -5,6 +5,8 @@
 import { ComponentProps, useEffect, useMemo, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useProfile } from '@/actions/hooks/profile'
 import { USER_ICON } from '@/constants/favicon'
 import { formatDateTime } from '@/utils/date'
@@ -20,6 +22,7 @@ export function ProfileAvartar({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
+  const t = useTranslations('merchant.profile')
   const { data: profile, isLoading } = useProfile()
 
   const { setValue, control } = useFormContext()
@@ -92,7 +95,7 @@ export function ProfileAvartar({
         )}
       </CardContent>
       <CardFooter className="flex justify-between border-t text-xs">
-        <span>เป็นสมาชิกตั้งแต่</span>
+        <span>{t('memberSince')}</span>
         {isLoading ? (
           <Skeleton className="h-3 w-20" />
         ) : (

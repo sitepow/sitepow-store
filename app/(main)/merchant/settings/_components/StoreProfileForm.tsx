@@ -5,6 +5,8 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import {
   useStoreProfile,
@@ -41,6 +43,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
 export function StoreProfileForm() {
+  const t = useTranslations('merchant.settings.storeProfile')
   const { selectedStoreId } = useStoreFilter()
   const { data: storeProfile } = useStoreProfile(selectedStoreId as string)
   const profileMutation = useUpdateStoreProfile()
@@ -188,8 +191,8 @@ export function StoreProfileForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconBuildingStore}
-          title="ตั้งค่าข้อมูลร้านค้า"
-          description="แก้ไขข้อมูลสาขาหลัก, URL Slug หน้าระบบ และข้อมูลข้อความหมายเหตุที่จะปรากฏในกระดาษใบเสร็จ POS"
+          title={t('title')}
+          description={t('description')}
         />
       </CardHeader>
       {selectedStoreId === ALL_STORES ? (
@@ -201,7 +204,7 @@ export function StoreProfileForm() {
           <CardContent className="space-y-6">
             <div className="grid gap-5 sm:grid-cols-2">
               <Field>
-                <FieldLabel>โลโก้ประจำแบรนด์ร้านค้า</FieldLabel>
+                <FieldLabel>{t('logo')}</FieldLabel>
                 <div className="flex flex-wrap items-center gap-5">
                   <div className="border-primary flex h-16.25 shrink-0 items-center justify-center border border-dashed p-1">
                     {logo && <StoreLogo image={previewLogoUrl ?? logo} />}
@@ -227,17 +230,16 @@ export function StoreProfileForm() {
                       className="w-full"
                       onClick={() => logoInputRef.current?.click()}
                     >
-                      อัปโหลดรูปภาพใหม่
+                      {t('uploadLogo')}
                     </Button>
                     <FieldDescription className="max-w-xs text-xs leading-normal">
-                      แนะนำไฟล์สี่เหลี่ยมจัตุรัส PNG หรือ JPG ขนาดไม่เกิน 2MB
-                      (ขนาดรูปที่แนะนำ 200x70)
+                      {t('logoHint')}
                     </FieldDescription>
                   </div>
                 </div>
               </Field>
               <Field>
-                <FieldLabel>รูปภาพแบนเนอร์หน้าร้าน</FieldLabel>
+                <FieldLabel>{t('banner')}</FieldLabel>
                 <div className="flex flex-col gap-3">
                   {coverImage && (
                     <div className="border-primary border border-dashed p-1">
@@ -259,7 +261,7 @@ export function StoreProfileForm() {
                     type="button"
                     onClick={() => bannerInputRef.current?.click()}
                   >
-                    อัปโหลดรูปภาพแบนเนอร์
+                    {t('uploadBanner')}
                   </Button>
                   <input
                     type="file"
@@ -274,14 +276,13 @@ export function StoreProfileForm() {
                   />
                 </div>
                 <FieldDescription className="max-w-xs text-xs leading-normal">
-                  แนะนำไฟล์สี่เหลี่ยมจัตุรัส PNG หรือ JPG หรือ MP4 ขนาดไม่เกิน
-                  10MB (ขนาดรูปที่แนะนำ 1980x500) สามารถใช้ไฟล์วิดีโอได้
+                  {t('bannerHint')}
                 </FieldDescription>
               </Field>
             </div>
             <Separator />
             <Field>
-              <FieldLabel>สีประจำแบรนด์ (Primary Color)</FieldLabel>
+              <FieldLabel>{t('primaryColor')}</FieldLabel>
               <Controller
                 control={control}
                 name="primaryColor"
@@ -291,7 +292,7 @@ export function StoreProfileForm() {
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="เลือกสีประจำแบรนด์" />
+                      <SelectValue placeholder={t('primaryColorPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       {PRIMARY_COLOR_OPTIONS.map((color) => (
@@ -309,22 +310,20 @@ export function StoreProfileForm() {
                   </Select>
                 )}
               />
-              <FieldDescription>
-                เลือกสีหลักสำหรับปุ่มและองค์ประกอบสำคัญในหน้าร้านของคุณ
-              </FieldDescription>
+              <FieldDescription>{t('primaryColorHint')}</FieldDescription>
             </Field>
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <Field>
-                <FieldLabel>ชื่อร้านค้า / ชื่อจดทะเบียนพาณิชย์</FieldLabel>
+                <FieldLabel>{t('name')}</FieldLabel>
                 <Input
-                  placeholder="ระบุชื่อเต็มของร้านค้า"
+                  placeholder={t('namePlaceholder')}
                   {...register('name')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.name?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>Store URL Slug</FieldLabel>
+                <FieldLabel>{t('slug')}</FieldLabel>
                 <div className="flex items-center overflow-hidden rounded-md">
                   <span className="border-input bg-muted text-muted-foreground flex h-9 items-center border border-r-0 px-3 text-sm select-none">
                     sitepow.store/
@@ -338,7 +337,7 @@ export function StoreProfileForm() {
                 <FieldError>{errors?.slug?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>อีเมลติดต่อหลัก</FieldLabel>
+                <FieldLabel>{t('email')}</FieldLabel>
                 <Input
                   type="email"
                   placeholder="example@store.com"
@@ -348,23 +347,23 @@ export function StoreProfileForm() {
                 <FieldError>{errors?.email?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>เลขประจำตัวผู้เสียภาษี 13 หลัก</FieldLabel>
+                <FieldLabel>{t('taxId')}</FieldLabel>
                 <Input
                   maxLength={13}
-                  placeholder="เลขประจำตัวผู้เสียภาษีสำหรับระบุบนใบเสร็จเต็มรูปแบบ"
+                  placeholder={t('taxIdPlaceholder')}
                   {...register('taxId')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.taxId?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>รายละเอียดร้านค้า</FieldLabel>
+                <FieldLabel>{t('storeDesc')}</FieldLabel>
                 <Textarea
-                  placeholder="ร้านค้านี้ขายเกี่ยวกับอะไร"
+                  placeholder={t('storeDescPlaceholder')}
                   {...register('description')}
                   disabled={isPending}
                 />
-                <FieldError>{errors?.taxId?.message}</FieldError>
+                <FieldError>{errors?.description?.message}</FieldError>
               </Field>
             </div>
           </CardContent>
@@ -376,7 +375,7 @@ export function StoreProfileForm() {
                 onClick={resetForm}
                 disabled={isPending}
               >
-                ล้างค่าการตั้งค่า
+                {t('reset')}
               </Button>
             )}
             <Button
@@ -386,10 +385,10 @@ export function StoreProfileForm() {
             >
               {isPending ? (
                 <>
-                  <Spinner /> กำลังบันทึก...
+                  <Spinner /> {t('saving')}
                 </>
               ) : (
-                'บันทึกการตั้งค่าร้านค้า'
+                t('save')
               )}
             </Button>
           </CardFooter>

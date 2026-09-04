@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { GetActivityLogItem } from '@/actions/activity-log'
 import { useActivityLogs } from '@/actions/hooks/activity-log'
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -35,6 +37,7 @@ import { AuditLogDetailDialog } from './_components/AuditLogDetailDialog'
 import { AuditLogFilters } from './_components/AuditLogFilters'
 
 export default function MerchantAuditLogsPage() {
+  const t = useTranslations('merchant.auditLogs')
   const { selectedStoreId } = useStoreFilter()
   const [actionFilter, setActionFilter] = useState<string>('all')
   const [actorFilter, setActorFilter] = useState<string>('all')
@@ -69,8 +72,8 @@ export default function MerchantAuditLogsPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHistory}
-        title="ประวัติกิจกรรม"
-        description="ตรวจสอบบันทึก Log การกระทำและเข้าถึงข้อมูลอย่างละเอียด เพื่อความโปร่งใสและการรักษาความปลอดภัยภายในองค์กร"
+        title={t('title')}
+        description={t('description')}
         endContent={<StoreSelectField />}
       />
 
@@ -79,8 +82,8 @@ export default function MerchantAuditLogsPage() {
       ) : !isPermissionLoading && !canViewActivityLogs ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <>
@@ -105,13 +108,13 @@ export default function MerchantAuditLogsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>เวลาที่บันทึก</TableHead>
-                  <TableHead>ประเภทเหตุการณ์</TableHead>
-                  <TableHead>ผู้กระทำ</TableHead>
-                  <TableHead>ผู้ดำเนินการ</TableHead>
-                  <TableHead>Target Entity</TableHead>
-                  <TableHead>IP Address</TableHead>
-                  <TableHead>ดูข้อมูล</TableHead>
+                  <TableHead>{t('columns.timestamp')}</TableHead>
+                  <TableHead>{t('columns.action')}</TableHead>
+                  <TableHead>{t('columns.actorGroup')}</TableHead>
+                  <TableHead>{t('columns.actor')}</TableHead>
+                  <TableHead>{t('columns.targetEntity')}</TableHead>
+                  <TableHead>{t('columns.ipAddress')}</TableHead>
+                  <TableHead>{t('columns.view')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -119,8 +122,8 @@ export default function MerchantAuditLogsPage() {
                   <TableLoadingRow colSpan={7} />
                 ) : logs.length === 0 ? (
                   <TableEmptyRow
-                    title="ไม่พบข้อมูลประวัติบันทึกกิจกรรม"
-                    description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
+                    title={t('empty')}
+                    description={t('emptyDesc')}
                     colSpan={7}
                   />
                 ) : (

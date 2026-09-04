@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useApplyGlobalRates,
   useGlobalShippingMetadata,
@@ -34,6 +36,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 export function ApplyGlobalRatesDialog() {
+  const t = useTranslations('merchant.settings.shipping.applyGlobal')
   const [open, setOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string>('')
 
@@ -79,25 +82,21 @@ export function ApplyGlobalRatesDialog() {
       <DialogTrigger asChild>
         <Button type="button" variant="outline">
           <IconCloudDownload />
-          นำเรทจัดส่งมาใช้กับร้านนี้
+          {t('trigger')}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>เลือกจังหวัดต้นทางของร้านค้า</DialogTitle>
-          <DialogDescription>
-            ระบบจะดึงเรทค่าจัดส่งจาก Master Data
-            พร้อมทั้งปรับปรุงที่อยู่ต้นทางของร้านค้า (จังหวัด/อำเภอ/ไปรษณีย์)
-            ให้ตรงกับข้อมูลเรทที่เลือกโดยอัตโนมัติ
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
 
         <Field>
-          <FieldLabel>จังหวัดต้นทาง</FieldLabel>
+          <FieldLabel>{t('provinceLabel')}</FieldLabel>
           <Select value={selectedProvince} onValueChange={setSelectedProvince}>
             <SelectTrigger>
-              <SelectValue placeholder="เลือกจังหวัด..." />
+              <SelectValue placeholder={t('provincePlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {provinces?.map((matrix) => (
@@ -112,10 +111,11 @@ export function ApplyGlobalRatesDialog() {
           </Select>
           {selectedProvince && (
             <FieldDescription>
-              อัพเดตฐานข้อมูลวันที่:{' '}
-              {matrixMeta?.updatedAt
-                ? formatDateTime(matrixMeta?.updatedAt)
-                : '-'}
+              {t('updatedAt', {
+                date: matrixMeta?.updatedAt
+                  ? formatDateTime(matrixMeta?.updatedAt)
+                  : '-',
+              })}
             </FieldDescription>
           )}
         </Field>
@@ -129,12 +129,12 @@ export function ApplyGlobalRatesDialog() {
             {isApplying ? (
               <>
                 <Spinner />
-                กำลังอัพเดต...
+                {t('updating')}
               </>
             ) : (
               <>
                 <IconCloudDownload size={14} />
-                นำเรทนี้ไปใช้กับร้านค้า
+                {t('apply')}
               </>
             )}
           </Button>

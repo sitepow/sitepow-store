@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconMail, IconReplace } from '@tabler/icons-react'
 
@@ -16,6 +18,7 @@ import { StoreTransferConfirmDialog } from './_components/StoreTransferConfirmDi
 import { StoreTransferHistoryTable } from './_components/StoreTransferHistoryTable'
 
 export function StoreTransferSettingsForm() {
+  const t = useTranslations('merchant.settings.transfer')
   const { selectedStoreId } = useStoreFilter()
   const [email, setEmail] = useState('')
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -27,8 +30,8 @@ export function StoreTransferSettingsForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconReplace}
-            title="โอนย้ายความเป็นเจ้าของร้าน"
-            description="ทำการส่งคำขอไปยังบัญชีผู้ใช้ท่านอื่นเพื่อโอนกรรมสิทธิ์ สิทธิ์ขาดในการตั้งค่า และสิทธิ์ความเป็น Owner ของร้านค้านี้"
+            title={t('title')}
+            description={t('description')}
           />
         </CardHeader>
 
@@ -36,14 +39,11 @@ export function StoreTransferSettingsForm() {
           <>
             <CardContent className="space-y-5">
               <ActionRequiredAlert
-                title="คำเตือนและข้อควรระวัง"
-                description="เมื่อผู้รับยืนยันการโอน
-                  บัญชีปัจจุบันของคุณจะถูกลดระดับสิทธิ์ลงทันที
-                  และไม่สามารถเข้าถึงการจัดการงบดุล รายได้
-                  หรือสิทธิ์การตั้งค่าระบบหลักของร้านค้านี้ได้อีกต่อไป"
+                title={t('warningTitle')}
+                description={t('warningDesc')}
               />
               <Field>
-                <FieldLabel>อีเมลของผู้รับโอนสิทธิ์</FieldLabel>
+                <FieldLabel>{t('email')}</FieldLabel>
                 <Input
                   type="email"
                   placeholder="example@merchant.com"
@@ -61,7 +61,7 @@ export function StoreTransferSettingsForm() {
                 onClick={() => setConfirmOpen(true)}
               >
                 <IconMail size={14} />
-                ส่งคำขอโอนร้านค้า
+                {t('submit')}
               </Button>
             </CardFooter>
           </>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -14,6 +16,7 @@ import { CreditHistoryTable } from './_components/CreditHistoryTable'
 import { StoreCreditCard } from './_components/StoreCreditCard'
 
 export default function CreditPage() {
+  const t = useTranslations('merchant.credits')
   const { selectedStoreId } = useStoreFilter()
   const { canViewCreditCard, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -22,8 +25,8 @@ export default function CreditPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconWallet}
-        title="จัดการเครดิต"
-        description="ตรวจสอบยอดเครดิตคงเหลือและประวัติการใช้บริการ AI และตรวจสลิปของคุณ"
+        title={t('title')}
+        description={t('description')}
         endContent={<StoreSelectField />}
       />
       {selectedStoreId === ALL_STORES ? (
@@ -31,8 +34,8 @@ export default function CreditPage() {
       ) : !isPermissionLoading && !canViewCreditCard ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลเครดิตและการทำธุรกรรมของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
