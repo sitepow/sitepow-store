@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { formatNumber } from '@/utils/pricing'
@@ -33,32 +34,29 @@ interface LowStockCardProps {
 }
 
 export function LowStockCard({ data }: LowStockCardProps) {
+  const t = useTranslations('merchant.dashboard.lowStock')
   const lowStock = data?.lowStock ?? []
 
   return (
     <AnalyticsCardShell
-      title="สินค้าใกล้หมด"
-      description="รายการสินค้าที่ต้องเติมสต็อกด่วน"
+      title={t('title')}
+      description={t('description')}
       isEmpty={lowStock.length === 0}
-      emptyMessage="ขณะนี้ยังไม่มีสินค้าที่ใกล้หมด"
+      emptyMessage={t('emptyMessage')}
       className="h-fit"
     >
       <div className="space-y-4">
-        {/* เพิ่ม overflow-x-auto เพื่อให้ตารางเลื่อนซ้าย-ขวาได้ */}
         <div className="overflow-x-auto rounded-md">
-          <Table className="min-w-[500px] border-separate border-spacing-0">
+          <Table className="min-w-125 border-separate border-spacing-0">
             <TableHeader>
               <TableRow>
-                {/* ตรึง Header รูปภาพสินค้าไว้ซ้ายสุด */}
                 <TableCell className="bg-background sticky left-0 z-20 w-16 font-medium shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                  รูปภาพ
+                  {t('image')}
                 </TableCell>
-                <TableCell className="font-medium">
-                  สินค้า / รหัสตัวเลือก / ชื่อตัวเลือก
-                </TableCell>
-                <TableCell className="font-medium">สาขา</TableCell>
+                <TableCell className="font-medium">{t('product')}</TableCell>
+                <TableCell className="font-medium">{t('branch')}</TableCell>
                 <TableCell className="text-right font-medium">
-                  คงเหลือ
+                  {t('remaining')}
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -106,7 +104,7 @@ export function LowStockCard({ data }: LowStockCardProps) {
         <div className="border-t pt-2">
           <Button variant="outline" className="w-full" asChild>
             <Link href="/merchant/inventory">
-              ดูคลังสินค้าทั้งหมด <ArrowRight />
+              {t('viewAllInventory')} <ArrowRight />
             </Link>
           </Button>
         </div>

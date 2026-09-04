@@ -1,5 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
+
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency } from '@/utils/pricing'
 import { IconTrendingUp } from '@tabler/icons-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
@@ -22,22 +26,27 @@ interface SalesTrendChartProps {
   }
 }
 
-const chartConfig = {
-  total: {
-    label: 'ยอดขาย',
-    color: '#10b981',
-  },
-} satisfies ChartConfig
-
 export function SalesTrendChart({ data }: SalesTrendChartProps) {
+  const t = useTranslations('merchant.dashboard.salesTrend')
   const salesTrend = data?.salesTrend ?? []
+
+  const chartConfig = useMemo(
+    () =>
+      ({
+        total: {
+          label: t('sales'),
+          color: '#10b981',
+        },
+      }) satisfies ChartConfig,
+    [t],
+  )
 
   return (
     <AnalyticsCardShell
-      title="แนวโน้มยอดขาย"
-      description="ยอดขายสุทธิ 6 เดือนล่าสุด"
+      title={t('title')}
+      description={t('description')}
       isEmpty={salesTrend.length === 0}
-      emptyMessage="ไม่มีข้อมูลแนวโน้มยอดขาย"
+      emptyMessage={t('emptyMessage')}
     >
       <div className="space-y-4">
         <ChartContainer config={chartConfig}>
@@ -73,7 +82,7 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
         </ChartContainer>
         <div className="text-muted-foreground flex items-center gap-2 border-t pt-2 text-xs">
           <IconTrendingUp className="size-4 text-emerald-500" />
-          <span>6 เดือนล่าสุด</span>
+          <span>{t('last6Months')}</span>
         </div>
       </div>
     </AnalyticsCardShell>

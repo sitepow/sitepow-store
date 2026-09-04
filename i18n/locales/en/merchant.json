@@ -106,13 +106,16 @@
       "title": "Sales Trend",
       "description": "Net sales over the last 6 months",
       "emptyMessage": "No sales trend data available",
-      "sales": "Sales"
+      "sales": "Sales",
+      "last6Months": "Last 6 months"
     },
     "recentSales": {
       "title": "Recent Sales",
       "description": "5 most recent orders for this branch",
       "emptyMessage": "No recent sales in this branch yet",
-      "sales": "Sales"
+      "sales": "Sales",
+      "customer": "Customer: {name}",
+      "unnamedCustomer": "Unnamed"
     }
   },
   "orders": {

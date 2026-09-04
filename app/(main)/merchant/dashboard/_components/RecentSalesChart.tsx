@@ -1,5 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
+
+import { useTranslations } from 'next-intl'
+
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
@@ -25,15 +29,20 @@ interface RecentSalesChartProps {
   }
 }
 
-const chartConfig = {
-  amount: {
-    label: 'ยอดขาย',
-    color: '#22c55e',
-  },
-} satisfies ChartConfig
-
 export function RecentSalesChart({ data }: RecentSalesChartProps) {
+  const t = useTranslations('merchant.dashboard.recentSales')
   const recentSales = data?.recentSales ?? []
+
+  const chartConfig = useMemo(
+    () =>
+      ({
+        amount: {
+          label: t('sales'),
+          color: '#22c55e',
+        },
+      }) satisfies ChartConfig,
+    [t],
+  )
 
   const chartData = recentSales.map((sale) => ({
     ...sale,
@@ -42,10 +51,10 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
 
   return (
     <AnalyticsCardShell
-      title="รายการขายล่าสุด"
-      description="5 ออเดอร์ล่าสุดของสาขานี้"
+      title={t('title')}
+      description={t('description')}
       isEmpty={recentSales.length === 0}
-      emptyMessage="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
+      emptyMessage={t('emptyMessage')}
     >
       <div className="h-64 w-full">
         <ChartContainer config={chartConfig} className="h-full w-full">
@@ -76,7 +85,9 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
                 <ChartTooltipContent
                   formatter={(value, name, item) => [
                     `+${formatCurrency(typeof value === 'number' ? value : 0)}`,
-                    `ลูกค้า: ${item.payload.name || 'ไม่ระบุชื่อ'}`,
+                    t('customer', {
+                      name: item.payload.name || t('unnamedCustomer'),
+                    }),
                   ]}
                 />
               }
@@ -84,7 +95,7 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
             <Area
               type="natural"
               dataKey="amount"
-              name="ยอดขาย"
+              name={t('sales')}
               stroke="#22c55e"
               fill="url(#fillRecentSales)"
               strokeWidth={2}

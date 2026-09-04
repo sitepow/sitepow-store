@@ -106,13 +106,16 @@
       "title": "销售趋势",
       "description": "最近 6 个月净销售额走势",
       "emptyMessage": "暂无销售趋势数据",
-      "sales": "销售额"
+      "sales": "销售额",
+      "last6Months": "最近 6 个月"
     },
     "recentSales": {
       "title": "最近销售订单",
       "description": "该分店最近的 5 笔订单",
       "emptyMessage": "该分店暂无最近销售记录",
-      "sales": "销售额"
+      "sales": "销售额",
+      "customer": "客户: {name}",
+      "unnamedCustomer": "未命名客户"
     }
   },
   "orders": {
