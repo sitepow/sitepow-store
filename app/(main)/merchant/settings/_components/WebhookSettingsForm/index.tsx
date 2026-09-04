@@ -314,7 +314,6 @@ export function WebhookSettingsForm() {
                               ))}
                             </div>
                           </TableCell>
-
                           <TableCell>
                             <div className="flex items-center gap-1.5 font-mono text-xs">
                               <span>
@@ -386,7 +385,6 @@ export function WebhookSettingsForm() {
                               />
                             </div>
                           </TableCell>
-
                           <TableCell className="text-right">
                             <div
                               className="flex items-center justify-end gap-1"

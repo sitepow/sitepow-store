@@ -6,6 +6,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
+import { syncVariantStockToAllMarketplaces } from '@/lib/marketplace/sync-service'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -322,6 +323,14 @@ export async function upsertStock(input: UpsertStockInput) {
       entityId: stock.id,
       details: { variantId, branchId, quantity, minStock, type: 'upserted' },
     })
+
+    syncVariantStockToAllMarketplaces(
+      variantId,
+      quantity,
+      branch.storeId,
+    ).catch((err) =>
+      console.error('Marketplace sync error on upsertStock:', err),
+    )
 
     return {
       success: true,

@@ -9,6 +9,7 @@ export enum SettingsTab {
   REVIEW_REWARD = 'review-reward',
   DOMAIN = 'domain',
   WEBHOOK = 'webhook',
+  MARKETPLACE = 'marketplace',
 }
 
 export enum UserSettingsTab {

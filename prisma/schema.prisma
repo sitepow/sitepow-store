@@ -217,7 +217,8 @@ model Branch {
   transfersIn      StockTransfer[]   @relation("TransferTo")
   stockAdjustments StockAdjustment[]
 
-  expenses Expense[]
+  expenses               Expense[]
+  marketplaceConnections MarketplaceConnection[]
 
   translations Json?
 
@@ -707,34 +708,36 @@ model Store {
   isInternationalSetup Boolean      @default(false)
   baseCurrency         CurrencyCode @default(THB)
 
-  blogs                Blog[]
-  categories           Category[]
-  products             Product[]
-  reviews              Review[]
-  orders               Order[]
-  customers            CustomerStore[]
-  transactions         Transaction[]
-  carts                Cart[]
-  branches             Branch[]
-  activityLogs         ActivityLog[]
-  coupons              Coupon[]
-  transferRequests     StoreTransferRequest[]
-  stockTransfers       StockTransfer[]
-  stockAdjustments     StockAdjustment[]
-  PaymentSetting       PaymentSetting[]
-  employeeStores       EmployeeStore[]
-  subscriptionInvoices SubscriptionInvoice[]
-  conversations        Conversation[]
-  StoreDomain          StoreDomain[]
-  role                 Role[]
-  supplierAgreements   ResellerAgreement[]       @relation("SupplierAgreements")
-  resellerAgreements   ResellerAgreement[]       @relation("ResellerAgreements")
-  slipHistories        SlipVerificationHistory[]
-  reviewRewardConfig   ReviewRewardConfig?
-  expenses             Expense[]
-  addresses            Address[]
-  storeThemeConfig     StoreThemeConfig?
-  webhookEndpoints     StoreWebhookEndpoint[]
+  blogs                  Blog[]
+  categories             Category[]
+  products               Product[]
+  reviews                Review[]
+  orders                 Order[]
+  customers              CustomerStore[]
+  transactions           Transaction[]
+  carts                  Cart[]
+  branches               Branch[]
+  activityLogs           ActivityLog[]
+  coupons                Coupon[]
+  transferRequests       StoreTransferRequest[]
+  stockTransfers         StockTransfer[]
+  stockAdjustments       StockAdjustment[]
+  PaymentSetting         PaymentSetting[]
+  employeeStores         EmployeeStore[]
+  subscriptionInvoices   SubscriptionInvoice[]
+  conversations          Conversation[]
+  StoreDomain            StoreDomain[]
+  role                   Role[]
+  supplierAgreements     ResellerAgreement[]       @relation("SupplierAgreements")
+  resellerAgreements     ResellerAgreement[]       @relation("ResellerAgreements")
+  slipHistories          SlipVerificationHistory[]
+  reviewRewardConfig     ReviewRewardConfig?
+  expenses               Expense[]
+  addresses              Address[]
+  storeThemeConfig       StoreThemeConfig?
+  webhookEndpoints       StoreWebhookEndpoint[]
+  marketplaceConnections MarketplaceConnection[]
+  marketplaceSyncLogs    MarketplaceSyncLog[]
 
   translations Json?
 
@@ -966,13 +969,14 @@ model ProductVariant {
 
   translations Json?
 
-  reviews          Review[]
-  stocks           ProductStock[]
-  stockTransfers   StockTransfer[]
-  stockAdjustments StockAdjustment[]
-  digitalItems     DigitalItem[]
-  resellerPrices   ResellerCustomPrice[]
-  resellerStock    ResellerStock[]
+  reviews             Review[]
+  stocks              ProductStock[]
+  stockTransfers      StockTransfer[]
+  stockAdjustments    StockAdjustment[]
+  digitalItems        DigitalItem[]
+  resellerPrices      ResellerCustomPrice[]
+  resellerStock       ResellerStock[]
+  marketplaceMappings MarketplaceProductMapping[]
 
   @@index([productId, isAvailable])
 }
@@ -1678,5 +1682,110 @@ model StoreWebhookLog {
   createdAt DateTime @default(now())
 
   @@index([endpointId])
+  @@index([createdAt])
+}
+
+enum MarketplacePlatform {
+  SHOPEE
+  LAZADA
+  FACEBOOK
+}
+
+enum MarketplaceConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  EXPIRED
+  ERROR
+}
+
+enum MarketplaceSyncStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+model MarketplaceConnection {
+  id       String                      @id @default(uuid())
+  storeId  String
+  store    Store                       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  platform MarketplacePlatform
+  status   MarketplaceConnectionStatus @default(DISCONNECTED)
+
+  shopId         String?
+  shopName       String?
+  appKey         String?
+  appSecret      String?
+  accessToken    String?   @db.Text
+  refreshToken   String?   @db.Text
+  tokenExpiresAt DateTime?
+
+  isAutoSync  Boolean @default(true)
+  isSimulator Boolean @default(false)
+
+  defaultBranchId String?
+  defaultBranch   Branch? @relation(fields: [defaultBranchId], references: [id], onDelete: SetNull)
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mappings MarketplaceProductMapping[]
+  syncLogs MarketplaceSyncLog[]
+
+  @@unique([storeId, platform, shopId])
+  @@index([storeId])
+  @@index([platform])
+}
+
+model MarketplaceProductMapping {
+  id           String                @id @default(uuid())
+  connectionId String
+  connection   MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  marketplaceItemId String
+  marketplaceSku    String
+
+  autoSyncStock Boolean @default(true)
+  autoSyncPrice Boolean @default(false)
+
+  lastSyncedStock Int?
+  lastSyncedPrice Decimal?  @db.Decimal(10, 2)
+  lastSyncedAt    DateTime?
+  syncError       String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([connectionId, variantId])
+  @@index([connectionId])
+  @@index([variantId])
+  @@index([marketplaceSku])
+}
+
+model MarketplaceSyncLog {
+  id      String @id @default(uuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  connectionId String
+  connection   MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  platform   MarketplacePlatform
+  action     String
+  status     MarketplaceSyncStatus
+  itemsCount Int                   @default(1)
+
+  payload      Json?
+  response     Json?
+  errorMessage String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId])
+  @@index([connectionId])
   @@index([createdAt])
 }

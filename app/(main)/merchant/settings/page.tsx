@@ -15,6 +15,7 @@ import {
   IconReceiptTax,
   IconReplace,
   IconSettings,
+  IconShare,
   IconStar,
   IconTruck,
   IconWebhook,
@@ -29,6 +30,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { DomainSettingsForm } from './DomainSettingsForm'
+import { MarketplaceSettingsForm } from './_components/MarketplaceSettingsForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PaymentSettingsForm } from './_components/PaymentSettingsForm'
 import { ReviewRewardSettingsForm } from './_components/ReviewRewardSettingsForm'
@@ -114,6 +116,9 @@ function MerchantSettingsContent() {
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.WEBHOOK}>
               <IconWebhook size={14} /> Webhooks (API)
+            </TabsTrigger>
+            <TabsTrigger value={SettingsTab.MARKETPLACE}>
+              <IconShare size={14} /> มาร์เก็ตเพลส
             </TabsTrigger>
           </TabsList>
           <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
@@ -224,6 +229,17 @@ function MerchantSettingsContent() {
               />
             ) : (
               <WebhookSettingsForm />
+            )}
+          </TabsContent>
+          <TabsContent value={SettingsTab.MARKETPLACE} className="flex-1">
+            {!isPermissionLoading && !canViewStoreSettings ? (
+              <ActionRequiredAlert
+                icon={<IconLock />}
+                title="ไม่มีสิทธิ์เข้าถึง"
+                description="คุณไม่มีสิทธิ์ในการดูหรือจัดการการเชื่อมต่อมาร์เก็ตเพลสของร้านค้านี้"
+              />
+            ) : (
+              <MarketplaceSettingsForm />
             )}
           </TabsContent>
         </Tabs>
