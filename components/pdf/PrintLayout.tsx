@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { DeliveryNoteDoc } from './DeliveryNoteDoc'
 import { PackingSlipDoc } from './PackingSlipDoc'
 import { ReceiptDoc } from './ReceiptDoc'
+import { ReceiptSlipDoc } from './ReceiptSlipDoc'
 import { ShippingLabelDoc } from './ShippingLabelDoc'
 import { TaxInvoiceDoc } from './TaxInvoiceDoc'
 import { DOC_TYPES, OrderDocType } from './types'
@@ -59,6 +60,8 @@ export function PrintLayout({
     switch (docType) {
       case 'receipt':
         return <ReceiptDoc order={order} />
+      case 'receipt-slip':
+        return <ReceiptSlipDoc order={order} />
       case 'tax-invoice':
         return <TaxInvoiceDoc order={order} />
       case 'delivery-note':
@@ -87,7 +90,19 @@ export function PrintLayout({
               }`}
             >
               <IconReceipt size={14} />
-              <span>ใบเสร็จรับเงิน</span>
+              <span>ใบเสร็จรับเงิน (A4)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDocType('receipt-slip')}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                docType === 'receipt-slip'
+                  ? 'bg-neutral-900 text-white'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+            >
+              <IconReceipt size={14} />
+              <span>ใบเสร็จอย่างย่อ (80mm)</span>
             </button>
             <button
               type="button"
@@ -162,9 +177,11 @@ export function PrintLayout({
       <main className="p-4 sm:p-8 print:p-0">
         <div
           className={`mx-auto bg-white transition-all ${
-            docConfig.pageSize === 'Label'
-              ? 'max-w-[120mm] rounded-lg p-3 shadow-md print:m-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
-              : 'min-h-[297mm] max-w-[210mm] rounded-lg p-8 shadow-md sm:p-12 print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
+            docConfig.pageSize === 'Slip'
+              ? 'max-w-[85mm] rounded-lg p-3 shadow-md print:m-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
+              : docConfig.pageSize === 'Label'
+                ? 'max-w-[120mm] rounded-lg p-3 shadow-md print:m-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
+                : 'min-h-[297mm] max-w-[210mm] rounded-lg p-8 shadow-md sm:p-12 print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none'
           }`}
         >
           {renderDocument()}
@@ -173,8 +190,20 @@ export function PrintLayout({
       <style jsx global>{`
         @media print {
           @page {
-            size: ${docConfig.pageSize === 'Label' ? '100mm 150mm' : 'A4 portrait'};
-            margin: ${docConfig.pageSize === 'Label' ? '4mm' : '8mm'};
+            size: ${
+              docConfig.pageSize === 'Slip'
+                ? '80mm auto'
+                : docConfig.pageSize === 'Label'
+                  ? '100mm 150mm'
+                  : 'A4 portrait'
+            };
+            margin: ${
+              docConfig.pageSize === 'Slip'
+                ? '2mm'
+                : docConfig.pageSize === 'Label'
+                  ? '4mm'
+                  : '8mm'
+            };
           }
           body {
             background-color: white !important;

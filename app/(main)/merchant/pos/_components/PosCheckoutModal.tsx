@@ -71,7 +71,7 @@ export function PosCheckoutModal({
   const currentStoreId = watch('storeId')
   const [shouldPrintReceipt, setShouldPrintReceipt] = useState(true)
   const [selectedDocType, setSelectedDocType] =
-    useState<OrderDocType>('receipt')
+    useState<OrderDocType>('receipt-slip')
 
   const supplierStoreId = cartItems[0]?.supplierStoreId || cartItems[0]?.storeId
 
@@ -469,36 +469,41 @@ export function PosCheckoutModal({
                     <span>ออกเอกสาร / พิมพ์ใบเสร็จทันที</span>
                   </div>
                 </label>
-                {shouldPrintReceipt && (
-                  <span className="text-muted-foreground text-[11px]">
-                    เปิดหน้าพิมพ์อัตโนมัติ
-                  </span>
-                )}
               </div>
               {shouldPrintReceipt && (
                 <div className="border-border/60 space-y-1.5 border-t pt-2.5">
-                  <span className="text-muted-foreground text-xs font-medium">
-                    เลือกประเภทเอกสาร:
-                  </span>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDocType('receipt-slip')}
+                      className={cn(
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all',
+                        selectedDocType === 'receipt-slip'
+                          ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
+                          : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
+                      )}
+                    >
+                      <IconReceipt className="size-3.5" />
+                      <span>สลิปย่อ (80mm)</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setSelectedDocType('receipt')}
                       className={cn(
-                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all',
                         selectedDocType === 'receipt'
                           ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
                           : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
                       )}
                     >
                       <IconReceipt className="size-3.5" />
-                      <span>ใบเสร็จรับเงิน</span>
+                      <span>ใบเสร็จ (A4)</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setSelectedDocType('tax-invoice')}
                       className={cn(
-                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all',
                         selectedDocType === 'tax-invoice'
                           ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
                           : 'border-border bg-background text-muted-foreground hover:bg-muted/50',
@@ -511,7 +516,7 @@ export function PosCheckoutModal({
                       type="button"
                       onClick={() => setSelectedDocType('delivery-note')}
                       className={cn(
-                        'flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-medium transition-all',
+                        'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all',
                         selectedDocType === 'delivery-note'
                           ? 'border-primary bg-primary/10 text-primary font-bold shadow-xs'
                           : 'border-border bg-background text-muted-foreground hover:bg-muted/50',

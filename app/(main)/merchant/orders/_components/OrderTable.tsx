@@ -70,7 +70,11 @@ function OrderRowActions({ order }: { order: any }) {
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => handleDownloadDoc('receipt')}>
             <IconReceipt size={16} />
-            <span>ใบเสร็จรับเงิน (Receipt)</span>
+            <span>ใบเสร็จรับเงิน (Receipt A4)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('receipt-slip')}>
+            <IconReceipt size={16} />
+            <span>ใบเสร็จอย่างย่อ (Slip 80mm)</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownloadDoc('tax-invoice')}>
             <IconFileInvoice size={16} />

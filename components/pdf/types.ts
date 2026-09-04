@@ -2,6 +2,7 @@ import { GetOrdersItem } from '@/actions/order'
 
 export type OrderDocType =
   | 'receipt'
+  | 'receipt-slip'
   | 'tax-invoice'
   | 'delivery-note'
   | 'shipping-label'
@@ -11,15 +12,21 @@ export interface DocTypeInfo {
   id: OrderDocType
   label: string
   sublabel: string
-  pageSize: 'A4' | 'Label'
+  pageSize: 'A4' | 'Label' | 'Slip'
 }
 
 export const DOC_TYPES: Record<OrderDocType, DocTypeInfo> = {
   receipt: {
     id: 'receipt',
     label: 'ใบเสร็จรับเงิน',
-    sublabel: 'Receipt',
+    sublabel: 'Receipt (A4)',
     pageSize: 'A4',
+  },
+  'receipt-slip': {
+    id: 'receipt-slip',
+    label: 'ใบเสร็จอย่างย่อ',
+    sublabel: 'Receipt Slip (80mm)',
+    pageSize: 'Slip',
   },
   'tax-invoice': {
     id: 'tax-invoice',

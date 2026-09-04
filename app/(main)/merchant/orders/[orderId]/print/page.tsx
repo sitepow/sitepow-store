@@ -59,6 +59,7 @@ export default async function PrintOrderPage({
 
   const validDocTypes: OrderDocType[] = [
     'receipt',
+    'receipt-slip',
     'tax-invoice',
     'delivery-note',
     'shipping-label',
