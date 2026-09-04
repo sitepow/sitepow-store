@@ -300,7 +300,9 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
         <Table className="min-w-220">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16">รูปภาพ</TableHead>
+              <TableHead className="bg-background sticky left-0 z-20 w-16 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                รูปภาพ
+              </TableHead>
               <TableHead>สินค้า / SKU</TableHead>
               <TableHead className="text-center">Local (HQ)</TableHead>
               <TableHead className="text-center">Shopee</TableHead>
@@ -330,7 +332,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
 
                 return (
                   <TableRow key={item.id} className="hover:bg-muted/50">
-                    <TableCell>
+                    <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       <ProductImage
                         alt={item.title}
                         className="size-12 rounded-md"
@@ -380,10 +382,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                       <div className="text-sm font-medium">
                         {formatNumber(item.channels.shopee.quantity)}
                       </div>
-                      <Badge
-                        variant="outline"
-                        className="mt-0.5 text-[10px] font-normal"
-                      >
+                      <Badge className="mt-0.5 text-[10px] font-normal">
                         In-Sync
                       </Badge>
                     </TableCell>
@@ -401,10 +400,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                           ไม่ตรงกัน
                         </Badge>
                       ) : (
-                        <Badge
-                          variant="outline"
-                          className="mt-0.5 text-[10px] font-normal"
-                        >
+                        <Badge className="mt-0.5 text-[10px] font-normal">
                           In-Sync
                         </Badge>
                       )}
@@ -413,10 +409,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                       <div className="text-sm font-medium">
                         {formatNumber(item.channels.facebook.quantity)}
                       </div>
-                      <Badge
-                        variant="outline"
-                        className="mt-0.5 text-[10px] font-normal"
-                      >
+                      <Badge className="mt-0.5 text-[10px] font-normal">
                         In-Sync
                       </Badge>
                     </TableCell>
@@ -426,7 +419,7 @@ export function SmartStockTable({ onMismatchResolved }: SmartStockTableProps) {
                       ) : item.localStock === 0 ? (
                         <Badge variant="destructive">หมด</Badge>
                       ) : (
-                        <Badge>สมบูรณ์</Badge>
+                        <Badge variant="outline">สมบูรณ์</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
