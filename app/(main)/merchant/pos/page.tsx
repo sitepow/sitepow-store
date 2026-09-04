@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   usePOSProducts,
@@ -35,6 +37,7 @@ import {
 } from './_components/PosProductOptionDialog'
 
 export default function MerchantPOSPage() {
+  const t = useTranslations('merchant.pos')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
   const { selectedAgreementId } = useResellerFilter()
@@ -124,8 +127,8 @@ export default function MerchantPOSPage() {
     if (quantity > remainingStock) {
       toast.error(
         product.isReseller
-          ? `สต็อกฝากขายคงเหลือไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`
-          : `สินค้าในสาขานี้มีไม่พอ (เหลือเพียง ${remainingStock} ชิ้น)`,
+          ? t('resellerStockNotEnough', { count: remainingStock })
+          : t('stockNotEnough', { count: remainingStock }),
       )
       return
     }
@@ -205,8 +208,8 @@ export default function MerchantPOSPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCashRegister}
-        title="แคชเชียร์"
-        description="เลือกสินค้า สแกนบาร์โค้ด และทำรายการชำระเงิน"
+        title={t('title')}
+        description={t('description')}
         endContent={
           <div className="flex flex-wrap items-center gap-2">
             <StoreSelectField />
@@ -219,14 +222,14 @@ export default function MerchantPOSPage() {
         <ActionRequiredAlert />
       ) : selectedBranchId === ALL_BRANCHES ? (
         <ActionRequiredAlert
-          title="โปรดเลือกสาขา"
-          description="กรุณาเลือกสาขาที่ต้องการก่อนเพื่อดำเนินการต่อ"
+          title={t('selectBranchTitle')}
+          description={t('selectBranchDescription')}
         />
       ) : !isPermissionLoading && !canCreateOrder ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการใช้งานระบบ POS ของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">

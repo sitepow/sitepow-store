@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
@@ -55,6 +57,7 @@ export function PosCart({
   onRemoveItem,
   onClearCart,
 }: PosCartProps) {
+  const t = useTranslations('merchant.pos')
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
@@ -189,7 +192,7 @@ export function PosCart({
           <CardTitle className="flex items-center justify-between text-lg">
             <div className="flex items-center gap-2">
               <IconShoppingCart className="size-5" />
-              <span>ตะกร้าสินค้า</span>
+              <span>{t('cart.title')}</span>
             </div>
             <div className="flex items-center gap-2">
               {cart.length > 0 && (
@@ -199,7 +202,7 @@ export function PosCart({
                   onClick={handleClearCartAll}
                 >
                   <IconTrash className="size-3.5" />
-                  ล้างตะกร้า
+                  {t('cart.clearCart')}
                 </Button>
               )}
               <Button size="icon-sm">{totalItems}</Button>
@@ -207,12 +210,17 @@ export function PosCart({
           </CardTitle>
           {!isResellerMode && customerId && (
             <CustomerCard
-              title="ข้อมูลลูกค้า"
+              title={t('customerInfo')}
               content={
                 <>
-                  รหัสลูกค้า: {customerId} <br />
-                  เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')} <br />
-                  แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                  {t('customerId', { id: customerId })} <br />
+                  {t('customerPhone', {
+                    phone: formatPromptPay(customerPhone || ''),
+                  })}{' '}
+                  <br />
+                  {t('customerPoints', {
+                    points: formatNumber(customerPoints),
+                  })}
                 </>
               }
               action={
@@ -232,14 +240,14 @@ export function PosCart({
             {cart.length === 0 ? (
               <div className="text-muted-foreground flex h-40 flex-col items-center justify-center gap-2 text-sm">
                 <IconShoppingCart className="size-10 opacity-30" />
-                ยังไม่มีสินค้าในตะกร้า
+                {t('cart.empty')}
               </div>
             ) : (
               <div className="flex flex-col gap-2 py-2">
                 {hasMixedProducts && (
                   <ActionRequiredAlert
-                    title="ไม่สามารถชำระเงินรวมกันได้"
-                    description="พบสินค้าตัวแทนจำหน่ายรวมกับสินค้าหน้าร้าน โปรดลบรายการออกเพื่อชำระเงินทีละประเภท"
+                    title={t('cart.mixedProductsTitle')}
+                    description={t('cart.mixedProductsDesc')}
                   />
                 )}
 
@@ -285,7 +293,7 @@ export function PosCart({
               disabled={cart.length === 0}
               onClick={handleClearCartAll}
             >
-              ยกเลิก
+              {t('cart.cancel')}
             </Button>
             <Button
               size="lg"
@@ -293,7 +301,9 @@ export function PosCart({
               disabled={cart.length === 0 || hasMixedProducts}
               onClick={() => setIsCheckoutOpen(true)}
             >
-              ชำระเงิน {formatCurrency(summaryData.finalPrice)}
+              {t('cart.checkoutWithAmount', {
+                amount: formatCurrency(summaryData.finalPrice),
+              })}
             </Button>
           </div>
         </CardFooter>

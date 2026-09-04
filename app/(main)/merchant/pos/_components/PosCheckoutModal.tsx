@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useStoreCheckout } from '@/actions/hooks/checkout'
@@ -60,6 +61,8 @@ export function PosCheckoutModal({
   agreementId,
   onSuccess,
 }: PosCheckoutModalProps) {
+  const t = useTranslations('merchant.pos.checkoutModal')
+  const tCart = useTranslations('merchant.pos.cart')
   const clearCart = useCartStore((state) => state.clearCart)
   const cartItems = useCartStore((state) => state.items)
   const { watch, setValue, handleSubmit, reset } =
@@ -117,15 +120,15 @@ export function PosCheckoutModal({
 
   const handlePaymentMethodSelect = (method: PaymentMethod) => {
     if (isResellerMode && method === PaymentMethod.CASH_ON_DELIVERY) {
-      toast.error('โหมดตัวแทนจำหน่ายต้องโอนเงินชำระตรงเข้าเจ้าของร้านเท่านั้น')
+      toast.error(t('resellerDirectTransferOnly'))
       return
     }
 
     if (method !== PaymentMethod.CASH_ON_DELIVERY && !isStripeAvailable) {
       toast.error(
         isResellerMode
-          ? 'ร้านค้าเจ้าของสินค้านี้ยังไม่ได้เปิดใช้งาน Stripe'
-          : 'กรุณาตั้งค่า Stripe ก่อนเปิดรับชำระด้วย PromptPay',
+          ? t('resellerStripeDisabled')
+          : t('stripeRequiredPromptPay'),
       )
       return
     }
@@ -147,13 +150,13 @@ export function PosCheckoutModal({
       ) {
         toast.error(
           isResellerMode
-            ? 'ระบบชำระเงินของร้านค้าเจ้าของสินค้ายังไม่พร้อมใช้งาน'
-            : 'ระบบชำระเงิน PromptPay ยังไม่พร้อมใช้งาน กรุณาตั้งค่า Stripe',
+            ? t('resellerPaymentSystemNotReady')
+            : t('promptPaySystemNotReady'),
         )
         return
       }
       if (isCash && !isValidCash) {
-        toast.error('จำนวนเงินรับมาไม่เพียงพอ')
+        toast.error(t('insufficientCashReceived'))
         return
       }
     }
@@ -166,7 +169,7 @@ export function PosCheckoutModal({
         const createdOrder = res.data
 
         if (paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY) {
-          toast.loading('กำลังนำคุณไปยังหน้าชำระเงิน Stripe...')
+          toast.loading(t('redirectingStripe'))
 
           const successUrl = shouldPrintReceipt
             ? `${window.location.origin}/merchant/orders/${createdOrder.id}/print?type=${selectedDocType}`
@@ -177,7 +180,9 @@ export function PosCheckoutModal({
               storeId: targetCheckStoreId,
               orderId: createdOrder.id,
               customerEmail: user?.email || 'guest@checkout.local',
-              description: `ชำระเงินคำสั่งซื้อ #${createdOrder.orderNumber}`,
+              description: t('orderPaymentDescription', {
+                orderNumber: createdOrder.orderNumber,
+              }),
               amount: Number(createdOrder.totalAmount),
               successUrl,
               cancelUrl: `${window.location.origin}/merchant/orders`,
@@ -191,14 +196,14 @@ export function PosCheckoutModal({
                   onOpenChange(false)
                   window.location.href = checkoutRes.url
                 } else {
-                  toast.error('ไม่สามารถสร้างลิงก์ชำระเงิน Stripe ได้')
+                  toast.error(t('stripeLinkFailed'))
                 }
               },
               onError: (err) => {
                 toast.error(
                   err instanceof Error
                     ? err.message
-                    : 'เกิดข้อผิดพลาดในการเชื่อมต่อ Stripe',
+                    : t('stripeConnectionError'),
                 )
               },
             },
@@ -213,25 +218,29 @@ export function PosCheckoutModal({
             const printUrl = `/merchant/orders/${createdOrder.id}/print?type=${selectedDocType}`
             window.open(printUrl, '_blank')
             toast.success(
-              (t) => (
+              (toastItem) => (
                 <div className="flex items-center justify-between gap-3">
-                  <span>ทำรายการสำเร็จ (#{createdOrder.orderNumber})</span>
+                  <span>
+                    {t('orderSuccessWithNumber', {
+                      orderNumber: createdOrder.orderNumber,
+                    })}
+                  </span>
                   <button
                     type="button"
                     onClick={() => {
                       window.open(printUrl, '_blank')
-                      toast.dismiss(t.id)
+                      toast.dismiss(toastItem.id)
                     }}
                     className="bg-primary text-primary-foreground rounded px-2.5 py-1 text-xs font-semibold hover:opacity-90"
                   >
-                    เปิดเอกสาร
+                    {t('openDocument')}
                   </button>
                 </div>
               ),
               { duration: 6000 },
             )
           } else {
-            toast.success('ทำรายการสำเร็จ')
+            toast.success(t('orderSuccess'))
           }
         }
       }
@@ -299,7 +308,7 @@ export function PosCheckoutModal({
           <div className="space-y-5 px-5 pt-4">
             <DialogHeader className="p-0 text-left">
               <DialogTitle className="text-base font-semibold">
-                เลือกช่องทางการชำระเงิน
+                {t('selectPaymentMethod')}
               </DialogTitle>
             </DialogHeader>
             <div
@@ -322,7 +331,7 @@ export function PosCheckoutModal({
                   )}
                 >
                   <IconCash className="size-7" />
-                  <span className="text-sm">เงินสด (Cash)</span>
+                  <span className="text-sm">{t('cash')}</span>
                 </button>
               )}
               {isStripeAvailable ? (
@@ -340,9 +349,7 @@ export function PosCheckoutModal({
                 >
                   <IconQrcode className="size-7" />
                   <span className="text-sm">
-                    {isResellerMode
-                      ? 'โอนเข้าเจ้าของร้าน (พร้อมเพย์ / QR)'
-                      : 'พร้อมเพย์ / QR'}
+                    {isResellerMode ? t('resellerPromptPay') : t('promptPay')}
                   </span>
                 </button>
               ) : (
@@ -350,8 +357,8 @@ export function PosCheckoutModal({
                   <IconQrcode className="text-muted-foreground/60 size-6" />
                   <span className="text-xs font-medium">
                     {isResellerMode
-                      ? 'ร้านค้ายังไม่เปิดระบบชำระเงิน (ยังไม่พร้อมใช้)'
-                      : 'พร้อมเพย์ (ยังไม่พร้อมใช้)'}
+                      ? t('resellerPaymentUnavailable')
+                      : t('promptPayUnavailable')}
                   </span>
                   {!isResellerMode && (
                     <Link
@@ -359,7 +366,7 @@ export function PosCheckoutModal({
                       target="_blank"
                       className="text-primary flex items-center gap-1 text-xs font-semibold hover:underline"
                     >
-                      ตั้งค่าระบบชำระเงิน
+                      {t('setupPayment')}
                       <IconExternalLink className="size-3" />
                     </Link>
                   )}
@@ -371,7 +378,7 @@ export function PosCheckoutModal({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <Label className="text-xs font-semibold">
-                      จำนวนเงินที่รับมา
+                      {t('receivedAmount')}
                     </Label>
                     {receivedAmount > 0 && (
                       <button
@@ -379,7 +386,7 @@ export function PosCheckoutModal({
                         onClick={() => setValue('receivedAmount', 0)}
                         className="text-muted-foreground hover:text-foreground text-xs underline"
                       >
-                        ล้างจำนวนเงิน
+                        {t('clearAmount')}
                       </button>
                     )}
                   </div>
@@ -396,7 +403,7 @@ export function PosCheckoutModal({
                       className="h-12 pr-12 text-right text-xl font-bold tracking-wide"
                     />
                     <span className="text-muted-foreground absolute top-3 right-3 text-sm font-semibold">
-                      บาท
+                      {t('baht')}
                     </span>
                   </div>
                 </div>
@@ -408,7 +415,7 @@ export function PosCheckoutModal({
                     className="h-9 font-medium"
                     onClick={() => handleQuickAmount(totalAmount)}
                   >
-                    พอดี
+                    {t('exactAmount')}
                   </Button>
                   {QUICK_AMOUNTS.map((amt) => (
                     <Button
@@ -433,8 +440,8 @@ export function PosCheckoutModal({
                 >
                   <span className="text-sm font-medium">
                     {receivedAmount > 0 && !isValidCash
-                      ? 'เงินยังขาดอีก'
-                      : 'เงินทอน'}
+                      ? t('insufficientAmount')
+                      : t('change')}
                   </span>
                   <span
                     className={cn(
@@ -466,7 +473,7 @@ export function PosCheckoutModal({
                   />
                   <div className="flex items-center gap-1.5">
                     <IconPrinter className="text-primary size-4" />
-                    <span>ออกเอกสาร / พิมพ์ใบเสร็จทันที</span>
+                    <span>{t('printReceiptImmediate')}</span>
                   </div>
                 </label>
               </div>
@@ -484,7 +491,7 @@ export function PosCheckoutModal({
                       )}
                     >
                       <IconReceipt className="size-3.5" />
-                      <span>สลิปย่อ (80mm)</span>
+                      <span>{t('receiptSlip')}</span>
                     </button>
                     <button
                       type="button"
@@ -497,7 +504,7 @@ export function PosCheckoutModal({
                       )}
                     >
                       <IconReceipt className="size-3.5" />
-                      <span>ใบเสร็จ (A4)</span>
+                      <span>{t('receiptA4')}</span>
                     </button>
                     <button
                       type="button"
@@ -510,7 +517,7 @@ export function PosCheckoutModal({
                       )}
                     >
                       <IconFileInvoice className="size-3.5" />
-                      <span>ใบกำกับภาษี</span>
+                      <span>{t('taxInvoice')}</span>
                     </button>
                     <button
                       type="button"
@@ -523,7 +530,7 @@ export function PosCheckoutModal({
                       )}
                     >
                       <IconPackageExport className="size-3.5" />
-                      <span>ใบส่งสินค้า</span>
+                      <span>{t('deliveryNote')}</span>
                     </button>
                   </div>
                 </div>
@@ -538,7 +545,7 @@ export function PosCheckoutModal({
               disabled={isPending}
               className="w-full sm:w-auto"
             >
-              ยกเลิก
+              {tCart('cancel')}
             </Button>
             <Button
               type="submit"
@@ -547,16 +554,16 @@ export function PosCheckoutModal({
               className="w-full min-w-40 gap-1.5 font-bold sm:w-auto"
             >
               {isPending ? (
-                'กำลังเชื่อมต่อ...'
+                t('connecting')
               ) : paymentMethod === PaymentMethod.STRIPE_QR_PROMPTPAY ? (
-                'ไปที่หน้าชำระเงิน'
+                t('goToPayment')
               ) : (
                 <>
                   {shouldPrintReceipt && <IconPrinter className="size-4" />}
                   <span>
                     {shouldPrintReceipt
-                      ? 'ยืนยันและพิมพ์เอกสาร'
-                      : 'ยืนยันการชำระเงิน'}
+                      ? t('confirmAndPrint')
+                      : t('confirmPayment')}
                   </span>
                 </>
               )}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { cn } from '@/lib/utils'
 
 interface DigitalPriceDisplayProps {
@@ -13,12 +15,14 @@ interface DigitalPriceDisplayProps {
 
 export function DigitalPriceDisplay({
   value,
-  label = 'ยอดรวมชำระสุทธิ',
+  label,
   currency = '฿',
   digits = 2,
   className,
   size = 'md',
 }: DigitalPriceDisplayProps) {
+  const t = useTranslations('merchant.pos')
+  const displayLabel = label ?? t('netPayable')
   const formattedValue = new Intl.NumberFormat('th-TH', {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
@@ -65,9 +69,9 @@ export function DigitalPriceDisplay({
       />
 
       <div className="relative z-10 flex flex-col justify-between gap-1">
-        {label && (
+        {displayLabel && (
           <div className="text-muted-foreground flex items-center justify-between font-semibold tracking-wider uppercase">
-            <span className={sizeStyles.label}>{label}</span>
+            <span className={sizeStyles.label}>{displayLabel}</span>
           </div>
         )}
 

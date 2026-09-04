@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
 import {
   useStorefrontLoyalty,
@@ -49,6 +51,8 @@ interface PosDiscountDialogProps {
 }
 
 export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
+  const t = useTranslations('merchant.pos.discountDialog')
+  const tPos = useTranslations('merchant.pos')
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
   const [open, setOpen] = useState(false)
@@ -99,7 +103,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
 
   const handleSearchMember = () => {
     if (!searchInput.trim()) {
-      toast.error('กรุณากรอกเบอร์โทรศัพท์ อีเมล หรือ รหัสสมาชิก')
+      toast.error(t('searchError'))
       return
     }
 
@@ -196,15 +200,15 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
         <Button variant="outline" className="w-full gap-2">
           <IconTicket />
           {couponCode || usedPoints > 0
-            ? 'แก้ไขส่วนลด/สมาชิก'
-            : 'เพิ่มลูกค้า/เพิ่มส่วนลด'}
+            ? t('editDiscountMember')
+            : t('addCustomerDiscount')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <IconTicket className="text-primary" />
-            ใช้ส่วนลด
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -214,16 +218,21 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                 <div className="flex items-center justify-between">
                   <Label className="flex items-center gap-1.5 text-sm font-semibold">
                     <IconUserPlus className="text-primary size-4" />
-                    สมาชิกสะสมแต้ม
+                    {t('memberLabel')}
                   </Label>
                 </div>
                 <CustomerCard
-                  title="ข้อมูลลูกค้า"
+                  title={tPos('customerInfo')}
                   content={
                     <>
-                      รหัสลูกค้า: {customerId} <br />
-                      เบอร์โทรศัพท์: {formatPromptPay(customerPhone)} <br />
-                      แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                      {tPos('customerId', { id: customerId })} <br />
+                      {tPos('customerPhone', {
+                        phone: formatPromptPay(customerPhone),
+                      })}{' '}
+                      <br />
+                      {tPos('customerPoints', {
+                        points: formatNumber(customerPoints),
+                      })}
                     </>
                   }
                   action={
@@ -246,21 +255,21 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                 <div className="flex flex-wrap items-center justify-between">
                   <Label className="flex items-center gap-1.5 text-sm font-semibold">
                     <IconUserPlus className="text-primary size-4" />
-                    สมาชิกสะสมแต้ม
+                    {t('memberLabel')}
                   </Label>
                   <TabsList className="h-8 p-0.5">
                     <TabsTrigger value="search" className="text-xs">
-                      ค้นหา
+                      {t('searchTab')}
                     </TabsTrigger>
                     <TabsTrigger value="create" className="text-xs">
-                      + สมัครใหม่
+                      {t('newMemberTab')}
                     </TabsTrigger>
                   </TabsList>
                 </div>
                 <TabsContent value="search" className="mt-0">
                   <div className="flex gap-2">
                     <Input
-                      placeholder="ค้นหาด้วย เบอร์โทร / อีเมล / รหัสสมาชิก..."
+                      placeholder={t('searchPlaceholder')}
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       onKeyDown={(e) =>
@@ -275,7 +284,9 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                       className="h-10 gap-1.5 px-4 font-medium"
                     >
                       <IconSearch className="size-4" />
-                      {searchCustomerMutation.isPending ? 'ค้นหา...' : 'ค้นหา'}
+                      {searchCustomerMutation.isPending
+                        ? t('searching')
+                        : t('search')}
                     </Button>
                   </div>
                 </TabsContent>
@@ -287,10 +298,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                     <div className="grid gap-2 sm:grid-cols-2">
                       <div className="space-y-1">
                         <Label className="text-xs">
-                          ชื่อ <span className="text-destructive">*</span>
+                          {t('firstName')}{' '}
+                          <span className="text-destructive">*</span>
                         </Label>
                         <Input
-                          placeholder="สมชาย"
+                          placeholder="John"
                           className="h-9 text-xs"
                           {...register('firstName')}
                         />
@@ -301,9 +313,9 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                         )}
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">นามสกุล</Label>
+                        <Label className="text-xs">{t('lastName')}</Label>
                         <Input
-                          placeholder="ใจดี"
+                          placeholder="Doe"
                           className="h-9 text-xs"
                           {...register('lastName')}
                         />
@@ -317,7 +329,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                     <div className="grid gap-2 sm:grid-cols-2">
                       <div className="space-y-1">
                         <Label className="text-xs">
-                          เบอร์โทรศัพท์{' '}
+                          {t('phone')}{' '}
                           <span className="text-destructive">*</span>
                         </Label>
                         <Controller
@@ -347,7 +359,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                         )}
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">อีเมล</Label>
+                        <Label className="text-xs">{t('email')}</Label>
                         <Input
                           type="email"
                           placeholder="customer@example.com"
@@ -369,8 +381,8 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                     >
                       <IconPlus className="size-4" />
                       {createCustomerMutation.isPending
-                        ? 'กำลังบันทึก...'
-                        : 'ลงทะเบียนสมาชิกใหม่'}
+                        ? t('registering')
+                        : t('registerMember')}
                     </Button>
                   </form>
                 </TabsContent>
@@ -384,11 +396,11 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                 <div className="flex items-center justify-between">
                   <Label className="flex items-center gap-2">
                     <IconWallet className="text-muted-foreground size-4" />
-                    ใช้แต้มสะสม
+                    {t('usePoints')}
                   </Label>
                   <span className="text-primary text-sm font-semibold">
                     {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
-                    แต้ม
+                    {t('pointsUnit')}
                   </span>
                 </div>
                 <Slider
@@ -416,7 +428,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                     className="w-24 text-center font-bold"
                   />
                   <span className="text-muted-foreground text-sm">
-                    แลกเป็นส่วนลดได้{' '}
+                    {t('redeemForDiscount')}{' '}
                     <strong className="text-primary">
                       {formatCurrency(pointsDiscount)}
                     </strong>
@@ -424,7 +436,9 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                 </div>
                 {pointRedeemRate > 0 && (
                   <p className="text-muted-foreground text-xs">
-                    (1 แต้ม = {formatCurrency(pointRedeemRate)})
+                    {t('pointsRate', {
+                      rate: formatCurrency(pointRedeemRate),
+                    })}
                   </p>
                 )}
               </div>
@@ -434,7 +448,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <IconDiscount2 className="text-muted-foreground size-4" />
-              รหัสส่วนลด
+              {t('couponTitle')}
             </Label>
             {couponCode ? (
               <div className="border-primary/20 bg-primary/5 flex items-center justify-between rounded-md border px-3 py-2">
@@ -455,7 +469,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
             ) : (
               <div className="flex gap-2">
                 <Input
-                  placeholder="กรอกรหัสส่วนลด"
+                  placeholder={t('couponPlaceholder')}
                   value={inputCouponCode}
                   className="uppercase"
                   onChange={(e) => setInputCouponCode(e.target.value)}
@@ -471,15 +485,15 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
                   }
                 >
                   {validateCouponMutation.isPending
-                    ? 'กำลังตรวจสอบ...'
-                    : 'ใช้งาน'}
+                    ? t('validatingCoupon')
+                    : t('applyCoupon')}
                 </Button>
               </div>
             )}
           </div>
           <div className="bg-muted/20 space-y-3 rounded-xl border p-4">
             <SummaryRow
-              label="ส่วนลดจากแต้มสะสม"
+              label={t('pointsDiscount')}
               value={
                 <HighlightText>
                   - {formatCurrency(pointsDiscount)}
@@ -487,7 +501,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
               }
             />
             <SummaryRow
-              label="ส่วนลดจากรหัส"
+              label={t('couponDiscount')}
               value={
                 <HighlightText>
                   - {formatCurrency(couponDiscount)}
@@ -496,7 +510,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
             />
             <Separator />
             <SummaryTotal
-              label="รวมส่วนลดทั้งหมด"
+              label={t('totalDiscount')}
               value={formatCurrency(totalDiscount)}
             />
           </div>

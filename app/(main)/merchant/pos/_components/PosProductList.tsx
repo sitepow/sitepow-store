@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { POSProductItem } from '@/actions/pos/product'
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { ProductCard } from '@/app/sites/[domain]/_components/product/ProductCard'
@@ -45,6 +47,7 @@ export function PosProductList({
   onAddToCart,
   isReseller = false,
 }: PosProductListProps) {
+  const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
   const [selectedProduct, setSelectedProduct] = useState<POSProductItem | null>(
     null,
@@ -110,7 +113,7 @@ export function PosProductList({
       <div className="relative">
         <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
         <Input
-          placeholder="ค้นหาสินค้า, SKU, หรือสแกนบาร์โค้ด..."
+          placeholder={t('searchPlaceholder')}
           className="pl-9"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
@@ -119,8 +122,8 @@ export function PosProductList({
       <ScrollArea>
         {products.length === 0 ? (
           <ActionRequiredAlert
-            title="ขออภัย"
-            description="ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน"
+            title={t('noProductsTitle')}
+            description={t('noProductsDesc')}
           />
         ) : (
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-4">

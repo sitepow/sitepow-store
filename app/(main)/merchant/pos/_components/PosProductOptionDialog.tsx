@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { POSProductItem } from '@/actions/pos/product'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
@@ -59,6 +61,7 @@ export function PosProductOptionDialog({
   onClose,
   onConfirm,
 }: PosProductOptionDialogProps) {
+  const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
   const [selectedVariantId, setSelectedVariantId] = useState<string>(
     product?.variants[0]?.id ?? '',
@@ -218,7 +221,7 @@ export function PosProductOptionDialog({
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>ตัวเลือกสินค้า</DialogTitle>
+          <DialogTitle>{t('productOptions')}</DialogTitle>
         </DialogHeader>
         {product?.title && (
           <div className="border-b pb-3">
@@ -232,7 +235,7 @@ export function PosProductOptionDialog({
             {product.variants.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs font-semibold">
-                  รูปแบบสินค้า / ตัวเลือก
+                  {t('variantsAndOptions')}
                 </Label>
                 <div className="space-y-2">
                   {product.variants.map((variant) => {
@@ -297,8 +300,10 @@ export function PosProductOptionDialog({
                               variant={isOutOfStock ? 'outline' : 'default'}
                             >
                               {isOutOfStock
-                                ? 'หมดสต็อก'
-                                : `คงเหลือ: ${formatNumber(stock)} ชิ้น`}
+                                ? t('outOfStock')
+                                : t('stockRemaining', {
+                                    count: formatNumber(stock),
+                                  })}
                             </Badge>
                             {hasDiscount &&
                               variant.discountType ===
@@ -307,12 +312,16 @@ export function PosProductOptionDialog({
                                   variant="secondary"
                                   className="text-[10px]"
                                 >
-                                  ลด {variant.discountAmount}%
+                                  {t('discountBadge', {
+                                    amount: variant.discountAmount ?? 0,
+                                  })}
                                 </Badge>
                               )}
                             {hasPoint && (
                               <Badge variant="outline" className="text-[10px]">
-                                +{variant.pointsAmount} แต้ม
+                                {t('pointsBadge', {
+                                  amount: variant.pointsAmount ?? 0,
+                                })}
                               </Badge>
                             )}
                             {hasDiscount ? (
@@ -345,7 +354,7 @@ export function PosProductOptionDialog({
                   </Label>
                   {option.require && (
                     <span className="text-destructive text-xs font-medium">
-                      * จำเป็น
+                      {t('required')}
                     </span>
                   )}
                 </div>
@@ -391,7 +400,7 @@ export function PosProductOptionDialog({
             {product.addons && product.addons.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs font-semibold">
-                  ท็อปปิ้ง / บริการเสริม
+                  {t('toppingsAndAddons')}
                 </Label>
                 <div className="grid gap-2">
                   {product.addons.map((addon) => {
@@ -447,10 +456,12 @@ export function PosProductOptionDialog({
             onClick={handleConfirmAddToCart}
           >
             {currentVariantStock <= 0
-              ? 'สินค้าหมด'
+              ? t('outOfStock')
               : quantity > currentVariantStock
-                ? 'สินค้าไม่พอ'
-                : `เพิ่มลงตะกร้า ${formatCurrency(unitPrice * quantity)}`}
+                ? t('insufficientStock')
+                : t('addToCartWithPrice', {
+                    price: formatCurrency(unitPrice * quantity),
+                  })}
           </Button>
         </DialogFooter>
       </DialogContent>
