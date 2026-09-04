@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { handleUserPrompt } from '@/actions/ai'
 import { useCategoryAi } from '@/actions/hooks/ai'
 import {
@@ -32,6 +34,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -61,6 +64,7 @@ export function CategoryDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
+  const t = useTranslations('merchant.categories')
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateCategory()
@@ -117,7 +121,7 @@ export function CategoryDialog({
 
     if (!currentTitle || currentTitle.trim().length === 0) {
       setError('title', {
-        message: 'กรุณากรอกชื่อหมวดหมู่ก่อนให้ AI ช่วยคิดครับ',
+        message: t('dialog.aiTitleRequired'),
       })
       return
     }
@@ -153,7 +157,7 @@ export function CategoryDialog({
       const res = await uploadMutation.mutateAsync(formData)
 
       if (!res.success) {
-        return toast.error('อัพโหลดรูปภาพไม่สำเร็จ')
+        return toast.error(t('dialog.imageUploadError'))
       }
 
       imageUrl = res.url
@@ -192,29 +196,25 @@ export function CategoryDialog({
         <DialogTrigger asChild>
           <Button variant="outline" onClick={onAdd}>
             <IconPlus />
-            เพิ่มหมวดหมู่ใหม่
+            {t('addCategory')}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <FormProvider {...methods}>
             <DialogHeader>
               <DialogTitle>
-                {categoryId ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่ใหม่'}
+                {categoryId ? t('dialog.editTitle') : t('dialog.createTitle')}
               </DialogTitle>
-              <DialogDescription>
-                กรอกข้อมูลหมวดหมู่สินค้าสำหรับจัดระเบียบสินค้าในร้านค้าของคุณ
-              </DialogDescription>
+              <DialogDescription>{t('dialog.description')}</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
               <Field>
-                <FieldLabel>
-                  รูปภาพหมวดหมู่ (รองรับรูปภาพและวิดีโอ ขนาดไฟล์สูงสุด 10 MB)
-                </FieldLabel>
+                <FieldLabel>{t('dialog.imageLabel')}</FieldLabel>
                 <FileUpload name="image" />
               </Field>
               <Field>
                 <div className="flex items-center justify-between">
-                  <FieldLabel>ชื่อหมวดหมู่</FieldLabel>
+                  <FieldLabel>{t('dialog.titleLabel')}</FieldLabel>
                   <Button
                     type="button"
                     variant="outline"
@@ -226,29 +226,29 @@ export function CategoryDialog({
                     ) : (
                       <IconWand className="mr-1 size-3.5" />
                     )}
-                    ให้ AI ช่วยคิด Slug & คำอธิบาย
+                    {t('dialog.aiButton')}
                   </Button>
                 </div>
                 <Input
-                  placeholder="เช่น เสื้อผ้า, รองเท้า, อุปกรณ์อิเล็กทรอนิกส์"
+                  placeholder={t('dialog.titlePlaceholder')}
                   {...register('title')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.title?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>URL Slug</FieldLabel>
+                <FieldLabel>{t('dialog.slugLabel')}</FieldLabel>
                 <Input
-                  placeholder="เช่น clothing, shoes"
+                  placeholder={t('dialog.slugPlaceholder')}
                   {...register('slug')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.slug?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>คำอธิบาย</FieldLabel>
+                <FieldLabel>{t('dialog.descriptionLabel')}</FieldLabel>
                 <Textarea
-                  placeholder="อธิบายสั้นๆ เกี่ยวกับหมวดหมู่นี้"
+                  placeholder={t('dialog.descriptionPlaceholder')}
                   rows={3}
                   {...register('description')}
                   disabled={isPending}
@@ -262,15 +262,15 @@ export function CategoryDialog({
                 onClick={handleClose}
                 disabled={isPending}
               >
-                ยกเลิก
+                {t('dialog.cancel')}
               </Button>
               <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> กำลังบันทึก...
+                    <Spinner /> {t('dialog.saving')}
                   </>
                 ) : (
-                  'บันทึกหมวดหมู่'
+                  t('dialog.save')
                 )}
               </Button>
             </DialogFooter>
@@ -280,19 +280,18 @@ export function CategoryDialog({
       <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              ยืนยันการใช้ AI คิดข้อมูลหมวดหมู่
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t('dialog.aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
-              <span className="text-primary font-bold">
-                {aiConfirm?.cost} เครดิต
-              </span>{' '}
-              คุณต้องการดำเนินการต่อหรือไม่?
+              {t.rich('dialog.aiConfirmDescription', {
+                cost: aiConfirm?.cost ?? 0,
+                b: (chunks) => (
+                  <span className="text-primary font-bold">{chunks}</span>
+                ),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogCancel>{t('dialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (aiConfirm) {
@@ -301,7 +300,7 @@ export function CategoryDialog({
                 }
               }}
             >
-              ยืนยัน
+              {t('dialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

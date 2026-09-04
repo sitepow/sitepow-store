@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useCategories, useDeleteCategory } from '@/actions/hooks/category'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -26,6 +28,7 @@ interface CategoriesTableProps {
 }
 
 export function CategoriesTable({ onEdit }: CategoriesTableProps) {
+  const t = useTranslations('merchant.categories')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -45,18 +48,20 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 z-25 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                รูปภาพ
+                {t('columns.image')}
               </TableHead>
-              <TableHead>ชื่อหมวดหมู่/Slug</TableHead>
-              <TableHead>คำอธิบาย</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.nameAndSlug')}</TableHead>
+              <TableHead>{t('columns.description')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && categories.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : categories.length === 0 ? (
-              <TableEmptyRow colSpan={4} title="ไม่พบรายการหมวดหมู่" />
+              <TableEmptyRow colSpan={4} title={t('empty')} />
             ) : (
               categories.map((category) => (
                 <TableRow key={category.id} className="hover:bg-muted/50">
