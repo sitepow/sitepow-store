@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useCheckout } from '@/actions/hooks/checkout'
 import { useCreateStore } from '@/actions/hooks/store'
 import { usePricingStore } from '@/app/(main)/pricing/store'
@@ -26,7 +28,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
-import { useTranslations } from 'next-intl'
 
 import { PlanSelector } from './PlanSelector'
 import { StoreNameField } from './StoreNameField'
@@ -118,9 +119,7 @@ export function StoreCreateDialog() {
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader className="space-y-2">
           <DialogTitle>{tDialog('title')}</DialogTitle>
-          <DialogDescription>
-            {tDialog('description')}
-          </DialogDescription>
+          <DialogDescription>{tDialog('description')}</DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="grid gap-5 sm:grid-cols-2">

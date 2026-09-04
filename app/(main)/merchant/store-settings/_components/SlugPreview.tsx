@@ -1,5 +1,6 @@
-import { useTranslations } from 'next-intl'
 import { useFormContext, useWatch } from 'react-hook-form'
+
+import { useTranslations } from 'next-intl'
 
 import { formatSlug } from '@/utils/slug'
 import { CreateStoreFormValues } from '@/zod/store'

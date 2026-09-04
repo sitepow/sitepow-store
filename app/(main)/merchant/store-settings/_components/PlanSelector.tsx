@@ -2,6 +2,8 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
 import { PLAN_DETAILS } from '@/constants/plan'
@@ -12,7 +14,6 @@ import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError } from '@/components/ui/field'
 import { RadioGroup } from '@/components/ui/radio-group'
-import { useTranslations } from 'next-intl'
 
 interface PlanSelectorProps {
   isPending: boolean

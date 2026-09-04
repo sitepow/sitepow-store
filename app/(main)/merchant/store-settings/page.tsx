@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { IconBuildingStore, IconLock } from '@tabler/icons-react'
@@ -10,7 +12,6 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTranslations } from 'next-intl'
 
 import { StoreCreateDialog } from './_components/StoreCreateDialog'
 import { StoreTable } from './_components/StoreTable'

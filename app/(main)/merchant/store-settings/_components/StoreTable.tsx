@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -45,7 +46,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useTranslations } from 'next-intl'
 
 function StoreRowActions({
   storeId,

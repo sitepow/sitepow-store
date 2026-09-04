@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useCheckStoreAvailability } from '@/actions/hooks/store'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { formatSlug } from '@/utils/slug'
@@ -10,7 +12,6 @@ import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { useTranslations } from 'next-intl'
 
 import { SlugPreview } from './SlugPreview'
 
