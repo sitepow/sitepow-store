@@ -8,6 +8,7 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useDeleteStore, useStores } from '@/actions/hooks/store'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
+import { SettingsTab } from '@/constants/settings'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
@@ -15,17 +16,26 @@ import { getSubscriptionStatusInfo } from '@/utils/pricing'
 import {
   IconAlertTriangle,
   IconCreditCard,
+  IconDotsVertical,
   IconExternalLink,
   IconHierarchy2,
   IconPackage,
   IconSettings,
+  IconTrash,
+  IconWorld,
 } from '@tabler/icons-react'
 
-import { DeleteButton } from '@/components/DeleteButton'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
 import {
   Table,
@@ -54,58 +64,89 @@ function StoreRowActions({
     canDeleteStore,
   } = useEmployeePermission(storeId)
 
-  return (
-    <div className="space-x-2 text-right">
-      {canUpdateStore && (
-        <Button
-          variant="outline"
-          size="icon-lg"
-          onClick={() => {
-            setSelectedStoreId(storeId)
-            router.push('/merchant/settings')
-          }}
-        >
-          <IconSettings />
-        </Button>
-      )}
-      {canViewBranches && (
-        <Button
-          variant="outline"
-          size="icon-lg"
-          onClick={() => {
-            setSelectedStoreId(storeId)
-            router.push('/merchant/organization-branches')
-          }}
-        >
-          <IconHierarchy2 />
-        </Button>
-      )}
-      {canViewSubscription && (
-        <Button
-          variant="outline"
-          size="icon-lg"
-          onClick={() => {
-            setSelectedStoreId(storeId)
-            router.push('/merchant/billing-subscription')
-          }}
-        >
-          <IconCreditCard />
-        </Button>
-      )}
-      {canViewProducts && (
-        <Button
-          variant="outline"
-          size="icon-lg"
-          onClick={() => {
-            setSelectedStoreId(storeId)
-            router.push('/merchant/store-settings/products')
-          }}
-        >
-          <IconPackage />
-        </Button>
-      )}
+  const hasGeneralActions =
+    canUpdateStore || canViewBranches || canViewSubscription || canViewProducts
 
-      {canDeleteStore && <DeleteButton isPending={false} onDelete={onDelete} />}
+  return (
+    <div className="text-right">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon-lg">
+            <IconDotsVertical size={18} />
+            <span className="sr-only">เปิดเมนูจัดการ</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {canUpdateStore && (
+            <DropdownMenuItem
+              onClick={() => {
+                setSelectedStoreId(storeId)
+                router.push('/merchant/settings')
+              }}
+            >
+              <IconSettings size={16} className="mr-2" />
+              <span>ตั้งค่าร้านค้า</span>
+            </DropdownMenuItem>
+          )}
+          {canUpdateStore && (
+            <DropdownMenuItem
+              onClick={() => {
+                setSelectedStoreId(storeId)
+                router.push(`/merchant/settings?tab=${SettingsTab.DOMAIN}`)
+              }}
+            >
+              <IconWorld size={16} className="mr-2" />
+              <span>โดเมน (Custom Domain)</span>
+            </DropdownMenuItem>
+          )}
+          {canViewBranches && (
+            <DropdownMenuItem
+              onClick={() => {
+                setSelectedStoreId(storeId)
+                router.push('/merchant/organization-branches')
+              }}
+            >
+              <IconHierarchy2 size={16} className="mr-2" />
+              <span>จัดการสาขา</span>
+            </DropdownMenuItem>
+          )}
+          {canViewSubscription && (
+            <DropdownMenuItem
+              onClick={() => {
+                setSelectedStoreId(storeId)
+                router.push('/merchant/billing-subscription')
+              }}
+            >
+              <IconCreditCard size={16} className="mr-2" />
+              <span>แพ็กเกจและการชำระเงิน</span>
+            </DropdownMenuItem>
+          )}
+          {canViewProducts && (
+            <DropdownMenuItem
+              onClick={() => {
+                setSelectedStoreId(storeId)
+                router.push('/merchant/store-settings/products')
+              }}
+            >
+              <IconPackage size={16} className="mr-2" />
+              <span>จัดการสินค้า</span>
+            </DropdownMenuItem>
+          )}
+          {canDeleteStore && (
+            <>
+              {hasGeneralActions && <DropdownMenuSeparator />}
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={onDelete}
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
+                <IconTrash size={16} className="mr-2" />
+                <span>ลบร้านค้า</span>
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

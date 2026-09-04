@@ -12,6 +12,7 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconArrowUpRight,
+  IconChartBar,
   IconLock,
   IconReceipt,
   IconShoppingCart,
@@ -22,6 +23,7 @@ import { format } from 'date-fns'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
+import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
@@ -90,17 +92,11 @@ export default function AnalyticsPage() {
 
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
-      <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              วิเคราะห์ภาพรวม
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              วิเคราะห์แนวโน้มกำไร วันขายดี Peak Hours สินค้าขายดี
-              และพฤติกรรมลูกค้า
-            </p>
-          </div>
+      <PageTabHeader
+        icon={IconChartBar}
+        title="วิเคราะห์ภาพรวม"
+        description="วิเคราะห์แนวโน้มกำไร วันขายดี Peak Hours สินค้าขายดี และพฤติกรรมลูกค้า"
+        endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <div className="flex items-end gap-2">
               <div className="w-36">
@@ -132,7 +128,9 @@ export default function AnalyticsPage() {
                 : 'สรุปกลยุทธ์ด้วย AI'}
             </Button>
           </div>
-        </div>
+        }
+      />
+      <div className="space-y-6">
         {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
         {selectedStoreId !== ALL_STORES &&
           (isPermissionLoading || isLoading) && <AnalyticsSkeleton />}

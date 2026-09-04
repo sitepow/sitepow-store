@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { PRICING_VALUE } from '@/constants/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
@@ -96,10 +97,11 @@ export function PricingCard({
         ))}
       </ul>
       <Button
+        asChild
         className="mt-6 w-full"
         variant={isPopular ? 'default' : 'outline'}
       >
-        {buttonText}
+        <Link href={`/merchant/store-settings`}>{buttonText}</Link>
       </Button>
     </section>
   )

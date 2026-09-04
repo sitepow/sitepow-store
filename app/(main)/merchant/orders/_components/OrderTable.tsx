@@ -13,7 +13,15 @@ import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
-import { IconCreditCard } from '@tabler/icons-react'
+import {
+  IconCreditCard,
+  IconDotsVertical,
+  IconFileDescription,
+  IconFileInvoice,
+  IconPackageExport,
+  IconPrinter,
+  IconReceipt,
+} from '@tabler/icons-react'
 import { Store, User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -22,6 +30,14 @@ import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -35,6 +51,51 @@ import { cn } from '@/lib/utils'
 
 import { OrderDetailView } from './OrderDetailView'
 import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
+
+function OrderRowActions({ order }: { order: any }) {
+  const handleDownloadDoc = (docType: string) => {
+    window.open(
+      `/api/stores/${order.storeId}/orders/${order.id}/documents/${docType}`,
+      '_blank',
+    )
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon-lg">
+          <IconDotsVertical size={18} />
+          <span className="sr-only">เปิดเมนูจัดการ</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>เอกสารคำสั่งซื้อ</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('receipt')}>
+            <IconReceipt size={16} />
+            <span>ใบเสร็จรับเงิน (Receipt)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('tax-invoice')}>
+            <IconFileInvoice size={16} />
+            <span>ใบกำกับภาษี (Tax Invoice)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('delivery-note')}>
+            <IconPackageExport size={16} />
+            <span>ใบส่งสินค้า (Delivery Note)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('shipping-label')}>
+            <IconPrinter size={16} />
+            <span>ใบปะหน้าพัสดุ (Shipping Label)</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownloadDoc('packing-slip')}>
+            <IconFileDescription size={16} />
+            <span>ใบจัดสินค้า (Packing Slip)</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export function OrderTable() {
   const { selectedStoreId } = useStoreFilter()
@@ -247,7 +308,7 @@ export function OrderTable() {
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
-                    <TableCell className="flex items-center justify-end gap-2.5 text-right">
+                    <TableCell className="flex items-center justify-end gap-1 text-right">
                       {order.status === OrderStatus.PENDING && (
                         <>
                           {isStripePayment ? (
@@ -273,7 +334,7 @@ export function OrderTable() {
                               <IconCreditCard className="mr-1 size-4" />
                               {storeCheckoutMutation.isPending
                                 ? 'กำลังเชื่อมต่อ...'
-                                : 'ชำระเงินผ่าน Stripe'}
+                                : 'ชำระเงิน'}
                             </Button>
                           ) : (
                             <UploadSlipDialog
@@ -296,6 +357,7 @@ export function OrderTable() {
                         <VerifySlipMerchantDialog order={order} />
                       )}
                       <OrderDetailView order={order} />
+                      <OrderRowActions order={order} />
                     </TableCell>
                   </TableRow>
                 )
