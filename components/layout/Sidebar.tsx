@@ -248,7 +248,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-        <div className="bg-background/95 border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5 backdrop-blur-sm">
+        <div className="bg-background border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <QuickSettingsMenu />

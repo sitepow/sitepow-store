@@ -137,7 +137,7 @@ export function WebhookEndpointDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'แก้ไข Webhook Endpoint' : 'เพิ่ม Webhook Endpoint'}
