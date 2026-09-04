@@ -12,12 +12,14 @@ import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError } from '@/components/ui/field'
 import { RadioGroup } from '@/components/ui/radio-group'
+import { useTranslations } from 'next-intl'
 
 interface PlanSelectorProps {
   isPending: boolean
 }
 
 export function PlanSelector({ isPending }: PlanSelectorProps) {
+  const t = useTranslations('merchant.stores.dialog')
   const selectedTab = usePricingStore((state) => state.selectedTab)
   const {
     control,
@@ -75,8 +77,9 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
                     {basePrice > 0 &&
                       selectedTab !== PRICING_VALUE.ONE_MONTH && (
                         <span className="text-[10px] font-medium opacity-60">
-                          เฉลี่ย {formatCurrency(Number(averagePerMonth))} /
-                          เดือน
+                          {t('averagePerMonth', {
+                            price: formatCurrency(Number(averagePerMonth)),
+                          })}
                         </span>
                       )}
                   </div>

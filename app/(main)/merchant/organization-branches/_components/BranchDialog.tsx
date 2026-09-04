@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useBranch,
   useCreateBranch,
@@ -63,6 +65,8 @@ export function BranchDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
+  const t = useTranslations('merchant.branches')
+  const tCommon = useTranslations('common.actions')
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateBranch()
   const updateMutation = useUpdateBranch()
@@ -90,10 +94,10 @@ export function BranchDialog({
     if (subDistrict && district && province) {
       setValue(
         'name',
-        `สาขา${subDistrict} (${province}) - ${Date.now().toString().slice(-3)}`,
+        `${t('dialog.branchNamePrefix')}${subDistrict} (${province}) - ${Date.now().toString().slice(-3)}`,
       )
     }
-  }, [subDistrict, district, province, setValue])
+  }, [subDistrict, district, province, setValue, t])
 
   useEffect(() => {
     if (branchData) {
@@ -151,24 +155,24 @@ export function BranchDialog({
       <DialogTrigger asChild>
         <Button variant="outline" onClick={onAdd}>
           <IconPlus className="size-4" />
-          เพิ่มสาขาใหม่
+          {t('addBranch')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {branchId ? 'แก้ไขข้อมูลสาขา' : 'เพิ่มสาขาใหม่'}
+            {branchId ? t('editBranch') : t('addBranch')}
           </DialogTitle>
-          <DialogDescription>
-            กรอกรายละเอียดสาขาเพื่อใช้ในการคำนวณค่าจัดส่งและตัดสต็อก
-          </DialogDescription>
+          <DialogDescription>{t('dialog.description')}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div className="space-y-0.5">
-              <FieldLabel className="text-base">ตั้งเป็นสาขาหลัก</FieldLabel>
+              <FieldLabel className="text-base">
+                {t('dialog.isMainLabel')}
+              </FieldLabel>
               <p className="text-muted-foreground text-xs">
-                สาขานี้จะถูกใช้เป็นจุดตั้งต้นหลักของร้านค้า
+                {t('dialog.isMainDesc')}
               </p>
             </div>
             <Controller
@@ -184,25 +188,25 @@ export function BranchDialog({
           </div>
 
           <Field>
-            <FieldLabel>ชื่อสาขา *</FieldLabel>
+            <FieldLabel>{t('dialog.nameLabel')}</FieldLabel>
             <Input
-              placeholder="เช่น สาขาอุบลราชธานี"
+              placeholder={t('dialog.namePlaceholder')}
               disabled
               {...register('name')}
             />
             <FieldError>{errors.name?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>ที่อยู่โดยละเอียด *</FieldLabel>
+            <FieldLabel>{t('dialog.addressLabel')}</FieldLabel>
             <Input
-              placeholder="บ้านเลขที่, ถนน, หมู่บ้าน"
+              placeholder={t('dialog.addressPlaceholder')}
               {...register('address')}
             />
             <FieldError>{errors.address?.message}</FieldError>
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel>ตำบล / แขวง *</FieldLabel>
+              <FieldLabel>{t('dialog.subDistrictLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="subDistrict"
@@ -217,7 +221,7 @@ export function BranchDialog({
               <FieldError>{errors.subDistrict?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>อำเภอ / เขต *</FieldLabel>
+              <FieldLabel>{t('dialog.districtLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="district"
@@ -232,7 +236,7 @@ export function BranchDialog({
               <FieldError>{errors.district?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>จังหวัด *</FieldLabel>
+              <FieldLabel>{t('dialog.provinceLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="province"
@@ -247,7 +251,7 @@ export function BranchDialog({
               <FieldError>{errors.province?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>รหัสไปรษณีย์ *</FieldLabel>
+              <FieldLabel>{t('dialog.postcodeLabel')}</FieldLabel>
               <Controller
                 control={control}
                 name="postcode"
@@ -265,7 +269,7 @@ export function BranchDialog({
         </div>
         {!!fields?.length && (
           <div className="space-y-3">
-            <FieldLabel>เวลาทำการ</FieldLabel>
+            <FieldLabel>{t('dialog.openingHoursLabel')}</FieldLabel>
             {fields.map((field, index) => {
               const isOpen = watch(`openingHours.${index}.isOpen`)
 
@@ -275,7 +279,9 @@ export function BranchDialog({
                   className="border-border/50 grid grid-cols-2 gap-3 rounded-lg border p-3 sm:grid-cols-[80px_1fr_1fr_120px] sm:items-center sm:border-none sm:p-0"
                 >
                   <span className="col-span-2 text-sm font-semibold sm:col-span-1 sm:font-medium">
-                    {field.day}
+                    {t.has(`dialog.days.${field.day}`)
+                      ? t(`dialog.days.${field.day}`)
+                      : field.day}
                   </span>
                   <Input
                     {...register(`openingHours.${index}.open`)}
@@ -291,7 +297,9 @@ export function BranchDialog({
                   />
                   <div className="flex w-fit flex-col items-center gap-2">
                     <span className="text-muted-foreground text-xs">
-                      {isOpen ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                      {isOpen
+                        ? t('dialog.openStatus')
+                        : t('dialog.closedStatus')}
                     </span>
                     <Controller
                       control={control}
@@ -311,9 +319,9 @@ export function BranchDialog({
         )}
 
         <Field>
-          <FieldLabel>Google Maps Embed URL</FieldLabel>
+          <FieldLabel>{t('dialog.mapUrlLabel')}</FieldLabel>
           <Input
-            placeholder="วาง URL จาก Google Maps"
+            placeholder={t('dialog.mapUrlPlaceholder')}
             {...register('mapUrl')}
           />
         </Field>
@@ -324,10 +332,10 @@ export function BranchDialog({
         )}
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={isPending}>
-            ยกเลิก
+            {tCommon('cancel')}
           </Button>
           <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-            {isPending ? <Spinner /> : 'บันทึกข้อมูล'}
+            {isPending ? <Spinner /> : tCommon('save')}
           </Button>
         </DialogFooter>
       </DialogContent>

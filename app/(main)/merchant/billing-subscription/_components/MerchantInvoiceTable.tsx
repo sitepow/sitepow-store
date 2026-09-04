@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useCheckout } from '@/actions/hooks/checkout'
 import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
 import { GetSubscriptionInvoiceItemSerialized } from '@/actions/subscription'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
-import { getLabel } from '@/constants/translate'
 import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -30,6 +31,7 @@ import {
 } from '@/components/ui/table'
 
 export function MerchantInvoiceTable() {
+  const t = useTranslations('merchant.billing')
   const { user } = useSession()
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -65,12 +67,12 @@ export function MerchantInvoiceTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสใบแจ้งหนี้</TableHead>
-              <TableHead>แพลน</TableHead>
-              <TableHead>รอบบริการ</TableHead>
-              <TableHead>สิทธิ์การใช้งาน</TableHead>
-              <TableHead>ยอด</TableHead>
-              <TableHead>สถานะ</TableHead>
+              <TableHead>{t('columns.invoiceNumber')}</TableHead>
+              <TableHead>{t('columns.plan')}</TableHead>
+              <TableHead>{t('columns.servicePeriod')}</TableHead>
+              <TableHead>{t('columns.features')}</TableHead>
+              <TableHead>{t('columns.amount')}</TableHead>
+              <TableHead>{t('columns.status')}</TableHead>
               <TableHead className="text-right"></TableHead>
             </TableRow>
           </TableHeader>
@@ -78,10 +80,7 @@ export function MerchantInvoiceTable() {
             {isLoading && invoices.length === 0 ? (
               <TableLoadingRow colSpan={7} />
             ) : invoices.length === 0 ? (
-              <TableEmptyRow
-                colSpan={7}
-                title="ไม่พบประวัติใบแจ้งหนี้ของร้านค้าที่คุณเลือก"
-              />
+              <TableEmptyRow colSpan={7} title={t('emptyInvoicesFiltered')} />
             ) : (
               invoices.map((inv) => (
                 <TableRow key={inv.id}>
@@ -115,7 +114,7 @@ export function MerchantInvoiceTable() {
                             : 'outline'
                       }
                     >
-                      {getLabel.invoiceStatus(inv.status)}
+                      {t(`invoiceStatus.${inv.status}`)}
                     </Badge>
                   </TableCell>
                   <TableCell></TableCell>
@@ -126,7 +125,7 @@ export function MerchantInvoiceTable() {
                         onClick={() => handleCheckout(inv)}
                         disabled={isPending}
                       >
-                        {isPending ? 'กำลังไปยังหน้าชำระเงิน...' : 'ชำระเงิน'}
+                        {isPending ? t('redirectingToPayment') : t('pay')}
                         <IconArrowRight />
                       </Button>
                     ) : (

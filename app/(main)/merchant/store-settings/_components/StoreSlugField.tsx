@@ -10,10 +10,12 @@ import { CreateStoreFormValues } from '@/zod/store'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from 'next-intl'
 
 import { SlugPreview } from './SlugPreview'
 
 export function StoreSlugField({ isPending }: { isPending: boolean }) {
+  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setError,
@@ -34,15 +36,15 @@ export function StoreSlugField({ isPending }: { isPending: boolean }) {
     }
 
     if (!availability?.slugAvailable) {
-      setError('slug', { message: 'Slug นี้ถูกใช้งานไปแล้ว' })
+      setError('slug', { message: t('slugAlreadyTaken') })
     } else {
       clearErrors('slug')
     }
-  }, [availability, debouncedSlug, setError, clearErrors])
+  }, [availability, debouncedSlug, setError, clearErrors, t])
 
   return (
     <Field>
-      <FieldLabel>URL หน้าร้าน (Slug)</FieldLabel>
+      <FieldLabel>{t('storeSlugLabel')}</FieldLabel>
       <div className="flex">
         <span className="bg-muted text-muted-foreground inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
           sitepow.store/

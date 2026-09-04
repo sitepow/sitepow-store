@@ -45,6 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useTranslations } from 'next-intl'
 
 function StoreRowActions({
   storeId,
@@ -53,6 +54,7 @@ function StoreRowActions({
   storeId: string
   onDelete: () => void
 }) {
+  const t = useTranslations('merchant.stores.actions')
   const router = useRouter()
   const { setSelectedStoreId } = useStoreFilter()
 
@@ -73,7 +75,7 @@ function StoreRowActions({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon-lg">
             <IconDotsVertical size={18} />
-            <span className="sr-only">เปิดเมนูจัดการ</span>
+            <span className="sr-only">{t('openMenu')}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
@@ -85,7 +87,7 @@ function StoreRowActions({
               }}
             >
               <IconSettings size={16} className="mr-2" />
-              <span>ตั้งค่าร้านค้า</span>
+              <span>{t('settings')}</span>
             </DropdownMenuItem>
           )}
           {canUpdateStore && (
@@ -96,7 +98,7 @@ function StoreRowActions({
               }}
             >
               <IconWorld size={16} className="mr-2" />
-              <span>โดเมน (Custom Domain)</span>
+              <span>{t('domain')}</span>
             </DropdownMenuItem>
           )}
           {canViewBranches && (
@@ -107,7 +109,7 @@ function StoreRowActions({
               }}
             >
               <IconHierarchy2 size={16} className="mr-2" />
-              <span>จัดการสาขา</span>
+              <span>{t('branches')}</span>
             </DropdownMenuItem>
           )}
           {canViewSubscription && (
@@ -118,7 +120,7 @@ function StoreRowActions({
               }}
             >
               <IconCreditCard size={16} className="mr-2" />
-              <span>แพ็กเกจและการชำระเงิน</span>
+              <span>{t('billing')}</span>
             </DropdownMenuItem>
           )}
           {canViewProducts && (
@@ -129,7 +131,7 @@ function StoreRowActions({
               }}
             >
               <IconPackage size={16} className="mr-2" />
-              <span>จัดการสินค้า</span>
+              <span>{t('products')}</span>
             </DropdownMenuItem>
           )}
           {canDeleteStore && (
@@ -141,7 +143,7 @@ function StoreRowActions({
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
                 <IconTrash size={16} className="mr-2" />
-                <span>ลบร้านค้า</span>
+                <span>{t('delete')}</span>
               </DropdownMenuItem>
             </>
           )}
@@ -152,6 +154,7 @@ function StoreRowActions({
 }
 
 export function StoreTable() {
+  const t = useTranslations('merchant.stores')
   const [page, setPage] = useState(1)
 
   const { data: { data: stores = [], meta } = {}, isLoading } = useStores({
@@ -165,14 +168,16 @@ export function StoreTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสร้านค้า</TableHead>
-              <TableHead>ร้านค้า</TableHead>
-              <TableHead>แพลน</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>สถานะและระยะเวลาคงเหลือ</TableHead>
-              <TableHead>สิทธิ์การใช้งาน (ปัจจุบัน)</TableHead>
-              <TableHead>วันที่สร้างร้านค้า</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.id')}</TableHead>
+              <TableHead>{t('columns.name')}</TableHead>
+              <TableHead>{t('columns.plan')}</TableHead>
+              <TableHead>{t('columns.status')}</TableHead>
+              <TableHead>{t('columns.subscriptionRemaining')}</TableHead>
+              <TableHead>{t('columns.features')}</TableHead>
+              <TableHead>{t('columns.createdAt')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -180,7 +185,7 @@ export function StoreTable() {
               <TableLoadingRow colSpan={8} />
             )}
             {!isLoading && stores.length === 0 && (
-              <TableEmptyRow colSpan={8} title="ไม่พบข้อมูลร้านค้าของคุณ" />
+              <TableEmptyRow colSpan={8} title={t('empty')} />
             )}
             {stores.length !== 0 &&
               stores.map((store) => {
@@ -221,10 +226,10 @@ export function StoreTable() {
                     <TableCell>
                       <Badge variant={isActive ? 'default' : 'outline'}>
                         {isActive
-                          ? 'เปิดใช้งานอยู่'
+                          ? t('status.active')
                           : isMaintenance
-                            ? 'ปิดปรับปรุงชั่วคราว'
-                            : 'ถูกระงับการใช้งาน'}
+                            ? t('status.maintenance')
+                            : t('status.suspended')}
                       </Badge>
                     </TableCell>
                     <TableCell className="max-w-75">
@@ -232,17 +237,25 @@ export function StoreTable() {
                         <div className="flex flex-col space-y-1.5">
                           <div className="text-destructive flex items-center gap-1 text-sm">
                             <IconAlertTriangle size={16} />
-                            <span>เกินกำหนดชำระ ({daysRemaining} วัน)</span>
+                            <span>
+                              {t('subscription.pastDue', {
+                                days: daysRemaining,
+                              })}
+                            </span>
                           </div>
                           <Progress value={progressValue} className="h-1" />
                         </div>
                       ) : (
                         <div className="flex flex-col">
                           <span className="text-sm font-medium">
-                            {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
+                            {isCanceled
+                              ? t('subscription.canceled')
+                              : t('subscription.normal')}
                           </span>
                           <span className="text-muted-foreground text-xs">
-                            คงเหลือ {daysRemaining} วัน
+                            {t('subscription.daysRemaining', {
+                              days: daysRemaining,
+                            })}
                           </span>
                         </div>
                       )}

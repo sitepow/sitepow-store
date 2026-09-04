@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranches, useDeleteBranch } from '@/actions/hooks/branch'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -26,6 +28,7 @@ interface BranchesTableProps {
 }
 
 export function BranchesTable({ onEdit }: BranchesTableProps) {
+  const t = useTranslations('merchant.branches')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -43,17 +46,19 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสสาขา</TableHead>
-              <TableHead>ชื่อสาขา</TableHead>
-              <TableHead>ประเภท</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
+              <TableHead>{t('columns.code')}</TableHead>
+              <TableHead>{t('columns.name')}</TableHead>
+              <TableHead>{t('columns.type')}</TableHead>
+              <TableHead className="text-right">
+                {t('columns.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && branches.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : branches.length === 0 ? (
-              <TableEmptyRow colSpan={4} title="ไม่พบรายการสาขา" />
+              <TableEmptyRow colSpan={4} title={t('empty')} />
             ) : (
               branches.map((branch) => (
                 <TableRow key={branch.id}>
@@ -63,7 +68,7 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
                   </TableCell>
                   <TableCell>
                     <Badge variant={branch.isMain ? 'default' : 'outline'}>
-                      {branch.isMain ? 'สาขาหลัก' : 'สาขาย่อย'}
+                      {branch.isMain ? t('mainBranch') : t('subBranch')}
                     </Badge>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">

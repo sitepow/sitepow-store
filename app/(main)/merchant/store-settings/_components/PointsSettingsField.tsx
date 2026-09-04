@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'
 
 import { Plan } from '@/generated/prisma/enums'
@@ -17,6 +18,7 @@ interface PointsSettingsFieldProps {
 }
 
 export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
+  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setValue,
@@ -36,7 +38,7 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
   return (
     <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        5. ระบบสมาชิกและคะแนนสะสม (CRM)
+        {t('step5')}
       </div>
 
       <div className="flex flex-col gap-1 py-1 sm:col-span-2">
@@ -55,11 +57,11 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
             disabled={currentPlan !== Plan.ULTIMATE || isPending}
           />
           <span className="flex items-center gap-1.5">
-            เปิดใช้งานระบบแต้มสะสมสำหรับร้านค้า
+            {t('enablePoints')}
             {currentPlan !== Plan.ULTIMATE && (
               <Badge variant="outline">
                 <IconLock />
-                เฉพาะ Ultimate แพลนเท่านั้น
+                {t('ultimateOnly')}
               </Badge>
             )}
           </span>
@@ -70,10 +72,10 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
       {isPointsEnabled && currentPlan === Plan.ULTIMATE && (
         <div className="bg-muted/40 animate-in slide-in-from-top-2 grid gap-5 rounded-lg border p-4 duration-200 sm:col-span-2 sm:grid-cols-2">
           <Field>
-            <FieldLabel>ยอดซื้อเพื่อรับ 1 แต้ม (บาท)</FieldLabel>
+            <FieldLabel>{t('pointEarningRateLabel')}</FieldLabel>
             <Input
               type="number"
-              placeholder="เช่น ซื้อครบ 100 บาท ได้ 1 แต้ม"
+              placeholder={t('pointEarningRatePlaceholder')}
               {...register('pointEarningRate', { valueAsNumber: true })}
               disabled={isPending}
             />
@@ -81,10 +83,10 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
           </Field>
 
           <Field>
-            <FieldLabel>มูลค่าส่วนลดต่อ 1 แต้ม (บาท)</FieldLabel>
+            <FieldLabel>{t('pointRedeemRateLabel')}</FieldLabel>
             <Input
               type="number"
-              placeholder="เช่น 1 แต้ม มีค่าเท่ากับ 1 บาท"
+              placeholder={t('pointRedeemRatePlaceholder')}
               {...register('pointRedeemRate', { valueAsNumber: true })}
               disabled={isPending}
             />

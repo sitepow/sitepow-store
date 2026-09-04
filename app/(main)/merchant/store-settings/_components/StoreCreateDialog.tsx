@@ -26,12 +26,15 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
+import { useTranslations } from 'next-intl'
 
 import { PlanSelector } from './PlanSelector'
 import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 
 export function StoreCreateDialog() {
+  const t = useTranslations('merchant.stores')
+  const tDialog = useTranslations('merchant.stores.dialog')
   const { selectedTab } = usePricingStore()
   const { user } = useSession()
   const [open, setOpen] = useState(false)
@@ -109,27 +112,27 @@ export function StoreCreateDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" disabled={!user?.emailVerified}>
           <IconPlus />
-          สร้างร้านค้าใหม่
+          {t('createStore')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader className="space-y-2">
-          <DialogTitle>เริ่มต้นสร้างร้านค้าใหม่</DialogTitle>
+          <DialogTitle>{tDialog('title')}</DialogTitle>
           <DialogDescription>
-            กรอกข้อมูลพื้นฐานและตั้งค่าระบบของร้านค้าเพื่อเริ่มต้นขายสินค้าออนไลน์
+            {tDialog('description')}
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="text-muted-foreground border-b pb-1 text-sm font-semibold sm:col-span-2">
-              1. เลือกแพลนการใช้งานของคุณ
+              {tDialog('step1')}
             </div>
             <div className="flex flex-col items-center gap-5 sm:col-span-2">
               <MerchantPricingTabs />
               <PlanSelector isPending={createStoreMutation.isPending} />
             </div>
             <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-              2. ข้อมูลทั่วไปของร้านค้า
+              {tDialog('step2')}
             </div>
             <StoreNameField isPending={createStoreMutation.isPending} />
             <StoreSlugField isPending={createStoreMutation.isPending} />
@@ -141,7 +144,7 @@ export function StoreCreateDialog() {
             onClick={handleClose}
             disabled={createStoreMutation.isPending}
           >
-            ยกเลิก
+            {tDialog('cancel')}
           </Button>
           <Button
             disabled={createStoreMutation.isPending}
@@ -149,10 +152,10 @@ export function StoreCreateDialog() {
           >
             {createStoreMutation.isPending ? (
               <>
-                <Spinner /> กำลังสร้างร้านค้า...
+                <Spinner /> {tDialog('creating')}
               </>
             ) : (
-              'สร้างร้านค้าของคุณ'
+              tDialog('submit')
             )}
           </Button>
         </DialogFooter>

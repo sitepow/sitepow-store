@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -41,6 +42,8 @@ export function ChangePlanDialog({
   storeId,
   currentPlan,
 }: ChangePlanDialogProps) {
+  const t = useTranslations('merchant.billing.dialog')
+  const tCommon = useTranslations('common.actions')
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const initiateUpgradeMutation = useInitiatePlanUpgrade()
@@ -108,10 +111,8 @@ export function ChangePlanDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>เปลี่ยนแพลนการใช้งาน</DialogTitle>
-          <DialogDescription>
-            เลือกแพลนที่เหมาะสมกับความต้องการของร้านค้าคุณ
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="flex flex-col items-center gap-5">
@@ -125,10 +126,14 @@ export function ChangePlanDialog({
             onClick={handleClose}
             disabled={changePlanMutation.isPending}
           >
-            ยกเลิก
+            {tCommon('cancel')}
           </Button>
           <Button onClick={handleSubmit(onSubmit)}>
-            {`ยืนยันการเปลี่ยนแพลน ${upgradeCost > 0 ? `(ชำระเพิ่ม ${formatCurrency(upgradeCost)})` : ''}`}
+            {upgradeCost > 0
+              ? t('confirmWithExtra', {
+                  extra: formatCurrency(upgradeCost),
+                })
+              : t('confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

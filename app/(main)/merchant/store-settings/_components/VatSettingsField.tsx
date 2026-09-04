@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'
 
 import { CreateStoreFormValues } from '@/zod/store'
@@ -13,6 +14,7 @@ interface VatSettingsFieldProps {
 }
 
 export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
+  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setValue,
@@ -25,13 +27,13 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
   return (
     <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        4. ข้อมูลระบบภาษี (Tax & VAT)
+        {t('step4')}
       </div>
 
       <Field>
-        <FieldLabel>เลขผู้เสียภาษีร้านค้า (Tax ID)</FieldLabel>
+        <FieldLabel>{t('taxIdLabel')}</FieldLabel>
         <Input
-          placeholder="เลข 13 หลัก (ถ้ามี)"
+          placeholder={t('taxIdPlaceholder')}
           maxLength={13}
           {...register('taxId', {
             onChange: (e) => {
@@ -52,13 +54,13 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
             }
             disabled={isPending}
           />
-          <span>ร้านค้าจดทะเบียนภาษีมูลค่าเพิ่ม (VAT)</span>
+          <span>{t('vatRegistered')}</span>
         </label>
       </div>
 
       {isVatRegistered && (
         <Field className="animate-in fade-in duration-200">
-          <FieldLabel>อัตราภาษีมูลค่าเพิ่ม (%)</FieldLabel>
+          <FieldLabel>{t('vatRateLabel')}</FieldLabel>
           <Input
             type="number"
             step="0.01"
