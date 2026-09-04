@@ -40,6 +40,20 @@ const orderSelect = {
   codFee: true,
   earnedPoints: true,
   storeId: true,
+  store: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      logo: true,
+      phone: true,
+      email: true,
+      taxId: true,
+      description: true,
+      isVatRegistered: true,
+      vatRate: true,
+    },
+  },
   pointRedeemRateSnapshot: true,
   pointEarningRateSnapshot: true,
   shippingAddrSnapshot: true,
@@ -546,5 +560,66 @@ export async function cancelOrder(id: string) {
       success: false,
       message: errorMessage,
     }
+  }
+}
+
+export async function getOrderById(id: string): Promise<GetOrdersItem | null> {
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+
+  if (!userId) {
+    return null
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: orderSelect,
+    })
+
+    if (!order) {
+      return null
+    }
+
+    const isCustomer = order.customer?.id === userId
+    const isStoreOwner = await prisma.store.findFirst({
+      where: { id: order.storeId, ownerId: userId },
+      select: { id: true },
+    })
+
+    if (isCustomer || isStoreOwner) {
+      return serializeDecimal(order)
+    }
+
+    if (order.resellerAgreementId) {
+      const reseller = await prisma.resellerAgreement.findFirst({
+        where: {
+          id: order.resellerAgreementId,
+          OR: [
+            { resellerCustomerId: userId },
+            { resellerStore: { ownerId: userId } },
+          ],
+        },
+        select: { id: true },
+      })
+      if (reseller) {
+        return serializeDecimal(order)
+      }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: order.storeId,
+      permission: 'canViewOrders',
+    })
+
+    if (authCheck.isAuthorized) {
+      return serializeDecimal(order)
+    }
+
+    return null
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }

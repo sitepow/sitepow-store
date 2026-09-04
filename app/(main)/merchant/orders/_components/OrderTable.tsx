@@ -54,10 +54,7 @@ import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
 
 function OrderRowActions({ order }: { order: any }) {
   const handleDownloadDoc = (docType: string) => {
-    window.open(
-      `/api/stores/${order.storeId}/orders/${order.id}/documents/${docType}`,
-      '_blank',
-    )
+    window.open(`/merchant/orders/${order.id}/print?type=${docType}`, '_blank')
   }
 
   return (

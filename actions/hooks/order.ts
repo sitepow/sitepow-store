@@ -6,7 +6,12 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { cancelOrder, getOrders, updateOrderStatus } from '../order'
+import {
+  cancelOrder,
+  getOrderById,
+  getOrders,
+  updateOrderStatus,
+} from '../order'
 import { orderKeys } from '../query-keys/order'
 import { posProductKeys } from '../query-keys/pos/product'
 import { productKeys } from '../query-keys/product'
@@ -38,6 +43,16 @@ export function useOrders({
       enabled: !!storeId,
       placeholderData: (prev) => prev,
       refetchOnWindowFocus: true,
+    }),
+  )
+}
+
+export function useOrder(orderId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: orderKeys.detail(orderId),
+      queryFn: async () => await getOrderById(orderId),
+      enabled: !!orderId,
     }),
   )
 }
