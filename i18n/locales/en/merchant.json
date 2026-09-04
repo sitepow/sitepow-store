@@ -453,6 +453,45 @@
       "availableStock": "Available",
       "reorderPoint": "Reorder Point",
       "actions": "Actions"
+    },
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "reasons": {
+      "DAMAGED": "Damaged Goods",
+      "LOST": "Lost Inventory",
+      "EXPIRED": "Expired Goods",
+      "CORRECTION": "Stock Correction",
+      "PROMOTION": "Promotion / Free Gift",
+      "OTHER": "Other"
+    },
+    "adjustment": {
+      "title": "Adjust Stock",
+      "branch": "Branch",
+      "type": "Adjustment Type",
+      "subtract": "Subtract (- Reduce)",
+      "add": "Add (+ Increase)",
+      "quantity": "Quantity",
+      "reason": "Reason",
+      "selectReason": "Select Reason",
+      "note": "Note",
+      "notePlaceholder": "e.g. Found 3 broken units during stock audit",
+      "confirm": "Confirm Adjustment"
+    },
+    "editStockDialog": {
+      "title": "Edit Product Stock",
+      "minStockLabel": "Minimum Stock Threshold (Alert when stock falls below)"
+    },
+    "transfer": {
+      "title": "Stock Transfer",
+      "fromBranch": "Source Branch",
+      "toBranch": "Destination Branch",
+      "selectToBranch": "Select Destination Branch",
+      "quantity": "Quantity to Transfer",
+      "note": "Note",
+      "notePlaceholder": "e.g. Transfer to restock branch",
+      "transferring": "Transferring...",
+      "confirm": "Confirm Transfer"
     }
   },
   "expenses": {

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useUpdateStock } from '@/actions/hooks/inventory'
 import { GetInventoryItem } from '@/actions/inventory'
 import { DecimalToNumber } from '@/utils/decimal'
@@ -38,6 +40,7 @@ export function StockEditDialog({
   productTitle = '',
   variantTitle = '',
 }: StockEditDialogProps) {
+  const t = useTranslations('merchant.inventory')
   const [open, setOpen] = useState(false)
   const updateStockMutation = useUpdateStock()
 
@@ -97,7 +100,7 @@ export function StockEditDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>แก้ไขสต็อกสินค้า</DialogTitle>
+          <DialogTitle>{t('editStockDialog.title')}</DialogTitle>
           <DialogDescription>
             {productTitle} {variantTitle ? `· ${variantTitle}` : ''}{' '}
             {stock?.branch?.name ? `· ${stock.branch.name}` : ''}
@@ -105,7 +108,7 @@ export function StockEditDialog({
         </DialogHeader>
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>จำนวนขั้นต่ำ (แจ้งเตือนเมื่อสต็อกต่ำกว่า)</FieldLabel>
+            <FieldLabel>{t('editStockDialog.minStockLabel')}</FieldLabel>
             <Input
               type="number"
               min={0}
@@ -121,7 +124,7 @@ export function StockEditDialog({
             onClick={handleClose}
             disabled={updateStockMutation.isPending}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -129,10 +132,10 @@ export function StockEditDialog({
           >
             {updateStockMutation.isPending ? (
               <>
-                <Spinner /> กำลังบันทึก...
+                <Spinner /> {t('saving')}
               </>
             ) : (
-              'บันทึก'
+              t('save')
             )}
           </Button>
         </DialogFooter>

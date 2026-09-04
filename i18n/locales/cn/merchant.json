@@ -453,6 +453,45 @@
       "availableStock": "可售库存",
       "reorderPoint": "补货警戒点",
       "actions": "操作"
+    },
+    "save": "保存",
+    "saving": "正在保存...",
+    "cancel": "取消",
+    "reasons": {
+      "DAMAGED": "商品破损",
+      "LOST": "商品遗失",
+      "EXPIRED": "商品过期",
+      "CORRECTION": "库存纠错",
+      "PROMOTION": "促销赠品",
+      "OTHER": "其他"
+    },
+    "adjustment": {
+      "title": "调整库存",
+      "branch": "分店",
+      "type": "调整类型",
+      "subtract": "出库扣减 (- 减少)",
+      "add": "入库增加 (+ 增加)",
+      "quantity": "数量",
+      "reason": "原因",
+      "selectReason": "选择原因",
+      "note": "备注",
+      "notePlaceholder": "例如：盘点发现 3 件破损",
+      "confirm": "确认调整库存"
+    },
+    "editStockDialog": {
+      "title": "编辑库存设置",
+      "minStockLabel": "最低库存预警线（低于此数量提醒）"
+    },
+    "transfer": {
+      "title": "调拨库存",
+      "fromBranch": "调出分店",
+      "toBranch": "调入分店",
+      "selectToBranch": "选择调入分店",
+      "quantity": "调拨数量",
+      "note": "备注",
+      "notePlaceholder": "例如：调拨以补充热销分店库存",
+      "transferring": "正在调拨...",
+      "confirm": "确认调拨"
     }
   },
   "expenses": {

@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranches } from '@/actions/hooks/branch'
 import { useCreateStockTransfer } from '@/actions/hooks/stock-transfer'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -48,6 +50,7 @@ export function StockTransferDialog({
   fromBranchId,
   fromBranchName,
 }: StockTransferDialogProps) {
+  const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
   const createStockTransferMutation = useCreateStockTransfer()
@@ -107,19 +110,19 @@ export function StockTransferDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>โอนย้ายสต็อก</DialogTitle>
+          <DialogTitle>{t('transfer.title')}</DialogTitle>
           <DialogDescription>{variantLabel}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>สาขาต้นทาง</FieldLabel>
+            <FieldLabel>{t('transfer.fromBranch')}</FieldLabel>
             <Input value={fromBranchName} disabled />
             <FieldError>{errors?.fromBranchId?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel>สาขาปลายทาง</FieldLabel>
+            <FieldLabel>{t('transfer.toBranch')}</FieldLabel>
             <Select
               onValueChange={(v) =>
                 setValue('toBranchId', v, { shouldValidate: true })
@@ -127,7 +130,7 @@ export function StockTransferDialog({
               disabled={createStockTransferMutation.isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder="เลือกสาขาปลายทาง" />
+                <SelectValue placeholder={t('transfer.selectToBranch')} />
               </SelectTrigger>
               <SelectContent>
                 {branches
@@ -143,7 +146,7 @@ export function StockTransferDialog({
           </Field>
 
           <Field>
-            <FieldLabel>จำนวนที่ต้องการโอน</FieldLabel>
+            <FieldLabel>{t('transfer.quantity')}</FieldLabel>
             <Input
               type="number"
               min={1}
@@ -154,9 +157,9 @@ export function StockTransferDialog({
           </Field>
 
           <Field>
-            <FieldLabel>หมายเหตุ</FieldLabel>
+            <FieldLabel>{t('transfer.note')}</FieldLabel>
             <Textarea
-              placeholder="เช่น โอนเพื่อเติมสต็อกสาขาสยาม"
+              placeholder={t('transfer.notePlaceholder')}
               rows={2}
               {...register('note')}
               disabled={createStockTransferMutation.isPending}
@@ -171,7 +174,7 @@ export function StockTransferDialog({
             onClick={handleClose}
             disabled={createStockTransferMutation.isPending}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -179,10 +182,10 @@ export function StockTransferDialog({
           >
             {createStockTransferMutation.isPending ? (
               <>
-                <Spinner /> กำลังโอนย้าย...
+                <Spinner /> {t('transfer.transferring')}
               </>
             ) : (
-              'ยืนยันการโอนย้าย'
+              t('transfer.confirm')
             )}
           </Button>
         </DialogFooter>
