@@ -17,6 +17,7 @@ import {
   IconSettings,
   IconStar,
   IconTruck,
+  IconWebhook,
   IconWorld,
 } from '@tabler/icons-react'
 
@@ -36,6 +37,7 @@ import { ShippingSettingsForm } from './_components/ShippingSettingsForm'
 import { StoreProfileForm } from './_components/StoreProfileForm'
 import { StoreTransferSettingsForm } from './_components/StoreTransferSettingsForm'
 import { TaxSettingsForm } from './_components/TaxSettingsForm'
+import { WebhookSettingsForm } from './_components/WebhookSettingsForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +58,7 @@ function MerchantSettingsContent() {
     canViewShipping,
     canViewPayment,
     canViewReviews,
+    canViewStoreSettings,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -108,6 +111,9 @@ function MerchantSettingsContent() {
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.REVIEW_REWARD}>
               <IconStar size={14} /> คะแนนการรีวิว
+            </TabsTrigger>
+            <TabsTrigger value={SettingsTab.WEBHOOK}>
+              <IconWebhook size={14} /> Webhooks (API)
             </TabsTrigger>
           </TabsList>
           <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
@@ -207,6 +213,17 @@ function MerchantSettingsContent() {
               />
             ) : (
               <ReviewRewardSettingsForm />
+            )}
+          </TabsContent>
+          <TabsContent value={SettingsTab.WEBHOOK} className="flex-1">
+            {!isPermissionLoading && !canViewStoreSettings ? (
+              <ActionRequiredAlert
+                icon={<IconLock />}
+                title="ไม่มีสิทธิ์เข้าถึง"
+                description="คุณไม่มีสิทธิ์ในการดูหรือจัดการ Webhook ของสาขาหรือร้านค้านี้"
+              />
+            ) : (
+              <WebhookSettingsForm />
             )}
           </TabsContent>
         </Tabs>

@@ -19,6 +19,7 @@ import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { dispatchStoreWebhook } from '@/lib/webhook'
 
 import { r2DeleteImage } from './r2'
 
@@ -276,6 +277,48 @@ export async function verifySlip(
     }
   })
 
+  if (isSlipValid) {
+    prisma.order
+      .findUnique({
+        where: { id: orderId },
+        select: {
+          id: true,
+          orderNumber: true,
+          totalAmount: true,
+          items: {
+            select: {
+              title: true,
+              variantTitle: true,
+              price: true,
+              quantity: true,
+              customerNote: true,
+            },
+          },
+        },
+      })
+      .then((orderData) => {
+        if (orderData) {
+          dispatchStoreWebhook(storeId, 'order.paid', {
+            orderId: orderData.id,
+            orderNumber: orderData.orderNumber,
+            status: 'PAID',
+            paidAt: new Date().toISOString(),
+            totalAmount: Number(orderData.totalAmount),
+            currency: 'THB',
+            paymentMethod: 'PROMPTPAY',
+            items: orderData.items.map((item) => ({
+              title: item.title,
+              variantTitle: item.variantTitle,
+              price: Number(item.price),
+              quantity: item.quantity,
+              customerNote: item.customerNote,
+            })),
+          }).catch((err) => console.error(err))
+        }
+      })
+      .catch((err) => console.error(err))
+  }
+
   return {
     success: isSlipValid,
     shouldDeleteImage: !isSlipValid,
@@ -369,6 +412,48 @@ export async function approveSlipManual(
         action: logActionText,
       },
     })
+
+    if (action === SlipVerificationAction.APPROVE) {
+      prisma.order
+        .findUnique({
+          where: { id: orderId },
+          select: {
+            id: true,
+            orderNumber: true,
+            totalAmount: true,
+            items: {
+              select: {
+                title: true,
+                variantTitle: true,
+                price: true,
+                quantity: true,
+                customerNote: true,
+              },
+            },
+          },
+        })
+        .then((orderData) => {
+          if (orderData) {
+            dispatchStoreWebhook(order.storeId, 'order.paid', {
+              orderId: orderData.id,
+              orderNumber: orderData.orderNumber,
+              status: 'PAID',
+              paidAt: new Date().toISOString(),
+              totalAmount: Number(orderData.totalAmount),
+              currency: 'THB',
+              paymentMethod: 'MANUAL_SLIP',
+              items: orderData.items.map((item) => ({
+                title: item.title,
+                variantTitle: item.variantTitle,
+                price: Number(item.price),
+                quantity: item.quantity,
+                customerNote: item.customerNote,
+              })),
+            }).catch((err) => console.error(err))
+          }
+        })
+        .catch((err) => console.error(err))
+    }
 
     return {
       success: true,

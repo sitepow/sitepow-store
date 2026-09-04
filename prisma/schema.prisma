@@ -734,6 +734,7 @@ model Store {
   expenses             Expense[]
   addresses            Address[]
   storeThemeConfig     StoreThemeConfig?
+  webhookEndpoints     StoreWebhookEndpoint[]
 
   translations Json?
 
@@ -1640,4 +1641,42 @@ model StoreThemeConfig {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model StoreWebhookEndpoint {
+  id      String @id @default(uuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  url         String
+  description String?
+  secret      String
+  events      String[]
+  isActive    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs StoreWebhookLog[]
+
+  @@index([storeId])
+}
+
+model StoreWebhookLog {
+  id         String               @id @default(uuid())
+  endpointId String
+  endpoint   StoreWebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  event           String
+  statusCode      Int?
+  requestPayload  Json
+  responseBody    String? @db.Text
+  executionTimeMs Int
+  isSuccess       Boolean @default(false)
+  errorMessage    String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([endpointId])
+  @@index([createdAt])
 }

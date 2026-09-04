@@ -10,6 +10,7 @@ import { createOrderCore } from '@/lib/order'
 import { CreateOrderInput } from '@/lib/order/types'
 import { requireVerifiedUser } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { dispatchStoreWebhook } from '@/lib/webhook'
 
 const storefrontOrderSelect = {
   id: true,
@@ -259,6 +260,26 @@ export async function createOrder(input: CreateOrderInput) {
           price: Number(item.price),
         })),
       }).catch((err) => console.error(err))
+
+      dispatchStoreWebhook(store.id, 'order.created', {
+        orderId: primaryOrder.id,
+        orderNumber: primaryOrder.orderNumber,
+        status: primaryOrder.status,
+        totalAmount: Number(primaryOrder.totalAmount),
+        paymentMethod: primaryOrder.paymentMethod,
+        paidAt: primaryOrder.paidAt,
+        createdAt: primaryOrder.createdAt,
+        customer: {
+          name: customerName,
+        },
+        items: primaryOrder.items.map((item) => ({
+          title: item.title,
+          variantTitle: item.variantTitle,
+          quantity: item.quantity,
+          price: Number(item.price),
+          customerNote: item.customerNote,
+        })),
+      }).catch((err) => console.error('Storefront order webhook error:', err))
     }
 
     return {

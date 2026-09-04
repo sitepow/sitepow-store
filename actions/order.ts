@@ -12,6 +12,7 @@ import { OrderEventPayload, appEvents } from '@/lib/events'
 import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { dispatchStoreWebhook } from '@/lib/webhook'
 
 interface GetOrdersParams {
   storeId: string
@@ -442,6 +443,48 @@ export async function updateOrderStatus(
       orderId: id,
     })
 
+    if (status === OrderStatus.PAID) {
+      prisma.order
+        .findUnique({
+          where: { id },
+          select: {
+            id: true,
+            orderNumber: true,
+            totalAmount: true,
+            items: {
+              select: {
+                title: true,
+                variantTitle: true,
+                price: true,
+                quantity: true,
+                customerNote: true,
+              },
+            },
+          },
+        })
+        .then((orderData) => {
+          if (orderData) {
+            dispatchStoreWebhook(order.storeId, 'order.paid', {
+              orderId: orderData.id,
+              orderNumber: orderData.orderNumber,
+              status: 'PAID',
+              paidAt: new Date().toISOString(),
+              totalAmount: Number(orderData.totalAmount),
+              currency: 'THB',
+              paymentMethod: 'MANUAL_STATUS_UPDATE',
+              items: orderData.items.map((item) => ({
+                title: item.title,
+                variantTitle: item.variantTitle,
+                price: Number(item.price),
+                quantity: item.quantity,
+                customerNote: item.customerNote,
+              })),
+            }).catch((err) => console.error(err))
+          }
+        })
+        .catch((err) => console.error(err))
+    }
+
     return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -546,6 +589,12 @@ export async function cancelOrder(id: string) {
       type: 'ORDER_CANCELLED',
       orderId: id,
     })
+
+    dispatchStoreWebhook(order.storeId, 'order.cancelled', {
+      orderId: id,
+      status: 'CANCELLED',
+      cancelledAt: new Date().toISOString(),
+    }).catch((err) => console.error(err))
 
     return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
   } catch (error: unknown) {

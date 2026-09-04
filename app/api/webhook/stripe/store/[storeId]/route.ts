@@ -7,6 +7,7 @@ import Stripe from 'stripe'
 import { OrderEventPayload, appEvents } from '@/lib/events'
 import { prisma } from '@/lib/prisma'
 import { getStripeInstance } from '@/lib/stripe'
+import { dispatchStoreWebhook } from '@/lib/webhook'
 
 interface RouteParams {
   params: Promise<{
@@ -69,9 +70,14 @@ export async function POST(req: Request, props: RouteParams) {
             id: true,
             orderNumber: true,
             storeId: true,
+            totalAmount: true,
             resellerAgreementId: true,
             items: {
               select: {
+                title: true,
+                variantTitle: true,
+                price: true,
+                customerNote: true,
                 variantId: true,
                 branchId: true,
                 quantity: true,
@@ -144,6 +150,25 @@ export async function POST(req: Request, props: RouteParams) {
               type: 'ORDER_UPDATED',
               orderId: order.id,
             })
+
+            dispatchStoreWebhook(order.storeId, 'order.paid', {
+              orderId: order.id,
+              orderNumber: order.orderNumber,
+              status: 'PAID',
+              paidAt: new Date().toISOString(),
+              totalAmount: Number(order.totalAmount),
+              currency: 'THB',
+              paymentMethod: 'STRIPE',
+              items: order.items.map((item) => ({
+                title: item.title,
+                variantTitle: item.variantTitle,
+                price: Number(item.price),
+                quantity: item.quantity,
+                customerNote: item.customerNote,
+              })),
+            }).catch((err) =>
+              console.error('Stripe webhook dispatch error:', err),
+            )
           }
         }
       }

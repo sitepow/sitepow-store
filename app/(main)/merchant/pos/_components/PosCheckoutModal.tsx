@@ -69,7 +69,7 @@ export function PosCheckoutModal({
   const { user } = useSession()
 
   const currentStoreId = watch('storeId')
-  const [shouldPrintReceipt, setShouldPrintReceipt] = useState(true)
+  const [shouldPrintReceipt, setShouldPrintReceipt] = useState(false)
   const [selectedDocType, setSelectedDocType] =
     useState<OrderDocType>('receipt-slip')
 
