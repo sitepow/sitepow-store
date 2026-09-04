@@ -733,7 +733,7 @@ model Store {
   reviewRewardConfig   ReviewRewardConfig?
   expenses             Expense[]
   addresses            Address[]
-  storeThemeConfig     StoreThemeConfig[]
+  storeThemeConfig     StoreThemeConfig?
 
   translations Json?
 
