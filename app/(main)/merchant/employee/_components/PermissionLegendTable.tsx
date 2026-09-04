@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   PERMISSION_DESCRIPTIONS,
   PERMISSION_MAPPING,
@@ -21,6 +23,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function PermissionLegendTable() {
+  const t = useTranslations('merchant.employee.permissionLegend')
   const permissionEntries = Object.entries(PERMISSION_MAPPING) as [
     PermissionKey,
     { domain: string; action: string },
@@ -62,8 +65,8 @@ export function PermissionLegendTable() {
           <Table className="border">
             <TableHeader>
               <TableRow>
-                <TableHead>Domain / Action</TableHead>
-                <TableHead>คำอธิบาย</TableHead>
+                <TableHead>{t('domainAction')}</TableHead>
+                <TableHead>{t('description')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -3,6 +3,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useReviews } from '@/actions/hooks/review'
 import { useDeleteReview } from '@/actions/hooks/storefront/review'
@@ -32,6 +34,7 @@ import {
 } from '@/components/ui/table'
 
 export function ReviewTable() {
+  const t = useTranslations('merchant.reviews')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
   const [selectedItem, setSelectedItem] = useState<{
@@ -68,8 +71,8 @@ export function ReviewTable() {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title="ไม่มีสิทธิ์เข้าถึง"
-        description="คุณไม่มีสิทธิ์ในการดูข้อมูลรีวิวของสาขาหรือร้านค้านี้"
+        title={t('noAccessTitle')}
+        description={t('noAccessDescription')}
       />
     )
   }
@@ -83,13 +86,15 @@ export function ReviewTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>วันที่</TableHead>
-              <TableHead>สินค้า</TableHead>
-              <TableHead>ลูกค้า</TableHead>
-              <TableHead>คะแนน</TableHead>
-              <TableHead>ความคิดเห็น</TableHead>
+              <TableHead>{t('columns.date')}</TableHead>
+              <TableHead>{t('columns.product')}</TableHead>
+              <TableHead>{t('columns.customer')}</TableHead>
+              <TableHead>{t('columns.rating')}</TableHead>
+              <TableHead>{t('columns.comment')}</TableHead>
               {showManageColumn && (
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -97,10 +102,7 @@ export function ReviewTable() {
             {(isLoading || isPermissionLoading) && reviews.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : reviews.length === 0 ? (
-              <TableEmptyRow
-                colSpan={totalColumns}
-                title="ยังไม่มีข้อมูลรีวิวในร้านค้านี้"
-              />
+              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
             ) : (
               reviews.map((item: any) => (
                 <TableRow key={item.id}>
@@ -109,7 +111,7 @@ export function ReviewTable() {
                     <div>{item.product?.title || '-'}</div>
                     {item.variant?.title && (
                       <div className="text-muted-foreground text-xs">
-                        ตัวเลือก: {item.variant.title}
+                        {t('variantPrefix', { variant: item.variant.title })}
                       </div>
                     )}
                   </TableCell>
@@ -117,7 +119,7 @@ export function ReviewTable() {
                     <div>
                       {[item.customer?.firstName, item.customer?.lastName]
                         .filter(Boolean)
-                        .join(' ') || 'ลูกค้าไม่ระบุชื่อ'}
+                        .join(' ') || t('anonymousCustomer')}
                     </div>
                     <div className="text-muted-foreground text-xs">
                       {item.customer?.email || '-'}
@@ -172,13 +174,13 @@ export function ReviewTable() {
                           }
                         >
                           <IconEdit className="size-4" />
-                          แก้ไข
+                          {t('edit')}
                         </Button>
                         <DeleteButton
                           isPending={deleteMutation.isPending}
                           icon={<IconTrash className="size-4" />}
-                          title="ยืนยันการลบรีวิว?"
-                          description="คุณต้องการลบรีวิวสินค้านี้ใช่หรือไม่? หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้"
+                          title={t('deleteConfirmTitle')}
+                          description={t('deleteConfirmDescription')}
                           onDelete={() => deleteMutation.mutate(item.id)}
                         />
                       </div>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -13,6 +15,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { ReviewTable } from './_components/ReviewTable'
 
 export default function ReviewPage() {
+  const t = useTranslations('merchant.reviews')
   const { selectedStoreId } = useStoreFilter()
 
   const { canViewReviews, isLoading: isPermissionLoading } =
@@ -22,8 +25,8 @@ export default function ReviewPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconStar}
-        title="จัดการรีวิว"
-        description="ตรวจสอบและจัดการรีวิวสินค้าจากลูกค้าภายในร้าน"
+        title={t('title')}
+        description={t('description')}
         endContent={<StoreSelectField />}
       />
       {selectedStoreId !== ALL_STORES &&
@@ -31,8 +34,8 @@ export default function ReviewPage() {
       !canViewReviews ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการดูข้อมูลรีวิวของสาขาหรือร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : (
         <ReviewTable />

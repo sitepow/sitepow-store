@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import {
   useResetStoreRolePermissions,
@@ -31,6 +33,7 @@ import { EmployeeTable } from './_components/EmployeeTable'
 import { PermissionLegendTable } from './_components/PermissionLegendTable'
 
 export default function EmployeePage() {
+  const t = useTranslations('merchant.employee')
   const { userId } = useSession()
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
@@ -58,8 +61,8 @@ export default function EmployeePage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUserCog}
-        title="จัดการพนักงาน"
-        description="จัดการพนักงานและบทบาทการเข้าถึงระบบของร้านค้า"
+        title={t('title')}
+        description={t('description')}
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
@@ -79,8 +82,8 @@ export default function EmployeePage() {
                 >
                   {showPermissions ? <IconX /> : <IconShieldLock />}
                   {showPermissions
-                    ? 'ซ่อนตารางอ้างอิงสิทธิ์'
-                    : 'แสดงตารางอ้างอิงสิทธิ์'}
+                    ? t('hidePermissions')
+                    : t('showPermissions')}
                 </Button>
               </>
             )}
@@ -98,7 +101,7 @@ export default function EmployeePage() {
                     })
                   }}
                 >
-                  <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน
+                  <IconClockRecord /> {t('resetOwnerPermissions')}
                 </Button>
                 <Button
                   variant="outline"
@@ -115,8 +118,8 @@ export default function EmployeePage() {
                     }
                   />
                   {syncStoreRolesMutation.isPending
-                    ? 'กำลังซิงค์สิทธิ์...'
-                    : 'ซิงค์สิทธิ์ Role ทั้งหมด'}
+                    ? t('syncingPermissions')
+                    : t('syncRoles')}
                 </Button>
               </>
             )}

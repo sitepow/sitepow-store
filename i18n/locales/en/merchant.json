@@ -673,14 +673,18 @@
     "title": "Staff Management",
     "description": "Manage staff members and their system access roles",
     "inviteEmployee": "Invite Employee",
+    "addEmployee": "Add Employee",
     "showPermissions": "Show Permissions Reference",
     "hidePermissions": "Hide Permissions Reference",
     "resetOwnerPermissions": "Reset Owner Default Permissions",
     "syncingPermissions": "Syncing Permissions...",
     "syncRoles": "Sync All Role Permissions",
-    "empty": "No employee data available",
+    "empty": "No employees in this store yet",
     "customPermissions": "Custom Permissions",
     "allBranches": "All Branches",
+    "noPermissions": "No permissions",
+    "noAccessTitle": "No Access Permission",
+    "noAccessDescription": "You do not have permission to view employee information for this store or branch.",
     "edit": "Edit",
     "delete": "Delete",
     "columns": {
@@ -692,6 +696,49 @@
       "branch": "Branch",
       "status": "Status",
       "actions": "Actions"
+    },
+    "roles": {
+      "OWNER": "Store Owner",
+      "OWNER_VIEWER": "Auditor (Read Only)",
+      "MANAGER": "Manager",
+      "CASHIER": "Cashier (POS)",
+      "STAFF": "Staff",
+      "POS_RESELLER": "Reseller",
+      "POS_CASHIER": "Consignment Store",
+      "CONTENT_CREATOR": "Content Creator",
+      "AUDITOR": "Internal Auditor",
+      "SUPPORT": "Customer Support",
+      "MARKETING": "Marketer",
+      "FULFILLMENT": "Fulfillment / Packing"
+    },
+    "dialog": {
+      "addEmployee": "Add Employee",
+      "editTitle": "Edit Employee",
+      "createTitle": "Add New Employee",
+      "nameLabel": "Employee Name",
+      "namePlaceholder": "e.g. John Doe",
+      "emailLabel": "Email",
+      "emailPlaceholder": "e.g. employee@example.com",
+      "assignmentsTitle": "Branch, Role & Permissions Assignment",
+      "addBranchAssignment": "Add Branch Assignment",
+      "alertTitle": "Notice",
+      "alertDescription": "This branch has no permissions assigned yet. Please set permissions before proceeding.",
+      "branchNumber": "Branch {number}",
+      "branchLabel": "Branch",
+      "selectBranch": "Select Branch",
+      "roleLabel": "Branch Role",
+      "selectRole": "Select Role",
+      "permissionsLabel": "Additional Permissions",
+      "selectPermissions": "Select Permissions",
+      "allPermissions": "All Permissions",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "permissionLegend": {
+      "domainAction": "Domain / Action",
+      "description": "Description"
     }
   },
   "branches": {
@@ -927,7 +974,12 @@
       "date": "Date",
       "reply": "Reply",
       "actions": "Actions"
-    }
+    },
+    "variantPrefix": "Variant: {variant}",
+    "anonymousCustomer": "Anonymous Customer",
+    "edit": "Edit",
+    "deleteConfirmTitle": "Confirm Deleting Review?",
+    "deleteConfirmDescription": "Are you sure you want to delete this product review? Once deleted, it cannot be recovered."
   },
   "reseller": {
     "title": "Reseller Management",

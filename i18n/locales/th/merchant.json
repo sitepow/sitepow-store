@@ -673,14 +673,18 @@
     "title": "จัดการพนักงาน",
     "description": "จัดการพนักงานและบทบาทการเข้าถึงระบบของร้านค้า",
     "inviteEmployee": "เชิญพนักงาน",
+    "addEmployee": "เพิ่มพนักงาน",
     "showPermissions": "แสดงตารางอ้างอิงสิทธิ์",
     "hidePermissions": "ซ่อนตารางอ้างอิงสิทธิ์",
     "resetOwnerPermissions": "กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน",
     "syncingPermissions": "กำลังซิงค์สิทธิ์...",
     "syncRoles": "ซิงค์สิทธิ์ Role ทั้งหมด",
-    "empty": "ยังไม่มีข้อมูลพนักงาน",
+    "empty": "ยังไม่มีพนักงานในร้านนี้",
     "customPermissions": "สิทธิ์แบบกำหนดเอง",
     "allBranches": "ทุกสาขา",
+    "noPermissions": "ไม่มีสิทธิ์",
+    "noAccessTitle": "ไม่มีสิทธิ์เข้าถึง",
+    "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้",
     "edit": "แก้ไข",
     "delete": "ลบ",
     "columns": {
@@ -692,6 +696,49 @@
       "branch": "สาขา",
       "status": "สถานะ",
       "actions": "จัดการ"
+    },
+    "roles": {
+      "OWNER": "เจ้าของร้าน",
+      "OWNER_VIEWER": "ผู้ตรวจสอบข้อมูล (อ่านได้อย่างเดียว)",
+      "MANAGER": "ผู้จัดการ",
+      "CASHIER": "แคชเชียร์ (POS)",
+      "STAFF": "พนักงานทั่วไป",
+      "POS_RESELLER": "ตัวแทนจำหน่าย",
+      "POS_CASHIER": "ร้านค้าฝากขาย (Consignment)",
+      "CONTENT_CREATOR": "ผู้สร้างคอนเทนต์",
+      "AUDITOR": "ผู้ตรวจสอบบัญชี/ภายใน",
+      "SUPPORT": "แอดมินดูแลลูกค้า",
+      "MARKETING": "นักการตลาด",
+      "FULFILLMENT": "พนักงานแพ็กของ/จัดส่ง"
+    },
+    "dialog": {
+      "addEmployee": "เพิ่มพนักงาน",
+      "editTitle": "แก้ไขข้อมูลพนักงาน",
+      "createTitle": "เพิ่มพนักงานใหม่",
+      "nameLabel": "ชื่อพนักงาน",
+      "namePlaceholder": "เช่น สมชาย ใจดี",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "เช่น employee@example.com",
+      "assignmentsTitle": "การกำหนดสาขา บทบาท และสิทธิ์",
+      "addBranchAssignment": "เพิ่มสาขาที่ดูแล",
+      "alertTitle": "แจ้งเตือน",
+      "alertDescription": "สาขานี้ยังไม่มีการตั้งค่า Permission กรุณากำหนดสิทธิ์ก่อนดำเนินการต่อ",
+      "branchNumber": "สาขาที่ {number}",
+      "branchLabel": "สาขา",
+      "selectBranch": "เลือกสาขา",
+      "roleLabel": "บทบาทประจำสาขา",
+      "selectRole": "เลือกบทบาท",
+      "permissionsLabel": "สิทธิ์การใช้งานเพิ่มเติม (Permissions)",
+      "selectPermissions": "เลือกสิทธิ์การใช้งาน",
+      "allPermissions": "ทุกสิทธิ์",
+      "reset": "ล้างการตั้งค่า",
+      "cancel": "ยกเลิก",
+      "save": "บันทึกข้อมูล",
+      "saving": "กำลังบันทึก..."
+    },
+    "permissionLegend": {
+      "domainAction": "Domain / Action",
+      "description": "คำอธิบาย"
     }
   },
   "branches": {
@@ -935,7 +982,12 @@
       "date": "วันที่",
       "reply": "การตอบกลับ",
       "actions": "จัดการ"
-    }
+    },
+    "variantPrefix": "ตัวเลือก: {variant}",
+    "anonymousCustomer": "ลูกค้าไม่ระบุชื่อ",
+    "edit": "แก้ไข",
+    "deleteConfirmTitle": "ยืนยันการลบรีวิว?",
+    "deleteConfirmDescription": "คุณต้องการลบรีวิวสินค้านี้ใช่หรือไม่? หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้"
   },
   "reseller": {
     "title": "จัดการตัวแทนจำหน่าย",

@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranchOptions } from '@/actions/hooks/branch'
 import {
   useCreateEmployee,
@@ -64,6 +66,8 @@ export function EmployeeDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
+  const t = useTranslations('merchant.employee.dialog')
+  const tEmp = useTranslations('merchant.employee')
   const { selectedStoreId } = useStoreFilter()
   const createEmployeeMutation = useCreateEmployee()
   const updateEmployeeMutation = useUpdateEmployee()
@@ -193,30 +197,30 @@ export function EmployeeDialog({
       <DialogTrigger asChild>
         <Button variant="outline" onClick={onAdd}>
           <IconPlus />
-          เพิ่มพนักงาน
+          {t('addEmployee')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
-            {employeeId ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานใหม่'}
+            {employeeId ? t('editTitle') : t('createTitle')}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>ชื่อพนักงาน</FieldLabel>
+            <FieldLabel>{t('nameLabel')}</FieldLabel>
             <Input
-              placeholder="เช่น สมชาย ใจดี"
+              placeholder={t('namePlaceholder')}
               {...register('name')}
               disabled={isPending || !!employeeId}
             />
             <FieldError>{errors?.name?.message as string}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>อีเมล</FieldLabel>
+            <FieldLabel>{t('emailLabel')}</FieldLabel>
             <Input
               type="email"
-              placeholder="เช่น employee@example.com"
+              placeholder={t('emailPlaceholder')}
               {...register('email')}
               disabled={isPending || !!employeeId}
             />
@@ -225,7 +229,7 @@ export function EmployeeDialog({
           <div className="space-y-3 border-t pt-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <span className="text-sm font-semibold">
-                การกำหนดสาขา บทบาท และสิทธิ์
+                {t('assignmentsTitle')}
               </span>
               <Button
                 type="button"
@@ -236,13 +240,13 @@ export function EmployeeDialog({
                   append({ branchId: '', roleId: '', permissionIds: [] })
                 }
               >
-                <IconPlus className="mr-1 size-4" /> เพิ่มสาขาที่ดูแล
+                <IconPlus className="mr-1 size-4" /> {t('addBranchAssignment')}
               </Button>
             </div>
             {fields.length === 0 && (
               <ActionRequiredAlert
-                title="แจ้งเตือน"
-                description="สาขานี้ยังไม่มีการตั้งค่า Permission กรุณากำหนดสิทธิ์ก่อนดำเนินการต่อ"
+                title={t('alertTitle')}
+                description={t('alertDescription')}
               />
             )}
             {fields.map((fieldItem, index) => {
@@ -267,7 +271,7 @@ export function EmployeeDialog({
                       <div className="bg-muted border-border flex items-center gap-1 border p-2.5 font-bold">
                         <IconKey />
                       </div>
-                      <span>สาขาที่ {index + 1}</span>
+                      <span>{t('branchNumber', { number: index + 1 })}</span>
                     </div>
                     <Button
                       type="button"
@@ -280,7 +284,9 @@ export function EmployeeDialog({
                     </Button>
                   </div>
                   <Field>
-                    <FieldLabel className="text-xs">สาขา</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      {t('branchLabel')}
+                    </FieldLabel>
                     <Select
                       value={currentBranchId}
                       disabled={isPending}
@@ -291,7 +297,7 @@ export function EmployeeDialog({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="เลือกสาขา" />
+                        <SelectValue placeholder={t('selectBranch')} />
                       </SelectTrigger>
                       <SelectContent>
                         {selectableBranchesForThisRow.map((branch) => (
@@ -303,7 +309,9 @@ export function EmployeeDialog({
                     </Select>
                   </Field>
                   <Field>
-                    <FieldLabel className="text-xs">บทบาทประจำสาขา</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      {t('roleLabel')}
+                    </FieldLabel>
                     <Select
                       value={currentRoleId}
                       disabled={isPending}
@@ -312,13 +320,14 @@ export function EmployeeDialog({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="เลือกบทบาท" />
+                        <SelectValue placeholder={t('selectRole')} />
                       </SelectTrigger>
                       <SelectContent>
                         {roles.map((role) => {
-                          const roleLabel =
-                            DEFAULT_ROLE_TH[role.name as DefaultRole] ||
-                            role.name
+                          const roleLabel = tEmp.has(`roles.${role.name}`)
+                            ? tEmp(`roles.${role.name}`)
+                            : DEFAULT_ROLE_TH[role.name as DefaultRole] ||
+                              role.name
 
                           return (
                             <SelectItem key={role.id} value={role.id}>
@@ -331,7 +340,7 @@ export function EmployeeDialog({
                   </Field>
                   <Field>
                     <FieldLabel className="text-xs">
-                      สิทธิ์การใช้งานเพิ่มเติม (Permissions)
+                      {t('permissionsLabel')}
                     </FieldLabel>
                     <MultiSelect
                       options={permissionOptions}
@@ -342,8 +351,8 @@ export function EmployeeDialog({
                         })
                       }
                       disabled={isPending}
-                      placeholder="เลือกสิทธิ์การใช้งาน"
-                      allSelectedLabel="ทุกสิทธิ์"
+                      placeholder={t('selectPermissions')}
+                      allSelectedLabel={t('allPermissions')}
                     />
                   </Field>
                 </div>
@@ -361,7 +370,7 @@ export function EmployeeDialog({
                 disabled={isPending}
               >
                 <IconX className="mr-1 size-4" />
-                ล้างการตั้งค่า
+                {t('reset')}
               </Button>
             ) : (
               <Button
@@ -369,16 +378,16 @@ export function EmployeeDialog({
                 onClick={handleClose}
                 disabled={isPending}
               >
-                ยกเลิก
+                {t('cancel')}
               </Button>
             )}
             <Button disabled={isPending} onClick={handleSubmit(onSubmit)}>
               {isPending ? (
                 <>
-                  <Spinner /> กำลังบันทึก...
+                  <Spinner /> {t('saving')}
                 </>
               ) : (
-                'บันทึกข้อมูล'
+                t('save')
               )}
             </Button>
           </div>

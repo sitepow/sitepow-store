@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useDeleteEmployee,
   useEmployeePermission,
@@ -34,6 +36,7 @@ interface EmployeeTableProps {
 }
 
 export function EmployeeTable({ onEdit }: EmployeeTableProps) {
+  const t = useTranslations('merchant.employee')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -66,8 +69,8 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title="ไม่มีสิทธิ์เข้าถึง"
-        description="คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้"
+        title={t('noAccessTitle')}
+        description={t('noAccessDescription')}
       />
     )
   }
@@ -78,14 +81,16 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสพนักงาน</TableHead>
-              <TableHead>ชื่อพนักงาน</TableHead>
-              <TableHead>อีเมล</TableHead>
-              <TableHead>บทบาท</TableHead>
-              <TableHead>สิทธิ์การใช้งาน</TableHead>
-              <TableHead>สาขา</TableHead>
+              <TableHead>{t('columns.employeeId')}</TableHead>
+              <TableHead>{t('columns.name')}</TableHead>
+              <TableHead>{t('columns.email')}</TableHead>
+              <TableHead>{t('columns.role')}</TableHead>
+              <TableHead>{t('columns.permissions')}</TableHead>
+              <TableHead>{t('columns.branch')}</TableHead>
               {canManageEmployee && (
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -93,10 +98,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
             {(isLoading || isPermissionLoading) && employees.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : employees.length === 0 ? (
-              <TableEmptyRow
-                colSpan={totalColumns}
-                title="ยังไม่มีพนักงานในร้านนี้"
-              />
+              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
             ) : (
               employees.map((employeeStore) => {
                 const {
@@ -120,9 +122,10 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                         ) : (
                           <>
                             {displayedRoles.map((roleName, idx) => {
-                              const roleLabel =
-                                DEFAULT_ROLE_TH[roleName as DefaultRole] ||
-                                roleName
+                              const roleLabel = t.has(`roles.${roleName}`)
+                                ? t(`roles.${roleName}`)
+                                : DEFAULT_ROLE_TH[roleName as DefaultRole] ||
+                                  roleName
 
                               return (
                                 <Badge key={idx} variant="outline">
@@ -143,7 +146,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                       <div className="flex max-w-72 min-w-72 flex-wrap items-center gap-1">
                         {uniquePermissions.length === 0 ? (
                           <span className="text-muted-foreground text-xs">
-                            ไม่มีสิทธิ์
+                            {t('noPermissions')}
                           </span>
                         ) : (
                           <>
@@ -169,7 +172,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {employeeStore.branches.length === 0 ? (
-                          <Badge variant="outline">ทุกสาขา</Badge>
+                          <Badge variant="outline">{t('allBranches')}</Badge>
                         ) : (
                           employeeStore.branches.map(({ branch }) => (
                             <Badge key={branch.id} variant="outline">
