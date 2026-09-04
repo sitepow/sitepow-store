@@ -2,6 +2,8 @@
 
 import { ReactNode } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { formatNumber } from '@/utils/pricing'
 
 import { RankBadge } from './RankBadge'
@@ -23,13 +25,15 @@ export function RankListItem({
   rank,
   percentage,
   quantityOrCount,
-  unitText = 'ชิ้น',
+  unitText,
   getRankStyle,
   crownColorClass,
   firstGradientClass,
   normalBarClass,
   children,
 }: RankListItemProps) {
+  const t = useTranslations('common.order')
+  const unit = unitText ?? t('pieces')
   const isFirst = rank === 0
 
   return (
@@ -48,7 +52,7 @@ export function RankListItem({
             {formatNumber(quantityOrCount)}
           </span>
           <span className="text-muted-foreground ml-1 text-xs font-medium">
-            {unitText}
+            {unit}
           </span>
         </div>
       </div>

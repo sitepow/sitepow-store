@@ -509,17 +509,119 @@
     }
   },
   "analytics": {
-    "title": "รายงานและการวิเคราะห์",
-    "description": "ข้อมูลเชิงลึกสรุปยอดขาย พฤติกรรมลูกค้า และประสิทธิภาพร้านค้า",
+    "title": "วิเคราะห์ภาพรวม",
+    "description": "วิเคราะห์แนวโน้มกำไร วันขายดี Peak Hours สินค้าขายดี และพฤติกรรมลูกค้า",
     "noAccessTitle": "ไม่มีสิทธิ์เข้าถึง",
-    "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูข้อมูลรายงานวิเคราะห์ของสาขาหรือร้านค้านี้",
-    "aiInsights": "ข้อมูลเชิงลึกจาก AI",
-    "retention": "การกลับมาซื้อซ้ำของลูกค้า",
-    "peakHours": "ช่วงเวลาที่มียอดขายสูงสุด",
+    "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูข้อมูลการวิเคราะห์ของสาขาหรือร้านค้านี้",
     "dateRange": {
-      "start": "วันที่เริ่มต้น",
-      "end": "วันที่สิ้นสุด",
-      "apply": "ปรับปรุงข้อมูล"
+      "startDatePlaceholder": "เริ่มวันที่",
+      "endDatePlaceholder": "ถึงวันที่"
+    },
+    "aiButton": {
+      "generating": "กำลังวิเคราะห์กลยุทธ์...",
+      "generate": "สรุปกลยุทธ์ด้วย AI",
+      "error": "เกิดข้อผิดพลาดในการสร้างคำแนะนำจาก AI"
+    },
+    "overviewStats": {
+      "totalRevenue": "ยอดขายรวม",
+      "totalRevenueDesc": "ยอดขายสะสมตามช่วงเวลา",
+      "netProfit": "กำไรสุทธิ",
+      "netProfitDesc": "หักต้นทุนและค่าใช้จ่ายแล้ว",
+      "totalOrders": "ออเดอร์ทั้งหมด",
+      "totalOrdersDesc": "จำนวนคำสั่งซื้อสำเร็จ",
+      "ordersUnit": "{count} รายการ",
+      "aov": "ยอดเฉลี่ย/บิล (AOV)",
+      "aovDesc": "ยอดใช้จ่ายต่อออเดอร์"
+    },
+    "financialTrend": {
+      "title": "สรุปผลประกอบการการเงิน",
+      "description": "แสดงยอดขาย, ต้นทุนสินค้า (COGS), ค่าใช้จ่ายดำเนินงาน และกำไรสุทธิ",
+      "emptyMessage": "ไม่มีข้อมูลผลประกอบการการเงิน",
+      "revenue": "ยอดขาย",
+      "cogs": "ต้นทุนสินค้า",
+      "expense": "ค่าใช้จ่าย",
+      "netProfit": "กำไรสุทธิ"
+    },
+    "customerRetention": {
+      "title": "การวิเคราะห์กลุ่มลูกค้า (Customer Retention)",
+      "description": "อัตราการซื้อซ้ำและพฤติกรรมระหว่างลูกค้าใหม่กับลูกค้าเดิม",
+      "totalCustomers": "ลูกค้าทั้งหมด",
+      "totalCustomersDesc": "จำนวนลูกค้าที่ไม่ซ้ำกัน",
+      "newCustomers": "ลูกค้าใหม่",
+      "newCustomersDesc": "ซื้อครั้งแรกในช่วงนี้",
+      "returningCustomers": "ลูกค้าเก่าซื้อซ้ำ",
+      "returningCustomersDesc": "มีการสั่งซื้อมากกว่า 1 ครั้ง",
+      "repeatPurchaseRate": "Repeat Purchase Rate",
+      "repeatPurchaseRateDesc": "อัตราส่วนการกลับมาซื้อซ้ำ",
+      "customerUnit": "{count} ราย"
+    },
+    "topProducts": {
+      "title": "5 อันดับสินค้าขายดีที่สุด (Top Products)",
+      "description": "เปรียบเทียบปริมาณการขายแต่ละสินค้า",
+      "emptyMessage": "ไม่มีข้อมูลสินค้า",
+      "quantitySold": "จำนวนที่ขายได้: {quantity} ชิ้น",
+      "totalSales": "ยอดขายรวม: {totalSales}"
+    },
+    "topVariants": {
+      "title": "5 อันดับรูปแบบสินค้าขายดี (Top Variants)",
+      "description": "เปรียบเทียบปริมาณการขายของแต่ละตัวเลือกสินค้า",
+      "emptyMessage": "ไม่มีข้อมูลรูปแบบสินค้า",
+      "quantitySold": "จำนวนที่ขายได้: {quantity} ชิ้น",
+      "totalSales": "ยอดขายรวม: {totalSales}"
+    },
+    "topProductPairs": {
+      "title": "คู่สินค้าที่มักจะถูกซื้อร่วมกัน (Top Product Pairs)",
+      "description": "วิเคราะห์สินค้าที่ถูกสั่งซื้อพร้อมกันในออเดอร์เดียวกันบ่อยที่สุด",
+      "emptyMessage": "ไม่มีข้อมูลการซื้อร่วมกัน",
+      "boughtTogether": "ซื้อร่วมกัน: {count} ออเดอร์"
+    },
+    "paymentBreakdown": {
+      "title": "ช่องทางการชำระเงิน (Payment Breakdown)",
+      "description": "สัดส่วนวิธีชำระเงินของลูกค้าทั้งหมด",
+      "emptyMessage": "ไม่มีข้อมูลการชำระเงิน",
+      "totalBills": "รวมทั้งหมด",
+      "itemsUnit": "รายการ",
+      "billCount": "{count} บิล ({percentage}%)",
+      "billSummary": "{count} บิล"
+    },
+    "dayOfWeekTrend": {
+      "title": "ปริมาณออเดอร์และยอดขายตามวันในสัปดาห์",
+      "description": "ช่วยให้เห็นว่าวันไหนมีสถิติลูกค้าเข้าซื้อหนาแน่นที่สุด",
+      "emptyMessage": "ไม่มีข้อมูลแนวโน้มรายวัน",
+      "salesLabel": "ยอดขาย (บาท)",
+      "ordersLabel": "จำนวนออเดอร์"
+    },
+    "heatmap": {
+      "title": "Heatmap ช่วงเวลาขายดี (Day x Hour Matrix)",
+      "description": "ระดับสีเข้มแสดงถึงช่วงเวลาที่มีจำนวนคำสั่งซื้อหนาแน่นที่สุดในสัปดาห์",
+      "emptyMessage": "ไม่มีข้อมูล Heatmap การขาย",
+      "dayTimeHeader": "วัน / เวลา",
+      "tooltip": "{day} {hour}:00 - {count} ออเดอร์",
+      "days": [
+        "อาทิตย์",
+        "จันทร์",
+        "อังคาร",
+        "พุธ",
+        "พฤหัสบดี",
+        "ศุกร์",
+        "เสาร์"
+      ]
+    },
+    "peakHours": {
+      "title": "5 อันดับ ช่วงเวลาขายดีที่สุด (Peak Hours)",
+      "description": "ช่วงเวลาที่มีการสร้างออเดอร์สูงสุดโดยรวม",
+      "emptyMessage": "ไม่มีข้อมูลช่วงเวลาขายดี",
+      "ordersLabel": "จำนวนออเดอร์",
+      "orderCountTooltip": "{count} ออเดอร์",
+      "footer": "ช่วงเวลาขายดีเรียงตามความหนาแน่นของออเดอร์"
+    },
+    "aiInsights": {
+      "title": "บทวิเคราะห์และกลยุทธ์จาก AI (AI Business Insights)",
+      "operatingHoursTitle": "กลยุทธ์เวลาเปิด-ปิดร้าน",
+      "recommendedStartHour": "เวลาที่ควรเปิด: {hour}",
+      "productPromoTitle": "การดันยอดสินค้า & โปรโมชั่น",
+      "retentionTitle": "การดึงดูดลูกค้าเดิม",
+      "actionItemsTitle": "ข้อแนะนำที่ร้านค้าควรปรับทำทันที (Action Items):"
     }
   },
   "reviews": {

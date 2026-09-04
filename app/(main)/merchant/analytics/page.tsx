@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useAnalyticsAi } from '@/actions/hooks/ai'
 import { useAnalyticsOverview } from '@/actions/hooks/analytics'
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -42,6 +44,7 @@ import { TopProductsCard } from './_components/TopProductsCard'
 import { TopVariantsCard } from './_components/TopVariantsCard'
 
 export default function AnalyticsPage() {
+  const t = useTranslations('merchant.analytics')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
 
@@ -76,7 +79,7 @@ export default function AnalyticsPage() {
         if (res.success && res.data) {
           setAiInsights(res.data)
         } else {
-          alert(res.message || 'เกิดข้อผิดพลาดในการสร้างคำแนะนำจาก AI')
+          alert(res.message || t('aiButton.error'))
         }
       },
     })
@@ -94,8 +97,8 @@ export default function AnalyticsPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconChartBar}
-        title="วิเคราะห์ภาพรวม"
-        description="วิเคราะห์แนวโน้มกำไร วันขายดี Peak Hours สินค้าขายดี และพฤติกรรมลูกค้า"
+        title={t('title')}
+        description={t('description')}
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <div className="flex items-end gap-2">
@@ -103,7 +106,7 @@ export default function AnalyticsPage() {
                 <DatePicker
                   value={startDate}
                   onChange={setStartDate}
-                  placeholder="เริ่มวันที่"
+                  placeholder={t('dateRange.startDatePlaceholder')}
                 />
               </div>
               <span className="text-muted-foreground text-sm">-</span>
@@ -111,7 +114,7 @@ export default function AnalyticsPage() {
                 <DatePicker
                   value={endDate}
                   onChange={setEndDate}
-                  placeholder="ถึงวันที่"
+                  placeholder={t('dateRange.endDatePlaceholder')}
                 />
               </div>
             </div>
@@ -124,8 +127,8 @@ export default function AnalyticsPage() {
             >
               <IconSparkles className="size-4" />
               {isGeneratingAi
-                ? 'กำลังวิเคราะห์กลยุทธ์...'
-                : 'สรุปกลยุทธ์ด้วย AI'}
+                ? t('aiButton.generating')
+                : t('aiButton.generate')}
             </Button>
           </div>
         }
@@ -139,8 +142,8 @@ export default function AnalyticsPage() {
           !canViewDashboard && (
             <ActionRequiredAlert
               icon={<IconLock />}
-              title="ไม่มีสิทธิ์เข้าถึง"
-              description="คุณไม่มีสิทธิ์ในการดูข้อมูลการวิเคราะห์ของสาขาหรือร้านค้านี้"
+              title={t('noAccessTitle')}
+              description={t('noAccessDescription')}
             />
           )}
         {selectedStoreId !== ALL_STORES &&
@@ -152,27 +155,29 @@ export default function AnalyticsPage() {
               {aiInsights && <AiInsightsCard aiInsights={aiInsights} />}
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 <StatsCard
-                  title="ยอดขายรวม"
+                  title={t('overviewStats.totalRevenue')}
                   value={formatCurrency(totalRevenue)}
-                  description="ยอดขายสะสมตามช่วงเวลา"
+                  description={t('overviewStats.totalRevenueDesc')}
                   icon={IconWallet}
                 />
                 <StatsCard
-                  title="กำไรสุทธิ"
+                  title={t('overviewStats.netProfit')}
                   value={formatCurrency(totalNetProfit)}
-                  description="หักต้นทุนและค่าใช้จ่ายแล้ว"
+                  description={t('overviewStats.netProfitDesc')}
                   icon={IconArrowUpRight}
                 />
                 <StatsCard
-                  title="ออเดอร์ทั้งหมด"
-                  value={`${formatNumber(totalOrders)} รายการ`}
-                  description="จำนวนคำสั่งซื้อสำเร็จ"
+                  title={t('overviewStats.totalOrders')}
+                  value={t('overviewStats.ordersUnit', {
+                    count: formatNumber(totalOrders),
+                  })}
+                  description={t('overviewStats.totalOrdersDesc')}
                   icon={IconShoppingCart}
                 />
                 <StatsCard
-                  title="ยอดเฉลี่ย/บิล (AOV)"
+                  title={t('overviewStats.aov')}
                   value={formatCurrency(averageOrderValue)}
-                  description="ยอดใช้จ่ายต่อออเดอร์"
+                  description={t('overviewStats.aovDesc')}
                   icon={IconReceipt}
                 />
               </div>

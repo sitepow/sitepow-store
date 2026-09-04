@@ -1,5 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
+
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
@@ -22,20 +26,26 @@ interface FinancialTrendChartProps {
   }>
 }
 
-const chartConfig = {
-  revenue: { label: 'ยอดขาย', color: '#22c55e' },
-  cogs: { label: 'ต้นทุนสินค้า', color: '#f97316' },
-  expense: { label: 'ค่าใช้จ่าย', color: '#ef4444' },
-  netProfit: { label: 'กำไรสุทธิ', color: '#3b82f6' },
-} satisfies ChartConfig
-
 export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
+  const t = useTranslations('merchant.analytics.financialTrend')
+
+  const chartConfig = useMemo(
+    () =>
+      ({
+        revenue: { label: t('revenue'), color: '#22c55e' },
+        cogs: { label: t('cogs'), color: '#f97316' },
+        expense: { label: t('expense'), color: '#ef4444' },
+        netProfit: { label: t('netProfit'), color: '#3b82f6' },
+      }) satisfies ChartConfig,
+    [t],
+  )
+
   return (
     <AnalyticsCardShell
-      title="สรุปผลประกอบการการเงิน"
-      description="แสดงยอดขาย, ต้นทุนสินค้า (COGS), ค่าใช้จ่ายดำเนินงาน และกำไรสุทธิ"
+      title={t('title')}
+      description={t('description')}
       isEmpty={data.length === 0}
-      emptyMessage="ไม่มีข้อมูลผลประกอบการการเงิน"
+      emptyMessage={t('emptyMessage')}
       className="lg:col-span-2"
     >
       <div className="h-80 w-full">
@@ -86,7 +96,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="revenue"
-              name="ยอดขาย"
+              name={t('revenue')}
               stroke="#22c55e"
               fill="url(#fillRevenue)"
               strokeWidth={2}
@@ -94,7 +104,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="cogs"
-              name="ต้นทุนสินค้า"
+              name={t('cogs')}
               stroke="#f97316"
               fill="url(#fillCogs)"
               strokeWidth={2}
@@ -102,7 +112,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="expense"
-              name="ค่าใช้จ่าย"
+              name={t('expense')}
               stroke="#ef4444"
               fill="url(#fillExpense)"
               strokeWidth={2}
@@ -110,7 +120,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="netProfit"
-              name="กำไรสุทธิ"
+              name={t('netProfit')}
               stroke="#3b82f6"
               fill="url(#fillNetProfit)"
               strokeWidth={2}

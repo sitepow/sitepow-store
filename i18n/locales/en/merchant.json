@@ -509,17 +509,111 @@
     }
   },
   "analytics": {
-    "title": "Reports & Analytics",
-    "description": "In-depth insights into sales, customer behavior, and store performance",
+    "title": "Overview Analytics",
+    "description": "Analyze profit trends, top selling days, peak hours, best sellers, and customer behaviors",
     "noAccessTitle": "Access Denied",
     "noAccessDescription": "You do not have permission to view analytics reports for this store or branch",
-    "aiInsights": "AI-Powered Insights",
-    "retention": "Customer Retention",
-    "peakHours": "Peak Selling Hours",
     "dateRange": {
-      "start": "Start Date",
-      "end": "End Date",
-      "apply": "Update Data"
+      "startDatePlaceholder": "Start Date",
+      "endDatePlaceholder": "End Date"
+    },
+    "aiButton": {
+      "generating": "Analyzing strategy...",
+      "generate": "Generate AI Strategy",
+      "error": "An error occurred while generating AI insights"
+    },
+    "overviewStats": {
+      "totalRevenue": "Total Revenue",
+      "totalRevenueDesc": "Accumulated sales in period",
+      "netProfit": "Net Profit",
+      "netProfitDesc": "After costs and operating expenses",
+      "totalOrders": "Total Orders",
+      "totalOrdersDesc": "Completed orders",
+      "ordersUnit": "{count} orders",
+      "aov": "Average Order Value (AOV)",
+      "aovDesc": "Average spend per order"
+    },
+    "financialTrend": {
+      "title": "Financial Performance Summary",
+      "description": "Shows sales, cost of goods sold (COGS), operating expenses, and net profit",
+      "emptyMessage": "No financial performance data",
+      "revenue": "Sales",
+      "cogs": "COGS",
+      "expense": "Expenses",
+      "netProfit": "Net Profit"
+    },
+    "customerRetention": {
+      "title": "Customer Retention Analysis",
+      "description": "Repeat purchase rates and behaviors between new and returning customers",
+      "totalCustomers": "Total Customers",
+      "totalCustomersDesc": "Unique customer count",
+      "newCustomers": "New Customers",
+      "newCustomersDesc": "First-time buyers in period",
+      "returningCustomers": "Returning Customers",
+      "returningCustomersDesc": "Ordered more than once",
+      "repeatPurchaseRate": "Repeat Purchase Rate",
+      "repeatPurchaseRateDesc": "Ratio of repeat purchases",
+      "customerUnit": "{count} customers"
+    },
+    "topProducts": {
+      "title": "Top 5 Products",
+      "description": "Comparison of sales volume by product",
+      "emptyMessage": "No product data",
+      "quantitySold": "Quantity sold: {quantity} pcs",
+      "totalSales": "Total sales: {totalSales}"
+    },
+    "topVariants": {
+      "title": "Top 5 Product Variants",
+      "description": "Comparison of sales volume by product variant",
+      "emptyMessage": "No variant data",
+      "quantitySold": "Quantity sold: {quantity} pcs",
+      "totalSales": "Total sales: {totalSales}"
+    },
+    "topProductPairs": {
+      "title": "Frequently Bought Together",
+      "description": "Products most often purchased together in the same order",
+      "emptyMessage": "No co-purchase data",
+      "boughtTogether": "Bought together: {count} orders"
+    },
+    "paymentBreakdown": {
+      "title": "Payment Breakdown",
+      "description": "Proportion of customer payment methods",
+      "emptyMessage": "No payment data",
+      "totalBills": "Total",
+      "itemsUnit": "orders",
+      "billCount": "{count} orders ({percentage}%)",
+      "billSummary": "{count} orders"
+    },
+    "dayOfWeekTrend": {
+      "title": "Orders & Sales by Day of Week",
+      "description": "Helps identify which days have the highest customer traffic",
+      "emptyMessage": "No daily trend data",
+      "salesLabel": "Sales (THB)",
+      "ordersLabel": "Orders"
+    },
+    "heatmap": {
+      "title": "Sales Peak Heatmap (Day x Hour Matrix)",
+      "description": "Darker colors indicate higher order concentration during the week",
+      "emptyMessage": "No heatmap data",
+      "dayTimeHeader": "Day / Time",
+      "tooltip": "{day} {hour}:00 - {count} orders",
+      "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    },
+    "peakHours": {
+      "title": "Top 5 Peak Hours",
+      "description": "Overall highest order volume time slots",
+      "emptyMessage": "No peak hours data",
+      "ordersLabel": "Orders",
+      "orderCountTooltip": "{count} orders",
+      "footer": "Peak hours ranked by order density"
+    },
+    "aiInsights": {
+      "title": "AI Business Insights & Strategy",
+      "operatingHoursTitle": "Operating Hours Strategy",
+      "recommendedStartHour": "Recommended Opening Time: {hour}",
+      "productPromoTitle": "Product Boost & Promotions",
+      "retentionTitle": "Customer Retention",
+      "actionItemsTitle": "Immediate Action Items:"
     }
   },
   "reviews": {

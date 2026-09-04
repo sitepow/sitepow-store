@@ -509,17 +509,111 @@
     }
   },
   "analytics": {
-    "title": "报表与数据分析",
-    "description": "全方位剖析销售业绩、客户回购行为与店铺经营效能",
+    "title": "数据分析与总览",
+    "description": "分析利润趋势、畅销日、高峰时段、热销商品及客户行为",
     "noAccessTitle": "无访问权限",
-    "noAccessDescription": "您没有权限查看此分店或店铺的报表分析数据",
-    "aiInsights": "AI 智能经营洞察",
-    "retention": "客户留存与复购率",
-    "peakHours": "销售高峰时段",
+    "noAccessDescription": "您没有权限查看此分店或店铺的数据分析报表",
     "dateRange": {
-      "start": "开始日期",
-      "end": "结束日期",
-      "apply": "更新统计"
+      "startDatePlaceholder": "开始日期",
+      "endDatePlaceholder": "结束日期"
+    },
+    "aiButton": {
+      "generating": "正在分析商业策略...",
+      "generate": "AI 生成策略总结",
+      "error": "生成 AI 建议时发生错误"
+    },
+    "overviewStats": {
+      "totalRevenue": "总营业额",
+      "totalRevenueDesc": "所选期间累计销售总额",
+      "netProfit": "净利润",
+      "netProfitDesc": "已扣除进货成本与运营费用",
+      "totalOrders": "总订单数",
+      "totalOrdersDesc": "已完成订单数量",
+      "ordersUnit": "{count} 笔",
+      "aov": "平均客单价 (AOV)",
+      "aovDesc": "每笔订单平均消费额"
+    },
+    "financialTrend": {
+      "title": "财务经营表现汇总",
+      "description": "展示销售额、商品销售成本 (COGS)、运营费用与净利润走势",
+      "emptyMessage": "暂无财务经营数据",
+      "revenue": "销售额",
+      "cogs": "商品成本",
+      "expense": "运营费用",
+      "netProfit": "净利润"
+    },
+    "customerRetention": {
+      "title": "客户留存与复购分析",
+      "description": "新老客户的购买行为与复购率走势",
+      "totalCustomers": "客户总数",
+      "totalCustomersDesc": "去重独立客户总数",
+      "newCustomers": "新客户",
+      "newCustomersDesc": "在此期间首次下单",
+      "returningCustomers": "老客户复购",
+      "returningCustomersDesc": "下单次数大于 1 次",
+      "repeatPurchaseRate": "Repeat Purchase Rate",
+      "repeatPurchaseRateDesc": "回头客复购比例",
+      "customerUnit": "{count} 人"
+    },
+    "topProducts": {
+      "title": "前 5 名畅销商品",
+      "description": "各商品销售量与销售额对比",
+      "emptyMessage": "暂无商品销售数据",
+      "quantitySold": "销量: {quantity} 件",
+      "totalSales": "总销售额: {totalSales}"
+    },
+    "topVariants": {
+      "title": "前 5 名热销规格",
+      "description": "各商品规格的销售量对比",
+      "emptyMessage": "暂无规格数据",
+      "quantitySold": "销量: {quantity} 件",
+      "totalSales": "总销售额: {totalSales}"
+    },
+    "topProductPairs": {
+      "title": "常见组合购买商品",
+      "description": "分析在同一订单中最常被一同购买的商品搭配",
+      "emptyMessage": "暂无组合购买数据",
+      "boughtTogether": "组合购买: {count} 笔订单"
+    },
+    "paymentBreakdown": {
+      "title": "支付方式占比",
+      "description": "客户各项支付方式比例分布",
+      "emptyMessage": "暂无支付方式数据",
+      "totalBills": "总计",
+      "itemsUnit": "笔",
+      "billCount": "{count} 笔 ({percentage}%)",
+      "billSummary": "{count} 笔"
+    },
+    "dayOfWeekTrend": {
+      "title": "按星期订单量与销售额",
+      "description": "直观展示一周中客流与销售额最集中的日期",
+      "emptyMessage": "暂无按星期数据",
+      "salesLabel": "销售额 (泰铢)",
+      "ordersLabel": "订单数"
+    },
+    "heatmap": {
+      "title": "高峰营业时段热力图 (Day x Hour Matrix)",
+      "description": "颜色越深代表一周中该时段订单越密集",
+      "emptyMessage": "暂无热力图数据",
+      "dayTimeHeader": "星期 / 时间",
+      "tooltip": "{day} {hour}:00 - {count} 笔订单",
+      "days": ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+    },
+    "peakHours": {
+      "title": "前 5 名高峰营业时段",
+      "description": "综合订单量最高的时间段",
+      "emptyMessage": "暂无高峰时段数据",
+      "ordersLabel": "订单数",
+      "orderCountTooltip": "{count} 笔订单",
+      "footer": "按订单密度排序的高峰营业时段"
+    },
+    "aiInsights": {
+      "title": "AI 商业洞察与经营策略",
+      "operatingHoursTitle": "营业时段策略",
+      "recommendedStartHour": "建议营业时间: {hour}",
+      "productPromoTitle": "商品推广与促销搭配",
+      "retentionTitle": "客户复购维系",
+      "actionItemsTitle": "建议立即采取的行动项 (Action Items):"
     }
   },
   "reviews": {

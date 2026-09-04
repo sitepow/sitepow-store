@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import {
   Area,
   AreaChart,
@@ -22,12 +24,14 @@ interface TopProductPairsCardProps {
 export function TopProductPairsCard({
   topProductPairs,
 }: TopProductPairsCardProps) {
+  const t = useTranslations('merchant.analytics.topProductPairs')
+
   return (
     <AnalyticsCardShell
-      title="คู่สินค้าที่มักจะถูกซื้อร่วมกัน (Top Product Pairs)"
-      description="วิเคราะห์สินค้าที่ถูกสั่งซื้อพร้อมกันในออเดอร์เดียวกันบ่อยที่สุด"
+      title={t('title')}
+      description={t('description')}
       isEmpty={topProductPairs.length === 0}
-      emptyMessage="ไม่มีข้อมูลการซื้อร่วมกัน"
+      emptyMessage={t('emptyMessage')}
     >
       <div className="h-70 w-full pt-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -78,7 +82,7 @@ export function TopProductPairsCard({
                         {data.pair}
                       </p>
                       <p className="font-medium text-purple-500">
-                        ซื้อร่วมกัน: {data.count} ออเดอร์
+                        {t('boughtTogether', { count: data.count })}
                       </p>
                     </div>
                   )

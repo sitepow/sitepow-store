@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency } from '@/utils/pricing'
 import {
   Area,
@@ -22,12 +24,14 @@ interface TopVariantsCardProps {
 }
 
 export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
+  const t = useTranslations('merchant.analytics.topVariants')
+
   return (
     <AnalyticsCardShell
-      title="5 อันดับรูปแบบสินค้าขายดี (Top Variants)"
-      description="เปรียบเทียบปริมาณการขายของแต่ละตัวเลือกสินค้า"
+      title={t('title')}
+      description={t('description')}
       isEmpty={topVariants.length === 0}
-      emptyMessage="ไม่มีข้อมูลรูปแบบสินค้า"
+      emptyMessage={t('emptyMessage')}
     >
       <div className="h-70 w-full pt-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -78,10 +82,12 @@ export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
                         {data.name}
                       </p>
                       <p className="font-medium text-orange-500">
-                        จำนวนที่ขายได้: {data.quantity} ชิ้น
+                        {t('quantitySold', { quantity: data.quantity })}
                       </p>
                       <p className="text-muted-foreground">
-                        ยอดขายรวม: {formatCurrency(data.totalSales)}
+                        {t('totalSales', {
+                          totalSales: formatCurrency(data.totalSales),
+                        })}
                       </p>
                     </div>
                   )

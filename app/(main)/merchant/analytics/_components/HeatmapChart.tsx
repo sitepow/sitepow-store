@@ -1,6 +1,8 @@
 'use client'
 
-import { DAYS, HOURS } from '@/constants/system'
+import { useTranslations } from 'next-intl'
+
+import { HOURS } from '@/constants/system'
 
 import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
 
@@ -13,6 +15,17 @@ interface HeatmapChartProps {
 }
 
 export function HeatmapChart({ heatmap }: HeatmapChartProps) {
+  const t = useTranslations('merchant.analytics.heatmap')
+  const days = [
+    t('days.0'),
+    t('days.1'),
+    t('days.2'),
+    t('days.3'),
+    t('days.4'),
+    t('days.5'),
+    t('days.6'),
+  ]
+
   const maxOrderInHeatmap = Math.max(...(heatmap.map((h) => h.count) ?? [1]), 1)
 
   const getHeatmapColor = (count: number) => {
@@ -39,21 +52,21 @@ export function HeatmapChart({ heatmap }: HeatmapChartProps) {
 
   return (
     <AnalyticsCardShell
-      title="Heatmap ช่วงเวลาขายดี (Day x Hour Matrix)"
-      description="ระดับสีเข้มแสดงถึงช่วงเวลาที่มีจำนวนคำสั่งซื้อหนาแน่นที่สุดในสัปดาห์"
+      title={t('title')}
+      description={t('description')}
       isEmpty={heatmap.length === 0}
-      emptyMessage="ไม่มีข้อมูล Heatmap การขาย"
+      emptyMessage={t('emptyMessage')}
       className="lg:col-span-2"
     >
       <div className="overflow-x-auto">
         <div className="min-w-175">
           <div className="mb-2 grid grid-cols-[80px_repeat(24,1fr)] gap-1 text-center text-xs font-semibold">
-            <div>วัน / เวลา</div>
+            <div>{t('dayTimeHeader')}</div>
             {HOURS.map((h) => (
               <div key={h}>{String(h).padStart(2, '0')}</div>
             ))}
           </div>
-          {DAYS.map((dayLabel, dayIdx) => (
+          {days.map((dayLabel, dayIdx) => (
             <div
               key={dayIdx}
               className="mb-1 grid grid-cols-[80px_repeat(24,1fr)] items-center gap-1"
@@ -69,7 +82,7 @@ export function HeatmapChart({ heatmap }: HeatmapChartProps) {
                 return (
                   <div
                     key={hour}
-                    title={`${dayLabel} ${hour}:00 - ${count} ออเดอร์`}
+                    title={t('tooltip', { day: dayLabel, hour, count })}
                     className={`flex h-8 items-center justify-center rounded text-[10px] transition-all ${getHeatmapColor(
                       count,
                     )}`}

@@ -1,5 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
+
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
@@ -20,20 +24,26 @@ interface DayOfWeekTrendChartProps {
   }>
 }
 
-const chartConfig = {
-  totalSales: { label: 'ยอดขาย (บาท)', color: '#22c55e' },
-  orderCount: { label: 'จำนวนออเดอร์', color: '#3b82f6' },
-} satisfies ChartConfig
-
 export function DayOfWeekTrendChart({
   dayOfWeekTrend,
 }: DayOfWeekTrendChartProps) {
+  const t = useTranslations('merchant.analytics.dayOfWeekTrend')
+
+  const chartConfig = useMemo(
+    () =>
+      ({
+        totalSales: { label: t('salesLabel'), color: '#22c55e' },
+        orderCount: { label: t('ordersLabel'), color: '#3b82f6' },
+      }) satisfies ChartConfig,
+    [t],
+  )
+
   return (
     <AnalyticsCardShell
-      title="ปริมาณออเดอร์และยอดขายตามวันในสัปดาห์"
-      description="ช่วยให้เห็นว่าวันไหนมีสถิติลูกค้าเข้าซื้อหนาแน่นที่สุด"
+      title={t('title')}
+      description={t('description')}
       isEmpty={dayOfWeekTrend.length === 0}
-      emptyMessage="ไม่มีข้อมูลแนวโน้มรายวัน"
+      emptyMessage={t('emptyMessage')}
       className="lg:col-span-2"
     >
       <div className="h-72 w-full">
@@ -78,7 +88,7 @@ export function DayOfWeekTrendChart({
               content={
                 <ChartTooltipContent
                   formatter={(value, name) => [
-                    name === 'totalSales' || name === 'ยอดขาย (บาท)'
+                    name === 'totalSales' || name === t('salesLabel')
                       ? formatCurrency(typeof value === 'number' ? value : 0)
                       : formatNumber(typeof value === 'number' ? value : 0),
                   ]}
@@ -90,7 +100,7 @@ export function DayOfWeekTrendChart({
               yAxisId="left"
               type="natural"
               dataKey="totalSales"
-              name="ยอดขาย (บาท)"
+              name={t('salesLabel')}
               stroke="#22c55e"
               fill="url(#fillTotalSales)"
               strokeWidth={2}
@@ -99,7 +109,7 @@ export function DayOfWeekTrendChart({
               yAxisId="right"
               type="natural"
               dataKey="orderCount"
-              name="จำนวนออเดอร์"
+              name={t('ordersLabel')}
               stroke="#3b82f6"
               fill="url(#fillOrderCount)"
               strokeWidth={2}

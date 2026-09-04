@@ -2,6 +2,8 @@
 
 import { ReactNode } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   Card,
   CardContent,
@@ -23,10 +25,13 @@ export function AnalyticsCardShell({
   title,
   description,
   isEmpty = false,
-  emptyMessage = 'ไม่มีข้อมูล',
+  emptyMessage,
   children,
   className,
 }: AnalyticsCardShellProps) {
+  const t = useTranslations('common.empty')
+  const resolvedEmptyMessage = emptyMessage ?? t('title')
+
   return (
     <Card className={`border-border/60 overflow-hidden ${className ?? ''}`}>
       <CardHeader>
@@ -36,7 +41,7 @@ export function AnalyticsCardShell({
       <CardContent>
         {isEmpty ? (
           <div className="text-muted-foreground py-8 text-center text-sm">
-            {emptyMessage}
+            {resolvedEmptyMessage}
           </div>
         ) : (
           children

@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PAYMENT_METHOD_TH } from '@/constants/translate'
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
@@ -26,14 +28,15 @@ interface PaymentBreakdownCardProps {
 export function PaymentBreakdownCard({
   paymentBreakdown,
 }: PaymentBreakdownCardProps) {
+  const t = useTranslations('merchant.analytics.paymentBreakdown')
   const totalBills = paymentBreakdown.reduce((acc, curr) => acc + curr.count, 0)
 
   return (
     <AnalyticsCardShell
-      title="ช่องทางการชำระเงิน (Payment Breakdown)"
-      description="สัดส่วนวิธีชำระเงินของลูกค้าทั้งหมด"
+      title={t('title')}
+      description={t('description')}
       isEmpty={paymentBreakdown.length === 0}
-      emptyMessage="ไม่มีข้อมูลการชำระเงิน"
+      emptyMessage={t('emptyMessage')}
     >
       <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
         <div className="relative flex h-52 w-52 shrink-0 items-center justify-center">
@@ -76,7 +79,10 @@ export function PaymentBreakdownCard({
                           </span>
                         </div>
                         <div className="text-muted-foreground mt-1 text-xs">
-                          {data.count} บิล ({data.percentage}%)
+                          {t('billCount', {
+                            count: data.count,
+                            percentage: data.percentage,
+                          })}
                         </div>
                       </div>
                     )
@@ -88,12 +94,14 @@ export function PaymentBreakdownCard({
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
             <span className="text-muted-foreground text-xs font-medium">
-              รวมทั้งหมด
+              {t('totalBills')}
             </span>
             <span className="text-foreground text-lg font-extrabold">
               {totalBills}
             </span>
-            <span className="text-muted-foreground text-[10px]">รายการ</span>
+            <span className="text-muted-foreground text-[10px]">
+              {t('itemsUnit')}
+            </span>
           </div>
         </div>
         <div className="w-full flex-1 space-y-2">
@@ -119,7 +127,7 @@ export function PaymentBreakdownCard({
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5 font-medium">
                     <span className="text-foreground font-bold">
-                      {item.count} บิล
+                      {t('billSummary', { count: item.count })}
                     </span>
                     <span className="text-muted-foreground">
                       ({item.percentage}%)
