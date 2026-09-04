@@ -91,7 +91,7 @@ function MerchantSettingsContent() {
               <IconBuildingStore size={14} /> ตั้งค่าข้อมูลร้านค้า
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.DOMAIN}>
-              <IconWorld size={14} /> โดเมนร้านค้า (Domain)
+              <IconWorld size={14} /> โดเมนร้านค้า
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.SECURITY}>
               <IconLock size={14} /> ความปลอดภัยบัญชี

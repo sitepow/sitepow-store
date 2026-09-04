@@ -11,7 +11,6 @@ import {
 import { DomainStatus } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
-  IconAlertCircle,
   IconCheck,
   IconCopy,
   IconExternalLink,
@@ -108,7 +107,7 @@ export function DomainSettingsForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconWorld}
-          title="การตั้งค่าโดเมนเนม (Custom Domain)"
+          title="การตั้งค่าโดเมนเนม"
           description="เชื่อมต่อชื่อโดเมนของคุณเองเพื่อสร้างแบรนด์ที่น่าเชื่อถือ หรือใช้งานระบบโดเมนฟรีของ Sitepow"
         />
       </CardHeader>
@@ -210,7 +209,7 @@ export function DomainSettingsForm() {
                     </span>
                     {customDomain.status === DomainStatus.ACTIVE && (
                       <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25">
-                        <IconCheck size={12} /> ใช้งานได้
+                        ใช้งานได้
                       </Badge>
                     )}
                     {customDomain.status === DomainStatus.PENDING && (
@@ -218,14 +217,11 @@ export function DomainSettingsForm() {
                         variant="outline"
                         className="border-amber-500/40 bg-amber-500/10 text-amber-600"
                       >
-                        <IconRefresh size={12} className="animate-spin" />{' '}
                         รอการยืนยัน DNS
                       </Badge>
                     )}
                     {customDomain.status === DomainStatus.FAILED && (
-                      <Badge variant="destructive">
-                        <IconAlertCircle size={12} /> ตรวจสอบไม่พบ
-                      </Badge>
+                      <Badge variant="destructive">ตรวจสอบไม่พบ</Badge>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
