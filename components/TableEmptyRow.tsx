@@ -1,18 +1,27 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { IconAlertCircle } from '@tabler/icons-react'
 
 import { TableCell, TableRow } from './ui/table'
 
 interface TableEmptyRowProps {
-  title: string
+  title?: string
   description?: string
   colSpan: number
 }
 
 export function TableEmptyRow({
   title,
-  description = 'ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือฟิลเตอร์ของคุณในปัจจุบัน',
+  description,
   colSpan,
 }: TableEmptyRowProps) {
+  const t = useTranslations('common.empty')
+
+  const displayTitle = title ?? t('title')
+  const displayDescription = description ?? t('description')
+
   return (
     <TableRow>
       <TableCell
@@ -21,10 +30,14 @@ export function TableEmptyRow({
       >
         <div className="flex flex-col items-center justify-center gap-2">
           <IconAlertCircle size={26} className="text-muted-foreground/40" />
-          <span className="text-foreground mt-1 font-semibold">{title}</span>
-          <span className="text-muted-foreground text-[11px]">
-            {description}
+          <span className="text-foreground mt-1 font-semibold">
+            {displayTitle}
           </span>
+          {displayDescription && (
+            <span className="text-muted-foreground text-[11px]">
+              {displayDescription}
+            </span>
+          )}
         </div>
       </TableCell>
     </TableRow>

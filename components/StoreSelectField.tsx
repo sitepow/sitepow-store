@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useMerchantStoreSetup, useStoreOptions } from '@/actions/hooks/store'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
@@ -19,6 +21,7 @@ import {
 import { Field, FieldLabel } from './ui/field'
 
 export function StoreSelectField() {
+  const t = useTranslations('merchant.shell')
   const isMounted = useIsMounted()
   const { data: stores = [], isLoading } = useStoreOptions()
   const { selectedStoreId, setSelectedStoreId, setSelectedStoreSlug } =
@@ -52,7 +55,7 @@ export function StoreSelectField() {
     <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
-        เลือกร้านค้าของคุณ
+        {t('selectStoreLabel')}
       </FieldLabel>
       <Select
         value={selectedStoreId}
@@ -71,11 +74,11 @@ export function StoreSelectField() {
         disabled={isLoading}
       >
         <SelectTrigger className="w-full sm:w-64">
-          <SelectValue placeholder="เลือกดูทุกร้านค้า" />
+          <SelectValue placeholder={t('allStoresPlaceholder')} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL_STORES}>
-            ทุกร้านค้า ({stores.length})
+            {t('allStoresOption', { count: stores.length })}
           </SelectItem>
           {stores.map((store) => (
             <SelectItem key={store.id} value={store.id}>

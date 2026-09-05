@@ -88,7 +88,6 @@ export function UserAvatarDropdown({
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="truncate text-sm leading-none font-medium">
-              บัญชีผู้ใช้งานของคุณ
               {tShell('yourAccount')}
             </p>
             <p className="text-muted-foreground text-xs leading-none">
@@ -109,7 +108,6 @@ export function UserAvatarDropdown({
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />
-                  {item.label}
                   {getItemLabel(item.value, item.label)}
                 </Link>
               </DropdownMenuItem>
@@ -122,7 +120,6 @@ export function UserAvatarDropdown({
           className="cursor-pointer"
           onClick={handleLogout}
         >
-          <IconLogout className="mr-2 stroke-[1.5]" size={18} /> ออกจากระบบ
           <IconLogout className="mr-2 stroke-[1.5]" size={18} />{' '}
           {tShell('logout')}
         </DropdownMenuItem>

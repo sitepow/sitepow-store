@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { useBranchOptions } from '@/actions/hooks/branch'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
@@ -15,6 +19,7 @@ import {
 import { Field, FieldLabel } from './ui/field'
 
 export function BranchSelectField() {
+  const t = useTranslations('merchant.shell')
   const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId, setSelectedBranchId } = useBranchFilter()
@@ -28,7 +33,7 @@ export function BranchSelectField() {
     <Field className="text-foreground w-full sm:w-fit">
       <FieldLabel>
         <IconFilter size={14} />
-        เลือกสาขาของร้านค้า
+        {t('selectBranchLabel')}
       </FieldLabel>
       <Select
         value={selectedBranchId}
@@ -36,11 +41,11 @@ export function BranchSelectField() {
         disabled={isLoading || !selectedStoreId}
       >
         <SelectTrigger className="w-full sm:w-64">
-          <SelectValue placeholder="เลือกดูทุกสาขา" />
+          <SelectValue placeholder={t('allBranchesPlaceholder')} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL_BRANCHES}>
-            ทุกสาขา ({branches.length})
+            {t('allBranchesOption', { count: branches.length })}
           </SelectItem>
           {branches.map((branch) => (
             <SelectItem key={branch.id} value={branch.id}>
