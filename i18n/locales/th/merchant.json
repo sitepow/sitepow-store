@@ -28,7 +28,12 @@
     "group_management": "การจัดการและบุคลากร",
     "group_marketing": "การตลาดและโปรโมชัน",
     "group_store_settings": "ตั้งค่าร้านค้าและบัญชี",
-    "group_account": "บัญชีและการตั้งค่า"
+    "group_account": "บัญชีและการตั้งค่า",
+    "buyer": {
+      "orders": "การซื้อของฉัน",
+      "reviews": "รีวิวของฉัน",
+      "settings": "ตั้งค่าบัญชี"
+    }
   },
   "shell": {
     "selectStoreLabel": "เลือกร้านค้าของคุณ",
@@ -57,7 +62,9 @@
     "actionRequired": {
       "title": "โปรดเลือกร้านค้า",
       "description": "กรุณาเลือกร้านค้าที่ต้องการก่อนเพื่อดำเนินการต่อ"
-    }
+    },
+    "creditsUnit": "เครดิต",
+    "currency": "บาท"
   },
   "dashboard": {
     "settingsButton": "ตั้งค่าร้านค้า",

@@ -28,7 +28,12 @@
     "group_management": "运营与团队",
     "group_marketing": "营销与推广",
     "group_store_settings": "店铺与账户设置",
-    "group_account": "账号与设置"
+    "group_account": "账号与设置",
+    "buyer": {
+      "orders": "我的订单",
+      "reviews": "我的评价",
+      "settings": "账户设置"
+    }
   },
   "shell": {
     "selectStoreLabel": "选择您的店铺",
@@ -57,7 +62,9 @@
     "actionRequired": {
       "title": "请选择店铺",
       "description": "请先选择需要操作的店铺以继续。"
-    }
+    },
+    "creditsUnit": "额度",
+    "currency": "泰铢"
   },
   "dashboard": {
     "settingsButton": "店铺设置",

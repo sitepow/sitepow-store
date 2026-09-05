@@ -28,7 +28,12 @@
     "group_management": "Operations & Staff",
     "group_marketing": "Marketing & Promotions",
     "group_store_settings": "Store & Account Settings",
-    "group_account": "Account & Settings"
+    "group_account": "Account & Settings",
+    "buyer": {
+      "orders": "My Purchases",
+      "reviews": "My Reviews",
+      "settings": "Account Settings"
+    }
   },
   "shell": {
     "selectStoreLabel": "Select your store",
@@ -57,7 +62,9 @@
     "actionRequired": {
       "title": "Please select a store",
       "description": "Please select a store to proceed."
-    }
+    },
+    "creditsUnit": "Credits",
+    "currency": "THB"
   },
   "dashboard": {
     "settingsButton": "Store Settings",

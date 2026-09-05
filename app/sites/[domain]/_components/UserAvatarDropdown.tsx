@@ -2,6 +2,7 @@
 
 import { ComponentProps, Fragment } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { USER_ICON } from '@/constants/favicon'
@@ -33,7 +34,22 @@ export function UserAvatarDropdown({
   redirectPath,
   ...props
 }: UserAvatarDropdownProps) {
+  const tShell = useTranslations('merchant.shell')
+  const tNav = useTranslations('merchant.navigation')
   const { user } = useSession()
+
+  const getItemLabel = (val: string, fallback: string) => {
+    if (redirectPath === 'user') {
+      const buyerKey = `buyer.${val}` as any
+      if (tNav.has(buyerKey)) {
+        return tNav(buyerKey)
+      }
+    }
+    if (tNav.has(val as any)) {
+      return tNav(val as any)
+    }
+    return fallback
+  }
 
   const handleLogout = async () => {
     const isCentralDomain =
@@ -73,6 +89,7 @@ export function UserAvatarDropdown({
           <div className="flex flex-col space-y-1">
             <p className="truncate text-sm leading-none font-medium">
               บัญชีผู้ใช้งานของคุณ
+              {tShell('yourAccount')}
             </p>
             <p className="text-muted-foreground text-xs leading-none">
               {user?.email}
@@ -93,6 +110,7 @@ export function UserAvatarDropdown({
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />
                   {item.label}
+                  {getItemLabel(item.value, item.label)}
                 </Link>
               </DropdownMenuItem>
             </Fragment>
@@ -105,6 +123,8 @@ export function UserAvatarDropdown({
           onClick={handleLogout}
         >
           <IconLogout className="mr-2 stroke-[1.5]" size={18} /> ออกจากระบบ
+          <IconLogout className="mr-2 stroke-[1.5]" size={18} />{' '}
+          {tShell('logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
