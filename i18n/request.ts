@@ -11,7 +11,6 @@ type MessageLoader = () => Promise<{ default: Record<string, unknown> }>
 const MESSAGE_LOADERS: Record<SupportedLocale, MessageLoader> = {
   th: () => import('./locales/th'),
   en: () => import('./locales/en'),
-  cn: () => import('./locales/cn'),
 }
 
 export default getRequestConfig(async ({ requestLocale }) => {
