@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -24,6 +25,7 @@ import { CartItemCard } from './_components/CartItemCard'
 import { CartSummary } from './_components/CartSummary'
 
 export function CartDrawer() {
+  const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
 
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
@@ -44,14 +46,14 @@ export function CartDrawer() {
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center gap-2">
             <ShoppingCartIcon className="size-5" />
-            ตะกร้าสินค้า ({summary.totalQuantity})
+            {t('title')} ({summary.totalQuantity})
           </DrawerTitle>
         </DrawerHeader>
         <ScrollArea className="flex-1 overflow-y-scroll px-4">
           {items.length === 0 ? (
             <div className="text-muted-foreground flex h-[60vh] flex-col items-center justify-center gap-2">
               <ShoppingCartIcon className="h-12 w-12 opacity-20" />
-              <p>ยังไม่มีสินค้าในตะกร้า</p>
+              <p>{t('empty')}</p>
             </div>
           ) : (
             <div className="space-y-4 py-4">
@@ -88,7 +90,9 @@ export function CartDrawer() {
                 size="lg"
                 className="h-12 w-full text-lg shadow-md sm:text-lg"
               >
-                สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
+                {t('checkoutButton', {
+                  amount: formatCurrency(summary.finalPrice),
+                })}
               </Button>
             </Link>
           </DrawerFooter>

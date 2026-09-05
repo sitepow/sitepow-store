@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { ChevronLeft, HeartIcon, Share2Icon } from 'lucide-react'
@@ -5,6 +8,8 @@ import { ChevronLeft, HeartIcon, Share2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function ProductGalleryHeader() {
+  const t = useTranslations('common.actions')
+
   return (
     <div className="flex items-center justify-between">
       <Link href={'/products'}>
@@ -13,7 +18,7 @@ export function ProductGalleryHeader() {
           className="text-muted-foreground hover:text-primary -ml-4"
         >
           <ChevronLeft className="mr-2 size-4" />
-          <span>ย้อนกลับ</span>
+          <span>{t('back')}</span>
         </Button>
       </Link>
       <div className="flex gap-2.5">

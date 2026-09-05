@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { TagIcon } from 'lucide-react'
 
@@ -20,6 +22,7 @@ const metadataLabelMap = PRODUCT_METADATA_MASTER.reduce<Record<string, string>>(
 )
 
 export function ProductSpecification() {
+  const t = useTranslations('storefront.products')
   const product = useProductPurchaseStore((s) => s.product)
   const isLoading = useProductPurchaseStore((s) => s.isLoading)
 
@@ -61,7 +64,7 @@ export function ProductSpecification() {
       {hasSpecs && (
         <>
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold">ข้อมูลจำเพาะ</h3>
+            <h3 className="text-xl font-bold">{t('specifications')}</h3>
             <Separator className="flex-1" />
           </div>
           <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
@@ -89,7 +92,7 @@ export function ProductSpecification() {
       {hasTags && (
         <>
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold">แท็กสินค้า</h3>
+            <h3 className="text-xl font-bold">{t('tags')}</h3>
             <Separator className="flex-1" />
           </div>
           <div className="flex flex-wrap gap-2">

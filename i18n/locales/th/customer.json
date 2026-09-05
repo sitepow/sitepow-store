@@ -95,7 +95,25 @@
     "uploadReceipt": "แนบหลักฐานการโอนเงิน (สลิป)",
     "clickOrDrag": "คลิกหรือลากไฟล์สลิปมาที่นี่",
     "submitting": "กำลังส่งข้อมูล...",
-    "submitSlip": "ยืนยันการแจ้งชำระเงิน"
+    "submitSlip": "ยืนยันการแจ้งชำระเงิน",
+    "statuses": {
+      "PENDING": "รอชำระเงิน",
+      "MANUAL_CHECK": "รอตรวจสอบสลิป",
+      "PAID": "ชำระเงินแล้ว",
+      "SHIPPED": "จัดส่งแล้ว",
+      "CANCELLED": "ยกเลิกแล้ว"
+    },
+    "stripePaymentDesc": "ชำระเงินคำสั่งซื้อ #{orderNumber}",
+    "shippingMethod": "วิธีการจัดส่ง",
+    "copied": "คัดลอกแล้ว",
+    "copy": "คัดลอก",
+    "clickToUploadSlip": "คลิกเพื่ออัปโหลดสลิป",
+    "uploadSlipExpired": "หมดเวลาอัปโหลดสลิป",
+    "confirmPayment": "ยืนยันการชำระเงิน",
+    "sending": "กำลังส่ง...",
+    "bankAccount": "เลขบัญชี",
+    "cancel": "ยกเลิก",
+    "slipNoticeDesc": "กรุณาโอนเงินให้ตรงกับยอดรวม ({totalAmount}) และอัปโหลดสลิปให้ตรงกับคำสั่งซื้อ #{orderNumber} นี้เท่านั้น หากยอดเงินไม่ตรงหรือสลิปไม่ถูกต้อง ระบบจะตีตกสถานะเป็นไม่ผ่านอัตโนมัติ"
   },
   "addresses": {
     "title": "สมุดที่อยู่",
@@ -134,7 +152,22 @@
     "taxIdPlaceholder": "เลข 13 หลัก",
     "branchCode": "รหัสสาขา *",
     "recipientPlaceholder": "ระบุชื่อผู้รับสินค้า",
-    "addressLinePlaceholder": "123/45 หมู่ 1 ซอย..."
+    "addressLinePlaceholder": "123/45 หมู่ 1 ซอย...",
+    "columns": {
+      "address": "ที่อยู่",
+      "recipient": "ผู้รับสินค้า",
+      "phone": "เบอร์ติดต่อ",
+      "details": "รายละเอียด",
+      "actions": "จัดการ"
+    },
+    "recipientNameRequired": "ชื่อ-นามสกุล ผู้รับพัสดุ *",
+    "phoneRequired": "หมายเลขโทรศัพท์ติดต่อ *",
+    "addressLineRequired": "บ้านเลขที่, หมู่ที่, ซอย, ถนน *",
+    "subDistrictRequired": "ตำบล / แขวง *",
+    "districtRequired": "อำเภอ / เขต *",
+    "provinceRequired": "จังหวัด *",
+    "postalCodeRequired": "รหัสไปรษณีย์ *",
+    "saveAddressButton": "บันทึกข้อมูลที่อยู่"
   },
   "profile": {
     "title": "โปรไฟล์ส่วนตัว",

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import {
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/table'
 
 export function AddressTable() {
+  const t = useTranslations('customer.addresses')
   const params = useParams()
   const domain = params?.domain as string
 
@@ -33,35 +35,45 @@ export function AddressTable() {
     useDeleteAddress()
   const { mutate: setDefault } = useSetDefaultAddress()
 
+  const isOfficeAddress = (name?: string | null) => {
+    if (!name) return false
+    const lower = name.toLowerCase()
+    return (
+      lower.includes('office') ||
+      lower.includes('work') ||
+      (t.has('office' as any) && name.includes(t('office' as any)))
+    )
+  }
+
   return (
     <div className="rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ที่อยู่</TableHead>
-            <TableHead>ผู้รับสินค้า</TableHead>
-            <TableHead>เบอร์ติดต่อ</TableHead>
-            <TableHead>รายละเอียด</TableHead>
-            <TableHead className="text-right">จัดการ</TableHead>
+            <TableHead>{t('columns.address')}</TableHead>
+            <TableHead>{t('columns.recipient')}</TableHead>
+            <TableHead>{t('columns.phone')}</TableHead>
+            <TableHead>{t('columns.details')}</TableHead>
+            <TableHead className="text-right">{t('columns.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading && addresses.length === 0 ? (
             <TableLoadingRow colSpan={5} />
           ) : addresses.length === 0 ? (
-            <TableEmptyRow colSpan={5} title="คุณยังไม่มีที่อยู่ในระบบ" />
+            <TableEmptyRow colSpan={5} title={t('empty')} />
           ) : (
             addresses.map((addr) => (
               <TableRow key={addr.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {addr.name?.includes('ออฟฟิศ') ? (
+                    {isOfficeAddress(addr.name) ? (
                       <IconBriefcase size={16} />
                     ) : (
                       <IconHome size={16} />
                     )}
                     <span>{addr.name}</span>
-                    {addr.isDefault && <Badge>ที่อยู่หลัก</Badge>}
+                    {addr.isDefault && <Badge>{t('defaultBadge')}</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>{addr.receiverName}</TableCell>
@@ -77,11 +89,13 @@ export function AddressTable() {
                         onClick={() => setDefault(addr.id)}
                       >
                         <IconArrowForward />
-                        ตั้งเป็นที่อยู่หลัก
+                        {t('setDefault')}
                       </Button>
                     )}
                     <DeleteButton
                       isPending={isDeletePending}
+                      title={t('confirmDeleteTitle')}
+                      description={t('confirmDeleteDesc')}
                       onDelete={() => deleteAddress(addr.id)}
                     />
                   </div>

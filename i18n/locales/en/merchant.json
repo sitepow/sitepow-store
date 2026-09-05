@@ -30,8 +30,11 @@
     "group_store_settings": "Store & Account Settings",
     "group_account": "Account & Settings",
     "buyer": {
+      "dashboard": "Dashboard",
       "orders": "My Purchases",
       "reviews": "My Reviews",
+      "profile": "My Profile",
+      "addresses": "Delivery Addresses",
       "settings": "Account Settings"
     }
   },
@@ -1144,15 +1147,7 @@
       "emptyMessage": "No heatmap data",
       "dayTimeHeader": "Day / Time",
       "tooltip": "{day} {hour}:00 - {count} orders",
-      "days": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
-      ]
+      "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     },
     "peakHours": {
       "title": "Top 5 Peak Hours",

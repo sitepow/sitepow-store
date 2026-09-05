@@ -1,4 +1,8 @@
+'use client'
+
 import toast from 'react-hot-toast'
+
+import { useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
 import {
@@ -21,6 +25,7 @@ import { useProductPurchaseStore } from '../../store'
 import { QuantitySelector } from './QuantitySelector'
 
 export function ProductAddToCart() {
+  const t = useTranslations('storefront.products')
   const {
     product,
     quantity,
@@ -46,7 +51,7 @@ export function ProductAddToCart() {
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
-      toast.error('กรุณาเลือกรูปแบบสินค้า')
+      toast.error(t('selectVariant'))
       return
     }
 
@@ -56,7 +61,9 @@ export function ProductAddToCart() {
     })
 
     if (missingOptions.length > 0) {
-      toast.error(`กรุณาเลือก ${missingOptions.join(', ')}`)
+      toast.error(
+        t('selectMissingOption', { options: missingOptions.join(', ') }),
+      )
       return
     }
 
@@ -89,21 +96,28 @@ export function ProductAddToCart() {
       product.images?.[0]?.url ||
       ''
 
-    addItem({
-      productId: product.id,
-      productTitle: product.title,
-      branchId: selectedBranchId ?? '',
-      branchName: selectedBranchName ?? '',
-      weight: selectedVariant.weight || 0,
-      image: itemImage,
-      variant: selectedVariant,
-      selectedOptions: mappedOptions,
-      selectedAddons: selectedAddonsData,
-      quantity,
-      unitPrice,
-      rewardPoints,
-      productType: product?.productType ?? ProductType.PHYSICAL,
-    })
+    addItem(
+      {
+        productId: product.id,
+        productTitle: product.title,
+        branchId: selectedBranchId ?? '',
+        branchName: selectedBranchName ?? '',
+        weight: selectedVariant.weight || 0,
+        image: itemImage,
+        variant: selectedVariant,
+        selectedOptions: mappedOptions,
+        selectedAddons: selectedAddonsData,
+        quantity,
+        unitPrice,
+        rewardPoints,
+        productType: product?.productType ?? ProductType.PHYSICAL,
+      },
+      {
+        consignmentStockOut: t('consignmentStockOut'),
+        branchStockOut: t('branchStockOut'),
+        addedToCart: t('addedToCart'),
+      },
+    )
   }
 
   if (isLoading) {
@@ -121,7 +135,7 @@ export function ProductAddToCart() {
   return (
     <>
       <div className="flex flex-col gap-2.5 font-bold">
-        <Label className="text-lg font-semibold">จำนวน</Label>
+        <Label className="text-lg font-semibold">{t('quantity')}</Label>
         <div className="flex items-center gap-5">
           <QuantitySelector
             value={quantity}
@@ -130,15 +144,17 @@ export function ProductAddToCart() {
           {(isPhysical || isDigitalItem) && (
             <div className="flex gap-2.5">
               <PackageIcon className="text-primary" />
-              <span>{formatNumber(stock)} ชิ้น</span>
+              <span>
+                {formatNumber(stock)} {t('pieces')}
+              </span>
             </div>
           )}
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-2">
-        <Label className="text-lg font-semibold">ข้อมูลเพิ่มเติม (ถ้ามี)</Label>
+        <Label className="text-lg font-semibold">{t('additionalInfo')}</Label>
         <Textarea
-          placeholder="กรอกข้อความถึงผู้ขายที่นี่"
+          placeholder={t('sellerNotePlaceholder')}
           className="min-h-20"
         />
       </div>
@@ -147,7 +163,7 @@ export function ProductAddToCart() {
         className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >
-        เพิ่มลงตะกร้า
+        {t('addToCart')}
       </Button>
     </>
   )

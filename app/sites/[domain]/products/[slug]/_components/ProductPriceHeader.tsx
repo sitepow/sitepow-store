@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { Label } from '@/components/ui/label'
@@ -7,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductPriceHeader() {
+  const t = useTranslations('storefront.products')
   const { product, getCurrentPoints, getTotalPrice, isLoading } =
     useProductPurchaseStore()
   const totalPrice = getTotalPrice()
@@ -27,7 +32,7 @@ export function ProductPriceHeader() {
           <Skeleton className="h-12 w-36 rounded-lg" />
         ) : (
           <>
-            <Label className="text-lg font-semibold">ราคาสินค้า</Label>
+            <Label className="text-lg font-semibold">{t('price')}</Label>
             <div className="flex items-end gap-2">
               <data
                 value={totalPrice}
@@ -39,11 +44,14 @@ export function ProductPriceHeader() {
 
             {points > 0 && (
               <p>
-                คุณจะได้รับ{' '}
-                <span className="text-primary text-lg font-bold">
-                  {formatNumber(points)}
-                </span>{' '}
-                แต้มสะสม
+                {t.rich('earnPoints', {
+                  points: formatNumber(points),
+                  span: (chunks) => (
+                    <span className="text-primary text-lg font-bold">
+                      {chunks}
+                    </span>
+                  ),
+                })}
               </p>
             )}
           </>

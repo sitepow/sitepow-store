@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
@@ -32,6 +33,7 @@ import { StoreMobileMenu } from './_components/StoreMobileMenu'
 import { StoreSearchInput } from './_components/StoreSearchInput'
 
 export function StoreNavbar() {
+  const t = useTranslations('storefront')
   const { store } = useStoreData()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -81,7 +83,7 @@ export function StoreNavbar() {
                 <Link href={loginHref} className="hidden lg:block">
                   <Button variant="secondary" size="lg">
                     <LockKeyholeIcon className="mr-2" />
-                    เข้าสู่ระบบ
+                    {t('navbar.login')}
                   </Button>
                 </Link>
               )}

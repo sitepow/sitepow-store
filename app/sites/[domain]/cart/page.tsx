@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import {
   useParams,
@@ -65,6 +66,7 @@ import { useCartStore } from './store'
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 
 export default function StoreCartPage() {
+  const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
   const isMounted = useIsMounted()
   const router = useRouter()
@@ -134,15 +136,19 @@ export default function StoreCartPage() {
             const baseDescription =
               acc.type === BankAccountType.PROMPTPAY
                 ? `${formatPromptPay(acc.promptPayId)} (${acc.accountName})`
-                : `บัญชี ${acc.bankName} เลขที่ ${formatBankAccount(acc.accountNumber)} (${acc.accountName})`
+                : t('bankAccountDesc', {
+                    bank: acc.bankName,
+                    number: formatBankAccount(acc.accountNumber),
+                    name: acc.accountName,
+                  })
 
             return {
               id: acc.id,
               title:
                 acc.type === BankAccountType.PROMPTPAY
-                  ? 'พร้อมเพย์ (PromptPay)'
-                  : 'โอนเงินบัญชีธนาคาร',
-              description: `${baseDescription} (ต้องอัพโหลดสลิปด้วยตนเอง)`,
+                  ? t('promptpay')
+                  : t('bankTransfer'),
+              description: `${baseDescription} (${t('manualUploadSlip')})`,
             }
           })
         : []),
@@ -150,31 +156,28 @@ export default function StoreCartPage() {
         ? [
             {
               id: PaymentMethod.STRIPE_QR_PROMPTPAY,
-              title: '(Stripe) QR พร้อมเพย์',
-              description:
-                'รองรับธนาคารไทยทุกแห่ง (กสิกร, ไทยพาณิชย์, กรุงเทพ, กรุงไทย, กสิกรไทย ฯลฯ) (ระบบอัตโนมัติ)',
+              title: t('stripePromptpay'),
+              description: t('stripePromptpayDesc'),
             },
             {
               id: PaymentMethod.STRIPE_CREDIT_CARD,
-              title: '(Stripe) บัตรเครดิต / เดบิต',
-              description: 'ชำระผ่าน Visa หรือ Mastercard (ระบบอัตโนมัติ)',
+              title: t('stripeCard'),
+              description: t('stripeCardDesc'),
             },
             {
               id: PaymentMethod.STRIPE_GOOGLE_PAY,
               title: '(Stripe) Google Pay',
-              description:
-                'ชำระเงินอย่างรวดเร็วผ่านบัญชี Google Pay (ระบบอัตโนมัติ)',
+              description: t('googlePayDesc'),
             },
             {
               id: PaymentMethod.STRIPE_APPLE_PAY,
               title: '(Stripe) Apple Pay',
-              description:
-                'ชำระเงินอย่างรวดเร็วผ่านบัญชี Apple Pay (ระบบอัตโนมัติ)',
+              description: t('applePayDesc'),
             },
           ]
         : []),
     ]
-  }, [paymentOptions])
+  }, [paymentOptions, t])
 
   const selectedAddressData = addressOptions.find(
     (a) => a.id === selectedAddress,
@@ -328,17 +331,17 @@ export default function StoreCartPage() {
   const sectionDescription = useMemo(() => {
     switch (activeSection) {
       case 'address':
-        return 'เลือกที่อยู่การจัดส่ง'
+        return t('stepAddressAction')
       case 'shipping':
-        return 'เลือกช่องทางจัดส่งสินค้า (รวมทุกสาขา)'
+        return t('stepShippingAction')
       case 'payment':
-        return 'เลือกวิธีชำระเงิน'
+        return t('stepPaymentAction')
       case 'review':
-        return 'ตรวจสอบรายการและยืนยันการสั่งซื้อ'
+        return t('stepReviewAction')
       default:
-        return 'ดำเนินการสั่งซื้อ'
+        return t('proceedOrder')
     }
-  }, [activeSection])
+  }, [activeSection, t])
 
   useEffect(() => {
     if (hasPhysical && !selectedAddress && addressOptions.length > 0) {
@@ -474,7 +477,9 @@ export default function StoreCartPage() {
                 customerEmail: user?.email ?? '',
                 storeId: store.id,
                 orderIds: orderIdsString,
-                description: `ชำระเงินคำสั่งซื้อ #${orderNumbersString}`,
+                description: t('orderPaymentFor', {
+                  orders: orderNumbersString,
+                }),
                 amount: calculatedGrandTotal,
                 successUrl: `${window.location.origin}/user/orders`,
                 cancelUrl: `${window.location.origin}/user/orders`,
@@ -501,17 +506,17 @@ export default function StoreCartPage() {
               <Link href={'/'}>
                 <Button variant="ghost" className="text-muted-foreground -ml-4">
                   <ChevronLeftIcon />
-                  <span>แก้ไขรายการสินค้า</span>
+                  <span>{t('editItems')}</span>
                 </Button>
               </Link>
             </div>
             <div className="border-border flex flex-col rounded-xl border">
               <div className="rounded-xl px-5 py-2.5 text-start font-bold">
                 <h2>
-                  ตะกร้าสินค้า{' '}
+                  {t('cartItems')}{' '}
                   {physicalGroups.length > 0 && (
                     <span className="text-primary text-xs font-normal">
-                      (สินค้าจัดส่งจาก{' '}
+                      ({t('shippingFromBranch')}{' '}
                       {physicalGroups
                         .map((g) => g.branchName)
                         .filter(Boolean)
@@ -525,7 +530,7 @@ export default function StoreCartPage() {
                 <div className="p-5">
                   <Alert>
                     <AlertDescription className="flex items-center gap-2">
-                      <IconAlertCircle /> ยังไม่มีสินค้าในตะกร้า
+                      <IconAlertCircle /> {t('empty')}
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -569,7 +574,7 @@ export default function StoreCartPage() {
                 />
                 <div className="space-y-0.5">
                   <h3 className="font-bold" suppressHydrationWarning>
-                    ยอดที่ต้องชำระ{' '}
+                    {t('totalToPay')}{' '}
                     <span className="font-extrabold">
                       {formatCurrency(grandTotal)}
                     </span>
@@ -582,7 +587,7 @@ export default function StoreCartPage() {
             </div>
             {physicalItems?.length > 0 && (
               <CheckoutSection
-                title={`${getStepNumber('address')}. ที่อยู่สำหรับการจัดส่ง`}
+                title={`${getStepNumber('address')}. ${t('stepAddressTitle')}`}
                 isActive={activeSection === 'address'}
                 isCompleted={!!selectedAddressData}
                 onEdit={() => handleSectionChange('address')}
@@ -591,14 +596,14 @@ export default function StoreCartPage() {
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2.5">
                     <span className="text-muted-foreground text-sm">
-                      เลือกที่อยู่ที่ต้องการให้จัดส่ง
+                      {t('selectDeliveryAddress')}
                     </span>
                     <CustomerAddressCreateDialog />
                   </div>
                   {addressOptions?.length === 0 && (
                     <ActionRequiredAlert
-                      title="พบข้อผิดพลาด"
-                      description="ไม่มีที่อยู่สำหรับการจัดส่งสินค้า"
+                      title={t('errorTitle')}
+                      description={t('noAddressError')}
                     />
                   )}
                   {addressOptions?.length !== 0 && (
@@ -625,7 +630,7 @@ export default function StoreCartPage() {
                     disabled={!selectedAddressData}
                     onClick={goToNextIncompleteStep}
                   >
-                    ดำเนินการต่อ <IconArrowRight />
+                    {t('continue')} <IconArrowRight />
                   </Button>
                 </div>
                 {selectedAddressData && (
@@ -642,7 +647,7 @@ export default function StoreCartPage() {
             )}
             {physicalItems?.length > 0 && (
               <CheckoutSection
-                title={`${getStepNumber('shipping')}. เลือกช่องทางจัดส่ง`}
+                title={`${getStepNumber('shipping')}. ${t('stepShippingTitle')}`}
                 isActive={activeSection === 'shipping'}
                 isCompleted={!!selectedShipping}
                 onEdit={() => handleSectionChange('shipping')}
@@ -651,8 +656,8 @@ export default function StoreCartPage() {
                 <div className="space-y-4">
                   {shippingOptions.length === 0 && (
                     <ActionRequiredAlert
-                      title="พบข้อผิดพลาด"
-                      description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางจัดส่ง กรุณาติดต่อร้านค้าโดยตรง"
+                      title={t('errorTitle')}
+                      description={t('noShippingError')}
                     />
                   )}
                   {shippingOptionsWithFees.length !== 0 && (
@@ -672,13 +677,17 @@ export default function StoreCartPage() {
                               description={
                                 <>
                                   <span>
-                                    ค่าจัดส่ง: {formatCurrency(method.fee ?? 0)}
+                                    {t('shippingFeePrefix')}{' '}
+                                    {formatCurrency(method.fee ?? 0)}
                                   </span>{' '}
                                   <br />
                                   <span>
-                                    ใช้เวลาจัดส่ง:{' '}
+                                    {t('deliveryTime')}{' '}
                                     {method.courierService.estimatedDays
-                                      ? `จัดส่งภายใน ${method.courierService.estimatedDays}`
+                                      ? t('deliveryDaysEstimated', {
+                                          days: method.courierService
+                                            .estimatedDays,
+                                        })
                                       : method.courierService.courier.name}
                                   </span>
                                 </>
@@ -696,7 +705,7 @@ export default function StoreCartPage() {
                     disabled={!selectedShippingData}
                     onClick={goToNextIncompleteStep}
                   >
-                    ดำเนินการต่อ <IconArrowRight />
+                    {t('continue')} <IconArrowRight />
                   </Button>
                 </div>
                 {selectedShippingData && (
@@ -708,16 +717,19 @@ export default function StoreCartPage() {
                       description={
                         <>
                           <span>
-                            ค่าจัดส่ง:{' '}
+                            {t('shippingFeePrefix')}{' '}
                             {selectedShippingData.fee !== null
                               ? formatCurrency(selectedShippingData.fee)
-                              : 'ไม่รองรับน้ำหนักนี้'}
+                              : t('notSupportWeight')}
                           </span>{' '}
                           <br />
                           <span>
-                            ใช้เวลาจัดส่ง:{' '}
+                            {t('deliveryTime')}{' '}
                             {selectedShippingData.courierService.estimatedDays
-                              ? `จัดส่งภายใน ${selectedShippingData.courierService.estimatedDays}`
+                              ? t('deliveryDaysEstimated', {
+                                  days: selectedShippingData.courierService
+                                    .estimatedDays,
+                                })
                               : selectedShippingData.courierService.courier
                                   .name}
                           </span>
@@ -729,7 +741,7 @@ export default function StoreCartPage() {
               </CheckoutSection>
             )}
             <CheckoutSection
-              title={`${getStepNumber('payment')}. วิธีชำระเงิน`}
+              title={`${getStepNumber('payment')}. ${t('stepPaymentTitle')}`}
               isActive={activeSection === 'payment'}
               isCompleted={!!selectedPayment}
               onEdit={() => handleSectionChange('payment')}
@@ -738,8 +750,8 @@ export default function StoreCartPage() {
               <div className="space-y-3">
                 {paymentMethods.length === 0 && (
                   <ActionRequiredAlert
-                    title="พบข้อผิดพลาด"
-                    description="ร้านค้านี้ยังไม่ได้ตั้งค่าช่องทางชำระเงิน กรุณาติดต่อร้านค้าโดยตรง"
+                    title={t('errorTitle')}
+                    description={t('noPaymentError')}
                   />
                 )}
                 {paymentMethods.length !== 0 && (
@@ -766,7 +778,7 @@ export default function StoreCartPage() {
                   disabled={!selectedPayment || paymentMethods.length === 0}
                   onClick={goToNextIncompleteStep}
                 >
-                  ดำเนินการต่อ <IconArrowRight />
+                  {t('continue')} <IconArrowRight />
                 </Button>
               </div>
               {selectedPaymentData && (
@@ -789,11 +801,11 @@ export default function StoreCartPage() {
               <div className="relative z-10">
                 <SummaryRow
                   className="mb-5"
-                  label="ส่วนลด"
+                  label={t('discount')}
                   value={<DiscountForm subtotal={summary.finalPrice} />}
                 />
                 <SummaryRow
-                  label="ค่าจัดส่งรวม"
+                  label={t('totalShippingFee')}
                   value={formatCurrency(shippingFee)}
                 />
                 <div>
@@ -803,7 +815,7 @@ export default function StoreCartPage() {
                   <div className="border-border mt-2 space-y-1 border-t pt-2">
                     {pointsDiscount > 0 && (
                       <SummaryRow
-                        label="ส่วนลดจากแต้มสะสม"
+                        label={t('pointsDiscountLabel')}
                         value={
                           <HighlightText>
                             - {formatCurrency(pointsDiscount)}
@@ -813,7 +825,9 @@ export default function StoreCartPage() {
                     )}
                     {couponDiscount > 0 && (
                       <SummaryRow
-                        label={`ส่วนลดจากรหัส (${appliedCoupon?.code})`}
+                        label={t('couponDiscountCode', {
+                          code: appliedCoupon?.code ?? '',
+                        })}
                         value={
                           <HighlightText>
                             - {formatCurrency(couponDiscount)}
@@ -825,7 +839,7 @@ export default function StoreCartPage() {
                 )}
                 <div className="border-border mt-4 border-t pt-2">
                   <SummaryTotal
-                    label="ยอดที่ต้องชำระ"
+                    label={t('orderTotal')}
                     value={formatCurrency(grandTotal)}
                   />
                 </div>
@@ -844,8 +858,8 @@ export default function StoreCartPage() {
                   >
                     {createOrderMutation.isPending ||
                     storeCheckoutMutation.isPending
-                      ? 'กำลังดำเนินการ...'
-                      : 'สั่งสินค้า'}
+                      ? t('processingOrderBtn')
+                      : t('placeOrderAction')}
                   </Button>
                 )}
                 {!isAuthenticated && (
@@ -855,8 +869,7 @@ export default function StoreCartPage() {
                     asChild
                   >
                     <Link href={loginHref}>
-                      เข้าสู่ระบบเพื่อสั่งซื้อ{' '}
-                      <IconLock className="ml-1 size-5" />
+                      {t('loginToOrder')} <IconLock className="ml-1 size-5" />
                     </Link>
                   </Button>
                 )}

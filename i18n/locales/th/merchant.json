@@ -30,8 +30,11 @@
     "group_store_settings": "ตั้งค่าร้านค้าและบัญชี",
     "group_account": "บัญชีและการตั้งค่า",
     "buyer": {
+      "dashboard": "แดชบอร์ด",
       "orders": "การซื้อของฉัน",
       "reviews": "รีวิวของฉัน",
+      "profile": "โปรไฟล์ส่วนตัว",
+      "addresses": "ที่อยู่จัดส่ง",
       "settings": "ตั้งค่าบัญชี"
     }
   },

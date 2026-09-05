@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
@@ -27,6 +28,7 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductVariantSelector() {
+  const t = useTranslations('storefront.products')
   const {
     product,
     selectedVariant,
@@ -46,7 +48,7 @@ export function ProductVariantSelector() {
         if (stock.branchId && !branchMap.has(stock.branchId)) {
           branchMap.set(
             stock.branchId,
-            stock.branch?.name || `สาขา ${stock.branchId}`,
+            stock.branch?.name || t('branchPrefix', { name: stock.branchId }),
           )
         }
       })
@@ -55,7 +57,7 @@ export function ProductVariantSelector() {
       branchId,
       branchName,
     }))
-  }, [product])
+  }, [product, t])
 
   useEffect(() => {
     if (!isPhysical) {
@@ -83,7 +85,7 @@ export function ProductVariantSelector() {
             {isPhysical && (
               <div className="space-y-2">
                 <Label className="text-lg font-semibold">
-                  สาขาที่รับสินค้า
+                  {t('branchPickup')}
                 </Label>
                 <Select
                   value={selectedBranchId || ''}
@@ -93,12 +95,13 @@ export function ProductVariantSelector() {
                     )
                     setSelectedBranch(
                       val,
-                      foundBranch?.branchName || `สาขา ${val}`,
+                      foundBranch?.branchName ||
+                        t('branchPrefix', { name: val }),
                     )
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="กรุณาเลือกสาขา" />
+                    <SelectValue placeholder={t('selectBranch')} />
                   </SelectTrigger>
                   <SelectContent>
                     {allBranches.map((branch) => (
@@ -110,7 +113,7 @@ export function ProductVariantSelector() {
                 </Select>
               </div>
             )}
-            <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
+            <Label className="text-lg font-semibold">{t('options')}</Label>
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
@@ -183,12 +186,14 @@ export function ProductVariantSelector() {
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
                             <Badge className="px-1.5 py-0 text-[10px]">
-                              ส่วนลด {variant.discountAmount}%
+                              {t('discountPercent', {
+                                percent: variant.discountAmount ?? 0,
+                              })}
                             </Badge>
                           )}
                         {hasPoint && (
                           <Badge className="px-1.5 py-0 text-[10px]">
-                            + {variant.pointsAmount} แต้ม
+                            {t('plusPoints', { points: variant.pointsAmount })}
                           </Badge>
                         )}
                       </div>

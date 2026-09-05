@@ -1,5 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
+
+import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import { useStorefrontDashboard } from '@/actions/hooks/storefront/dashboard'
@@ -27,25 +30,8 @@ import {
 } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const spendingChartConfig = {
-  total: {
-    label: 'ยอดซื้อรวม',
-    color: 'hsl(var(--primary))',
-  },
-} satisfies ChartConfig
-
-const pointsChartConfig = {
-  earned: {
-    label: 'แต้มที่ได้รับ',
-    color: 'hsl(var(--chart-1))',
-  },
-  used: {
-    label: 'แต้มที่ใช้ไป',
-    color: 'hsl(var(--chart-2))',
-  },
-} satisfies ChartConfig
-
 export default function StoreUserDashboardPage() {
+  const t = useTranslations('customer.dashboard')
   const params = useParams()
   const storeSlug = params.domain as string
 
@@ -59,30 +45,56 @@ export default function StoreUserDashboardPage() {
   const prevMonth = spendingTrend[spendingTrend.length - 2]?.total ?? 0
   const isSpendingUp = lastMonth >= prevMonth
 
+  const spendingChartConfig = useMemo(
+    () =>
+      ({
+        total: {
+          label: t('totalSpent'),
+          color: 'hsl(var(--primary))',
+        },
+      }) satisfies ChartConfig,
+    [t],
+  )
+
+  const pointsChartConfig = useMemo(
+    () =>
+      ({
+        earned: {
+          label: t('earnedPointsLabel'),
+          color: 'hsl(var(--chart-1))',
+        },
+        used: {
+          label: t('usedPointsLabel'),
+          color: 'hsl(var(--chart-2))',
+        },
+      }) satisfies ChartConfig,
+    [t],
+  )
+
   const statsData = stats
     ? [
         {
-          title: 'ยอดซื้อสะสม (ร้านนี้)',
+          title: t('totalSpentStore'),
           value: formatCurrency(stats.totalSpent),
-          description: 'ยอดรวมจากการสั่งซื้อสำเร็จทั้งหมด',
+          description: t('totalSpentDesc'),
           icon: CreditCard,
         },
         {
-          title: 'แต้มสะสมคงเหลือ',
-          value: `${formatNumber(stats.rewardPoints)} แต้ม`,
-          description: 'สามารถใช้เป็นส่วนลดในออเดอร์ถัดไป',
+          title: t('rewardPoints'),
+          value: `${formatNumber(stats.rewardPoints)} ${t('pointsUnit')}`,
+          description: t('rewardPointsDesc'),
           icon: Award,
         },
         {
-          title: 'คำสั่งซื้อทั้งหมดของคุณ',
+          title: t('totalOrders'),
           value: formatNumber(stats.totalOrders),
-          description: `รอดำเนินการ ${stats.pendingOrders} รายการ`,
+          description: t('pendingOrders', { count: stats.pendingOrders }),
           icon: ShoppingBag,
         },
         {
-          title: 'คูปองที่ใช้ได้',
-          value: `${formatNumber(stats.availableCoupons)} ใบ`,
-          description: 'คูปองของร้านนี้ที่ยังใช้งานได้ในขณะนี้',
+          title: t('availableCoupons'),
+          value: `${formatNumber(stats.availableCoupons)} ${t('couponsUnit')}`,
+          description: t('availableCouponsDesc'),
           icon: Ticket,
         },
       ]
@@ -117,10 +129,10 @@ export default function StoreUserDashboardPage() {
           </div>
           <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
             <AnalyticsCardShell
-              title="ประวัติการใช้จ่ายของคุณ"
-              description="แสดงยอดสรุปการซื้อสินค้าของคุณในรอบ 6 เดือนที่ผ่านมา"
+              title={t('spendingHistoryTitle')}
+              description={t('spendingHistoryDesc')}
               isEmpty={!spendingTrend || spendingTrend.length === 0}
-              emptyMessage="ไม่มีข้อมูลประวัติการใช้จ่าย"
+              emptyMessage={t('emptySpending')}
             >
               <div className="space-y-4">
                 <ChartContainer config={spendingChartConfig}>
@@ -161,9 +173,7 @@ export default function StoreUserDashboardPage() {
                 <div className="border-border/40 flex w-full items-start gap-2 border-t pt-2 text-sm">
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2 leading-none font-medium">
-                      {isSpendingUp
-                        ? 'คุณมียอดซื้อเพิ่มขึ้นในเดือนที่ผ่านมา'
-                        : 'ยอดซื้อของคุณลดลงในเดือนที่ผ่านมา'}{' '}
+                      {isSpendingUp ? t('spendingUp') : t('spendingDown')}{' '}
                       {isSpendingUp ? (
                         <TrendingUp className="size-4" />
                       ) : (
@@ -171,17 +181,17 @@ export default function StoreUserDashboardPage() {
                       )}
                     </div>
                     <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                      6 เดือนล่าสุด
+                      {t('last6Months')}
                     </div>
                   </div>
                 </div>
               </div>
             </AnalyticsCardShell>
             <AnalyticsCardShell
-              title="ความเคลื่อนไหวของแต้มสะสม"
-              description="เปรียบเทียบแต้มที่คุณได้รับและแต้มที่ใช้ไปในแต่ละเดือน"
+              title={t('pointsHistoryTitle')}
+              description={t('pointsHistoryDesc')}
               isEmpty={!pointsHistory || pointsHistory.length === 0}
-              emptyMessage="ไม่มีข้อมูลความเคลื่อนไหวของแต้มสะสม"
+              emptyMessage={t('emptyPoints')}
             >
               <div className="space-y-4">
                 <ChartContainer config={pointsChartConfig}>
@@ -232,10 +242,10 @@ export default function StoreUserDashboardPage() {
                   <div className="flex w-full items-start gap-2 text-sm">
                     <div className="grid gap-1">
                       <div className="flex items-center gap-2 leading-none font-medium">
-                        สะสมแต้มให้ครบเพื่อแลกรับส่วนลดพิเศษในออเดอร์ถัดไป
+                        {t('pointsTip')}
                       </div>
                       <div className="text-muted-foreground flex items-center gap-2 leading-none">
-                        6 เดือนล่าสุด
+                        {t('last6Months')}
                       </div>
                     </div>
                   </div>
@@ -244,13 +254,13 @@ export default function StoreUserDashboardPage() {
                       <div className="shrink-0 rounded-md border border-green-200 bg-green-50 p-1 text-green-600 dark:border-green-900/50 dark:bg-green-950 dark:text-green-400">
                         <IconArrowDownLeft size={14} />
                       </div>
-                      <span>แต้มที่ได้รับ (Earned)</span>
+                      <span>{t('earnedPointsLabel')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div className="shrink-0 rounded-md border border-red-200 bg-red-50 p-1 text-red-500 dark:border-red-900/50 dark:bg-red-950 dark:text-red-400">
                         <IconArrowUpRight size={14} />
                       </div>
-                      <span>แต้มที่ใช้ (Used)</span>
+                      <span>{t('usedPointsLabel')}</span>
                     </div>
                   </div>
                 </div>

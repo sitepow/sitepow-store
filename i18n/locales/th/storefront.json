@@ -8,11 +8,22 @@
     "contact": "ติดต่อเรา",
     "cart": "ตะกร้าสินค้า",
     "myAccount": "บัญชีของฉัน",
-    "myOrders": "คำสั่งซื้อของฉัน",
+    "myOrders": "การสั่งซื้อของฉัน",
     "login": "เข้าสู่ระบบ",
     "register": "สมัครสมาชิก",
     "logout": "ออกจากระบบ",
-    "dashboard": "จัดการร้านค้าของคุณ"
+    "dashboard": "จัดการร้านค้าของคุณ",
+    "loginRegister": "เข้าสู่ระบบ / สมัครสมาชิก",
+    "searchPlaceholder": "ค้นหาสินค้าที่ต้องการ...",
+    "aboutStore": "เกี่ยวกับร้าน",
+    "storeDetail": "รายละเอียดร้าน",
+    "faqs": "คำถามที่พบบ่อย",
+    "storeRating": "คะแนนร้านค้า",
+    "howToOrder": "วิธีการสั่งซื้อ",
+    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+    "returnPolicy": "นโยบายการคืนสินค้า",
+    "productCategories": "หมวดหมู่สินค้า",
+    "allBlogs": "บทความทั้งหมด"
   },
   "footer": {
     "allRightsReserved": "สงวนลิขสิทธิ์",
@@ -58,7 +69,11 @@
     "addDiscount": "เพิ่มส่วนลด",
     "applyDiscount": "ใช้ส่วนลด",
     "couponCode": "รหัสส่วนลด",
-    "redeemWorth": "แลกเป็นส่วนลดได้ {amount}",
+    "usePoints": "ใช้แต้มสะสม",
+    "pointsUnit": "แต้ม",
+    "applyCode": "ใช้งาน",
+    "enterCouponCodePlaceholder": "กรอกรหัสส่วนลด",
+    "redeemWorth": "แลกเป็นส่วนลดได้ <strong>{amount}</strong>",
     "pointsRateInfo": "คุณมีแต้มสะสม {points} แต้ม (1 แต้ม = {rate})",
     "checking": "กำลังตรวจสอบ...",
     "couponDiscount": "ส่วนลดจากรหัส",
@@ -118,7 +133,18 @@
     "orderNow": "สั่งสินค้า",
     "loginToOrder": "เข้าสู่ระบบเพื่อสั่งซื้อ",
     "processing": "กำลังดำเนินการ...",
-    "bankAccountPrefix": "บัญชี {bank} เลขที่ {account} ({name})"
+    "bankAccountPrefix": "บัญชี {bank} เลขที่ {account} ({name})",
+    "checkoutButton": "สั่งซื้อสินค้า ({amount})",
+    "actualTotal": "ยอดที่ต้องจ่ายจริง",
+    "bankAccountDesc": "บัญชี {bank} เลขที่ {number} ({name})",
+    "deliveryDaysEstimated": "จัดส่งภายใน {days}",
+    "notSupportWeight": "ไม่รองรับน้ำหนักนี้",
+    "orderTotal": "ยอดที่ต้องชำระ",
+    "processingOrderBtn": "กำลังดำเนินการ...",
+    "placeOrderAction": "สั่งสินค้า",
+    "shippingFeePrefix": "ค่าจัดส่ง:",
+    "pointsDiscountLabel": "ส่วนลดจากแต้มสะสม",
+    "couponDiscountCode": "ส่วนลดจากรหัส ({code})"
   },
   "storeStatus": {
     "welcome": "ยินดีต้อนรับสู่ร้าน {name}",
@@ -143,7 +169,7 @@
     "noProductsDesc": "ไม่พบสินค้าในระบบที่คุณกำลังค้นหา โปรดติดต่อร้านค้าโดยตรง",
     "addToCart": "เพิ่มลงตะกร้า",
     "buyNow": "ซื้อเลย",
-    "outOfStock": "สินค้าหมด",
+    "outOfStock": "ขออภัยสินค้าหมด",
     "inStock": "มีสินค้าพร้อมส่ง",
     "remaining": "คงเหลือ",
     "pieces": "ชิ้น",
@@ -172,10 +198,22 @@
     "consignmentStockOut": "สต็อกฝากขายหมดแล้ว",
     "branchStockOut": "สินค้าในสาขานี้หมดแล้ว",
     "newProducts": "สินค้าใหม่",
-    "showingTotal": "แสดงทั้งหมด {count} รายการ",
+    "showingTotal": "แสดงทั้งหมด <span>{count}</span> รายการ",
     "sortLatest": "เรียงตาม: ล่าสุด",
     "discountOff": "ลด",
-    "earnPoints": "คุณจะได้รับ {points} แต้มสะสม"
+    "earnPoints": "คุณจะได้รับ <span>{points}</span> แต้มสะสม",
+    "viewAll": "ดูทั้งหมด",
+    "sorry": "ขออภัย",
+    "noProductsFound": "ไม่พบสินค้าในระบบที่คุณกำลังค้นหา โปรดติดต่อร้านค้าโดยตรง",
+    "categories": "หมวดหมู่",
+    "clearFilters": "ล้างตัวกรองทั้งหมด",
+    "sortPriceAsc": "ราคา: น้อยไปมาก",
+    "sortPriceDesc": "ราคา: มากไปน้อย",
+    "additionalInfo": "ข้อมูลเพิ่มเติม (ถ้ามี)",
+    "sellerNotePlaceholder": "กรอกข้อความถึงผู้ขายที่นี่",
+    "selectBranch": "กรุณาเลือกสาขา",
+    "discountPercent": "ส่วนลด {percent}%",
+    "plusPoints": "+ {points} แต้ม"
   },
   "blogs": {
     "title": "บทความและสาระน่ารู้",
@@ -196,5 +234,18 @@
     "storeNotFound": "ไม่พบร้านค้านี้ในระบบ กรุณาตรวจสอบชื่อโดเมนอีกครั้ง",
     "storeMaintenance": "ร้านค้านี้กำลังปิดปรับปรุงชั่วคราว ขออภัยในความไม่สะดวกครับ",
     "storeSuspended": "ร้านค้านี้หมดระยะเวลาบริการชั่วคราว หากคุณเป็นเจ้าของร้าน โปรดติดต่อผู้ให้บริการเพื่อเปิดใช้งานอีกครั้ง"
+  },
+  "adminSidebar": {
+    "storeManagement": "จัดการร้านค้า",
+    "dashboard": "แดชบอร์ด",
+    "products": "สินค้า",
+    "addProduct": "เพิ่มสินค้าใหม่",
+    "productList": "รายการสินค้า",
+    "settings": "ตั้งค่า",
+    "storeSettings": "ตั้งค่าร้านค้า"
+  },
+  "metadata": {
+    "welcome": "ยินดีต้อนรับสู่ร้าน {name}",
+    "defaultDescription": "เลือกซื้อสินค้าคุณภาพจาก {name} บนระบบของเรา"
   }
 }

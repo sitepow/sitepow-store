@@ -95,7 +95,25 @@
     "uploadReceipt": "Attach Transfer Slip",
     "clickOrDrag": "Click or drag slip image here",
     "submitting": "Submitting...",
-    "submitSlip": "Confirm Payment Slip"
+    "submitSlip": "Confirm Payment Slip",
+    "statuses": {
+      "PENDING": "Pending Payment",
+      "MANUAL_CHECK": "Verifying Slip",
+      "PAID": "Paid",
+      "SHIPPED": "Shipped",
+      "CANCELLED": "Cancelled"
+    },
+    "stripePaymentDesc": "Payment for Order #{orderNumber}",
+    "shippingMethod": "Shipping Method",
+    "copied": "Copied",
+    "copy": "Copy",
+    "clickToUploadSlip": "Click to upload slip",
+    "uploadSlipExpired": "Slip upload expired",
+    "confirmPayment": "Confirm Payment",
+    "sending": "Sending...",
+    "bankAccount": "Bank Account",
+    "cancel": "Cancel",
+    "slipNoticeDesc": "Please transfer the exact amount ({totalAmount}) and upload the slip for order #{orderNumber} only. If the amount or slip is incorrect, the system will automatically reject it."
   },
   "addresses": {
     "title": "Address Book",
@@ -133,7 +151,22 @@
     "taxIdPlaceholder": "13-digit ID",
     "branchCode": "Branch Code *",
     "recipientPlaceholder": "Enter recipient name",
-    "addressLinePlaceholder": "123/45 Moo 1, Soi..."
+    "addressLinePlaceholder": "123/45 Moo 1, Soi...",
+    "columns": {
+      "address": "Address",
+      "recipient": "Recipient",
+      "phone": "Phone",
+      "details": "Details",
+      "actions": "Actions"
+    },
+    "recipientNameRequired": "Recipient Name *",
+    "phoneRequired": "Contact Phone Number *",
+    "addressLineRequired": "Address (House No., Street, etc.) *",
+    "subDistrictRequired": "Subdistrict *",
+    "districtRequired": "District *",
+    "provinceRequired": "Province *",
+    "postalCodeRequired": "Postal Code *",
+    "saveAddressButton": "Save Address"
   },
   "profile": {
     "title": "Personal Profile",

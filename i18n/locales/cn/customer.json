@@ -95,7 +95,25 @@
     "uploadReceipt": "上传转账凭据 (水单/回执)",
     "clickOrDrag": "点击或将凭证文件拖拽至此处",
     "submitting": "正在提交数据...",
-    "submitSlip": "确认提交转账凭据"
+    "submitSlip": "确认提交转账凭据",
+    "statuses": {
+      "PENDING": "待付款",
+      "MANUAL_CHECK": "待核验凭证",
+      "PAID": "已付款",
+      "SHIPPED": "已发货",
+      "CANCELLED": "已取消"
+    },
+    "stripePaymentDesc": "支付订单 #{orderNumber}",
+    "shippingMethod": "配送方式",
+    "copied": "已复制",
+    "copy": "复制",
+    "clickToUploadSlip": "点击上传转账凭证",
+    "uploadSlipExpired": "凭证上传已超时",
+    "confirmPayment": "确认付款",
+    "sending": "提交中...",
+    "bankAccount": "银行账号",
+    "cancel": "取消",
+    "slipNoticeDesc": "请转账准确金额 ({totalAmount}) 并仅上传订单 #{orderNumber} 的转账凭证。如果金额或凭证不正确，系统将自动判定为不通过。"
   },
   "addresses": {
     "title": "收货地址簿",
@@ -134,7 +152,22 @@
     "taxIdPlaceholder": "13 位税号",
     "branchCode": "分支机构代码 *",
     "recipientPlaceholder": "请输入收件人姓名",
-    "addressLinePlaceholder": "123/45 弄..."
+    "addressLinePlaceholder": "123/45 弄...",
+    "columns": {
+      "address": "地址",
+      "recipient": "收件人",
+      "phone": "联系电话",
+      "details": "详情",
+      "actions": "操作"
+    },
+    "recipientNameRequired": "收件人姓名 *",
+    "phoneRequired": "联系电话 *",
+    "addressLineRequired": "详细地址（门牌号、街道等） *",
+    "subDistrictRequired": "街道/乡镇 *",
+    "districtRequired": "区/县 *",
+    "provinceRequired": "省/市 *",
+    "postalCodeRequired": "邮政编码 *",
+    "saveAddressButton": "保存地址"
   },
   "profile": {
     "title": "个人资料",

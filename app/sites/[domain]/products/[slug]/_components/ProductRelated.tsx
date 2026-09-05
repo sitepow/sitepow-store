@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useRelatedProducts } from '@/actions/hooks/storefront/product'
 import { useCarousel } from '@/hooks/use-carousel'
 
@@ -11,6 +13,7 @@ import { ProductCard } from '../../../_components/product/ProductCard'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductRelated() {
+  const t = useTranslations('storefront.products')
   const { emblaRef } = useCarousel()
   const product = useProductPurchaseStore((s) => s.product)
   const { data: products, isLoading } = useRelatedProducts(
@@ -25,7 +28,9 @@ export function ProductRelated() {
   return (
     <div className="w-full space-y-6 overflow-hidden">
       <div className="flex items-center gap-2">
-        <h3 className="text-foreground text-xl font-bold">สินค้าใกล้เคียง</h3>
+        <h3 className="text-foreground text-xl font-bold">
+          {t('relatedProducts')}
+        </h3>
         <Separator className="flex-1" />
       </div>
       <div className="w-full overflow-hidden">

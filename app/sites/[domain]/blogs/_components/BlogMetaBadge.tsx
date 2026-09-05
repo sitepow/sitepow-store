@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { formatDateTime } from '@/utils/date'
 import { CalendarIcon, Clock, User2 } from 'lucide-react'
 
@@ -15,13 +19,15 @@ interface BlogMetaBadgeProps {
 }
 
 export function BlogMetaBadge({
-  authorName = 'ผู้ดูแลระบบ',
+  authorName,
   authorAvatar,
   createdAt,
   readingTime,
   bgImage = '/images/hero-section/section-5.jpeg',
   className,
 }: BlogMetaBadgeProps) {
+  const t = useTranslations('storefront.blogs')
+  const displayAuthorName = authorName || t('adminAuthor')
   const hasBg = Boolean(bgImage)
 
   return (
@@ -41,7 +47,7 @@ export function BlogMetaBadge({
       <div className="relative z-10 flex flex-wrap items-center justify-center gap-2.5">
         <div className="flex items-center gap-2">
           <Avatar className="size-8 border border-white/20">
-            <AvatarImage src={authorAvatar} alt={authorName} />
+            <AvatarImage src={authorAvatar} alt={displayAuthorName} />
             <AvatarFallback className={cn(hasBg && 'bg-black/40 text-white')}>
               <User2 size={16} />
             </AvatarFallback>
@@ -52,7 +58,7 @@ export function BlogMetaBadge({
               hasBg ? 'text-white' : 'text-foreground',
             )}
           >
-            {authorName}
+            {displayAuthorName}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -61,7 +67,7 @@ export function BlogMetaBadge({
         </div>
         <div className="flex items-center gap-1.5">
           <Clock size={16} />
-          <span>อ่าน {readingTime} นาที</span>
+          <span>{t('readTime', { time: readingTime ?? 0 })}</span>
         </div>
       </div>
     </div>

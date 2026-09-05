@@ -24,7 +24,14 @@ interface CartStore {
   items: CartItem[]
   appliedCoupon: AppliedCoupon | null
   usedPoints: number
-  addItem: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => void
+  addItem: (
+    item: Omit<CartItem, 'cartItemId' | 'totalPrice'>,
+    messages?: {
+      consignmentStockOut?: string
+      branchStockOut?: string
+      addedToCart?: string
+    },
+  ) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, qty: number) => void
   clearCart: () => void
@@ -39,7 +46,7 @@ export const useCartStore = create<CartStore>()(
       items: [],
       appliedCoupon: null,
       usedPoints: 0,
-      addItem: (newItem) => {
+      addItem: (newItem, messages) => {
         const { items } = get()
 
         const getAvailableStock = () => {
@@ -77,8 +84,8 @@ export const useCartStore = create<CartStore>()(
         ) {
           toast.error(
             newItem.isReseller
-              ? 'สต็อกฝากขายหมดแล้ว'
-              : 'สินค้าในสาขานี้หมดแล้ว',
+              ? (messages?.consignmentStockOut ?? 'Consignment stock sold out')
+              : (messages?.branchStockOut ?? 'Branch stock sold out'),
           )
           return
         }
@@ -121,7 +128,7 @@ export const useCartStore = create<CartStore>()(
           }
           set({ items: [...items, cartItem] })
         }
-        toast.success('เพิ่มสินค้าลงในตะกร้าแล้ว')
+        toast.success(messages?.addedToCart ?? 'Added to cart')
       },
       removeItem: (cartItemId) => {
         set((state) => ({

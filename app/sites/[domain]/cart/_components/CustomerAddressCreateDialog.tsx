@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useCreateAddress } from '@/actions/hooks/storefront/address'
 import { AddressType } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -33,6 +35,8 @@ import { Address } from '@/lib/address/logic'
 const InputThaiAddress = CreateInput()
 
 export function CustomerAddressCreateDialog() {
+  const t = useTranslations('customer.addresses')
+  const tActions = useTranslations('common.actions')
   const { store } = useStoreData()
 
   const [open, setOpen] = useState(false)
@@ -102,7 +106,7 @@ export function CustomerAddressCreateDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">
           <PlusIcon className="mr-2 size-4" />
-          <span>เพิ่มที่อยู่จัดส่ง/ภาษี</span>
+          <span>{t('addShippingTaxAddress')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -111,17 +115,20 @@ export function CustomerAddressCreateDialog() {
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>เพิ่มที่อยู่ใหม่</DialogTitle>
+            <DialogTitle>{t('addAddress')}</DialogTitle>
           </DialogHeader>
           <FieldGroup className="grid grid-cols-2 gap-x-5 gap-y-4 py-4">
             <Field className="col-span-2">
-              <Label>ป้ายกำกับที่อยู่ (เช่น บ้าน, ที่ทำงาน) *</Label>
-              <Input {...register('name')} placeholder="ระบุป้ายกำกับ" />
+              <Label>{t('addressLabel')}</Label>
+              <Input
+                {...register('name')}
+                placeholder={t('addressLabelPlaceholder')}
+              />
               <FieldError>{errors.name?.message}</FieldError>
             </Field>
             <Field className="col-span-2">
               <Label className="mb-3 block font-bold">
-                วัตถุประสงค์ของที่อยู่นี้
+                {t('addressPurpose')}
               </Label>
               <Controller
                 control={control}
@@ -141,7 +148,7 @@ export function CustomerAddressCreateDialog() {
                         htmlFor="shipping"
                         className="cursor-pointer font-normal"
                       >
-                        ส่งสินค้าอย่างเดียว
+                        {t('shippingOnly')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -150,7 +157,7 @@ export function CustomerAddressCreateDialog() {
                         htmlFor="tax"
                         className="cursor-pointer font-normal"
                       >
-                        ออกใบกำกับภาษีอย่างเดียว
+                        {t('taxOnly')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -159,7 +166,7 @@ export function CustomerAddressCreateDialog() {
                         htmlFor="both"
                         className="cursor-pointer font-normal"
                       >
-                        เป็นทั้งที่ส่งและภาษี
+                        {t('bothShippingTax')}
                       </Label>
                     </div>
                   </RadioGroup>
@@ -169,10 +176,10 @@ export function CustomerAddressCreateDialog() {
             <Separator className="col-span-2" />
             {showShippingFields && (
               <Field className="col-span-2">
-                <Label>ชื่อ-นามสกุล ผู้รับพัสดุ *</Label>
+                <Label>{t('recipientNameRequired')}</Label>
                 <Input
                   {...register('receiverName')}
-                  placeholder="ระบุชื่อผู้รับสินค้า"
+                  placeholder={t('recipientPlaceholder')}
                 />
                 <FieldError>{errors.receiverName?.message}</FieldError>
               </Field>
@@ -180,27 +187,27 @@ export function CustomerAddressCreateDialog() {
             {showTaxFields && (
               <div className="bg-muted/30 border-primary col-span-2 grid grid-cols-12 gap-4 rounded-lg border border-dashed p-4">
                 <div className="text-muted-foreground col-span-12 text-sm font-semibold">
-                  ข้อมูลผู้เสียภาษี
+                  {t('taxInfo')}
                 </div>
                 <Field className="col-span-12">
-                  <Label>ชื่อผู้เสียภาษี (บุคคล/บริษัท) *</Label>
+                  <Label>{t('taxPayerName')}</Label>
                   <Input
                     {...register('taxName')}
-                    placeholder="ระบุชื่อที่ปรากฏในใบกำกับภาษี"
+                    placeholder={t('taxPayerPlaceholder')}
                   />
                   <FieldError>{errors.taxName?.message}</FieldError>
                 </Field>
                 <Field className="col-span-8">
-                  <Label>เลขประจำตัวผู้เสียภาษี *</Label>
+                  <Label>{t('taxId')}</Label>
                   <Input
                     {...register('taxId')}
-                    placeholder="เลข 13 หลัก"
+                    placeholder={t('taxIdPlaceholder')}
                     maxLength={13}
                   />
                   <FieldError>{errors.taxId?.message}</FieldError>
                 </Field>
                 <Field className="col-span-4">
-                  <Label>รหัสสาขา *</Label>
+                  <Label>{t('branchCode')}</Label>
                   <Input
                     {...register('branchCode')}
                     placeholder="00000"
@@ -211,7 +218,7 @@ export function CustomerAddressCreateDialog() {
               </div>
             )}
             <Field className="col-span-2">
-              <Label>หมายเลขโทรศัพท์ติดต่อ *</Label>
+              <Label>{t('phoneRequired')}</Label>
               <Controller
                 name="phone"
                 control={control}
@@ -230,15 +237,15 @@ export function CustomerAddressCreateDialog() {
               <FieldError>{errors.phone?.message}</FieldError>
             </Field>
             <Field className="col-span-2">
-              <Label>บ้านเลขที่, หมู่ที่, ซอย, ถนน *</Label>
+              <Label>{t('addressLineRequired')}</Label>
               <Input
                 {...register('addressLine')}
-                placeholder="123/45 หมู่ 1 ซอย..."
+                placeholder={t('addressLinePlaceholder')}
               />
               <FieldError>{errors.addressLine?.message}</FieldError>
             </Field>
             <Field>
-              <Label>ตำบล / แขวง *</Label>
+              <Label>{t('subDistrictRequired')}</Label>
               <Controller
                 control={control}
                 name="subDistrict"
@@ -253,7 +260,7 @@ export function CustomerAddressCreateDialog() {
               <FieldError>{errors.subDistrict?.message}</FieldError>
             </Field>
             <Field>
-              <Label>อำเภอ / เขต *</Label>
+              <Label>{t('districtRequired')}</Label>
               <Controller
                 control={control}
                 name="district"
@@ -268,7 +275,7 @@ export function CustomerAddressCreateDialog() {
               <FieldError>{errors.district?.message}</FieldError>
             </Field>
             <Field>
-              <Label>จังหวัด *</Label>
+              <Label>{t('provinceRequired')}</Label>
               <Controller
                 control={control}
                 name="province"
@@ -283,7 +290,7 @@ export function CustomerAddressCreateDialog() {
               <FieldError>{errors.province?.message}</FieldError>
             </Field>
             <Field>
-              <Label>รหัสไปรษณีย์ *</Label>
+              <Label>{t('postalCodeRequired')}</Label>
               <Controller
                 control={control}
                 name="postalCode"
@@ -307,10 +314,10 @@ export function CustomerAddressCreateDialog() {
             >
               {isPending ? (
                 <>
-                  <Spinner /> กำลังบันทึก...
+                  <Spinner /> {tActions('saving')}
                 </>
               ) : (
-                'บันทึกข้อมูลที่อยู่'
+                t('saveAddressButton')
               )}
             </Button>
             <Button
@@ -319,7 +326,7 @@ export function CustomerAddressCreateDialog() {
               variant="outline"
               onClick={handleClose}
             >
-              ยกเลิก
+              {tActions('cancel')}
             </Button>
           </DialogFooter>
         </form>

@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
@@ -38,18 +39,20 @@ function ReviewActionButton({
   }
   onSelect: () => void
 }) {
+  const t = useTranslations('customer.reviews')
   const { data: rewardConfigRes } = useReviewRewardConfig(item.storeId)
   const isRewardEnabled = rewardConfigRes?.data?.isEnabled ?? false
 
   return (
     <Button size="sm" onClick={onSelect}>
       <IconMessagePlus className="size-4" />
-      {isRewardEnabled ? 'เขียนรีวิวรับแต้ม' : 'เขียนรีวิว'}
+      {isRewardEnabled ? t('writeReviewReward') : t('writeReview')}
     </Button>
   )
 }
 
 export function MyReviewTable() {
+  const t = useTranslations('customer.reviews')
   const params = useParams()
   const domain = params?.domain as string
 
@@ -72,13 +75,15 @@ export function MyReviewTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
-              <TableHead>สินค้า</TableHead>
-              <TableHead>คะแนน</TableHead>
-              <TableHead>ความคิดเห็น</TableHead>
-              <TableHead>วันที่เขียน</TableHead>
+              <TableHead>{t('columns.orderNumber')}</TableHead>
+              <TableHead>{t('columns.product')}</TableHead>
+              <TableHead>{t('columns.rating')}</TableHead>
+              <TableHead>{t('columns.comment')}</TableHead>
+              <TableHead>{t('columns.date')}</TableHead>
               {hasUnreviewedItems && (
-                <TableHead className="text-right">จัดการ</TableHead>
+                <TableHead className="text-right">
+                  {t('columns.actions')}
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -88,7 +93,7 @@ export function MyReviewTable() {
             ) : items.length === 0 ? (
               <TableEmptyRow
                 colSpan={hasUnreviewedItems ? 6 : 5}
-                title="ยังไม่มีรายการสินค้าที่จัดส่งสำเร็จ หรือพร้อมให้รีวิว"
+                title={t('empty')}
               />
             ) : (
               items.map((item) => {
@@ -110,7 +115,7 @@ export function MyReviewTable() {
                         </div>
                       ) : (
                         <span className="text-muted-foreground text-xs">
-                          ยังไม่ได้รีวิว
+                          {t('notReviewed')}
                         </span>
                       )}
                     </TableCell>

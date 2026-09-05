@@ -1,13 +1,36 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
-import { getStore } from '@/actions/store'
-import { BASE_FAVICON } from '@/constants/favicon'
-import { StoreStatus } from '@/generated/prisma/enums'
 
-import { AlertLayout } from '@/components/layout/AlertLayout'
 
-import { StoreInitializer } from './_components/layout/StoreInitializer'
+import { getStore } from '@/actions/store';
+import { BASE_FAVICON } from '@/constants/favicon';
+import { StoreStatus } from '@/generated/prisma/enums';
+
+
+
+import { AlertLayout } from '@/components/layout/AlertLayout';
+
+
+
+import { StoreInitializer } from './_components/layout/StoreInitializer';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 type Props = {
   params: Promise<{ domain: string }>
@@ -22,6 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getTranslations('storefront.metadata')
   const storeDomain = store.customDomain || domain
   const url = storeDomain.includes('.')
     ? `https://${storeDomain}`
@@ -31,11 +55,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: {
-      default: `ยินดีต้อนรับสู่ร้าน ${storeName}`,
+      default: t('welcome', { name: storeName }),
       template: `%s | ${storeName}`,
     },
     description:
-      store.description || `เลือกซื้อสินค้าคุณภาพจาก ${storeName} บนระบบของเรา`,
+      store.description || t('defaultDescription', { name: storeName }),
     icons: {
       icon: store.logo || BASE_FAVICON,
       shortcut: BASE_FAVICON,
@@ -63,30 +87,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function StoreLayout({ children, params }: Props) {
   const { domain } = await params
   const store = await getStore({ domain })
+  const t = await getTranslations('storefront.alerts')
 
   if (!store) {
-    return (
-      <AlertLayout title="ไม่พบร้านค้านี้ในระบบ กรุณาตรวจสอบชื่อโดเมนอีกครั้ง" />
-    )
+    return <AlertLayout title={t('storeNotFound')} />
   }
 
   if (store.status === StoreStatus.MAINTENANCE) {
-    return (
-      <AlertLayout title="ร้านค้านี้กำลังปิดปรับปรุงชั่วคราว ขออภัยในความไม่สะดวกครับ" />
-    )
+    return <AlertLayout title={t('storeMaintenance')} />
   }
 
   if (store.status === StoreStatus.SUSPENDED) {
-    return (
-      <AlertLayout
-        title={
-          <>
-            ร้านค้านี้หมดระยะเวลาบริการชั่วคราว หากคุณเป็นเจ้าของร้าน
-            โปรดติดต่อผู้ให้บริการเพื่อเปิดใช้งานอีกครั้ง
-          </>
-        }
-      />
-    )
+    return <AlertLayout title={t('storeSuspended')} />
   }
 
   return (

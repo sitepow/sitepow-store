@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -11,6 +13,7 @@ import { SeeMoreButton } from '../SeeMoreButton'
 import { ProductCard } from '../product/ProductCard'
 
 export function ProductsSection({ storeSlug }: { storeSlug: string }) {
+  const t = useTranslations('storefront.products')
   const { data, isLoading } = useStorefrontProducts({ storeSlug, limit: 8 })
   const products = data?.data ?? []
 
@@ -19,8 +22,8 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
       <SectionContainer>
         <ActionRequiredAlert
           className="w-fit"
-          title="ขออภัย"
-          description="ไม่พบสินค้าในระบบที่คุณกำลังค้นหา โปรดติดต่อร้านค้าโดยตรง"
+          title={t('sorry')}
+          description={t('noProductsFound')}
         />
       </SectionContainer>
     )
@@ -28,7 +31,7 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
 
   return (
     <SectionContainer>
-      <SectionHeader title="สินค้าใหม่" />
+      <SectionHeader title={t('newProducts')} />
 
       <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         {isLoading

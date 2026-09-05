@@ -1,3 +1,7 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 import { PencilIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -19,6 +23,7 @@ export function CheckoutSection({
   children,
   isDisabled = false,
 }: CheckoutSectionProps) {
+  const t = useTranslations('common.actions')
   const [editView, summaryView] = children
 
   return (
@@ -50,7 +55,7 @@ export function CheckoutSection({
             onClick={onEdit}
             className="flex items-center gap-1 text-xs font-medium hover:underline"
           >
-            <PencilIcon className="size-3" /> แก้ไข
+            <PencilIcon className="size-3" /> {t('edit')}
           </button>
         )}
       </div>

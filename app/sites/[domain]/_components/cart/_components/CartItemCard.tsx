@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
@@ -27,6 +29,7 @@ export function CartItemCard({
   productClassName,
   textClassName,
 }: CartItemCardProps) {
+  const t = useTranslations('storefront.products')
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
   const isResellerItem = item.isReseller || Boolean(item.agreementId)
@@ -47,7 +50,7 @@ export function CartItemCard({
             </h4>
             {isResellerItem && (
               <Badge className="shrink-0 border-amber-500/20 bg-amber-500/10 px-1.5 py-0 text-[10px] font-normal text-amber-700 hover:bg-amber-500/20 dark:text-amber-400">
-                ตัวแทนจำหน่าย
+                {t('reseller')}
               </Badge>
             )}
           </div>

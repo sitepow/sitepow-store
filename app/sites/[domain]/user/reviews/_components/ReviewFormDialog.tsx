@@ -3,6 +3,8 @@
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
 import {
@@ -54,6 +56,8 @@ export function ReviewFormDialog({
   initialData,
   targetInfo,
 }: ReviewFormDialogProps) {
+  const t = useTranslations('customer.reviews')
+  const tCommon = useTranslations('common')
   const isEditing = !!initialData?.id
 
   const { data: rewardConfigRes } = useReviewRewardConfig(
@@ -244,7 +248,7 @@ export function ReviewFormDialog({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
-              {isEditing ? 'แก้ไขรีวิวสินค้า' : 'เขียนรีวิวสินค้า'}
+              {isEditing ? t('dialogEditTitle') : t('dialogTitle')}
             </DialogTitle>
             {isRewardEnabled && (
               <Badge
@@ -253,7 +257,9 @@ export function ReviewFormDialog({
               >
                 <IconSparkles className="size-4 text-amber-500" />
                 <span>
-                  รับ +{formatNumber(calculatedPoints.totalPoints)} แต้ม
+                  {t('earnPoints', {
+                    points: formatNumber(calculatedPoints.totalPoints),
+                  })}
                 </span>
               </Badge>
             )}
@@ -279,7 +285,7 @@ export function ReviewFormDialog({
               <Field>
                 <div className="flex flex-col items-center justify-center gap-1 py-2">
                   <FieldLabel className="text-muted-foreground text-sm">
-                    ให้คะแนนสินค้า
+                    {t('rateProduct')}
                   </FieldLabel>
                   <Controller
                     control={control}
@@ -316,15 +322,15 @@ export function ReviewFormDialog({
               <Field>
                 <div className="mb-1 flex items-center justify-between">
                   <FieldLabel className="text-sm font-medium">
-                    ความคิดเห็นของคุณ
+                    {t('yourComment')}
                   </FieldLabel>
                   <span className="text-muted-foreground text-xs">
-                    {(watchedComment || '').trim().length} ตัวอักษร
+                    {(watchedComment || '').trim().length} {t('characters')}
                   </span>
                 </div>
                 <Textarea
                   {...register('comment')}
-                  placeholder="แบ่งปันความประทับใจเกี่ยวกับสินค้าชิ้นนี้..."
+                  placeholder={t('commentPlaceholder')}
                   rows={4}
                 />
                 {errors.comment && (
@@ -336,12 +342,12 @@ export function ReviewFormDialog({
               <Field>
                 <div className="mb-1 flex items-center justify-between">
                   <FieldLabel className="text-sm font-medium">
-                    รูปภาพสินค้า
+                    {t('productPhotos')}
                   </FieldLabel>
                   <span className="text-muted-foreground text-xs">
                     {isRewardEnabled
-                      ? `แนบสูงสุด 3 รูป (+${photoBonusText} แต้ม/รูป)`
-                      : 'แนบสูงสุด 3 รูป'}
+                      ? t('photoBonus', { bonus: photoBonusText })
+                      : t('maxPhotos')}
                   </span>
                 </div>
                 <ImageUploadSection showPrimaryControl={false} />
@@ -359,14 +365,14 @@ export function ReviewFormDialog({
                 onClick={onClose}
                 disabled={isPending}
               >
-                ยกเลิก
+                {tCommon('cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending
-                  ? 'กำลังบันทึก...'
+                  ? t('saving')
                   : isEditing
-                    ? 'บันทึกการแก้ไข'
-                    : 'ส่งรีวิว'}
+                    ? t('saveChanges')
+                    : t('submitReview')}
               </Button>
             </div>
           </form>

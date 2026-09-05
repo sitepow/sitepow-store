@@ -2,6 +2,8 @@
 
 import { Suspense } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { UserSettingsTab } from '@/constants/settings'
 import { useQueryParam } from '@/hooks/use-query-param'
@@ -23,6 +25,7 @@ import { PdpaManagementForm } from './_components/PdpaManagementForm'
 export const dynamic = 'force-dynamic'
 
 function StoreUserSettingsContent() {
+  const t = useTranslations('customer.settings')
   const [activeTab, setActiveTab] = useQueryParam(
     'tab',
     UserSettingsTab.PASSWORD,
@@ -32,8 +35,8 @@ function StoreUserSettingsContent() {
     <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconSettings}
-        title="ตั้งค่าบัญชี"
-        description="จัดการความปลอดภัยของรหัสผ่าน การรับข้อมูลแจ้งเตือน และรักษาสิทธิ์ของข้อมูลส่วนบุคคล (PDPA) ของคุณ"
+        title={t('title')}
+        description={t('description')}
       />
       <Tabs
         value={activeTab}
@@ -43,13 +46,13 @@ function StoreUserSettingsContent() {
       >
         <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1 xl:sticky xl:top-5 xl:w-57.5 xl:flex-col">
           <TabsTrigger value={UserSettingsTab.PASSWORD}>
-            <IconLock size={14} /> เปลี่ยนรหัสผ่าน
+            <IconLock size={14} /> {t('tabs.password')}
           </TabsTrigger>
           <TabsTrigger value={UserSettingsTab.NOTIFICATIONS}>
-            <IconBell size={14} /> ตั้งค่าการแจ้งเตือน
+            <IconBell size={14} /> {t('tabs.notifications')}
           </TabsTrigger>
           <TabsTrigger value={UserSettingsTab.PDPA}>
-            <IconShieldLock size={14} /> การจัดการข้อมูล (PDPA)
+            <IconShieldLock size={14} /> {t('tabs.pdpa')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value={UserSettingsTab.PASSWORD} className="flex-1">

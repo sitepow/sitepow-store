@@ -1,3 +1,6 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -11,6 +14,7 @@ import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { StoreLogo } from '@/components/StoreLogo'
 
 export function StoreFooter() {
+  const t = useTranslations('storefront.footer')
   const { store } = useStoreData()
   const currentYear = new Date().getFullYear()
 
@@ -28,7 +32,7 @@ export function StoreFooter() {
         <span>{row.day}</span>
         <span>
           {!row.isOpen ? (
-            <span className="text-primary">ปิดทำการ (ออนไลน์ปกติ)</span>
+            <span className="text-primary">{t('closedOnlineNormal')}</span>
           ) : (
             `${row.open} - ${row.close}`
           )}
@@ -126,12 +130,10 @@ export function StoreFooter() {
               <LogoBrandText />
             )}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              {store?.description
-                ? store?.description
-                : 'เราคัดสรรสินค้าคุณภาพดีในราคาที่จับต้องได้ ช้อปง่าย ได้ของไว และตั้งใจดูแลทุกออเดอร์ให้ส่งถึงมือคุณอย่างปลอดภัย'}
+              {store?.description ? store?.description : t('storeDescription')}
             </p>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              อีเมล: {store?.email || '-'} เลขประจำตัวผู้เสียภาษี:{' '}
+              {t('emailLabel')}: {store?.email || '-'} {t('taxIdLabel')}:{' '}
               {store?.taxId || '-'}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-5">
@@ -149,7 +151,7 @@ export function StoreFooter() {
           </div>
           {(mainBranch?.address || mainBranch?.subDistrict) && (
             <div>
-              <h3 className="mb-4 font-bold">ที่ตั้งร้าน (สาขาหลัก)</h3>
+              <h3 className="mb-4 font-bold">{t('mainBranchLocation')}</h3>
               {mainBranch?.mapUrl && (
                 <div className="border-border mb-4 overflow-hidden rounded-lg border">
                   <iframe
@@ -172,7 +174,7 @@ export function StoreFooter() {
           {mainBranch?.openingHours &&
             Array.isArray(mainBranch.openingHours) && (
               <div>
-                <h3 className="mb-4 font-bold">เวลาทำการ (หน้าร้าน)</h3>
+                <h3 className="mb-4 font-bold">{t('openingHoursStore')}</h3>
                 <div className="space-y-1 text-sm opacity-60">
                   {renderOpeningHours(
                     mainBranch.openingHours as OpeningHours[],
@@ -187,10 +189,10 @@ export function StoreFooter() {
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/privacy-policy" className="hover:underline">
-              นโยบายความเป็นส่วนตัว
+              {t('privacyPolicy')}
             </Link>
             <Link href="/refund-return-policy" className="hover:underline">
-              ข้อตกลง และเงื่อนไข
+              {t('terms')}
             </Link>
           </div>
         </div>

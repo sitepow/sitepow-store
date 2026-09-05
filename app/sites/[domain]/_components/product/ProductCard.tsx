@@ -1,4 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
@@ -43,6 +46,7 @@ export function ProductCard({
   quantity,
   isReseller,
 }: ProductCardProps) {
+  const t = useTranslations('storefront.products')
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
@@ -86,12 +90,12 @@ export function ProductCard({
             variant="destructive"
             className="absolute top-2 right-2 text-xs"
           >
-            <IconAlertCircle /> ขออภัยสินค้าหมด
+            <IconAlertCircle /> {t('outOfStock')}
           </Badge>
         ) : (
           hasDiscount && (
             <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
-              ลด <br /> -{maxDiscountPercent}%
+              {t('discountOff')} <br /> -{maxDiscountPercent}%
             </Badge>
           )
         )}
@@ -105,7 +109,7 @@ export function ProductCard({
         {isReseller && (
           <Badge>
             <IconBuildingStore className="size-4" />
-            ตัวแทนจำหน่าย
+            {t('reseller')}
           </Badge>
         )}
         <div className="group-hover:text-primary flex flex-col items-center justify-center">

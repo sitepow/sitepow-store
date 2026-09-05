@@ -69,5 +69,9 @@
     "trackingRequiredTitle": "กรุณากรอกเลขพัสดุสำหรับการจัดส่ง",
     "trackingRequiredDesc": "จำเป็นต้องระบุเลข Tracking Number ก่อนเปลี่ยนสถานะเป็นกำลังจัดส่ง",
     "trackingPlaceholder": "ระบุเลข Tracking Number เช่น TH123456789..."
+  },
+  "pagination": {
+    "previous": "ก่อนหน้า",
+    "next": "ถัดไป"
   }
 }

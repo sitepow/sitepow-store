@@ -2,6 +2,8 @@
 
 import { ComponentProps } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
@@ -29,6 +31,7 @@ export function CartSummary({
   summary: customSummary,
   ...props
 }: CartSummaryProps) {
+  const t = useTranslations('storefront')
   const { store } = useStoreData()
   const { getCartSummary } = useCartStore()
   const summary = customSummary ?? getCartSummary()
@@ -39,10 +42,13 @@ export function CartSummary({
       {...props}
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
-      <SummaryRow label="ราคาสินค้า" value={formatCurrency(summary.subtotal)} />
+      <SummaryRow
+        label={t('products.price')}
+        value={formatCurrency(summary.subtotal)}
+      />
       {summary.totalDiscount > 0 && (
         <SummaryRow
-          label="ส่วนลด"
+          label={t('cart.discount')}
           value={
             <HighlightText>
               - {formatCurrency(Math.abs(summary.totalDiscount))}
@@ -53,11 +59,11 @@ export function CartSummary({
       <Separator className="my-2" />
       {summary.totalPoints > 0 && (
         <p className="text-primary text-right text-xs font-medium">
-          คุณจะได้รับ {formatNumber(summary.totalPoints)} แต้ม
+          {t('cart.earnPoints', { points: formatNumber(summary.totalPoints) })}
         </p>
       )}
       <SummaryRow
-        label="ยอดที่ต้องจ่ายจริง"
+        label={t('cart.actualTotal')}
         value={formatCurrency(summary.finalPrice)}
       />
     </div>

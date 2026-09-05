@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -16,6 +18,7 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductOptionGroups() {
+  const t = useTranslations('storefront.products')
   const {
     product,
     selectedVariant,
@@ -72,7 +75,7 @@ export function ProductOptionGroups() {
             <Label className="text-lg font-semibold">{option.title}</Label>
             {option.require && (
               <Badge variant="outline" className="border-primary text-primary">
-                * จำเป็น
+                * {t('required')}
               </Badge>
             )}
           </div>

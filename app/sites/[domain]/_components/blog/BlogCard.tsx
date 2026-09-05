@@ -1,4 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+'use client'
+
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { StorefrontBlogListItem } from '@/actions/storefront/blog'
@@ -39,6 +42,7 @@ export function BlogCard({
   blog,
   isFeatured,
 }: BlogCardProps) {
+  const t = useTranslations('storefront.blogs')
   const isVideo = isVideoUrl(blog.image)
 
   return (
@@ -93,7 +97,7 @@ export function BlogCard({
             )}
           >
             <Button variant="link" className="text-primary h-auto p-0">
-              <span className="mr-1">อ่านต่อ</span>
+              <span className="mr-1">{t('readMoreBtn')}</span>
               <ArrowRightIcon className="size-4" />
             </Button>
           </div>

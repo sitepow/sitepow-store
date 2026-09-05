@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   Pagination,
   PaginationContent,
@@ -27,6 +29,8 @@ export function StorePagination({
   hasPreviousPage = false,
   onPageChange,
 }: StorePaginationProps) {
+  const t = useTranslations('common.pagination')
+
   if (totalPages <= 1) {
     return null
   }
@@ -75,7 +79,7 @@ export function StorePagination({
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            text="ก่อนหน้า"
+            text={t('previous')}
             className={
               !hasPreviousPage
                 ? 'pointer-events-none opacity-50'
@@ -87,7 +91,7 @@ export function StorePagination({
         {renderPages()}
         <PaginationItem>
           <PaginationNext
-            text="ถัดไป"
+            text={t('next')}
             className={
               !hasNextPage
                 ? 'pointer-events-none opacity-50'

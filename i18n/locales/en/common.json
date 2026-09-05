@@ -69,5 +69,9 @@
     "trackingRequiredTitle": "Please enter shipment tracking number",
     "trackingRequiredDesc": "Tracking number is required before changing status to Shipped",
     "trackingPlaceholder": "Enter tracking number e.g. TH123456789..."
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
   }
 }

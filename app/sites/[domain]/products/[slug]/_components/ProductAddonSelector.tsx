@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -15,6 +17,7 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddonSelector() {
+  const t = useTranslations('storefront.products')
   const {
     product,
     selectedVariant,
@@ -65,7 +68,7 @@ export function ProductAddonSelector() {
     <>
       {product?.addons && product.addons.length > 0 && (
         <div className="space-y-4">
-          <Label className="text-lg font-semibold">บริการเสริม</Label>
+          <Label className="text-lg font-semibold">{t('addons')}</Label>
           <div className="space-y-2">
             {product.addons.map((addon) => {
               const isDisabled = !addon.isAvailable || isOutOfStock

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
@@ -67,6 +68,7 @@ export function UploadSlipDialog({
   createdAt,
   bankAccounts,
 }: UploadSlipDialogProps) {
+  const t = useTranslations('customer.orders')
   const { store } = useStoreData()
   const { userId } = useSession()
   const [isOpen, setIsOpen] = useState(false)
@@ -175,7 +177,7 @@ export function UploadSlipDialog({
   if (!bankAccounts || bankAccounts.length === 0) {
     return (
       <Button variant="outline" size="sm" disabled>
-        <IconUpload size={16} className="mr-2" /> ไม่พบบัญชีรับเงิน
+        <IconUpload size={16} className="mr-2" /> {t('noBankAccount')}
       </Button>
     )
   }
@@ -184,7 +186,7 @@ export function UploadSlipDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconUpload size={16} className="mr-2" /> แจ้งชำระเงิน
+          <IconUpload size={16} className="mr-2" /> {t('uploadSlip')}
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -192,8 +194,8 @@ export function UploadSlipDialog({
         style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <DialogHeader>
-          <DialogTitle>แจ้งชำระเงิน #{orderNumber}</DialogTitle>
-          <DialogDescription>เลือกบัญชีที่ต้องการโอนเงิน</DialogDescription>
+          <DialogTitle>{t('uploadSlipTitle', { orderNumber })}</DialogTitle>
+          <DialogDescription>{t('selectBankAccount')}</DialogDescription>
         </DialogHeader>
         <div
           className={`flex items-center justify-between rounded-lg p-3 text-sm font-semibold ${
@@ -204,9 +206,11 @@ export function UploadSlipDialog({
         >
           <div className="flex items-center gap-2">
             <IconClock size={18} />
-            <span>{isExpired ? 'หมดเวลาชำระเงิน' : 'กรุณาชำระเงินภายใน'}</span>
+            <span>{isExpired ? t('timeExpired') : t('payWithin')}</span>
           </div>
-          <span className="font-bold">{timeLeft} นาที</span>
+          <span className="font-bold">
+            {timeLeft} {t('minutes')}
+          </span>
         </div>
         {selectedAccount.type === BankAccountType.PROMPTPAY && qrCodeUrl && (
           <div className="relative h-52 w-full">
@@ -220,14 +224,14 @@ export function UploadSlipDialog({
         )}
         <div className="bg-muted/50 space-y-2 rounded-lg border p-4 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">ชื่อบัญชี</span>
+            <span className="text-muted-foreground">{t('accountName')}</span>
             <span>{selectedAccount.accountName}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">
               {selectedAccount.type === BankAccountType.PROMPTPAY
-                ? 'หมายเลขพร้อมเพย์'
-                : 'เลขบัญชี'}
+                ? t('promptpayNumber')
+                : t('bankAccount')}
             </span>
             <span>
               {selectedAccount.type === BankAccountType.PROMPTPAY
@@ -236,15 +240,18 @@ export function UploadSlipDialog({
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">ยอดเงินที่ต้องชำระ</span>
+            <span className="text-muted-foreground">{t('amountToPay')}</span>
             <span className="text-primary font-bold">
               {formatCurrency(totalAmount ?? 0)}
             </span>
           </div>
         </div>
         <ActionRequiredAlert
-          title="คำเตือนสำคัญ"
-          description={`กรุณาโอนเงินให้ตรงกับยอดรวม (${formatCurrency(totalAmount ?? 0)}) และอัปโหลดสลิปให้ตรงกับคำสั่งซื้อ #${orderNumber} นี้เท่านั้น หากยอดเงินไม่ตรงหรือสลิปไม่ถูกต้อง ระบบจะตีตกสถานะเป็นไม่ผ่านอัตโนมัติ`}
+          title={t('importantNoticeTitle')}
+          description={t('slipNoticeDesc', {
+            totalAmount: formatCurrency(totalAmount ?? 0),
+            orderNumber,
+          })}
         />
         <div className="flex flex-col items-center justify-center">
           {previewUrl ? (
@@ -275,7 +282,7 @@ export function UploadSlipDialog({
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <IconPhoto className="text-muted-foreground mb-2 size-8" />
                 <p className="text-sm">
-                  {isExpired ? 'หมดเวลาอัปโหลดสลิป' : 'คลิกเพื่ออัปโหลดสลิป'}
+                  {isExpired ? t('uploadSlipExpired') : t('clickToUploadSlip')}
                 </p>
               </div>
               <input
@@ -294,7 +301,7 @@ export function UploadSlipDialog({
             variant="outline"
             onClick={() => setIsOpen(false)}
           >
-            ยกเลิก
+            {t('cancel')}
           </Button>
           <Button
             type="button"
@@ -303,10 +310,10 @@ export function UploadSlipDialog({
           >
             {isVerifying && <Spinner />}
             {isVerifying
-              ? 'กำลังส่ง...'
+              ? t('sending')
               : isExpired
-                ? 'หมดเวลาชำระเงิน'
-                : 'ยืนยันการชำระเงิน'}
+                ? t('timeExpired')
+                : t('confirmPayment')}
           </Button>
         </DialogFooter>
       </DialogContent>
