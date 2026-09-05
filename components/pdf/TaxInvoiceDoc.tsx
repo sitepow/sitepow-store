@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { PAYMENT_METHOD_TH } from '@/constants/translate'
 import { thaiBahtText } from '@/utils/baht-text'
 import { formatDateTime } from '@/utils/date'
@@ -19,13 +21,15 @@ interface ExtendedOrderProps {
 }
 
 export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
+  const t = useTranslations('merchant.pdf')
   const store = getStoreInfoFromOrder(order)
   const defaultCustomer = getCustomerInfoFromOrder(order)
   const extendedOrder = order as typeof order & ExtendedOrderProps
 
-  const customerName = order.taxName || defaultCustomer.name
+  const customerName =
+    order.taxName || defaultCustomer.name || t('common.generalCustomer')
   const customerTaxId = order.taxId || '-'
-  const customerBranch = order.taxBranchCode || 'สำนักงานใหญ่'
+  const customerBranch = order.taxBranchCode || t('common.headOffice')
   const customerAddress = order.taxAddress || defaultCustomer.fullAddress
 
   const totalAmount = Number(order.totalAmount || 0)
@@ -55,12 +59,14 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
   )
 
   const paymentMethodLabel = useMemo(() => {
-    if (!order.paymentMethod) return 'เงินสด / โอนเงิน'
+    if (!order.paymentMethod) return t('common.cashOrTransfer')
     return (
-      (PAYMENT_METHOD_TH as Record<string, string>)[order.paymentMethod] ||
+      (t.has(`paymentMethods.${order.paymentMethod}`)
+        ? t(`paymentMethods.${order.paymentMethod}` as any)
+        : (PAYMENT_METHOD_TH as Record<string, string>)[order.paymentMethod]) ||
       order.paymentMethod
     )
-  }, [order.paymentMethod])
+  }, [order.paymentMethod, t])
 
   const pointsDiscount = Number(order.pointsDiscount || 0)
   const couponDiscount = Number(order.coupon?.discountAmount || 0)
@@ -80,10 +86,10 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
             )}
             <div className="space-y-0.5">
               <h1 className="text-base font-semibold text-neutral-950">
-                {store.name}
+                {store.name || t('common.onlineStore')}
               </h1>
               <p className="text-neutral-600 print:text-neutral-800">
-                สำนักงานใหญ่ (Head Office)
+                {t('common.headOfficeWithEn')}
               </p>
               {store.address && (
                 <p className="max-w-md text-neutral-600 print:text-neutral-800">
@@ -92,39 +98,43 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
               )}
               <div className="flex flex-wrap gap-x-4 pt-1 text-neutral-700 print:text-neutral-900">
                 <span>
-                  เลขประจำตัวผู้เสียภาษีอากร:{' '}
+                  {t('common.taxIdFull')}
                   <span className="font-semibold text-neutral-950">
                     {store.taxId
                       ? formatPromptPay(store.taxId)
                       : '0-0000-00000-00-0'}
                   </span>
                 </span>
-                {store.phone && <span>โทรศัพท์: {store.phone}</span>}
+                {store.phone && (
+                  <span>{t('common.phone', { phone: store.phone })}</span>
+                )}
               </div>
             </div>
           </div>
           <div className="text-left sm:text-right print:text-right">
             <h2 className="text-xl font-bold tracking-tight text-neutral-950">
-              ใบกำกับภาษี / ใบเสร็จรับเงิน
+              {t('documentTitles.taxInvoice')}
             </h2>
             <p className="text-[11px] font-semibold tracking-widest text-neutral-500 uppercase">
-              Tax Invoice / Receipt
+              {t('documentTitles.taxInvoiceSub')}
             </p>
             <div className="mt-3 space-y-1">
               <p>
-                <span className="text-neutral-500">เลขที่เอกสาร: </span>
+                <span className="text-neutral-500">
+                  {t('common.docNumber')}
+                </span>
                 <span className="font-semibold text-neutral-950">
                   TAX-{order.orderNumber}
                 </span>
               </p>
               <p>
-                <span className="text-neutral-500">เลขอ้างอิงคำสั่งซื้อ: </span>
+                <span className="text-neutral-500">{t('common.orderRef')}</span>
                 <span className="font-medium text-neutral-900">
                   #{order.orderNumber}
                 </span>
               </p>
               <p>
-                <span className="text-neutral-500">วันที่ออกเอกสาร: </span>
+                <span className="text-neutral-500">{t('common.docDate')}</span>
                 <span className="text-neutral-900">{documentDate}</span>
               </p>
             </div>
@@ -133,13 +143,13 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
         <section className="mt-5 grid grid-cols-1 gap-4 border border-neutral-300 p-4 sm:grid-cols-2 print:grid-cols-2">
           <div className="space-y-1">
             <span className="text-neutral-500">
-              ชื่อผู้ซื้อ / ผู้รับบริการ:
+              {t('common.buyerRecipient')}
             </span>
             <p className="pt-0.5 font-semibold text-neutral-950">
               {customerName}
             </p>
             <span className="inline-block pt-1 text-neutral-500">
-              ที่อยู่จดทะเบียนภาษี:
+              {t('common.taxRegisteredAddress')}
             </span>
             <p className="leading-relaxed text-neutral-700 print:text-neutral-900">
               {customerAddress}
@@ -147,21 +157,23 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
           </div>
           <div className="space-y-1 border-t border-neutral-200 pt-3 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4 print:border-t-0 print:border-l print:pt-0 print:pl-4">
             <p>
-              <span className="text-neutral-500">
-                เลขประจำตัวผู้เสียภาษีอากร:{' '}
-              </span>
+              <span className="text-neutral-500">{t('common.taxIdFull')}</span>
               <span className="font-semibold text-neutral-950">
                 {customerTaxId !== '-' ? formatPromptPay(customerTaxId) : '-'}
               </span>
             </p>
             <p>
-              <span className="text-neutral-500">สาขา: </span>
+              <span className="text-neutral-500">
+                {t('common.branchLabel')}
+              </span>
               <span className="font-medium text-neutral-900">
                 {customerBranch}
               </span>
             </p>
             <p>
-              <span className="text-neutral-500">ช่องทางการชำระเงิน: </span>
+              <span className="text-neutral-500">
+                {t('common.paymentChannel')}
+              </span>
               <span className="text-neutral-900">{paymentMethodLabel}</span>
             </p>
           </div>
@@ -170,11 +182,19 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-y border-neutral-400 bg-neutral-100 font-semibold text-neutral-800 print:bg-neutral-50">
-                <th className="w-12 px-2 py-2.5 text-center">ลำดับ</th>
-                <th className="px-3 py-2.5">รายการ</th>
-                <th className="w-20 px-3 py-2.5 text-center">จำนวน</th>
-                <th className="w-32 px-3 py-2.5 text-right">ราคาต่อหน่วย</th>
-                <th className="w-36 px-3 py-2.5 text-right">จำนวนเงิน</th>
+                <th className="w-12 px-2 py-2.5 text-center">
+                  {t('table.index')}
+                </th>
+                <th className="px-3 py-2.5">{t('table.itemShort')}</th>
+                <th className="w-20 px-3 py-2.5 text-center">
+                  {t('table.quantity')}
+                </th>
+                <th className="w-32 px-3 py-2.5 text-right">
+                  {t('table.unitPrice')}
+                </th>
+                <th className="w-36 px-3 py-2.5 text-right">
+                  {t('table.amount')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200">
@@ -191,7 +211,9 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
                       </p>
                       {item.variantTitle && (
                         <p className="text-[11px] text-neutral-500">
-                          ตัวเลือก: {item.variantTitle}
+                          {t('table.variantPrefix', {
+                            variant: item.variantTitle,
+                          })}
                         </p>
                       )}
                     </td>
@@ -215,54 +237,58 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
             <div className="flex flex-1 flex-col justify-between space-y-3">
               <div className="border border-neutral-300 bg-neutral-50 p-3 print:bg-transparent">
                 <span className="font-semibold text-neutral-600">
-                  จำนวนเงินรวมทั้งสิ้น (ตัวอักษร):
+                  {t('summary.textAmountTotal')}
                 </span>
                 <p className="mt-0.5 font-medium text-neutral-950">
                   {thaiBahtText(totalAmount)}
                 </p>
               </div>
               <p className="text-[11px] text-neutral-500 print:text-neutral-700">
-                * ราคาสินค้ารวมภาษีมูลค่าเพิ่มเรียบร้อยแล้ว (VAT Included)
+                {t('common.vatIncludedNote')}
               </p>
             </div>
             <div className="w-full space-y-2 sm:w-80 print:w-80">
               <div className="flex justify-between text-neutral-600 print:text-neutral-800">
-                <span>มูลค่าสินค้ารวม:</span>
+                <span>{t('summary.subtotalValue')}</span>
                 <span className="font-medium text-neutral-900">
                   {formatCurrency(itemsSubtotal)}
                 </span>
               </div>
               {pointsDiscount > 0 && (
                 <div className="flex justify-between text-neutral-800">
-                  <span>หัก ส่วนลดแต้มสะสม:</span>
+                  <span>{t('summary.pointsDiscountDeduct')}</span>
                   <span>-{formatCurrency(pointsDiscount)}</span>
                 </div>
               )}
               {order.coupon && couponDiscount > 0 && (
                 <div className="flex justify-between text-neutral-800">
-                  <span>หัก ส่วนลดคูปอง ({order.coupon.code}):</span>
+                  <span>
+                    {t('summary.couponDiscountDeduct', {
+                      code: order.coupon.code,
+                    })}
+                  </span>
                   <span>-{formatCurrency(couponDiscount)}</span>
                 </div>
               )}
               {shippingFee > 0 && (
                 <div className="flex justify-between text-neutral-600 print:text-neutral-800">
-                  <span>ค่าบริการจัดส่ง:</span>
+                  <span>{t('summary.shippingServiceFee')}</span>
                   <span>{formatCurrency(shippingFee)}</span>
                 </div>
               )}
               <div className="space-y-1 border-t border-neutral-300 pt-2">
                 <div className="flex justify-between text-neutral-700 print:text-neutral-900">
-                  <span>มูลค่าสินค้าก่อนภาษีมูลค่าเพิ่ม:</span>
+                  <span>{t('summary.beforeVat')}</span>
                   <span>{formatCurrency(totalBeforeVat)}</span>
                 </div>
                 <div className="flex justify-between text-neutral-700 print:text-neutral-900">
-                  <span>ภาษีมูลค่าเพิ่ม ({vatRate}%):</span>
+                  <span>{t('summary.vat', { rate: vatRate })}</span>
                   <span>{formatCurrency(vatAmount)}</span>
                 </div>
               </div>
 
               <div className="flex justify-between border-t-2 border-neutral-900 pt-2 text-sm font-bold text-neutral-950">
-                <span>ยอดรวมสุทธิทั้งสิ้น:</span>
+                <span>{t('summary.grandTotal')}</span>
                 <span className="text-base font-bold">
                   {formatCurrency(totalAmount)}
                 </span>
@@ -276,24 +302,24 @@ export function TaxInvoiceDoc({ order }: OrderDocComponentProps) {
           <div className="flex flex-col items-center">
             <div className="h-16 w-48 border-b border-neutral-400" />
             <p className="mt-2 font-medium text-neutral-900">
-              ผู้รับเอกสาร / ผู้ซื้อ (Customer)
+              {t('signatures.buyerCustomer')}
             </p>
             <p className="text-[11px] text-neutral-500">
-              วันที่: _____/_____/_________
+              {t('common.datePlaceholder')}
             </p>
           </div>
           <div className="flex flex-col items-center">
             <div className="h-16 w-48 border-b border-neutral-400" />
             <p className="mt-2 font-medium text-neutral-900">
-              ผู้มีอำนาจลงนาม / ในนามผู้ขาย (Authorized)
+              {t('signatures.authorizedSeller')}
             </p>
             <p className="text-[11px] text-neutral-500">
-              วันที่: _____/_____/_________
+              {t('common.datePlaceholder')}
             </p>
           </div>
         </div>
         <p className="mt-8 text-center text-[11px] text-neutral-500">
-          เอกสารนี้ออกโดยระบบอัตโนมัติ (ต้นฉบับ)
+          {t('common.autoGeneratedOriginal')}
         </p>
       </footer>
     </div>

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
 import { formatCurrency } from '@/utils/pricing'
@@ -15,6 +17,7 @@ interface ExtendedOrderProps {
 }
 
 export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
+  const t = useTranslations('merchant.pdf')
   const store = getStoreInfoFromOrder(order)
   const customer = getCustomerInfoFromOrder(order)
   const extendedOrder = order as typeof order & ExtendedOrderProps
@@ -57,10 +60,10 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
       <header className="flex items-start justify-between border-b-2 border-neutral-900 pb-2.5">
         <div>
           <div className="inline-block border border-neutral-900 bg-neutral-950 px-2.5 py-1 text-xs font-bold text-white print:bg-black">
-            {order.shippingMethod || 'STANDARD DELIVERY'}
+            {order.shippingMethod || t('common.standardDelivery')}
           </div>
           <p className="mt-1.5 text-xs font-semibold text-neutral-950">
-            คำสั่งซื้อ: #{order.orderNumber}
+            {t('common.orderNumber', { orderNumber: order.orderNumber })}
           </p>
         </div>
         {qrCodeUrl ? (
@@ -77,7 +80,7 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
       </header>
       <section className="mt-2 border border-neutral-300 bg-neutral-50 py-1.5 text-center print:bg-transparent">
         <p className="text-[10px] font-semibold text-neutral-500 uppercase print:text-neutral-700">
-          หมายเลขติดตามพัสดุ (Tracking No.)
+          {t('common.trackingNoLabel')}
         </p>
         <p className="text-base font-bold tracking-wider text-neutral-950">
           {order.trackingNumber || `#${order.orderNumber}`}
@@ -85,11 +88,15 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
       </section>
       <section className="mt-2.5 border-b border-neutral-300 pb-2 text-[11px]">
         <span className="font-bold text-neutral-500 uppercase print:text-neutral-700">
-          ผู้ส่ง (From):
+          {t('shippingLabel.sender')}
         </span>
-        <p className="font-semibold text-neutral-950">{store.name}</p>
+        <p className="font-semibold text-neutral-950">
+          {store.name || t('common.onlineStore')}
+        </p>
         {store.phone && (
-          <p className="text-neutral-800">โทรศัพท์: {store.phone}</p>
+          <p className="text-neutral-800">
+            {t('common.phone', { phone: store.phone })}
+          </p>
         )}
         {store.address && (
           <p className="leading-snug text-neutral-700 print:text-neutral-900">
@@ -100,7 +107,7 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
       <section className="mt-2.5 border-2 border-neutral-900 p-2.5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-neutral-950 uppercase">
-            ผู้รับ (To):
+            {t('shippingLabel.recipient')}
           </span>
           {postalCode && (
             <div className="border border-neutral-900 bg-neutral-950 px-2 py-0.5 text-sm font-bold text-white print:bg-black">
@@ -109,10 +116,10 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
           )}
         </div>
         <p className="mt-1 text-sm font-bold text-neutral-950">
-          {customer.name}
+          {customer.name || t('common.generalCustomer')}
         </p>
         <p className="text-xs font-semibold text-neutral-950">
-          โทรศัพท์: {customer.phone}
+          {t('common.phone', { phone: customer.phone })}
         </p>
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-900">
           {customer.fullAddress}
@@ -122,7 +129,7 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
         {isCOD ? (
           <div className="border-2 border-neutral-900 bg-neutral-100 p-2 text-center print:bg-transparent">
             <p className="text-xs font-bold text-neutral-950 uppercase">
-              เก็บเงินปลายทาง (Cash on Delivery)
+              {t('shippingLabel.cod')}
             </p>
             <p className="text-lg font-bold text-neutral-950">
               {formatCurrency(Number(order.totalAmount))}
@@ -131,14 +138,14 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
         ) : (
           <div className="border border-neutral-900 p-1.5 text-center">
             <span className="text-xs font-bold text-neutral-950">
-              ชำระเงินแล้ว / ไม่ต้องเก็บเงิน (PAID)
+              {t('shippingLabel.paid')}
             </span>
           </div>
         )}
       </section>
       <section className="mt-2.5 border-t border-neutral-300 pt-2 text-[10px]">
         <p className="font-semibold text-neutral-600 print:text-neutral-800">
-          รายการสินค้าในพัสดุ:
+          {t('shippingLabel.itemsInPackage')}
         </p>
         <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-neutral-800 print:text-neutral-900">
           {order.items.slice(0, 4).map((item) => (
@@ -149,14 +156,18 @@ export function ShippingLabelDoc({ order }: OrderDocComponentProps) {
           ))}
           {order.items.length > 4 && (
             <li className="list-none pt-0.5 text-neutral-500 print:text-neutral-700">
-              ...และรายการอื่นๆ อีก {order.items.length - 4} รายการ
+              {t('shippingLabel.moreItems', { count: order.items.length - 4 })}
             </li>
           )}
         </ul>
       </section>
       <footer className="mt-2 flex items-center justify-between border-t border-neutral-300 pt-1.5 text-[9px] text-neutral-500 print:text-neutral-700">
-        <span>วันที่: {formatDateTime(order.createdAt)}</span>
-        {order.totalWeight && <span>น้ำหนัก: {order.totalWeight} กก.</span>}
+        <span>
+          {t('common.date', { date: formatDateTime(order.createdAt) })}
+        </span>
+        {order.totalWeight && (
+          <span>{t('common.weight', { weight: order.totalWeight })}</span>
+        )}
       </footer>
     </div>
   )

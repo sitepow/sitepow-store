@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { PAYMENT_METHOD_TH } from '@/constants/translate'
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/date'
@@ -19,6 +21,7 @@ interface ExtendedOrderProps {
 }
 
 export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
+  const t = useTranslations('merchant.pdf')
   const store = getStoreInfoFromOrder(order)
   const customer = getCustomerInfoFromOrder(order)
   const extendedOrder = order as typeof order & ExtendedOrderProps
@@ -53,18 +56,20 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
   const isCash = order.paymentMethod === PaymentMethod.CASH_ON_DELIVERY
 
   const paymentLabel = useMemo(() => {
-    if (!order.paymentMethod) return 'เงินสด'
+    if (!order.paymentMethod) return t('common.cash')
     return (
-      (PAYMENT_METHOD_TH as Record<string, string>)[order.paymentMethod] ||
+      (t.has(`paymentMethods.${order.paymentMethod}`)
+        ? t(`paymentMethods.${order.paymentMethod}` as any)
+        : (PAYMENT_METHOD_TH as Record<string, string>)[order.paymentMethod]) ||
       order.paymentMethod
     )
-  }, [order.paymentMethod])
+  }, [order.paymentMethod, t])
 
   useEffect(() => {
     let isMounted = true
     QRCode.toDataURL(`ORD-${order.orderNumber}`, {
-      margin: 0,
-      width: 130,
+      margin: 1,
+      width: 120,
       errorCorrectionLevel: 'M',
     })
       .then((url) => {
@@ -78,7 +83,7 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
   }, [order.orderNumber])
 
   return (
-    <div className="mx-auto w-full max-w-[80mm] bg-white px-3 py-4 text-[11px] leading-tight text-neutral-900 print:m-0 print:w-[76mm] print:p-0 print:text-black">
+    <div className="mx-auto w-full max-w-[80mm] bg-white text-xs leading-tight text-neutral-900 print:m-0 print:w-[75mm] print:text-black">
       <header className="text-center">
         {store.logo && (
           <img
@@ -88,11 +93,11 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
           />
         )}
         <h1 className="text-sm font-bold tracking-tight text-neutral-950">
-          {store.name}
+          {store.name || t('common.onlineStore')}
         </h1>
         {order.items[0]?.branch?.name && (
           <p className="mt-0.5 text-[10px] text-neutral-600 print:text-neutral-800">
-            สาขา: {order.items[0].branch.name}
+            {t('common.branch', { branch: order.items[0].branch.name })}
           </p>
         )}
         {store.address && (
@@ -101,23 +106,27 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
           </p>
         )}
         <div className="mt-0.5 flex flex-wrap justify-center gap-x-2 text-[10px] text-neutral-600 print:text-neutral-800">
-          {store.phone && <span>โทร: {store.phone}</span>}
-          {store.taxId && <span>เลขผู้เสียภาษี: {store.taxId}</span>}
+          {store.phone && (
+            <span>{t('common.phoneShort', { phone: store.phone })}</span>
+          )}
+          {store.taxId && (
+            <span>{t('common.taxIdShort', { taxId: store.taxId })}</span>
+          )}
         </div>
 
         <div className="mt-2.5 border-y border-neutral-900 py-1.5">
           <p className="font-bold tracking-wide uppercase">
-            ใบเสร็จรับเงิน / ใบกำกับภาษีอย่างย่อ
+            {t('receiptSlip.title')}
           </p>
           <p className="text-[9px] tracking-wider text-neutral-500 uppercase print:text-neutral-700">
-            TAX INVOICE (ABB) / RECEIPT
+            {t('receiptSlip.subtitle')}
           </p>
         </div>
       </header>
       <section className="mt-2 space-y-0.5 border-b border-dashed border-neutral-400 pb-2 text-[10px]">
         <div className="flex justify-between">
           <span className="text-neutral-600 print:text-neutral-800">
-            เลขที่เอกสาร:
+            {t('common.docNumber')}
           </span>
           <span className="font-semibold text-neutral-950">
             #{order.orderNumber}
@@ -125,22 +134,22 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
         </div>
         <div className="flex justify-between">
           <span className="text-neutral-600 print:text-neutral-800">
-            วันที่:
+            {t('common.dateLabel')}
           </span>
           <span>{formatDateTime(order.paidAt || order.createdAt)}</span>
         </div>
         {extendedOrder.employee?.name && (
           <div className="flex justify-between">
             <span className="text-neutral-600 print:text-neutral-800">
-              พนักงาน:
+              {t('receiptSlip.employee')}
             </span>
             <span>{extendedOrder.employee.name}</span>
           </div>
         )}
-        {customer.name && customer.name !== 'ลูกค้าทั่วไป' && (
+        {customer.name && customer.name !== '-' && (
           <div className="flex justify-between">
             <span className="text-neutral-600 print:text-neutral-800">
-              ลูกค้า:
+              {t('receiptSlip.customer')}
             </span>
             <span className="max-w-[45mm] truncate font-medium">
               {customer.name}
@@ -150,8 +159,8 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
       </section>
       <section className="pt-2">
         <div className="flex justify-between border-b border-neutral-900 pb-1 font-semibold text-neutral-900">
-          <span>รายการ</span>
-          <span>จำนวนเงิน</span>
+          <span>{t('table.itemShort')}</span>
+          <span>{t('table.amount')}</span>
         </div>
         <div className="space-y-2 pt-2">
           {order.items.map((item) => {
@@ -177,45 +186,47 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
       </section>
       <section className="mt-2.5 space-y-1 border-t border-dashed border-neutral-400 pt-2 text-[10px]">
         <div className="flex justify-between text-neutral-600 print:text-neutral-800">
-          <span>จำนวนสินค้ารวม:</span>
-          <span>{totalQuantity} ชิ้น</span>
+          <span>{t('table.totalQuantity')}</span>
+          <span>
+            {t('common.itemsTotalQuantityShort', { count: totalQuantity })}
+          </span>
         </div>
         <div className="flex justify-between text-neutral-600 print:text-neutral-800">
-          <span>รวมเป็นเงิน:</span>
+          <span>{t('summary.subtotalShort')}</span>
           <span>{formatCurrency(itemsSubtotal)}</span>
         </div>
         {pointsDiscount > 0 && (
           <div className="flex justify-between text-neutral-800">
-            <span>ส่วนลดแต้ม:</span>
+            <span>{t('summary.pointsDiscountShort')}</span>
             <span>-{formatCurrency(pointsDiscount)}</span>
           </div>
         )}
         {couponDiscount > 0 && (
           <div className="flex justify-between text-neutral-800">
-            <span>ส่วนลดคูปอง:</span>
+            <span>{t('summary.couponDiscountShort')}</span>
             <span>-{formatCurrency(couponDiscount)}</span>
           </div>
         )}
         {shippingFee > 0 && (
           <div className="flex justify-between text-neutral-600 print:text-neutral-800">
-            <span>ค่าส่ง:</span>
+            <span>{t('summary.shippingFeeShort')}</span>
             <span>{formatCurrency(shippingFee)}</span>
           </div>
         )}
         <div className="flex justify-between border-t border-neutral-900 pt-1.5 text-xs font-bold text-neutral-950">
-          <span>ยอดรวมสุทธิ:</span>
+          <span>{t('summary.netTotalShort')}</span>
           <span className="text-sm">{formatCurrency(totalAmount)}</span>
         </div>
       </section>
       <section className="mt-2 space-y-0.5 border-t border-dashed border-neutral-400 pt-2 text-[10px] text-neutral-700 print:text-neutral-900">
         <div className="flex justify-between">
-          <span>ช่องทางชำระ:</span>
+          <span>{t('common.paymentChannelShort')}</span>
           <span className="font-medium text-neutral-900">{paymentLabel}</span>
         </div>
         {isCash && (
           <>
             <div className="flex justify-between">
-              <span>รับเงิน:</span>
+              <span>{t('summary.received')}</span>
               <span>
                 {formatCurrency(
                   Number(extendedOrder.receivedAmount || totalAmount),
@@ -223,7 +234,7 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
               </span>
             </div>
             <div className="flex justify-between">
-              <span>เงินทอน:</span>
+              <span>{t('summary.change')}</span>
               <span>
                 {formatCurrency(Number(extendedOrder.changeAmount || 0))}
               </span>
@@ -232,13 +243,17 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
         )}
         <div className="flex justify-between pt-1 text-[9px] text-neutral-500 print:text-neutral-700">
           <span>
-            (ราคารวมภาษีมูลค่าเพิ่ม 7% แล้ว: {formatCurrency(vatAmount)})
+            {t('common.vatIncludedShort', {
+              amount: formatCurrency(vatAmount),
+            })}
           </span>
         </div>
         {earnedPoints > 0 && (
           <div className="flex justify-between pt-0.5 text-[10px] font-medium text-neutral-900">
-            <span>แต้มสะสมที่ได้รับ:</span>
-            <span>+{earnedPoints} แต้ม</span>
+            <span>{t('summary.earnedPoints')}</span>
+            <span>
+              {t('summary.earnedPointsValue', { points: earnedPoints })}
+            </span>
           </div>
         )}
       </section>
@@ -252,12 +267,14 @@ export function ReceiptSlipDoc({ order }: OrderDocComponentProps) {
             />
           </div>
         )}
-        <p className="font-semibold text-neutral-900">ขอบคุณที่ใช้บริการ</p>
+        <p className="font-semibold text-neutral-900">
+          {t('receiptSlip.thankYou')}
+        </p>
         <p className="text-[9px] tracking-wider text-neutral-500 uppercase print:text-neutral-700">
-          Thank you
+          {t('receiptSlip.thankYouSub')}
         </p>
         <p className="mt-1 text-[8px] text-neutral-500 print:text-neutral-700">
-          กรุณาเก็บเอกสารนี้ไว้เพื่อเป็นหลักฐาน
+          {t('receiptSlip.keepEvidence')}
         </p>
       </footer>
     </div>

@@ -11,7 +11,7 @@ export function getStoreInfoFromOrder(order: GetOrdersItem): StoreInfo {
     storeData.name ||
     storeSnapshot.name ||
     (order as any).resellerAgreement?.resellerStore?.name ||
-    'ร้านค้าออนไลน์'
+    ''
 
   const logo = storeData.logo || storeSnapshot.logo || null
   const phone = storeData.phone || storeSnapshot.phone || null
@@ -65,7 +65,7 @@ export function getCustomerInfoFromOrder(order: GetOrdersItem) {
     resellerInfo?.resellerUser?.name ||
     order.taxName ||
     order.customer?.email ||
-    'ลูกค้าทั่วไป'
+    ''
 
   const phone = shippingAddr?.phone || order.customer?.phone || '-'
   const email =

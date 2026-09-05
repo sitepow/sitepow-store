@@ -2,6 +2,8 @@
 
 import { type ComponentType, useEffect, useRef, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { GetOrdersItem } from '@/actions/order'
 import {
   IconFileDescription,
@@ -35,15 +37,14 @@ const DOC_COMPONENTS: Record<
 }
 
 const NAV_TABS = [
-  { id: 'receipt', label: 'ใบเสร็จรับเงิน (A4)', icon: IconReceipt },
-  { id: 'receipt-slip', label: 'ใบเสร็จอย่างย่อ (80mm)', icon: IconReceipt },
-  { id: 'tax-invoice', label: 'ใบกำกับภาษี', icon: IconFileInvoice },
-  { id: 'delivery-note', label: 'ใบส่งสินค้า', icon: IconPackageExport },
-  { id: 'shipping-label', label: 'ใบปะหน้าพัสดุ', icon: IconPrinter },
-  { id: 'packing-slip', label: 'ใบจัดสินค้า', icon: IconFileDescription },
+  { id: 'receipt', icon: IconReceipt },
+  { id: 'receipt-slip', icon: IconReceipt },
+  { id: 'tax-invoice', icon: IconFileInvoice },
+  { id: 'delivery-note', icon: IconPackageExport },
+  { id: 'shipping-label', icon: IconPrinter },
+  { id: 'packing-slip', icon: IconFileDescription },
 ] as const satisfies ReadonlyArray<{
   id: OrderDocType
-  label: string
   icon: typeof IconReceipt
 }>
 
@@ -79,6 +80,7 @@ export function PrintLayout({
   initialDocType = 'receipt',
   autoPrint = true,
 }: PrintLayoutProps) {
+  const t = useTranslations('merchant.pdf')
   const [docType, setDocType] = useState<OrderDocType>(initialDocType)
   const hasAutoPrinted = useRef(false)
 
@@ -106,7 +108,7 @@ export function PrintLayout({
             className="flex flex-wrap items-center gap-1"
             aria-label="Document Types"
           >
-            {NAV_TABS.map(({ id, label, icon: Icon }) => {
+            {NAV_TABS.map(({ id, icon: Icon }) => {
               const isActive = docType === id
               return (
                 <button
@@ -120,7 +122,7 @@ export function PrintLayout({
                   }`}
                 >
                   <Icon size={14} />
-                  <span>{label}</span>
+                  <span>{t(`types.${id}` as any)}</span>
                 </button>
               )
             })}
@@ -132,7 +134,7 @@ export function PrintLayout({
               className="bg-primary text-primary-foreground gap-1.5 shadow-sm"
             >
               <IconPrinter size={16} />
-              <span>พิมพ์เอกสาร (Print)</span>
+              <span>{t('print')}</span>
             </Button>
             <Button
               variant="outline"
@@ -141,7 +143,7 @@ export function PrintLayout({
               className="shrink-0 gap-1"
             >
               <IconX size={16} />
-              <span className="hidden sm:inline">ปิดหน้าต่าง</span>
+              <span className="hidden sm:inline">{t('closeWindow')}</span>
             </Button>
           </div>
         </div>

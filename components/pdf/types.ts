@@ -18,37 +18,37 @@ export interface DocTypeInfo {
 export const DOC_TYPES: Record<OrderDocType, DocTypeInfo> = {
   receipt: {
     id: 'receipt',
-    label: 'ใบเสร็จรับเงิน',
+    label: 'Receipt',
     sublabel: 'Receipt (A4)',
     pageSize: 'A4',
   },
   'receipt-slip': {
     id: 'receipt-slip',
-    label: 'ใบเสร็จอย่างย่อ',
+    label: 'Receipt Slip',
     sublabel: 'Receipt Slip (80mm)',
     pageSize: 'Slip',
   },
   'tax-invoice': {
     id: 'tax-invoice',
-    label: 'ใบกำกับภาษี',
+    label: 'Tax Invoice',
     sublabel: 'Tax Invoice',
     pageSize: 'A4',
   },
   'delivery-note': {
     id: 'delivery-note',
-    label: 'ใบส่งสินค้า',
+    label: 'Delivery Note',
     sublabel: 'Delivery Note',
     pageSize: 'A4',
   },
   'shipping-label': {
     id: 'shipping-label',
-    label: 'ใบปะหน้าพัสดุ',
+    label: 'Shipping Label',
     sublabel: 'Shipping Label (100x150mm)',
     pageSize: 'Label',
   },
   'packing-slip': {
     id: 'packing-slip',
-    label: 'ใบจัดสินค้า',
+    label: 'Packing Slip',
     sublabel: 'Packing Slip',
     pageSize: 'A4',
   },
