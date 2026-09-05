@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export function MetadataCombobox({ value, onChange }: Props) {
+  const t = useTranslations('merchant.products.form')
   const [open, setOpen] = React.useState(false)
 
   const selectedLabel = PRODUCT_METADATA_MASTER.flatMap((g) => g.fields).find(
@@ -45,16 +48,16 @@ export function MetadataCombobox({ value, onChange }: Props) {
           )}
         >
           <span className="line-clamp-1 flex items-center gap-1.5">
-            {selectedLabel || 'เลือกคุณสมบัติ...'}
+            {selectedLabel || t('selectProperty')}
           </span>
           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-75 p-0">
         <Command>
-          <CommandInput placeholder="ค้นหาคุณสมบัติ..." />
+          <CommandInput placeholder={t('searchProperty')} />
           <CommandList>
-            <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
+            <CommandEmpty>{t('noPropertyFound')}</CommandEmpty>
             {PRODUCT_METADATA_MASTER.map((group) => (
               <CommandGroup key={group.category} heading={group.category}>
                 {group.fields.map((item) => (

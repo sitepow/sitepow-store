@@ -2,6 +2,8 @@
 
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/product'
 
@@ -17,6 +19,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 
 export function DiscountField({ index }: { index: number }) {
+  const t = useTranslations('merchant.products.form')
   const { control } = useFormContext<ProductFormValues>()
 
   const discountActive = useWatch({
@@ -28,7 +31,7 @@ export function DiscountField({ index }: { index: number }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="space-y-0.5">
-          <span className="text-sm font-medium">เปิดใช้งานส่วนลด</span>
+          <span className="text-sm font-medium">{t('enableDiscount')}</span>
         </div>
         <Controller
           name={`variants.${index}.discount.active`}
@@ -46,7 +49,7 @@ export function DiscountField({ index }: { index: number }) {
           render={({ field }) => (
             <Field>
               <FieldLabel className="text-muted-foreground text-[10px]">
-                ประเภท
+                {t('discountType')}
               </FieldLabel>
               <Select
                 onValueChange={field.onChange}
@@ -58,9 +61,11 @@ export function DiscountField({ index }: { index: number }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={DiscountType.PERCENTAGE}>
-                    เปอร์เซ็นต์
+                    {t('discountPercentage')}
                   </SelectItem>
-                  <SelectItem value={DiscountType.FIXED}>จำนวนเงิน</SelectItem>
+                  <SelectItem value={DiscountType.FIXED}>
+                    {t('discountFixed')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -72,7 +77,7 @@ export function DiscountField({ index }: { index: number }) {
           render={({ field, fieldState }) => (
             <Field>
               <FieldLabel className="text-muted-foreground text-[10px]">
-                มูลค่าส่วนลด
+                {t('discountValue')}
               </FieldLabel>
               <Input
                 {...field}

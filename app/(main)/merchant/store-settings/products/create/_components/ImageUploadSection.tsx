@@ -3,6 +3,8 @@
 
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { ProductFormValues } from '@/zod/product'
 import { ImagePlus, Star, X } from 'lucide-react'
 
@@ -18,6 +20,7 @@ interface ImageUploadSectionProps {
 export function ImageUploadSection({
   showPrimaryControl = true,
 }: ImageUploadSectionProps) {
+  const t = useTranslations('merchant.products.form')
   const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
     control,
@@ -70,11 +73,9 @@ export function ImageUploadSection({
   return (
     <FieldSet className="space-y-4">
       <FieldLegend variant="label" className="text-lg font-bold">
-        สื่อประกอบ ({fields.length})
+        {t('mediaTitle', { count: fields.length })}
       </FieldLegend>
-      <FieldDescription>
-        รองรับรูปภาพและวิดีโอ (ขนาดไฟล์สูงสุด 10 MB)
-      </FieldDescription>
+      <FieldDescription>{t('mediaDescription')}</FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field: any, index) => {
           const rawFile = field.url || field.file
@@ -128,7 +129,7 @@ export function ImageUploadSection({
                       size="icon-lg"
                       className="size-8"
                       onClick={() => handleSetPrimary(index)}
-                      title="ตั้งเป็นรูปหลัก"
+                      title={t('setMainImage')}
                     >
                       <Star className="size-4" />
                     </Button>
@@ -139,7 +140,7 @@ export function ImageUploadSection({
                     size="icon-lg"
                     className="size-8"
                     onClick={() => handleRemoveImage(index)}
-                    title="ลบรูปภาพ"
+                    title={t('deleteImage')}
                   >
                     <X className="size-4" />
                   </Button>
@@ -150,7 +151,7 @@ export function ImageUploadSection({
         })}
         <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center border border-dashed">
           <ImagePlus className="size-5" />
-          <span className="mt-2 text-xs font-medium">เพิ่มสื่อ</span>
+          <span className="mt-2 text-xs font-medium">{t('addMedia')}</span>
           <input
             type="file"
             multiple

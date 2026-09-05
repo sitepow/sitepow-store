@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -29,6 +31,7 @@ export function ProductSlugField({
   isPending: boolean
   onAiTrigger: (action: () => void) => void
 }) {
+  const t = useTranslations('merchant.products.form')
   const { selectedStoreId } = useStoreFilter()
   const {
     register,
@@ -69,7 +72,7 @@ export function ProductSlugField({
           size="icon"
           onClick={() => onAiTrigger(() => genSlug())}
           disabled={isGenSlug}
-          title="สร้าง Slug จากชื่อสินค้า"
+          title={t('generateSlugTooltip')}
         >
           <IconWand className="size-4" />
         </Button>

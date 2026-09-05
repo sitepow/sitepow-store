@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { BranchDialog } from '@/app/(main)/merchant/organization-branches/_components/BranchDialog'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { IconPlus } from '@tabler/icons-react'
+import { IconEdit, IconPlus } from '@tabler/icons-react'
 import { ArrowLeftIcon } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -25,6 +26,7 @@ interface ProductCreateClientProps {
 }
 
 export function ProductCreateClient({ productId }: ProductCreateClientProps) {
+  const t = useTranslations('merchant.products.form')
   const [openCategory, setOpenCategory] = useState(false)
   const [openBranch, setOpenBranch] = useState(false)
 
@@ -38,14 +40,14 @@ export function ProductCreateClient({ productId }: ProductCreateClientProps) {
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconPlus}
-        title="เพิ่มสินค้าใหม่"
-        description="กรอกข้อมูลรายละเอียดสินค้า ราคา และจำนวนสต็อกเพื่อบันทึกเข้าสู่ระบบ"
+        icon={productId ? IconEdit : IconPlus}
+        title={productId ? t('editTitle') : t('createTitle')}
+        description={t('createDescription')}
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <Button asChild variant="outline">
               <Link href="/merchant/store-settings/products">
-                <ArrowLeftIcon /> ย้อนกลับ
+                <ArrowLeftIcon /> {t('back')}
               </Link>
             </Button>
             {selectedStoreId !== ALL_STORES && (

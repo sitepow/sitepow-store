@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useProductOptions } from '@/actions/hooks/product'
 import { getProductById } from '@/actions/product'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
@@ -41,6 +43,7 @@ import { cn } from '@/lib/utils'
 type ProductPreview = Awaited<ReturnType<typeof getProductById>>
 
 export function CopyProductDataPicker({ storeId }: { storeId: string }) {
+  const t = useTranslations('merchant.products.form')
   const [open, setOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const { setValue, getValues } = useFormContext<ProductFormValues>()
@@ -54,7 +57,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
 
   const groupedOptions = options.reduce(
     (acc, item) => {
-      const category = item.category?.title || 'ไม่มีหมวดหมู่'
+      const category = item.category?.title || t('noCategory')
       if (!acc[category]) {
         acc[category] = []
       }
@@ -141,7 +144,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
       })
     }
 
-    toast.success('คัดลอกข้อมูลที่เลือกเรียบร้อย')
+    toast.success(t('copySuccess'))
     setOpen(false)
   }
 
@@ -155,13 +158,12 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <IconDatabaseImport className="size-4" />{' '}
-          คัดลอกข้อมูลสินค้าในฐานข้อมูล
+          <IconDatabaseImport className="size-4" /> {t('copyFromDatabase')}
         </Button>
       </DialogTrigger>
       <DialogContent className="flex min-h-96 flex-col">
         <DialogHeader>
-          <DialogTitle>คัดลอกข้อมูลสินค้าจาก</DialogTitle>
+          <DialogTitle>{t('copyProductFrom')}</DialogTitle>
         </DialogHeader>
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
@@ -176,16 +178,16 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
               <span className="line-clamp-1 flex items-center gap-1.5">
                 {sourceId
                   ? options.find((p) => p.id === sourceId)?.title
-                  : 'ค้นหาสินค้าต้นแบบ...'}
+                  : t('searchTemplatePlaceholder')}
               </span>
               <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="max-w-100 p-0">
             <Command>
-              <CommandInput placeholder="พิมพ์ชื่อสินค้าเพื่อค้นหา..." />
+              <CommandInput placeholder={t('searchProductInputPlaceholder')} />
               <CommandList>
-                <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
+                <CommandEmpty>{t('productNotFound')}</CommandEmpty>
                 {Object.entries(groupedOptions).map(([category, items]) => (
                   <CommandGroup key={category} heading={category}>
                     {items.map((p) => (
@@ -227,7 +229,9 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
                       onCheckedChange={() => toggleField(field)}
                     />
                     <span className="text-sm font-medium">
-                      [คัดลอก] {FIELD_LABELS[field] || field}
+                      {t('copyFieldLabel', {
+                        field: FIELD_LABELS[field] || field,
+                      })}
                     </span>
                   </label>
                   {field === 'metadata' &&
@@ -267,7 +271,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
           </div>
         )}
         <Button onClick={handleCopy} disabled={selectedFields.length === 0}>
-          ยืนยันการคัดลอก
+          {t('confirmCopy')}
         </Button>
       </DialogContent>
     </Dialog>

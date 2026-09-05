@@ -9,6 +9,8 @@ import {
   useWatch,
 } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useBranches } from '@/actions/hooks/branch'
 import { ProductType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -51,6 +53,7 @@ export function VariantItem({
   removeVariant,
   isOnlyOne,
 }: VariantItemProps) {
+  const t = useTranslations('merchant.products.form')
   const { control, setValue, watch } = useFormContext<ProductFormValues>()
 
   const {
@@ -142,7 +145,7 @@ export function VariantItem({
       <div className="flex flex-wrap justify-between gap-2.5 border-b px-5 pt-3 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
-            {isAvailable ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+            {isAvailable ? t('statusActive') : t('statusInactive')}
           </span>
           <Controller
             name={`variants.${index}.isAvailable`}
@@ -184,7 +187,7 @@ export function VariantItem({
                       size="icon-lg"
                       className="size-8"
                       onClick={handleRemoveImage}
-                      title="ลบรูปภาพ"
+                      title={t('deleteImage')}
                     >
                       <X className="size-4" />
                     </Button>
@@ -194,7 +197,7 @@ export function VariantItem({
                 <label className="text-muted-foreground hover:text-foreground flex size-full cursor-pointer flex-col items-center justify-center transition-colors">
                   <ImagePlus className="size-5" />
                   <span className="mt-2 text-xs font-medium">
-                    เพิ่มรูปตัวเลือก
+                    {t('addVariantImage')}
                   </span>
                   <input
                     type="file"
@@ -214,7 +217,7 @@ export function VariantItem({
                 render={({ field }) => (
                   <Field>
                     <FieldLabel className="text-xs">
-                      ชื่อตัวเลือก (เช่น ไซส์ M)
+                      {t('variantTitlePlaceholder')}
                     </FieldLabel>
                     <Input {...field} />
                   </Field>
@@ -227,7 +230,7 @@ export function VariantItem({
                 control={control}
                 render={({ field }) => (
                   <Field>
-                    <FieldLabel className="text-xs">SKU (ถ้ามี)</FieldLabel>
+                    <FieldLabel className="text-xs">{t('skuLabel')}</FieldLabel>
                     <Input
                       {...field}
                       value={field.value ?? ''}
@@ -243,7 +246,9 @@ export function VariantItem({
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="text-xs">ราคาขาย</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      {t('priceLabel')}
+                    </FieldLabel>
                     <Input
                       {...field}
                       type="number"
@@ -265,7 +270,9 @@ export function VariantItem({
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="text-xs">ต้นทุนสินค้า</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      {t('costLabel')}
+                    </FieldLabel>
                     <Input
                       {...field}
                       type="number"
@@ -289,7 +296,9 @@ export function VariantItem({
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <div className="space-y-0.5">
-                  <span className="text-sm font-medium">สะสมคะแนน</span>
+                  <span className="text-sm font-medium">
+                    {t('rewardPointsSwitch')}
+                  </span>
                 </div>
                 <Controller
                   name={`variants.${index}.rewardPoints.isActive`}
@@ -308,12 +317,12 @@ export function VariantItem({
                 render={({ field }) => (
                   <Field>
                     <FieldLabel className="text-muted-foreground text-[10px]">
-                      คะแนนที่ได้รับ
+                      {t('rewardPointsAmount')}
                     </FieldLabel>
                     <Input
                       {...field}
                       type="number"
-                      placeholder="ระบุจำนวนแต้ม"
+                      placeholder={t('rewardPointsPlaceholder')}
                       className="h-9"
                       min="0"
                       step="1"
@@ -333,12 +342,12 @@ export function VariantItem({
                 render={({ field }) => (
                   <Field>
                     <FieldLabel className="text-xs">
-                      ลิงก์ดาวน์โหลด (Digital URL)
+                      {t('digitalUrl')}
                     </FieldLabel>
                     <Input
                       {...field}
                       value={field.value ?? ''}
-                      placeholder="ระบุลิงค์ดาว์นโหลดของคุณ"
+                      placeholder={t('digitalUrlPlaceholder')}
                     />
                   </Field>
                 )}
@@ -351,7 +360,7 @@ export function VariantItem({
               <div className="grid grid-cols-2 gap-4 md:col-span-12">
                 <div className="col-span-2">
                   <FieldLabel className="text-muted-foreground text-xs font-bold">
-                    ข้อมูลการจัดส่ง
+                    {t('shippingInfo')}
                   </FieldLabel>
                 </div>
                 <Controller
@@ -359,7 +368,7 @@ export function VariantItem({
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel className="text-xs">น้ำหนัก (g)</FieldLabel>
+                      <FieldLabel className="text-xs">{t('weight')}</FieldLabel>
                       <Input
                         {...field}
                         type="number"
@@ -375,7 +384,7 @@ export function VariantItem({
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel className="text-xs">กว้าง (cm)</FieldLabel>
+                      <FieldLabel className="text-xs">{t('width')}</FieldLabel>
                       <Input
                         {...field}
                         type="number"
@@ -391,7 +400,7 @@ export function VariantItem({
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel className="text-xs">สูง (cm)</FieldLabel>
+                      <FieldLabel className="text-xs">{t('height')}</FieldLabel>
                       <Input
                         {...field}
                         type="number"
@@ -407,7 +416,7 @@ export function VariantItem({
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel className="text-xs">ยาว (cm)</FieldLabel>
+                      <FieldLabel className="text-xs">{t('length')}</FieldLabel>
                       <Input
                         {...field}
                         type="number"
@@ -426,7 +435,7 @@ export function VariantItem({
           <div className="bg-muted/20 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
-                สต็อกรายสาขา
+                {t('branchStock')}
               </FieldLegend>
               <Button
                 type="button"
@@ -437,7 +446,7 @@ export function VariantItem({
                   appendStock({ branchId: '', quantity: 0, minStock: 0 })
                 }
               >
-                <PlusCircle className="mr-2 size-4" /> เพิ่มสาขา
+                <PlusCircle className="mr-2 size-4" /> {t('addBranch')}
               </Button>
             </div>
             <div className="space-y-2">
@@ -455,7 +464,7 @@ export function VariantItem({
                         value={field.value}
                       >
                         <SelectTrigger className="h-8 w-full text-xs">
-                          <SelectValue placeholder="เลือกสาขา" />
+                          <SelectValue placeholder={t('selectBranch')} />
                         </SelectTrigger>
                         <SelectContent>
                           {branches
@@ -505,7 +514,7 @@ export function VariantItem({
           <div className="bg-muted/20 mt-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
-                รายการสินค้าดิจิทัล (Key/Content)
+                {t('digitalItemsTitle')}
               </FieldLegend>
               <Button
                 type="button"
@@ -513,7 +522,7 @@ export function VariantItem({
                 size="sm"
                 onClick={() => appendDigital({ content: '', isUsed: false })}
               >
-                <PlusCircle className="mr-2 size-4" /> เพิ่มเนื้อหา/คีย์
+                <PlusCircle className="mr-2 size-4" /> {t('addDigitalItem')}
               </Button>
             </div>
             <div className="space-y-2">
@@ -525,13 +534,13 @@ export function VariantItem({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        placeholder="ระบุคีย์สินค้า หรือเนื้อหาดิจิทัล"
+                        placeholder={t('digitalContentPlaceholder')}
                       />
                     )}
                   />
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-muted-foreground text-[10px]">
-                      ใช้แล้ว
+                      {t('used')}
                     </span>
                     <Controller
                       name={`variants.${index}.digitalItems.${dIndex}.isUsed`}
@@ -557,7 +566,7 @@ export function VariantItem({
               ))}
               {digitalFields.length === 0 && (
                 <p className="text-muted-foreground py-4 text-center text-sm">
-                  ยังไม่มีข้อมูลดิจิทัล
+                  {t('noDigitalItems')}
                 </p>
               )}
             </div>
@@ -565,12 +574,8 @@ export function VariantItem({
         )}
         {isDigitalService && (
           <ActionRequiredAlert
-            title="ข้อมูลแจ้งเตือน"
-            description=" ระบบจะส่งเหตุการณ์ตัวเลือกของสินค้านี้เข้าไปใน Webhook
-              ที่ตั้งค่าไว้ในลิงก์ API Webhooks ของคุณ
-              เพื่อนำข้อมูลการสั่งซื้อไปทำงานต่อใน Logic ของคุณ
-              หากยังไม่ได้ตั้งค่า Webhook
-              โปรดไปตั้งค่าและตรวจสอบให้เรียบร้อยครับ"
+            title={t('webhookAlertTitle')}
+            description={t('webhookAlertDesc')}
           />
         )}
       </CardContent>

@@ -9,6 +9,7 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import { handleUserPrompt } from '@/actions/ai'
@@ -103,6 +104,7 @@ const dataURLtoFile = (dataurl: string, filename: string): File => {
 }
 
 export function CreateProductForm({ productId }: { productId?: string }) {
+  const t = useTranslations('merchant.products.form')
   const { store } = useStoreData()
   const [aiTaskConfirm, setAiTaskConfirm] = useState<{
     task: AiGenTask
@@ -147,7 +149,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     images: [],
     variants: [
       {
-        title: 'มาตรฐาน',
+        title: t('defaultVariantTitle'),
         price: 0,
         costPrice: 0,
         sku: '',
@@ -339,7 +341,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   const handleResetForm = () => {
     localStorage.removeItem(DRAFT_KEY)
     reset(defaultFormValues)
-    toast.success('ล้างข้อมูลและข้อมูลร่างเรียบร้อยแล้ว')
+    toast.success(t('clearSuccess'))
   }
 
   const handleApplyPreset = (id: string) => {
@@ -352,7 +354,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       ...preset.data,
     } as ProductFormValues)
 
-    toast.success(`โหลดตัวอย่าง ${preset.toastLabel} เรียบร้อยแล้ว`)
+    toast.success(t('loadPresetSuccess', { label: preset.toastLabel }))
   }
 
   const {
@@ -519,23 +521,23 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 ) : (
                   <IconWand className="mr-2 size-4" />
                 )}{' '}
-                เครื่องมือ AI
+                {t('aiTools')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>สร้างเนื้อหา</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('createContent')}</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => handleAiTrigger(AiGenTask.ALL, () => genAll())}
               >
-                ให้ AI คิดให้ทั้งหมด
+                {t('aiThinkAll')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleAiTrigger(AiGenTask.SLUG, () => genSlug())}
               >
-                ให้ AI คิดให้เฉพาะ Slug
+                {t('aiThinkSlug')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>โหลดตัวอย่าง</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('loadPresets')}</DropdownMenuLabel>
               {PRODUCT_PRESETS_MASTER.map((preset) => (
                 <DropdownMenuItem
                   key={preset.id}
@@ -556,14 +558,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               variant="outline"
               onClick={handleResetForm}
             >
-              <IconX /> ล้างการตั้งค่า
+              <IconX /> {t('clearSettings')}
             </Button>
           )}
 
           {isDirty && (
             <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
               {isPending && <Spinner />}
-              บันทึกข้อมูล
+              {isPending ? t('savingProduct') : t('saveProduct')}
             </Button>
           )}
         </CardContent>
@@ -595,11 +597,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
                     <div className="space-y-0.5">
                       <FieldLabel className="text-base font-semibold">
-                        แสดงสินค้าที่หน้าร้าน
+                        {t('displayStorefront')}
                       </FieldLabel>
                       <p className="text-muted-foreground text-xs">
-                        เปิดเพื่อแสดงสินค้านี้บนเว็บไซต์/หน้าร้านออนไลน์
-                        หรือปิดเพื่อซ่อนไว้ชั่วคราว
+                        {t('displayStorefrontDesc')}
                       </p>
                     </div>
                     <Switch
@@ -614,19 +615,19 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           </FieldSet>
 
           <Field>
-            <FieldLabel>ประเภทสินค้า</FieldLabel>
+            <FieldLabel>{t('productType')}</FieldLabel>
             <Controller
               control={form.control}
               name="productType"
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="เลือกประเภทสินค้า" />
+                    <SelectValue placeholder={t('selectProductType')} />
                   </SelectTrigger>
                   <SelectContent>
                     {PRODUCT_TYPE_OPTIONS.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
-                        {type.label}
+                        {t(`productTypes.${type.value}` as any)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -639,7 +640,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <FieldLegend variant="label" className="text-lg font-bold">
-              ตัวเลือกสินค้า
+              {t('variantsTitle')}
             </FieldLegend>
             <div className="flex flex-wrap items-center gap-2.5">
               <Button
@@ -656,7 +657,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 ) : (
                   <IconWand className="mr-2 size-4" />
                 )}
-                ให้ AI ช่วยคิด Variants
+                {t('aiVariants')}
               </Button>
               <Button
                 type="button"
@@ -678,7 +679,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   })
                 }
               >
-                <PlusCircle className="mr-2 size-4" /> เพิ่มตัวเลือก
+                <PlusCircle className="mr-2 size-4" /> {t('addVariant')}
               </Button>
             </div>
           </div>
@@ -700,7 +701,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
-                Metadata (ข้อมูลทางเทคนิค)
+                {t('metadataTitle')}
               </FieldLegend>
               <div className="flex flex-wrap gap-2.5">
                 <Button
@@ -717,14 +718,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   ) : (
                     <IconWand className="mr-2 size-4" />
                   )}
-                  ให้ AI ช่วยคิด Metadata
+                  {t('aiMetadata')}
                 </Button>
                 <Button
                   type="button"
                   size="sm"
                   onClick={() => appendMetadata({ key: '', value: '' })}
                 >
-                  <CirclePlus className="mr-1 size-4" /> เพิ่มฟิลด์
+                  <CirclePlus className="mr-1 size-4" /> {t('addField')}
                 </Button>
               </div>
             </div>
@@ -747,7 +748,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     />
                   </div>
                   <Input
-                    placeholder="ค่าข้อมูล (เช่น Apple, 5000mAh, สีดำ)"
+                    placeholder={t('propertyValuePlaceholder')}
                     className="flex-1"
                     {...register(`metadata.${index}.value`)}
                   />
@@ -763,10 +764,10 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               ))}
             </div>
             <Field className="mt-4">
-              <FieldLabel>Tags (คั่นด้วยเครื่องหมายคอมม่า)</FieldLabel>
+              <FieldLabel>{t('tagsLabel')}</FieldLabel>
               <div className="flex gap-2">
                 <Input
-                  placeholder="เสื้อผ้า, แฟชั่น, cotton"
+                  placeholder={t('tagsPlaceholder')}
                   {...register('tags')}
                   disabled={isPending}
                 />
@@ -791,7 +792,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
               <FieldLegend variant="label" className="text-lg font-bold">
-                บริการเสริม (Addons)
+                {t('addonsTitle')}
               </FieldLegend>
               <div className="flex flex-wrap gap-2.5">
                 <Button
@@ -808,7 +809,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   ) : (
                     <IconWand className="mr-2 size-4" />
                   )}
-                  ให้ AI ช่วยคิด Addons
+                  {t('aiAddons')}
                 </Button>
                 <Button
                   type="button"
@@ -817,7 +818,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     appendAddon({ title: '', price: 0, isAvailable: true })
                   }
                 >
-                  <PlusCircle className="mr-2 size-4" /> เพิ่มบริการเสริม
+                  <PlusCircle className="mr-2 size-4" /> {t('addAddon')}
                 </Button>
               </div>
             </div>
@@ -828,12 +829,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     <div className="grid flex-1 gap-3">
                       <Field>
                         <FieldLabel className="text-xs">
-                          ชื่อบริการ (เช่น ห่อของขวัญ)
+                          {t('addonNamePlaceholder')}
                         </FieldLabel>
                         <Input {...register(`addons.${index}.title`)} />
                       </Field>
                       <Field>
-                        <FieldLabel className="text-xs">ราคาเพิ่ม</FieldLabel>
+                        <FieldLabel className="text-xs">
+                          {t('extraPrice')}
+                        </FieldLabel>
                         <Input
                           type="number"
                           {...register(`addons.${index}.price`, {
@@ -855,7 +858,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
               ))}
               {addonFields.length === 0 && (
                 <div className="text-muted-foreground rounded-lg border-2 border-dashed py-6 text-center md:col-span-2">
-                  ยังไม่มีบริการเสริม
+                  {t('noAddons')}
                 </div>
               )}
             </FieldGroup>
@@ -873,15 +876,18 @@ export function CreateProductForm({ productId }: { productId?: string }) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>ยืนยันการใช้ AI</AlertDialogTitle>
+            <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
-              <span className="text-primary">{aiTaskConfirm?.cost} เครดิต</span>{' '}
-              คุณต้องการดำเนินการต่อหรือไม่?
+              {t.rich('aiConfirmDesc', {
+                cost: aiTaskConfirm?.cost ?? 0,
+                highlight: (chunks) => (
+                  <span className="text-primary">{chunks}</span>
+                ),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (aiTaskConfirm) {
@@ -890,7 +896,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                 }
               }}
             >
-              ยืนยัน
+              {t('aiConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

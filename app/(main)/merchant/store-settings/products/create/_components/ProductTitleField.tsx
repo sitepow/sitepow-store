@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useProductAi } from '@/actions/hooks/ai'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useStoreFilter } from '@/stores/use-store-filter'
@@ -29,6 +31,7 @@ export function ProductTitleField({
   isPending: boolean
   onAiTrigger: (action: () => void) => void
 }) {
+  const t = useTranslations('merchant.products.form')
   const { selectedStoreId } = useStoreFilter()
   const {
     register,
@@ -56,10 +59,10 @@ export function ProductTitleField({
 
   return (
     <Field>
-      <FieldLabel>ชื่อสินค้า</FieldLabel>
+      <FieldLabel>{t('title')}</FieldLabel>
       <div className="flex items-center gap-2">
         <Textarea
-          placeholder="เช่น เสื้อยืดลายพิเศษ"
+          placeholder={t('titlePlaceholder')}
           {...register('title')}
           disabled={isPending}
         />
@@ -69,7 +72,7 @@ export function ProductTitleField({
           size="icon"
           onClick={() => onAiTrigger(() => genTitle())}
           disabled={isGenTitle}
-          title="สร้าง Title จากชื่อสินค้า"
+          title={t('generateTitleTooltip')}
         >
           <IconWand className="size-4" />
         </Button>

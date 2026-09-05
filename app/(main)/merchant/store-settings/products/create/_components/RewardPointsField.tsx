@@ -2,6 +2,8 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { ProductFormValues } from '@/zod/product'
 
 import { Checkbox } from '@/components/ui/checkbox'
@@ -9,6 +11,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 export function RewardPointsField({ index }: { index: number }) {
+  const t = useTranslations('merchant.products.form')
   const {
     register,
     setValue,
@@ -28,12 +31,12 @@ export function RewardPointsField({ index }: { index: number }) {
             setValue(`variants.${index}.rewardPoints.isActive`, !!v)
           }
         />
-        <span>มอบแต้มสะสมเมื่อซื้อตัวเลือกนี้</span>
+        <span>{t('giveRewardPoints')}</span>
       </label>
 
       {isActive && (
         <Field>
-          <FieldLabel>จำนวนแต้มที่ได้รับ</FieldLabel>
+          <FieldLabel>{t('rewardPointsEarned')}</FieldLabel>
           <Input
             type="number"
             placeholder="0"

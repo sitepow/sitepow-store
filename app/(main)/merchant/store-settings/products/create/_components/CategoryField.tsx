@@ -2,6 +2,8 @@
 
 import { Controller, useFormContext } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useCategoryOptions } from '@/actions/hooks/category'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
@@ -16,6 +18,7 @@ import {
 } from '@/components/ui/select'
 
 export function CategoryField({ isPending }: { isPending: boolean }) {
+  const t = useTranslations('merchant.products.form')
   const {
     control,
     formState: { errors },
@@ -28,7 +31,7 @@ export function CategoryField({ isPending }: { isPending: boolean }) {
 
   return (
     <Field>
-      <FieldLabel>หมวดหมู่</FieldLabel>
+      <FieldLabel>{t('categoryLabel')}</FieldLabel>
       <Controller
         name="categoryId"
         control={control}
@@ -39,7 +42,7 @@ export function CategoryField({ isPending }: { isPending: boolean }) {
             disabled={isPending || !storeId}
           >
             <SelectTrigger>
-              <SelectValue placeholder="เลือกหมวดหมู่" />
+              <SelectValue placeholder={t('selectCategory')} />
             </SelectTrigger>
             <SelectContent>
               {categories.map((category) => (

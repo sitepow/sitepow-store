@@ -1,5 +1,6 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
@@ -7,6 +8,7 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
 export function ProductPreviewContent() {
+  const t = useTranslations('merchant.products.form')
   const { control } = useFormContext()
   const { selectedStoreSlug } = useStoreFilter()
 
@@ -15,7 +17,7 @@ export function ProductPreviewContent() {
     name: ['title', 'slug', 'tags', 'variants', 'images'],
   })
 
-  const displayTitle = title || 'ชื่อสินค้าจะแสดงตรงนี้'
+  const displayTitle = title || t('previewDefaultTitle')
   const displaySlug = slug || 'url-slug-example'
   const formattedTags = arrayToString(stringToArray(tags))
 
@@ -61,14 +63,19 @@ export function ProductPreviewContent() {
   const minPrice = getMinPrice()
 
   const priceText =
-    minPrice !== null ? ` เริ่มต้นเพียง ฿${minPrice.toLocaleString()}! ` : ' '
-  const description = `${formattedTags ? `${formattedTags}` : ''}ช้อปเลย! ${title || 'สินค้าคุณภาพ'}${priceText}พร้อมโปรโมชั่นพิเศษและตัวเลือกเสริมมากมาย การันตีของแท้ สั่งซื้อได้ที่นี่...`
+    minPrice !== null ? ` (฿${minPrice.toLocaleString()}) ` : ' '
+  const description = `${formattedTags ? `${formattedTags} ` : ''}${t(
+    'previewDefaultDescription',
+    {
+      title: title ? `${title} ` : '',
+    },
+  )}`
 
   return (
     <div className="text-foreground space-y-6">
       <div className="dark:bg-foreground/5 rounded-lg border p-4">
         <p className="mb-2 text-xs font-semibold uppercase opacity-60">
-          Google Search (ตัวอย่าง)
+          {t('previewGoogleSearch')}
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
@@ -82,7 +89,7 @@ export function ProductPreviewContent() {
       </div>
       <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
-          Social Share (ตัวอย่าง)
+          {t('previewSocialShare')}
         </p>
         <Image
           src={previewImageUrl}
