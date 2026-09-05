@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -21,16 +21,12 @@ import {
 import { MarketplacePlatform } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
-  IconAlertCircle,
   IconCheck,
-  IconClock,
   IconLink,
   IconPlayerPlay,
-  IconPlus,
   IconRefresh,
   IconShare,
   IconTrash,
-  IconX,
 } from '@tabler/icons-react'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
@@ -225,24 +221,24 @@ export function MarketplaceSettingsForm() {
         description={t('description')}
       />
       <Tabs defaultValue="connections" className="space-y-6">
-        <div className="overflow-x-auto pb-1">
-          <TabsList className="bg-background/80 flex h-auto w-fit shrink-0 flex-row! items-center justify-start gap-1 rounded-xl border p-1 shadow-sm">
+        <div className="w-full pb-1 sm:overflow-x-auto">
+          <TabsList className="bg-background/80 flex h-auto w-full flex-col items-stretch gap-1 rounded-xl border p-1 shadow-sm sm:w-fit sm:flex-row sm:items-center sm:justify-start">
             <TabsTrigger
               value="connections"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap transition-all sm:w-auto sm:py-1.5"
             >
               {t('tabs.connections')}
             </TabsTrigger>
             <TabsTrigger
               value="mappings"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap transition-all sm:w-auto sm:py-1.5"
             >
               {t('tabs.mappings')}{' '}
               {mappings.length > 0 && `(${mappings.length})`}
             </TabsTrigger>
             <TabsTrigger
               value="logs"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-all"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap transition-all sm:w-auto sm:py-1.5"
             >
               {t('tabs.logs')}
             </TabsTrigger>
