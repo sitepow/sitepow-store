@@ -68,7 +68,19 @@
     "paidAt": "Paid at",
     "trackingRequiredTitle": "Please enter shipment tracking number",
     "trackingRequiredDesc": "Tracking number is required before changing status to Shipped",
-    "trackingPlaceholder": "Enter tracking number e.g. TH123456789..."
+    "trackingPlaceholder": "Enter tracking number e.g. TH123456789...",
+    "itemQuantityDetail": "Qty: {quantity} pcs x {price} THB each",
+    "notePrefix": "Note: {note}",
+    "shippedFromBranch": "Shipped from branch {branch}",
+    "subtotal": "Subtotal",
+    "productDiscount": "Product Discount",
+    "shippingFee": "Shipping Fee",
+    "shippingFeeWithMethod": "Shipping Fee ({method})",
+    "couponDiscount": "Coupon Discount ({code})",
+    "pointsDiscount": "Points Discount ({points} points)",
+    "codFee": "Cash on Delivery (COD) Fee",
+    "earnPoints": "You will earn {points} points",
+    "totalPayment": "Total Payment"
   },
   "pagination": {
     "previous": "Previous",

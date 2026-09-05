@@ -68,7 +68,19 @@
     "paidAt": "ชำระเงินเมื่อ",
     "trackingRequiredTitle": "กรุณากรอกเลขพัสดุสำหรับการจัดส่ง",
     "trackingRequiredDesc": "จำเป็นต้องระบุเลข Tracking Number ก่อนเปลี่ยนสถานะเป็นกำลังจัดส่ง",
-    "trackingPlaceholder": "ระบุเลข Tracking Number เช่น TH123456789..."
+    "trackingPlaceholder": "ระบุเลข Tracking Number เช่น TH123456789...",
+    "itemQuantityDetail": "จำนวน: {quantity} ชิ้น x ชิ้นละ {price} บาท",
+    "notePrefix": "โน้ต: {note}",
+    "shippedFromBranch": "จัดส่งจากสาขา {branch}",
+    "subtotal": "รวมราคาสินค้า",
+    "productDiscount": "ส่วนลดสินค้า",
+    "shippingFee": "ค่าจัดส่ง",
+    "shippingFeeWithMethod": "ค่าจัดส่ง ({method})",
+    "couponDiscount": "ส่วนลดคูปอง ({code})",
+    "pointsDiscount": "ส่วนลดจากแต้มสะสม ({points} แต้ม)",
+    "codFee": "ค่าธรรมเนียมเก็บเงินปลายทาง (COD)",
+    "earnPoints": "คุณจะได้รับ {points} แต้ม",
+    "totalPayment": "ยอดชำระทั้งสิ้น"
   },
   "pagination": {
     "previous": "ก่อนหน้า",

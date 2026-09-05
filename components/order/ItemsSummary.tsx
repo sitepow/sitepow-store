@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { GetOrdersItem } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
@@ -16,6 +18,17 @@ export interface OrderItemsSummaryProps {
 }
 
 export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
+  const t = useTranslations('common.order')
+
+  const tr = (key: string, values?: any, fallback?: string) => {
+    try {
+      if (t.has(key as any)) {
+        return t(key as any, values)
+      }
+    } catch {}
+    return fallback ?? key
+  }
+
   const {
     rawSubtotal,
     productDiscount,
@@ -73,7 +86,9 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
 
   return (
     <div className="space-y-2 rounded-lg border p-4">
-      <div className="text-sm font-semibold">รายการสินค้า</div>
+      <div className="text-sm font-semibold">
+        {tr('items', undefined, 'รายการสินค้า')}
+      </div>
 
       {items.map((item, idx) => {
         const itemKey = item.id || `${item.title}-${item.variantTitle}-${idx}`
@@ -111,20 +126,37 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                   )}
                 </span>
                 <span className="text-muted-foreground text-xs">
-                  จำนวน: {item.quantity} ชิ้น x ชิ้นละ{' '}
-                  {hasDiscount
-                    ? formatNumber(unitPrice)
-                    : formatNumber(originalUnitPrice)}{' '}
-                  บาท
+                  {tr(
+                    'itemQuantityDetail',
+                    {
+                      quantity: item.quantity,
+                      price: hasDiscount
+                        ? formatNumber(unitPrice)
+                        : formatNumber(originalUnitPrice),
+                    },
+                    `จำนวน: ${item.quantity} ชิ้น x ชิ้นละ ${
+                      hasDiscount
+                        ? formatNumber(unitPrice)
+                        : formatNumber(originalUnitPrice)
+                    } บาท`,
+                  )}
                 </span>
                 {item.customerNote && (
                   <span className="text-primary mt-0.5 text-xs wrap-break-word italic">
-                    โน้ต: {item.customerNote}
+                    {tr(
+                      'notePrefix',
+                      { note: item.customerNote },
+                      `โน้ต: ${item.customerNote}`,
+                    )}
                   </span>
                 )}
                 {item.branch?.name && (
                   <span className="text-primary mt-0.5 text-xs">
-                    จัดส่งจากสาขา {item.branch.name}
+                    {tr(
+                      'shippedFromBranch',
+                      { branch: item.branch.name },
+                      `จัดส่งจากสาขา ${item.branch.name}`,
+                    )}
                   </span>
                 )}
                 <div className="flex shrink-0 flex-col items-start whitespace-nowrap">
@@ -143,47 +175,70 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
         )
       })}
       <div className="mt-3 space-y-1.5 border-t pt-3">
-        <SummaryRow label="รวมราคาสินค้า" value={formatCurrency(rawSubtotal)} />
+        <SummaryRow
+          label={tr('subtotal', undefined, 'รวมราคาสินค้า')}
+          value={formatCurrency(rawSubtotal)}
+        />
         {productDiscount > 0 && (
           <SummaryRow
-            label="ส่วนลดสินค้า"
+            label={tr('productDiscount', undefined, 'ส่วนลดสินค้า')}
             value={formatCurrency(productDiscount)}
             isDiscount
           />
         )}
         {!!shippingFee && (
           <SummaryRow
-            label={`ค่าจัดส่ง ${shippingMethod ? `(${shippingMethod})` : ''}`}
+            label={
+              shippingMethod
+                ? tr(
+                    'shippingFeeWithMethod',
+                    { method: shippingMethod },
+                    `ค่าจัดส่ง (${shippingMethod})`,
+                  )
+                : tr('shippingFee', undefined, 'ค่าจัดส่ง')
+            }
             value={formatCurrency(shippingFee)}
           />
         )}
         {!!coupon && couponDiscount > 0 && (
           <SummaryRow
-            label={`ส่วนลดคูปอง (${coupon.code})`}
+            label={tr(
+              'couponDiscount',
+              { code: coupon.code },
+              `ส่วนลดคูปอง (${coupon.code})`,
+            )}
             value={formatCurrency(couponDiscount)}
             isDiscount
           />
         )}
         {(usedPoints ?? 0) > 0 && (
           <SummaryRow
-            label={`ส่วนลดจากแต้มสะสม (${usedPoints?.toLocaleString()} แต้ม)`}
+            label={tr(
+              'pointsDiscount',
+              { points: formatNumber(usedPoints ?? 0) },
+              `ส่วนลดจากแต้มสะสม (${formatNumber(usedPoints ?? 0)} แต้ม)`,
+            )}
             value={formatCurrency(pointsDiscount)}
             isDiscount
           />
         )}
         {!!codFee && (
           <SummaryRow
-            label="ค่าธรรมเนียมเก็บเงินปลายทาง (COD)"
+            label={tr('codFee', undefined, 'ค่าธรรมเนียมเก็บเงินปลายทาง (COD)')}
             value={formatCurrency(codFee)}
           />
         )}
         {(earnedPoints ?? 0) > 0 && (
           <p className="text-primary text-right text-xs font-medium">
-            คุณจะได้รับ {formatNumber(earnedPoints ?? 0)} แต้ม
+            {tr(
+              'earnPoints',
+              { points: formatNumber(earnedPoints ?? 0) },
+              `คุณจะได้รับ ${formatNumber(earnedPoints ?? 0)} แต้ม`,
+            )}
           </p>
         )}
         <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
-          <span>ยอดชำระทั้งสิ้น</span>
+          <span>{tr('totalPayment', undefined, 'ยอดชำระทั้งสิ้น')}</span>
           <HighlightText>{formatCurrency(totalAmount)}</HighlightText>
         </div>
       </div>

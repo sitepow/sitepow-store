@@ -68,7 +68,19 @@
     "paidAt": "付款时间",
     "trackingRequiredTitle": "请填写发货物流单号",
     "trackingRequiredDesc": "更新为已发货状态前，必须先填写快递单号。",
-    "trackingPlaceholder": "请输入物流单号，如 TH123456789..."
+    "trackingPlaceholder": "请输入物流单号，如 TH123456789...",
+    "itemQuantityDetail": "数量: {quantity} 件 x 单价 {price} 泰铢",
+    "notePrefix": "备注: {note}",
+    "shippedFromBranch": "从 {branch} 分店发货",
+    "subtotal": "商品总额",
+    "productDiscount": "商品优惠",
+    "shippingFee": "运费",
+    "shippingFeeWithMethod": "运费 ({method})",
+    "couponDiscount": "优惠券折扣 ({code})",
+    "pointsDiscount": "积分抵扣 ({points} 积分)",
+    "codFee": "货到付款手续费 (COD)",
+    "earnPoints": "您将获得 {points} 积分",
+    "totalPayment": "实付款"
   },
   "pagination": {
     "previous": "上一页",

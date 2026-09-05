@@ -1253,15 +1253,7 @@
       "emptyMessage": "No heatmap data",
       "dayTimeHeader": "Day / Time",
       "tooltip": "{day} {hour}:00 - {count} orders",
-      "days": [
-        "Sun",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat"
-      ]
+      "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     },
     "peakHours": {
       "title": "Top 5 Peak Hours",
