@@ -55,14 +55,12 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
             }
             disabled={isPending}
           />
-          <span>ร้านค้าจดทะเบียนภาษีมูลค่าเพิ่ม (VAT)</span>
           <span>{t('vatRegistered')}</span>
         </label>
       </div>
 
       {isVatRegistered && (
         <Field className="animate-in fade-in duration-200">
-          <FieldLabel>อัตราภาษีมูลค่าเพิ่ม (%)</FieldLabel>
           <FieldLabel>{t('vatRateLabel')}</FieldLabel>
           <Input
             type="number"

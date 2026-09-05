@@ -75,7 +75,6 @@ function StoreRowActions({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon-lg">
             <IconDotsVertical size={18} />
-            <span className="sr-only">เปิดเมนูจัดการ</span>
             <span className="sr-only">{t('openMenu')}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -88,7 +87,6 @@ function StoreRowActions({
               }}
             >
               <IconSettings size={16} className="mr-2" />
-              <span>ตั้งค่าร้านค้า</span>
               <span>{t('settings')}</span>
             </DropdownMenuItem>
           )}
@@ -100,7 +98,6 @@ function StoreRowActions({
               }}
             >
               <IconWorld size={16} className="mr-2" />
-              <span>โดเมน (Custom Domain)</span>
               <span>{t('domain')}</span>
             </DropdownMenuItem>
           )}
@@ -112,7 +109,6 @@ function StoreRowActions({
               }}
             >
               <IconHierarchy2 size={16} className="mr-2" />
-              <span>จัดการสาขา</span>
               <span>{t('branches')}</span>
             </DropdownMenuItem>
           )}
@@ -124,7 +120,6 @@ function StoreRowActions({
               }}
             >
               <IconCreditCard size={16} className="mr-2" />
-              <span>แพ็กเกจและการชำระเงิน</span>
               <span>{t('billing')}</span>
             </DropdownMenuItem>
           )}
@@ -136,7 +131,6 @@ function StoreRowActions({
               }}
             >
               <IconPackage size={16} className="mr-2" />
-              <span>จัดการสินค้า</span>
               <span>{t('products')}</span>
             </DropdownMenuItem>
           )}
@@ -149,7 +143,6 @@ function StoreRowActions({
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
                 <IconTrash size={16} className="mr-2" />
-                <span>ลบร้านค้า</span>
                 <span>{t('delete')}</span>
               </DropdownMenuItem>
             </>
@@ -175,14 +168,6 @@ export function StoreTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>รหัสร้านค้า</TableHead>
-              <TableHead>ร้านค้า</TableHead>
-              <TableHead>แพลน</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>สถานะและระยะเวลาคงเหลือ</TableHead>
-              <TableHead>สิทธิ์การใช้งาน (ปัจจุบัน)</TableHead>
-              <TableHead>วันที่สร้างร้านค้า</TableHead>
-              <TableHead className="text-right">จัดการ</TableHead>
               <TableHead>{t('columns.id')}</TableHead>
               <TableHead>{t('columns.name')}</TableHead>
               <TableHead>{t('columns.plan')}</TableHead>

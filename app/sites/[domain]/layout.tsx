@@ -1,36 +1,14 @@
-import { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 
+import { getStore } from '@/actions/store'
+import { BASE_FAVICON } from '@/constants/favicon'
+import { StoreStatus } from '@/generated/prisma/enums'
 
+import { AlertLayout } from '@/components/layout/AlertLayout'
 
-import { getStore } from '@/actions/store';
-import { BASE_FAVICON } from '@/constants/favicon';
-import { StoreStatus } from '@/generated/prisma/enums';
-
-
-
-import { AlertLayout } from '@/components/layout/AlertLayout';
-
-
-
-import { StoreInitializer } from './_components/layout/StoreInitializer';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { StoreInitializer } from './_components/layout/StoreInitializer'
 
 type Props = {
   params: Promise<{ domain: string }>

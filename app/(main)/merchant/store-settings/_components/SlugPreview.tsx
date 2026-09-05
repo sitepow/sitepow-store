@@ -22,7 +22,6 @@ export function SlugPreview() {
 
   return (
     <FieldDescription>
-      ลิงก์ร้านค้าของคุณ{' '}
       {t('slugPreview')}{' '}
       <span className="text-foreground font-medium">
         https://{formatSlug(storeSlug)}.sitepow.store

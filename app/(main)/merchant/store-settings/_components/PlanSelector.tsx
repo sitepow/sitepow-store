@@ -78,8 +78,6 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
                     {basePrice > 0 &&
                       selectedTab !== PRICING_VALUE.ONE_MONTH && (
                         <span className="text-[10px] font-medium opacity-60">
-                          เฉลี่ย {formatCurrency(Number(averagePerMonth))} /
-                          เดือน
                           {t('averagePerMonth', {
                             price: formatCurrency(Number(averagePerMonth)),
                           })}

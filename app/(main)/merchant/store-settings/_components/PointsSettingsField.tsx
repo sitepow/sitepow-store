@@ -39,7 +39,6 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
   return (
     <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        5. ระบบสมาชิกและคะแนนสะสม (CRM)
         {t('step5')}
       </div>
 
@@ -59,12 +58,10 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
             disabled={currentPlan !== Plan.ULTIMATE || isPending}
           />
           <span className="flex items-center gap-1.5">
-            เปิดใช้งานระบบแต้มสะสมสำหรับร้านค้า
             {t('enablePoints')}
             {currentPlan !== Plan.ULTIMATE && (
               <Badge variant="outline">
                 <IconLock />
-                เฉพาะ Ultimate แพลนเท่านั้น
                 {t('ultimateOnly')}
               </Badge>
             )}
