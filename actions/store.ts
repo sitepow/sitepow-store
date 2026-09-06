@@ -55,6 +55,7 @@ export interface CreateStoreInput {
   isPointsEnabled?: boolean
   pointEarningRate?: number | string | Prisma.Decimal | null
   pointRedeemRate?: number | string | Prisma.Decimal | null
+  allowSearchEngineIndex?: boolean
 }
 
 export interface UpdateStoreInput extends Partial<
@@ -190,6 +191,7 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         slug: true,
         ownerId: true,
         customDomain: true,
+        allowSearchEngineIndex: true,
       },
     })
   })

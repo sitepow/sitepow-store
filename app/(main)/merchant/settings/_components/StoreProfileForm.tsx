@@ -17,7 +17,7 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBuildingStore } from '@tabler/icons-react'
+import { IconBuildingStore, IconSearch } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
 export function StoreProfileForm() {
@@ -76,6 +77,7 @@ export function StoreProfileForm() {
       coverImage: '',
       primaryColor: '',
       description: '',
+      allowSearchEngineIndex: true,
     },
   })
 
@@ -126,6 +128,7 @@ export function StoreProfileForm() {
         taxId: storeProfile.taxId ?? '',
         description: storeProfile.description ?? '',
         primaryColor: storeProfile.primaryColor ?? '',
+        allowSearchEngineIndex: storeProfile.allowSearchEngineIndex ?? true,
       })
     }
   }, [storeProfile, reset])
@@ -365,6 +368,31 @@ export function StoreProfileForm() {
                 />
                 <FieldError>{errors?.description?.message}</FieldError>
               </Field>
+            </div>
+            <Separator />
+            <div className="border-input bg-muted/20 flex flex-wrap items-center justify-between gap-5 rounded-xl border border-dashed p-4">
+              <div className="space-y-1 pr-4">
+                <div className="flex items-center gap-2">
+                  <IconSearch size={16} className="text-muted-foreground" />
+                  <span className="block text-sm font-medium">
+                    {t('searchEngineIndex')}
+                  </span>
+                </div>
+                <span className="text-muted-foreground block text-xs leading-relaxed">
+                  {t('searchEngineIndexHint')}
+                </span>
+              </div>
+              <Controller
+                control={control}
+                name="allowSearchEngineIndex"
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isPending}
+                  />
+                )}
+              />
             </div>
           </CardContent>
           <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">

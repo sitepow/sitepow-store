@@ -1455,6 +1455,8 @@
       "taxIdPlaceholder": "Tax identification number for full tax invoices",
       "storeDesc": "Store Description",
       "storeDescPlaceholder": "What does this store sell?",
+      "searchEngineIndex": "Search Engine Visibility (Google)",
+      "searchEngineIndexHint": "Allow Google and other search engines to index this store so customers can find you online.",
       "reset": "Reset Changes",
       "saving": "Saving...",
       "save": "Save Store Profile"

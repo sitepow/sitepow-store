@@ -20,6 +20,7 @@ const storeProfileSelect = {
   coverImage: true,
   description: true,
   primaryColor: true,
+  allowSearchEngineIndex: true,
 } satisfies Prisma.StoreSelect
 
 export type GetStoreProfileResult = Prisma.StoreGetPayload<{

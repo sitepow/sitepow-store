@@ -31,6 +31,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const storeName = store.name
 
+  const isSearchable =
+    store.status === StoreStatus.ACTIVE &&
+    Boolean(store.allowSearchEngineIndex ?? true)
+
   return {
     title: {
       default: t('welcome', { name: storeName }),
@@ -46,19 +50,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: url,
     },
-    // robots: {
-    //   index: store.status === StoreStatus.ACTIVE,
-    //   follow: store.status === StoreStatus.ACTIVE,
-    // },
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-      },
-    },
+    robots: isSearchable
+      ? {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+          },
+        }
+      : {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: {
+            index: false,
+            follow: false,
+          },
+        },
   }
 }
 

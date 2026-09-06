@@ -708,6 +708,8 @@ model Store {
   isInternationalSetup Boolean      @default(false)
   baseCurrency         CurrencyCode @default(THB)
 
+  allowSearchEngineIndex Boolean @default(true)
+
   blogs                  Blog[]
   categories             Category[]
   products               Product[]
