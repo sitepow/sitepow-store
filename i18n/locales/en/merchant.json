@@ -1747,6 +1747,20 @@
         "error": "An error occurred"
       },
       "events": {
+        "order": {
+          "created": {
+            "label": "Order Created (order.created)",
+            "description": "Triggered when a customer checks out via storefront or POS"
+          },
+          "paid": {
+            "label": "Order Paid (order.paid)",
+            "description": "Triggered when an order payment succeeds (crucial for digital goods / top-up automation)"
+          },
+          "cancelled": {
+            "label": "Order Cancelled (order.cancelled)",
+            "description": "Triggered when an order is cancelled"
+          }
+        },
         "orderCreated": {
           "label": "Order Created (order.created)",
           "description": "Triggered when a customer checks out via storefront or POS"

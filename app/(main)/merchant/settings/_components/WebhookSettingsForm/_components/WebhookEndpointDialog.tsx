@@ -4,14 +4,14 @@ import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import {
   useCreateWebhookEndpoint,
   useUpdateWebhookEndpoint,
 } from '@/actions/hooks/webhook'
 import { StoreWebhookEndpointItem } from '@/actions/webhook'
-import { WEBHOOK_EVENTS } from '@/constants/webhook'
+import { WEBHOOK_EVENTS, getWebhookEvents } from '@/constants/webhook'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { WebhookEndpointFormValues, webhookEndpointSchema } from '@/zod/webhook'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -44,6 +44,8 @@ export function WebhookEndpointDialog({
 }: WebhookEndpointDialogProps) {
   const t = useTranslations('merchant.settings.webhook.dialog')
   const tEvents = useTranslations('merchant.settings.webhook.events')
+  const locale = useLocale()
+  const fallbackEvents = getWebhookEvents(locale)
   const { selectedStoreId } = useStoreFilter()
   const isEditing = !!endpoint
 
@@ -193,14 +195,23 @@ export function WebhookEndpointDialog({
                 <div className="space-y-2.5 rounded-lg border p-3">
                   {WEBHOOK_EVENTS.map((event) => {
                     const isChecked = field.value?.includes(event.id)
+                    const fallback =
+                      fallbackEvents.find((e) => e.id === event.id) ?? event
+                    const camelKey = event.id.replace(/\.([a-z])/g, (_, l) =>
+                      l.toUpperCase(),
+                    )
                     const label = tEvents.has(`${event.id}.label` as any)
                       ? tEvents(`${event.id}.label` as any)
-                      : event.label
+                      : tEvents.has(`${camelKey}.label` as any)
+                        ? tEvents(`${camelKey}.label` as any)
+                        : fallback.label
                     const description = tEvents.has(
                       `${event.id}.description` as any,
                     )
                       ? tEvents(`${event.id}.description` as any)
-                      : event.description
+                      : tEvents.has(`${camelKey}.description` as any)
+                        ? tEvents(`${camelKey}.description` as any)
+                        : fallback.description
                     return (
                       <div
                         key={event.id}

@@ -1,4 +1,4 @@
-export const WEBHOOK_EVENTS = [
+export const WEBHOOK_EVENTS_TH = [
   {
     id: 'order.created',
     label: 'ออเดอร์ถูกสร้างใหม่ (order.created)',
@@ -18,4 +18,34 @@ export const WEBHOOK_EVENTS = [
   },
 ] as const
 
+export const WEBHOOK_EVENTS_EN = [
+  {
+    id: 'order.created',
+    label: 'Order Created (order.created)',
+    description: 'Triggered when a customer checks out via storefront or POS',
+  },
+  {
+    id: 'order.paid',
+    label: 'Order Paid (order.paid)',
+    description:
+      'Triggered when an order payment succeeds (crucial for digital goods / top-up automation)',
+  },
+  {
+    id: 'order.cancelled',
+    label: 'Order Cancelled (order.cancelled)',
+    description: 'Triggered when an order is cancelled',
+  },
+] as const
+
+export const WEBHOOK_EVENTS = WEBHOOK_EVENTS_TH
+
 export type WebhookEventId = (typeof WEBHOOK_EVENTS)[number]['id']
+
+export const WEBHOOK_EVENTS_BY_LOCALE = {
+  th: WEBHOOK_EVENTS_TH,
+  en: WEBHOOK_EVENTS_EN,
+}
+
+export function getWebhookEvents(locale: string = 'th') {
+  return locale === 'en' ? WEBHOOK_EVENTS_EN : WEBHOOK_EVENTS_TH
+}
