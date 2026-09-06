@@ -21,6 +21,9 @@ const storeProfileSelect = {
   description: true,
   primaryColor: true,
   allowSearchEngineIndex: true,
+  seoTitle: true,
+  seoDescription: true,
+  seoKeywords: true,
 } satisfies Prisma.StoreSelect
 
 export type GetStoreProfileResult = Prisma.StoreGetPayload<{

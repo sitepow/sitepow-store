@@ -5,7 +5,7 @@ import { redis } from '@/lib/redis'
 
 export const config = {
   matcher: [
-    '/((?!_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|xml|webmanifest)).*)',
+    '/((?!_next|_static|[\\w-]+\\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|webmanifest)).*)',
   ],
 }
 
@@ -30,7 +30,7 @@ export default async function middleware(req: NextRequest) {
 
   if (
     url.pathname.match(
-      /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|txt|xml|webmanifest)$/,
+      /\.(?:ico|png|jpg|jpeg|avif|svg|css|js|map|json|webmanifest)$/,
     )
   ) {
     return NextResponse.next()

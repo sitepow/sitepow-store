@@ -193,6 +193,9 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         ownerId: true,
         customDomain: true,
         allowSearchEngineIndex: true,
+        seoTitle: true,
+        seoDescription: true,
+        seoKeywords: true,
       },
     })
   })

@@ -709,6 +709,9 @@ model Store {
   baseCurrency         CurrencyCode @default(THB)
 
   allowSearchEngineIndex Boolean @default(true)
+  seoTitle               String?
+  seoDescription         String?      @db.Text
+  seoKeywords            String?
 
   blogs                  Blog[]
   categories             Category[]

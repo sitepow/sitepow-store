@@ -29,19 +29,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `https://${storeDomain}`
     : `https://${storeDomain}.sitepow.store`
 
-  const storeName = store.name
+  const storeName = store.seoTitle || store.name
+  const storeDescription =
+    store.seoDescription ||
+    store.description ||
+    t('defaultDescription', { name: store.name })
+
+  const keywords = store.seoKeywords
+    ? store.seoKeywords
+        .split(',')
+        .map((k) => k.trim())
+        .filter(Boolean)
+    : undefined
 
   const isSearchable =
     store.status === StoreStatus.ACTIVE &&
     Boolean(store.allowSearchEngineIndex ?? true)
 
   return {
+    metadataBase: new URL(url),
     title: {
-      default: t('welcome', { name: storeName }),
-      template: `%s | ${storeName}`,
+      default: store.seoTitle || t('welcome', { name: store.name }),
+      template: `%s | ${store.name}`,
     },
-    description:
-      store.description || t('defaultDescription', { name: storeName }),
+    description: storeDescription,
+    keywords,
     icons: {
       icon: store.logo || BASE_FAVICON,
       shortcut: BASE_FAVICON,
@@ -49,6 +61,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     alternates: {
       canonical: url,
+    },
+    openGraph: {
+      title: storeName,
+      description: storeDescription,
+      url,
+      siteName: store.name,
+      images: store.logo ? [store.logo] : undefined,
+      type: 'website',
     },
     robots: isSearchable
       ? {
@@ -91,8 +111,37 @@ export default async function StoreLayout({ children, params }: Props) {
     return <AlertLayout title={t('storeSuspended')} />
   }
 
+  const storeDomain = store.customDomain || domain
+  const url = storeDomain.includes('.')
+    ? `https://${storeDomain}`
+    : `https://${storeDomain}.sitepow.store`
+
+  const storeJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${url}/#website`,
+        url,
+        name: store.seoTitle || store.name,
+        description: store.seoDescription || store.description || undefined,
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${url}/#organization`,
+        name: store.name,
+        url,
+        logo: store.logo || undefined,
+      },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+      />
       <StoreInitializer store={store} />
       {children}
     </>

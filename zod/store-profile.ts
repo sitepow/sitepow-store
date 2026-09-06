@@ -23,6 +23,9 @@ export const storeProfileSchema = z.object({
   description: z.string().optional(),
   primaryColor: z.string().optional().nullable(),
   allowSearchEngineIndex: z.boolean(),
+  seoTitle: z.string().optional().nullable(),
+  seoDescription: z.string().optional().nullable(),
+  seoKeywords: z.string().optional().nullable(),
 })
 
 export type StoreProfileFormValues = z.infer<typeof storeProfileSchema>

@@ -78,6 +78,9 @@ export function StoreProfileForm() {
       primaryColor: '',
       description: '',
       allowSearchEngineIndex: true,
+      seoTitle: '',
+      seoDescription: '',
+      seoKeywords: '',
     },
   })
 
@@ -129,6 +132,9 @@ export function StoreProfileForm() {
         description: storeProfile.description ?? '',
         primaryColor: storeProfile.primaryColor ?? '',
         allowSearchEngineIndex: storeProfile.allowSearchEngineIndex ?? true,
+        seoTitle: storeProfile.seoTitle ?? '',
+        seoDescription: storeProfile.seoDescription ?? '',
+        seoKeywords: storeProfile.seoKeywords ?? '',
       })
     }
   }, [storeProfile, reset])
@@ -370,29 +376,68 @@ export function StoreProfileForm() {
               </Field>
             </div>
             <Separator />
-            <div className="border-input bg-muted/20 flex flex-wrap items-center justify-between gap-5 rounded-xl border border-dashed p-4">
-              <div className="space-y-1 pr-4">
+            <div className="space-y-5 rounded-xl border p-4 sm:p-5">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <IconSearch size={16} className="text-muted-foreground" />
+                  <IconSearch size={18} className="text-primary" />
+                  <h4 className="text-base font-semibold">
+                    {t('seoSettingsTitle')}
+                  </h4>
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  {t('seoSettingsDesc')}
+                </p>
+              </div>
+              <div className="border-input bg-muted/20 flex flex-wrap items-center justify-between gap-5 rounded-xl border border-dashed p-4">
+                <div className="space-y-1 pr-4">
                   <span className="block text-sm font-medium">
                     {t('searchEngineIndex')}
                   </span>
+                  <span className="text-muted-foreground block text-xs leading-relaxed">
+                    {t('searchEngineIndexHint')}
+                  </span>
                 </div>
-                <span className="text-muted-foreground block text-xs leading-relaxed">
-                  {t('searchEngineIndexHint')}
-                </span>
+                <Controller
+                  control={control}
+                  name="allowSearchEngineIndex"
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isPending}
+                    />
+                  )}
+                />
               </div>
-              <Controller
-                control={control}
-                name="allowSearchEngineIndex"
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
+              <div className="grid grid-cols-1 gap-5">
+                <Field>
+                  <FieldLabel>{t('seoTitle')}</FieldLabel>
+                  <Input
+                    placeholder={t('seoTitlePlaceholder')}
+                    {...register('seoTitle')}
                     disabled={isPending}
                   />
-                )}
-              />
+                  <FieldDescription>{t('seoTitleHint')}</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel>{t('seoDescription')}</FieldLabel>
+                  <Textarea
+                    placeholder={t('seoDescriptionPlaceholder')}
+                    {...register('seoDescription')}
+                    disabled={isPending}
+                  />
+                  <FieldDescription>{t('seoDescriptionHint')}</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel>{t('seoKeywords')}</FieldLabel>
+                  <Input
+                    placeholder={t('seoKeywordsPlaceholder')}
+                    {...register('seoKeywords')}
+                    disabled={isPending}
+                  />
+                  <FieldDescription>{t('seoKeywordsHint')}</FieldDescription>
+                </Field>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
