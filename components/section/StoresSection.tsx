@@ -71,11 +71,13 @@ export function StoresSection() {
               <h3 className="mb-5 line-clamp-2 text-lg font-bold sm:text-xl">
                 {store.name}
               </h3>
-              <ActionRequiredAlert
-                title={t('searchAlertTitle')}
-                description={t('searchAlertDesc')}
-              />
-              <div className="mt-6 flex items-end justify-end">
+              {!store.allowSearchEngineIndex && (
+                <ActionRequiredAlert
+                  title={t('searchAlertTitle')}
+                  description={t('searchAlertDesc')}
+                />
+              )}
+              <div className="mt-auto flex items-end justify-end pt-6">
                 <Button variant="outline" asChild>
                   <Link
                     href={`https://${store.slug}.sitepow.store`}

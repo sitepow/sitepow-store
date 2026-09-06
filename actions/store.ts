@@ -128,6 +128,7 @@ const storeLandingSelect = {
   logo: true,
   coverImage: true,
   description: true,
+  allowSearchEngineIndex: true,
 } satisfies Prisma.StoreSelect
 
 export type StoreLandingItem = Prisma.StoreGetPayload<{
