@@ -1774,6 +1774,16 @@
         "orderCancelled": {
           "label": "Order Cancelled (order.cancelled)",
           "description": "Triggered when an order is cancelled"
+        },
+        "test": {
+          "ping": {
+            "label": "Test Ping (test.ping)",
+            "description": "Triggered when testing webhook connectivity"
+          }
+        },
+        "testPing": {
+          "label": "Test Ping (test.ping)",
+          "description": "Triggered when testing webhook connectivity"
         }
       },
       "logDetail": {

@@ -1,7 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
+import { getWebhookEvents } from '@/constants/webhook'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { IconCheck, IconCopy, IconRefresh } from '@tabler/icons-react'
 
@@ -45,6 +46,22 @@ export function WebhookLogDetailDialog({
   isResending,
 }: WebhookLogDetailDialogProps) {
   const t = useTranslations('merchant.settings.webhook.logDetail')
+  const tEvents = useTranslations('merchant.settings.webhook.events')
+  const locale = useLocale()
+  const fallbackEvents = getWebhookEvents(locale)
+
+  const getEventLabel = (eventId: string) => {
+    const camelKey = eventId.replace(/\.([a-z])/g, (_, l) => l.toUpperCase())
+    if (tEvents.has(`${eventId}.label` as any)) {
+      return tEvents(`${eventId}.label` as any)
+    }
+    if (tEvents.has(`${camelKey}.label` as any)) {
+      return tEvents(`${camelKey}.label` as any)
+    }
+    const fallback = fallbackEvents.find((e) => e.id === eventId)
+    return fallback?.label || eventId
+  }
+
   const { copied, copy } = useCopyToClipboard()
 
   if (!log) {
@@ -65,7 +82,8 @@ export function WebhookLogDetailDialog({
             </Badge>
           </div>
           <DialogDescription>
-            {t('event')}: <span className="font-medium">{log.event}</span> •{' '}
+            {t('event')}:{' '}
+            <span className="font-medium">{getEventLabel(log.event)}</span> •{' '}
             {t('duration')}: {log.executionTimeMs}ms • {t('date')}:{' '}
             {new Date(log.createdAt).toLocaleString()}
           </DialogDescription>

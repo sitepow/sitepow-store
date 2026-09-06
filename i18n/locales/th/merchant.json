@@ -1782,6 +1782,16 @@
         "orderCancelled": {
           "label": "ออเดอร์ถูกยกเลิก (order.cancelled)",
           "description": "ส่งเมื่อคำสั่งซื้อถูกยกเลิก"
+        },
+        "test": {
+          "ping": {
+            "label": "ทดสอบระบบ (test.ping)",
+            "description": "ส่งเมื่อกดทดสอบเชื่อมต่อ Webhook"
+          }
+        },
+        "testPing": {
+          "label": "ทดสอบระบบ (test.ping)",
+          "description": "ส่งเมื่อกดทดสอบเชื่อมต่อ Webhook"
         }
       },
       "logDetail": {

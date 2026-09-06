@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import {
   useDeleteWebhookEndpoint,
@@ -15,6 +15,7 @@ import {
   useWebhookLogs,
 } from '@/actions/hooks/webhook'
 import { StoreWebhookEndpointItem } from '@/actions/webhook'
+import { getWebhookEvents } from '@/constants/webhook'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
@@ -63,6 +64,22 @@ import {
 
 export function WebhookSettingsForm() {
   const t = useTranslations('merchant.settings.webhook')
+  const tEvents = useTranslations('merchant.settings.webhook.events')
+  const locale = useLocale()
+  const fallbackEvents = getWebhookEvents(locale)
+
+  const getEventLabel = (eventId: string) => {
+    const camelKey = eventId.replace(/\.([a-z])/g, (_, l) => l.toUpperCase())
+    if (tEvents.has(`${eventId}.label` as any)) {
+      return tEvents(`${eventId}.label` as any)
+    }
+    if (tEvents.has(`${camelKey}.label` as any)) {
+      return tEvents(`${camelKey}.label` as any)
+    }
+    const fallback = fallbackEvents.find((e) => e.id === eventId)
+    return fallback?.label || eventId
+  }
+
   const { selectedStoreId } = useStoreFilter()
   const { data: endpoints = [], isLoading } =
     useStoreWebhookEndpoints(selectedStoreId)
@@ -327,7 +344,7 @@ export function WebhookSettingsForm() {
                                   }
                                   className="text-xs"
                                 >
-                                  {ev}
+                                  {getEventLabel(ev)}
                                 </Badge>
                               ))}
                             </div>
@@ -810,7 +827,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                         </TableCell>
                         <TableCell>
                           <span className="text-xs font-semibold">
-                            {log.event}
+                            {getEventLabel(log.event)}
                           </span>
                         </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
