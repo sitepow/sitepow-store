@@ -66,6 +66,22 @@
     "statusLabel": "สถานะออเดอร์",
     "paymentLabel": "รูปแบบชำระเงิน",
     "paidAt": "ชำระเงินเมื่อ",
+    "statuses": {
+      "PENDING": "รอชำระเงิน",
+      "MANUAL_CHECK": "รอตรวจสอบสลิป",
+      "PAID": "ชำระเงินแล้ว",
+      "SHIPPED": "จัดส่งแล้ว",
+      "CANCELLED": "ยกเลิก"
+    },
+    "paymentMethods": {
+      "BANK_TRANSFER": "โอนเงินผ่านบัญชีธนาคาร",
+      "MANUAL_QR_PROMPTPAY": "พร้อมเพย์ร้านค้า (แนบสลิป)",
+      "STRIPE_QR_PROMPTPAY": "พร้อมเพย์ (QR ผ่าน Stripe)",
+      "STRIPE_CREDIT_CARD": "บัตรเครดิต/เดบิต (ผ่าน Stripe)",
+      "STRIPE_GOOGLE_PAY": "Google Pay (ผ่าน Stripe)",
+      "STRIPE_APPLE_PAY": "Apple Pay (ผ่าน Stripe)",
+      "CASH_ON_DELIVERY": "เก็บเงินปลายทาง"
+    },
     "trackingRequiredTitle": "กรุณากรอกเลขพัสดุสำหรับการจัดส่ง",
     "trackingRequiredDesc": "จำเป็นต้องระบุเลข Tracking Number ก่อนเปลี่ยนสถานะเป็นกำลังจัดส่ง",
     "trackingPlaceholder": "ระบุเลข Tracking Number เช่น TH123456789...",

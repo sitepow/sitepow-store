@@ -66,6 +66,22 @@
     "statusLabel": "Order Status",
     "paymentLabel": "Payment Method",
     "paidAt": "Paid at",
+    "statuses": {
+      "PENDING": "Pending Payment",
+      "MANUAL_CHECK": "Verifying Slip",
+      "PAID": "Paid",
+      "SHIPPED": "Shipped",
+      "CANCELLED": "Cancelled"
+    },
+    "paymentMethods": {
+      "BANK_TRANSFER": "Bank Transfer",
+      "MANUAL_QR_PROMPTPAY": "Merchant PromptPay (Attach Slip)",
+      "STRIPE_QR_PROMPTPAY": "PromptPay (QR via Stripe)",
+      "STRIPE_CREDIT_CARD": "Credit / Debit Card (via Stripe)",
+      "STRIPE_GOOGLE_PAY": "Google Pay (via Stripe)",
+      "STRIPE_APPLE_PAY": "Apple Pay (via Stripe)",
+      "CASH_ON_DELIVERY": "Cash on Delivery"
+    },
     "trackingRequiredTitle": "Please enter shipment tracking number",
     "trackingRequiredDesc": "Tracking number is required before changing status to Shipped",
     "trackingPlaceholder": "Enter tracking number e.g. TH123456789...",
