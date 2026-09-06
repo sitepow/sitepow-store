@@ -17,7 +17,6 @@ import {
   IconReceiptTax,
   IconReplace,
   IconSettings,
-  IconShare,
   IconStar,
   IconTruck,
   IconWebhook,
@@ -32,7 +31,6 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { DomainSettingsForm } from './DomainSettingsForm'
-import { MarketplaceSettingsForm } from './_components/MarketplaceSettingsForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PaymentSettingsForm } from './_components/PaymentSettingsForm'
 import { ReviewRewardSettingsForm } from './_components/ReviewRewardSettingsForm'
@@ -119,9 +117,6 @@ function MerchantSettingsContent() {
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.WEBHOOK}>
               <IconWebhook size={14} /> {t('tabs.webhook')}
-            </TabsTrigger>
-            <TabsTrigger value={SettingsTab.MARKETPLACE}>
-              <IconShare size={14} /> {t('tabs.marketplace')}
             </TabsTrigger>
           </TabsList>
           <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
@@ -232,17 +227,6 @@ function MerchantSettingsContent() {
               />
             ) : (
               <WebhookSettingsForm />
-            )}
-          </TabsContent>
-          <TabsContent value={SettingsTab.MARKETPLACE} className="flex-1">
-            {!isPermissionLoading && !canViewStoreSettings ? (
-              <ActionRequiredAlert
-                icon={<IconLock />}
-                title={t('noAccess.title')}
-                description={t('noAccess.marketplace')}
-              />
-            ) : (
-              <MarketplaceSettingsForm />
             )}
           </TabsContent>
         </Tabs>

@@ -16,7 +16,6 @@ import {
 import { deductCustomerPoints, refundCustomerPoints } from '@/utils/points'
 
 import { createLog } from '@/lib/activity-log'
-import { syncVariantStockToAllMarketplaces } from '@/lib/marketplace/sync-service'
 import { prisma } from '@/lib/prisma'
 
 import { CancelOrderCoreInput, CreateOrderCoreInput } from './types'
@@ -576,34 +575,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       changeAmount: input.changeAmount,
     },
   })
-
-  const physicalItems = input.items.filter(
-    (item) => item.productType === ProductType.PHYSICAL && item.variantId,
-  )
-  if (physicalItems.length > 0) {
-    ;(async () => {
-      try {
-        for (const item of physicalItems) {
-          const branchStock = await prisma.productStock.findFirst({
-            where: {
-              variantId: item.variantId,
-              branch: { storeId: store.id },
-            },
-            select: { quantity: true },
-          })
-          const remainingQty = branchStock?.quantity ?? 0
-          await syncVariantStockToAllMarketplaces(
-            item.variantId,
-            remainingQty,
-            store.id,
-          )
-        }
-      } catch (syncErr) {
-        console.error('Marketplace sync error after order:', syncErr)
-      }
-    })().catch(console.error)
-  }
-
   return createdOrders
 }
 

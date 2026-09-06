@@ -5,7 +5,6 @@ import {
   IconCashRegister,
   IconChartBar,
   IconCoin,
-  IconCpu,
   IconCreditCard,
   IconHierarchy2,
   IconHistory,
@@ -135,13 +134,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'คลังสินค้า',
     tab: 'inventory',
     icon: IconBox,
-    permissionKey: 'canViewInventory',
-  },
-  {
-    value: 'smart-stock',
-    label: 'สต็อกสินค้าอัจฉริยะ',
-    tab: 'smart-stock',
-    icon: IconCpu,
     permissionKey: 'canViewInventory',
   },
   {

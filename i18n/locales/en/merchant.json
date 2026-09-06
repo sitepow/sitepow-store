@@ -7,7 +7,6 @@
     "store-settings/products": "Products",
     "store-settings/categories": "Categories",
     "inventory": "Inventory",
-    "smart-stock": "Smart Stock",
     "expenses": "Expenses",
     "reseller": "Reseller",
     "customers": "Customers",
@@ -609,93 +608,6 @@
       "notePlaceholder": "e.g. Transfer to restock branch",
       "transferring": "Transferring...",
       "confirm": "Confirm Transfer"
-    }
-  },
-  "smartStock": {
-    "title": "Smart Stock",
-    "description": "Monitor and manage auto-synced stock across local store (HQ), Shopee, Lazada, and Facebook Marketplace",
-    "apiSettings": "API Settings",
-    "noAccessTitle": "Access Denied",
-    "noAccessDescription": "You do not have permission to manage inventory for this branch or store",
-    "acknowledged": "Acknowledge",
-    "mismatchAlert": {
-      "title": "Found {count} item(s) with mismatched stock",
-      "description": "Product '{product}' on Lazada does not match the main warehouse stock. Please click sync to synchronize."
-    },
-    "sharedPoolAlert": {
-      "title": "Automated Shared Pool Stock Synchronization",
-      "description": "When a sale occurs via POS or any marketplace, stock is deducted from the main warehouse and instantly broadcasted to Shopee, Lazada, and Facebook Marketplace in real-time to prevent overselling."
-    },
-    "cards": {
-      "totalStock": "Total Stock (All Channels)",
-      "pieces": "units",
-      "totalSkus": "Covering a total of {count} SKUs",
-      "mainWarehouse": "Main Store Warehouse (HQ)",
-      "mainWarehouseDesc": "Primary stock for POS and storefront sales",
-      "connectedChannels": "Connected Channels",
-      "platforms": "{count} Platforms",
-      "connectedChannelsDesc": "Shopee, Lazada, Facebook Marketplace",
-      "stockAccuracy": "Stock Accuracy",
-      "stockAccuracyDesc": "{synced} matched, {mismatch} require review"
-    },
-    "searchPlaceholder": "Search by product name or SKU...",
-    "filter": {
-      "placeholder": "Filter status",
-      "all": "All items",
-      "mismatch": "Stock Mismatch",
-      "lowStock": "Low Stock",
-      "outOfStock": "Out of Stock"
-    },
-    "syncAll": "Sync All Stock",
-    "columns": {
-      "image": "Image",
-      "productSku": "Product / SKU",
-      "localHq": "Local (HQ)",
-      "shopee": "Shopee",
-      "lazada": "Lazada",
-      "facebook": "Facebook",
-      "status": "Status",
-      "actions": "Actions"
-    },
-    "empty": "No matching products found",
-    "decreaseStock": "Decrease stock",
-    "increaseStock": "Increase stock",
-    "badges": {
-      "inSync": "In-Sync",
-      "mismatch": "Mismatch",
-      "mismatchTooltip": "Click to sync",
-      "pendingSync": "Pending Sync",
-      "outOfStock": "Out of Stock",
-      "complete": "Complete"
-    },
-    "actions": {
-      "sync": "Sync",
-      "syncTooltip": "Sync this product",
-      "simulate": "Simulate Sale",
-      "simulateTooltip": "Simulate order"
-    },
-    "channels": {
-      "local": "POS Storefront",
-      "shopee": "Shopee",
-      "lazada": "Lazada",
-      "facebook": "Facebook Marketplace"
-    },
-    "toast": {
-      "stockUpdated": "Updated {sku} stock to {quantity} units",
-      "syncSingleSuccess": "Successfully synced {sku} to all platforms",
-      "syncAllSuccess": "All stock channels synced successfully",
-      "insufficientStock": "Insufficient stock in warehouse",
-      "simulateSuccess": "Simulated sale via {channel} of {quantity} unit(s) successful (remaining stock: {remaining} units)"
-    },
-    "justNow": "Just now",
-    "dialog": {
-      "title": "Simulate Sale Stock Deduction",
-      "description": "Test simulated order to observe central stock deduction and real-time broadcast to other channels",
-      "currentStock": "Current Stock: {quantity} units",
-      "channelLabel": "Sales Channel",
-      "quantityLabel": "Quantity Sold (units)",
-      "cancel": "Cancel",
-      "confirm": "Confirm Simulation"
     }
   },
   "expenses": {
@@ -1866,6 +1778,17 @@
       "autoSync": "Auto-Sync Stock:",
       "configConnection": "Configure",
       "connectStore": "Connect Store",
+      "connectWithShopee": "Log in to Shopee to Connect",
+      "connectingShopee": "Redirecting to Shopee...",
+      "disconnect": "Disconnect",
+      "disconnectConfirmTitle": "Disconnect {platform}?",
+      "disconnectConfirmDesc": "The system will stop syncing stock with this store. You can reconnect at any time.",
+      "confirmDisconnect": "Confirm Disconnect",
+      "connectSimulator": "Connect with Simulator Mode",
+      "manualConfig": "Advanced (Manual API Input)",
+      "missingEnvNotice": "SHOPEE_PARTNER_ID is not configured in .env. You can connect via simulator mode or configure credentials manually.",
+      "connectSuccessToast": "Successfully connected to Shopee",
+      "disconnectSuccessToast": "Successfully disconnected",
       "syncAllNow": "Sync All Items Now",
       "simulatorOrder": "Simulate Inbound Order",
       "mappingTitle": "SKU Mapping",
