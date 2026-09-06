@@ -622,6 +622,8 @@
     "description": "Experience real stores running on our high-performance infrastructure",
     "searchAlertTitle": "Search Indexing Disabled",
     "searchAlertDesc": "As these are demo showcase stores, search engine indexing is disabled to prevent sample items from appearing in public search results.",
+    "searchAlertActiveTitle": "Search Indexing Active",
+    "searchAlertActiveDesc": "This store is indexed by Google and other search engines, allowing customers to discover it online.",
     "visitWebsite": "Visit Website",
     "createStoreTitle": "Create Your Store",
     "createStoreDesc": "Start building an outstanding shopping experience with Sitepow Store",

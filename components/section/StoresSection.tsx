@@ -9,7 +9,7 @@ import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
-import { IconArrowUpRight, IconPlus } from '@tabler/icons-react'
+import { IconArrowUpRight, IconCheck, IconPlus } from '@tabler/icons-react'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { SectionHeader } from '@/components/SectionHeader'
@@ -71,8 +71,15 @@ export function StoresSection() {
               <h3 className="mb-5 line-clamp-2 text-lg font-bold sm:text-xl">
                 {store.name}
               </h3>
-              {!store.allowSearchEngineIndex && (
+              {store.allowSearchEngineIndex ? (
                 <ActionRequiredAlert
+                  variant="success"
+                  title={t('searchAlertActiveTitle')}
+                  description={t('searchAlertActiveDesc')}
+                />
+              ) : (
+                <ActionRequiredAlert
+                  variant="warning"
                   title={t('searchAlertTitle')}
                   description={t('searchAlertDesc')}
                 />
