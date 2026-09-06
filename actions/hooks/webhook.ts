@@ -14,6 +14,7 @@ import {
   getStoreWebhookEndpoints,
   getStoreWebhookLogs,
   regenerateWebhookSecret,
+  resendWebhookLog,
   testWebhookEndpoint,
   updateStoreWebhookEndpoint,
 } from '../webhook'
@@ -136,3 +137,22 @@ export function useTestWebhookEndpoint() {
   })
 }
 
+export function useResendWebhookLog() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (logId: string) => await resendWebhookLog(logId),
+    onSuccess: (res) => {
+      if (res.endpointId) {
+        queryClient.invalidateQueries({
+          queryKey: webhookKeys.logs(res.endpointId),
+        })
+      }
+      if (res.storeId) {
+        queryClient.invalidateQueries({
+          queryKey: webhookKeys.list(res.storeId),
+        })
+      }
+    },
+  })
+}

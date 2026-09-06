@@ -1724,6 +1724,8 @@
       "logDateCol": "Sent At",
       "logActionsCol": "Actions",
       "viewPayload": "View Payload",
+      "resend": "Resend",
+      "resending": "Resending...",
       "success": "Success",
       "failed": "Failed",
       "dialog": {
@@ -1784,7 +1786,9 @@
         "copied": "Copied!",
         "copyJson": "Copy JSON",
         "responseBody": "Response Body",
-        "noResponse": "(No response data received)"
+        "noResponse": "(No response data received)",
+        "resend": "Resend Payload (Retry)",
+        "resending": "Resending..."
       }
     },
     "marketplace": {

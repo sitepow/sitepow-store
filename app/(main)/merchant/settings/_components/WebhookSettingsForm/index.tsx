@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import {
   useDeleteWebhookEndpoint,
   useRegenerateWebhookSecret,
+  useResendWebhookLog,
   useStoreWebhookEndpoints,
   useTestWebhookEndpoint,
   useUpdateWebhookEndpoint,
@@ -93,10 +94,12 @@ export function WebhookSettingsForm() {
   const { mutate: regenerateSecret, isPending: isRegenerating } =
     useRegenerateWebhookSecret()
   const { mutate: testPing, isPending: isTesting } = useTestWebhookEndpoint()
+  const { mutate: resendLog } = useResendWebhookLog()
 
   const [testingEndpointId, setTestingEndpointId] = useState<string | null>(
     null,
   )
+  const [resendingLogId, setResendingLogId] = useState<string | null>(null)
 
   if (!selectedStoreId || selectedStoreId === ALL_STORES) {
     return (
@@ -193,6 +196,24 @@ export function WebhookSettingsForm() {
       },
       onError: (err) => {
         setTestingEndpointId(null)
+        toast.error(err.message)
+      },
+    })
+  }
+
+  const handleResendLog = (logId: string) => {
+    setResendingLogId(logId)
+    resendLog(logId, {
+      onSuccess: (res) => {
+        setResendingLogId(null)
+        if (res.success) {
+          toast.success(res.message)
+        } else {
+          toast.error(res.message)
+        }
+      },
+      onError: (err) => {
+        setResendingLogId(null)
         toast.error(err.message)
       },
     })
@@ -728,7 +749,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
               <CardDescription className="text-xs">
                 {activeEndpointId ? (
                   <>
-                    {t('logsDescPrefix')}
+                    {t('logsDescPrefix')}{' '}
                     <span className="text-foreground font-medium">
                       {endpoints.find((e) => e.id === activeEndpointId)?.url}
                     </span>
@@ -799,14 +820,35 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                           {new Date(log.createdAt).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => handleViewLog(log)}
-                          >
-                            {t('viewPayload')}
-                          </Button>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => handleViewLog(log)}
+                            >
+                              {t('viewPayload')}
+                            </Button>
+                            <Button
+                              variant={log.isSuccess ? 'ghost' : 'default'}
+                              size="sm"
+                              className="h-7 gap-1 px-2 text-xs"
+                              onClick={() => handleResendLog(log.id)}
+                              disabled={resendingLogId === log.id}
+                              title={t('resend')}
+                            >
+                              {resendingLogId === log.id ? (
+                                <Spinner className="size-3" />
+                              ) : (
+                                <IconRefresh size={13} />
+                              )}
+                              <span>
+                                {resendingLogId === log.id
+                                  ? t('resending')
+                                  : t('resend')}
+                              </span>
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -826,6 +868,8 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
         open={logDialogOpen}
         setOpen={setLogDialogOpen}
         log={selectedLog}
+        onResend={handleResendLog}
+        isResending={resendingLogId === selectedLog?.id}
       />
     </div>
   )

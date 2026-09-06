@@ -212,3 +212,85 @@ export async function sendWebhookTestPing(endpointId: string) {
     logId: log.id,
   }
 }
+
+export async function retryWebhookLog(logId: string) {
+  const originalLog = await prisma.storeWebhookLog.findUnique({
+    where: { id: logId },
+    include: {
+      endpoint: true,
+    },
+  })
+
+  if (!originalLog) {
+    throw new Error('ไม่พบข้อมูลประวัติ Webhook นี้')
+  }
+
+  const { endpoint } = originalLog
+  if (!endpoint) {
+    throw new Error('ไม่พบข้อมูล Webhook Endpoint ที่เชื่อมโยงกับประวัตินี้')
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000)
+  const payloadString = JSON.stringify(originalLog.requestPayload)
+  const signature = signWebhookPayload(
+    payloadString,
+    endpoint.secret,
+    timestamp,
+  )
+
+  const startTime = Date.now()
+  let statusCode: number | null = null
+  let responseBody: string | null = null
+  let isSuccess = false
+  let errorMessage: string | null = null
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+    const res = await fetch(endpoint.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'SitePow-Webhook-Dispatcher/1.0',
+        'X-Sitepow-Signature': `t=${timestamp},v1=${signature}`,
+        'X-Sitepow-Event': originalLog.event,
+        'X-Sitepow-Delivery-Attempt': 'retry',
+      },
+      body: payloadString,
+      signal: controller.signal,
+    })
+
+    clearTimeout(timeoutId)
+    statusCode = res.status
+    responseBody = await res.text()
+    isSuccess = res.ok
+  } catch (err: unknown) {
+    errorMessage = err instanceof Error ? err.message : 'Connection failed'
+  }
+
+  const executionTimeMs = Date.now() - startTime
+
+  const newLog = await prisma.storeWebhookLog.create({
+    data: {
+      endpointId: endpoint.id,
+      event: originalLog.event,
+      statusCode,
+      requestPayload: originalLog.requestPayload as Prisma.InputJsonValue,
+      responseBody: responseBody ? responseBody.slice(0, 2000) : null,
+      executionTimeMs,
+      isSuccess,
+      errorMessage,
+    },
+  })
+
+  return {
+    success: isSuccess,
+    statusCode,
+    executionTimeMs,
+    errorMessage,
+    logId: newLog.id,
+    endpointId: endpoint.id,
+    storeId: endpoint.storeId,
+  }
+}

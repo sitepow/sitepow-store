@@ -6,7 +6,11 @@ import { WebhookEndpointFormValues, webhookEndpointSchema } from '@/zod/webhook'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { generateWebhookSecret, sendWebhookTestPing } from '@/lib/webhook'
+import {
+  generateWebhookSecret,
+  retryWebhookLog,
+  sendWebhookTestPing,
+} from '@/lib/webhook'
 
 const webhookEndpointSelect = {
   id: true,
@@ -377,6 +381,70 @@ export async function testWebhookEndpoint(endpointId: string) {
         error instanceof Error
           ? error.message
           : 'เกิดข้อผิดพลาดในการทดสอบ Webhook',
+    }
+  }
+}
+
+export async function resendWebhookLog(logId: string) {
+  try {
+    if (!logId) {
+      return { success: false, message: 'ไม่พบ Log ID' }
+    }
+
+    const log = await prisma.storeWebhookLog.findUnique({
+      where: { id: logId },
+      include: {
+        endpoint: {
+          select: { storeId: true, id: true },
+        },
+      },
+    })
+
+    if (!log || !log.endpoint) {
+      return {
+        success: false,
+        message: 'ไม่พบประวัติหรือ Webhook Endpoint ที่เชื่อมโยง',
+      }
+    }
+
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบ' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: log.endpoint.storeId,
+      permission: 'canUpdateStoreSettings',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'คุณไม่มีสิทธิ์ในการส่ง Webhook ซ้ำ',
+      }
+    }
+
+    const result = await retryWebhookLog(logId)
+
+    return {
+      success: result.success,
+      message: result.success
+        ? `ส่ง Webhook อีกครั้งสำเร็จ (Status: ${result.statusCode}, ${result.executionTimeMs}ms)`
+        : `ส่ง Webhook อีกครั้งไม่สำเร็จ (${result.errorMessage || `Status: ${result.statusCode}`})`,
+      data: result,
+      endpointId: log.endpoint.id,
+      storeId: log.endpoint.storeId,
+    }
+  } catch (error: unknown) {
+    console.error('Error resending webhook:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'เกิดข้อผิดพลาดในการส่ง Webhook ซ้ำ',
     }
   }
 }

@@ -1732,6 +1732,8 @@
       "logDateCol": "วัน-เวลาที่ส่ง",
       "logActionsCol": "ดูข้อมูล",
       "viewPayload": "ดู Payload",
+      "resend": "ส่งซ้ำ",
+      "resending": "กำลังส่งซ้ำ...",
       "success": "Success",
       "failed": "Failed",
       "dialog": {
@@ -1792,7 +1794,9 @@
         "copied": "คัดลอกแล้ว",
         "copyJson": "คัดลอก JSON",
         "responseBody": "Response Body (ข้อความตอบกลับจากเซิร์ฟเวอร์ของคุณ)",
-        "noResponse": "(ไม่มีข้อมูลตอบกลับ)"
+        "noResponse": "(ไม่มีข้อมูลตอบกลับ)",
+        "resend": "ส่งข้อมูลนี้อีกครั้ง (Retry)",
+        "resending": "กำลังส่งซ้ำ..."
       }
     },
     "marketplace": {

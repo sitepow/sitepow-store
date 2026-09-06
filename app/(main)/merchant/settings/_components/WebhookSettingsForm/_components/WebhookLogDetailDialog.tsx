@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { IconCheck, IconCopy } from '@tabler/icons-react'
+import { IconCheck, IconCopy, IconRefresh } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,9 +11,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Spinner } from '@/components/ui/spinner'
 
 export interface WebhookLogItem {
   id: string
@@ -31,12 +33,16 @@ interface WebhookLogDetailDialogProps {
   open: boolean
   setOpen: (open: boolean) => void
   log: WebhookLogItem | null
+  onResend?: (logId: string) => void
+  isResending?: boolean
 }
 
 export function WebhookLogDetailDialog({
   open,
   setOpen,
   log,
+  onResend,
+  isResending,
 }: WebhookLogDetailDialogProps) {
   const t = useTranslations('merchant.settings.webhook.logDetail')
   const { copied, copy } = useCopyToClipboard()
@@ -106,6 +112,27 @@ export function WebhookLogDetailDialog({
             </pre>
           </div>
         </div>
+        <DialogFooter className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+            ปิด
+          </Button>
+          {onResend && (
+            <Button
+              variant={log.isSuccess ? 'outline' : 'default'}
+              size="sm"
+              className="gap-1.5"
+              disabled={isResending}
+              onClick={() => onResend(log.id)}
+            >
+              {isResending ? (
+                <Spinner className="size-3.5" />
+              ) : (
+                <IconRefresh size={14} />
+              )}
+              <span>{isResending ? t('resending') : t('resend')}</span>
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
