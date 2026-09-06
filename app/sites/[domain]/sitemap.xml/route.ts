@@ -9,6 +9,8 @@ type Props = {
   params: Promise<{ domain: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 function escapeXml(unsafe: string): string {
   return unsafe
     .replace(/&/g, '&amp;')

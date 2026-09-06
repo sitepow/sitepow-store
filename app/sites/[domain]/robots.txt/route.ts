@@ -7,6 +7,8 @@ type Props = {
   params: Promise<{ domain: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(_req: Request, { params }: Props) {
   const { domain } = await params
   const store = await getStore({ domain })
