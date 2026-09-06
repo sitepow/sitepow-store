@@ -322,7 +322,7 @@ export function WebhookSettingsForm() {
                           onClick={() => setSelectedEndpointId(endpoint.id)}
                         >
                           <TableCell className="max-w-xs">
-                            <div className="text-sm font-semibold">
+                            <div className="max-w-52 min-w-52 text-sm wrap-break-word whitespace-pre-line">
                               {endpoint.url}
                             </div>
                             {endpoint.description && (
@@ -333,7 +333,7 @@ export function WebhookSettingsForm() {
                           </TableCell>
 
                           <TableCell>
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex max-w-52 min-w-52 flex-wrap gap-1 wrap-break-word whitespace-pre-line">
                               {endpoint.events.map((ev) => (
                                 <Badge
                                   key={ev}
@@ -351,7 +351,7 @@ export function WebhookSettingsForm() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1.5 text-xs">
-                              <span>
+                              <span className="max-w-52 min-w-52 wrap-break-word whitespace-pre-line">
                                 {isRevealed
                                   ? endpoint.secret
                                   : `${endpoint.secret.slice(0, 10)}••••••••••••`}
@@ -440,7 +440,7 @@ export function WebhookSettingsForm() {
                                 <span>{t('testPing')}</span>
                               </Button>
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="icon"
                                 className="size-8"
                                 onClick={() => handleOpenEdit(endpoint)}
@@ -449,9 +449,9 @@ export function WebhookSettingsForm() {
                                 <IconEdit size={15} />
                               </Button>
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="icon"
-                                className="text-destructive hover:bg-destructive/10 size-8"
+                                className="size-8"
                                 onClick={() => handleDelete(endpoint.id)}
                                 disabled={isDeleting}
                                 title={t('delete')}
@@ -826,7 +826,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="text-xs font-semibold">
+                          <span className="text-xs">
                             {getEventLabel(log.event)}
                           </span>
                         </TableCell>
