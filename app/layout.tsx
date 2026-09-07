@@ -57,6 +57,21 @@ export const metadata: Metadata = {
     siteName: 'Sitepow Store',
     locale: 'th_TH',
     type: 'website',
+    images: [
+      {
+        url: '/images/seo-cover.png',
+        width: 1200,
+        height: 630,
+        alt: 'Sitepow Store - All-in-One eCommerce SaaS Platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+    description:
+      'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
+    images: ['/images/seo-cover.png'],
   },
   robots: {
     index: true,
