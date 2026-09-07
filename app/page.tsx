@@ -1,25 +1,15 @@
 import { Suspense } from 'react'
 
+import { CtaSection } from '@/components/landing-template/CtaSection'
+import { FaqSection } from '@/components/landing-template/FaqSection'
+import { FeaturesBentoSection } from '@/components/landing-template/FeaturesBentoSection'
+import { HeroSection } from '@/components/landing-template/HeroSection'
+import { HowItWorksSection } from '@/components/landing-template/HowItWorksSection'
+import { LogosSection } from '@/components/landing-template/LogosSection'
+import { PricingSection } from '@/components/landing-template/PricingSection'
+import { ProblemSection } from '@/components/landing-template/ProblemSection'
+import { SolutionSection } from '@/components/landing-template/SolutionSection'
 import { MainLayout } from '@/components/layout/Layout'
-import { AiVerificationSection } from '@/components/section/AiVerificationSection'
-import { ChatSection } from '@/components/section/ChatSection'
-import { ComparisonSection } from '@/components/section/ComparisonSection'
-import { CustomerLoyaltySection } from '@/components/section/CustomerLoyaltySection'
-import { ExpenseSection } from '@/components/section/ExpenseSection'
-import { FeatureSection } from '@/components/section/FeatureSection'
-import { HeroSection } from '@/components/section/HeroSection'
-import { InfrastructureSection } from '@/components/section/InfrastructureSection'
-import { InventorySection } from '@/components/section/InventorySection'
-import { LogisticsSection } from '@/components/section/LogisticsSection'
-import { POSSection } from '@/components/section/POSSection'
-import { PaymentSection } from '@/components/section/PaymentSection'
-import { PermissionSection } from '@/components/section/PermissionSection'
-import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
-import { ProductTypeSection } from '@/components/section/ProductTypeSection'
-import { ResellerSection } from '@/components/section/ResellerSection'
-import { SecurityTrustSection } from '@/components/section/SecurityTrustSection'
-import { StoreCustomizationSection } from '@/components/section/StoreCustomizationSection'
-import { StoresSection } from '@/components/section/StoresSection'
 
 export default function HomePage() {
   return (
@@ -27,24 +17,14 @@ export default function HomePage() {
       <Suspense>
         <HeroSection />
       </Suspense>
-      <FeatureSection />
-      <ProductTypeSection />
-      <POSSection />
-      <InventorySection />
-      <PermissionSection />
-      <ExpenseSection />
-      <ResellerSection />
-      <CustomerLoyaltySection />
-      <StoreCustomizationSection />
-      <PaymentSection />
-      <AiVerificationSection />
-      <ChatSection />
-      <LogisticsSection />
-      <InfrastructureSection />
-      <SecurityTrustSection />
-      <ComparisonSection />
-      <PricingPhilosophySection />
-      <StoresSection />
+      <LogosSection />
+      <ProblemSection />
+      <SolutionSection />
+      <HowItWorksSection />
+      <FeaturesBentoSection />
+      <PricingSection />
+      <FaqSection />
+      <CtaSection />
     </MainLayout>
   )
 }

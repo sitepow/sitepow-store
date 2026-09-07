@@ -121,37 +121,6 @@ export interface GetStoresResponse {
   }
 }
 
-const storeLandingSelect = {
-  id: true,
-  name: true,
-  slug: true,
-  logo: true,
-  coverImage: true,
-  description: true,
-  allowSearchEngineIndex: true,
-} satisfies Prisma.StoreSelect
-
-export type StoreLandingItem = Prisma.StoreGetPayload<{
-  select: typeof storeLandingSelect
-}>
-
-export async function getLandingStores(
-  limit = 11,
-): Promise<StoreLandingItem[]> {
-  const cacheKey = queryKeyToRedisKey(storeKeys.landing())
-
-  return (
-    (await withCache(cacheKey, () =>
-      prisma.store.findMany({
-        where: { status: StoreStatus.ACTIVE },
-        select: storeLandingSelect,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-      }),
-    )) ?? []
-  )
-}
-
 export type StoreData = Prisma.StoreGetPayload<{
   select: {
     id: true

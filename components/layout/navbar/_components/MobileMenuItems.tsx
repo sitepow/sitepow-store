@@ -41,8 +41,19 @@ export function MobileMenuItems({
           <div key={idx} className="flex flex-col">
             {item.children ? (
               <div className="space-y-4">
-                <p className="text-sm font-bold opacity-40">{title}</p>
-                <div className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-muted-foreground text-xs font-semibold">
+                    {title}
+                  </p>
+                  <Link
+                    href="/features"
+                    onClick={onClose}
+                    className="text-primary text-xs font-semibold hover:underline"
+                  >
+                    ดูทั้งหมด 12 ฟังก์ชัน →
+                  </Link>
+                </div>
+                <div className="border-border ml-2 flex flex-col space-y-3 border-l-2 pl-4">
                   {item.children.map((child, childIdx) => {
                     const childTitle = tFeatures.raw(
                       `items.${childIdx}.title`,
@@ -53,7 +64,7 @@ export function MobileMenuItems({
                         key={childIdx}
                         href={child.href}
                         onClick={onClose}
-                        className="active:text-primary text-lg font-semibold opacity-80"
+                        className="text-muted-foreground hover:text-foreground active:text-primary text-base font-medium transition-colors"
                       >
                         {childTitle}
                       </Link>
@@ -65,7 +76,7 @@ export function MobileMenuItems({
               <Link
                 href={item.href!}
                 onClick={onClose}
-                className="text-foreground text-xl font-bold"
+                className="text-foreground hover:text-primary text-lg font-medium transition-colors"
               >
                 {title}
               </Link>
@@ -81,15 +92,15 @@ export function MobileMenuItems({
           <div className="flex flex-col gap-3 pt-4 pb-10">
             <Link href={loginHref} onClick={onClose}>
               <Button
-                variant="secondary"
-                className="w-full justify-center gap-2 py-7 text-lg font-bold"
+                variant="outline"
+                className="w-full justify-center gap-2 py-6 text-base font-medium"
               >
-                <LockIcon size={20} />
+                <LockIcon size={18} />
                 {tNav('login')}
               </Button>
             </Link>
             <Link href={registerHref} onClick={onClose}>
-              <Button className="w-full justify-center py-7 text-lg font-bold">
+              <Button className="w-full justify-center py-6 text-base font-medium">
                 {tNav('register')}
               </Button>
             </Link>

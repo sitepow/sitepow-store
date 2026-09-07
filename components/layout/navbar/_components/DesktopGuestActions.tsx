@@ -20,14 +20,17 @@ export function DesktopGuestActions({
   return (
     <>
       <Link href={loginHref}>
-        <Button variant="secondary" className="font-bold">
+        <Button
+          variant="ghost"
+          className="text-muted-foreground hover:text-foreground font-medium"
+        >
           {t('login')}
         </Button>
       </Link>
       <Link href={registerHref}>
-        <Button className="font-bold">{t('register')}</Button>
+        <Button className="font-medium">{t('register')}</Button>
       </Link>
-      <QuickSettingsMenu buttonVariant="secondary" />
+      <QuickSettingsMenu buttonVariant="ghost" />
     </>
   )
 }

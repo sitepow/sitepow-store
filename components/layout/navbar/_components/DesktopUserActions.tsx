@@ -29,14 +29,14 @@ export function DesktopUserActions({
         className="hidden lg:block"
       />
       {userRole === UserRole.MERCHANT && (
-        <Button variant="secondary" className="flex gap-2 font-bold" asChild>
+        <Button variant="outline" className="flex gap-2 font-medium" asChild>
           <Link href="/merchant/dashboard">
             <IconLock />
             {t('manageStore')}
           </Link>
         </Button>
       )}
-      <QuickSettingsMenu buttonVariant="secondary" />
+      <QuickSettingsMenu buttonVariant="ghost" />
     </>
   )
 }

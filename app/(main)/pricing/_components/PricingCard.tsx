@@ -1,17 +1,18 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
+import React from 'react'
+
 import Link from 'next/link'
 
-import { PRICING_VALUE } from '@/constants/pricing'
+import { PRICING_OPTIONS, PRICING_VALUE } from '@/constants/pricing'
+import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useRandomGradient } from '@/hooks/use-random-gradient'
+import { useSession } from '@/hooks/use-session'
 import { PricingPlanProps } from '@/types/pricing'
-import { calculatePlanPrice, formatCurrency } from '@/utils/pricing'
+import { calculatePlanPrice } from '@/utils/pricing'
 
+import { BorderBeam } from '@/components/magicui/border-beam'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 
 import { usePricingStore } from '../store'
 
@@ -19,90 +20,120 @@ export function PricingCard({
   title,
   description,
   price,
-  currency,
   uniqueFeatures,
   buttonText,
   isPopular,
-  seed,
 }: PricingPlanProps) {
-  const t = useTranslations('pricing.card')
   const isMounted = useIsMounted()
-  const fallbackGradient = useRandomGradient()
+  const { isAuthenticated } = useSession()
   const selectedTab = usePricingStore((state) => state.selectedTab)
 
-  const {
-    basePrice,
-    discountPercent,
-    totalPriceBeforeDiscount,
-    finalPrice,
-    averagePerMonth,
-  } = calculatePlanPrice(price, selectedTab)
+  const registerParams = new URLSearchParams()
+  registerParams.set('role', UserRole.MERCHANT)
+  registerParams.set('callbackUrl', '/merchant/dashboard')
+  const registerHref = `/register?${registerParams.toString()}`
+  const targetHref = !isAuthenticated
+    ? registerHref
+    : '/merchant/store-settings'
+
+  const { basePrice, discountPercent, finalPrice, averagePerMonth } =
+    calculatePlanPrice(price, selectedTab)
+
+  const currentOption =
+    PRICING_OPTIONS.find((opt) => opt.value === selectedTab) ||
+    PRICING_OPTIONS[0]
 
   if (!isMounted) {
     return null
   }
 
   return (
-    <section
-      className={`text-foreground dark:bg-foreground/5 flex flex-col items-center rounded-xl border p-2.5 text-start ${
-        isPopular && 'text-white shadow-md'
+    <div
+      className={`relative flex flex-col justify-between rounded-3xl p-5 transition-all duration-300 sm:p-6 ${
+        isPopular
+          ? 'border-primary bg-card/90 ring-primary/20 border-2 shadow-xl ring-1 lg:-translate-y-2'
+          : 'border-border/80 bg-card/60 hover:border-border border hover:shadow-md'
       }`}
-      style={{
-        backgroundImage: isPopular ? fallbackGradient : '',
-      }}
     >
-      <Image
-        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&skinColor=fbd3ad`}
-        width={32}
-        height={32}
-        unoptimized
-        alt=""
-        className="border-primary mb-2.5 size-32 rounded-full border bg-white"
-      />
-      <h2 className="text-xl leading-tight font-bold">{title}</h2>
-      <p className="max-w-[85%] text-center font-medium opacity-70">
-        {description}
-      </p>
-      <Separator className="my-5 max-w-[75%]" />
-      <div className="flex flex-col items-center gap-1">
-        {discountPercent > 0 && basePrice > 0 && (
-          <span className="text-muted-foreground text-sm line-through">
-            {t('from')} {formatCurrency(totalPriceBeforeDiscount)}{' '}
-            {currency.split(' ')[0]}
-          </span>
-        )}
-        <div className="flex items-end gap-2">
-          <data value={finalPrice} className="text-2xl font-bold">
-            {basePrice === 0 ? '0.00' : formatCurrency(finalPrice)}
-          </data>
-          <span className="mb-0.5 text-sm font-bold">
-            {basePrice === 0 ? currency : currency.split(' ')[0]}
-          </span>
+      {isPopular && (
+        <>
+          <div className="bg-primary text-primary-foreground absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-sm">
+            แนะนำมากที่สุด
+          </div>
+          <BorderBeam
+            size={160}
+            duration={8}
+            colorFrom="#f97316"
+            colorTo="#3b82f6"
+            borderWidth={2}
+          />
+        </>
+      )}
+
+      <div>
+        {/* Title & Tag */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-foreground text-xl font-bold">{title}</h3>
+          {basePrice === 0 && (
+            <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium">
+              ฟรีตลอดชีพ
+            </span>
+          )}
         </div>
-        {basePrice > 0 && selectedTab !== PRICING_VALUE.ONE_MONTH && (
-          <span className="text-primary text-xs font-medium">
-            {t('averagePerMonth', { price: formatCurrency(averagePerMonth) })}
-          </span>
-        )}
+
+        {/* Price display */}
+        <div className="pt-3">
+          {discountPercent > 0 && basePrice > 0 && (
+            <span className="text-muted-foreground text-xs line-through">
+              ฿{basePrice.toLocaleString()} / เดือน
+            </span>
+          )}
+          <div className="flex items-baseline gap-1">
+            <span className="text-foreground text-3xl font-extrabold sm:text-4xl">
+              {basePrice === 0
+                ? '฿0'
+                : `฿${Math.round(averagePerMonth).toLocaleString()}`}
+            </span>
+            <span className="text-muted-foreground text-xs font-medium">
+              {basePrice === 0 ? '/ ตลอดชีพ' : '/ เดือน'}
+            </span>
+          </div>
+          {basePrice > 0 && selectedTab !== PRICING_VALUE.ONE_MONTH && (
+            <p className="text-muted-foreground pt-1 text-[11px]">
+              ชำระรวม ฿{Math.round(finalPrice).toLocaleString()} (
+              {currentOption?.label})
+            </p>
+          )}
+        </div>
+
+        <p className="text-muted-foreground min-h-[36px] pt-3 text-xs leading-relaxed">
+          {description}
+        </p>
+
+        <div className="border-border/60 my-5 border-t" />
+
+        {/* Features List */}
+        <ul className="text-foreground space-y-3 text-xs sm:text-sm">
+          {uniqueFeatures?.map((feature, index) => (
+            <li key={index} className="flex items-start gap-2.5">
+              <div className="text-primary mt-0.5 shrink-0" aria-hidden="true">
+                {feature.icon}
+              </div>
+              <span className="leading-snug">{feature.text}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <Separator className="my-5 max-w-[75%]" />
-      <ul className="mt-4 flex w-full grow flex-col gap-2">
-        {uniqueFeatures?.map((feature, index) => (
-          <li key={index} className="flex items-start gap-2 text-sm">
-            <div className="text-primary mt-0.5 shrink-0" aria-hidden="true">
-              {feature.icon}
-            </div>
-            <span>{feature.text}</span>
-          </li>
-        ))}
-      </ul>
-      <Button
-        asChild
-        className="mt-6 w-full"
-        variant={isPopular ? 'default' : 'outline'}
-      >
-        <Link href={`/merchant/store-settings`}>{buttonText}</Link>
-      </Button>
-    </section>
+
+      <div className="pt-6">
+        <Button
+          asChild
+          className="h-10 w-full cursor-pointer text-xs font-semibold sm:text-sm"
+          variant={isPopular ? 'default' : 'outline'}
+        >
+          <Link href={targetHref}>{buttonText}</Link>
+        </Button>
+      </div>
+    </div>
   )
 }

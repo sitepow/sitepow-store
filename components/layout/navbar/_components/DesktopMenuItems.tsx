@@ -38,7 +38,7 @@ export function DesktopMenuItems() {
           <NavigationMenuItem className="mx-0.5" key={idx}>
             {item.children ? (
               <>
-                <NavigationMenuTrigger className="font-bold opacity-60 hover:bg-neutral-900 focus:bg-neutral-900 data-open:bg-neutral-900/50 data-open:hover:bg-neutral-900 data-open:focus:bg-neutral-900 data-popup-open:bg-neutral-900/50 data-popup-open:hover:bg-neutral-900 2xl:text-lg">
+                <NavigationMenuTrigger className="text-muted-foreground hover:text-foreground font-medium transition-colors">
                   {title}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -62,6 +62,19 @@ export function DesktopMenuItems() {
                         </ListItem>
                       )
                     })}
+                    <li className="border-border/60 col-span-3 border-t pt-2">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/features"
+                          className="bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
+                        >
+                          <span>
+                            สำรวจภาพรวมฟังก์ชันระบบทั้งหมด (12 ฟังก์ชัน)
+                          </span>
+                          <span>→</span>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
                   </ul>
                 </NavigationMenuContent>
               </>
@@ -70,7 +83,7 @@ export function DesktopMenuItems() {
                 asChild
                 className={cn(
                   navigationMenuTriggerStyle(),
-                  'font-bold opacity-60 hover:bg-transparent 2xl:text-lg',
+                  'text-muted-foreground hover:text-foreground font-medium transition-colors',
                 )}
               >
                 <Link href={item.href!}>{title}</Link>

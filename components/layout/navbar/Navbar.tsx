@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
-import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { IconLogin } from '@tabler/icons-react'
@@ -65,21 +63,12 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-50 w-full bg-neutral-900">
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <Image
-            src={FALLBACK_IMAGE}
-            alt="footer-background"
-            width={800}
-            height={800}
-            className="size-full object-cover opacity-40"
-          />
-        </div>
+      <header className="border-border/40 bg-background/80 supports-[backdrop-filter]:bg-background/60 fixed top-0 left-0 z-50 w-full border-b backdrop-blur-md">
         <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
-          <LogoBrand className="text-white" />
+          <LogoBrand />
           <div className="hidden lg:block">
             <NavigationMenu>
-              <NavigationMenuList className="text-white">
+              <NavigationMenuList>
                 <DesktopMenuItems />
               </NavigationMenuList>
             </NavigationMenu>
@@ -106,20 +95,20 @@ export function Navbar() {
             )}
             <div className="flex flex-wrap gap-2">
               {!isAuthenticated && (
-                <Button size="icon-lg" variant="secondary" asChild>
+                <Button size="icon-lg" variant="ghost" asChild>
                   <Link href={loginHref} aria-label="เข้าสู่ระบบ">
                     <IconLogin className="size-[1.2rem]" />
                   </Link>
                 </Button>
               )}
-              <QuickSettingsMenu buttonVariant="secondary" />
+              <QuickSettingsMenu buttonVariant="ghost" />
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="icon-lg"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-foreground hover:bg-transparent"
+                aria-label="เมนูหลัก"
               >
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
               </Button>
             </div>
           </div>
