@@ -1,33 +1,38 @@
 'use client'
-
 import React from 'react'
+
+import { useTranslations } from 'next-intl'
 
 import { PROFIT_COMPARISON } from '@/constants/pricing'
 import { IconSparkles } from '@tabler/icons-react'
 
-export function ProfitComparisonSection() {
-  const { columns, categories } = PROFIT_COMPARISON
+import { MainSectionHeader } from '../../_components/MainSectionHeader'
+import { TableScrollHint } from '../../_components/TableScrollHint'
 
+export function ProfitComparisonSection() {
+  const t = useTranslations('pricing.profitComparison')
+  const columns: string[] =
+    (t.raw('columns') as string[]) || PROFIT_COMPARISON.columns
+  const categories = PROFIT_COMPARISON.categories.map((cat, cIdx) => ({
+    name: (t.raw(`categories.${cIdx}.name`) as string) || cat.name,
+    features: cat.features.map((feat, fIdx) => ({
+      label:
+        (t.raw(`categories.${cIdx}.features.${fIdx}.label`) as string) ||
+        feat.label,
+      values:
+        (t.raw(`categories.${cIdx}.features.${fIdx}.values`) as string[]) ||
+        feat.values,
+    })),
+  }))
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-3 text-center">
-        <span className="text-primary text-xs font-semibold">
-          เปรียบเทียบผลกำไรและความคุ้มค่า
-        </span>
-        <h3 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          เปรียบเทียบความคุ้มค่าและกำไรที่คุณได้รับจริง
-        </h3>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          เห็นความแตกต่างชัดเจนระหว่างการขายบน Marketplace
-          กับการมีระบบร้านค้าของตัวเองบน Sitepow Store
-        </p>
-      </div>
-
-      <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs md:hidden">
-        <span>เลื่อนซ้าย-ขวาเพื่อดูตาราง</span>
-        <span>⇄</span>
-      </div>
-
+      <MainSectionHeader
+        as="h3"
+        badge={t('badge')}
+        title={t('title')}
+        description={t('description')}
+      />
+      <TableScrollHint />
       <div className="border-border/80 bg-card/60 w-full overflow-hidden rounded-3xl border shadow-sm backdrop-blur-xs">
         <div className="overflow-x-auto">
           <table className="w-full min-w-180 border-collapse text-left">
@@ -61,7 +66,6 @@ export function ProfitComparisonSection() {
                       {cat.name}
                     </td>
                   </tr>
-
                   {cat.features.map((item, fIdx) => (
                     <tr
                       key={fIdx}

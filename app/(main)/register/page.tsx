@@ -17,13 +17,10 @@ export const metadata: Metadata = {
     },
   },
 }
-
 export default async function TenantRegisterPage() {
   const userSession = await getCurrentUser()
-
   if (userSession) {
     redirect('/')
   }
-
   return <RegisterForm />
 }

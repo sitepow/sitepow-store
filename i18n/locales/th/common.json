@@ -6,7 +6,9 @@
     "contact": "ติดต่อเรา",
     "login": "เข้าสู่ระบบ",
     "register": "สมัครเปิดร้าน",
-    "manageStore": "จัดการร้านค้าของคุณ"
+    "manageStore": "จัดการร้านค้าของคุณ",
+    "allFeaturesOverview": "สำรวจภาพรวมฟังก์ชันระบบทั้งหมด (12 ฟังก์ชัน)",
+    "viewAllFeatures": "ดูทั้งหมด 12 ฟังก์ชัน →"
   },
   "settings": {
     "title": "ตั้งค่าทั่วไป",
@@ -17,11 +19,54 @@
     "language": "ภาษา"
   },
   "footer": {
-    "description": "สร้างสรรค์ประสบการณ์ดิจิทัลที่ดีที่สุดสำหรับคุณ เชื่อมต่อทุกความเป็นไปได้ด้วยเทคโนโลยีที่ทันสมัย",
-    "contactInfo": "อีเมล: - เลขประจำตัวผู้เสียภาษี: -",
-    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
-    "terms": "ข้อตกลง และเงื่อนไข",
-    "rights": "All rights reserved."
+    "description": "ระบบจัดการร้านค้าและ POS อัจฉริยะสำหรับธุรกิจยุคใหม่ เชื่อมต่อหน้าร้านและออนไลน์แบบ Omnichannel ขายฟรี 0% GP พร้อม AI ตรวจสอบสลิปและตัดสต็อกอัตโนมัติ",
+    "uptime": "ระบบทำงานปกติ (99.99% Uptime)",
+    "supportHours": "ทีมงานพร้อมช่วยเหลือ 09:00 - 24:00 น. ทุกวัน",
+    "followUs": "ติดตามข่าวสารและอัปเดต",
+    "ssl": "SSL 256-bit ปลอดภัย 100%",
+    "rights": "All rights reserved.",
+    "columns": {
+      "features": {
+        "title": "ฟังก์ชันระบบ",
+        "pos": "ระบบ POS หน้าร้าน",
+        "posBadge": "ยอดนิยม",
+        "ai": "AI จัดการร้าน & ตรวจสลิป",
+        "aiBadge": "AI",
+        "inventory": "คลังสินค้า & ตัดสต็อก Real-time",
+        "onlineStore": "หน้าร้านค้าออนไลน์ส่วนตัว",
+        "crm": "ระบบสมาชิก CRM & พ้อยท์",
+        "allFeatures": "รวมฟังก์ชันทั้งหมด 12 ระบบ"
+      },
+      "download": {
+        "title": "ดาวน์โหลด & แอป",
+        "windows": "Windows POS Desktop",
+        "windowsBadge": "v2.4",
+        "android": "Android & Mobile POS",
+        "ios": "iPadOS & iOS App",
+        "macos": "macOS Application",
+        "web": "Cloud Web POS (ไม่ต้องลงแอป)",
+        "hardware": "ตรวจสอบอุปกรณ์ฮาร์ดแวร์"
+      },
+      "pricing": {
+        "title": "ราคา & โซลูชัน",
+        "packages": "แพ็กเกจและราคา",
+        "zeroGp": "ขายฟรี 0% GP ตลอดชีพ",
+        "zeroGpBadge": "ฟรี",
+        "yearlyDiscount": "ส่วนลดรายปีสูงสุด 25%",
+        "compare": "ตารางเปรียบเทียบฟังก์ชัน",
+        "roi": "คำนวณกำไรและความคุ้มค่า",
+        "enterprise": "โซลูชันสำหรับธุรกิจองค์กร"
+      },
+      "help": {
+        "title": "ช่วยเหลือ & บริษัท",
+        "contact": "ศูนย์ช่วยเหลือ & ติดต่อเรา",
+        "line": "LINE OA: @830sdfow",
+        "faq": "คำถามที่พบบ่อย (FAQ)",
+        "terms": "เงื่อนไขและข้อตกลง",
+        "privacy": "นโยบายความเป็นส่วนตัว",
+        "security": "มาตรฐานความปลอดภัยระบบ"
+      }
+    }
   },
   "actions": {
     "save": "บันทึก",

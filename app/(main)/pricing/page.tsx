@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 
 import { CtaSection } from '@/components/landing-template/CtaSection'
 import { FaqSection } from '@/components/landing-template/FaqSection'
@@ -11,17 +12,19 @@ import { PricingPackages } from './_components/PricingPackages'
 import { PricingTables } from './_components/PricingTables'
 import { ProfitComparisonSection } from './_components/ProfitComparisonSection'
 
-export const metadata: Metadata = {
-  title: 'ราคาและแพ็กเกจ | Sitepow Store: เลือกระบบที่เหมาะกับธุรกิจคุณ',
-  description:
-    'ดูราคาและแพ็กเกจจัดการร้านค้าออนไลน์ Sitepow Store เริ่มต้นฟรี ไม่มีค่าคอมมิชชั่น 0% GP ครบวงจรทั้ง POS สต็อก และจัดการออเดอร์',
-  alternates: {
-    canonical: '/pricing',
-    languages: {
-      th: '/pricing?lang=th',
-      en: '/pricing?lang=en',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('pricing.meta')
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical: '/pricing',
+      languages: {
+        th: '/pricing?lang=th',
+        en: '/pricing?lang=en',
+      },
     },
-  },
+  }
 }
 
 export default function PricingPage() {

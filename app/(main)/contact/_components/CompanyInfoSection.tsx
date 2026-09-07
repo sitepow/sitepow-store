@@ -1,59 +1,34 @@
 'use client'
-
+import { useTranslations } from "next-intl"
 import {
   IconClock,
   IconPercentage,
   IconServer,
   IconShieldCheck,
-} from '@tabler/icons-react'
+} from "@tabler/icons-react"
+import { MainSectionHeader } from "../../_components/MainSectionHeader"
 
-const HIGHLIGHTS = [
-  {
-    icon: <IconServer size={24} />,
-    title: 'เซิร์ฟเวอร์ในประเทศไทย (Local Cloud)',
-    description:
-      'ระบบตั้งอยู่บน Cloud Infrastructure คุณภาพสูงในไทย ตอบสนองรวดเร็วระดับมิลลิวินาที ใช้งานหน้าร้านได้ลื่นไหลไม่มีสะดุด',
-  },
-  {
-    icon: <IconShieldCheck size={24} />,
-    title: 'ความปลอดภัยมาตรฐานระดับธนาคาร',
-    description:
-      'เข้ารหัสข้อมูลด้วย SSL/TLS 256-bit พร้อมระบบสำรองข้อมูล (Backup) อัตโนมัติในทุกวัน ข้อมูลลูกค้าและยอดขายปลอดภัย 100%',
-  },
-  {
-    icon: <IconClock size={24} />,
-    title: 'ทีมงานซัพพอร์ตพร้อมดูแลทุกวัน',
-    description:
-      'เจ้าหน้าที่และวิศวกรคนไทยพร้อมดูแลตั้งแต่ 09:00 - 24:00 น. ทุกวัน เพื่อให้ธุรกิจของคุณดำเนินต่อไปได้อย่างมั่นใจ',
-  },
-  {
-    icon: <IconPercentage size={24} />,
-    title: 'โปร่งใส ไม่มีค่าธรรมเนียมแอบแฝง',
-    description:
-      '0% GP ทุกยอดขาย เงินโอนเข้าบัญชีคุณโดยตรง ไม่มีการหักค่าหัวคิว มีความจริงใจและแฟร์กับผู้ประกอบการที่สุด',
-  },
-]
+const INFO_ICONS = [IconServer, IconShieldCheck, IconClock, IconPercentage]
 
 export function CompanyInfoSection() {
+  const t = useTranslations("contact.companyInfo")
+  const items = INFO_ICONS.map((Icon, idx) => ({
+    icon: <Icon size={24} />,
+    title: t(`items.${idx}.title`),
+    description: t(`items.${idx}.description`),
+  }))
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-3 text-center">
-        <span className="text-primary text-xs font-semibold">
-          มาตรฐานความปลอดภัยและความเสถียร
-        </span>
-        <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          มั่นใจด้วยมาตรฐานระดับ Enterprise
-        </h2>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          โครงสร้างพื้นฐานและความมุ่งมั่นในการดูแลร้านค้าของ Sitepow Store
-        </p>
-      </div>
-
+      <MainSectionHeader
+        badge={t("badge")}
+        title={t("title")}
+        description={t("description")}
+      />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {HIGHLIGHTS.map((item, idx) => (
+        {items.map((item, idx) => (
           <div
             key={idx}
-            className="border-border/80 bg-card/60 hover:border-border relative flex flex-col justify-between rounded-3xl border p-6 shadow-xs transition-all duration-300 hover:shadow-md"
+            className="border-border/80 bg-card/60 hover:border-border relative flex flex-col justify-between rounded-3xl border p-5 shadow-xs transition-all duration-300 hover:shadow-md sm:p-6"
           >
             <div className="space-y-3">
               <div className="bg-primary/10 text-primary mb-4 flex size-10 items-center justify-center rounded-xl">

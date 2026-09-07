@@ -50,7 +50,7 @@ export function MobileMenuItems({
                     onClick={onClose}
                     className="text-primary text-xs font-semibold hover:underline"
                   >
-                    ดูทั้งหมด 12 ฟังก์ชัน →
+                    {tNav("viewAllFeatures")}
                   </Link>
                 </div>
                 <div className="border-border ml-2 flex flex-col space-y-3 border-l-2 pl-4">

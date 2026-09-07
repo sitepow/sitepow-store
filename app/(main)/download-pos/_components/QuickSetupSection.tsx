@@ -1,58 +1,40 @@
 'use client'
-
+import { useTranslations } from "next-intl"
 import {
   IconBuildingStore,
   IconDownload,
   IconPlugConnected,
-} from '@tabler/icons-react'
+} from "@tabler/icons-react"
+import { Safari } from "@/components/magicui/safari"
+import { MainSectionHeader } from "../../_components/MainSectionHeader"
 
-import { Safari } from '@/components/magicui/safari'
-
-const STEPS = [
-  {
-    step: '01',
-    title: '1. ดาวน์โหลดหรือเปิดผ่านเว็บ',
-    description:
-      'เลือกติดตั้งโปรแกรมตามระบบปฏิบัติการที่คุณใช้งาน (Windows, Android, iOS, Mac) หรือจะเปิดใช้งานผ่านเว็บเบราว์เซอร์ Chrome / Safari ได้ทันทีโดยไม่ต้องติดตั้ง',
-    icon: <IconDownload size={20} />,
-  },
-  {
-    step: '02',
-    title: '2. เข้าสู่ระบบร้านค้าของคุณ',
-    description:
-      'ล็อกอินด้วยบัญชี Sitepow Store ระบบจะทำการซิงก์ข้อมูลสินค้า หมวดหมู่ ราคาสินค้า และสต็อกคงเหลือจากทุกสาขามาให้อัตโนมัติในทันที',
-    icon: <IconBuildingStore size={20} />,
-  },
-  {
-    step: '03',
-    title: '3. เสียบอุปกรณ์แล้วเริ่มขายได้เลย',
-    description:
-      'เชื่อมต่อเครื่องพิมพ์ใบเสร็จและเครื่องยิงบาร์โค้ด เริ่มเปิดบิล คิดเงิน รับเงินโอนผ่าน PromptPay 0% GP และตัดสต็อกแบบ Real-time ทันที',
-    icon: <IconPlugConnected size={20} />,
-  },
+const STEP_ICONS = [
+  <IconDownload key="dl" size={20} />,
+  <IconBuildingStore key="bs" size={20} />,
+  <IconPlugConnected key="pc" size={20} />,
 ]
 
 export function QuickSetupSection() {
-  return (
-    <div className="mx-auto w-full max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-3 text-center">
-        <span className="text-primary text-xs font-semibold">
-          ขั้นตอนการติดตั้ง
-        </span>
-        <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
-          เริ่มต้นใช้งานง่าย ๆ ใน 3 ขั้นตอน
-        </h2>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          ไม่จำเป็นต้องมีความรู้เรื่องคอมพิวเตอร์หรือระบบไอที
-          เพียงทำตามขั้นตอนสั้น ๆ ก็พร้อมเปิดขายหน้าร้านได้ภายในไม่กี่นาที
-        </p>
-      </div>
+  const t = useTranslations("downloadPos.quickSetup")
+  const steps = [0, 1, 2].map((idx) => ({
+    step: `0${idx + 1}`,
+    title: t(`steps.${idx}.title`),
+    description: t(`steps.${idx}.description`),
+    icon: STEP_ICONS[idx],
+  }))
 
+  return (
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+      <MainSectionHeader
+        badge={t("badge")}
+        title={t("title")}
+        description={t("description")}
+      />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {STEPS.map((s, idx) => (
+        {steps.map((s, idx) => (
           <div
             key={idx}
-            className="border-border/80 bg-card/60 relative flex flex-col justify-between rounded-3xl border p-6 shadow-xs transition-all duration-300 hover:shadow-md sm:p-7"
+            className="border-border/80 bg-card/60 relative flex flex-col justify-between rounded-3xl border p-5 shadow-xs transition-all duration-300 hover:shadow-md sm:p-6"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -63,7 +45,6 @@ export function QuickSetupSection() {
                   {s.icon}
                 </div>
               </div>
-
               <h3 className="text-foreground text-lg font-bold">{s.title}</h3>
               <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
                 {s.description}
@@ -72,8 +53,7 @@ export function QuickSetupSection() {
           </div>
         ))}
       </div>
-
-      <div className="relative mx-auto w-full max-w-4xl pt-4">
+      <div className="relative mx-auto w-full max-w-4xl pt-2">
         <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
           <Safari
             url="pos.sitepow.store/cashier"

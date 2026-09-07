@@ -24,7 +24,6 @@ export const metadata: Metadata = {
     },
   },
 }
-
 export default function DownloadPosPage() {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">

@@ -1,5 +1,5 @@
 'use client'
-
+import { useTranslations } from "next-intl"
 import {
   IconBolt,
   IconBrandMastercard,
@@ -10,50 +10,30 @@ import {
   IconRobot,
   IconShieldCheck,
   IconTruck,
-} from '@tabler/icons-react'
-
-import { Marquee } from '@/components/magicui/marquee'
+} from "@tabler/icons-react"
+import { Marquee } from "@/components/magicui/marquee"
 
 const LOGO_ITEMS = [
-  { name: 'PromptPay QR', icon: IconQrcode, note: 'สแกนจ่ายเงินเข้าบัญชีตรง' },
-  {
-    name: 'Stripe Payments',
-    icon: IconBrandStripe,
-    note: 'รับบัตรเครดิตทั่วโลก',
-  },
-  {
-    name: 'AI Slip Verification',
-    icon: IconRobot,
-    note: 'ตรวจจับสลิปปลอมอัตโนมัติ',
-  },
-  {
-    name: 'Visa & Mastercard',
-    icon: IconBrandMastercard,
-    note: 'ความปลอดภัยมาตรฐาน',
-  },
-  { name: '0% GP Commission', icon: IconBolt, note: 'ไม่หักเปอร์เซ็นต์ยอดขาย' },
-  { name: 'Flash Express', icon: IconTruck, note: 'ออกเลขพัสดุอัตโนมัติ' },
-  { name: 'Kerry Express', icon: IconPackage, note: 'เชื่อมต่อพิมพ์ใบปะหน้า' },
-  { name: 'Thailand Post', icon: IconTruck, note: 'EMS และลงทะเบียน' },
-  {
-    name: 'Digital Key Codes',
-    icon: IconDeviceMobile,
-    note: 'ส่งมอบรหัส/คีย์ทันที',
-  },
-  { name: 'SSL Security', icon: IconShieldCheck, note: 'แยกฐานข้อมูลปลอดภัย' },
+  { name: "PromptPay QR", icon: IconQrcode, note: "PromptPay QR" },
+  { name: "Stripe Payments", icon: IconBrandStripe, note: "Credit / Debit Cards" },
+  { name: "AI Slip Verification", icon: IconRobot, note: "AI Slip Verification" },
+  { name: "Visa & Mastercard", icon: IconBrandMastercard, note: "Visa & Mastercard" },
+  { name: "0% GP Commission", icon: IconBolt, note: "0% GP Commission" },
+  { name: "Flash Express", icon: IconTruck, note: "Flash Express" },
+  { name: "Kerry Express", icon: IconPackage, note: "Kerry Express" },
+  { name: "Thailand Post", icon: IconTruck, note: "Thailand Post EMS" },
+  { name: "Digital Key Codes", icon: IconDeviceMobile, note: "Digital Goods & Keys" },
+  { name: "SSL Security", icon: IconShieldCheck, note: "SSL Encryption 256-bit" },
 ]
 
 export function LogosSection() {
+  const t = useTranslations("home.logos")
   return (
-    <section
-      id="logos"
-      className="border-border/40 relative w-full border-b py-12"
-    >
-      <div className="container mx-auto px-4 md:px-8">
+    <section id="logos" className="border-border/40 relative w-full border-b py-12">
+      <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <h3 className="text-muted-foreground text-center text-xs font-semibold">
-          ช่องทางชำระเงินและระบบขนส่งที่รองรับ
+          {t("title")}
         </h3>
-
         <div className="relative mt-6">
           <Marquee pauseOnHover className="[--duration:35s] [--gap:1.5rem]">
             {LOGO_ITEMS.map((item, idx) => (
@@ -75,7 +55,6 @@ export function LogosSection() {
               </div>
             ))}
           </Marquee>
-
           <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-24 bg-gradient-to-r to-transparent md:w-36" />
           <div className="from-background pointer-events-none absolute inset-y-0 right-0 h-full w-24 bg-gradient-to-l to-transparent md:w-36" />
           <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-12 bg-gradient-to-r to-transparent sm:w-24 md:w-36" />

@@ -69,7 +69,7 @@ export function DesktopMenuItems() {
                           className="bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
                         >
                           <span>
-                            สำรวจภาพรวมฟังก์ชันระบบทั้งหมด (12 ฟังก์ชัน)
+                            {tNav("allFeaturesOverview")}
                           </span>
                           <span>→</span>
                         </Link>

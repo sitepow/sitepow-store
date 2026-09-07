@@ -1,5 +1,4 @@
 'use client'
-
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
@@ -35,22 +34,22 @@ export function Footer() {
 
   const socialLinks = [
     {
-      icon: <IconBrandFacebook className="size-4.5" />,
+      icon: <IconBrandFacebook className="size-4" />,
       href: 'https://web.facebook.com/profile.php?id=61584675643468',
       label: 'Facebook',
     },
     {
-      icon: <IconBrandMessenger className="size-4.5" />,
+      icon: <IconBrandMessenger className="size-4" />,
       href: 'https://m.me/61584675643468',
       label: 'Messenger',
     },
     {
-      icon: <IconBrandLine className="size-4.5" />,
+      icon: <IconBrandLine className="size-4" />,
       href: 'https://line.me/ti/p/~@830sdfow',
       label: 'LINE Official',
     },
     {
-      icon: <IconBrandInstagram className="size-4.5" />,
+      icon: <IconBrandInstagram className="size-4" />,
       href: 'https://www.instagram.com/sitepow.store',
       label: 'Instagram',
     },
@@ -58,100 +57,109 @@ export function Footer() {
 
   const footerNav: FooterColumn[] = [
     {
-      title: 'ฟังก์ชันระบบ',
+      title: t('columns.features.title'),
       links: [
-        { label: 'ระบบ POS หน้าร้าน', href: '/features/pos', badge: 'ยอดนิยม' },
         {
-          label: 'AI จัดการร้าน & ตรวจสลิป',
+          label: t('columns.features.pos'),
+          href: '/features/pos',
+          badge: t('columns.features.posBadge'),
+        },
+        {
+          label: t('columns.features.ai'),
           href: '/features/ai',
-          badge: 'AI',
+          badge: t('columns.features.aiBadge'),
         },
+        { label: t('columns.features.inventory'), href: '/features/inventory' },
         {
-          label: 'คลังสินค้า & ตัดสต็อก Real-time',
-          href: '/features/inventory',
+          label: t('columns.features.onlineStore'),
+          href: '/features/online-store',
         },
-        { label: 'หน้าร้านค้าออนไลน์ส่วนตัว', href: '/features/online-store' },
-        { label: 'ระบบสมาชิก CRM & พ้อยท์', href: '/features/crm' },
+        { label: t('columns.features.crm'), href: '/features/crm' },
         {
-          label: 'รวมฟังก์ชันทั้งหมด 12 ระบบ',
+          label: t('columns.features.allFeatures'),
           href: '/features',
           highlight: true,
         },
       ],
     },
     {
-      title: 'ดาวน์โหลด & แอป',
+      title: t('columns.download.title'),
       links: [
-        { label: 'Windows POS Desktop', href: '/download-pos', badge: 'v2.4' },
-        { label: 'Android & Mobile POS', href: '/download-pos' },
-        { label: 'iPadOS & iOS App', href: '/download-pos' },
-        { label: 'macOS Application', href: '/download-pos' },
-        { label: 'Cloud Web POS (ไม่ต้องลงแอป)', href: '/download-pos' },
-        { label: 'ตรวจสอบอุปกรณ์ฮาร์ดแวร์', href: '/download-pos' },
-      ],
-    },
-    {
-      title: 'ราคา & โซลูชัน',
-      links: [
-        { label: 'แพ็กเกจและราคา', href: '/pricing' },
-        { label: 'ขายฟรี 0% GP ตลอดชีพ', href: '/pricing', badge: 'ฟรี' },
-        { label: 'ส่วนลดรายปีสูงสุด 25%', href: '/pricing' },
-        { label: 'ตารางเปรียบเทียบฟังก์ชัน', href: '/pricing' },
-        { label: 'คำนวณกำไรและความคุ้มค่า', href: '/pricing' },
-        { label: 'โซลูชันสำหรับธุรกิจองค์กร', href: '/contact' },
-      ],
-    },
-    {
-      title: 'ช่วยเหลือ & บริษัท',
-      links: [
-        { label: 'ศูนย์ช่วยเหลือ & ติดต่อเรา', href: '/contact' },
         {
-          label: 'LINE OA: @830sdfow',
+          label: t('columns.download.windows'),
+          href: '/download-pos',
+          badge: t('columns.download.windowsBadge'),
+        },
+        { label: t('columns.download.android'), href: '/download-pos' },
+        { label: t('columns.download.ios'), href: '/download-pos' },
+        { label: t('columns.download.macos'), href: '/download-pos' },
+        { label: t('columns.download.web'), href: '/download-pos' },
+        { label: t('columns.download.hardware'), href: '/download-pos' },
+      ],
+    },
+    {
+      title: t('columns.pricing.title'),
+      links: [
+        { label: t('columns.pricing.packages'), href: '/pricing' },
+        {
+          label: t('columns.pricing.zeroGp'),
+          href: '/pricing',
+          badge: t('columns.pricing.zeroGpBadge'),
+        },
+        { label: t('columns.pricing.yearlyDiscount'), href: '/pricing' },
+        { label: t('columns.pricing.compare'), href: '/pricing' },
+        { label: t('columns.pricing.roi'), href: '/pricing' },
+        { label: t('columns.pricing.enterprise'), href: '/contact' },
+      ],
+    },
+    {
+      title: t('columns.help.title'),
+      links: [
+        { label: t('columns.help.contact'), href: '/contact' },
+        {
+          label: t('columns.help.line'),
           href: 'https://line.me/ti/p/~@830sdfow',
           external: true,
         },
-        { label: 'คำถามที่พบบ่อย (FAQ)', href: '/#faq' },
-        { label: 'เงื่อนไขและข้อตกลง', href: '/contact' },
-        { label: 'นโยบายความเป็นส่วนตัว', href: '/contact' },
-        { label: 'มาตรฐานความปลอดภัยระบบ', href: '/contact' },
+        { label: t('columns.help.faq'), href: '/#faq' },
+        { label: t('columns.help.terms'), href: '/contact' },
+        { label: t('columns.help.privacy'), href: '/contact' },
+        { label: t('columns.help.security'), href: '/contact' },
       ],
     },
   ]
 
   return (
     <footer className="border-border/40 bg-background text-foreground border-t transition-colors">
-      <div className="container mx-auto px-6 py-14 sm:px-10 lg:py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 lg:gap-8">
-          <div className="flex flex-col justify-between sm:col-span-2 md:col-span-4 lg:col-span-2">
+      <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="flex flex-col justify-between space-y-6 lg:col-span-4">
             <div className="space-y-4">
               <LogoBrand />
               <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
-                ระบบจัดการร้านค้าและ POS อัจฉริยะสำหรับธุรกิจยุคใหม่
-                เชื่อมต่อหน้าร้านและออนไลน์แบบ Omnichannel ขายฟรี 0% GP พร้อม AI
-                ตรวจสอบสลิปและตัดสต็อกอัตโนมัติ
+                {t('description')}
               </p>
 
-              <div className="border-border/60 bg-muted/40 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
-                </span>
-                <span className="font-medium">
-                  ระบบทำงานปกติ (99.99% Uptime)
-                </span>
-              </div>
-
-              <div className="text-muted-foreground flex items-center gap-2 pt-1 text-xs">
-                <IconHeadset className="text-primary size-4" />
-                <span>ทีมงานพร้อมช่วยเหลือ 09:00 - 24:00 น. ทุกวัน</span>
+              <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:gap-3">
+                <div className="border-border/60 bg-muted/40 text-muted-foreground inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs">
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+                  </span>
+                  <span className="font-medium">{t('uptime')}</span>
+                </div>
+                <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                  <IconHeadset className="text-primary size-4 shrink-0" />
+                  <span>{t('supportHours')}</span>
+                </div>
               </div>
             </div>
 
-            <div className="pt-6">
+            <div className="pt-2">
               <p className="text-muted-foreground mb-3 text-xs font-medium">
-                ติดตามข่าวสารและอัปเดต
+                {t('followUs')}
               </p>
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-2">
                 {socialLinks.map((social) => (
                   <a
                     key={social.label}
@@ -159,7 +167,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="border-border/60 bg-muted/30 text-muted-foreground hover:border-primary/40 hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-xl border transition-all hover:shadow-xs"
+                    className="border-border/60 bg-muted/30 text-muted-foreground hover:border-primary/40 hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-xl border transition-all hover:shadow-xs active:scale-95"
                   >
                     {social.icon}
                   </a>
@@ -168,61 +176,62 @@ export function Footer() {
             </div>
           </div>
 
-          {footerNav.map((col, idx) => (
-            <div key={idx} className="flex flex-col space-y-3.5">
-              <h3 className="text-foreground text-sm font-semibold">
-                {col.title}
-              </h3>
-              <ul className="space-y-2.5 text-sm">
-                {col.links.map((link, linkIdx) => {
-                  const isExternal = 'external' in link && link.external
-                  const linkClass = `group inline-flex items-center gap-1.5 transition-colors ${
-                    'highlight' in link && link.highlight
-                      ? 'text-primary font-medium hover:underline'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`
-
-                  return (
-                    <li key={linkIdx}>
-                      {isExternal ? (
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={linkClass}
-                        >
-                          <span>{link.label}</span>
-                          <IconExternalLink className="size-3 opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </a>
-                      ) : (
-                        <Link href={link.href} className={linkClass}>
-                          <span>{link.label}</span>
-                          {link.badge && (
-                            <span className="border-primary/20 bg-primary/10 text-primary rounded-md border px-1.5 py-0.5 text-[10px] font-medium">
-                              {link.badge}
-                            </span>
-                          )}
-                        </Link>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ))}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8 lg:gap-x-8">
+            {footerNav.map((col, idx) => (
+              <div key={idx} className="flex flex-col space-y-4">
+                <h3 className="text-foreground text-sm font-semibold tracking-wide">
+                  {col.title}
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  {col.links.map((link, linkIdx) => {
+                    const isExternal = link.external
+                    const linkClass = `group inline-flex items-center gap-1.5 text-xs sm:text-sm transition-colors ${
+                      link.highlight
+                        ? 'text-primary font-medium hover:underline'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`
+                    return (
+                      <li key={linkIdx} className="leading-snug">
+                        {isExternal ? (
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={linkClass}
+                          >
+                            <span>{link.label}</span>
+                            <IconExternalLink className="size-3.5 shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </a>
+                        ) : (
+                          <Link href={link.href} className={linkClass}>
+                            <span>{link.label}</span>
+                            {link.badge && (
+                              <span className="border-primary/20 bg-primary/10 text-primary shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] leading-none font-medium">
+                                {link.badge}
+                              </span>
+                            )}
+                          </Link>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="border-border/40 mt-14 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
-          <div className="text-muted-foreground flex flex-col items-center gap-2 text-xs sm:flex-row sm:gap-4">
+        <div className="border-border/40 mt-14 flex flex-col-reverse items-center justify-between gap-4 border-t pt-8 sm:flex-row">
+          <div className="text-muted-foreground text-center text-xs sm:text-left">
             <p>
               © {currentYear} Sitepow Co., Ltd.{' '}
               <span>{t.raw('rights') as string}</span>
             </p>
           </div>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
-            <div className="flex items-center gap-1">
-              <IconShieldCheck className="text-primary size-4" />
-              <span>SSL 256-bit ปลอดภัย 100%</span>
+          <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <IconShieldCheck className="text-primary size-4 shrink-0" />
+              <span>{t('ssl')}</span>
             </div>
             <QuickSettingsMenu buttonVariant="ghost" />
           </div>

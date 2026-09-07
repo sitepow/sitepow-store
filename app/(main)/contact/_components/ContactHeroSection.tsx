@@ -1,28 +1,23 @@
 'use client'
-
-import { IconHeadset } from '@tabler/icons-react'
+import { useTranslations } from "next-intl"
+import { IconHeadset } from "@tabler/icons-react"
+import { MainHeroHeader } from "../../_components/MainHeroHeader"
 
 export function ContactHeroSection() {
+  const t = useTranslations("contact.hero")
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 px-4 pt-8 pb-4 text-center sm:px-6 lg:px-8">
-      <div className="border-primary/30 bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold shadow-2xs">
-        <IconHeadset size={15} />
-        <span>ติดต่อและศูนย์ช่วยเหลือ</span>
-      </div>
-
-      <div className="space-y-4">
-        <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
-          ติดต่อทีมงาน{' '}
+    <MainHeroHeader
+      badgeIcon={<IconHeadset size={15} />}
+      badgeText={t("badgeText")}
+      title={
+        <>
+          {t("titleStart")}{" "}
           <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent">
-            Sitepow Store
+            {t("titleGradient")}
           </span>
-        </h1>
-        <p className="text-muted-foreground mx-auto max-w-3xl text-base leading-relaxed text-balance sm:text-lg">
-          มีคำถามเกี่ยวกับระบบ ต้องการปรึกษาการใช้งาน หรือสนใจแพ็กเกจ
-          Enterprise?
-          ทีมงานผู้เชี่ยวชาญคนไทยของเราพร้อมดูแลและให้คำแนะนำในทุกวัน
-        </p>
-      </div>
-    </div>
+        </>
+      }
+      description={t("description")}
+    />
   )
 }

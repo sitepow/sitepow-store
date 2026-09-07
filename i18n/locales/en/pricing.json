@@ -1,6 +1,12 @@
 {
+  "meta": {
+    "title": "Pricing & Plans | Sitepow Store: Choose the Best Plan for Your Business",
+    "description": "Explore pricing and packages for Sitepow Store online store management. Start for free with 0% GP commission, all-in-one POS, inventory, and order management."
+  },
   "hero": {
-    "title": "Choose the Right Package for Your Store Size & Business Goals"
+    "badge": "Pricing & Packages",
+    "title": "Choose the Right Package for Your Store Size & Business Goals",
+    "description": "Transparent, cost-effective, no hidden fees, and 0% GP commission forever. Start your online store immediately."
   },
   "tabs": {
     "1month": "1 Month",
@@ -11,7 +17,12 @@
   },
   "card": {
     "from": "From",
-    "averagePerMonth": "Average {price} / month"
+    "averagePerMonth": "Average {price} / month",
+    "mostPopular": "Most Popular",
+    "freeForever": "Free Forever",
+    "perMonth": "/ month",
+    "perLifetime": "/ lifetime",
+    "totalPayment": "Total ฿{price} ({period})"
   },
   "plans": [
     {
@@ -66,7 +77,9 @@
     }
   ],
   "commonFeatures": {
+    "badge": "Standard Features Across All Packages",
     "title": "Features Included in All Packages",
+    "description": "Whichever package you start with, you get complete enterprise infrastructure and store management capabilities immediately.",
     "items": [
       "Personal online storefront (customizable to match your brand style)",
       "Bank transfer support (manual slip verification)",
@@ -87,9 +100,148 @@
       "Unified conversation inbox supporting sales chats and customer support"
     ]
   },
+  "profitComparison": {
+    "badge": "Profit & Value Comparison",
+    "title": "Compare Real Profit & Value You Actually Keep",
+    "description": "See the crystal-clear difference between selling on third-party Marketplaces versus owning your store on Sitepow Store",
+    "columns": [
+      "Comparison Point",
+      "Marketplace Platforms",
+      "Other E-Commerce SaaS",
+      "Sitepow Store"
+    ],
+    "categories": [
+      {
+        "name": "Cost & Financials",
+        "features": [
+          {
+            "label": "Commission Fees (GP/Transaction)",
+            "values": [
+              "15% - 25% (deducted per order)",
+              "Potential hidden transaction fees",
+              "0% (keep 100% of your earnings)"
+            ]
+          },
+          {
+            "label": "Pricing Model",
+            "values": [
+              "% deducted from sales volume",
+              "Fixed monthly/annual fees",
+              "No sales, no charge (fairest model)"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "AI & Technology Capabilities",
+        "features": [
+          {
+            "label": "Product Management with AI",
+            "values": [
+              "Manual typing",
+              "Manual data entry",
+              "AI Vision: snap photo, instant copywriting"
+            ]
+          },
+          {
+            "label": "Product Search (Visual Search)",
+            "values": [
+              "None",
+              "None",
+              "Yes (snap photo to instantly locate in inventory)"
+            ]
+          },
+          {
+            "label": "Infrastructure",
+            "values": [
+              "Standard shared",
+              "Shared Hosting",
+              "Enterprise (Cloud-Native + Redis Caching)"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Store & Counter Operations",
+        "features": [
+          {
+            "label": "Frontline POS System",
+            "values": ["None", "Basic only", "Full POS + Real-time stock sync"]
+          },
+          {
+            "label": "Storefront Customization",
+            "values": [
+              "Strict platform template",
+              "Limited",
+              "100% freedom (colors, media, header)"
+            ]
+          },
+          {
+            "label": "Security & Reliability",
+            "values": [
+              "Platform standard",
+              "Standard hosting",
+              "Bank-grade + Automated cloud backups"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Smart Marketing & Logistics",
+        "features": [
+          {
+            "label": "Shipping Fee Management",
+            "values": [
+              "Platform mandated rates",
+              "Fixed carrier rates",
+              "Rate Matrix (flexible custom rates, zero loss)"
+            ]
+          },
+          {
+            "label": "CRM & Promotional Tools",
+            "values": [
+              "Limited",
+              "Occasional tools",
+              "Membership loyalty + coupon campaigns"
+            ]
+          },
+          {
+            "label": "Order Fulfillment",
+            "values": [
+              "In-app only",
+              "Basic management",
+              "Omnichannel central inbox + standard airway bill printing"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Case Study: Professional Merchant (Sales 500,000 THB/mo)",
+        "features": [
+          {
+            "label": "Lost fees deducted per year",
+            "values": [
+              "~1,200,000 THB",
+              "Annual software fee + partial GP",
+              "0 THB (software fee only)"
+            ]
+          },
+          {
+            "label": "Actual Net Profit Kept",
+            "values": ["Low", "Moderate", "Highest (keep full 500k/mo)"]
+          }
+        ]
+      }
+    ]
+  },
   "tables": {
+    "badge": "Detailed Feature Comparison Table",
     "title": "Compare Feature Capabilities Across Packages",
+    "description": "Explore detailed comparisons to choose the plan that best fits your business goals",
     "choosePackage": "Choose the package that suits you",
+    "popularBadge": "Popular",
+    "supported": "Supported",
+    "notSupported": "Not Supported",
     "tiers": ["Free", "Starter", "Pro", "Ultimate"],
     "categories": [
       {

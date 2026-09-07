@@ -1,22 +1,18 @@
 'use client'
-
-import React from 'react'
-
 import { useTranslations } from 'next-intl'
 
 import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/pricing'
 
+import { MainSectionHeader } from '../../_components/MainSectionHeader'
 import { PricingCard } from './PricingCard'
 
 export function PricingPackages() {
   const t = useTranslations('pricing')
-
   const translatedPlans = PRICING_PLANS.map((plan, idx) => {
     let title = plan.title
     let description = plan.description
     let buttonText = plan.buttonText
     let uniqueFeatures = plan.uniqueFeatures
-
     try {
       title = (t.raw(`plans.${idx}.title`) as string) || plan.title
       description =
@@ -29,7 +25,6 @@ export function PricingPackages() {
           (t.raw(`plans.${idx}.features.${fIdx}`) as string) || feature.text,
       }))
     } catch {}
-
     return {
       ...plan,
       title,
@@ -38,7 +33,6 @@ export function PricingPackages() {
       uniqueFeatures,
     }
   })
-
   const translatedCommonFeatures = COMMON_FEATURES.map((feature, index) => {
     let text = feature.text
     try {
@@ -49,30 +43,23 @@ export function PricingPackages() {
       text,
     }
   })
-
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-20 px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl space-y-16 px-4 sm:px-6 lg:px-8">
       <div className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {translatedPlans.map((plan) => (
           <PricingCard key={plan.title} {...plan} />
         ))}
       </div>
-
       <div className="space-y-8">
-        <div className="mx-auto max-w-3xl space-y-3 text-center">
-          <span className="text-primary text-xs font-semibold">
-            ฟังก์ชันมาตรฐานที่มีในทุกแพ็กเกจ
-          </span>
-          <h3 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-            {(t.raw('commonFeatures.title') as string) ||
-              'ฟีเจอร์ที่ทุกแพ็กเกจได้รับเหมือนกัน'}
-          </h3>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            ไม่ว่าคุณจะเริ่มต้นด้วยแพ็กเกจใด
-            คุณจะได้รับระบบโครงสร้างพื้นฐานและการจัดการร้านค้าครบวงจรทันที
-          </p>
-        </div>
-
+        <MainSectionHeader
+          as="h3"
+          badge={t('commonFeatures.badge')}
+          title={
+            (t.raw('commonFeatures.title') as string) ||
+            'ฟีเจอร์ที่ทุกแพ็กเกจได้รับเหมือนกัน'
+          }
+          description={t('commonFeatures.description')}
+        />
         <div className="grid w-full grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {translatedCommonFeatures.map((feature, index) => (
             <div

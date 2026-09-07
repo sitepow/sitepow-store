@@ -6,7 +6,9 @@
     "contact": "Contact Us",
     "login": "Log In",
     "register": "Open Store",
-    "manageStore": "Manage Your Store"
+    "manageStore": "Manage Your Store",
+    "allFeaturesOverview": "Explore All 12 Platform Features",
+    "viewAllFeatures": "View All 12 Features →"
   },
   "settings": {
     "title": "General Settings",
@@ -17,11 +19,54 @@
     "language": "Language"
   },
   "footer": {
-    "description": "Crafting the best digital experience for you. Connecting every possibility with modern technology.",
-    "contactInfo": "Email: - Tax ID: -",
-    "privacyPolicy": "Privacy Policy",
-    "terms": "Terms & Conditions",
-    "rights": "All rights reserved."
+    "description": "Next-gen intelligent store management and POS platform for modern commerce. Connecting in-store and online omnichannel with 0% GP, AI slip verification, and automated inventory sync.",
+    "uptime": "Operational (99.99% Uptime)",
+    "supportHours": "Support team ready to help daily 09:00 - 24:00",
+    "followUs": "Follow Us & Latest Updates",
+    "ssl": "SSL 256-bit 100% Secure",
+    "rights": "All rights reserved.",
+    "columns": {
+      "features": {
+        "title": "System Features",
+        "pos": "In-Store POS Register",
+        "posBadge": "Popular",
+        "ai": "AI Store & Slip Check",
+        "aiBadge": "AI",
+        "inventory": "Inventory & Real-Time Sync",
+        "onlineStore": "Custom Online Storefront",
+        "crm": "CRM Loyalty & Points",
+        "allFeatures": "Explore All 12 Features"
+      },
+      "download": {
+        "title": "Downloads & Apps",
+        "windows": "Windows POS Desktop",
+        "windowsBadge": "v2.4",
+        "android": "Android & Mobile POS",
+        "ios": "iPadOS & iOS App",
+        "macos": "macOS Application",
+        "web": "Cloud Web POS (No Install)",
+        "hardware": "Compatible Hardware"
+      },
+      "pricing": {
+        "title": "Pricing & Solutions",
+        "packages": "Plans & Pricing",
+        "zeroGp": "0% GP Commission for Life",
+        "zeroGpBadge": "Free",
+        "yearlyDiscount": "Annual Discount up to 25%",
+        "compare": "Feature Comparison Table",
+        "roi": "Profit & Value Calculator",
+        "enterprise": "Enterprise Solutions"
+      },
+      "help": {
+        "title": "Support & Company",
+        "contact": "Help Center & Contact Us",
+        "line": "LINE OA: @830sdfow",
+        "faq": "Frequently Asked Questions (FAQ)",
+        "terms": "Terms and Conditions",
+        "privacy": "Privacy Policy",
+        "security": "Security Standards"
+      }
+    }
   },
   "actions": {
     "save": "Save",
