@@ -29,22 +29,11 @@ export default function ContactPage() {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">
       <Suspense>
-        {/* 1. Hero Section */}
         <ContactHeroSection />
-
-        {/* 2. Direct Channels (LINE, Messenger, Live Chat, Email) */}
         <ContactChannelsSection />
-
-        {/* 3. Interactive Contact Form with BorderBeam */}
         <ContactFormSection />
-
-        {/* 4. Enterprise Standards & Security Information */}
         <CompanyInfoSection />
-
-        {/* 5. Frequently Asked Questions */}
         <ContactFaqSection />
-
-        {/* 6. Closing Call to Action Banner */}
         <CtaSection />
       </Suspense>
     </MainLayout>

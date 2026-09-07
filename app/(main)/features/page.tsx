@@ -26,13 +26,8 @@ export default function FeaturesPage() {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">
       <Suspense>
-        {/* 1. Hero Header */}
         <FeaturesHeroSection />
-
-        {/* 2. Features Grid with Category Filters */}
         <FeaturesGridSection />
-
-        {/* 3. Call to Action Banner */}
         <CtaSection />
       </Suspense>
     </MainLayout>

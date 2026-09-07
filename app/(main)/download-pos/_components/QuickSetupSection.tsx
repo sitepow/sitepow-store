@@ -1,20 +1,12 @@
 'use client'
 
-import React from 'react'
-
-import Link from 'next/link'
-
 import {
   IconBuildingStore,
-  IconCheck,
-  IconDeviceLaptop,
   IconDownload,
   IconPlugConnected,
-  IconQrcode,
 } from '@tabler/icons-react'
 
 import { Safari } from '@/components/magicui/safari'
-import { Button } from '@/components/ui/button'
 
 const STEPS = [
   {
@@ -43,7 +35,6 @@ const STEPS = [
 export function QuickSetupSection() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           ขั้นตอนการติดตั้ง
@@ -57,7 +48,6 @@ export function QuickSetupSection() {
         </p>
       </div>
 
-      {/* Grid: 3 Steps Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {STEPS.map((s, idx) => (
           <div
@@ -83,7 +73,6 @@ export function QuickSetupSection() {
         ))}
       </div>
 
-      {/* Clean Safari Screen Preview with Grey Background */}
       <div className="relative mx-auto w-full max-w-4xl pt-4">
         <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
           <Safari

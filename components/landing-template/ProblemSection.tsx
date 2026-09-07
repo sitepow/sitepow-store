@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import { IconCoins, IconReceipt2, IconRefreshAlert } from '@tabler/icons-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -31,7 +29,6 @@ export function ProblemSection() {
   return (
     <section id="problem" className="relative w-full py-16 md:py-24">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
         <div className="mx-auto max-w-3xl space-y-4 pb-6 text-center">
           <h2 className="text-primary text-sm font-semibold">ปัญหาที่พบบ่อย</h2>
           <h3 className="text-foreground text-3xl font-bold tracking-tight text-balance sm:text-4xl md:text-5xl">
@@ -43,7 +40,6 @@ export function ProblemSection() {
           </p>
         </div>
 
-        {/* 3 Column Cards */}
         <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
           {PROBLEMS.map((prob, idx) => (
             <Card

@@ -10,7 +10,6 @@ export function ProfitComparisonSection() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           เปรียบเทียบผลกำไรและความคุ้มค่า
@@ -24,16 +23,14 @@ export function ProfitComparisonSection() {
         </p>
       </div>
 
-      {/* Mobile Scroll Hint */}
-      <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground md:hidden">
+      <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs md:hidden">
         <span>เลื่อนซ้าย-ขวาเพื่อดูตาราง</span>
         <span>⇄</span>
       </div>
 
-      {/* Comparison Table */}
       <div className="border-border/80 bg-card/60 w-full overflow-hidden rounded-3xl border shadow-sm backdrop-blur-xs">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] border-collapse text-left">
+          <table className="w-full min-w-180 border-collapse text-left">
             <thead>
               <tr className="border-border/80 bg-muted/40 border-b">
                 <th className="text-muted-foreground w-1/3 p-4 text-xs font-semibold sm:p-5">
@@ -56,7 +53,6 @@ export function ProfitComparisonSection() {
             <tbody className="divide-border/60 divide-y">
               {categories.map((cat, cIdx) => (
                 <React.Fragment key={cIdx}>
-                  {/* Category Header */}
                   <tr className="bg-muted/70">
                     <td
                       colSpan={4}
@@ -66,7 +62,6 @@ export function ProfitComparisonSection() {
                     </td>
                   </tr>
 
-                  {/* Feature Rows */}
                   {cat.features.map((item, fIdx) => (
                     <tr
                       key={fIdx}
@@ -81,7 +76,7 @@ export function ProfitComparisonSection() {
                       <td className="text-muted-foreground px-4 py-3.5 text-center text-xs sm:text-sm">
                         {item.values[1]}
                       </td>
-                      <td className="border-primary/15 bg-primary/[0.04] dark:bg-primary/[0.08] text-primary border-x px-4 py-3.5 text-center text-xs font-semibold sm:text-sm">
+                      <td className="border-primary/15 bg-primary/4 dark:bg-primary/8 text-primary border-x px-4 py-3.5 text-center text-xs font-semibold sm:text-sm">
                         {item.values[2]}
                       </td>
                     </tr>

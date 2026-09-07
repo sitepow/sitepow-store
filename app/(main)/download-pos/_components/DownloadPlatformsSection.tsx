@@ -227,14 +227,13 @@ export function DownloadPlatformsSection() {
                   <span>•</span>
                   <span>{platform.size}</span>
                 </div>
-                <p className="text-muted-foreground min-h-[48px] pt-2.5 text-xs leading-relaxed">
+                <p className="text-muted-foreground min-h-12 pt-2.5 text-xs leading-relaxed">
                   {platform.description}
                 </p>
               </div>
 
               <div className="border-border/60 my-5 border-t" />
 
-              {/* Features list */}
               <ul className="space-y-2.5 text-xs">
                 {platform.features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-2">
@@ -252,7 +251,6 @@ export function DownloadPlatformsSection() {
               </ul>
             </div>
 
-            {/* Downloads Buttons */}
             <div className="space-y-2 pt-6">
               {platform.downloads.map((btn, bIdx) => (
                 <Button
@@ -275,7 +273,6 @@ export function DownloadPlatformsSection() {
         ))}
       </div>
 
-      {/* Web Cloud POS Banner */}
       <div className="bg-primary/5 border-primary/20 relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-3xl border p-6 sm:p-8 md:flex-row">
         <div className="space-y-2 text-center md:text-left">
           <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-semibold">

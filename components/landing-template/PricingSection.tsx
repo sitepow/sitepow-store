@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -47,9 +47,7 @@ export function PricingSection() {
         text:
           (t.raw(`plans.${idx}.features.${fIdx}`) as string) || feature.text,
       }))
-    } catch {
-      // use defaults from PRICING_PLANS
-    }
+    } catch {}
 
     return {
       ...plan,
@@ -67,7 +65,6 @@ export function PricingSection() {
   return (
     <section id="pricing" className="relative w-full py-16 md:py-24">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mx-auto max-w-3xl space-y-4 pb-6 text-center">
           <h2 className="text-primary text-sm font-semibold">ราคาและแพ็กเกจ</h2>
           <h3 className="text-foreground text-3xl font-bold tracking-tight text-balance sm:text-4xl md:text-5xl">
@@ -77,7 +74,6 @@ export function PricingSection() {
             โปร่งใส คุ้มค่า ไม่มีค่าธรรมเนียมแอบแฝง และ 0% GP ตลอดอายุการใช้งาน
           </p>
 
-          {/* Billing Period Selector (from PRICING_OPTIONS) */}
           <div className="flex justify-center pt-4">
             <div className="bg-muted/70 border-border/80 inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-xs">
               {PRICING_OPTIONS.map((opt) => {
@@ -105,7 +101,6 @@ export function PricingSection() {
           </div>
         </div>
 
-        {/* 4 Pricing Cards (Free, Starter, Pro, Ultimate from PRICING_PLANS) */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((plan, idx) => {
             const { basePrice, discountPercent, finalPrice, averagePerMonth } =
@@ -118,14 +113,14 @@ export function PricingSection() {
             return (
               <Card
                 key={idx}
-                className={`relative flex flex-col justify-between rounded-3xl p-5 transition-all duration-300 sm:p-6 ${
+                className={`relative flex flex-col justify-between overflow-visible rounded-3xl p-5 transition-all duration-300 sm:p-6 ${
                   plan.isPopular
                     ? 'border-primary bg-card ring-primary/20 border-2 shadow-xl ring-1 lg:-translate-y-2'
                     : 'border-border/80 bg-card/60 border hover:shadow-md'
                 }`}
               >
                 {plan.isPopular && (
-                  <div className="bg-primary text-primary-foreground absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-sm">
+                  <div className="bg-primary text-primary-foreground absolute -top-3.5 left-1/2 z-10 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-sm">
                     แนะนำมากที่สุด
                   </div>
                 )}
@@ -168,14 +163,13 @@ export function PricingSection() {
                         )}
                     </div>
 
-                    <p className="text-muted-foreground min-h-[36px] pt-2 text-xs leading-relaxed">
+                    <p className="text-muted-foreground min-h-9 pt-2 text-xs leading-relaxed">
                       {plan.description}
                     </p>
                   </CardHeader>
 
                   <div className="border-border/60 my-5 border-t" />
 
-                  {/* Features List */}
                   <ul className="text-foreground space-y-3 text-xs sm:text-sm">
                     {plan.uniqueFeatures.map((feat, fIdx) => (
                       <li key={fIdx} className="flex items-start gap-2.5">
@@ -207,7 +201,6 @@ export function PricingSection() {
           })}
         </div>
 
-        {/* Link to Full Pricing & Comparison Tables */}
         <div className="mt-12 text-center">
           <Link
             href="/pricing"

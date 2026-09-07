@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import {
   Accordion,
   AccordionContent,
@@ -11,7 +9,7 @@ import {
 
 const FAQS = [
   {
-    q: 'SitePow Store คิดค่าธรรมเนียม GP ต่อยอดขายหรือไม่?',
+    q: 'Sitepow Store คิดค่าธรรมเนียม GP ต่อยอดขายหรือไม่?',
     a: 'ไม่มีเลยครับ! เราให้บริการแบบ 0% GP ไม่มีการหักเปอร์เซ็นต์ส่วนแบ่งยอดขายใดๆ ทั้งสิ้น ยอดเงินจากการสั่งซื้อของลูกค้าจะโอนตรงเข้าบัญชีธนาคารของคุณ 100%',
   },
   {
@@ -39,18 +37,16 @@ export function FaqSection() {
       className="border-border/40 relative w-full border-t py-16 md:py-24"
     >
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mx-auto max-w-3xl space-y-4 pb-6 text-center">
           <h2 className="text-primary text-sm font-semibold">คำถามที่พบบ่อย</h2>
           <h3 className="text-foreground text-3xl font-bold tracking-tight text-balance sm:text-4xl md:text-5xl">
             คำถามที่พบบ่อย
           </h3>
           <p className="text-muted-foreground text-base sm:text-lg">
-            ข้อสงสัยทั่วไปเกี่ยวกับการเริ่มต้นใช้งาน SitePow Store
+            ข้อสงสัยทั่วไปเกี่ยวกับการเริ่มต้นใช้งาน Sitepow Store
           </p>
         </div>
 
-        {/* Accordion */}
         <div className="mt-10">
           <Accordion
             type="single"

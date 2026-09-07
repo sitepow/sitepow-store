@@ -1,13 +1,11 @@
 'use client'
 
-import React from 'react'
-
 import Link from 'next/link'
 
 import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { IconBuildingStore } from '@tabler/icons-react'
-import { ArrowRight, Check } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
@@ -25,7 +23,6 @@ export function CtaSection() {
       className="bg-muted/50 border-border/40 relative w-full overflow-hidden border-t py-20 md:py-28"
     >
       <div className="container mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-        {/* Glow */}
         <div className="bg-primary/20 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
 
         <div className="mx-auto max-w-3xl space-y-6">
@@ -80,21 +77,6 @@ export function CtaSection() {
                 ดูรายละเอียดแพ็กเกจ
               </Link>
             </Button>
-          </div>
-
-          <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-6 pt-4 text-xs sm:text-sm">
-            <div className="flex items-center gap-1.5">
-              <Check size={16} className="text-emerald-500" />
-              <span>ไม่ต้องผูกบัตรเครดิต</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Check size={16} className="text-emerald-500" />
-              <span>เปิดใช้งานได้ทันทีใน 1 นาที</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Check size={16} className="text-emerald-500" />
-              <span>ซัพพอร์ตโดยทีมงานคนไทย</span>
-            </div>
           </div>
         </div>
       </div>

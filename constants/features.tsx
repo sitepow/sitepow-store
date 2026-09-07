@@ -9,7 +9,6 @@ import {
   IconDatabaseImport,
   IconDeviceLaptop,
   IconPercentage,
-  IconRobot,
   IconSparkles,
   IconTicket,
   IconTruckDelivery,
@@ -65,10 +64,6 @@ export interface FeatureItem {
   comparison: FeatureComparison
   capabilities: FeatureCapability[]
   faqs: FeatureFaq[]
-  floatingBadges: {
-    top: string
-    bottom: string
-  }
 }
 
 export const FEATURES_DATA: FeatureItem[] = [
@@ -78,7 +73,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'ประหยัดเวลาด้วยระบบปัญญาประดิษฐ์ที่ออกแบบมาเพื่อร้านค้าออนไลน์',
     category: 'ai',
     categoryLabel: 'AI & Automation',
-    icon: <IconSparkles size={28} className="text-amber-500" />,
+    icon: <IconSparkles size={28} />,
     shortDescription:
       'ถ่ายรูปปุ๊บ AI ช่วยเขียนชื่อสินค้าและคำบรรยายให้อัตโนมัติ พร้อมตรวจจับสลิปปลอมและสลิปซ้ำได้ 100%',
     fullDescription:
@@ -106,10 +101,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'อนุมัติคำสั่งซื้อและส่งมอบสินค้าได้ทันที 24 ชม.',
       },
     ],
-    floatingBadges: {
-      top: '✨ AI Vision: สร้างชื่อสินค้าและแคปชันพร้อมขายใน 3 วินาที',
-      bottom: '🛡️ AI Slip Shield: ป้องกันสลิปปลอมและสลิปซ้ำแม่นยำ 100%',
-    },
     workflow: [
       {
         step: '01',
@@ -197,7 +188,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'ไม่มีค่าคอมมิชชั่นต่อออเดอร์ กำไรสุทธิเข้ากระเป๋าคุณโดยตรง',
     category: 'sales',
     categoryLabel: 'Pricing & Finance',
-    icon: <IconPercentage size={28} className="text-emerald-500" />,
+    icon: <IconPercentage size={28} />,
     shortDescription:
       'ไม่โดนหัก 15-25% เหมือน Marketplace ลูกค้าโอนตรงเข้าบัญชีคุณทันที ไม่มีค่าธรรมเนียมแอบแฝง',
     fullDescription:
@@ -225,10 +216,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'เทียบกับยอดขาย 500,000 บาทบน Marketplace ทั่วไป',
       },
     ],
-    floatingBadges: {
-      top: '💰 0% GP Guarantee: ไม่หักเปอร์เซ็นต์ค่าคอมมิชชั่นต่อชิ้น',
-      bottom: '⚡ Instant Payout: เงินเข้าบัญชีตรงทันที ไม่ต้องรอรอบเคลียร์เงิน',
-    },
     workflow: [
       {
         step: '01',
@@ -306,7 +293,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'ตัดสต็อกอัตโนมัติแบบ Real-time ควบคุมสินค้าได้แม่นยำในที่เดียว',
     category: 'inventory',
     categoryLabel: 'Inventory & Stock',
-    icon: <IconBox size={28} className="text-blue-500" />,
+    icon: <IconBox size={28} />,
     shortDescription:
       'ดูแลสต็อกทุกสาขาได้ในที่เดียว ตัดสต็อกพร้อมกันทั้งหน้าร้านและออนไลน์ พร้อมแจ้งเตือนเมื่อสินค้าใกล้หมด',
     fullDescription:
@@ -334,10 +321,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'จัดการหลายสาขาและโอนย้ายสินค้าระหว่างคลังได้สะดวก',
       },
     ],
-    floatingBadges: {
-      top: '📦 Real-time Sync: ตัดสต็อกหน้าร้านและออนไลน์พร้อมกันทันที',
-      bottom: '🔔 Low Stock Alerts: แจ้งเตือนเมื่อสินค้าใกล้หมด วางแผนล่วงหน้าได้ทัน',
-    },
     workflow: [
       {
         step: '01',
@@ -411,7 +394,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'เปลี่ยนอุปกรณ์ที่คุณมีให้เป็นเครื่องคิดเงินอัจฉริยะ',
     category: 'pos',
     categoryLabel: 'Point of Sale (POS)',
-    icon: <IconDeviceLaptop size={28} className="text-primary" />,
+    icon: <IconDeviceLaptop size={28} />,
     shortDescription:
       'เปิดบิลคิดเงิน ยิงบาร์โค้ด และสั่งพิมพ์ใบเสร็จความร้อนได้ทันที รองรับทั้ง PC, Mac, iPad และ Android',
     fullDescription:
@@ -439,10 +422,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'เปิดบิลหน้าร้าน สต็อกหน้าเว็บตัดออกทันที',
       },
     ],
-    floatingBadges: {
-      top: '🖥️ Universal POS: รองรับทั้งคอมพิวเตอร์ แท็บเล็ต และเครื่อง POS พกพา',
-      bottom: '🧾 ESC/POS Ready: พิมพ์ใบเสร็จภาษาไทยและเปิดลิ้นชักเก็บเงินอัตโนมัติ',
-    },
     workflow: [
       {
         step: '01',
@@ -520,7 +499,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'สร้างเว็บไซต์ร้านค้าที่น่าเชื่อถือ ปิดการขายได้ตลอด 24 ชั่วโมง',
     category: 'sales',
     categoryLabel: 'Online Storefront',
-    icon: <IconBuildingStore size={28} className="text-indigo-500" />,
+    icon: <IconBuildingStore size={28} />,
     shortDescription:
       'เว็บไซต์ร้านค้าส่วนตัวที่ปรับแต่งสีสันและแบรนด์ได้อิสระ ตะกร้าสินค้าใช้ง่าย รองรับเชื่อมโดเมนส่วนตัว',
     fullDescription:
@@ -548,10 +527,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'ช่วยให้ลูกค้าค้นหาร้านของคุณเจอได้ง่ายขึ้นบน Google',
       },
     ],
-    floatingBadges: {
-      top: '🌐 Custom Domain: รองรับการเชื่อมต่อชื่อโดเมนส่วนตัวของร้านค้า',
-      bottom: '🛒 Seamless Checkout: สั่งซื้อและแนบสลิปง่ายดายภายใน 3 ขั้นตอน',
-    },
     workflow: [
       {
         step: '01',
@@ -625,7 +600,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'รวบรวมคำสั่งซื้อจากทุกช่องทางมาจัดการในที่เดียว ไม่ตกหล่น',
     category: 'sales',
     categoryLabel: 'Order Management',
-    icon: <IconClipboardList size={28} className="text-teal-500" />,
+    icon: <IconClipboardList size={28} />,
     shortDescription:
       'ดูสถานะออเดอร์ ตรวจสอบการชำระเงิน จัดเตรียมพัสดุ และอัปเดตเลขพัสดุได้สะดวกรวดเร็ว',
     fullDescription:
@@ -653,10 +628,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'ลูกค้าตรวจสถานะพัสดุได้เองผ่านหน้าเว็บ',
       },
     ],
-    floatingBadges: {
-      top: '📋 Centralized Hub: รวมออเดอร์จากทุกช่องทางในแดชบอร์ดเดียว',
-      bottom: '🚚 Auto Tracking: อัปเดตสถานะการจัดส่งให้ลูกค้าทราบอัตโนมัติ',
-    },
     workflow: [
       {
         step: '01',
@@ -724,7 +695,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'มองเห็นภาพรวมธุรกิจและตัวเลขกำไรสุทธิที่แท้จริงแบบ Real-time',
     category: 'sales',
     categoryLabel: 'Analytics & Insights',
-    icon: <IconChartBar size={28} className="text-violet-500" />,
+    icon: <IconChartBar size={28} />,
     shortDescription:
       'สรุปรายได้ สินค้าขายดี ยอดกำไร-ขาดทุนรายวัน และช่วงเวลาขายดี ช่วยวางแผนสต็อกได้อย่างแม่นยำ',
     fullDescription:
@@ -752,10 +723,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'รู้ชัดเจนว่าสินค้าตัวไหนคือหัวใจของธุรกิจ',
       },
     ],
-    floatingBadges: {
-      top: '📊 Live Dashboard: สรุปยอดขาย กำไร และจำนวนออเดอร์แบบ Real-time',
-      bottom: '📈 Top Sellers: เจาะลึกสินค้าขายดีและสินค้ากำไรสูงสุด',
-    },
     workflow: [
       {
         step: '01',
@@ -823,7 +790,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'รองรับทั้งโอนเงิน PromptPay QR และตัดบัตรเครดิต สะดวก ปลอดภัย',
     category: 'sales',
     categoryLabel: 'Payment Gateway',
-    icon: <IconCreditCard size={28} className="text-sky-500" />,
+    icon: <IconCreditCard size={28} />,
     shortDescription:
       'รับเงินโอน QR Code ไม่เสียค่าธรรมเนียม พร้อมรองรับการเชื่อมต่อ Stripe ตัดบัตรเครดิต Visa/Mastercard',
     fullDescription:
@@ -851,10 +818,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'ระบบตรวจจับยอดเงินและเปลี่ยนสถานะบิลให้อัตโนมัติ',
       },
     ],
-    floatingBadges: {
-      top: '💳 Dynamic QR: สร้าง QR Code ตรงตามยอดบิล ลูกค้าไม่ต้องพิมพ์ยอดเอง',
-      bottom: '🔒 Bank-grade Security: มาตรฐานความปลอดภัยระดับสากล PCI-DSS',
-    },
     workflow: [
       {
         step: '01',
@@ -922,7 +885,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'เปลี่ยนลูกค้าขาจรให้เป็นลูกค้าประจำที่กลับมาซื้อซ้ำอย่างยั่งยืน',
     category: 'marketing',
     categoryLabel: 'CRM & Loyalty',
-    icon: <IconUsers size={28} className="text-pink-500" />,
+    icon: <IconUsers size={28} />,
     shortDescription:
       'ระบบสะสมคะแนนจากยอดซื้อ ระบบระดับสมาชิก (VIP Tiers) และสิทธิพิเศษวันเกิด กระตุ้นยอดขายซ้ำ',
     fullDescription:
@@ -950,10 +913,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'แต้มจากการซื้อหน้าร้านและออนไลน์รวมอยู่ในบัญชีเดียวกัน',
       },
     ],
-    floatingBadges: {
-      top: '⭐ Loyalty Points: สะสมแต้มอัตโนมัติจากทุกยอดการสั่งซื้อ',
-      bottom: '👑 VIP Tiers: ยกระดับสิทธิพิเศษให้ลูกค้าประจำคนสำคัญ',
-    },
     workflow: [
       {
         step: '01',
@@ -1021,7 +980,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'เครื่องมือส่งเสริมการขายที่ช่วยกระตุ้นการตัดสินใจซื้อในทันที',
     category: 'marketing',
     categoryLabel: 'Promotions & Coupons',
-    icon: <IconTicket size={28} className="text-orange-500" />,
+    icon: <IconTicket size={28} />,
     shortDescription:
       'สร้างโค้ดส่วนลด กำหนดยอดซื้อขั้นต่ำ จัดแคมเปญ Flash Sale จำกัดเวลา และโปรโมชันส่งฟรี',
     fullDescription:
@@ -1049,10 +1008,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'ระบบเปิด-ปิดโปรโมชันตามเวลาที่ตั้งไว้ ไม่ต้องเฝ้าจอ',
       },
     ],
-    floatingBadges: {
-      top: '🏷️ Smart Coupons: สร้างโค้ดส่วนลดและจำกัดสิทธิ์ได้ตามต้องการ',
-      bottom: '⚡ Flash Sale Timer: นับเวลาถอยหลังสร้างความเร่งด่วนในการตัดสินใจซื้อ',
-    },
     workflow: [
       {
         step: '01',
@@ -1120,7 +1075,7 @@ export const FEATURES_DATA: FeatureItem[] = [
     tagline: 'ย้ายข้อมูลสินค้าจาก Marketplace เข้าสู่ร้านใหม่ได้ในคลิกเดียว',
     category: 'inventory',
     categoryLabel: 'Data & Migration',
-    icon: <IconDatabaseImport size={28} className="text-cyan-500" />,
+    icon: <IconDatabaseImport size={28} />,
     shortDescription:
       'นำเข้าสินค้าจำนวนมากจาก Lazada หรือ Shopee ผ่านไฟล์ CSV ไม่ต้องนั่งพิมพ์เองทีละชิ้น',
     fullDescription:
@@ -1148,10 +1103,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'เป็นเจ้าของข้อมูล 100% ไม่มีสัญญาผูกมัด',
       },
     ],
-    floatingBadges: {
-      top: '📁 Bulk Import: ย้ายสินค้าหลายร้อยชิ้นจาก Shopee/Lazada ในคลิกเดียว',
-      bottom: '📊 Full Export: ส่งออกยอดขาย สต็อก และรายชื่อลูกค้าเป็นไฟล์ Excel ได้ตลอดเวลา',
-    },
     workflow: [
       {
         step: '01',
@@ -1220,7 +1171,7 @@ export const FEATURES_DATA: FeatureItem[] = [
       'จัดการพัสดุอย่างมืออาชีพ พิมพ์ใบปะหน้าเร็ว และส่งเลขพัสดุอัตโนมัติ',
     category: 'sales',
     categoryLabel: 'Logistics & Shipping',
-    icon: <IconTruckDelivery size={28} className="text-lime-500" />,
+    icon: <IconTruckDelivery size={28} />,
     shortDescription:
       'พิมพ์ใบปะหน้ามาตรฐานผ่านเครื่องพิมพ์ความร้อน ออกเลข Tracking และส่งข้อความแจ้งลูกค้าอัตโนมัติ',
     fullDescription:
@@ -1248,10 +1199,6 @@ export const FEATURES_DATA: FeatureItem[] = [
         desc: 'ลูกค้าเช็คสถานะพัสดุได้เอง ลดงานแอดมินตอบแชท',
       },
     ],
-    floatingBadges: {
-      top: '🏷️ Thermal Printing: พิมพ์ใบปะหน้าสติกเกอร์ ลอกแปะกล่องพัสดุได้ทันที',
-      bottom: '🚚 Multi-Carrier: รองรับ Flash Express, Kerry, ไปรษณีย์ไทย, J&T',
-    },
     workflow: [
       {
         step: '01',

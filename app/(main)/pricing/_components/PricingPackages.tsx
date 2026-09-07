@@ -28,9 +28,7 @@ export function PricingPackages() {
         text:
           (t.raw(`plans.${idx}.features.${fIdx}`) as string) || feature.text,
       }))
-    } catch {
-      // fallback
-    }
+    } catch {}
 
     return {
       ...plan,
@@ -45,9 +43,7 @@ export function PricingPackages() {
     let text = feature.text
     try {
       text = (t.raw(`commonFeatures.items.${index}`) as string) || feature.text
-    } catch {
-      // fallback
-    }
+    } catch {}
     return {
       ...feature,
       text,
@@ -56,14 +52,12 @@ export function PricingPackages() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-20 px-4 sm:px-6 lg:px-8">
-      {/* 4 Pricing Cards */}
       <div className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {translatedPlans.map((plan) => (
           <PricingCard key={plan.title} {...plan} />
         ))}
       </div>
 
-      {/* Common Features Section */}
       <div className="space-y-8">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
           <span className="text-primary text-xs font-semibold">

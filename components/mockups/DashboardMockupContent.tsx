@@ -1,5 +1,3 @@
-import React from 'react'
-
 import {
   IconBox,
   IconCheck,
@@ -19,14 +17,13 @@ import {
 export function DashboardMockupContent() {
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-slate-950 font-sans text-xs text-slate-200 select-none">
-      {/* Top Navbar */}
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900/90 px-4">
         <div className="flex items-center gap-3">
           <div className="bg-primary flex size-7 items-center justify-center rounded-lg font-bold text-white shadow-xs">
             S
           </div>
           <span className="font-semibold tracking-tight text-white">
-            SitePow Store Admin
+            Sitepow Store Admin
           </span>
           <span className="hidden rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 sm:inline">
             ● ระบบออนไลน์ 0% GP
@@ -44,9 +41,7 @@ export function DashboardMockupContent() {
         </div>
       </div>
 
-      {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <div className="hidden w-44 shrink-0 flex-col border-r border-slate-800 bg-slate-900/40 p-2.5 md:flex">
           <div className="space-y-1">
             <div className="bg-primary/15 text-primary flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-medium">
@@ -83,9 +78,7 @@ export function DashboardMockupContent() {
           </div>
         </div>
 
-        {/* Content View */}
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
-          {/* Key Metrics */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
               <div className="flex items-center justify-between text-slate-400">
@@ -137,9 +130,7 @@ export function DashboardMockupContent() {
             </div>
           </div>
 
-          {/* Orders & POS live split */}
           <div className="grid gap-3 lg:grid-cols-3">
-            {/* Live Orders Table */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 lg:col-span-2">
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-semibold text-white">
@@ -212,7 +203,6 @@ export function DashboardMockupContent() {
               </div>
             </div>
 
-            {/* Quick POS & Channels */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
               <div className="mb-2 font-semibold text-white">
                 ช่องทางชำระเงินที่เปิดอยู่

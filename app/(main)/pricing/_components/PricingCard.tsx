@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import Link from 'next/link'
 
 import { PRICING_OPTIONS, PRICING_VALUE } from '@/constants/pricing'
@@ -71,7 +69,6 @@ export function PricingCard({
       )}
 
       <div>
-        {/* Title & Tag */}
         <div className="flex items-center justify-between">
           <h3 className="text-foreground text-xl font-bold">{title}</h3>
           {basePrice === 0 && (
@@ -81,7 +78,6 @@ export function PricingCard({
           )}
         </div>
 
-        {/* Price display */}
         <div className="pt-3">
           {discountPercent > 0 && basePrice > 0 && (
             <span className="text-muted-foreground text-xs line-through">
@@ -106,13 +102,12 @@ export function PricingCard({
           )}
         </div>
 
-        <p className="text-muted-foreground min-h-[36px] pt-3 text-xs leading-relaxed">
+        <p className="text-muted-foreground min-h-9 pt-3 text-xs leading-relaxed">
           {description}
         </p>
 
         <div className="border-border/60 my-5 border-t" />
 
-        {/* Features List */}
         <ul className="text-foreground space-y-3 text-xs sm:text-sm">
           {uniqueFeatures?.map((feature, index) => (
             <li key={index} className="flex items-start gap-2.5">

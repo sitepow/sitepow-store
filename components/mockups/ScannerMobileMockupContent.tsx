@@ -1,21 +1,13 @@
-import React from 'react'
-
 import {
-  IconBarcode,
-  IconCheck,
   IconCircleCheck,
-  IconCopy,
-  IconFileInvoice,
   IconPackage,
   IconPrinter,
-  IconShieldCheck,
   IconSparkles,
 } from '@tabler/icons-react'
 
 export function ScannerMobileMockupContent() {
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-slate-950 font-sans text-white select-none">
-      {/* Top Bar */}
       <div className="flex h-16 shrink-0 flex-col justify-end border-b border-slate-800/80 bg-slate-900/80 px-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -30,9 +22,7 @@ export function ScannerMobileMockupContent() {
         </div>
       </div>
 
-      {/* Body */}
       <div className="flex-1 space-y-3 overflow-y-auto p-3">
-        {/* Verification Card */}
         <div className="space-y-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5">
           <div className="flex items-center gap-2 text-emerald-400">
             <IconCircleCheck size={18} />
@@ -58,7 +48,6 @@ export function ScannerMobileMockupContent() {
           </div>
         </div>
 
-        {/* Shipping Label Ready */}
         <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
@@ -83,7 +72,6 @@ export function ScannerMobileMockupContent() {
         </div>
       </div>
 
-      {/* Bottom Status */}
       <div className="shrink-0 border-t border-slate-800 bg-slate-900/90 p-3 text-center">
         <div className="text-[10px] text-slate-400">
           เชื่อมต่อกับเครื่องพิมพ์ความร้อนและกล้องสแกนทันที

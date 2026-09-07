@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import Link from 'next/link'
 
-import { FEATURES_DATA, FeatureItem } from '@/constants/features'
+import { FEATURES_DATA } from '@/constants/features'
 import { IconArrowRight, IconCheck } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
@@ -28,7 +28,6 @@ export function FeaturesGridSection() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-10 px-4 sm:px-6 lg:px-8">
-      {/* Category Filter Pills */}
       <div className="flex justify-center">
         <div className="bg-muted/70 border-border/80 inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-xs">
           {CATEGORIES.map((cat) => {
@@ -50,7 +49,6 @@ export function FeaturesGridSection() {
         </div>
       </div>
 
-      {/* 12 Features Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredFeatures.map((feat) => (
           <div
@@ -58,9 +56,8 @@ export function FeaturesGridSection() {
             className="group border-border/80 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between rounded-3xl border p-5 shadow-xs transition-all duration-300 hover:shadow-md sm:p-7"
           >
             <div>
-              {/* Header: Icon & Category */}
               <div className="flex items-start justify-between">
-                <div className="bg-muted flex size-12 items-center justify-center rounded-2xl shadow-2xs transition-transform group-hover:scale-105">
+                <div className="bg-primary/10 text-primary mb-4 flex size-10 items-center justify-center rounded-xl">
                   {feat.icon}
                 </div>
                 <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-[10px] font-semibold">
@@ -68,19 +65,17 @@ export function FeaturesGridSection() {
                 </span>
               </div>
 
-              {/* Title & Description */}
               <div className="pt-5">
                 <h3 className="text-foreground group-hover:text-primary text-lg font-bold transition-colors">
                   {feat.title}
                 </h3>
-                <p className="text-muted-foreground min-h-[48px] pt-2 text-xs leading-relaxed">
+                <p className="text-muted-foreground min-h-12 pt-2 text-xs leading-relaxed">
                   {feat.shortDescription}
                 </p>
               </div>
 
               <div className="border-border/60 my-5 border-t" />
 
-              {/* Highlights */}
               <ul className="space-y-2 text-xs">
                 {feat.highlights.slice(0, 3).map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2">
@@ -98,14 +93,12 @@ export function FeaturesGridSection() {
               </ul>
             </div>
 
-            {/* Clickable Overlay */}
             <Link
               href={`/features/${feat.slug}`}
               className="absolute inset-0 z-10 cursor-pointer"
               aria-label={feat.title}
             />
 
-            {/* Action Link to Detail Page */}
             <div className="relative z-20 pt-6">
               <Button
                 asChild

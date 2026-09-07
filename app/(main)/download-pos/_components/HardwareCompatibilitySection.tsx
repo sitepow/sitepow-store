@@ -1,15 +1,10 @@
 'use client'
 
-import React from 'react'
-
 import {
   IconCheck,
-  IconCpu,
   IconDeviceDesktop,
   IconPrinter,
-  IconQrcode,
   IconScan,
-  IconShieldCheck,
   IconWallet,
 } from '@tabler/icons-react'
 
@@ -17,7 +12,7 @@ const HARDWARE_ITEMS = [
   {
     title: 'เครื่องพิมพ์ใบเสร็จความร้อน (Thermal Printer)',
     badge: 'รองรับ 58mm & 80mm',
-    icon: <IconPrinter size={26} className="text-primary" />,
+    icon: <IconPrinter size={26} />,
     description:
       'พิมพ์ใบเสร็จ ออกบิลหน้าร้าน และพิมพ์ใบส่งของได้อย่างรวดเร็ว ไม่ต้องเติมหมึก รองรับกระดาษความร้อนมาตรฐานทุกยี่ห้อ',
     specs: [
@@ -30,7 +25,7 @@ const HARDWARE_ITEMS = [
   {
     title: 'เครื่องสแกนบาร์โค้ด & QR Code (Barcode Scanner)',
     badge: 'รองรับ 1D & 2D',
-    icon: <IconScan size={26} className="text-amber-500" />,
+    icon: <IconScan size={26} />,
     description:
       'ยิงค้นหาสินค้าและคิดเงินได้ในเสี้ยววินาที ลดความผิดพลาดและประหยัดเวลาการทำงานของแคชเชียร์',
     specs: [
@@ -43,7 +38,7 @@ const HARDWARE_ITEMS = [
   {
     title: 'ลิ้นชักเก็บเงินไฟฟ้า (Electronic Cash Drawer)',
     badge: 'พอร์ต RJ11',
-    icon: <IconWallet size={26} className="text-emerald-500" />,
+    icon: <IconWallet size={26} />,
     description:
       'ควบคุมความปลอดภัยของเงินสดหน้าร้าน ลิ้นชักจะเด้งเปิดอัตโนมัติเฉพาะเมื่อมีการกดรับเงินสดและพิมพ์บิล',
     specs: [
@@ -56,7 +51,7 @@ const HARDWARE_ITEMS = [
   {
     title: 'จอแสดงผลลูกค้า & จอที่สอง (Customer Display)',
     badge: 'Dual Screen & QR',
-    icon: <IconDeviceDesktop size={26} className="text-blue-500" />,
+    icon: <IconDeviceDesktop size={26} />,
     description:
       'แสดงรายการสินค้าที่กำลังสแกน ยอดเงินรวม และสร้าง QR Code PromptPay ให้ลูกค้าใช้มือถือสแกนจ่ายได้สะดวก',
     specs: [
@@ -71,7 +66,6 @@ const HARDWARE_ITEMS = [
 export function HardwareCompatibilitySection() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-12 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           อุปกรณ์ที่รองรับ
@@ -86,7 +80,6 @@ export function HardwareCompatibilitySection() {
         </p>
       </div>
 
-      {/* 4 Hardware Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {HARDWARE_ITEMS.map((item, idx) => (
           <div
@@ -95,7 +88,7 @@ export function HardwareCompatibilitySection() {
           >
             <div>
               <div className="flex items-start justify-between gap-4">
-                <div className="bg-muted flex size-12 shrink-0 items-center justify-center rounded-2xl shadow-2xs">
+                <div className="bg-primary/10 text-primary mb-4 flex size-10 items-center justify-center rounded-xl">
                   {item.icon}
                 </div>
                 <span className="bg-primary/10 text-primary rounded-full px-3 py-0.5 text-xs font-semibold">
@@ -114,7 +107,6 @@ export function HardwareCompatibilitySection() {
 
               <div className="border-border/60 my-5 border-t" />
 
-              {/* Specs */}
               <ul className="space-y-2.5 text-xs sm:text-sm">
                 {item.specs.map((spec, sIdx) => (
                   <li key={sIdx} className="flex items-start gap-2.5">

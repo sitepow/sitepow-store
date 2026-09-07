@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { Safari } from '@/components/magicui/safari'
 
@@ -34,7 +34,6 @@ export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="relative w-full py-16 md:py-24">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mx-auto max-w-3xl space-y-4 pb-6 text-center">
           <h2 className="text-primary text-sm font-semibold">
             ขั้นตอนการทำงาน
@@ -48,9 +47,7 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        {/* 2 Column: Steps & Live Preview */}
         <div className="mt-14 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
-          {/* Left: Steps list */}
           <div className="space-y-4 lg:col-span-5">
             {STEPS.map((s, idx) => (
               <div
@@ -58,14 +55,14 @@ export function HowItWorksSection() {
                 onClick={() => setActiveStep(idx)}
                 className={`group cursor-pointer rounded-2xl border p-4 transition-all duration-300 sm:p-5 ${
                   activeStep === idx
-                    ? 'border-primary/40 bg-primary/[0.04] dark:bg-primary/[0.08] shadow-md'
+                    ? 'border-primary/40 bg-primary/4 dark:bg-primary/8 shadow-md'
                     : 'border-border/60 bg-card hover:border-border'
                 }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-3">
                     <span
-                      className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                         activeStep === idx
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground'
@@ -88,7 +85,6 @@ export function HowItWorksSection() {
             ))}
           </div>
 
-          {/* Right: Step Visual Preview */}
           <div className="lg:col-span-7">
             <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
               <Safari

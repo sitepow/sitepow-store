@@ -1,12 +1,9 @@
 'use client'
 
-import React from 'react'
-
 import {
   IconBolt,
   IconBrandMastercard,
   IconBrandStripe,
-  IconCreditCard,
   IconDeviceMobile,
   IconPackage,
   IconQrcode,
@@ -79,7 +76,6 @@ export function LogosSection() {
             ))}
           </Marquee>
 
-          {/* Left & Right Gradient Fades */}
           <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-24 bg-gradient-to-r to-transparent md:w-36" />
           <div className="from-background pointer-events-none absolute inset-y-0 right-0 h-full w-24 bg-gradient-to-l to-transparent md:w-36" />
           <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-12 bg-gradient-to-r to-transparent sm:w-24 md:w-36" />

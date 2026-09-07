@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import {
   Accordion,
   AccordionContent,
@@ -39,7 +37,6 @@ const POS_FAQS = [
 export function PosFaqSection() {
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           คำถามที่พบบ่อย
@@ -52,7 +49,6 @@ export function PosFaqSection() {
         </p>
       </div>
 
-      {/* Accordion List */}
       <div className="border-border/80 bg-card/60 rounded-3xl border p-4 shadow-xs backdrop-blur-xs sm:p-6">
         <Accordion type="single" collapsible className="w-full">
           {POS_FAQS.map((faq, idx) => (

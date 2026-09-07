@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import Link from 'next/link'
 
 import {
@@ -23,7 +21,6 @@ export function FeaturesBentoSection() {
       className="bg-muted/40 border-border/40 relative w-full border-y py-16 md:py-24"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mx-auto max-w-3xl space-y-4 pb-6 text-center">
           <h2 className="text-primary text-sm font-semibold">
             ฟังก์ชันและระบบ
@@ -37,10 +34,8 @@ export function FeaturesBentoSection() {
           </p>
         </div>
 
-        {/* Bento Grid */}
         <div className="mt-14">
-          <BentoGrid className="auto-rows-auto sm:auto-rows-[20rem] lg:auto-rows-[22rem]">
-            {/* 1. POS Omnichannel */}
+          <BentoGrid className="auto-rows-auto sm:auto-rows-80 lg:auto-rows-88">
             <BentoCard
               name="ระบบขายหน้าร้าน POS & ออนไลน์"
               className="col-span-1 md:col-span-2 lg:col-span-2"
@@ -53,7 +48,6 @@ export function FeaturesBentoSection() {
               }
             />
 
-            {/* 2. AI Slip & Product */}
             <BentoCard
               name="AI ลงสินค้า & ตรวจสลิปอัตโนมัติ"
               className="col-span-1"
@@ -66,7 +60,6 @@ export function FeaturesBentoSection() {
               }
             />
 
-            {/* 3. 0% GP */}
             <BentoCard
               name="ขายฟรี 0% GP ตลอดชีพ"
               className="col-span-1"
@@ -75,13 +68,12 @@ export function FeaturesBentoSection() {
               href="/features/zero-gp"
               cta="ดูรายละเอียด 0% GP"
               background={
-                <div className="text-foreground/[0.04] absolute right-4 bottom-2 text-7xl font-black">
+                <div className="text-foreground/4 absolute right-4 bottom-2 text-7xl font-black">
                   0%
                 </div>
               }
             />
 
-            {/* 4. Multi-branch inventory */}
             <BentoCard
               name="คลังสินค้า & สต็อกหลายสาขา"
               className="col-span-1"
@@ -94,7 +86,6 @@ export function FeaturesBentoSection() {
               }
             />
 
-            {/* 5. Supported Items */}
             <BentoCard
               name="รองรับ Physical & Digital Keys"
               className="col-span-1"
@@ -107,7 +98,6 @@ export function FeaturesBentoSection() {
               }
             />
 
-            {/* 6. CRM & Coupons */}
             <BentoCard
               name="ระบบสมาชิก CRM, สะสมแต้ม & คูปองส่วนลด"
               className="col-span-1 md:col-span-2 lg:col-span-3"
@@ -122,7 +112,6 @@ export function FeaturesBentoSection() {
           </BentoGrid>
         </div>
 
-        {/* View all features button */}
         <div className="mt-12 flex justify-center">
           <Button
             size="lg"

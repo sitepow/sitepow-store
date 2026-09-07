@@ -90,12 +90,9 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">
       <Suspense>
-        {/* 1. Feature Hero Section */}
         <div className="relative mx-auto w-full max-w-5xl space-y-8 px-4 pt-6 pb-4 text-center sm:px-6 lg:px-8">
-          {/* Subtle Ambient Radial Glow */}
           <div className="bg-primary/10 pointer-events-none absolute top-1/2 left-1/2 -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
 
-          {/* Breadcrumb & Category Badge */}
           <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
             <Link
               href="/features"
@@ -110,9 +107,8 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
             </span>
           </div>
 
-          {/* Icon & Headline */}
           <div className="space-y-4">
-            <div className="bg-card/80 border-border/80 shadow-primary/5 mx-auto inline-flex size-20 items-center justify-center rounded-3xl border shadow-xl backdrop-blur-md">
+            <div className="bg-card/80 text-primary border-border/80 shadow-primary/5 mx-auto inline-flex size-20 items-center justify-center rounded-3xl border shadow-xl backdrop-blur-md">
               {feature.icon}
             </div>
             <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
@@ -126,7 +122,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
             </p>
           </div>
 
-          {/* Direct CTA Buttons */}
           <div className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-3 pt-2 sm:max-w-none sm:flex-row sm:items-center">
             <Button
               size="lg"
@@ -154,7 +149,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
             </Button>
           </div>
 
-          {/* 3 Key Metrics Stat Cards */}
           <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 pt-4 sm:grid-cols-3">
             {feature.metrics.map((metric, mIdx) => (
               <div
@@ -162,7 +156,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
                 className="bg-card/70 border-border/80 relative flex flex-col items-center justify-center rounded-3xl border p-5 shadow-xs backdrop-blur-md transition-all duration-300 hover:shadow-md"
               >
                 <div className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
-                  <span className="from-primary bg-gradient-to-r to-orange-500 bg-clip-text text-transparent">
+                  <span className="from-primary bg-linear-to-r to-orange-500 bg-clip-text text-transparent">
                     {metric.value}
                   </span>
                 </div>
@@ -176,7 +170,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
             ))}
           </div>
 
-          {/* Highlights checklist pills */}
           <div className="mx-auto grid max-w-3xl grid-cols-1 gap-3 pt-2 text-left text-xs sm:grid-cols-2 sm:text-sm">
             {feature.highlights.map((item, idx) => (
               <div
@@ -194,7 +187,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         </div>
 
-        {/* 2. Safari Screen Preview with Floating Glassmorphic Badges */}
         <div className="relative mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
             <Safari
@@ -202,7 +194,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
               mode="simple"
               className="w-full"
             >
-              <div className="size-full min-h-[220px] bg-neutral-200 transition-colors sm:min-h-[420px] dark:bg-neutral-800" />
+              <div className="size-full min-h-55 bg-neutral-200 transition-colors sm:min-h-105 dark:bg-neutral-800" />
             </Safari>
             <BorderBeam
               size={200}
@@ -212,20 +204,8 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
               borderWidth={2}
             />
           </div>
-
-          {/* Floating UI Badges */}
-          <div className="mt-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-            <div className="bg-card/90 border-border/80 text-foreground flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-md backdrop-blur-md">
-              <span className="inline-block size-2 animate-pulse rounded-full bg-emerald-500" />
-              <span>{feature.floatingBadges.top}</span>
-            </div>
-            <div className="bg-card/90 border-border/80 text-foreground flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-md backdrop-blur-md">
-              <span>{feature.floatingBadges.bottom}</span>
-            </div>
-          </div>
         </div>
 
-        {/* 3. Before vs After Comparison (วิธีเดิม vs Sitepow Store) */}
         <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-3 text-center">
             <span className="text-primary text-xs font-semibold">
@@ -240,8 +220,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Left: Traditional */}
-            <div className="relative flex flex-col justify-between rounded-3xl border border-rose-500/20 bg-rose-500/[0.03] p-5 shadow-xs sm:p-8 dark:bg-rose-500/[0.05]">
+            <div className="relative flex flex-col justify-between rounded-3xl border border-rose-500/20 bg-rose-500/3 p-5 shadow-xs sm:p-8 dark:bg-rose-500/5">
               <div className="space-y-5">
                 <div className="flex items-center gap-3">
                   <div className="flex size-9 items-center justify-center rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400">
@@ -267,7 +246,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
               </div>
             </div>
 
-            {/* Right: Sitepow Store */}
             <div className="border-primary/40 bg-card/80 shadow-primary/5 relative flex flex-col justify-between rounded-3xl border p-5 shadow-xl backdrop-blur-md sm:p-8">
               <BorderBeam
                 size={140}
@@ -303,7 +281,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         </div>
 
-        {/* 4. 3-Step Workflow Section */}
         <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-3 text-center">
             <span className="text-primary text-xs font-semibold">
@@ -339,7 +316,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         </div>
 
-        {/* 5. Key Capabilities Bento Grid */}
         <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-3 text-center">
             <span className="text-primary text-xs font-semibold">
@@ -374,7 +350,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         </div>
 
-        {/* 6. Feature FAQ Section */}
         {feature.faqs.length > 0 && (
           <div className="mx-auto w-full max-w-4xl space-y-6 px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-3 text-center">
@@ -419,7 +394,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         )}
 
-        {/* 7. Related Features */}
         <div className="mx-auto w-full max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 text-center">
             <h3 className="text-foreground text-xl font-bold">
@@ -443,7 +417,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
                 />
                 <div>
                   <div className="flex items-center gap-3">
-                    <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-xl">
+                    <div className="bg-primary/10 text-primary mb-4 flex size-10 items-center justify-center rounded-xl">
                       {rel.icon}
                     </div>
                     <div>
@@ -477,7 +451,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           </div>
         </div>
 
-        {/* 8. Closing CTA Banner */}
         <CtaSection />
       </Suspense>
     </MainLayout>

@@ -1,12 +1,10 @@
 'use client'
 
-import React from 'react'
-
 import { useTranslations } from 'next-intl'
 
 import { PRICING_OPTIONS } from '@/constants/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { Check } from 'lucide-react'
+import { IconPackage } from '@tabler/icons-react'
 
 import { usePricingStore } from '../store'
 
@@ -17,12 +15,11 @@ export function PricingHeroSection() {
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6 px-4 pt-6 pb-2 text-center sm:px-6 lg:px-8">
-      {/* Badge */}
       <div className="border-primary/30 bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold shadow-2xs">
+        <IconPackage className="size-4" />
         <span>ราคาและแพ็กเกจ</span>
       </div>
 
-      {/* Headline */}
       <div className="space-y-3">
         <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
           {(t.raw('hero.title') as string) ||
@@ -34,29 +31,6 @@ export function PricingHeroSection() {
         </p>
       </div>
 
-      {/* Trust Highlights */}
-      <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium sm:text-sm">
-        <div className="flex items-center gap-1.5">
-          <div className="flex size-4 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-            <Check size={11} strokeWidth={3} />
-          </div>
-          <span>0% GP ทุกออเดอร์</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="flex size-4 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-            <Check size={11} strokeWidth={3} />
-          </div>
-          <span>ไม่ต้องผูกบัตรเครดิตเพื่อเริ่มฟรี</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="flex size-4 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-            <Check size={11} strokeWidth={3} />
-          </div>
-          <span>ปรับเปลี่ยนหรือยกเลิกแผนได้ตลอดเวลา</span>
-        </div>
-      </div>
-
-      {/* Floating Billing Period Pills */}
       {isMounted && (
         <div className="flex justify-center pt-4">
           <div className="bg-muted/70 border-border/80 inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-xs">

@@ -1,13 +1,9 @@
 'use client'
 
-import React from 'react'
-
 import Image from 'next/image'
 import Link from 'next/link'
 
 import {
-  IconBrandLine,
-  IconBrandMessenger,
   IconExternalLink,
   IconMail,
   IconMessageDots,
@@ -67,7 +63,6 @@ const CHANNELS = [
     buttonLabel: 'เปิด Live Chat',
     isPrimary: false,
     onClick: () => {
-      // Trigger support widget if available
       const btn = document.querySelector<HTMLButtonElement>(
         '[aria-label="support"], [aria-label="chat"]',
       )
@@ -91,7 +86,6 @@ const CHANNELS = [
 export function ContactChannelsSection() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           ช่องทางติดต่อด่วน
@@ -105,7 +99,6 @@ export function ContactChannelsSection() {
         </p>
       </div>
 
-      {/* 4 Channel Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {CHANNELS.map((ch) => (
           <div
@@ -150,7 +143,7 @@ export function ContactChannelsSection() {
                 <div className="text-primary pt-0.5 text-xs font-semibold">
                   {ch.account}
                 </div>
-                <p className="text-muted-foreground min-h-[48px] pt-2.5 text-xs leading-relaxed">
+                <p className="text-muted-foreground min-h-12 pt-2.5 text-xs leading-relaxed">
                   {ch.description}
                 </p>
               </div>

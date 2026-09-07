@@ -1,7 +1,5 @@
 'use client'
 
-import React from 'react'
-
 import Link from 'next/link'
 
 import { UserRole } from '@/generated/prisma/enums'
@@ -27,7 +25,6 @@ export function HeroSection() {
       className="relative w-full overflow-hidden pt-12 md:pt-16"
     >
       <div className="relative flex w-full flex-col items-center justify-start px-4 sm:px-6 md:px-8">
-        {/* Announcement Pill Badge */}
         <Link
           href={!isAuthenticated ? registerHref : '/merchant/dashboard'}
           className="group border-primary/30 bg-primary/10 text-primary hover:bg-primary/15 flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full border px-3 py-1.5 text-center text-xs font-medium transition-all sm:flex-nowrap sm:text-sm"
@@ -41,11 +38,10 @@ export function HeroSection() {
           <ArrowRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
         </Link>
 
-        {/* Heading & Subtitle */}
         <div className="flex w-full max-w-4xl flex-col space-y-4 pt-6 text-center">
-          <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance break-words sm:text-5xl md:text-6xl">
+          <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance wrap-break-word sm:text-5xl md:text-6xl">
             เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย{' '}
-            <span className="from-primary bg-gradient-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent">
+            <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent">
               ของการขายสินค้าออนไลน์
             </span>
           </h1>
@@ -56,7 +52,6 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Action Button */}
         <div className="mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           {!isAuthenticated ? (
             <Button
@@ -70,14 +65,13 @@ export function HeroSection() {
               >
                 <IconBuildingStore className="size-5" />
                 <span>สมัครเปิดร้านค้าฟรี</span>
-                <ArrowRight className="size-4" />
               </Link>
             </Button>
           ) : (
             <Button
               size="lg"
               asChild
-              className="shadow-primary/25 h-11 w-full px-6 text-sm font-semibold shadow-lg sm:w-auto sm:text-base"
+              className="shadow-primary/20 h-11 cursor-pointer px-6 text-sm font-semibold shadow-md"
             >
               <Link
                 href="/merchant/dashboard"
@@ -85,7 +79,6 @@ export function HeroSection() {
               >
                 <IconBuildingStore className="size-5" />
                 <span>จัดการร้านค้าของคุณ</span>
-                <ArrowRight className="size-4" />
               </Link>
             </Button>
           )}
@@ -101,13 +94,6 @@ export function HeroSection() {
           </Button>
         </div>
 
-        {/* Trust Note */}
-        <p className="text-muted-foreground mt-4 text-xs sm:text-sm">
-          ขายฟรี 0% GP ไม่มีค่าคอมมิชชั่น • ไม่ต้องผูกบัตรเครดิต •
-          เริ่มต้นใช้งานได้ใน 1 นาที
-        </p>
-
-        {/* Safari Mockup Frame */}
         <div className="relative mx-auto mt-12 flex w-full max-w-5xl items-center justify-center">
           <div className="bg-background/50 ring-border relative w-full rounded-2xl border p-2 shadow-2xl ring-1 backdrop-blur-md">
             <Safari url="app.sitepow.store" className="w-full">
@@ -122,8 +108,7 @@ export function HeroSection() {
             />
           </div>
 
-          {/* Bottom Gradient Fade */}
-          <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 -bottom-8 h-1/4 bg-gradient-to-t to-transparent" />
+          <div className="from-background via-background/80 pointer-events-none absolute inset-x-0 -bottom-8 h-1/4 bg-linear-to-t to-transparent" />
         </div>
       </div>
     </section>

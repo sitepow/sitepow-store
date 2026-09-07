@@ -3,13 +3,7 @@
 import React, { useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-import {
-  IconCheck,
-  IconLoader2,
-  IconMessageCircle,
-  IconSend,
-  IconSparkles,
-} from '@tabler/icons-react'
+import { IconCheck, IconLoader2, IconSend } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Button } from '@/components/ui/button'
@@ -52,7 +46,6 @@ export function ContactFormSection() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           ส่งข้อความถึงเรา
@@ -66,7 +59,6 @@ export function ContactFormSection() {
         </p>
       </div>
 
-      {/* Form Card with BorderBeam */}
       <div className="border-border/80 bg-card/70 relative overflow-hidden rounded-3xl border p-5 shadow-xl backdrop-blur-md sm:p-8 md:p-10">
         <BorderBeam
           size={200}
@@ -103,7 +95,6 @@ export function ContactFormSection() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {/* Full Name */}
               <div className="space-y-2">
                 <Label
                   htmlFor="fullName"
@@ -122,7 +113,6 @@ export function ContactFormSection() {
                 />
               </div>
 
-              {/* Phone */}
               <div className="space-y-2">
                 <Label
                   htmlFor="phone"
@@ -142,7 +132,6 @@ export function ContactFormSection() {
             </div>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {/* Email */}
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
@@ -161,7 +150,6 @@ export function ContactFormSection() {
                 />
               </div>
 
-              {/* Topic Select */}
               <div className="space-y-2">
                 <Label
                   htmlFor="topic"
@@ -188,7 +176,6 @@ export function ContactFormSection() {
               </div>
             </div>
 
-            {/* Message */}
             <div className="space-y-2">
               <Label
                 htmlFor="message"
@@ -208,7 +195,6 @@ export function ContactFormSection() {
               />
             </div>
 
-            {/* Submit Button */}
             <div className="pt-2">
               <Button
                 type="submit"

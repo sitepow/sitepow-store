@@ -10,7 +10,6 @@ import {
   IconBrandMessenger,
   IconExternalLink,
   IconHeadset,
-  IconServer,
   IconShieldCheck,
 } from '@tabler/icons-react'
 
@@ -121,10 +120,8 @@ export function Footer() {
 
   return (
     <footer className="border-border/40 bg-background text-foreground border-t transition-colors">
-      {/* Top Pre-Footer / Main Grid */}
       <div className="container mx-auto px-6 py-14 sm:px-10 lg:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 lg:gap-8">
-          {/* Brand & Elevator Pitch Column (Span 2 on lg) */}
           <div className="flex flex-col justify-between sm:col-span-2 md:col-span-4 lg:col-span-2">
             <div className="space-y-4">
               <LogoBrand />
@@ -134,7 +131,6 @@ export function Footer() {
                 ตรวจสอบสลิปและตัดสต็อกอัตโนมัติ
               </p>
 
-              {/* Real-time System Status Pill */}
               <div className="border-border/60 bg-muted/40 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
                 <span className="relative flex size-2">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -145,14 +141,12 @@ export function Footer() {
                 </span>
               </div>
 
-              {/* Service SLA Notice */}
               <div className="text-muted-foreground flex items-center gap-2 pt-1 text-xs">
                 <IconHeadset className="text-primary size-4" />
                 <span>ทีมงานพร้อมช่วยเหลือ 09:00 - 24:00 น. ทุกวัน</span>
               </div>
             </div>
 
-            {/* Social Links */}
             <div className="pt-6">
               <p className="text-muted-foreground mb-3 text-xs font-medium">
                 ติดตามข่าวสารและอัปเดต
@@ -174,7 +168,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Navigation Columns */}
           {footerNav.map((col, idx) => (
             <div key={idx} className="flex flex-col space-y-3.5">
               <h3 className="text-foreground text-sm font-semibold">
@@ -219,26 +212,18 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom Bar / Copyright & Settings */}
         <div className="border-border/40 mt-14 flex flex-col items-center justify-between gap-4 border-t pt-8 sm:flex-row">
           <div className="text-muted-foreground flex flex-col items-center gap-2 text-xs sm:flex-row sm:gap-4">
             <p>
               © {currentYear} Sitepow Co., Ltd.{' '}
               <span>{t.raw('rights') as string}</span>
             </p>
-            <span className="text-border hidden sm:inline">•</span>
-            <div className="inline-flex items-center gap-1.5">
-              <IconServer className="size-3.5 text-emerald-500" />
-              <span>โฮสต์บนระบบคลาวด์มาตรฐานความปลอดภัยในประเทศไทย 🇹🇭</span>
-            </div>
           </div>
-
           <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
               <IconShieldCheck className="text-primary size-4" />
               <span>SSL 256-bit ปลอดภัย 100%</span>
             </div>
-            <span className="text-border">•</span>
             <QuickSettingsMenu buttonVariant="ghost" />
           </div>
         </div>

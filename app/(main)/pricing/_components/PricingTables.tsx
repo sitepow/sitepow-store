@@ -14,7 +14,6 @@ export function PricingTables() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-3xl space-y-3 text-center">
         <span className="text-primary text-xs font-semibold">
           ตารางเปรียบเทียบฟังก์ชันอย่างละเอียด
@@ -28,16 +27,14 @@ export function PricingTables() {
         </p>
       </div>
 
-      {/* Mobile Scroll Hint */}
-      <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground md:hidden">
+      <div className="text-muted-foreground flex items-center justify-end gap-1 text-xs md:hidden">
         <span>เลื่อนซ้าย-ขวาเพื่อดูตาราง</span>
         <span>⇄</span>
       </div>
 
-      {/* Modern SaaS Comparison Table */}
       <div className="border-border/80 bg-card/60 w-full overflow-hidden rounded-3xl border shadow-sm backdrop-blur-xs">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] border-collapse text-left">
+          <table className="w-full min-w-170 border-collapse text-left">
             <thead>
               <tr className="border-border/80 bg-muted/40 border-b">
                 <th className="text-muted-foreground w-2/5 p-4 text-xs font-semibold sm:p-5">
@@ -77,7 +74,6 @@ export function PricingTables() {
 
                 return (
                   <React.Fragment key={category.name}>
-                    {/* Category Divider Header */}
                     <tr className="bg-muted/70">
                       <td
                         colSpan={tiers.length + 1}
@@ -87,7 +83,6 @@ export function PricingTables() {
                       </td>
                     </tr>
 
-                    {/* Features in Category */}
                     {category.features.map((feature, idx) => {
                       const featureLabel =
                         (t.raw(
@@ -109,7 +104,7 @@ export function PricingTables() {
                                 key={i}
                                 className={`px-4 py-3.5 text-center ${
                                   isPro
-                                    ? 'border-primary/15 bg-primary/[0.03] dark:bg-primary/[0.06] border-x'
+                                    ? 'border-primary/15 bg-primary/3 dark:bg-primary/6 border-x'
                                     : ''
                                 }`}
                               >

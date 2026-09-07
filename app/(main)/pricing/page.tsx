@@ -28,22 +28,11 @@ export default function PricingPage() {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">
       <Suspense>
-        {/* 1. Hero Header & Integrated Billing Period Selector */}
         <PricingHeroSection />
-
-        {/* 2. 4 Modern SaaS Pricing Cards & Common Features Grid */}
         <PricingPackages />
-
-        {/* 3. Profit & ROI Comparison against Marketplaces (0% GP) */}
         <ProfitComparisonSection />
-
-        {/* 4. Deep Feature-by-Feature Comparison Table */}
         <PricingTables />
-
-        {/* 5. Frequently Asked Questions */}
         <FaqSection />
-
-        {/* 6. Closing Call to Action Banner */}
         <CtaSection />
       </Suspense>
     </MainLayout>

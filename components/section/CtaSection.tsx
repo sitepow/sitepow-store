@@ -1,12 +1,9 @@
 'use client'
 
-import React from 'react'
-
 import Link from 'next/link'
 
 import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { IconCheck } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
 
 import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
@@ -28,7 +25,7 @@ export function CtaSection() {
         numSquares={25}
         maxOpacity={0.2}
         duration={3}
-        className="[mask-image:radial-gradient(ellipse_at_center,white_20%,transparent_75%)]"
+        className="mask-[radial-gradient(ellipse_at_center,white_20%,transparent_75%)]"
       />
 
       <div className="bg-primary/20 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-[350px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[100px]" />
@@ -71,21 +68,6 @@ export function CtaSection() {
           >
             <Link href="/pricing">ตรวจสอบราคาแพ็กเกจ</Link>
           </Button>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-6 pt-3 text-xs text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <IconCheck size={15} className="text-emerald-400" />
-            <span>ไม่ต้องผูกบัตรเครดิต</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <IconCheck size={15} className="text-emerald-400" />
-            <span>ติดตั้งง่าย ใช้งานได้ทันที</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <IconCheck size={15} className="text-emerald-400" />
-            <span>มีทีมงานซัพพอร์ตภาษาไทย</span>
-          </div>
         </div>
       </div>
     </section>

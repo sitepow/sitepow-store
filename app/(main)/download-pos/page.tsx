@@ -29,22 +29,11 @@ export default function DownloadPosPage() {
   return (
     <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-24">
       <Suspense>
-        {/* 1. Hero Section */}
         <DownloadHeroSection />
-
-        {/* 2. Multi-Platform Download Cards (Windows, Android, iOS, Mac, Web POS) */}
         <DownloadPlatformsSection />
-
-        {/* 3. Hardware Compatibility Guide */}
         <HardwareCompatibilitySection />
-
-        {/* 4. 3-Step Quick Setup Guide */}
         <QuickSetupSection />
-
-        {/* 5. POS & Hardware Frequently Asked Questions */}
         <PosFaqSection />
-
-        {/* 6. Closing Call to Action Banner */}
         <CtaSection />
       </Suspense>
     </MainLayout>
