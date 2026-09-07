@@ -96,7 +96,11 @@ export function HeroSection() {
 
         <div className="relative mx-auto mt-12 flex w-full max-w-5xl items-center justify-center">
           <div className="bg-background/50 ring-border relative w-full rounded-2xl border p-2 shadow-2xl ring-1 backdrop-blur-md">
-            <Safari url="app.sitepow.store" className="w-full">
+            <Safari
+              url="app.sitepow.store"
+              className="w-full"
+              videoSrc={'/hero-section.webm'}
+            >
               <div className="size-full bg-neutral-200 dark:bg-neutral-800" />
             </Safari>
             <BorderBeam

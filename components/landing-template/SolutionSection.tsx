@@ -38,9 +38,11 @@ export function SolutionSection() {
             </div>
 
             <div className="border-border relative mt-6 overflow-hidden rounded-xl border shadow-sm transition-transform duration-300 group-hover:-translate-y-1">
-              <Safari url="pos.sitepow.store" mode="simple" className="w-full">
-                <div className="size-full bg-neutral-200 dark:bg-neutral-800" />
-              </Safari>
+              <Safari
+                url="pos.sitepow.store"
+                className="w-full"
+                videoSrc="/pos-section.webm"
+              />
             </div>
           </div>
 
