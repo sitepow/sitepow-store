@@ -204,5 +204,13 @@
         "description": "Generate shipping labels with complete order details instantly. Compatible with thermal printers <hilight>to eliminate handwriting and fulfillment errors.</hilight>"
       }
     ]
+  },
+  "blogs": {
+    "badge": "Blogs & Insights",
+    "title": "Tips and Insights to Accelerate Your Business Growth",
+    "description": "Stay updated with e-commerce trends, AI automation strategies, and practical sales-boosting guides.",
+    "readMore": "Read more",
+    "viewAll": "View all articles",
+    "readingTime": "{minutes} min read"
   }
 }

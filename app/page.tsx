@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 
+import { BlogsSection } from '@/components/landing-template/BlogsSection'
 import { CtaSection } from '@/components/landing-template/CtaSection'
 import { FaqSection } from '@/components/landing-template/FaqSection'
 import { FeaturesBentoSection } from '@/components/landing-template/FeaturesBentoSection'
@@ -23,6 +24,7 @@ export default function HomePage() {
       <HowItWorksSection />
       <FeaturesBentoSection />
       <PricingSection />
+      <BlogsSection />
       <FaqSection />
       <CtaSection />
     </MainLayout>

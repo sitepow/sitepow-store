@@ -122,6 +122,7 @@ export function Footer() {
           external: true,
         },
         { label: t('columns.help.faq'), href: '/#faq' },
+        { label: t('columns.help.blogs'), href: '/blogs' },
         { label: t('columns.help.terms'), href: '/contact' },
         { label: t('columns.help.privacy'), href: '/contact' },
         { label: t('columns.help.security'), href: '/contact' },
