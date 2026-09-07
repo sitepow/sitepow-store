@@ -27,32 +27,95 @@ const dancingScript = Dancing_Script({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://sitepow.store'),
+  applicationName: 'Sitepow Store',
   title: {
-    default: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+    default:
+      'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
     template: '%s | Sitepow Store',
   },
   description:
-    'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
+    'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน จัดการสต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน ระบบตัวแทนจำหน่าย ขายฟรี 0% GP สมัครเปิดร้านฟรี',
   keywords: [
     'Sitepow',
+    'Sitepow Store',
+    'ไซต์พาว',
     'ระบบจัดการร้านค้าออนไลน์',
-    'จัดการสต็อกสินค้า',
-    'ระบบหลังบ้านร้านค้า',
-    'ขายของออนไลน์',
+    'เปิดร้านค้าออนไลน์ฟรี',
+    'โปรแกรมจัดการร้านค้า',
+    'ระบบหลังบ้านร้านค้าออนไลน์',
+    'ระบบขายของออนไลน์',
+    'เว็บบอร์ดขายของออนไลน์',
+    'แพลตฟอร์มขายของออนไลน์',
+    'ขายของออนไลน์ 0% GP',
+    'เว็บขายของไม่หัก GP',
+
+    'โปรแกรม POS',
+    'ระบบ POS หน้าร้าน',
+    'โปรแกรมคิดเงินหน้าร้าน',
+    'ระบบขายหน้าร้าน',
+    'เครื่องคิดเงิน POS',
+    'พิมพ์ใบเสร็จความร้อน',
+    'ระบบ POS สแกนบาร์โค้ด',
+
+    'ระบบจัดการสต็อกสินค้า',
     'โปรแกรมสต็อกสินค้า',
+    'จัดการสต็อกสินค้าหลายสาขา',
+    'ระบบตัดสต็อกอัตโนมัติ',
+    'เช็กสต็อกสินค้า',
+    'ระบบโอนย้ายสินค้า',
+    'Stock Transfer',
+    'Stock Adjustment',
+    'บริหารคลังสินค้า',
+
+    'ระบบจัดการออเดอร์',
+    'รวมออเดอร์ทุกช่องทาง',
+    'พิมพ์ใบปะหน้าพัสดุ',
+    'โปรแกรมพิมพ์ใบปะหน้า',
+    'ระบบแจ้งสถานะพัสดุ',
+    'เช็คเลขพัสดุอัตโนมัติ',
+
+    'AI ตรวจสลิป',
+    'ระบบตรวจสลิปโอนเงิน',
+    'สแกนสลิปโอนเงินอัตโนมัติ',
+    'เช็กสลิปปลอม',
+    'ระบบรับชำระเงิน QR PromptPay',
+    'บันทึกรายรับรายจ่ายร้านค้า',
+    'คำนวณกำไรสุทธิ',
+
+    'ระบบตัวแทนจำหน่าย',
+    'ระบบขายส่ง B2B',
+    'ตั้งราคาส่งตัวแทน',
+    'สัญญาตัวแทนจำหน่าย',
+
+    'ระบบสะสมแต้ม',
+    'ระบบสมาชิก CRM',
+    'คูปองส่วนลดร้านค้า',
+    'โปรโมชั่น Flash Sale',
+    'รีวิวสะสมคะแนน',
+
+    'ระบบขายสินค้าดิจิทัล',
+    'ขายคีย์เกมอัตโนมัติ',
+    'ระบบส่งไฟล์ดาวน์โหลด',
+    'ระบบจัดการสิทธิ์พนักงาน',
   ],
+  authors: [{ name: 'Sitepow Store', url: 'https://sitepow.store' }],
+  creator: 'Sitepow Store',
+  publisher: 'Sitepow Store',
+  category: 'ecommerce',
+  classification:
+    'Business & Productivity Software, E-Commerce SaaS, POS System',
   alternates: {
     canonical: '/',
     languages: {
       th: '/?lang=th',
       en: '/?lang=en',
-      zh: '/?lang=cn',
     },
   },
   openGraph: {
-    title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+    title:
+      'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
     description:
-      'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
+      'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน จัดการสต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน ระบบตัวแทนจำหน่าย ขายฟรี 0% GP สมัครเปิดร้านฟรี',
     url: 'https://sitepow.store',
     siteName: 'Sitepow Store',
     locale: 'th_TH',
@@ -68,9 +131,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+    title:
+      'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
     description:
-      'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
+      'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน จัดการสต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน ระบบตัวแทนจำหน่าย ขายฟรี 0% GP สมัครเปิดร้านฟรี',
     images: ['/images/seo-cover.png'],
   },
   robots: {
@@ -96,7 +160,7 @@ const jsonLd = {
       name: 'Sitepow Store',
       alternateName: ['Sitepow', 'ไซต์พาว'],
       description:
-        'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว',
+        'Sitepow Store ระบบจัดการร้านค้าออนไลน์ครบวงจร จัดการสินค้า สต็อก ออเดอร์ POS และ AI ตรวจสลิป',
       inLanguage: ['th', 'en'],
       potentialAction: {
         '@type': 'SearchAction',
@@ -115,6 +179,42 @@ const jsonLd = {
         'https://www.instagram.com/sitepow.store',
         'https://line.me/ti/p/~@830sdfow',
       ],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://sitepow.store/#software',
+      name: 'Sitepow Store',
+      operatingSystem: 'All (Cloud-based Web Application)',
+      applicationCategory: 'BusinessApplication',
+      applicationSubCategory: 'E-commerce & POS Management Software',
+      description:
+        'Sitepow Store ระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน สต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน และระบบตัวแทนจำหน่าย 0% GP',
+      url: 'https://sitepow.store',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'THB',
+        priceValidUntil: '2028-12-31',
+        availability: 'https://schema.org/InStock',
+        description: 'เริ่มต้นใช้งานฟรี 0% GP ไม่มีค่าคอมมิชชั่น',
+      },
+      featureList: [
+        'ระบบจัดการร้านค้าออนไลน์และหน้าเว็บส่วนตัว 0% GP',
+        'โปรแกรม POS ขายหน้าร้านพร้อมตัดสต็อก Real-time',
+        'ระบบจัดการสต็อกสินค้าหลายสาขา (Multi-Branch Inventory & Stock Transfer)',
+        'AI ตรวจสอบสลิปโอนเงินอัตโนมัติ ป้องกันสลิปปลอม (Slip Verification)',
+        'ระบบจัดการออเดอร์รวมศูนย์และพิมพ์ใบปะหน้าพัสดุ',
+        'ระบบตัวแทนจำหน่ายและราคาส่ง B2B (Reseller System)',
+        'ระบบสะสมแต้ม CRM และคูปองโปรโมชัน',
+        'รองรับสินค้าทั่วไปและสินค้าดิจิทัล (Digital Keys & Downloads)',
+      ],
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        ratingCount: '128',
+        bestRating: '5',
+        worstRating: '1',
+      },
     },
     {
       '@type': 'ItemList',
