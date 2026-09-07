@@ -41,18 +41,18 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0 (Latest)',
     size: '85 MB',
     requirements: 'Windows 10 / 11 (64-bit)',
-    icon: <IconBrandWindows size={32} className="text-blue-500" />,
+    icon: <IconBrandWindows size={30} className="text-blue-500" />,
     isFeatured: true,
     downloads: [
       {
         href: '#',
         isPrimary: true,
-        icon: <IconDownload size={16} />,
+        icon: <IconDownload size={15} />,
       },
       {
         href: '#',
         isPrimary: false,
-        icon: <IconDownload size={16} />,
+        icon: <IconDownload size={15} />,
       },
     ],
   },
@@ -61,17 +61,17 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '45 MB',
     requirements: 'Android 8.0+',
-    icon: <IconBrandAndroid size={32} className="text-emerald-500" />,
+    icon: <IconBrandAndroid size={30} className="text-emerald-500" />,
     downloads: [
       {
         href: '#',
         isPrimary: true,
-        icon: <IconDownload size={16} />,
+        icon: <IconDownload size={15} />,
       },
       {
         href: '#',
         isPrimary: false,
-        icon: <IconExternalLink size={16} />,
+        icon: <IconExternalLink size={15} />,
       },
     ],
   },
@@ -80,17 +80,17 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '38 MB',
     requirements: 'iPadOS / iOS 15.0+',
-    icon: <IconDeviceIpad size={32} className="text-indigo-500" />,
+    icon: <IconDeviceIpad size={30} className="text-indigo-500" />,
     downloads: [
       {
         href: '#',
         isPrimary: true,
-        icon: <IconExternalLink size={16} />,
+        icon: <IconExternalLink size={15} />,
       },
       {
         href: '/merchant/pos',
         isPrimary: false,
-        icon: <IconWorld size={16} />,
+        icon: <IconWorld size={15} />,
       },
     ],
   },
@@ -99,12 +99,12 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '92 MB',
     requirements: 'macOS 12.0+ (Apple Silicon & Intel)',
-    icon: <IconBrandApple size={32} className="text-foreground" />,
+    icon: <IconBrandApple size={30} className="text-foreground" />,
     downloads: [
       {
         href: '#',
         isPrimary: true,
-        icon: <IconDownload size={16} />,
+        icon: <IconDownload size={15} />,
       },
     ],
   },
@@ -127,18 +127,18 @@ export function DownloadPlatformsSection() {
   return (
     <section
       id="platforms"
-      className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8"
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
     >
       <MainSectionHeader
         badge={t('badge')}
         title={t('title')}
         description={t('description')}
       />
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
         {platforms.map((platform) => (
           <div
             key={platform.id}
-            className={`relative flex flex-col justify-between rounded-3xl p-5 transition-all duration-300 sm:p-6 ${
+            className={`relative flex flex-col justify-between rounded-2xl p-4 transition-all duration-300 sm:rounded-3xl sm:p-6 ${
               platform.isFeatured
                 ? 'border-primary bg-card/90 ring-primary/20 border-2 shadow-xl ring-1 lg:-translate-y-2'
                 : 'border-border/80 bg-card/60 hover:border-border border hover:shadow-md'
@@ -146,7 +146,7 @@ export function DownloadPlatformsSection() {
           >
             {platform.isFeatured && (
               <>
-                <div className="bg-primary text-primary-foreground absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-sm">
+                <div className="bg-primary text-primary-foreground absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-2.5 py-0.5 text-[11px] font-semibold shadow-sm sm:-top-3.5 sm:px-3 sm:text-xs">
                   {t('recommendedBadge')}
                 </div>
                 <BorderBeam
@@ -160,28 +160,28 @@ export function DownloadPlatformsSection() {
             )}
             <div>
               <div className="flex items-start justify-between">
-                <div className="bg-muted/80 flex size-12 items-center justify-center rounded-2xl shadow-2xs">
+                <div className="bg-muted/80 flex size-10 items-center justify-center rounded-xl shadow-2xs sm:size-12 sm:rounded-2xl">
                   {platform.icon}
                 </div>
-                <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-[10px] font-semibold">
+                <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5">
                   {platform.badge}
                 </span>
               </div>
-              <div className="pt-4">
-                <h3 className="text-foreground text-lg font-bold">
+              <div className="pt-2.5 sm:pt-4">
+                <h3 className="text-foreground text-base font-bold sm:text-lg">
                   {platform.name}
                 </h3>
-                <div className="text-muted-foreground flex items-center gap-2 pt-1 text-[11px]">
+                <div className="text-muted-foreground flex items-center gap-2 pt-0.5 text-[11px]">
                   <span>{platform.version}</span>
                   <span>•</span>
                   <span>{platform.size}</span>
                 </div>
-                <p className="text-muted-foreground min-h-12 pt-2.5 text-xs leading-relaxed">
+                <p className="text-muted-foreground min-h-auto pt-1.5 text-xs leading-relaxed sm:min-h-12 sm:pt-2.5">
                   {platform.description}
                 </p>
               </div>
-              <div className="border-border/60 my-5 border-t" />
-              <ul className="space-y-2.5 text-xs">
+              <div className="border-border/60 my-3.5 border-t sm:my-5" />
+              <ul className="space-y-2 text-xs sm:space-y-2.5">
                 {platform.features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <div
@@ -197,7 +197,7 @@ export function DownloadPlatformsSection() {
                 ))}
               </ul>
             </div>
-            <div className="space-y-2 pt-6">
+            <div className="space-y-2 pt-4 sm:pt-6">
               {platform.downloads.map((btn, bIdx) => (
                 <Button
                   key={bIdx}
@@ -211,20 +211,20 @@ export function DownloadPlatformsSection() {
                   </Link>
                 </Button>
               ))}
-              <div className="text-muted-foreground pt-1 text-center text-[10px]">
+              <div className="text-muted-foreground pt-0.5 text-center text-[10px]">
                 {t('systemRequirements')} {platform.requirements}
               </div>
             </div>
           </div>
         ))}
       </div>
-      <div className="bg-primary/5 border-primary/20 relative flex flex-col items-center justify-between gap-6 overflow-hidden rounded-3xl border p-6 sm:p-8 md:flex-row">
-        <div className="space-y-2 text-center md:text-left">
-          <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-semibold">
+      <div className="bg-primary/5 border-primary/20 relative flex flex-col items-center justify-between gap-4 overflow-hidden rounded-2xl border p-4 sm:gap-6 sm:rounded-3xl sm:p-8 md:flex-row">
+        <div className="space-y-1.5 text-center sm:space-y-2 md:text-left">
+          <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
             <IconSparkles size={14} />
             <span>{t('webBanner.badge')}</span>
           </div>
-          <h3 className="text-foreground text-xl font-bold sm:text-2xl">
+          <h3 className="text-foreground text-lg font-bold sm:text-2xl">
             {t('webBanner.title')}
           </h3>
           <p className="text-muted-foreground max-w-2xl text-xs sm:text-sm">
@@ -234,14 +234,14 @@ export function DownloadPlatformsSection() {
         <Button
           size="lg"
           asChild
-          className="shadow-primary/20 h-11 w-full shrink-0 cursor-pointer px-6 text-sm font-semibold shadow-md sm:w-auto"
+          className="shadow-primary/20 h-10 w-full shrink-0 cursor-pointer px-5 text-xs font-semibold shadow-md sm:h-11 sm:w-auto sm:px-6 sm:text-sm"
         >
           <Link
             href="/merchant/pos"
             target="_blank"
             className="flex items-center justify-center gap-2"
           >
-            <IconWorld size={18} />
+            <IconWorld size={16} />
             <span>{t('webBanner.btn')}</span>
           </Link>
         </Button>

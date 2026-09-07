@@ -11,11 +11,13 @@ interface FaqItem {
   q: string
   a: string
 }
+
 interface MainFaqAccordionProps {
   items: FaqItem[]
   idPrefix?: string
   className?: string
 }
+
 export function MainFaqAccordion({
   items,
   idPrefix = 'faq',
@@ -24,7 +26,7 @@ export function MainFaqAccordion({
   return (
     <div
       className={cn(
-        'border-border/80 bg-card/60 rounded-3xl border p-4 shadow-xs backdrop-blur-xs sm:p-6',
+        'border-border/80 bg-card/60 rounded-2xl border p-3.5 shadow-xs backdrop-blur-xs sm:rounded-3xl sm:p-6',
         className,
       )}
     >
@@ -35,10 +37,10 @@ export function MainFaqAccordion({
             value={`${idPrefix}-${idx}`}
             className="border-border/60"
           >
-            <AccordionTrigger className="text-foreground hover:text-primary cursor-pointer py-4 text-left text-sm font-semibold sm:text-base">
+            <AccordionTrigger className="text-foreground hover:text-primary cursor-pointer py-3 text-left text-xs font-semibold sm:py-4 sm:text-base">
               {faq.q}
             </AccordionTrigger>
-            <AccordionContent className="text-muted-foreground pb-4 text-xs leading-relaxed sm:text-sm">
+            <AccordionContent className="text-muted-foreground pb-3 text-xs leading-relaxed sm:pb-4 sm:text-sm">
               {faq.a}
             </AccordionContent>
           </AccordionItem>

@@ -71,9 +71,9 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
   )
 
   return (
-    <MainLayout className="flex flex-col items-center gap-16 overflow-hidden pt-4 pb-12 md:gap-20">
-      <div className="mx-auto w-full max-w-4xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+    <MainLayout className="flex flex-col items-center gap-8 overflow-hidden pt-2 pb-10 sm:gap-12 sm:pt-4 sm:pb-12 md:gap-20">
+      <div className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link
               href="/blogs"
@@ -85,22 +85,22 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
           </Button>
           <BlogShareButton title={blog.title} />
         </div>
-        <div className="space-y-4 text-start">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-2.5 text-start sm:space-y-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             {blog.tags.map((tag) => (
               <span
                 key={tag}
-                className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold sm:px-3 sm:py-1 sm:text-xs"
               >
                 <Tag className="size-3" />
                 {tag}
               </span>
             ))}
           </div>
-          <h1 className="text-foreground text-2xl leading-tight font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+          <h1 className="text-foreground text-xl leading-tight font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
             {blog.title}
           </h1>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-4 pt-1 text-xs font-medium">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-3 pt-0.5 text-[11px] font-medium sm:gap-4 sm:pt-1 sm:text-xs">
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="size-3.5" />
               {formattedDate}
@@ -112,11 +112,11 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
             <span>•</span>
             <span>{t('author')}</span>
           </div>
-          <p className="text-muted-foreground border-border/70 border-b pt-2 pb-6 text-sm leading-relaxed sm:text-base">
+          <p className="text-muted-foreground border-border/70 border-b pt-1 pb-4 text-xs leading-relaxed sm:pt-2 sm:pb-6 sm:text-base">
             {blog.description}
           </p>
         </div>
-        <div className="border-border/80 bg-muted relative aspect-video w-full overflow-hidden rounded-3xl border shadow-md">
+        <div className="border-border/80 bg-muted relative aspect-video w-full overflow-hidden rounded-2xl border shadow-md sm:rounded-3xl">
           <Image
             src={blog.image}
             alt={blog.title}
@@ -126,18 +126,18 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
             sizes="(max-width: 1024px) 100vw, 896px"
           />
         </div>
-        <div className="mx-auto w-full pt-4">
+        <div className="mx-auto w-full pt-2 sm:pt-4">
           <MarkdownRenderer content={blog.content} className="max-w-none" />
         </div>
-        <div className="border-border/70 flex flex-wrap items-center justify-between gap-4 border-t pt-8">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="border-border/70 flex flex-wrap items-center justify-between gap-3 border-t pt-4 sm:gap-4 sm:pt-8">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="text-muted-foreground text-xs font-semibold">
               {t('tags')}:
             </span>
             {blog.tags.map((tag) => (
               <span
                 key={tag}
-                className="bg-muted text-muted-foreground rounded-lg px-2.5 py-1 text-xs font-medium"
+                className="bg-muted text-muted-foreground rounded-lg px-2 py-0.5 text-xs font-medium sm:px-2.5 sm:py-1"
               >
                 #{tag}
               </span>
@@ -147,20 +147,20 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
         </div>
       </div>
       {relatedBlogs.length > 0 && (
-        <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-          <div className="border-border/70 border-t pt-12">
-            <h2 className="text-foreground pb-6 text-xl font-bold sm:text-2xl">
+        <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+          <div className="border-border/70 border-t pt-6 sm:pt-12">
+            <h2 className="text-foreground pb-3 text-lg font-bold sm:pb-6 sm:text-2xl">
               {t('badge')}
             </h2>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {relatedBlogs.map((item) => (
                 <article
                   key={item.id}
-                  className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-3xl border shadow-xs transition-all duration-300 hover:shadow-md"
+                  className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl"
                 >
                   <Link
                     href={`/blogs/${item.slug}`}
-                    className="bg-muted relative block h-44 w-full overflow-hidden"
+                    className="bg-muted relative block h-36 w-full overflow-hidden sm:h-44"
                   >
                     <Image
                       src={item.image}
@@ -170,13 +170,13 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />
                   </Link>
-                  <div className="flex flex-1 flex-col justify-between p-5">
+                  <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-5">
                     <Link href={`/blogs/${item.slug}`}>
-                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-sm font-bold transition-colors sm:text-base">
+                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-xs font-bold transition-colors sm:text-base">
                         {item.title}
                       </h3>
                     </Link>
-                    <p className="text-muted-foreground line-clamp-2 pt-2 text-xs leading-relaxed">
+                    <p className="text-muted-foreground line-clamp-2 pt-1 text-xs leading-relaxed sm:pt-2">
                       {item.description}
                     </p>
                   </div>

@@ -15,7 +15,7 @@ export function ContentDivider({
       )}
     >
       <div className="border-border w-full border-t" />
-      <span className="bg-card text-muted-foreground absolute px-3 text-xs font-medium tracking-wider">
+      <span className="bg-card text-muted-foreground absolute px-3 text-xs font-medium">
         {name}
       </span>
     </div>

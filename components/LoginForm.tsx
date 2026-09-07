@@ -137,34 +137,21 @@ export function LoginForm() {
   const isCustomer = role === UserRole.CUSTOMER
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-6 p-4 sm:p-6 lg:p-10">
-      <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-3xl border p-6 shadow-xl shadow-black/[0.03] sm:p-10 dark:shadow-black/20">
-        <div className="mb-6 flex justify-center">
+    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10">
+      <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-2xl border p-4.5 shadow-xl shadow-black/[0.03] sm:rounded-3xl sm:p-8 md:p-10 dark:shadow-black/20">
+        <div className="mb-4 flex justify-center sm:mb-6">
           <LogoBrand className="text-xl" />
         </div>
-        <div className="w-full space-y-6">
-          <div className="space-y-2 text-center">
-            <div className="bg-muted/80 text-muted-foreground border-border/50 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
-              {isCustomer ? (
-                <>
-                  <UserIcon className="text-primary size-3" />
-                  <span>{t('customerRoleBadge')}</span>
-                </>
-              ) : (
-                <>
-                  <StoreIcon className="text-primary size-3" />
-                  <span>{t('merchantRoleBadge')}</span>
-                </>
-              )}
-            </div>
-            <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
+        <div className="w-full space-y-4 sm:space-y-6">
+          <div className="space-y-1.5 text-center sm:space-y-2">
+            <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-3xl">
               {t('title')}
             </h1>
             <p className="text-muted-foreground text-xs sm:text-sm">
               {isCustomer ? t('buyerSubtitle') : t('merchantSubtitle')}
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
             {LOGIN_PROVIDERS.map((provider, idx) => (
               <SSOButton
                 key={idx}
@@ -174,7 +161,10 @@ export function LoginForm() {
             ))}
           </div>
           <ContentDivider name={t('orEmail')} />
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-3 sm:space-y-4"
+          >
             <Field>
               <FieldLabel className="text-xs font-medium">
                 {t('emailLabel')}
@@ -184,7 +174,7 @@ export function LoginForm() {
                 <Input
                   type="email"
                   placeholder={t('emailPlaceholder')}
-                  className="h-11 rounded-xl pl-10 text-sm"
+                  className="h-10 rounded-xl pl-10 text-sm sm:h-11"
                   {...register('email', {
                     required: t('emailRequired'),
                   })}
@@ -204,7 +194,7 @@ export function LoginForm() {
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('passwordPlaceholder')}
-                  className="h-11 rounded-xl pr-10 pl-10 text-sm"
+                  className="h-10 rounded-xl pr-10 pl-10 text-sm sm:h-11"
                   {...register('password', {
                     required: t('passwordRequired'),
                   })}
@@ -228,7 +218,7 @@ export function LoginForm() {
             </Field>
             <Button
               type="submit"
-              className="shadow-primary/20 hover:shadow-primary/25 h-11 w-full cursor-pointer rounded-xl text-sm font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.99]"
+              className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full cursor-pointer rounded-xl text-sm font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.99] sm:h-11"
               size="lg"
               disabled={isPending}
             >

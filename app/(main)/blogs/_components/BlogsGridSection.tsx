@@ -38,12 +38,12 @@ export function BlogsGridSection() {
   }, [allBlogs, selectedTag, searchQuery])
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4">
         <div className="flex max-w-full flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
           <button
             onClick={() => setSelectedTag('all')}
-            className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-all sm:px-3.5 sm:py-1.5 ${
               selectedTag === 'all'
                 ? 'bg-primary text-primary-foreground shadow-xs'
                 : 'bg-muted/70 text-muted-foreground hover:text-foreground'
@@ -55,7 +55,7 @@ export function BlogsGridSection() {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+              className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-all sm:px-3.5 sm:py-1.5 ${
                 selectedTag === tag
                   ? 'bg-primary text-primary-foreground shadow-xs'
                   : 'bg-muted/70 text-muted-foreground hover:text-foreground'
@@ -76,13 +76,13 @@ export function BlogsGridSection() {
         </div>
       </div>
       {filteredBlogs.length === 0 ? (
-        <div className="border-border/80 bg-card/40 flex flex-col items-center justify-center rounded-3xl border py-16 text-center">
+        <div className="border-border/80 bg-card/40 flex flex-col items-center justify-center rounded-2xl border py-10 text-center sm:rounded-3xl sm:py-16">
           <p className="text-muted-foreground text-sm font-medium">
             {t('noBlogsFound')}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {filteredBlogs.map((blog) => {
             const readingMinutes = Math.ceil(blog.content.length / 500) || 3
             const formattedDate = new Date(blog.createdAt).toLocaleDateString(
@@ -92,11 +92,11 @@ export function BlogsGridSection() {
             return (
               <article
                 key={blog.id}
-                className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-3xl border shadow-xs transition-all duration-300 hover:shadow-md"
+                className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl"
               >
                 <Link
                   href={`/blogs/${blog.slug}`}
-                  className="bg-muted relative block h-48 w-full overflow-hidden"
+                  className="bg-muted relative block h-40 w-full overflow-hidden sm:h-48"
                 >
                   <Image
                     src={blog.image}
@@ -105,21 +105,21 @@ export function BlogsGridSection() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                  <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 sm:top-3 sm:left-3">
                     {blog.tags.slice(0, 2).map((tag) => (
                       <span
                         key={tag}
-                        className="bg-background/90 text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium shadow-xs backdrop-blur-xs"
+                        className="bg-background/90 text-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-xs backdrop-blur-xs sm:px-2.5 sm:text-[11px]"
                       >
-                        <Tag className="text-primary size-3" />
+                        <Tag className="text-primary size-2.5 sm:size-3" />
                         {tag}
                       </span>
                     ))}
                   </div>
                 </Link>
-                <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
-                  <div className="space-y-2.5">
-                    <div className="text-muted-foreground flex items-center gap-3 text-[11px]">
+                <div className="flex flex-1 flex-col justify-between p-4 sm:p-6">
+                  <div className="space-y-2 sm:space-y-2.5">
+                    <div className="text-muted-foreground flex items-center gap-2.5 text-[11px] sm:gap-3">
                       <span className="inline-flex items-center gap-1">
                         <Calendar className="size-3" />
                         {formattedDate}
@@ -130,7 +130,7 @@ export function BlogsGridSection() {
                       </span>
                     </div>
                     <Link href={`/blogs/${blog.slug}`} className="block">
-                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-base font-bold transition-colors sm:text-lg">
+                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-sm font-bold transition-colors sm:text-lg">
                         {blog.title}
                       </h3>
                     </Link>
@@ -138,7 +138,7 @@ export function BlogsGridSection() {
                       {blog.description}
                     </p>
                   </div>
-                  <div className="pt-4">
+                  <div className="pt-3 sm:pt-4">
                     <Link
                       href={`/blogs/${blog.slug}`}
                       className="text-primary hover:text-primary/80 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"

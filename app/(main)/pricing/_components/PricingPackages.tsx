@@ -44,13 +44,13 @@ export function PricingPackages() {
     }
   })
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-16 px-4 sm:px-6 lg:px-8">
-      <div className="grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:space-y-16 lg:px-8">
+      <div className="grid w-full gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {translatedPlans.map((plan) => (
           <PricingCard key={plan.title} {...plan} />
         ))}
       </div>
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-8">
         <MainSectionHeader
           as="h3"
           badge={t('commonFeatures.badge')}
@@ -60,14 +60,14 @@ export function PricingPackages() {
           }
           description={t('commonFeatures.description')}
         />
-        <div className="grid w-full grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-3">
           {translatedCommonFeatures.map((feature, index) => (
             <div
               key={index}
-              className="bg-card/60 hover:bg-card border-border/70 hover:border-border flex items-start gap-3 rounded-2xl border p-4 shadow-2xs transition-all duration-200"
+              className="bg-card/60 hover:bg-card border-border/70 hover:border-border flex items-start gap-2.5 rounded-xl border p-3 shadow-2xs transition-all duration-200 sm:gap-3 sm:rounded-2xl sm:p-4"
             >
               <div
-                className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl"
+                className="bg-primary/10 text-primary mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg sm:size-8 sm:rounded-xl"
                 aria-hidden="true"
               >
                 {feature.icon}

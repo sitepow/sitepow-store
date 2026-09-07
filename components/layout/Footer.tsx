@@ -180,7 +180,7 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8 lg:gap-x-8">
             {footerNav.map((col, idx) => (
               <div key={idx} className="flex flex-col space-y-4">
-                <h3 className="text-foreground text-sm font-semibold tracking-wide">
+                <h3 className="text-foreground text-sm font-semibold">
                   {col.title}
                 </h3>
                 <ul className="space-y-3 text-sm">

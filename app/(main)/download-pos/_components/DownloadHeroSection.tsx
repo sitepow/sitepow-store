@@ -1,54 +1,60 @@
 'use client'
-import { useTranslations } from "next-intl"
-import Link from "next/link"
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+
 import {
   IconArrowDown,
   IconDeviceDesktop,
   IconWorld,
-} from "@tabler/icons-react"
-import { Button } from "@/components/ui/button"
-import { MainHeroHeader } from "../../_components/MainHeroHeader"
+} from '@tabler/icons-react'
+
+import { Button } from '@/components/ui/button'
+
+import { MainHeroHeader } from '../../_components/MainHeroHeader'
 
 export function DownloadHeroSection() {
-  const t = useTranslations("downloadPos.hero")
+  const t = useTranslations('downloadPos.hero')
   return (
     <MainHeroHeader
       badgeIcon={<IconDeviceDesktop size={15} />}
-      badgeText={t("badgeText")}
+      badgeText={t('badgeText')}
       title={
         <>
-          {t("titleStart")}{" "}
+          {t('titleStart')}{' '}
           <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent">
-            {t("titleGradient")}
+            {t('titleGradient')}
           </span>
         </>
       }
-      description={t("description")}
+      description={t('description')}
     >
-      <div className="flex flex-col items-center justify-center gap-3 pt-2 sm:flex-row">
+      <div className="flex flex-col items-center justify-center gap-2.5 pt-1 sm:flex-row sm:gap-3 sm:pt-2">
         <Button
           size="lg"
           asChild
-          className="shadow-primary/20 h-11 cursor-pointer px-6 text-sm font-semibold shadow-md"
+          className="shadow-primary/20 h-10 w-full cursor-pointer px-5 text-xs font-semibold shadow-md sm:h-11 sm:w-auto sm:px-6 sm:text-sm"
         >
-          <a href="#platforms" className="flex items-center gap-2">
-            <IconArrowDown size={18} />
-            <span>{t("selectOsBtn")}</span>
+          <a
+            href="#platforms"
+            className="flex items-center justify-center gap-2"
+          >
+            <IconArrowDown size={16} />
+            <span>{t('selectOsBtn')}</span>
           </a>
         </Button>
         <Button
           variant="outline"
           size="lg"
           asChild
-          className="h-11 cursor-pointer px-6 text-sm font-medium"
+          className="h-10 w-full cursor-pointer px-5 text-xs font-medium sm:h-11 sm:w-auto sm:px-6 sm:text-sm"
         >
           <Link
             href="/merchant/pos"
             target="_blank"
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2"
           >
-            <IconWorld size={18} />
-            <span>{t("webPosBtn")}</span>
+            <IconWorld size={16} />
+            <span>{t('webPosBtn')}</span>
           </Link>
         </Button>
       </div>

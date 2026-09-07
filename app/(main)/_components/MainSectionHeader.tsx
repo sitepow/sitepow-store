@@ -21,25 +21,21 @@ export function MainSectionHeader({
     <div
       className={cn(
         'mx-auto flex flex-col items-center text-center',
-        'max-w-3xl space-y-3 px-4 sm:space-y-4',
+        'max-w-3xl space-y-2 px-3 sm:space-y-4 sm:px-4',
         className,
       )}
       {...props}
     >
       {badge && (
-        <span className="text-primary text-xs font-semibold tracking-wide uppercase">
+        <span className="text-primary text-[11px] font-semibold sm:text-xs">
           {badge}
         </span>
       )}
-
-      {/* เอา max-w-52 ออก แล้วใช้ max-w-2xl พร้อม balance text */}
-      <Heading className="text-foreground max-w-2xl text-2xl font-bold tracking-tight text-balance sm:text-3xl md:text-4xl md:leading-tight">
+      <Heading className="text-foreground max-w-2xl text-xl font-bold tracking-tight text-balance sm:text-3xl md:text-4xl md:leading-tight">
         {title}
       </Heading>
-
-      {/* ควบคุมความยาว Description ให้อ่านสบายตา ไม่ยาวเกินไป */}
       {description && (
-        <p className="text-muted-foreground max-w-xl text-sm leading-relaxed sm:text-base">
+        <p className="text-muted-foreground max-w-xl text-xs leading-relaxed sm:text-base">
           {description}
         </p>
       )}

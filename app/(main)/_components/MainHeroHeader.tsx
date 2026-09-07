@@ -9,6 +9,7 @@ interface MainHeroHeaderProps extends Omit<ComponentProps<'div'>, 'title'> {
   description?: ReactNode
   children?: ReactNode
 }
+
 export function MainHeroHeader({
   badgeIcon,
   badgeText,
@@ -21,23 +22,23 @@ export function MainHeroHeader({
   return (
     <div
       className={cn(
-        'mx-auto w-full max-w-5xl space-y-6 px-4 pt-8 pb-4 text-center sm:px-6 lg:px-8',
+        'mx-auto w-full max-w-5xl space-y-4 px-3.5 pt-4 pb-2 text-center sm:space-y-6 sm:px-6 sm:pt-8 sm:pb-4 lg:px-8',
         className,
       )}
       {...props}
     >
       {badgeText && (
-        <div className="border-primary/30 bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold shadow-2xs">
+        <div className="border-primary/30 bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-semibold shadow-2xs sm:px-3.5 sm:py-1">
           {badgeIcon}
           <span>{badgeText}</span>
         </div>
       )}
-      <div className="space-y-4">
-        <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
+      <div className="space-y-2.5 sm:space-y-4">
+        <h1 className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
           {title}
         </h1>
         {description && (
-          <p className="text-muted-foreground mx-auto max-w-3xl text-base leading-relaxed text-balance sm:text-lg">
+          <p className="text-muted-foreground mx-auto max-w-3xl text-xs leading-relaxed text-balance sm:text-base md:text-lg">
             {description}
           </p>
         )}
