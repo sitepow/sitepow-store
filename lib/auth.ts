@@ -21,6 +21,12 @@ export const auth = betterAuth({
       mainDomain,
       'http://localhost:3000',
       'http://lvh.me:3000',
+      'http://manage.localhost:3000',
+      'http://manage.lvh.me:3000',
+      'https://manage.sitepow.store',
+      'http://control.localhost:3000',
+      'http://control.lvh.me:3000',
+      'https://control.sitepow.store',
     ]
 
     const requestOrigin =
@@ -37,7 +43,8 @@ export const auth = betterAuth({
       if (
         hostname.endsWith('sitepow.store') ||
         hostname.endsWith('lvh.me') ||
-        hostname === 'localhost'
+        hostname === 'localhost' ||
+        hostname.endsWith('localhost')
       ) {
         return Array.from(new Set([...baseOrigins, originUrl.origin]))
       }
@@ -73,7 +80,7 @@ export const auth = betterAuth({
       secure: isProd,
       httpOnly: true,
       path: '/',
-      domain: isProd ? '.sitepow.store' : undefined,
+      domain: isProd ? '.sitepow.store' : '.lvh.me',
     },
   },
 

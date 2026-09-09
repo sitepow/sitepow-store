@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { authClient } from '@/lib/auth-client'
+import { getManageUrl } from '@/lib/manage-url'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarDropdownProps extends ComponentProps<typeof Avatar> {
@@ -101,18 +102,22 @@ export function UserAvatarDropdown({
         <DropdownMenuSeparator />
         {items.map((item) => {
           const Icon = item.icon
+          const targetUrl =
+            redirectPath === 'merchant'
+              ? getManageUrl(`/merchant/${item.value}`)
+              : `/${redirectPath}/${item.value}`
 
           return (
             <Fragment key={item.value}>
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
-                <Link
-                  href={`/${redirectPath}/${item.value}`}
+                <a
+                  href={targetUrl}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />
                   {getItemLabel(item.value, item.label)}
-                </Link>
+                </a>
               </DropdownMenuItem>
             </Fragment>
           )

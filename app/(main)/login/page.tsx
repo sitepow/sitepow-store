@@ -17,10 +17,15 @@ export const metadata: Metadata = {
     },
   },
 }
-export default async function TenantLoginPage() {
+export default async function TenantLoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ callbackUrl?: string }>
+}) {
+  const params = await searchParams
   const userSession = await getCurrentUser()
   if (userSession) {
-    redirect('/')
+    redirect(params?.callbackUrl || '/')
   }
   return <LoginForm />
 }

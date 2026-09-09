@@ -11,6 +11,8 @@ import { IconLock } from '@tabler/icons-react'
 import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 
+import { getManageUrl } from '@/lib/manage-url'
+
 interface DesktopUserActionsProps {
   navbarItems: NavigationItem[]
   userRole?: UserRole
@@ -30,10 +32,10 @@ export function DesktopUserActions({
       />
       {userRole === UserRole.MERCHANT && (
         <Button variant="outline" className="flex gap-2 font-medium" asChild>
-          <Link href="/merchant/dashboard">
+          <a href={getManageUrl('/merchant/dashboard')}>
             <IconLock />
             {t('manageStore')}
-          </Link>
+          </a>
         </Button>
       )}
       <QuickSettingsMenu buttonVariant="ghost" />

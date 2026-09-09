@@ -27,6 +27,7 @@ import { Safari } from '@/components/magicui/safari'
 import { Button } from '@/components/ui/button'
 
 import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
+import { getManageUrl } from '@/lib/manage-url'
 
 export function HeroSection() {
   const isMounted = useIsMounted()
@@ -279,14 +280,14 @@ export function HeroSection() {
               asChild
               className="shadow-primary/20 h-10 w-full shadow-lg sm:h-12 sm:w-auto sm:px-8"
             >
-              <Link
-                href="/merchant/dashboard"
+              <a
+                href={getManageUrl('/merchant/dashboard')}
                 className="flex items-center justify-center gap-2 text-xs font-bold sm:text-base"
               >
                 <IconBuildingStore className="size-4 sm:size-5" />
                 <span>{t('manageStoreBtn')}</span>
                 <IconArrowRight className="size-3.5 transition-transform group-hover:translate-x-1 sm:size-4" />
-              </Link>
+              </a>
             </RainbowButton>
           )}
 

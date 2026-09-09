@@ -12,6 +12,8 @@ import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
+import { getManageUrl } from '@/lib/manage-url'
+
 export function CtaSection() {
   const isMounted = useIsMounted()
   const t = useTranslations('home.cta')
@@ -19,7 +21,7 @@ export function CtaSection() {
   const isAuth = isMounted && isAuthenticated
   const registerParams = new URLSearchParams()
   registerParams.set('role', UserRole.MERCHANT)
-  registerParams.set('callbackUrl', '/merchant/dashboard')
+  registerParams.set('callbackUrl', getManageUrl('/merchant/dashboard'))
   const registerHref = `/register?${registerParams.toString()}`
 
   return (
@@ -64,14 +66,14 @@ export function CtaSection() {
                 asChild
                 className="h-11 w-full shadow-lg sm:w-auto"
               >
-                <Link
-                  href="/merchant/dashboard"
+                <a
+                  href={getManageUrl('/merchant/dashboard')}
                   className="flex items-center justify-center gap-2 text-sm font-semibold sm:text-base"
                 >
                   <IconBuildingStore className="size-4.5 sm:size-5" />
                   <span>{t('dashboardBtn')}</span>
                   <ArrowRight className="size-4" />
-                </Link>
+                </a>
               </RainbowButton>
             )}
             <Button

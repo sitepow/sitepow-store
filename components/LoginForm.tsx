@@ -98,10 +98,14 @@ export function LoginForm() {
     try {
       const currentOrigin =
         typeof window !== 'undefined' ? window.location.origin : ''
+      const isAbsoluteCallback =
+        callbackUrl.startsWith('http://') || callbackUrl.startsWith('https://')
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
-      const returnTo = `${currentOrigin}${targetPath}`
+      const returnTo = isAbsoluteCallback
+        ? callbackUrl
+        : `${currentOrigin}${targetPath}`
 
       const isCentralDomain =
         window.location.hostname.endsWith('sitepow.store') ||

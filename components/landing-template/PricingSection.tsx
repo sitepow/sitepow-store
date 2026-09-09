@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardFooter, CardHeader } from '@/components/ui/card'
 
 import { gsap } from '@/lib/gsap'
+import { getManageUrl } from '@/lib/manage-url'
 
 export function PricingSection() {
   const isMounted = useIsMounted()
@@ -83,7 +84,7 @@ export function PricingSection() {
   )
   const registerParams = new URLSearchParams()
   registerParams.set('role', UserRole.MERCHANT)
-  registerParams.set('callbackUrl', '/merchant/dashboard')
+  registerParams.set('callbackUrl', getManageUrl('/merchant/dashboard'))
   const registerHref = `/register?${registerParams.toString()}`
   const plans = PRICING_PLANS.map((plan, idx) => {
     let title = plan.title

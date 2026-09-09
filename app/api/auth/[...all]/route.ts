@@ -29,15 +29,32 @@ function sanitizeCookiesForHost(
 ): Response {
   const host = request.headers.get('host')?.split(':')[0].toLowerCase() || ''
   const isSitepow = host === 'sitepow.store' || host.endsWith('.sitepow.store')
+  const isLvh = host === 'lvh.me' || host.endsWith('.lvh.me')
 
-  if (!isSitepow && typeof response.headers.getSetCookie === 'function') {
+  if (typeof response.headers.getSetCookie === 'function') {
     const setCookies = response.headers.getSetCookie()
     if (setCookies.length > 0) {
       response.headers.delete('set-cookie')
       for (const cookieStr of setCookies) {
-        const cleaned = cookieStr
-          .replace(/;\s*Domain=\.?sitepow\.store/gi, '')
-          .replace(/;\s*Domain=\.?localhost/gi, '')
+        let cleaned = cookieStr
+        if (isSitepow) {
+          if (!/;\s*Domain=/i.test(cleaned)) {
+            cleaned = `${cleaned}; Domain=.sitepow.store`
+          } else {
+            cleaned = cleaned.replace(
+              /;\s*Domain=[^;]+/gi,
+              '; Domain=.sitepow.store',
+            )
+          }
+        } else if (isLvh) {
+          if (!/;\s*Domain=/i.test(cleaned)) {
+            cleaned = `${cleaned}; Domain=.lvh.me`
+          } else {
+            cleaned = cleaned.replace(/;\s*Domain=[^;]+/gi, '; Domain=.lvh.me')
+          }
+        } else {
+          cleaned = cleaned.replace(/;\s*Domain=[^;]+/gi, '')
+        }
         response.headers.append('set-cookie', cleaned)
       }
     }
