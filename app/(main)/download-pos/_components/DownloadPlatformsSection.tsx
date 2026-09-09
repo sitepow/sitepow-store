@@ -1,10 +1,11 @@
 'use client'
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useGSAP } from '@gsap/react'
 import {
   IconCheck,
   IconDownload,
@@ -16,6 +17,8 @@ import {
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
+
+import { gsap } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
@@ -146,6 +149,55 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
 
 export function DownloadPlatformsSection() {
   const t = useTranslations('downloadPos.platforms')
+  const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (cardsRef.current) {
+        const cards = Array.from(cardsRef.current.children)
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            { y: 50, scale: 0.95, opacity: 0 },
+            {
+              y: 0,
+              scale: 1,
+              opacity: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+    },
+    { scope: sectionRef },
+  )
+
   const platforms = PLATFORM_CONFIGS.map((p) => ({
     ...p,
     name: t(`items.${p.id}.name`),
@@ -160,15 +212,21 @@ export function DownloadPlatformsSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="platforms"
       className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
     >
-      <MainSectionHeader
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
-      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div ref={headerRef}>
+        <MainSectionHeader
+          badge={t('badge')}
+          title={t('title')}
+          description={t('description')}
+        />
+      </div>
+      <div
+        ref={cardsRef}
+        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4"
+      >
         {platforms.map((platform) => (
           <div
             key={platform.id}

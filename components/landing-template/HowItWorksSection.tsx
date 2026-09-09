@@ -1,16 +1,88 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { MainSectionHeader } from '@/app/(main)/_components/MainSectionHeader'
+import { useGSAP } from '@gsap/react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Safari } from '@/components/magicui/safari'
 
+import { gsap } from '@/lib/gsap'
+
 export function HowItWorksSection() {
   const [activeStep, setActiveStep] = useState(0)
   const t = useTranslations('home.howItWorks')
+
+  const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const stepsRef = useRef<HTMLDivElement>(null)
+  const mockupRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (stepsRef.current) {
+        const stepItems = Array.from(stepsRef.current.children)
+        stepItems.forEach((step) => {
+          gsap.fromTo(
+            step,
+            { x: -40, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: step,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+
+      if (mockupRef.current) {
+        gsap.fromTo(
+          mockupRef.current,
+          { scale: 0.93, y: 50, opacity: 0 },
+          {
+            scale: 1,
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: mockupRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+    },
+    { scope: sectionRef },
+  )
+
   const steps = [
     {
       step: '01',
@@ -32,15 +104,21 @@ export function HowItWorksSection() {
     },
   ]
   return (
-    <section id="how-it-works" className="relative w-full py-16 md:py-24">
+    <section
+      ref={sectionRef}
+      id="how-it-works"
+      className="relative w-full py-16 md:py-24"
+    >
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <MainSectionHeader
-          badge={t('badge')}
-          title={t('title')}
-          description={t('description')}
-        />
+        <div ref={headerRef}>
+          <MainSectionHeader
+            badge={t('badge')}
+            title={t('title')}
+            description={t('description')}
+          />
+        </div>
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-8">
-          <div className="space-y-4 lg:col-span-5">
+          <div ref={stepsRef} className="space-y-4 lg:col-span-5">
             {steps.map((s, idx) => (
               <div
                 key={idx}
@@ -76,7 +154,7 @@ export function HowItWorksSection() {
               </div>
             ))}
           </div>
-          <div className="lg:col-span-7">
+          <div ref={mockupRef} className="lg:col-span-7">
             <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
               <Safari
                 url={

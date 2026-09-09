@@ -1,5 +1,9 @@
 'use client'
-import { useTranslations } from "next-intl"
+import { useRef } from 'react'
+
+import { useTranslations } from 'next-intl'
+
+import { useGSAP } from '@gsap/react'
 import {
   IconBolt,
   IconBrandMastercard,
@@ -10,29 +14,77 @@ import {
   IconRobot,
   IconShieldCheck,
   IconTruck,
-} from "@tabler/icons-react"
-import { Marquee } from "@/components/magicui/marquee"
+} from '@tabler/icons-react'
+
+import { Marquee } from '@/components/magicui/marquee'
+
+import { gsap } from '@/lib/gsap'
 
 const LOGO_ITEMS = [
-  { name: "PromptPay QR", icon: IconQrcode, note: "PromptPay QR" },
-  { name: "Stripe Payments", icon: IconBrandStripe, note: "Credit / Debit Cards" },
-  { name: "AI Slip Verification", icon: IconRobot, note: "AI Slip Verification" },
-  { name: "Visa & Mastercard", icon: IconBrandMastercard, note: "Visa & Mastercard" },
-  { name: "0% GP Commission", icon: IconBolt, note: "0% GP Commission" },
-  { name: "Flash Express", icon: IconTruck, note: "Flash Express" },
-  { name: "Kerry Express", icon: IconPackage, note: "Kerry Express" },
-  { name: "Thailand Post", icon: IconTruck, note: "Thailand Post EMS" },
-  { name: "Digital Key Codes", icon: IconDeviceMobile, note: "Digital Goods & Keys" },
-  { name: "SSL Security", icon: IconShieldCheck, note: "SSL Encryption 256-bit" },
+  { name: 'PromptPay QR', icon: IconQrcode, note: 'PromptPay QR' },
+  {
+    name: 'Stripe Payments',
+    icon: IconBrandStripe,
+    note: 'Credit / Debit Cards',
+  },
+  {
+    name: 'AI Slip Verification',
+    icon: IconRobot,
+    note: 'AI Slip Verification',
+  },
+  {
+    name: 'Visa & Mastercard',
+    icon: IconBrandMastercard,
+    note: 'Visa & Mastercard',
+  },
+  { name: '0% GP Commission', icon: IconBolt, note: '0% GP Commission' },
+  { name: 'Flash Express', icon: IconTruck, note: 'Flash Express' },
+  { name: 'Kerry Express', icon: IconPackage, note: 'Kerry Express' },
+  { name: 'Thailand Post', icon: IconTruck, note: 'Thailand Post EMS' },
+  {
+    name: 'Digital Key Codes',
+    icon: IconDeviceMobile,
+    note: 'Digital Goods & Keys',
+  },
+  {
+    name: 'SSL Security',
+    icon: IconShieldCheck,
+    note: 'SSL Encryption 256-bit',
+  },
 ]
 
 export function LogosSection() {
-  const t = useTranslations("home.logos")
+  const t = useTranslations('home.logos')
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      if (sectionRef.current) {
+        gsap.from(sectionRef.current, {
+          opacity: 0,
+          y: 20,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+          },
+        })
+      }
+    },
+    { scope: sectionRef },
+  )
+
   return (
-    <section id="logos" className="border-border/40 relative w-full border-b py-12">
+    <section
+      ref={sectionRef}
+      id="logos"
+      className="border-border/40 relative w-full border-b py-12"
+    >
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <h3 className="text-muted-foreground text-center text-xs font-semibold">
-          {t("title")}
+          {t('title')}
         </h3>
         <div className="relative mt-6">
           <Marquee pauseOnHover className="[--duration:35s] [--gap:1.5rem]">

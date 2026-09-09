@@ -1,29 +1,85 @@
 'use client'
-import React from 'react'
+import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { PRICING_TABLES } from '@/constants/pricing'
 import { Check, Minus } from 'lucide-react'
 
+import { gsap, useGSAP } from '@/lib/gsap'
+
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 import { TableScrollHint } from '../../_components/TableScrollHint'
 
 export function PricingTables() {
   const t = useTranslations('pricing.tables')
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const tableCardRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (tableCardRef.current) {
+        gsap.fromTo(
+          tableCardRef.current,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: tableCardRef.current,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+    },
+    { scope: sectionRef },
+  )
+
   const tiers: string[] = (t.raw('tiers') as string[]) || PRICING_TABLES.tiers
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        as="h3"
-        badge={t('badge')}
-        title={
-          (t.raw('title') as string) || 'เปรียบเทียบความสามารถของแต่ละ Package'
-        }
-        description={t('description')}
-      />
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div ref={headerRef}>
+        <MainSectionHeader
+          as="h3"
+          badge={t('badge')}
+          title={
+            (t.raw('title') as string) ||
+            'เปรียบเทียบความสามารถของแต่ละ Package'
+          }
+          description={t('description')}
+        />
+      </div>
       <TableScrollHint />
-      <div className="border-border/80 bg-card/60 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-xs sm:rounded-3xl">
+      <div
+        ref={tableCardRef}
+        className="border-border/80 bg-card/60 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-xs sm:rounded-3xl"
+      >
         <div className="overflow-x-auto">
           <table className="w-full min-w-170 border-collapse text-left">
             <thead>

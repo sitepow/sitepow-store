@@ -5,7 +5,22 @@
     "description": "All-in-one store management platform (E-Commerce), POS cashier system, real-time multi-branch stock sync, and automated AI payment slip verification in one place.",
     "registerBtn": "Start Selling for Free",
     "manageStoreBtn": "Manage Your Store",
-    "pricingBtn": "View Pricing & Packages"
+    "pricingBtn": "View Pricing & Packages",
+    "badgeNew": "NEW 2.0",
+    "badgeText": "{gp}% GP Omnichannel POS & E-Commerce with Smart Inventory",
+    "downloadPosBtn": "Download POS & Pricing",
+    "ratingText": "{rating}/5 from {merchants}+ merchants",
+    "trust1": "{gp}% GP Lifetime",
+    "trust2": "No credit card required",
+    "trust3": "Ready in {minutes} minutes",
+    "widget1Title": "Ultra-Fast POS Billing",
+    "widget1Desc": "⚡ {seconds}s/bill • Instant stock sync",
+    "widget2Title": "Real-Time AI Slip Verification",
+    "widget2Badge": "{accuracy}% Accurate",
+    "widget2Desc": "✓ Verified {amount} • Detects fake slips",
+    "widget3Title": "{gp}% GP Lifetime",
+    "widget3Badge": "+{profit}% Net Profit",
+    "widget3Desc": "📈 Keep 100% direct profit, 0% fee"
   },
   "logos": {
     "title": "Supported Payment Channels and Courier Partners"
@@ -145,11 +160,20 @@
     ]
   },
   "cta": {
+    "badge": "Ready in {minutes} Minutes • Zero Hidden Fees",
     "title": "Ready to Elevate Your Online & In-Store Business?",
-    "description": "Start using the all-in-one E-Commerce & POS store management platform today. Easy, secure, and 0% GP commission.",
+    "description": "Start using the all-in-one E-Commerce & POS store management platform today. Easy, secure, and {gp}% GP commission.",
     "registerBtn": "Open Your Store for Free",
     "dashboardBtn": "Go to Store Dashboard",
-    "pricingBtn": "View Pricing Details"
+    "pricingBtn": "View Pricing Details",
+    "trust1": "No credit card required",
+    "trust2": "Set up in {minutes} minutes",
+    "trust3": "{gp}% GP {profit}% Profit",
+    "trust4": "Direct payouts to your bank",
+    "floatLeftTitle": "Ultra-Fast POS Checkout",
+    "floatLeftDesc": "⚡ {seconds}s per bill & instant receipt",
+    "floatRightTitle": "{gp}% GP Lifetime Free",
+    "floatRightDesc": "💰 Keep {profit}% of your earnings"
   },
   "features": {
     "items": [

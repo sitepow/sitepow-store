@@ -1,4 +1,6 @@
 'use client'
+import { useRef } from 'react'
+
 import { useTranslations } from 'next-intl'
 
 import {
@@ -10,6 +12,8 @@ import {
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Safari } from '@/components/magicui/safari'
 
+import { gsap, useGSAP } from '@/lib/gsap'
+
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
 const STEP_ICONS = [
@@ -20,6 +24,74 @@ const STEP_ICONS = [
 
 export function QuickSetupSection() {
   const t = useTranslations('downloadPos.quickSetup')
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const stepsRef = useRef<HTMLDivElement>(null)
+  const mockupRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (stepsRef.current) {
+        const stepItems = Array.from(stepsRef.current.children)
+        stepItems.forEach((step) => {
+          gsap.fromTo(
+            step,
+            { y: 45, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: step,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+
+      if (mockupRef.current) {
+        gsap.fromTo(
+          mockupRef.current,
+          { scale: 0.94, y: 50, opacity: 0 },
+          {
+            scale: 1,
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: mockupRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+    },
+    { scope: sectionRef },
+  )
+
   const steps = [0, 1, 2].map((idx) => ({
     step: `0${idx + 1}`,
     title: t(`steps.${idx}.title`),
@@ -28,13 +100,21 @@ export function QuickSetupSection() {
   }))
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
-      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-3">
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div ref={headerRef}>
+        <MainSectionHeader
+          badge={t('badge')}
+          title={t('title')}
+          description={t('description')}
+        />
+      </div>
+      <div
+        ref={stepsRef}
+        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-3"
+      >
         {steps.map((s, idx) => (
           <div
             key={idx}
@@ -59,7 +139,10 @@ export function QuickSetupSection() {
           </div>
         ))}
       </div>
-      <div className="relative mx-auto w-full max-w-4xl pt-1 sm:pt-2">
+      <div
+        ref={mockupRef}
+        className="relative mx-auto w-full max-w-4xl pt-1 sm:pt-2"
+      >
         <div className="bg-card ring-border relative overflow-hidden rounded-2xl border p-1 shadow-2xl ring-1 sm:rounded-3xl sm:p-2">
           <Safari
             url="pos.sitepow.store/cashier"

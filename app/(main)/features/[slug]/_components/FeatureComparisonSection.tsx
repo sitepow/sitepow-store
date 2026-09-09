@@ -1,10 +1,15 @@
 'use client'
+import { useRef } from 'react'
+
 import { useTranslations } from 'next-intl'
 
 import { FeatureComparison } from '@/constants/features'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconCheck, IconSparkles, IconX } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../../_components/MainSectionHeader'
 
@@ -13,15 +18,76 @@ export function FeatureComparisonSection({
 }: {
   comparison: FeatureComparison
 }) {
+  const isMounted = useIsMounted()
   const t = useTranslations('features.detail.comparison')
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const columnsRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (!isMounted) return
+
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (columnsRef.current) {
+        const cols = Array.from(columnsRef.current.children)
+        cols.forEach((col) => {
+          gsap.fromTo(
+            col,
+            { y: 45, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: col,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+
+      ScrollTrigger.refresh()
+    },
+    { scope: sectionRef, dependencies: [isMounted, comparison] },
+  )
+
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
-      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2">
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div ref={headerRef}>
+        <MainSectionHeader
+          badge={t('badge')}
+          title={t('title')}
+          description={t('description')}
+        />
+      </div>
+      <div
+        ref={columnsRef}
+        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2"
+      >
         <div className="relative flex flex-col justify-between rounded-2xl border border-rose-500/20 bg-rose-500/3 p-4 shadow-xs sm:rounded-3xl sm:p-6 dark:bg-rose-500/5">
           <div className="space-y-3.5 sm:space-y-5">
             <div className="flex items-center gap-2.5 sm:gap-3">

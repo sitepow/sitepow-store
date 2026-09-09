@@ -5,7 +5,22 @@
     "description": "รวมระบบจัดการร้านค้าออนไลน์ (E-Commerce), ระบบคิดเงินหน้าร้าน (POS), ตัดสต็อกสินค้าหลายสาขาแบบ Real-time และ AI ตรวจสอบสลิปโอนเงินอัตโนมัติ ไว้ในที่เดียว",
     "registerBtn": "สมัครเปิดร้านค้าฟรี",
     "manageStoreBtn": "จัดการร้านค้าของคุณ",
-    "pricingBtn": "ดูราคาและแพ็กเกจ"
+    "pricingBtn": "ดูราคาและแพ็กเกจ",
+    "badgeNew": "NEW 2.0",
+    "badgeText": "{gp}% GP Omnichannel POS & E-Commerce รวมสต็อกอัจฉริยะ",
+    "downloadPosBtn": "ดาวน์โหลด POS & ดูราคา",
+    "ratingText": "{rating}/5 จาก {merchants}+ ร้านค้า",
+    "trust1": "{gp}% GP ตลอดชีพ",
+    "trust2": "ไม่ต้องกรอกบัตรเครดิต",
+    "trust3": "เปิดร้านได้ใน {minutes} นาที",
+    "widget1Title": "หน้าร้าน POS คิดเงินไว",
+    "widget1Desc": "⚡ {seconds} วินาที/บิล • สต็อกซิงก์ทันที",
+    "widget2Title": "AI ตรวจสลิป Real-time",
+    "widget2Badge": "{accuracy}% แม่นยำ",
+    "widget2Desc": "✓ ตรวจยอด {amount} • ดักจับสลิปปลอม",
+    "widget3Title": "ขายฟรี {gp}% GP",
+    "widget3Badge": "+{profit}% กำไรสุทธิ",
+    "widget3Desc": "📈 รับเงินเต็มจำนวน ไม่ถูกหักส่วนแบ่ง"
   },
   "logos": {
     "title": "ช่องทางชำระเงินและระบบขนส่งที่รองรับ"
@@ -145,11 +160,20 @@
     ]
   },
   "cta": {
+    "badge": "เริ่มต้นง่ายใน {minutes} นาที • ไม่มีค่าธรรมเนียมแอบแฝง",
     "title": "พร้อมยกระดับธุรกิจออนไลน์และหน้าร้านของคุณแล้วหรือยัง?",
-    "description": "เริ่มต้นใช้งานระบบจัดการร้านค้า E-Commerce & POS แบบ All-in-One วันนี้ ใช้งานง่าย ปลอดภัย และไม่มีการหักค่าคอมมิชชั่น 0% GP",
+    "description": "เริ่มต้นใช้งานระบบจัดการร้านค้า E-Commerce & POS แบบ All-in-One วันนี้ ใช้งานง่าย ปลอดภัย และไม่มีการหักค่าคอมมิชชั่น {gp}% GP",
     "registerBtn": "สมัครเปิดร้านค้าฟรี",
     "dashboardBtn": "ไปยังแดชบอร์ดจัดการร้านค้า",
-    "pricingBtn": "ดูรายละเอียดแพ็กเกจ"
+    "pricingBtn": "ดูรายละเอียดแพ็กเกจ",
+    "trust1": "ไม่ต้องใช้บัตรเครดิต",
+    "trust2": "เปิดร้านใน {minutes} นาที",
+    "trust3": "{gp}% GP กำไร {profit}%",
+    "trust4": "เงินโอนตรงเข้าบัญชีคุณ",
+    "floatLeftTitle": "เปิดบิลหน้าร้าน POS ไว",
+    "floatLeftDesc": "⚡ {seconds} วินาที/บิล ออกใบเสร็จทันที",
+    "floatRightTitle": "ขายฟรี {gp}% GP ตลอดชีพ",
+    "floatRightDesc": "💰 รับกำไรเต็มกระเป๋า {profit}%"
   },
   "features": {
     "items": [

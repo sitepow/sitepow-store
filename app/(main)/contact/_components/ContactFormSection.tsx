@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
@@ -13,10 +13,58 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
+import { gsap, useGSAP } from '@/lib/gsap'
+
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
 export function ContactFormSection() {
   const t = useTranslations('contact.form')
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const formCardRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (formCardRef.current) {
+        gsap.fromTo(
+          formCardRef.current,
+          { y: 45, scale: 0.98, opacity: 0 },
+          {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 0.85,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: formCardRef.current,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+    },
+    { scope: sectionRef },
+  )
+
   const topics = [0, 1, 2, 3, 4, 5].map((idx) => t(`topics.${idx}`))
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
@@ -41,13 +89,21 @@ export function ContactFormSection() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
-      <div className="border-border/80 bg-card/70 relative overflow-hidden rounded-2xl border p-4 shadow-xl backdrop-blur-md sm:rounded-3xl sm:p-8 md:p-10">
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div ref={headerRef}>
+        <MainSectionHeader
+          badge={t('badge')}
+          title={t('title')}
+          description={t('description')}
+        />
+      </div>
+      <div
+        ref={formCardRef}
+        className="border-border/80 bg-card/70 relative overflow-hidden rounded-2xl border p-4 shadow-xl backdrop-blur-md sm:rounded-3xl sm:p-8 md:p-10"
+      >
         <BorderBeam
           size={200}
           duration={10}

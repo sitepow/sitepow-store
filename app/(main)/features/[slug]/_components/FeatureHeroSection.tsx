@@ -1,8 +1,11 @@
 'use client'
+import { useRef } from 'react'
+
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { FeatureItem } from '@/constants/features'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -16,6 +19,8 @@ import { NumberTicker } from '@/components/magicui/number-ticker'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
+import { gsap, useGSAP } from '@/lib/gsap'
+
 export function FeatureHeroSection({
   feature,
   registerHref,
@@ -23,9 +28,58 @@ export function FeatureHeroSection({
   feature: FeatureItem
   registerHref: string
 }) {
+  const isMounted = useIsMounted()
   const t = useTranslations('features.detail')
+  const heroRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const metricsRef = useRef<HTMLDivElement>(null)
+  const highlightsRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (!isMounted) return
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      if (headerRef.current) {
+        tl.fromTo(
+          headerRef.current,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.75 },
+        )
+      }
+      if (ctaRef.current) {
+        tl.fromTo(
+          ctaRef.current,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6 },
+          '-=0.35',
+        )
+      }
+      if (metricsRef.current && metricsRef.current.children.length > 0) {
+        tl.fromTo(
+          metricsRef.current.children,
+          { y: 25, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.1, duration: 0.6 },
+          '-=0.3',
+        )
+      }
+      if (highlightsRef.current && highlightsRef.current.children.length > 0) {
+        tl.fromTo(
+          highlightsRef.current.children,
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.06, duration: 0.5 },
+          '-=0.2',
+        )
+      }
+    },
+    { scope: heroRef, dependencies: [isMounted] },
+  )
+
   return (
-    <div className="relative mx-auto w-full max-w-5xl space-y-4 px-3.5 pt-3 pb-2 text-center sm:space-y-8 sm:px-6 sm:pt-6 sm:pb-4 lg:px-8">
+    <div
+      ref={heroRef}
+      className="relative mx-auto w-full max-w-5xl space-y-4 px-3.5 pt-3 pb-2 text-center sm:space-y-8 sm:px-6 sm:pt-6 sm:pb-4 lg:px-8"
+    >
       <AnimatedGridPattern
         numSquares={25}
         maxOpacity={0.35}
@@ -46,7 +100,7 @@ export function FeatureHeroSection({
           {feature.categoryLabel}
         </span>
       </div>
-      <div className="space-y-2.5 sm:space-y-4">
+      <div ref={headerRef} className="space-y-2.5 sm:space-y-4">
         <div className="bg-card/80 text-primary border-border/80 shadow-primary/5 mx-auto inline-flex size-14 items-center justify-center rounded-2xl border shadow-xl backdrop-blur-md sm:size-20 sm:rounded-3xl">
           {feature.icon}
         </div>
@@ -60,7 +114,10 @@ export function FeatureHeroSection({
           {feature.fullDescription}
         </p>
       </div>
-      <div className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 pt-1 sm:max-w-none sm:flex-row sm:items-center sm:gap-3 sm:pt-2">
+      <div
+        ref={ctaRef}
+        className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 pt-1 sm:max-w-none sm:flex-row sm:items-center sm:gap-3 sm:pt-2"
+      >
         <RainbowButton
           size="lg"
           asChild
@@ -86,7 +143,10 @@ export function FeatureHeroSection({
           </Link>
         </Button>
       </div>
-      <div className="mx-auto grid max-w-4xl grid-cols-1 gap-2.5 pt-2 sm:grid-cols-3 sm:gap-4 sm:pt-4">
+      <div
+        ref={metricsRef}
+        className="mx-auto grid max-w-4xl grid-cols-1 gap-2.5 pt-2 sm:grid-cols-3 sm:gap-4 sm:pt-4"
+      >
         {feature.metrics.map((metric, mIdx) => {
           const match = metric.value.match(
             /^([^0-9]*)([0-9]+(?:\.[0-9]+)?)(.*)$/,
@@ -127,7 +187,10 @@ export function FeatureHeroSection({
           )
         })}
       </div>
-      <div className="mx-auto grid max-w-3xl grid-cols-1 gap-2 pt-1 text-left text-xs sm:grid-cols-2 sm:gap-3 sm:pt-2 sm:text-sm">
+      <div
+        ref={highlightsRef}
+        className="mx-auto grid max-w-3xl grid-cols-1 gap-2 pt-1 text-left text-xs sm:grid-cols-2 sm:gap-3 sm:pt-2 sm:text-sm"
+      >
         {feature.highlights.map((item, idx) => (
           <div
             key={idx}

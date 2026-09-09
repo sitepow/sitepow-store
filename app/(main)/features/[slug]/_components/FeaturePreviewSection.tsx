@@ -1,9 +1,48 @@
+'use client'
+import { useRef } from 'react'
+
+import { useIsMounted } from '@/hooks/use-is-mounted'
+
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Safari } from '@/components/magicui/safari'
 
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
+
 export function FeaturePreviewSection({ slug }: { slug: string }) {
+  const isMounted = useIsMounted()
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(
+    () => {
+      if (!isMounted) return
+      if (containerRef.current) {
+        gsap.fromTo(
+          containerRef.current,
+          { scale: 0.94, y: 50, opacity: 0 },
+          {
+            scale: 1,
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+      ScrollTrigger.refresh()
+    },
+    { scope: containerRef, dependencies: [isMounted] },
+  )
+
   return (
-    <div className="relative mx-auto w-full max-w-5xl px-3.5 sm:px-6 lg:px-8">
+    <div
+      ref={containerRef}
+      className="relative mx-auto w-full max-w-5xl px-3.5 sm:px-6 lg:px-8"
+    >
       <div className="bg-card ring-border relative overflow-hidden rounded-2xl border p-1 shadow-2xl ring-1 sm:rounded-3xl sm:p-2">
         <Safari
           url={`app.sitepow.store/${slug}`}

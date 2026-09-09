@@ -1,13 +1,16 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { getLocalizedFeatures } from '@/constants/features'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconArrowRight, IconCheck } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
+
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 const CATEGORIES = [
   { id: 'all', key: 'all' },
@@ -19,6 +22,7 @@ const CATEGORIES = [
 ]
 
 export function FeaturesGridSection() {
+  const isMounted = useIsMounted()
   const t = useTranslations('features')
   const features = getLocalizedFeatures(t)
   const [selectedCat, setSelectedCat] = useState('all')
@@ -27,9 +31,66 @@ export function FeaturesGridSection() {
       ? features
       : features.filter((f) => f.category === selectedCat)
 
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const hasAnimatedTabs = useRef(false)
+
+  useGSAP(
+    () => {
+      if (!isMounted) return
+
+      if (tabsRef.current && !hasAnimatedTabs.current) {
+        hasAnimatedTabs.current = true
+        gsap.fromTo(
+          tabsRef.current,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: tabsRef.current,
+              start: 'top 92%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (gridRef.current) {
+        const cards = Array.from(gridRef.current.children)
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 92%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+
+      ScrollTrigger.refresh()
+    },
+    { scope: sectionRef, dependencies: [isMounted, selectedCat] },
+  )
+
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <div className="flex justify-center">
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div ref={tabsRef} className="flex justify-center">
         <div className="bg-muted/70 border-border/80 inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 rounded-xl border p-1 shadow-xs sm:gap-1 sm:rounded-2xl sm:p-1.5">
           {CATEGORIES.map((cat) => {
             const isSelected = selectedCat === cat.id
@@ -49,7 +110,10 @@ export function FeaturesGridSection() {
           })}
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        ref={gridRef}
+        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
+      >
         {filteredFeatures.map((feat) => (
           <div
             key={feat.slug}

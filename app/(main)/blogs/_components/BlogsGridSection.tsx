@@ -1,21 +1,30 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { getStaticBlogs } from '@/constants/blogs'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ArrowRight, Calendar, Clock, Search, Tag } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
 
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
+
 export function BlogsGridSection() {
+  const isMounted = useIsMounted()
   const locale = useLocale()
   const t = useTranslations('blogs')
   const allBlogs = useMemo(() => getStaticBlogs(locale), [locale])
   const [selectedTag, setSelectedTag] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const filterBarRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const hasAnimatedFilterBar = useRef(false)
 
   const availableTags = useMemo(() => {
     const tagsSet = new Set<string>()
@@ -37,9 +46,64 @@ export function BlogsGridSection() {
     })
   }, [allBlogs, selectedTag, searchQuery])
 
+  useGSAP(
+    () => {
+      if (!isMounted) return
+
+      if (filterBarRef.current && !hasAnimatedFilterBar.current) {
+        hasAnimatedFilterBar.current = true
+        gsap.fromTo(
+          filterBarRef.current,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: filterBarRef.current,
+              start: 'top 92%',
+              toggleActions: 'play none none none',
+            },
+          },
+        )
+      }
+
+      if (gridRef.current) {
+        const cards = Array.from(gridRef.current.children)
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.75,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 92%',
+                toggleActions: 'play none none none',
+              },
+            },
+          )
+        })
+      }
+
+      ScrollTrigger.refresh()
+    },
+    { scope: sectionRef, dependencies: [isMounted, filteredBlogs] },
+  )
+
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4">
+    <div
+      ref={sectionRef}
+      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+    >
+      <div
+        ref={filterBarRef}
+        className="flex flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4"
+      >
         <div className="flex max-w-full flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
           <button
             onClick={() => setSelectedTag('all')}
@@ -82,7 +146,10 @@ export function BlogsGridSection() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+        >
           {filteredBlogs.map((blog) => {
             const readingMinutes = Math.ceil(blog.content.length / 500) || 3
             const formattedDate = new Date(blog.createdAt).toLocaleDateString(
