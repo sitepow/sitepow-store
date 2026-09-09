@@ -20,10 +20,12 @@ const SOLUTION_CONFIGS = [
   {
     icon: <IconCpu size={22} />,
     url: 'ai.sitepow.store',
+    videoSrc: '/slip-verify.webm',
   },
   {
     icon: <IconFlame size={22} />,
     url: 'app.sitepow.store',
+    videoSrc: '/gp-section.webm',
   },
 ]
 

@@ -1,24 +1,24 @@
-"use client";
+'use client'
 
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
-  ScrollTrigger.config({ ignoreMobileResize: true });
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger, useGSAP)
+  ScrollTrigger.config({ ignoreMobileResize: true })
 
-  if (document.readyState === "complete") {
-    ScrollTrigger.refresh();
+  if (document.readyState === 'complete') {
+    ScrollTrigger.refresh()
   } else {
-    window.addEventListener("load", () => ScrollTrigger.refresh());
+    window.addEventListener('load', () => ScrollTrigger.refresh())
   }
 
-  if (typeof document !== "undefined" && "fonts" in document) {
+  if (typeof document !== 'undefined' && 'fonts' in document) {
     document.fonts.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
+      ScrollTrigger.refresh()
+    })
   }
 }
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, ScrollTrigger, useGSAP }
