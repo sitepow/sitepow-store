@@ -15,6 +15,7 @@ import { useSession } from '@/hooks/use-session'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { ArrowRight } from 'lucide-react'
 
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 import { Card, CardFooter, CardHeader } from '@/components/ui/card'
 
@@ -181,13 +182,22 @@ export function PricingSection() {
                   </ul>
                 </div>
                 <CardFooter className="p-0 pt-6">
-                  <Button
-                    asChild
-                    variant={plan.isPopular ? 'default' : 'outline'}
-                    className="h-10 w-full cursor-pointer text-xs font-semibold sm:text-sm"
-                  >
-                    <Link href={targetHref}>{plan.buttonText}</Link>
-                  </Button>
+                  {plan.isPopular ? (
+                    <RainbowButton
+                      asChild
+                      className="h-10 w-full text-xs font-semibold sm:text-sm"
+                    >
+                      <Link href={targetHref}>{plan.buttonText}</Link>
+                    </RainbowButton>
+                  ) : (
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-10 w-full cursor-pointer text-xs font-semibold sm:text-sm"
+                    >
+                      <Link href={targetHref}>{plan.buttonText}</Link>
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             )

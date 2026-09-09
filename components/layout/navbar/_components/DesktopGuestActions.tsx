@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 interface DesktopGuestActionsProps {
@@ -28,7 +29,9 @@ export function DesktopGuestActions({
         </Button>
       </Link>
       <Link href={registerHref}>
-        <Button className="font-medium">{t('register')}</Button>
+        <RainbowButton size="sm" className="font-medium">
+          {t('register')}
+        </RainbowButton>
       </Link>
       <QuickSettingsMenu buttonVariant="ghost" />
     </>

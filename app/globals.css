@@ -51,9 +51,15 @@
   --shadow-airy: 0 1.50943px 9.0566px rgba(96, 108, 171, 0.15);
   --tracking-tighter: -0.05em;
   --letter-spacing-tighter: var(--tracking-tighter);
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
 }
 
 :root {
+  --color-1: hsl(0 100% 63%);
+  --color-2: hsl(270 100% 63%);
+  --color-3: hsl(210 100% 63%);
+  --color-4: hsl(195 100% 63%);
+  --color-5: hsl(90 100% 63%);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -321,4 +327,17 @@ article.prose li {
 
 .animate-shiny-text {
   animation: shiny-text 8s infinite;
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.animate-rainbow {
+  animation: rainbow var(--speed, 2s) infinite linear;
 }

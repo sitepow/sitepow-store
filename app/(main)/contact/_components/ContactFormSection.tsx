@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { IconCheck, IconLoader2, IconSend } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -173,11 +174,11 @@ export function ContactFormSection() {
               />
             </div>
             <div className="pt-1 sm:pt-2">
-              <Button
+              <RainbowButton
                 type="submit"
                 size="lg"
                 disabled={isSubmitting}
-                className="shadow-primary/20 flex h-10 w-full cursor-pointer items-center justify-center gap-2 text-xs font-semibold shadow-md sm:h-11 sm:text-sm"
+                className="flex h-10 w-full items-center justify-center gap-2 text-xs sm:h-11 sm:text-sm"
               >
                 {isSubmitting ? (
                   <>
@@ -190,7 +191,7 @@ export function ContactFormSection() {
                     <span>{t('submitBtn')}</span>
                   </>
                 )}
-              </Button>
+              </RainbowButton>
             </div>
           </form>
         )}

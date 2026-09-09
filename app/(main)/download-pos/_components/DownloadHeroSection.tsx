@@ -8,6 +8,7 @@ import {
   IconWorld,
 } from '@tabler/icons-react'
 
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 import { MainHeroHeader } from '../../_components/MainHeroHeader'
@@ -29,10 +30,10 @@ export function DownloadHeroSection() {
       description={t('description')}
     >
       <div className="flex flex-col items-center justify-center gap-2.5 pt-1 sm:flex-row sm:gap-3 sm:pt-2">
-        <Button
+        <RainbowButton
           size="lg"
           asChild
-          className="shadow-primary/20 h-10 w-full cursor-pointer px-5 text-xs font-semibold shadow-md sm:h-11 sm:w-auto sm:px-6 sm:text-sm"
+          className="h-10 w-full sm:h-11 sm:w-auto"
         >
           <a
             href="#platforms"
@@ -41,7 +42,7 @@ export function DownloadHeroSection() {
             <IconArrowDown size={16} />
             <span>{t('selectOsBtn')}</span>
           </a>
-        </Button>
+        </RainbowButton>
         <Button
           variant="outline"
           size="lg"

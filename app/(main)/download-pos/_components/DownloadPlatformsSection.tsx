@@ -17,6 +17,7 @@ import {
 } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
@@ -231,10 +232,10 @@ export function DownloadPlatformsSection() {
             {t('webBanner.description')}
           </p>
         </div>
-        <Button
+        <RainbowButton
           size="lg"
           asChild
-          className="shadow-primary/20 h-10 w-full shrink-0 cursor-pointer px-5 text-xs font-semibold shadow-md sm:h-11 sm:w-auto sm:px-6 sm:text-sm"
+          className="h-10 w-full shrink-0 sm:h-11 sm:w-auto"
         >
           <Link
             href="/merchant/pos"
@@ -244,7 +245,7 @@ export function DownloadPlatformsSection() {
             <IconWorld size={16} />
             <span>{t('webBanner.btn')}</span>
           </Link>
-        </Button>
+        </RainbowButton>
       </div>
     </section>
   )

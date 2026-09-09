@@ -9,7 +9,6 @@ import {
   IconBrandMessenger,
   IconExternalLink,
   IconHeadset,
-  IconShieldCheck,
 } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
@@ -142,13 +141,6 @@ export function Footer() {
               </p>
 
               <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:gap-3">
-                <div className="border-border/60 bg-muted/40 text-muted-foreground inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs">
-                  <span className="relative flex size-2">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
-                  </span>
-                  <span className="font-medium">{t('uptime')}</span>
-                </div>
                 <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
                   <IconHeadset className="text-primary size-4 shrink-0" />
                   <span>{t('supportHours')}</span>
@@ -230,10 +222,6 @@ export function Footer() {
             </p>
           </div>
           <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <IconShieldCheck className="text-primary size-4 shrink-0" />
-              <span>{t('ssl')}</span>
-            </div>
             <QuickSettingsMenu buttonVariant="ghost" />
           </div>
         </div>

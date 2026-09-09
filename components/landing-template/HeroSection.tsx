@@ -7,6 +7,7 @@ import { useSession } from '@/hooks/use-session'
 import { IconBuildingStore } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Safari } from '@/components/magicui/safari'
 import { Button } from '@/components/ui/button'
 
@@ -36,11 +37,7 @@ export function HeroSection() {
         </div>
         <div className="mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
           {!isAuthenticated ? (
-            <Button
-              size="lg"
-              asChild
-              className="shadow-primary/25 h-11 w-full cursor-pointer px-6 text-sm font-semibold shadow-lg sm:w-auto sm:text-base"
-            >
+            <RainbowButton size="lg" asChild className="h-11 w-full sm:w-auto">
               <Link
                 href={registerHref}
                 className="flex items-center justify-center gap-2"
@@ -48,13 +45,9 @@ export function HeroSection() {
                 <IconBuildingStore className="size-5" />
                 <span>{t('registerBtn')}</span>
               </Link>
-            </Button>
+            </RainbowButton>
           ) : (
-            <Button
-              size="lg"
-              asChild
-              className="shadow-primary/20 h-11 cursor-pointer px-6 text-sm font-semibold shadow-md sm:w-auto sm:text-base"
-            >
+            <RainbowButton size="lg" asChild className="h-11 w-full sm:w-auto">
               <Link
                 href="/merchant/dashboard"
                 className="flex items-center justify-center gap-2"
@@ -62,7 +55,7 @@ export function HeroSection() {
                 <IconBuildingStore className="size-5" />
                 <span>{t('manageStoreBtn')}</span>
               </Link>
-            </Button>
+            </RainbowButton>
           )}
           <Button
             variant="outline"

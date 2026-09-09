@@ -11,6 +11,7 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react'
 
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 export function FeatureHeroSection({
@@ -52,10 +53,10 @@ export function FeatureHeroSection({
         </p>
       </div>
       <div className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 pt-1 sm:max-w-none sm:flex-row sm:items-center sm:gap-3 sm:pt-2">
-        <Button
+        <RainbowButton
           size="lg"
           asChild
-          className="shadow-primary/25 h-10 w-full cursor-pointer rounded-full px-6 text-xs font-semibold shadow-lg transition-transform hover:scale-105 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
+          className="h-10 w-full rounded-full sm:h-12 sm:w-auto"
         >
           <Link
             href={registerHref}
@@ -65,7 +66,7 @@ export function FeatureHeroSection({
             <span>{t('registerBtn')}</span>
             <IconArrowRight size={15} />
           </Link>
-        </Button>
+        </RainbowButton>
         <Button
           variant="outline"
           size="lg"

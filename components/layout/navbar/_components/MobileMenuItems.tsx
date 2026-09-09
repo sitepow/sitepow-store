@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { NAVBAR_ITEMS } from '@/constants/navbar'
 import { LockIcon } from 'lucide-react'
 
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
@@ -50,7 +51,7 @@ export function MobileMenuItems({
                     onClick={onClose}
                     className="text-primary text-xs font-semibold hover:underline"
                   >
-                    {tNav("viewAllFeatures")}
+                    {tNav('viewAllFeatures')}
                   </Link>
                 </div>
                 <div className="border-border ml-2 flex flex-col space-y-3 border-l-2 pl-4">
@@ -100,9 +101,12 @@ export function MobileMenuItems({
               </Button>
             </Link>
             <Link href={registerHref} onClick={onClose}>
-              <Button className="w-full justify-center py-6 text-base font-medium">
+              <RainbowButton
+                size="lg"
+                className="w-full justify-center py-6 text-base font-medium"
+              >
                 {tNav('register')}
-              </Button>
+              </RainbowButton>
             </Link>
           </div>
         </>

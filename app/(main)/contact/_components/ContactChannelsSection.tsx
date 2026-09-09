@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
@@ -127,18 +128,42 @@ export function ContactChannelsSection() {
             </div>
             <div className="pt-3.5 sm:pt-6">
               {ch.onClick ? (
-                <Button
-                  onClick={ch.onClick}
-                  variant={ch.isPrimary ? 'default' : 'outline'}
-                  className="flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 text-xs font-semibold sm:h-10"
+                ch.isPrimary ? (
+                  <RainbowButton
+                    onClick={ch.onClick}
+                    className="flex h-9 w-full items-center justify-center gap-1.5 text-xs sm:h-10"
+                  >
+                    <span>{ch.buttonLabel}</span>
+                    <IconExternalLink size={14} />
+                  </RainbowButton>
+                ) : (
+                  <Button
+                    onClick={ch.onClick}
+                    variant="outline"
+                    className="flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 text-xs font-semibold sm:h-10"
+                  >
+                    <span>{ch.buttonLabel}</span>
+                    <IconExternalLink size={14} />
+                  </Button>
+                )
+              ) : ch.isPrimary ? (
+                <RainbowButton
+                  asChild
+                  className="flex h-9 w-full items-center justify-center gap-1.5 text-xs sm:h-10"
                 >
-                  <span>{ch.buttonLabel}</span>
-                  <IconExternalLink size={14} />
-                </Button>
+                  <Link
+                    href={ch.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>{ch.buttonLabel}</span>
+                    <IconExternalLink size={14} />
+                  </Link>
+                </RainbowButton>
               ) : (
                 <Button
                   asChild
-                  variant={ch.isPrimary ? 'default' : 'outline'}
+                  variant="outline"
                   className="flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 text-xs font-semibold sm:h-10"
                 >
                   <Link

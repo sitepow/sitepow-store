@@ -25,6 +25,7 @@ import { ForgotPasswordDialog } from '@/components/ForgotPasswordForm'
 import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -216,15 +217,15 @@ export function LoginForm() {
               </div>
               <FieldError>{errors?.password?.message}</FieldError>
             </Field>
-            <Button
+            <RainbowButton
               type="submit"
-              className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full cursor-pointer rounded-xl text-sm font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.99] sm:h-11"
+              className="h-10 w-full sm:h-11"
               size="lg"
               disabled={isPending}
             >
               {isPending && <Spinner className="mr-2" />}
               {isPending ? t('submitting') : t('submit')}
-            </Button>
+            </RainbowButton>
           </form>
           <p className="text-muted-foreground text-center text-xs sm:text-sm">
             {t('noAccount')}{' '}

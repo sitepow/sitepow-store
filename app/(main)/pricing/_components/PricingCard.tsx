@@ -10,6 +10,7 @@ import { PricingPlanProps } from '@/types/pricing'
 import { calculatePlanPrice } from '@/utils/pricing'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
 import { usePricingStore } from '../store'
@@ -115,13 +116,22 @@ export function PricingCard({
         </ul>
       </div>
       <div className="pt-4 sm:pt-6">
-        <Button
-          asChild
-          className="h-9 w-full cursor-pointer text-xs font-semibold sm:h-10 sm:text-sm"
-          variant={isPopular ? 'default' : 'outline'}
-        >
-          <Link href={targetHref}>{buttonText}</Link>
-        </Button>
+        {isPopular ? (
+          <RainbowButton
+            asChild
+            className="h-9 w-full text-xs font-semibold sm:h-10 sm:text-sm"
+          >
+            <Link href={targetHref}>{buttonText}</Link>
+          </RainbowButton>
+        ) : (
+          <Button
+            asChild
+            className="h-9 w-full cursor-pointer text-xs font-semibold sm:h-10 sm:text-sm"
+            variant="outline"
+          >
+            <Link href={targetHref}>{buttonText}</Link>
+          </Button>
+        )}
       </div>
     </div>
   )
