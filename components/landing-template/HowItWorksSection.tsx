@@ -1,4 +1,5 @@
 'use client'
+
 import { useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -89,20 +90,29 @@ export function HowItWorksSection() {
       title: t('steps.0.title'),
       description: t('steps.0.description'),
       badge: t('steps.0.badge'),
+      url: 'sitepow.store/register',
+      videoSrc: '/login-section.webm',
     },
     {
       step: '02',
       title: t('steps.1.title'),
       description: t('steps.1.description'),
       badge: t('steps.1.badge'),
+      url: 'sitepow.store/merchant/products',
+      videoSrc: '/product-section.webm',
     },
     {
       step: '03',
       title: t('steps.2.title'),
       description: t('steps.2.description'),
       badge: t('steps.2.badge'),
+      url: 'sitepow.store/merchant/pos',
+      videoSrc: '/storefront-section.webm',
     },
   ]
+
+  const currentStep = steps[activeStep]
+
   return (
     <section
       ref={sectionRef}
@@ -154,20 +164,23 @@ export function HowItWorksSection() {
               </div>
             ))}
           </div>
+
           <div ref={mockupRef} className="lg:col-span-7">
             <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
-              <Safari
-                url={
-                  activeStep === 0
-                    ? 'sitepow.store/register'
-                    : activeStep === 1
-                      ? 'sitepow.store/merchant/products'
-                      : 'sitepow.store/merchant/pos'
-                }
-                mode="simple"
-                className="w-full"
-              >
-                <div className="size-full bg-neutral-200 transition-colors dark:bg-neutral-800" />
+              <Safari url={currentStep.url} className="w-full">
+                {currentStep.videoSrc ? (
+                  <video
+                    key={currentStep.videoSrc}
+                    src={currentStep.videoSrc}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <div className="size-full bg-neutral-200 transition-colors dark:bg-neutral-800" />
+                )}
               </Safari>
               <BorderBeam
                 size={160}
