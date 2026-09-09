@@ -100,7 +100,7 @@ export function CouponCreateDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <IconPlus />
           {t('createCoupon')}
         </Button>

@@ -35,7 +35,7 @@ export default function MerchantStoreSettingsProductsPage() {
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
             {canCreateProducts && (
-              <Button asChild variant="outline">
+              <Button asChild>
                 <Link href={'/merchant/store-settings/products/create'}>
                   <IconPlus />
                   {t('addProduct')}

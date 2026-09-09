@@ -194,7 +194,7 @@ export function CategoryDialog({
         onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}
       >
         <DialogTrigger asChild>
-          <Button variant="outline" onClick={onAdd}>
+          <Button onClick={onAdd}>
             <IconPlus />
             {t('addCategory')}
           </Button>

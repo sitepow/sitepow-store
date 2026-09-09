@@ -55,7 +55,7 @@ export function DeleteButton({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>ยกเลิก</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete} disabled={isPending}>
+          <AlertDialogAction variant="destructive" onClick={onDelete} disabled={isPending}>
             {isPending ? 'กำลังลบ...' : 'ยืนยัน'}
           </AlertDialogAction>
         </AlertDialogFooter>

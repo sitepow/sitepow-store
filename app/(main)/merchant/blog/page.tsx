@@ -35,7 +35,7 @@ export default function MerchantBlogsPage() {
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
             {canCreateBlogs && (
-              <Button asChild variant="outline">
+              <Button asChild>
                 <Link href={'/merchant/blog/create'}>
                   <IconPlus />
                   {t('addBlog')}

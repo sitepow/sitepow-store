@@ -195,7 +195,7 @@ export function EmployeeDialog({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={onAdd}>
+        <Button onClick={onAdd}>
           <IconPlus />
           {t('addEmployee')}
         </Button>

@@ -153,7 +153,7 @@ export function BranchDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={onAdd}>
+        <Button onClick={onAdd}>
           <IconPlus className="size-4" />
           {t('addBranch')}
         </Button>
