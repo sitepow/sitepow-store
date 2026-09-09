@@ -75,6 +75,10 @@ export const auth = betterAuth({
 
   advanced: {
     useSecureCookies: false,
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: isProd ? '.sitepow.store' : '.lvh.me',
+    },
     defaultCookieAttributes: {
       sameSite: 'lax',
       secure: isProd,

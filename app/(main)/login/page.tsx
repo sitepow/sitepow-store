@@ -25,7 +25,12 @@ export default async function TenantLoginPage({
   const params = await searchParams
   const userSession = await getCurrentUser()
   if (userSession) {
-    redirect(params?.callbackUrl || '/')
+    const target = params?.callbackUrl
+    if (target && !target.includes('/login')) {
+      redirect(target)
+    } else {
+      redirect('/')
+    }
   }
   return <LoginForm />
 }
