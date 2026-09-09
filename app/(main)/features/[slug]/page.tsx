@@ -79,7 +79,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
     <MainLayout className="flex flex-col items-center gap-8 overflow-hidden pt-2 pb-10 sm:gap-12 sm:pt-4 sm:pb-12 md:gap-20 lg:gap-24">
       <Suspense>
         <FeatureHeroSection feature={feature} registerHref={registerHref} />
-        <FeaturePreviewSection slug={feature.slug} />
+        <FeaturePreviewSection slug={feature.slug} imageSrc={feature.image} />
         <FeatureComparisonSection comparison={feature.comparison} />
         <FeatureWorkflowSection workflow={feature.workflow} />
         <FeatureCapabilitiesSection capabilities={feature.capabilities} />

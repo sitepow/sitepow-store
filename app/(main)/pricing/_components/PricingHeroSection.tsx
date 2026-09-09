@@ -12,13 +12,22 @@ export function PricingHeroSection() {
   const isMounted = useIsMounted()
   const t = useTranslations('pricing')
   const { selectedTab, setSelectedTab } = usePricingStore()
+  const titleStart =
+    (t.raw('hero.titleStart') as string) || 'เลือก Package ที่เหมาะกับ'
+  const titleGradient =
+    (t.raw('hero.titleGradient') as string) || 'ขนาดร้านค้าและธุรกิจของคุณ'
+
   return (
     <MainHeroHeader
       badgeIcon={<IconPackage className="size-4" />}
       badgeText={t('hero.badge')}
       title={
-        (t.raw('hero.title') as string) ||
-        'เลือก Package ที่เหมาะกับ ขนาดร้านค้าและธุรกิจของคุณ'
+        <>
+          {titleStart}{' '}
+          <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent drop-shadow-xs">
+            {titleGradient}
+          </span>
+        </>
       }
       description={t('hero.description')}
     >

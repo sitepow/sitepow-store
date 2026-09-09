@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { useUnreadCount } from '@/actions/hooks/chat'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
@@ -81,6 +82,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
   const { data: storeOptions } = useStoreOptions()
+  const { data: unreadChatCount = 0 } = useUnreadCount(user?.id || '')
 
   const permissions = useEmployeePermission()
 
@@ -130,12 +132,19 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
     return fallback
   }
 
-  const checkMenuPermission = (item: { permissionKey?: PermissionKey }) => {
+  const checkMenuPermission = (item: {
+    permissionKey?: PermissionKey
+    value?: string
+  }) => {
     if (!isMerchant) {
       return true
     }
 
     if (!item.permissionKey) return true
+
+    if (item.value === 'chat' && userRole === UserRole.MERCHANT) {
+      return true
+    }
 
     return permissions[item.permissionKey] ?? true
   }
@@ -259,9 +268,19 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                         )}
                       >
                         {hasMainPermission ? (
-                          <Link href={mainUrl}>
+                          <Link
+                            href={mainUrl}
+                            className="flex w-full items-center"
+                          >
                             <item.icon className="size-4" />
-                            <span>{getItemLabel(item.value, item.label)}</span>
+                            <span className="flex-1">
+                              {getItemLabel(item.value, item.label)}
+                            </span>
+                            {item.value === 'chat' && unreadChatCount > 0 && (
+                              <span className="bg-primary text-primary-foreground ml-auto flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
+                                {unreadChatCount > 99 ? '99+' : unreadChatCount}
+                              </span>
+                            )}
                           </Link>
                         ) : (
                           <div className="flex w-full items-center gap-2">

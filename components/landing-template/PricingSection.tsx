@@ -11,6 +11,7 @@ import {
   PRICING_VALUE,
 } from '@/constants/pricing'
 import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { useGSAP } from '@gsap/react'
@@ -23,10 +24,12 @@ import { Card, CardFooter, CardHeader } from '@/components/ui/card'
 import { gsap } from '@/lib/gsap'
 
 export function PricingSection() {
+  const isMounted = useIsMounted()
   const [selectedPeriod, setSelectedPeriod] = useState<string>(
     PRICING_VALUE.TWELVE_MONTHS,
   )
   const { isAuthenticated } = useSession()
+  const isAuth = isMounted && isAuthenticated
   const t = useTranslations('pricing')
   const tHome = useTranslations('home.pricing')
 
@@ -162,7 +165,7 @@ export function PricingSection() {
           {plans.map((plan, idx) => {
             const { basePrice, discountPercent, finalPrice, averagePerMonth } =
               calculatePlanPrice(plan.price, selectedPeriod)
-            const targetHref = !isAuthenticated
+            const targetHref = !isAuth
               ? registerHref
               : '/merchant/store-settings'
             return (

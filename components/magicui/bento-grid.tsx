@@ -28,7 +28,7 @@ export function BentoGrid({ children, className, ...props }: BentoGridProps) {
     <div
       className={cn(
         'grid w-full auto-rows-[22rem] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3',
-        'grid w-full auto-rows-auto sm:auto-rows-[22rem] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3',
+        'grid w-full auto-rows-auto grid-cols-1 gap-4 sm:auto-rows-[22rem] md:grid-cols-2 lg:grid-cols-3',
         className,
       )}
       {...props}
@@ -52,14 +52,15 @@ export function BentoCard({
     <div
       key={name}
       className={cn(
-        'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/80 bg-white/70 p-6 backdrop-blur-md transition-all duration-300 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-900/60',
         'group relative flex min-h-[16rem] flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/80 bg-white/70 p-5 backdrop-blur-md transition-all duration-300 hover:shadow-xl sm:p-6 dark:border-neutral-800 dark:bg-neutral-900/60',
         'transform-gpu',
         className,
       )}
       {...props}
     >
-      <div className="absolute inset-0 -z-10 overflow-hidden">{background}</div>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {background}
+      </div>
 
       <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-2 transition-all duration-300 lg:group-hover:-translate-y-2">
         {Icon && (

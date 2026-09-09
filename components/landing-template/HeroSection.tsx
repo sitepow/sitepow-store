@@ -32,6 +32,7 @@ export function HeroSection() {
   const isMounted = useIsMounted()
   const t = useTranslations('home.hero')
   const { isAuthenticated } = useSession()
+  const isAuth = isMounted && isAuthenticated
   const registerParams = new URLSearchParams()
   registerParams.set('role', UserRole.MERCHANT)
   registerParams.set('callbackUrl', '/merchant/dashboard')
@@ -235,7 +236,7 @@ export function HeroSection() {
           {/* Main Headline */}
           <h1
             ref={titleRef}
-            className="text-foreground text-3xl leading-[1.08] font-black tracking-tight text-balance sm:text-5xl md:text-6xl lg:text-[70px] xl:text-[76px]"
+            className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl"
           >
             {t('titleStart')}{' '}
             <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent drop-shadow-xs">
@@ -257,7 +258,7 @@ export function HeroSection() {
           ref={ctaRef}
           className="mt-6 flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 sm:mt-8 sm:max-w-none sm:flex-row sm:items-center sm:gap-3"
         >
-          {!isAuthenticated ? (
+          {!isAuth ? (
             <RainbowButton
               size="lg"
               asChild

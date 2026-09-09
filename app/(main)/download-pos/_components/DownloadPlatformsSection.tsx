@@ -8,8 +8,7 @@ import Link from 'next/link'
 import { useGSAP } from '@gsap/react'
 import {
   IconCheck,
-  IconDownload,
-  IconExternalLink,
+  IconClock,
   IconSparkles,
   IconWorld,
 } from '@tabler/icons-react'
@@ -29,11 +28,6 @@ interface PlatformConfig {
   requirements: string
   icon: React.ReactNode
   isFeatured?: boolean
-  downloads: {
-    href: string
-    isPrimary?: boolean
-    icon?: React.ReactNode
-  }[]
 }
 
 const PLATFORM_CONFIGS: PlatformConfig[] = [
@@ -53,18 +47,6 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
       />
     ),
     isFeatured: true,
-    downloads: [
-      {
-        href: '#',
-        isPrimary: true,
-        icon: <IconDownload size={15} />,
-      },
-      {
-        href: '#',
-        isPrimary: false,
-        icon: <IconDownload size={15} />,
-      },
-    ],
   },
   {
     id: 'android',
@@ -81,18 +63,6 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
         unoptimized
       />
     ),
-    downloads: [
-      {
-        href: '#',
-        isPrimary: true,
-        icon: <IconDownload size={15} />,
-      },
-      {
-        href: '#',
-        isPrimary: false,
-        icon: <IconExternalLink size={15} />,
-      },
-    ],
   },
   {
     id: 'ios',
@@ -109,18 +79,6 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
         unoptimized
       />
     ),
-    downloads: [
-      {
-        href: '#',
-        isPrimary: true,
-        icon: <IconExternalLink size={15} />,
-      },
-      {
-        href: '/merchant/pos',
-        isPrimary: false,
-        icon: <IconWorld size={15} />,
-      },
-    ],
   },
   {
     id: 'macos',
@@ -137,13 +95,6 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
         unoptimized
       />
     ),
-    downloads: [
-      {
-        href: '#',
-        isPrimary: true,
-        icon: <IconDownload size={15} />,
-      },
-    ],
   },
 ]
 
@@ -204,10 +155,6 @@ export function DownloadPlatformsSection() {
     badge: t(`items.${p.id}.badge`),
     description: t(`items.${p.id}.description`),
     features: [0, 1, 2, 3].map((fIdx) => t(`items.${p.id}.features.${fIdx}`)),
-    downloads: p.downloads.map((d, bIdx) => ({
-      ...d,
-      label: t(`items.${p.id}.downloads.${bIdx}`),
-    })),
   }))
 
   return (
@@ -290,19 +237,18 @@ export function DownloadPlatformsSection() {
               </ul>
             </div>
             <div className="space-y-2 pt-4 sm:pt-6">
-              {platform.downloads.map((btn, bIdx) => (
-                <Button
-                  key={bIdx}
-                  asChild
-                  variant={btn.isPrimary ? 'default' : 'outline'}
-                  className="flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 text-xs font-semibold"
-                >
-                  <Link href={btn.href}>
-                    {btn.icon}
-                    <span>{btn.label}</span>
-                  </Link>
-                </Button>
-              ))}
+              <Button
+                disabled
+                variant="outline"
+                className={`flex h-9 w-full cursor-not-allowed items-center justify-center gap-1.5 text-xs font-semibold select-none ${
+                  platform.isFeatured
+                    ? 'border-primary/40 bg-primary/10 text-primary dark:border-primary/40 dark:bg-primary/15'
+                    : 'border-border/80 bg-muted/50 text-muted-foreground'
+                }`}
+              >
+                <IconClock size={15} />
+                <span>{t('comingSoon')}</span>
+              </Button>
               <div className="text-muted-foreground pt-0.5 text-center text-[10px]">
                 {t('systemRequirements')} {platform.requirements}
               </div>

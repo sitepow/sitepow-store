@@ -8,7 +8,13 @@ import { Safari } from '@/components/magicui/safari'
 
 import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
-export function FeaturePreviewSection({ slug }: { slug: string }) {
+export function FeaturePreviewSection({
+  slug,
+  imageSrc,
+}: {
+  slug: string
+  imageSrc?: string
+}) {
   const isMounted = useIsMounted()
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -48,9 +54,7 @@ export function FeaturePreviewSection({ slug }: { slug: string }) {
           url={`app.sitepow.store/${slug}`}
           mode="simple"
           className="w-full"
-        >
-          <div className="size-full min-h-40 bg-neutral-200 transition-colors sm:min-h-105 dark:bg-neutral-800" />
-        </Safari>
+        />
         <BorderBeam
           size={200}
           duration={8}

@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
 import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { IconLogin } from '@tabler/icons-react'
 import { Menu, X } from 'lucide-react'
@@ -29,8 +30,10 @@ import { DesktopUserActions } from './_components/DesktopUserActions'
 import { MobileMenuItems } from './_components/MobileMenuItems'
 
 export function Navbar() {
+  const isMounted = useIsMounted()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user, userRole } = useSession()
+  const isAuth = isMounted && isAuthenticated
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -51,7 +54,7 @@ export function Navbar() {
   const loginHref = `/login?${authParams.toString()}`
   const registerHref = `/register?${authParams.toString()}`
 
-  const isEmailUnverified = isAuthenticated && !user?.emailVerified
+  const isEmailUnverified = isAuth && !user?.emailVerified
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -73,7 +76,7 @@ export function Navbar() {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-          {!isAuthenticated && (
+          {!isAuth && (
             <div className="hidden items-center gap-2.5 lg:flex">
               <DesktopGuestActions
                 loginHref={loginHref}
@@ -81,7 +84,7 @@ export function Navbar() {
               />
             </div>
           )}
-          {isAuthenticated && (
+          {isAuth && (
             <div className="hidden items-center gap-4 lg:flex">
               <DesktopUserActions
                 navbarItems={navbarItems}
@@ -90,11 +93,11 @@ export function Navbar() {
             </div>
           )}
           <div className="flex items-center gap-2 lg:hidden">
-            {isAuthenticated && (
+            {isAuth && (
               <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
             )}
             <div className="flex flex-wrap gap-2">
-              {!isAuthenticated && (
+              {!isAuth && (
                 <Button size="icon-lg" variant="ghost" asChild>
                   <Link href={loginHref} aria-label="เข้าสู่ระบบ">
                     <IconLogin className="size-[1.2rem]" />
@@ -123,7 +126,7 @@ export function Navbar() {
         >
           <MobileMenuItems
             onClose={() => setIsMenuOpen(false)}
-            isAuthenticated={isAuthenticated}
+            isAuthenticated={isAuth}
             loginHref={loginHref}
             registerHref={registerHref}
           />

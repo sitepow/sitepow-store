@@ -21,6 +21,27 @@ interface ChatWindowProps {
   currentUserId: string
   isAiEnabled?: boolean
   canToggleAi?: boolean
+  showAIToggleBar?: boolean
+  headerContent?: React.ReactNode
+}
+
+function formatDateSeparator(dateStr: Date | string) {
+  const date = new Date(dateStr)
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+
+  if (date.toDateString() === today.toDateString()) {
+    return 'วันนี้'
+  }
+  if (date.toDateString() === yesterday.toDateString()) {
+    return 'เมื่อวาน'
+  }
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 export function ChatWindow({
@@ -28,10 +49,13 @@ export function ChatWindow({
   currentUserId,
   isAiEnabled,
   canToggleAi = false,
+  showAIToggleBar = true,
+  headerContent,
 }: ChatWindowProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChatMessages(conversationId)
-  const { register, handleSubmit, reset, watch } = useForm<ChatFormValues>()
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<ChatFormValues>()
 
   useChatScroll(messages, containerRef)
   useChatStream(conversationId)
@@ -42,8 +66,9 @@ export function ChatWindow({
   const hasContent = !!watch('content')?.trim()
 
   return (
-    <div className="flex h-full flex-col">
-      {canToggleAi && (
+    <div className="bg-background flex h-full flex-col">
+      {headerContent}
+      {canToggleAi && showAIToggleBar && (
         <ChatAIToggle
           enabled={isAiEnabled}
           onToggle={(c) => {
@@ -56,19 +81,42 @@ export function ChatWindow({
       )}
       <div
         ref={containerRef}
-        className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4"
+        className="bg-muted/20 min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4"
       >
-        <div className="flex flex-col gap-4">
-          {messages.map((msg) => {
+        {messages.length === 0 && (
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <p className="text-muted-foreground text-xs">
+              เริ่มต้นบทสนทนาโดยการพิมพ์ข้อความด้านล่าง
+            </p>
+          </div>
+        )}
+        <div className="flex flex-col gap-3">
+          {messages.map((msg, index) => {
+            const prevMsg = messages[index - 1]
+            const isNewDay =
+              !prevMsg ||
+              new Date(prevMsg.createdAt).toDateString() !==
+                new Date(msg.createdAt).toDateString()
             const isMySender = msg.senderId === currentUserId
+
             return (
-              <MessageBubble key={msg.id} msg={msg} isMySender={isMySender} />
+              <div key={msg.id} className="flex flex-col gap-3">
+                {isNewDay && (
+                  <div className="my-2 flex items-center justify-center">
+                    <span className="bg-background border-border/60 text-muted-foreground rounded-full border px-3 py-1 text-[11px] font-medium shadow-2xs select-none">
+                      {formatDateSeparator(msg.createdAt)}
+                    </span>
+                  </div>
+                )}
+                <MessageBubble msg={msg} isMySender={isMySender} />
+              </div>
             )
           })}
         </div>
       </div>
       <ChatInput
         register={register}
+        setValue={setValue}
         onSubmit={handleSubmit((data) => {
           sendMessage(data.content)
           reset()

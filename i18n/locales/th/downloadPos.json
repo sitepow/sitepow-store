@@ -13,6 +13,7 @@
     "description": "ดาวน์โหลดและติดตั้งได้ฟรี ทุกเวอร์ชันเชื่อมต่อกับฐานข้อมูลร้านค้าเดียวกัน ซิงก์สินค้าและสต็อก Real-time",
     "recommendedBadge": "แนะนำสำหรับหน้าร้าน",
     "systemRequirements": "ความต้องการระบบ:",
+    "comingSoon": "เร็วๆ นี้",
     "webBanner": {
       "badge": "ไม่ต้องติดตั้งโปรแกรม",
       "title": "หรือเปิดใช้งานผ่าน Web Cloud POS ได้ทันที ทุกที่ ทุกเวลา",
@@ -45,10 +46,7 @@
           "เชื่อมต่อเครื่องพิมพ์ใบเสร็จ Bluetooth หน้าร้าน",
           "พกพาง่าย เปิดบิลนอกสถานที่หรือออกบูธได้สะดวก"
         ],
-        "downloads": [
-          "ดาวน์โหลดไฟล์ APK (.apk)",
-          "Google Play Store"
-        ]
+        "downloads": ["ดาวน์โหลดไฟล์ APK (.apk)", "Google Play Store"]
       },
       "ios": {
         "name": "iPadOS & iOS",
@@ -60,10 +58,7 @@
           "ระบบสัมผัส Multi-Touch ใช้งานง่าย พนักงานเรียนรู้ไว",
           "รองรับระบบ Progressive Web App (PWA)"
         ],
-        "downloads": [
-          "Apple App Store",
-          "เปิดใช้งานผ่าน PWA"
-        ]
+        "downloads": ["Apple App Store", "เปิดใช้งานผ่าน PWA"]
       },
       "macos": {
         "name": "macOS Desktop",
@@ -75,9 +70,7 @@
           "รองรับ Dark Mode สวยงามเข้ากับตัวระบบปฏิบัติการ",
           "เปิดบิล จัดการสต็อก และดูสรุปกะสิ้นวันได้ทันที"
         ],
-        "downloads": [
-          "ดาวน์โหลด macOS Installer (.dmg)"
-        ]
+        "downloads": ["ดาวน์โหลด macOS Installer (.dmg)"]
       }
     }
   },

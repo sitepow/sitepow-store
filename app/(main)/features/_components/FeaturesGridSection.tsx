@@ -2,9 +2,10 @@
 import { useRef, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
 
-import { getLocalizedFeatures } from '@/constants/features'
+import { FEATURE_IMAGES, getLocalizedFeatures } from '@/constants/features'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconArrowRight, IconCheck } from '@tabler/icons-react'
 
@@ -117,18 +118,35 @@ export function FeaturesGridSection() {
         {filteredFeatures.map((feat) => (
           <div
             key={feat.slug}
-            className="group border-border/80 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between rounded-2xl border p-4 shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl sm:p-6"
+            className="group border-border/80 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3.5 shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl sm:p-5"
           >
             <div>
-              <div className="flex items-start justify-between">
-                <div className="bg-primary/10 text-primary mb-2.5 flex size-9 items-center justify-center rounded-xl sm:mb-4 sm:size-10">
-                  {feat.icon}
+              <div className="border-border/60 bg-muted/40 relative mb-3 aspect-[16/9] w-full overflow-hidden rounded-xl border sm:mb-4">
+                <Image
+                  src={
+                    feat.image ||
+                    FEATURE_IMAGES[feat.slug] ||
+                    '/images/landing/landing-pos.jpeg'
+                  }
+                  alt={feat.title}
+                  fill
+                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="from-card/90 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-2">
+                  <div className="bg-background/90 text-primary flex size-8 items-center justify-center rounded-lg shadow-xs backdrop-blur-md">
+                    {feat.icon}
+                  </div>
                 </div>
-                <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5">
-                  {feat.categoryLabel}
-                </span>
+                <div className="absolute top-2.5 right-2.5">
+                  <span className="bg-background/90 text-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-xs backdrop-blur-md">
+                    {feat.categoryLabel}
+                  </span>
+                </div>
               </div>
-              <div className="pt-2 sm:pt-4">
+
+              <div>
                 <h3 className="text-foreground group-hover:text-primary text-base font-bold transition-colors sm:text-lg">
                   {feat.title}
                 </h3>

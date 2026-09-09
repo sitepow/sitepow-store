@@ -10,6 +10,7 @@ import {
   IconHistory,
   IconLayoutDashboard,
   IconMapPin,
+  IconMessages,
   IconNews,
   IconPackage,
   IconReceipt,
@@ -42,7 +43,14 @@ export interface NavigationItem {
   items?: NavigationSubItem[]
 }
 
-export const SUPPORT_NAVIGATION: NavigationItem[] = []
+export const SUPPORT_NAVIGATION: NavigationItem[] = [
+  {
+    value: 'chat',
+    label: 'กล่องข้อความ Support',
+    tab: 'chat',
+    icon: IconMessages,
+  },
+]
 
 export const BUYER_NAVIGATION: NavigationItem[] = [
   {
@@ -56,6 +64,12 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     label: 'การซื้อของฉัน',
     tab: 'orders',
     icon: IconPackage,
+  },
+  {
+    value: 'chat',
+    label: 'แชทและข้อความ',
+    tab: 'chat',
+    icon: IconMessages,
   },
   {
     value: 'reviews',
@@ -112,6 +126,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'orders',
     icon: IconShoppingCart,
     permissionKey: 'canViewOrders',
+  },
+  {
+    value: 'chat',
+    label: 'แชทของร้านค้า',
+    tab: 'chat',
+    icon: IconMessages,
+    permissionKey: 'canViewConversation',
   },
   {
     value: 'store-settings/products',

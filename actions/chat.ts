@@ -241,7 +241,7 @@ export async function getCustomerConversations() {
     },
     orderBy: { lastMessageAt: 'desc' },
     include: {
-      store: { select: { name: true } },
+      store: { select: { id: true, name: true, logo: true, slug: true } },
       messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       members: { include: { user: true } },
     },
@@ -257,6 +257,11 @@ export async function getCustomerConversations() {
       lastMessageAt: c.lastMessageAt,
       unreadCount: me?.unreadCount ?? 0,
       type: c.type,
+      storeId: c.storeId,
+      storeLogo: c.store?.logo ?? null,
+      storeSlug: c.store?.slug ?? null,
+      isAiEnabled: c.isAiEnabled,
+      createdAt: c.createdAt,
     }
   })
 
@@ -276,32 +281,51 @@ export async function getSupportConversations(storeId?: string) {
     return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
   }
 
+  let storeFilter: { storeId?: string; storeIdIn?: string[] } = {}
+
   if (userRole === UserRole.MERCHANT) {
-    if (!storeId) {
-      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
-    }
-
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { id: true, ownerId: true },
-    })
-
-    if (!store) {
-      return { success: false, message: 'ไม่พบร้านค้านี้' }
-    }
-
-    const isOwner = store.ownerId === userId
-
-    if (!isOwner) {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canUpdateConversation',
+    if (storeId && storeId !== 'all') {
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { id: true, ownerId: true },
       })
 
-      if (!authCheck.isAuthorized) {
-        return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+      if (!store) {
+        return { success: false, message: 'ไม่พบร้านค้านี้' }
       }
+
+      const isOwner = store.ownerId === userId
+
+      if (!isOwner) {
+        const authCheck = await verifyEmployeePermission({
+          userId,
+          storeId,
+          permission: 'canUpdateConversation',
+        })
+
+        if (!authCheck.isAuthorized) {
+          return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+        }
+      }
+
+      storeFilter = { storeId }
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: { ownerId: userId },
+        select: { id: true },
+      })
+      const employeeStores = await prisma.employeeStore.findMany({
+        where: { employee: { userId } },
+        select: { storeId: true },
+      })
+      const accessibleStoreIds = Array.from(
+        new Set([
+          ...userStores.map((s) => s.id),
+          ...employeeStores.map((e) => e.storeId),
+        ]),
+      )
+
+      storeFilter = { storeIdIn: accessibleStoreIds }
     }
   }
 
@@ -311,10 +335,15 @@ export async function getSupportConversations(storeId?: string) {
         ? { type: ConversationType.SUPPORT }
         : {
             type: ConversationType.STORE,
-            storeId: storeId,
+            ...(storeFilter.storeId
+              ? { storeId: storeFilter.storeId }
+              : storeFilter.storeIdIn
+                ? { storeId: { in: storeFilter.storeIdIn } }
+                : {}),
           },
     orderBy: { lastMessageAt: 'desc' },
     include: {
+      store: { select: { id: true, name: true, slug: true, logo: true } },
       members: { include: { user: true } },
       messages: { orderBy: { createdAt: 'desc' }, take: 1 },
     },
@@ -327,13 +356,20 @@ export async function getSupportConversations(storeId?: string) {
 
     return {
       id: c.id,
-      merchantName: other?.name ?? other?.email ?? 'ไม่ทราบชื่อ',
+      merchantName: other?.name ?? other?.email ?? 'ลูกค้าทั่วไป',
       merchantId: other?.id ?? '',
       lastMessage: c.messages[0]?.content ?? null,
       lastMessageAt: c.lastMessageAt,
       unreadCount: me?.unreadCount ?? 0,
       isAiEnabled: c.isAiEnabled,
       type: c.type,
+      storeId: c.storeId,
+      storeName: c.store?.name ?? null,
+      customerEmail: other?.email ?? null,
+      customerPhone: other?.phone ?? null,
+      customerImage: other?.image ?? null,
+      customerRole: other?.role ?? null,
+      createdAt: c.createdAt,
     }
   })
 

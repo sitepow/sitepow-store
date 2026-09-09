@@ -30,6 +30,7 @@ export function CtaSection() {
   const isMounted = useIsMounted()
   const t = useTranslations('home.cta')
   const { isAuthenticated } = useSession()
+  const isAuth = isMounted && isAuthenticated
   const registerParams = new URLSearchParams()
   registerParams.set('role', UserRole.MERCHANT)
   registerParams.set('callbackUrl', '/merchant/dashboard')
@@ -287,7 +288,7 @@ export function CtaSection() {
               ref={ctaRef}
               className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-3 pt-2 sm:max-w-none sm:flex-row sm:items-center sm:gap-4 sm:pt-3"
             >
-              {!isAuthenticated ? (
+              {!isAuth ? (
                 <RainbowButton
                   size="lg"
                   asChild

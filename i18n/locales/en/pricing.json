@@ -6,6 +6,8 @@
   "hero": {
     "badge": "Pricing & Packages",
     "title": "Choose the Right Package for Your Store Size & Business Goals",
+    "titleStart": "Choose the Right Package for",
+    "titleGradient": "Your Store Size & Business Goals",
     "description": "Transparent, cost-effective, no hidden fees, and 0% GP commission forever. Start your online store immediately."
   },
   "tabs": {
