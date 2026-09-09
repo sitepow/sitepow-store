@@ -217,7 +217,7 @@ export function HeroSection() {
           <div ref={badgeRef}>
             <Link
               href="/features"
-              className="group border-primary/30 bg-background/80 hover:bg-background hover:border-primary/50 text-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold shadow-xs backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] sm:px-4 sm:py-1.5"
+              className="group border-primary/30 bg-background/80 hover:bg-background hover:border-primary/50 text-foreground inline-flex flex-wrap items-center justify-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold shadow-xs backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] sm:px-4 sm:py-1.5"
             >
               <span className="relative flex size-2">
                 <span className="bg-primary absolute inline-flex size-full animate-ping rounded-full opacity-75" />
