@@ -28,13 +28,22 @@ export function PdpaManagementForm() {
     deleteAccount(undefined, {
       onSuccess: async (data) => {
         if (data?.success) {
-          await authClient.signOut({
-            fetchOptions: {
-              onSuccess: () => {
-                router.replace('/')
-              },
-            },
-          })
+          try {
+            await fetch('/api/auth/custom-logout', {
+              method: 'POST',
+              credentials: 'include',
+            })
+          } catch (err) {
+            console.error('Logout error:', err)
+          }
+
+          try {
+            await authClient.signOut()
+          } catch (err) {
+            // Ignore
+          }
+
+          window.location.href = '/'
         }
       },
     })

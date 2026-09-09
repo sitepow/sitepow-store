@@ -52,18 +52,21 @@ export function UserAvatarDropdown({
   }
 
   const handleLogout = async () => {
-    const isCentralDomain =
-      window.location.hostname.endsWith('sitepow.store') ||
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === 'lvh.me'
-
-    if (!isCentralDomain) {
-      await fetch('/api/auth/custom-logout', { method: 'POST' })
-      window.location.href = '/login'
-      return
+    try {
+      await fetch('/api/auth/custom-logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+    } catch (err) {
+      console.error('Logout error:', err)
     }
 
-    await authClient.signOut()
+    try {
+      await authClient.signOut()
+    } catch (err) {
+      // Ignore
+    }
+
     window.location.href = '/login'
   }
 

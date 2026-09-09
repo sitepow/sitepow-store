@@ -16,7 +16,9 @@ export async function GET(req: NextRequest) {
   }
 
   const rawCookieHeader = req.headers.get('cookie') || ''
-  const match = rawCookieHeader.match(/better-auth\.session_token=([^;]+)/)
+  const match = rawCookieHeader.match(
+    /(?:__Secure-)?better-auth\.session_token=([^;]+)/,
+  )
 
   if (!match) {
     const cleanReturnTo = decodeURIComponent(returnTo)
