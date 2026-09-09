@@ -167,20 +167,12 @@ export function HowItWorksSection() {
 
           <div ref={mockupRef} className="lg:col-span-7">
             <div className="bg-card ring-border relative overflow-hidden rounded-3xl border p-2 shadow-2xl ring-1">
-              <Safari url={currentStep.url} className="w-full">
-                {currentStep.videoSrc ? (
-                  <video
-                    key={currentStep.videoSrc}
-                    src={currentStep.videoSrc}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <div className="size-full bg-neutral-200 transition-colors dark:bg-neutral-800" />
-                )}
+              <Safari
+                url={currentStep.url}
+                videoSrc={currentStep.videoSrc}
+                className="w-full"
+              >
+                <div className="size-full bg-neutral-200 transition-colors dark:bg-neutral-800" />
               </Safari>
               <BorderBeam
                 size={160}

@@ -125,9 +125,7 @@ export function SolutionSection() {
                   videoSrc={item.videoSrc}
                   className="w-full"
                 >
-                  {!item.videoSrc && (
-                    <div className="aspect-video size-full bg-neutral-200 dark:bg-neutral-800" />
-                  )}
+                  <div className="size-full bg-neutral-200 transition-colors dark:bg-neutral-800" />
                 </Safari>
               </div>
             </div>

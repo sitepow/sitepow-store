@@ -1,4 +1,13 @@
-import type { HTMLAttributes, ReactNode } from 'react'
+'use client'
+
+import {
+  type HTMLAttributes,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 
 const SAFARI_WIDTH = 1203
 const SAFARI_HEIGHT = 753
@@ -21,6 +30,9 @@ export interface SafariProps extends HTMLAttributes<HTMLDivElement> {
   videoSrc?: string
   mode?: SafariMode
   children?: ReactNode
+  lazyVideo?: boolean
+  deferVideo?: boolean
+  lazyMargin?: string
 }
 
 export function Safari({
@@ -31,13 +43,120 @@ export function Safari({
   className,
   style,
   children,
+  lazyVideo = true,
+  deferVideo = false,
+  lazyMargin = '200px',
   ...props
 }: SafariProps) {
+  const rawId = useId()
+  const uniqueId = rawId.replace(/[^a-zA-Z0-9_-]/g, '')
+  const maskId = `safariPunch-${uniqueId}`
+  const clipId = `safariClip-${uniqueId}`
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
   const hasVideo = !!videoSrc
   const hasMedia = hasVideo || !!imageSrc || !!children
 
+  const [isInView, setIsInView] = useState(!lazyVideo)
+  const [isDeferredReady, setIsDeferredReady] = useState(!deferVideo)
+  const [isVideoReady, setIsVideoReady] = useState(false)
+
+  // Reset video ready state when video source changes
+  useEffect(() => {
+    setIsVideoReady(false)
+  }, [videoSrc])
+
+  // Handle deferred video loading (e.g. for above-the-fold hero to let critical UI load first)
+  useEffect(() => {
+    if (!hasVideo || !deferVideo) {
+      setIsDeferredReady(true)
+      return
+    }
+
+    let idleId: number | undefined
+    let timerId: ReturnType<typeof setTimeout> | undefined
+
+    const activate = () => {
+      setIsDeferredReady(true)
+    }
+
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleId = (
+        window as Window & {
+          requestIdleCallback: (
+            cb: () => void,
+            opts?: { timeout: number },
+          ) => number
+          cancelIdleCallback: (id: number) => void
+        }
+      ).requestIdleCallback(activate, { timeout: 1200 })
+    } else {
+      timerId = setTimeout(activate, 500)
+    }
+
+    return () => {
+      if (
+        idleId !== undefined &&
+        typeof window !== 'undefined' &&
+        'cancelIdleCallback' in window
+      ) {
+        ;(
+          window as Window & { cancelIdleCallback: (id: number) => void }
+        ).cancelIdleCallback(idleId)
+      }
+      if (timerId !== undefined) {
+        clearTimeout(timerId)
+      }
+    }
+  }, [hasVideo, deferVideo])
+
+  // Handle IntersectionObserver for below-the-fold videos
+  useEffect(() => {
+    if (!hasVideo || !lazyVideo) {
+      setIsInView(true)
+      return
+    }
+
+    const element = containerRef.current
+    if (!element || typeof IntersectionObserver === 'undefined') {
+      setIsInView(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          if (videoRef.current && videoRef.current.paused) {
+            videoRef.current.play().catch(() => {})
+          }
+        } else {
+          // Pause offscreen videos to save mobile battery & hardware decoding resources
+          if (videoRef.current && !videoRef.current.paused) {
+            videoRef.current.pause()
+          }
+        }
+      },
+      {
+        rootMargin: lazyMargin,
+        threshold: 0.05,
+      },
+    )
+
+    observer.observe(element)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [hasVideo, lazyVideo, lazyMargin])
+
+  const shouldLoadVideo = hasVideo && isInView && isDeferredReady
+
   return (
     <div
+      ref={containerRef}
       className={`relative inline-block w-full align-middle leading-none ${className ?? ''}`}
       style={{
         aspectRatio: `${SAFARI_WIDTH}/${SAFARI_HEIGHT}`,
@@ -53,17 +172,39 @@ export function Safari({
             top: `${TOP_PCT}%`,
             width: `${WIDTH_PCT}%`,
             height: `${HEIGHT_PCT}%`,
+            borderRadius: '0 0 11px 11px',
           }}
         >
-          <video
-            className="block size-full object-cover"
-            src={videoSrc}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-          />
+          {/* Background skeleton/placeholder while video is preparing or loading */}
+          <div
+            className={`absolute inset-0 z-0 transition-opacity duration-500 ${
+              isVideoReady ? 'pointer-events-none opacity-0' : 'opacity-100'
+            }`}
+          >
+            {children ?? (
+              <div className="size-full bg-neutral-200/70 transition-colors duration-300 dark:bg-neutral-800/70" />
+            )}
+          </div>
+
+          {/* Video element only mounted and buffered when in view / deferred ready */}
+          {shouldLoadVideo && (
+            <video
+              ref={videoRef}
+              key={videoSrc}
+              className={`relative z-10 block size-full object-cover transition-opacity duration-700 ${
+                isVideoReady ? 'opacity-100' : 'opacity-0'
+              }`}
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              disablePictureInPicture
+              onLoadedData={() => setIsVideoReady(true)}
+              onCanPlay={() => setIsVideoReady(true)}
+            />
+          )}
         </div>
       )}
 
@@ -82,6 +223,8 @@ export function Safari({
           <img
             src={imageSrc}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="block size-full object-cover object-top"
           />
         </div>
@@ -110,7 +253,7 @@ export function Safari({
         style={{ transform: 'translateZ(0)' }}
       >
         <defs>
-          <mask id="safariPunch" maskUnits="userSpaceOnUse">
+          <mask id={maskId} maskUnits="userSpaceOnUse">
             <rect
               x="0"
               y="0"
@@ -124,21 +267,14 @@ export function Safari({
             />
           </mask>
 
-          <clipPath id="path0">
+          <clipPath id={clipId}>
             <rect width={SAFARI_WIDTH} height={SAFARI_HEIGHT} fill="white" />
-          </clipPath>
-
-          <clipPath id="roundedBottom">
-            <path
-              d="M1 52H1201V741C1201 747.075 1196.08 752 1190 752H12C5.92486 752 1 747.075 1 741V52Z"
-              fill="white"
-            />
           </clipPath>
         </defs>
 
         <g
-          clipPath="url(#path0)"
-          mask={hasMedia ? 'url(#safariPunch)' : undefined}
+          clipPath={`url(#${clipId})`}
+          mask={hasMedia ? `url(#${maskId})` : undefined}
         >
           <path
             d="M0 52H1202V741C1202 747.627 1196.63 753 1190 753H12C5.37258 753 0 747.627 0 741V52Z"

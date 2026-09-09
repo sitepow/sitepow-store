@@ -393,6 +393,7 @@ export function HeroSection() {
                 url="app.sitepow.store"
                 className="w-full"
                 videoSrc="/hero-section.webm"
+                deferVideo={true}
               >
                 <div className="size-full bg-neutral-200 dark:bg-neutral-800" />
               </Safari>
