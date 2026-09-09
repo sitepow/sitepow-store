@@ -1,5 +1,7 @@
 import { ComponentProps, ElementType, ReactNode } from 'react'
 
+import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
+
 import { cn } from '@/lib/utils'
 
 interface MainSectionHeaderProps extends Omit<ComponentProps<'div'>, 'title'> {
@@ -28,7 +30,9 @@ export function MainSectionHeader({
     >
       {badge && (
         <span className="text-primary text-[11px] font-semibold sm:text-xs">
-          {badge}
+          <AnimatedShinyText className="text-primary dark:text-primary">
+            {badge}
+          </AnimatedShinyText>
         </span>
       )}
       <Heading className="text-foreground max-w-2xl text-xl font-bold tracking-tight text-balance sm:text-3xl md:text-4xl md:leading-tight">

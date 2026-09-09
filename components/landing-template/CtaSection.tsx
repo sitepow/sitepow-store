@@ -7,6 +7,7 @@ import { useSession } from '@/hooks/use-session'
 import { IconBuildingStore } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
 
+import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
@@ -22,6 +23,12 @@ export function CtaSection() {
       id="cta"
       className="bg-muted/50 border-border/40 relative w-full overflow-hidden border-t py-10 sm:py-16 md:py-24"
     >
+      <AnimatedGridPattern
+        numSquares={20}
+        maxOpacity={0.35}
+        duration={3}
+        className="-z-10 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)] opacity-70 sm:[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] dark:opacity-35"
+      />
       <div className="mx-auto w-full max-w-5xl px-3.5 text-center sm:px-6 lg:px-8">
         <div className="bg-primary/20 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-64 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
         <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">

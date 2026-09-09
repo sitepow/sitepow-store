@@ -7,6 +7,7 @@ import {
   IconPlugConnected,
 } from '@tabler/icons-react'
 
+import { BorderBeam } from '@/components/magicui/border-beam'
 import { Safari } from '@/components/magicui/safari'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
@@ -67,6 +68,13 @@ export function QuickSetupSection() {
           >
             <div className="size-full min-h-44 bg-neutral-200 transition-colors sm:min-h-72 dark:bg-neutral-800" />
           </Safari>
+          <BorderBeam
+            size={180}
+            duration={8}
+            colorFrom="#f97316"
+            colorTo="#10b981"
+            borderWidth={1.5}
+          />
         </div>
       </div>
     </div>

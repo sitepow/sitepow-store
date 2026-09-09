@@ -6,6 +6,8 @@ import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { IconBuildingStore } from '@tabler/icons-react'
 
+import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
+import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Safari } from '@/components/magicui/safari'
@@ -23,8 +25,20 @@ export function HeroSection() {
       id="hero"
       className="relative w-full overflow-hidden pt-12 md:pt-16"
     >
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.4}
+        duration={3}
+        className="-z-10 [mask-image:radial-gradient(450px_circle_at_center,white,transparent)] opacity-75 sm:[mask-image:radial-gradient(750px_circle_at_center,white,transparent)] dark:opacity-40"
+      />
       <div className="relative flex w-full flex-col items-center justify-start px-4 sm:px-6 md:px-8">
-        <div className="flex w-full max-w-4xl flex-col space-y-4 pt-6 text-center">
+        <div className="flex w-full max-w-4xl flex-col items-center space-y-4 pt-6 text-center">
+          <div className="border-primary/30 bg-primary/10 inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold shadow-2xs">
+            <span className="bg-primary size-2 animate-pulse rounded-full" />
+            <AnimatedShinyText className="text-primary dark:text-primary">
+              Sitepow Store • 0% GP Omnichannel POS & E-Commerce
+            </AnimatedShinyText>
+          </div>
           <h1 className="text-foreground text-3xl font-extrabold tracking-tight text-balance wrap-break-word sm:text-5xl md:text-6xl">
             {t('titleStart')}{' '}
             <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent">

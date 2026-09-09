@@ -2,14 +2,11 @@
 import React from 'react'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import {
-  IconBrandAndroid,
-  IconBrandApple,
-  IconBrandWindows,
   IconCheck,
-  IconDeviceIpad,
   IconDownload,
   IconExternalLink,
   IconSparkles,
@@ -42,7 +39,16 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0 (Latest)',
     size: '85 MB',
     requirements: 'Windows 10 / 11 (64-bit)',
-    icon: <IconBrandWindows size={30} className="text-blue-500" />,
+    icon: (
+      <Image
+        src="/images/platforms/windows.svg"
+        alt="Windows logo"
+        width={32}
+        height={32}
+        className="size-6.5 object-contain sm:size-7.5"
+        unoptimized
+      />
+    ),
     isFeatured: true,
     downloads: [
       {
@@ -62,7 +68,16 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '45 MB',
     requirements: 'Android 8.0+',
-    icon: <IconBrandAndroid size={30} className="text-emerald-500" />,
+    icon: (
+      <Image
+        src="/images/platforms/android.svg"
+        alt="Android logo"
+        width={32}
+        height={32}
+        className="size-6.5 object-contain sm:size-7.5"
+        unoptimized
+      />
+    ),
     downloads: [
       {
         href: '#',
@@ -81,7 +96,16 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '38 MB',
     requirements: 'iPadOS / iOS 15.0+',
-    icon: <IconDeviceIpad size={30} className="text-indigo-500" />,
+    icon: (
+      <Image
+        src="/images/platforms/apple.svg"
+        alt="Apple iOS logo"
+        width={32}
+        height={32}
+        className="size-6.5 object-contain sm:size-7.5 dark:invert"
+        unoptimized
+      />
+    ),
     downloads: [
       {
         href: '#',
@@ -100,7 +124,16 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '92 MB',
     requirements: 'macOS 12.0+ (Apple Silicon & Intel)',
-    icon: <IconBrandApple size={30} className="text-foreground" />,
+    icon: (
+      <Image
+        src="/images/platforms/macos.svg"
+        alt="macOS Finder logo"
+        width={32}
+        height={32}
+        className="size-6.5 rounded-md object-contain shadow-xs sm:size-7.5"
+        unoptimized
+      />
+    ),
     downloads: [
       {
         href: '#',
@@ -161,7 +194,7 @@ export function DownloadPlatformsSection() {
             )}
             <div>
               <div className="flex items-start justify-between">
-                <div className="bg-muted/80 flex size-10 items-center justify-center rounded-xl shadow-2xs sm:size-12 sm:rounded-2xl">
+                <div className="bg-muted/60 border-border/50 flex size-11 items-center justify-center rounded-xl border shadow-xs sm:size-12 sm:rounded-2xl">
                   {platform.icon}
                 </div>
                 <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5">

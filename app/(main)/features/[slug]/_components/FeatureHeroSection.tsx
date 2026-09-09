@@ -11,6 +11,8 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react'
 
+import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
+import { NumberTicker } from '@/components/magicui/number-ticker'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
@@ -24,6 +26,12 @@ export function FeatureHeroSection({
   const t = useTranslations('features.detail')
   return (
     <div className="relative mx-auto w-full max-w-5xl space-y-4 px-3.5 pt-3 pb-2 text-center sm:space-y-8 sm:px-6 sm:pt-6 sm:pb-4 lg:px-8">
+      <AnimatedGridPattern
+        numSquares={25}
+        maxOpacity={0.35}
+        duration={3}
+        className="-z-10 [mask-image:radial-gradient(350px_circle_at_center,white,transparent)] opacity-70 sm:[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] dark:opacity-35"
+      />
       <div className="bg-primary/10 pointer-events-none absolute top-1/2 left-1/2 -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
       <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-1.5 text-xs font-medium sm:gap-2">
         <Link
@@ -79,24 +87,45 @@ export function FeatureHeroSection({
         </Button>
       </div>
       <div className="mx-auto grid max-w-4xl grid-cols-1 gap-2.5 pt-2 sm:grid-cols-3 sm:gap-4 sm:pt-4">
-        {feature.metrics.map((metric, mIdx) => (
-          <div
-            key={mIdx}
-            className="bg-card/70 border-border/80 relative flex flex-col items-center justify-center rounded-2xl border p-3.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:shadow-md sm:rounded-3xl sm:p-5"
-          >
-            <div className="text-foreground text-2xl font-black tracking-tight sm:text-4xl">
-              <span className="from-primary bg-linear-to-r to-orange-500 bg-clip-text text-transparent">
-                {metric.value}
-              </span>
+        {feature.metrics.map((metric, mIdx) => {
+          const match = metric.value.match(
+            /^([^0-9]*)([0-9]+(?:\.[0-9]+)?)(.*)$/,
+          )
+          return (
+            <div
+              key={mIdx}
+              className="bg-card/70 border-border/80 relative flex flex-col items-center justify-center rounded-2xl border p-3.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:shadow-md sm:rounded-3xl sm:p-5"
+            >
+              <div className="text-foreground text-2xl font-black tracking-tight sm:text-4xl">
+                {match ? (
+                  <span className="from-primary bg-linear-to-r to-orange-500 bg-clip-text text-transparent">
+                    {match[1]}
+                    <NumberTicker
+                      value={parseFloat(match[2])}
+                      decimalPlaces={
+                        match[2].includes('.')
+                          ? match[2].split('.')[1].length
+                          : 0
+                      }
+                      className="from-primary bg-linear-to-r to-orange-500 bg-clip-text text-transparent"
+                    />
+                    {match[3]}
+                  </span>
+                ) : (
+                  <span className="from-primary bg-linear-to-r to-orange-500 bg-clip-text text-transparent">
+                    {metric.value}
+                  </span>
+                )}
+              </div>
+              <div className="text-foreground pt-1 text-xs font-bold sm:text-sm">
+                {metric.label}
+              </div>
+              <div className="text-muted-foreground pt-0.5 text-center text-[11px] sm:text-xs">
+                {metric.desc}
+              </div>
             </div>
-            <div className="text-foreground pt-1 text-xs font-bold sm:text-sm">
-              {metric.label}
-            </div>
-            <div className="text-muted-foreground pt-0.5 text-center text-[11px] sm:text-xs">
-              {metric.desc}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
       <div className="mx-auto grid max-w-3xl grid-cols-1 gap-2 pt-1 text-left text-xs sm:grid-cols-2 sm:gap-3 sm:pt-2 sm:text-sm">
         {feature.highlights.map((item, idx) => (

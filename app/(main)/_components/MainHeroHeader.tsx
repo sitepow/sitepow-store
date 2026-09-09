@@ -1,5 +1,7 @@
 import { ComponentProps, ReactNode } from 'react'
 
+import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
+
 import { cn } from '@/lib/utils'
 
 interface MainHeroHeaderProps extends Omit<ComponentProps<'div'>, 'title'> {
@@ -30,7 +32,9 @@ export function MainHeroHeader({
       {badgeText && (
         <div className="border-primary/30 bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-semibold shadow-2xs sm:px-3.5 sm:py-1">
           {badgeIcon}
-          <span>{badgeText}</span>
+          <AnimatedShinyText className="text-primary dark:text-primary">
+            {badgeText}
+          </AnimatedShinyText>
         </div>
       )}
       <div className="space-y-2.5 sm:space-y-4">
