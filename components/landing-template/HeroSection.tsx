@@ -426,7 +426,7 @@ export function HeroSection({
         {/* Social Proof */}
         <div
           ref={trustRef}
-          className="flex flex-wrap items-center justify-center gap-3 text-xs sm:mt-8 sm:gap-6 sm:text-sm"
+          className="mt-8 flex flex-wrap items-center justify-center gap-3 text-xs sm:gap-6 sm:text-sm"
         >
           <div className="flex items-center gap-2.5">
             <div className="flex -space-x-2">
