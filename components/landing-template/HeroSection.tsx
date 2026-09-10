@@ -358,10 +358,7 @@ export function HeroSection({
             ref={titleRef}
             className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl"
           >
-            {resolvedTitleStart}{' '}
-            <span className="from-primary bg-linear-to-r via-orange-500 to-amber-500 bg-clip-text text-transparent drop-shadow-xs">
-              {resolvedTitleGradient}
-            </span>
+            {resolvedTitleStart} {resolvedTitleGradient}
           </h1>
           <p
             ref={descRef}

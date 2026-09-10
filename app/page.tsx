@@ -149,7 +149,6 @@ export default async function HomePage() {
           trust1={tHero('trust1', { gp: 0 })}
           trust2={tHero('trust2')}
           trust3={tHero('trust3', { minutes: 3 })}
-          // Floating Badges Props
           floatSalesTitle={tHero('floating.salesTodayTitle')}
           floatSalesAmount={tHero('floating.salesTodayAmount', {
             amount: '24,850',

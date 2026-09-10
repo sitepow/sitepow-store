@@ -46,7 +46,6 @@ export function CtaSection({
   registerParams.set('callbackUrl', getManageUrl('/merchant/dashboard'))
   const registerHref = `/register?${registerParams.toString()}`
 
-  const resolvedBadge = badge ?? t('badge', { minutes: 1 })
   const resolvedTitle = title ?? t('title')
   const resolvedDescription = description ?? t('description', { gp: 0 })
   const resolvedRegisterBtn = registerBtn ?? t('registerBtn')
@@ -61,42 +60,25 @@ export function CtaSection({
       id="cta"
       className="border-border/40 relative w-full overflow-hidden border-t py-16 sm:py-20 md:py-28"
     >
-      {/* Background Lights & Grid แบบเต็มหน้าจอ ไม่ตีกรอบ */}
       <AnimatedGridPattern
         numSquares={28}
         maxOpacity={0.3}
         duration={3}
-        className="-z-10 [mask-image:radial-gradient(500px_circle_at_center,white,transparent)] opacity-70 sm:[mask-image:radial-gradient(800px_circle_at_center,white,transparent)] dark:opacity-30"
+        className="-z-10 mask-[radial-gradient(500px_circle_at_center,white,transparent)] opacity-70 sm:mask-[radial-gradient(800px_circle_at_center,white,transparent)] dark:opacity-30"
       />
       <div
         aria-hidden="true"
-        className="from-primary/20 dark:from-primary/15 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-80 w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-radial via-orange-500/10 to-transparent blur-[130px] dark:via-orange-500/5"
+        className="from-primary/20 dark:from-primary/15 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-80 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-radial via-orange-500/10 to-transparent blur-[130px] dark:via-orange-500/5"
       />
 
       <div className="relative mx-auto w-full max-w-5xl px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
-          {/* Badge บนหัวข้อ เรียบหรู ไม่ตะโกน */}
-          {resolvedBadge && (
-            <div className="border-primary/25 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-md">
-              <span className="relative flex size-2">
-                <span className="bg-primary absolute inline-flex size-full animate-ping rounded-full opacity-75" />
-                <span className="bg-primary relative inline-flex size-2 rounded-full" />
-              </span>
-              <span>{resolvedBadge}</span>
-            </div>
-          )}
-
-          {/* Heading เต็มหน้าจอ */}
           <h2 className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-5xl">
             {resolvedTitle}
           </h2>
-
-          {/* Description */}
           <p className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed text-balance sm:text-base md:text-lg">
             {resolvedDescription}
           </p>
-
-          {/* Buttons Group */}
           <div className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 pt-2 sm:max-w-none sm:flex-row sm:items-center sm:gap-3.5 sm:pt-3">
             {!isAuth ? (
               <RainbowButton
@@ -140,8 +122,6 @@ export function CtaSection({
               </Link>
             </Button>
           </div>
-
-          {/* Clean Trust Line ใต้ปุ่ม บรรทัดเดียว คลีนๆ ไม่รก */}
           <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-2 text-[11px] font-medium sm:text-xs">
             <span className="flex items-center gap-1.5">
               <IconCheck
