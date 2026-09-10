@@ -1,36 +1,57 @@
 'use client'
-import { useRef } from 'react'
+import { useRef } from 'react';
 
-import { useTranslations } from 'next-intl'
-import Link from 'next/link'
 
-import { UserRole } from '@/generated/prisma/enums'
-import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useSession } from '@/hooks/use-session'
-import {
-  IconAlertTriangle,
-  IconArrowRight,
-  IconBolt,
-  IconBuildingStore,
-  IconCheck,
-  IconDeviceLaptop,
-  IconQrcode,
-  IconReceipt2,
-  IconStarFilled,
-  IconTrendingUp,
-  IconWifiOff,
-} from '@tabler/icons-react'
-import { ArrowRight } from 'lucide-react'
 
-import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
-import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
-import { BorderBeam } from '@/components/magicui/border-beam'
-import { RainbowButton } from '@/components/magicui/rainbow-button'
-import { Safari } from '@/components/magicui/safari'
-import { Button } from '@/components/ui/button'
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
-import { getManageUrl } from '@/lib/manage-url'
+
+
+import { UserRole } from '@/generated/prisma/enums';
+import { useIsMounted } from '@/hooks/use-is-mounted';
+import { useSession } from '@/hooks/use-session';
+import { IconAlertTriangle, IconArrowRight, IconBolt, IconBuildingStore, IconCheck, IconDeviceLaptop, IconQrcode, IconReceipt2, IconStarFilled, IconTrendingUp, IconWifiOff } from '@tabler/icons-react';
+import { ArrowRight } from 'lucide-react';
+
+
+
+import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern';
+import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text';
+import { BorderBeam } from '@/components/magicui/border-beam';
+import { RainbowButton } from '@/components/magicui/rainbow-button';
+import { Safari } from '@/components/magicui/safari';
+import { Button } from '@/components/ui/button';
+
+
+
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap';
+import { getManageUrl } from '@/lib/manage-url';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export interface HeroSectionProps {
   badgeNew?: string
@@ -497,7 +518,7 @@ export function HeroSection({
               <Safari
                 url="app.sitepow.store"
                 className="w-full"
-                videoSrc="/hero-section.webm"
+                videoSrc="/hero-section.mp4"
                 deferVideo={true}
               >
                 <div className="size-full bg-neutral-200 dark:bg-neutral-800" />

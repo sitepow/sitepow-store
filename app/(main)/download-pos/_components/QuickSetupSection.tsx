@@ -177,7 +177,7 @@ export function QuickSetupSection() {
             <Safari
               url="pos.sitepow.store/cashier"
               className="w-full"
-              videoSrc="/hero-section.webm" // เปลี่ยนเป็น path วิดีโอที่ต้องการได้เลย
+              videoSrc="/hero-section.mp4" // เปลี่ยนเป็น path วิดีโอที่ต้องการได้เลย
               deferVideo={true}
             >
               <div className="size-full bg-neutral-200 dark:bg-neutral-800" />

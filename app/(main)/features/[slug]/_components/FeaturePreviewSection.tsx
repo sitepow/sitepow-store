@@ -84,7 +84,7 @@ export function FeaturePreviewSection({
             <Safari
               url={`app.sitepow.store/${slug}`}
               // imageSrc={imageSrc}
-              videoSrc="/hero-section.webm"
+              videoSrc="/hero-section.mp4"
               className="w-full"
             >
               {!imageSrc && (
