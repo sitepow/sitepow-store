@@ -12,7 +12,19 @@ import { Safari } from '@/components/magicui/safari'
 
 import { gsap } from '@/lib/gsap'
 
-export function HowItWorksSection() {
+export interface HowItWorksSectionProps {
+  badge?: string
+  title?: string
+  description?: string
+  steps?: Array<{ title: string; description: string; badge?: string }>
+}
+
+export function HowItWorksSection({
+  badge,
+  title,
+  description,
+  steps: propSteps,
+}: HowItWorksSectionProps = {}) {
   const [activeStep, setActiveStep] = useState(0)
   const t = useTranslations('home.howItWorks')
 
@@ -20,6 +32,10 @@ export function HowItWorksSection() {
   const headerRef = useRef<HTMLDivElement>(null)
   const stepsRef = useRef<HTMLDivElement>(null)
   const mockupRef = useRef<HTMLDivElement>(null)
+
+  const resolvedBadge = badge ?? t('badge')
+  const resolvedTitle = title ?? t('title')
+  const resolvedDescription = description ?? t('description')
 
   useGSAP(
     () => {
@@ -84,32 +100,30 @@ export function HowItWorksSection() {
     { scope: sectionRef },
   )
 
-  const steps = [
+  const defaultStepConfigs = [
     {
       step: '01',
-      title: t('steps.0.title'),
-      description: t('steps.0.description'),
-      badge: t('steps.0.badge'),
       url: 'sitepow.store/register',
       videoSrc: '/login-section.webm',
     },
     {
       step: '02',
-      title: t('steps.1.title'),
-      description: t('steps.1.description'),
-      badge: t('steps.1.badge'),
       url: 'sitepow.store/merchant/products',
       videoSrc: '/product-section.webm',
     },
     {
       step: '03',
-      title: t('steps.2.title'),
-      description: t('steps.2.description'),
-      badge: t('steps.2.badge'),
       url: 'sitepow.store/merchant/pos',
       videoSrc: '/storefront-section.webm',
     },
   ]
+
+  const steps = defaultStepConfigs.map((cfg, idx) => ({
+    ...cfg,
+    title: propSteps?.[idx]?.title ?? t(`steps.${idx}.title`),
+    description: propSteps?.[idx]?.description ?? t(`steps.${idx}.description`),
+    badge: propSteps?.[idx]?.badge ?? t(`steps.${idx}.badge`),
+  }))
 
   const currentStep = steps[activeStep]
 
@@ -122,9 +136,9 @@ export function HowItWorksSection() {
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         <div ref={headerRef}>
           <MainSectionHeader
-            badge={t('badge')}
-            title={t('title')}
-            description={t('description')}
+            badge={resolvedBadge}
+            title={resolvedTitle}
+            description={resolvedDescription}
           />
         </div>
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-8">

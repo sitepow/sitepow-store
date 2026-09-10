@@ -53,9 +53,14 @@ const LOGO_ITEMS = [
   },
 ]
 
-export function LogosSection() {
+export interface LogosSectionProps {
+  title?: string
+}
+
+export function LogosSection({ title }: LogosSectionProps = {}) {
   const t = useTranslations('home.logos')
   const sectionRef = useRef<HTMLElement>(null)
+  const resolvedTitle = title ?? t('title')
 
   useGSAP(
     () => {
@@ -84,7 +89,7 @@ export function LogosSection() {
     >
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
         <h3 className="text-muted-foreground text-center text-xs font-semibold">
-          {t('title')}
+          {resolvedTitle}
         </h3>
         <div className="relative mt-6">
           <Marquee pauseOnHover className="[--duration:35s] [--gap:1.5rem]">

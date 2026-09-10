@@ -14,10 +14,34 @@ import { Button } from '@/components/ui/button'
 
 import { gsap } from '@/lib/gsap'
 
-export function BlogsSection() {
+import { StaticBlogItem } from '@/constants/blogs'
+
+export interface BlogsSectionProps {
+  badge?: string
+  title?: string
+  description?: string
+  viewAll?: string
+  readMore?: string
+  blogs?: StaticBlogItem[]
+}
+
+export function BlogsSection({
+  badge,
+  title,
+  description,
+  viewAll,
+  readMore,
+  blogs: propBlogs,
+}: BlogsSectionProps = {}) {
   const locale = useLocale()
   const t = useTranslations('home.blogs')
-  const blogs = getStaticBlogs(locale).slice(0, 4)
+  const blogs = propBlogs ?? getStaticBlogs(locale).slice(0, 4)
+
+  const resolvedBadge = badge ?? t('badge')
+  const resolvedTitle = title ?? t('title')
+  const resolvedDescription = description ?? t('description')
+  const resolvedViewAll = viewAll ?? t('viewAll')
+  const resolvedReadMore = readMore ?? t('readMore')
 
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -76,9 +100,9 @@ export function BlogsSection() {
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         <div ref={headerRef}>
           <MainSectionHeader
-            badge={t('badge')}
-            title={t('title')}
-            description={t('description')}
+            badge={resolvedBadge}
+            title={resolvedTitle}
+            description={resolvedDescription}
           />
         </div>
         <div
@@ -156,7 +180,7 @@ export function BlogsSection() {
                       href={`/blogs/${blog.slug}`}
                       className="text-primary hover:text-primary/80 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
                     >
-                      <span>{t('readMore')}</span>
+                      <span>{resolvedReadMore}</span>
                       <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
@@ -168,7 +192,7 @@ export function BlogsSection() {
         <div className="flex justify-center pt-2">
           <Button asChild variant="outline" className="rounded-xl px-6">
             <Link href="/blogs" className="inline-flex items-center gap-2">
-              <span>{t('viewAll')}</span>
+              <span>{resolvedViewAll}</span>
               <ArrowRight className="size-4" />
             </Link>
           </Button>

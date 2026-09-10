@@ -21,11 +21,74 @@ import { Button } from '@/components/ui/button'
 
 import { gsap } from '@/lib/gsap'
 
-export function FeaturesBentoSection() {
+export interface BentoCardData {
+  name: string
+  description: string
+  cta: string
+}
+
+export interface FeaturesBentoSectionProps {
+  badge?: string
+  title?: string
+  description?: string
+  allFeaturesBtn?: string
+  cards?: {
+    pos?: BentoCardData
+    ai?: BentoCardData
+    zeroGp?: BentoCardData
+    inventory?: BentoCardData
+    digital?: BentoCardData
+    crm?: BentoCardData
+  }
+}
+
+export function FeaturesBentoSection({
+  badge,
+  title,
+  description,
+  allFeaturesBtn,
+  cards: propCards,
+}: FeaturesBentoSectionProps = {}) {
   const t = useTranslations('home.featuresBento')
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+
+  const resolvedBadge = badge ?? t('badge')
+  const resolvedTitle = title ?? t('title')
+  const resolvedDescription = description ?? t('description')
+  const resolvedAllFeaturesBtn = allFeaturesBtn ?? t('allFeaturesBtn')
+
+  const cardPos = propCards?.pos ?? {
+    name: t('cards.pos.name'),
+    description: t('cards.pos.description'),
+    cta: t('cards.pos.cta'),
+  }
+  const cardAi = propCards?.ai ?? {
+    name: t('cards.ai.name'),
+    description: t('cards.ai.description'),
+    cta: t('cards.ai.cta'),
+  }
+  const cardZeroGp = propCards?.zeroGp ?? {
+    name: t('cards.zeroGp.name'),
+    description: t('cards.zeroGp.description'),
+    cta: t('cards.zeroGp.cta'),
+  }
+  const cardInventory = propCards?.inventory ?? {
+    name: t('cards.inventory.name'),
+    description: t('cards.inventory.description'),
+    cta: t('cards.inventory.cta'),
+  }
+  const cardDigital = propCards?.digital ?? {
+    name: t('cards.digital.name'),
+    description: t('cards.digital.description'),
+    cta: t('cards.digital.cta'),
+  }
+  const cardCrm = propCards?.crm ?? {
+    name: t('cards.crm.name'),
+    description: t('cards.crm.description'),
+    cta: t('cards.crm.cta'),
+  }
 
   useGSAP(
     () => {
@@ -80,20 +143,20 @@ export function FeaturesBentoSection() {
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         <div ref={headerRef}>
           <MainSectionHeader
-            badge={t('badge')}
-            title={t('title')}
-            description={t('description')}
+            badge={resolvedBadge}
+            title={resolvedTitle}
+            description={resolvedDescription}
           />
         </div>
         <div ref={gridRef}>
           <BentoGrid className="auto-rows-auto sm:auto-rows-80 lg:auto-rows-88">
             <BentoCard
-              name={t('cards.pos.name')}
+              name={cardPos.name}
               className="col-span-1 md:col-span-2 lg:col-span-2"
               Icon={IconBuildingStore}
-              description={t('cards.pos.description')}
+              description={cardPos.description}
               href="/features/pos"
-              cta={t('cards.pos.cta')}
+              cta={cardPos.cta}
               background={
                 <>
                   <div className="bg-primary/10 absolute -top-10 -right-10 size-48 rounded-full blur-2xl" />
@@ -101,7 +164,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-pos.jpeg"
-                        alt={t('cards.pos.name')}
+                        alt={cardPos.name}
                         fill
                         className="rounded-tl-2xl border-t border-l border-neutral-200/70 object-cover object-left-top shadow-2xl dark:border-neutral-800/70"
                         sizes="(max-width: 768px) 100vw, 50vw"
@@ -114,12 +177,12 @@ export function FeaturesBentoSection() {
               }
             />
             <BentoCard
-              name={t('cards.ai.name')}
+              name={cardAi.name}
               className="col-span-1"
               Icon={IconRobot}
-              description={t('cards.ai.description')}
+              description={cardAi.description}
               href="/features/ai"
-              cta={t('cards.ai.cta')}
+              cta={cardAi.cta}
               background={
                 <>
                   <div className="absolute -top-8 -right-8 size-48 rounded-full bg-amber-500/10 blur-2xl" />
@@ -127,7 +190,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-ai-slip.jpeg"
-                        alt={t('cards.ai.name')}
+                        alt={cardAi.name}
                         fill
                         className="object-cover object-top"
                         sizes="(max-width: 768px) 100vw, 33vw"
@@ -140,12 +203,12 @@ export function FeaturesBentoSection() {
               }
             />
             <BentoCard
-              name={t('cards.zeroGp.name')}
+              name={cardZeroGp.name}
               className="col-span-1"
               Icon={IconCoins}
-              description={t('cards.zeroGp.description')}
+              description={cardZeroGp.description}
               href="/features/zero-gp"
-              cta={t('cards.zeroGp.cta')}
+              cta={cardZeroGp.cta}
               background={
                 <>
                   <div className="text-foreground/5 absolute -top-2 right-2 text-8xl font-black select-none">
@@ -155,7 +218,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-payments.jpeg"
-                        alt={t('cards.zeroGp.name')}
+                        alt={cardZeroGp.name}
                         fill
                         className="object-cover object-top"
                         sizes="(max-width: 768px) 100vw, 33vw"
@@ -168,12 +231,12 @@ export function FeaturesBentoSection() {
               }
             />
             <BentoCard
-              name={t('cards.inventory.name')}
+              name={cardInventory.name}
               className="col-span-1"
               Icon={IconBoxSeam}
-              description={t('cards.inventory.description')}
+              description={cardInventory.description}
               href="/features/inventory"
-              cta={t('cards.inventory.cta')}
+              cta={cardInventory.cta}
               background={
                 <>
                   <div className="absolute -right-10 -bottom-10 size-40 rounded-full bg-blue-500/10 blur-2xl" />
@@ -181,7 +244,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-inventory.jpeg"
-                        alt={t('cards.inventory.name')}
+                        alt={cardInventory.name}
                         fill
                         className="object-cover object-left-top"
                         sizes="(max-width: 768px) 100vw, 33vw"
@@ -194,12 +257,12 @@ export function FeaturesBentoSection() {
               }
             />
             <BentoCard
-              name={t('cards.digital.name')}
+              name={cardDigital.name}
               className="col-span-1"
               Icon={IconKey}
-              description={t('cards.digital.description')}
+              description={cardDigital.description}
               href="/features/online-store"
-              cta={t('cards.digital.cta')}
+              cta={cardDigital.cta}
               background={
                 <>
                   <div className="absolute -top-10 -right-10 size-40 rounded-full bg-purple-500/10 blur-2xl" />
@@ -207,7 +270,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-product-boxs.jpeg"
-                        alt={t('cards.digital.name')}
+                        alt={cardDigital.name}
                         fill
                         className="object-cover object-top"
                         sizes="(max-width: 768px) 100vw, 33vw"
@@ -220,12 +283,12 @@ export function FeaturesBentoSection() {
               }
             />
             <BentoCard
-              name={t('cards.crm.name')}
+              name={cardCrm.name}
               className="col-span-1 md:col-span-2 lg:col-span-3"
               Icon={IconUsers}
-              description={t('cards.crm.description')}
+              description={cardCrm.description}
               href="/features/crm"
-              cta={t('cards.crm.cta')}
+              cta={cardCrm.cta}
               background={
                 <>
                   <div className="bg-primary/10 absolute -right-10 -bottom-10 size-64 rounded-full blur-3xl" />
@@ -233,7 +296,7 @@ export function FeaturesBentoSection() {
                     <div className="relative h-full w-full">
                       <Image
                         src="/images/landing/landing-loyalty.jpeg"
-                        alt={t('cards.crm.name')}
+                        alt={cardCrm.name}
                         fill
                         className="rounded-tl-2xl border-t border-l border-neutral-200/70 object-cover object-left-top shadow-2xl dark:border-neutral-800/70"
                         sizes="(max-width: 768px) 100vw, 60vw"
@@ -255,7 +318,7 @@ export function FeaturesBentoSection() {
             className="h-11 w-full gap-2 rounded-full px-6 text-sm font-semibold shadow-xs transition-all hover:shadow-md sm:w-auto"
           >
             <Link href="/features">
-              <span>{t('allFeaturesBtn')}</span>
+              <span>{resolvedAllFeaturesBtn}</span>
               <IconBuildingStore className="size-4" />
             </Link>
           </Button>

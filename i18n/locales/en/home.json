@@ -1,18 +1,34 @@
 {
   "hero": {
-    "titleStart": "Turn Complex Online Selling",
-    "titleGradient": "into Complete Simplicity",
-    "description": "All-in-one store management platform (E-Commerce), POS cashier system, real-time multi-branch stock sync, and automated AI payment slip verification in one place.",
-    "registerBtn": "Start Selling for Free",
-    "manageStoreBtn": "Manage Your Store",
-    "pricingBtn": "View Pricing & Packages",
-    "badgeNew": "NEW 2.0",
-    "badgeText": "{gp}% GP Omnichannel POS & E-Commerce with Smart Inventory",
-    "downloadPosBtn": "Download POS & Pricing",
-    "ratingText": "{rating}/5 from {merchants}+ merchants",
-    "trust1": "{gp}% GP Lifetime",
-    "trust2": "No credit card required",
-    "trust3": "Ready in {minutes} minutes"
+    "titleStart": "Sell In-Store. Sync Online.",
+    "titleGradient": "Unified Commerce, Zero Inventory Chaos",
+    "description": "Stop juggling fragmented apps and manual stock counts. Unify your retail POS, online storefront, and automated AI payment verification with real-time central sync—scale across unlimited locations without overselling.",
+    "registerBtn": "Start Free 14-Day Trial",
+    "manageStoreBtn": "Merchant Login",
+    "pricingBtn": "View Pricing",
+    "badgeNew": "OMNICHANNEL 2.0",
+    "badgeText": "One Platform for POS & E-Commerce with 0% GP",
+    "downloadPosBtn": "Try POS for Free",
+    "ratingText": "Rated {rating}/5 by {merchants}+ stores nationwide",
+    "trust1": "Starting at {gp}% GP, No Hidden Fees",
+    "trust2": "No Credit Card Required",
+    "trust3": "Setup and Sell in {minutes} Mins",
+    "floating": {
+      "salesTodayTitle": "Total Omnichannel Sales",
+      "salesTodayAmount": "${amount}",
+      "salesTodayGrowth": "+{rate}%",
+      "qrTitle": "AI Slip & Payment Verification",
+      "qrDesc": "Instant fraud check & auto-matching",
+      "stockTitle": "Real-Time Central Inventory",
+      "stockDesc": "{item}: {count} units left across all channels",
+      "offlineTitle": "Offline-First POS",
+      "offlineDesc": "Never stop selling. Auto-syncs once online",
+      "speedTitle": "Checkout in {time}s",
+      "speedDesc": "Scan • Deduct Inventory • Print Receipt",
+      "orderTitle": "New Order #{orderNo}",
+      "orderDesc": "Online orders routed instantly to store",
+      "cloudSyncText": "100% Cloud-Synced • In-Store & Online Stock Always Aligned"
+    }
   },
   "logos": {
     "title": "Supported Payment Channels and Courier Partners"

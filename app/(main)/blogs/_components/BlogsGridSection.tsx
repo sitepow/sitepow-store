@@ -6,25 +6,59 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getStaticBlogs } from '@/constants/blogs'
+import { StaticBlogItem } from '@/constants/blogs'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { ArrowRight, Calendar, Clock, Search, Tag } from 'lucide-react'
+import {
+  ArrowRight,
+  Calendar,
+  Clock,
+  Flame,
+  Search,
+  Sparkles,
+  Tag,
+  X,
+} from 'lucide-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 
 import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
-export function BlogsGridSection() {
+export interface BlogsGridSectionProps {
+  initialBlogs?: StaticBlogItem[]
+  allTagsText?: string
+  searchPlaceholderText?: string
+  noBlogsFoundText?: string
+  readMoreText?: string
+}
+
+export function BlogsGridSection({
+  initialBlogs,
+  allTagsText,
+  searchPlaceholderText,
+  noBlogsFoundText,
+  readMoreText,
+}: BlogsGridSectionProps = {}) {
   const isMounted = useIsMounted()
   const locale = useLocale()
   const t = useTranslations('blogs')
-  const allBlogs = useMemo(() => getStaticBlogs(locale), [locale])
+  const allBlogs = useMemo(
+    () => initialBlogs ?? getStaticBlogs(locale),
+    [initialBlogs, locale],
+  )
+  const resolvedAllTags = allTagsText ?? t('allTags')
+  const resolvedSearchPlaceholder =
+    searchPlaceholderText ?? t('searchPlaceholder')
+  const resolvedNoBlogsFound = noBlogsFoundText ?? t('noBlogsFound')
+  const resolvedReadMore = readMoreText ?? t('readMore')
+
   const [selectedTag, setSelectedTag] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   const sectionRef = useRef<HTMLDivElement>(null)
   const filterBarRef = useRef<HTMLDivElement>(null)
+  const featuredRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
-  const hasAnimatedFilterBar = useRef(false)
 
   const availableTags = useMemo(() => {
     const tagsSet = new Set<string>()
@@ -46,23 +80,27 @@ export function BlogsGridSection() {
     })
   }, [allBlogs, selectedTag, searchQuery])
 
+  // แยก Featured Blog (บทความแรกสุด) และบทความที่เหลือสำหรับ Grid
+  const isDefaultView = selectedTag === 'all' && !searchQuery.trim()
+  const featuredBlog = isDefaultView ? filteredBlogs[0] : null
+  const restBlogs = isDefaultView ? filteredBlogs.slice(1) : filteredBlogs
+
   useGSAP(
     () => {
       if (!isMounted) return
 
-      if (filterBarRef.current && !hasAnimatedFilterBar.current) {
-        hasAnimatedFilterBar.current = true
+      if (featuredRef.current) {
         gsap.fromTo(
-          filterBarRef.current,
-          { y: 25, opacity: 0 },
+          featuredRef.current,
+          { y: 35, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: filterBarRef.current,
-              start: 'top 92%',
+              trigger: featuredRef.current,
+              start: 'top 90%',
               toggleActions: 'play none none none',
             },
           },
@@ -71,23 +109,22 @@ export function BlogsGridSection() {
 
       if (gridRef.current) {
         const cards = Array.from(gridRef.current.children)
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            { y: 40, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.75,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 92%',
-                toggleActions: 'play none none none',
-              },
+        gsap.fromTo(
+          cards,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 92%',
+              toggleActions: 'play none none none',
             },
-          )
-        })
+          },
+        )
       }
 
       ScrollTrigger.refresh()
@@ -95,129 +132,236 @@ export function BlogsGridSection() {
     { scope: sectionRef, dependencies: [isMounted, filteredBlogs] },
   )
 
+  const formatBlogDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+
   return (
     <div
       ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
+      className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8"
     >
+      {/* --- Filter & Glass Search Bar --- */}
       <div
         ref={filterBarRef}
-        className="flex flex-col items-center justify-between gap-3"
+        className="border-border/60 bg-card/60 relative flex flex-col items-center justify-between gap-3 rounded-2xl border p-2.5 shadow-sm backdrop-blur-xl sm:flex-row sm:rounded-3xl sm:p-3"
       >
-        <div className="flex max-w-full flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
+        {/* Horizontal Category Pill Tabs */}
+        <div className="no-scrollbar flex w-full max-w-full items-center gap-1.5 overflow-x-auto pb-1 sm:w-auto sm:pb-0">
           <button
             onClick={() => setSelectedTag('all')}
-            className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-all sm:px-3.5 sm:py-1.5 ${
+            className={`shrink-0 cursor-pointer rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
               selectedTag === 'all'
-                ? 'bg-primary text-primary-foreground shadow-xs'
-                : 'bg-muted/70 text-muted-foreground hover:text-foreground'
+                ? 'bg-primary text-primary-foreground shadow-md'
+                : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
             }`}
           >
-            {t('allTags')}
+            {resolvedAllTags}
           </button>
           {availableTags.map((tag) => (
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-all sm:px-3.5 sm:py-1.5 ${
+              className={`shrink-0 cursor-pointer rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
                 selectedTag === tag
-                  ? 'bg-primary text-primary-foreground shadow-xs'
-                  : 'bg-muted/70 text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
               }`}
             >
               {tag}
             </button>
           ))}
         </div>
-        <div className="relative w-full sm:w-64">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+
+        {/* Search Box */}
+        <div className="relative w-full sm:w-72">
+          <Search className="text-muted-foreground absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('searchPlaceholder')}
-            className="h-9 rounded-xl pl-9 text-xs"
+            placeholder={resolvedSearchPlaceholder}
+            className="border-border/70 bg-background/80 focus:border-primary focus:ring-primary/20 h-10 w-full rounded-xl pr-8 pl-9.5 text-xs transition-all"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* --- Case 1: Empty Search --- */}
       {filteredBlogs.length === 0 ? (
-        <div className="border-border/80 bg-card/40 flex flex-col items-center justify-center rounded-2xl border py-10 text-center sm:rounded-3xl sm:py-16">
-          <p className="text-muted-foreground text-sm font-medium">
-            {t('noBlogsFound')}
+        <div className="border-border/80 bg-card/40 flex flex-col items-center justify-center rounded-3xl border py-16 text-center shadow-xs">
+          <div className="border-border/60 bg-muted/50 mb-3 flex size-12 items-center justify-center rounded-2xl border">
+            <Search className="text-muted-foreground size-5" />
+          </div>
+          <p className="text-foreground text-sm font-semibold">
+            {resolvedNoBlogsFound}
+          </p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            ลองปรับคำค้นหาหรือเลือกหมวดหมู่อื่นดูอีกครั้ง
           </p>
         </div>
       ) : (
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
-        >
-          {filteredBlogs.map((blog) => {
-            const readingMinutes = Math.ceil(blog.content.length / 500) || 3
-            const formattedDate = new Date(blog.createdAt).toLocaleDateString(
-              locale === 'th' ? 'th-TH' : 'en-US',
-              { day: 'numeric', month: 'short', year: 'numeric' },
-            )
-            return (
-              <article
-                key={blog.id}
-                className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl"
-              >
-                <Link
-                  href={`/blogs/${blog.slug}`}
-                  className="bg-muted relative block h-40 w-full overflow-hidden sm:h-48"
-                >
+        <div className="space-y-8 sm:space-y-12">
+          {/* --- Case 2: Featured Hero Article (เฉพาะหน้าแรกที่ยังไม่ค้นหา) --- */}
+          {featuredBlog && (
+            <div ref={featuredRef} className="group relative">
+              <Link
+                href={`/blogs/${featuredBlog.slug}`}
+                className="absolute inset-0 z-10 cursor-pointer"
+                aria-label={featuredBlog.title}
+              />
+              <div className="border-border/80 bg-card/70 hover:border-border relative grid grid-cols-1 overflow-hidden rounded-3xl border shadow-lg backdrop-blur-md transition-all duration-500 hover:shadow-2xl md:grid-cols-12">
+                {/* Featured Image */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden md:col-span-7 md:aspect-auto">
                   <Image
-                    src={blog.image}
-                    alt={blog.title}
+                    src={featuredBlog.image}
+                    alt={featuredBlog.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 60vw"
                   />
-                  <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 sm:top-3 sm:left-3">
-                    {blog.tags.slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        className="bg-background/90 text-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-xs backdrop-blur-xs sm:px-2.5 sm:text-[11px]"
-                      >
-                        <Tag className="text-primary size-2.5 sm:size-3" />
-                        {tag}
+                  <div className="from-card/90 absolute inset-0 bg-gradient-to-t via-transparent to-transparent md:hidden" />
+                </div>
+
+                {/* Featured Text Content */}
+                <div className="flex flex-col justify-between p-6 sm:p-8 md:col-span-5 md:p-10">
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
+                        <Flame className="size-3" />
+                        Featured
                       </span>
-                    ))}
-                  </div>
-                </Link>
-                <div className="flex flex-1 flex-col justify-between p-4 sm:p-6">
-                  <div className="space-y-2 sm:space-y-2.5">
-                    <div className="text-muted-foreground flex items-center gap-2.5 text-[11px] sm:gap-3">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="size-3" />
-                        {formattedDate}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="size-3" />
-                        {t('readingTime', { minutes: readingMinutes })}
-                      </span>
+                      {featuredBlog.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="border-border/60 bg-muted/60 text-foreground/80 rounded-full border px-2.5 py-0.5 text-[11px] font-medium"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
-                    <Link href={`/blogs/${blog.slug}`} className="block">
-                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-sm font-bold transition-colors sm:text-lg">
-                        {blog.title}
-                      </h3>
-                    </Link>
-                    <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed sm:text-sm">
-                      {blog.description}
+
+                    <h2 className="text-foreground group-hover:text-primary text-xl font-extrabold tracking-tight transition-colors sm:text-2xl lg:text-3xl">
+                      {featuredBlog.title}
+                    </h2>
+
+                    <p className="text-muted-foreground line-clamp-3 text-xs leading-relaxed sm:text-sm">
+                      {featuredBlog.description}
                     </p>
                   </div>
-                  <div className="pt-3 sm:pt-4">
-                    <Link
-                      href={`/blogs/${blog.slug}`}
-                      className="text-primary hover:text-primary/80 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
-                    >
-                      <span>{t('readMore')}</span>
-                      <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-                    </Link>
+
+                  <div className="pt-6">
+                    <div className="text-muted-foreground border-border/50 flex items-center justify-between border-t pt-4 text-xs">
+                      <div className="flex items-center gap-3 text-[11px]">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="size-3" />
+                          {formatBlogDate(featuredBlog.createdAt)}
+                        </span>
+                        <span>•</span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="size-3" />
+                          {t('readingTime', {
+                            minutes:
+                              Math.ceil(featuredBlog.content.length / 500) || 3,
+                          })}
+                        </span>
+                      </div>
+                      <span className="text-primary inline-flex items-center gap-1 text-xs font-bold">
+                        {resolvedReadMore}
+                        <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </article>
-            )
-          })}
+              </div>
+            </div>
+          )}
+
+          {/* --- Case 3: Magazine / Bento Style Grid --- */}
+          <div
+            ref={gridRef}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+          >
+            {restBlogs.map((blog) => {
+              const readingMinutes = Math.ceil(blog.content.length / 500) || 3
+              return (
+                <article
+                  key={blog.id}
+                  className="group border-border/70 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between overflow-hidden rounded-3xl border p-4 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl sm:p-5"
+                >
+                  <Link
+                    href={`/blogs/${blog.slug}`}
+                    className="absolute inset-0 z-10 cursor-pointer"
+                    aria-label={blog.title}
+                  />
+
+                  <div>
+                    {/* Image Box */}
+                    <div className="border-border/60 bg-muted/40 relative mb-4 aspect-[16/10] w-full overflow-hidden rounded-2xl border shadow-inner">
+                      <Image
+                        src={blog.image}
+                        alt={blog.title}
+                        fill
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      <div className="from-card/80 absolute inset-0 bg-gradient-to-t via-transparent to-transparent opacity-80" />
+                      <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
+                        {blog.tags.slice(0, 1).map((tag) => (
+                          <span
+                            key={tag}
+                            className="bg-background/90 text-foreground inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-semibold shadow-xs backdrop-blur-md"
+                          >
+                            <Tag className="text-primary size-2.5" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Metadata & Title */}
+                    <div className="space-y-2">
+                      <div className="text-muted-foreground flex items-center gap-2 text-[11px]">
+                        <span>{formatBlogDate(blog.createdAt)}</span>
+                        <span>•</span>
+                        <span>
+                          {t('readingTime', { minutes: readingMinutes })}
+                        </span>
+                      </div>
+
+                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-base font-bold transition-colors sm:text-lg">
+                        {blog.title}
+                      </h3>
+
+                      <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed sm:text-sm">
+                        {blog.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Read More Footer */}
+                  <div className="relative z-20 pt-4 sm:pt-6">
+                    <div className="border-border/50 flex items-center justify-between border-t pt-3">
+                      <span className="text-primary group-hover:text-primary/80 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors">
+                        <span>{resolvedReadMore}</span>
+                        <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>

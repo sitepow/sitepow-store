@@ -9,10 +9,26 @@ import { useGSAP } from '@gsap/react'
 
 import { gsap } from '@/lib/gsap'
 
-export function FaqSection() {
+export interface FaqSectionProps {
+  badge?: string
+  title?: string
+  description?: string
+  items?: Array<{ q: string; a: string }>
+}
+
+export function FaqSection({
+  badge,
+  title,
+  description,
+  items: propItems,
+}: FaqSectionProps = {}) {
   const t = useTranslations('home.faq')
   const sectionRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+
+  const resolvedBadge = badge ?? t('badge')
+  const resolvedTitle = title ?? t('title')
+  const resolvedDescription = description ?? t('description')
 
   useGSAP(
     () => {
@@ -40,10 +56,12 @@ export function FaqSection() {
     { scope: sectionRef },
   )
 
-  const items = [0, 1, 2, 3, 4].map((idx) => ({
-    q: t(`items.${idx}.q`),
-    a: t(`items.${idx}.a`),
-  }))
+  const items =
+    propItems ??
+    [0, 1, 2, 3, 4].map((idx) => ({
+      q: t(`items.${idx}.q`),
+      a: t(`items.${idx}.a`),
+    }))
   return (
     <section
       ref={sectionRef}
@@ -55,9 +73,9 @@ export function FaqSection() {
         className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
       >
         <MainSectionHeader
-          badge={t('badge')}
-          title={t('title')}
-          description={t('description')}
+          badge={resolvedBadge}
+          title={resolvedTitle}
+          description={resolvedDescription}
         />
         <MainFaqAccordion items={items} idPrefix="landing-faq" />
       </div>

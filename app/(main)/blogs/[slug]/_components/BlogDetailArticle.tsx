@@ -37,6 +37,28 @@ export function BlogDetailArticle({
   const imageRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const relatedRef = useRef<HTMLDivElement>(null)
+  const deckRef = useRef<HTMLDivElement>(null)
+
+  const relatedCount = relatedBlogs.length
+
+  const getCardTransformStyle = (index: number) => {
+    if (relatedCount <= 1) {
+      return {
+        '--card-rotate': '0deg',
+        '--card-y': '0px',
+      } as React.CSSProperties
+    }
+
+    const mid = (relatedCount - 1) / 2
+    const offset = index - mid
+    const rotation = offset * 5.5
+    const yOffset = Math.abs(offset) * 10
+
+    return {
+      '--card-rotate': `${rotation}deg`,
+      '--card-y': `${yOffset}px`,
+    } as React.CSSProperties
+  }
 
   useGSAP(
     () => {
@@ -81,7 +103,6 @@ export function BlogDetailArticle({
 
       if (relatedRef.current) {
         const heading = relatedRef.current.querySelector('h2')
-        const cards = relatedRef.current.querySelectorAll('article')
 
         if (heading) {
           gsap.fromTo(
@@ -101,28 +122,31 @@ export function BlogDetailArticle({
           )
         }
 
-        cards.forEach((card) => {
+        if (deckRef.current) {
+          const cards = Array.from(deckRef.current.children)
           gsap.fromTo(
-            card,
-            { y: 40, opacity: 0 },
+            cards,
+            { y: 50, opacity: 0, scale: 0.9 },
             {
               y: 0,
               opacity: 1,
-              duration: 0.75,
-              ease: 'power3.out',
+              scale: 1,
+              duration: 0.85,
+              stagger: 0.1,
+              ease: 'back.out(1.2)',
               scrollTrigger: {
-                trigger: card,
-                start: 'top 92%',
+                trigger: deckRef.current,
+                start: 'top 85%',
                 toggleActions: 'play none none none',
               },
             },
           )
-        })
+        }
       }
 
       ScrollTrigger.refresh()
     },
-    { scope: pageRef, dependencies: [isMounted, blog.slug] },
+    { scope: pageRef, dependencies: [isMounted, blog.slug, relatedBlogs] },
   )
 
   return (
@@ -218,39 +242,56 @@ export function BlogDetailArticle({
           className="mx-auto mt-8 w-full max-w-7xl space-y-4 px-3.5 sm:mt-12 sm:space-y-8 sm:px-6 lg:px-8"
         >
           <div className="border-border/70 border-t pt-6 sm:pt-12">
-            <h2 className="text-foreground pb-3 text-lg font-bold sm:pb-6 sm:text-2xl">
+            <h2 className="text-foreground pb-3 text-center text-lg font-bold sm:pb-8 sm:text-2xl">
               {t('badge')}
             </h2>
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-              {relatedBlogs.map((item) => (
-                <article
-                  key={item.id}
-                  className="bg-card/60 hover:bg-card border-border/80 hover:border-border group flex flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl"
-                >
-                  <Link
-                    href={`/blogs/${item.slug}`}
-                    className="bg-muted relative block h-36 w-full overflow-hidden sm:h-44"
+            <div className="relative mx-auto flex w-full justify-center overflow-visible py-4 perspective-distant sm:py-8">
+              <div
+                ref={deckRef}
+                className="group/deck flex w-full max-w-5xl flex-col items-center justify-center gap-4 sm:flex-row sm:-space-x-14 md:-space-x-20 lg:-space-x-24"
+              >
+                {relatedBlogs.map((item, index) => (
+                  <article
+                    key={item.id}
+                    style={getCardTransformStyle(index)}
+                    className="group border-border/80 bg-card/90 hover:border-primary/50 hover:bg-card relative flex w-full max-w-[340px] shrink-0 translate-y-0 rotate-0 flex-col justify-between overflow-hidden rounded-2xl border p-4 shadow-xl backdrop-blur-md transition-all duration-500 ease-out hover:!z-30 hover:shadow-2xl sm:[transform:rotate(var(--card-rotate))_translateY(var(--card-y))] sm:rounded-3xl sm:p-5 sm:hover:!-translate-y-7 sm:hover:!scale-105 sm:hover:!rotate-0"
                   >
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </Link>
-                  <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-5">
-                    <Link href={`/blogs/${item.slug}`}>
-                      <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-xs font-bold transition-colors sm:text-base">
-                        {item.title}
-                      </h3>
+                    <Link
+                      href={`/blogs/${item.slug}`}
+                      className="bg-muted border-border/60 relative block h-40 w-full overflow-hidden rounded-xl border shadow-inner sm:h-44"
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 340px"
+                      />
                     </Link>
-                    <p className="text-muted-foreground line-clamp-2 pt-1 text-xs leading-relaxed sm:pt-2">
-                      {item.description}
-                    </p>
-                  </div>
-                </article>
-              ))}
+                    <div className="flex flex-1 flex-col justify-between pt-3 sm:pt-4">
+                      <div>
+                        <Link href={`/blogs/${item.slug}`}>
+                          <h3 className="text-foreground group-hover:text-primary line-clamp-2 text-xs font-bold transition-colors sm:text-sm">
+                            {item.title}
+                          </h3>
+                        </Link>
+                        <p className="text-muted-foreground line-clamp-2 pt-1 text-xs leading-relaxed sm:pt-1.5">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div className="pt-3">
+                        <Link
+                          href={`/blogs/${item.slug}`}
+                          className="text-primary hover:text-primary/80 inline-flex items-center gap-1 text-[11px] font-semibold transition-colors"
+                        >
+                          <span>{t('readMore') ?? 'อ่านเพิ่มเติม'}</span>
+                          <span aria-hidden="true">→</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </div>

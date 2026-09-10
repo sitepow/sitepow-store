@@ -55,7 +55,7 @@ export function MainHeroHeader({
     <div
       ref={containerRef}
       className={cn(
-        'relative mx-auto w-full max-w-[45rem] space-y-4 px-3.5 pt-4 pb-2 text-center sm:space-y-6 sm:px-6 sm:pt-8 sm:pb-4 lg:px-8',
+        'relative mx-auto w-full max-w-4xl space-y-4 px-3.5 pt-4 pb-2 text-center sm:space-y-6 sm:px-6 sm:pt-8 sm:pb-4 lg:px-8',
         className,
       )}
       {...props}

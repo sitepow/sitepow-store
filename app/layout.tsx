@@ -3,7 +3,11 @@ import { Toaster } from 'react-hot-toast'
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
-import { Dancing_Script, IBM_Plex_Sans_Thai, Inter } from 'next/font/google'
+import {
+  Dancing_Script,
+  IBM_Plex_Sans_Thai_Looped,
+  Inter,
+} from 'next/font/google'
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -14,7 +18,7 @@ import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
-const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai({
+const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
@@ -160,11 +164,11 @@ const jsonLd = {
       name: 'Sitepow Store',
       alternateName: ['Sitepow', 'ไซต์พาว'],
       description:
-        'Sitepow Store ระบบจัดการร้านค้าออนไลน์ครบวงจร จัดการสินค้า สต็อก ออเดอร์ POS และ AI ตรวจสลิป',
+        'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน สต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน และระบบตัวแทนจำหน่าย 0% GP',
       inLanguage: ['th', 'en'],
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://sitepow.store/?q={search_term_string}',
+        target: 'https://sitepow.store/blogs?q={search_term_string}',
         'query-input': 'required name=search_term_string',
       },
     },
@@ -174,6 +178,12 @@ const jsonLd = {
       name: 'Sitepow Store',
       url: 'https://sitepow.store',
       logo: 'https://sitepow.store/favicon.ico',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        availableLanguage: ['Thai', 'English'],
+        url: 'https://sitepow.store/contact',
+      },
       sameAs: [
         'https://web.facebook.com/profile.php?id=61584675643468',
         'https://www.instagram.com/sitepow.store',
@@ -184,7 +194,8 @@ const jsonLd = {
       '@type': 'SoftwareApplication',
       '@id': 'https://sitepow.store/#software',
       name: 'Sitepow Store',
-      operatingSystem: 'All (Cloud-based Web Application)',
+      operatingSystem:
+        'All (Cloud-based Web Application, Windows, macOS, Android, iOS)',
       applicationCategory: 'BusinessApplication',
       applicationSubCategory: 'E-commerce & POS Management Software',
       description:
@@ -233,6 +244,14 @@ const jsonLd = {
         {
           '@type': 'SiteNavigationElement',
           position: 2,
+          name: 'ฟีเจอร์และระบบทั้งหมด',
+          description:
+            'สำรวจฟีเจอร์ทั้งหมดของ Sitepow Store ทั้งระบบคิดเงินหน้าร้าน POS, สต็อก Real-time, AI ช่วยลงสินค้าและตรวจสลิป',
+          url: 'https://sitepow.store/features',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 3,
           name: 'ราคาและแพ็กเกจ',
           description:
             'ดูราคาและแพ็กเกจจัดการร้านค้าออนไลน์ Sitepow Store เริ่มต้นฟรี 0% GP',
@@ -240,7 +259,31 @@ const jsonLd = {
         },
         {
           '@type': 'SiteNavigationElement',
-          position: 3,
+          position: 4,
+          name: 'ดาวน์โหลดโปรแกรม POS',
+          description:
+            'ดาวน์โหลดโปรแกรมขายหน้าร้าน Sitepow POS สำหรับ Windows, macOS, Android และ iPadOS',
+          url: 'https://sitepow.store/download-pos',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 5,
+          name: 'บทความและคู่มือ',
+          description:
+            'บทความ เทคนิคการขายของออนไลน์ และคู่มือใช้งานระบบร้านค้าออนไลน์ Sitepow Store',
+          url: 'https://sitepow.store/blogs',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 6,
+          name: 'ติดต่อเรา',
+          description:
+            'ติดต่อทีมงาน Sitepow Store เพื่อขอคำปรึกษาการใช้งานระบบ หรือสอบถามแพ็กเกจ Enterprise',
+          url: 'https://sitepow.store/contact',
+        },
+        {
+          '@type': 'SiteNavigationElement',
+          position: 7,
           name: 'สมัครเปิดร้านค้าฟรี',
           description:
             'เริ่มต้นเปิดร้านค้าออนไลน์ฟรี ครบทุกระบบจัดการสินค้า สต็อก ออเดอร์ และ POS',
@@ -248,7 +291,7 @@ const jsonLd = {
         },
         {
           '@type': 'SiteNavigationElement',
-          position: 4,
+          position: 8,
           name: 'เข้าสู่ระบบ',
           description:
             'เข้าสู่ระบบจัดการร้านค้าหลังบ้าน POS และสินค้าของ Sitepow Store',

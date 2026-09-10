@@ -100,7 +100,10 @@ export function FeatureHeroSection({
           {feature.categoryLabel}
         </span>
       </div>
-      <div ref={headerRef} className="space-y-2.5 sm:space-y-4">
+      <div
+        ref={headerRef}
+        className="mx-auto max-w-4xl space-y-2.5 sm:space-y-4"
+      >
         <div className="bg-card/80 text-primary border-border/80 shadow-primary/5 mx-auto inline-flex size-14 items-center justify-center rounded-2xl border shadow-xl backdrop-blur-md sm:size-20 sm:rounded-3xl">
           {feature.icon}
         </div>

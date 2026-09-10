@@ -11,11 +11,27 @@ import { gsap } from '@/lib/gsap'
 
 const PROBLEM_ICONS = [IconCoins, IconReceipt2, IconRefreshAlert]
 
-export function ProblemSection() {
+export interface ProblemSectionProps {
+  badge?: string
+  title?: string
+  description?: string
+  items?: Array<{ title: string; description: string }>
+}
+
+export function ProblemSection({
+  badge,
+  title,
+  description,
+  items,
+}: ProblemSectionProps = {}) {
   const t = useTranslations('home.problem')
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<HTMLDivElement>(null)
+
+  const resolvedBadge = badge ?? t('badge')
+  const resolvedTitle = title ?? t('title')
+  const resolvedDescription = description ?? t('description')
 
   useGSAP(
     () => {
@@ -61,11 +77,18 @@ export function ProblemSection() {
     { scope: sectionRef },
   )
 
-  const items = [0, 1, 2].map((idx) => ({
-    icon: PROBLEM_ICONS[idx],
-    title: t(`items.${idx}.title`),
-    description: t(`items.${idx}.description`),
+  const resolvedItems =
+    items ??
+    [0, 1, 2].map((idx) => ({
+      title: t(`items.${idx}.title`),
+      description: t(`items.${idx}.description`),
+    }))
+  const displayItems = resolvedItems.map((item, idx) => ({
+    icon: PROBLEM_ICONS[idx % PROBLEM_ICONS.length],
+    title: item.title,
+    description: item.description,
   }))
+
   return (
     <section
       ref={sectionRef}
@@ -75,13 +98,13 @@ export function ProblemSection() {
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         <div ref={headerRef}>
           <MainSectionHeader
-            badge={t('badge')}
-            title={t('title')}
-            description={t('description')}
+            badge={resolvedBadge}
+            title={resolvedTitle}
+            description={resolvedDescription}
           />
         </div>
         <div ref={cardsRef} className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {items.map((prob, idx) => (
+          {displayItems.map((prob, idx) => (
             <div
               key={idx}
               className="border-border/80 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between rounded-3xl border p-5 shadow-xs transition-all duration-300 hover:shadow-md sm:p-6"

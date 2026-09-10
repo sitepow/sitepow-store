@@ -12,7 +12,7 @@ import {
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { Safari } from '@/components/magicui/safari'
 
-import { gsap, useGSAP } from '@/lib/gsap'
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
@@ -27,19 +27,21 @@ export function QuickSetupSection() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const stepsRef = useRef<HTMLDivElement>(null)
-  const mockupRef = useRef<HTMLDivElement>(null)
+  const mockupWrapperRef = useRef<HTMLDivElement>(null)
+  const mockupInnerRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
       if (headerRef.current) {
-        gsap.fromTo(
+        tl.fromTo(
           headerRef.current,
           { y: 35, opacity: 0 },
           {
             y: 0,
             opacity: 1,
             duration: 0.8,
-            ease: 'power3.out',
             scrollTrigger: {
               trigger: headerRef.current,
               start: 'top 90%',
@@ -70,24 +72,40 @@ export function QuickSetupSection() {
         })
       }
 
-      if (mockupRef.current) {
+      // 3D Tilt Entrance & Scrub Scroll (แบบเดียวกับ HeroSection)
+      if (mockupInnerRef.current) {
         gsap.fromTo(
-          mockupRef.current,
-          { scale: 0.94, y: 50, opacity: 0 },
+          mockupInnerRef.current,
+          { rotateX: 18, y: 0, scale: 0.9, opacity: 0 },
           {
-            scale: 1,
+            rotateX: 6,
             y: 0,
+            scale: 1,
             opacity: 1,
-            duration: 0.9,
-            ease: 'power3.out',
+            duration: 1.1,
+            ease: 'power2.out',
             scrollTrigger: {
-              trigger: mockupRef.current,
+              trigger: mockupWrapperRef.current,
               start: 'top 85%',
               toggleActions: 'play none none none',
             },
           },
         )
+
+        gsap.to(mockupInnerRef.current, {
+          rotateX: 0,
+          y: -40,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: mockupWrapperRef.current,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1,
+          },
+        })
       }
+
+      ScrollTrigger.refresh()
     },
     { scope: sectionRef },
   )
@@ -111,6 +129,8 @@ export function QuickSetupSection() {
           description={t('description')}
         />
       </div>
+
+      {/* 3 Step Cards */}
       <div
         ref={stepsRef}
         className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-3"
@@ -139,25 +159,47 @@ export function QuickSetupSection() {
           </div>
         ))}
       </div>
+
+      {/* Safari Showcase (โคลนโครงสร้าง 3D & Styling จาก HeroSection) */}
       <div
-        ref={mockupRef}
-        className="relative mx-auto w-full max-w-4xl pt-1 sm:pt-2"
+        ref={mockupWrapperRef}
+        className="relative mx-auto mt-6 w-full max-w-5xl pt-2 perspective-distant sm:mt-10 sm:pt-4"
       >
-        <div className="bg-card ring-border relative overflow-hidden rounded-2xl border p-1 shadow-2xl ring-1 sm:rounded-3xl sm:p-2">
-          <Safari
-            url="pos.sitepow.store/cashier"
-            mode="simple"
-            className="w-full"
-          >
-            <div className="size-full min-h-44 bg-neutral-200 transition-colors sm:min-h-72 dark:bg-neutral-800" />
-          </Safari>
-          <BorderBeam
-            size={180}
-            duration={8}
-            colorFrom="#f97316"
-            colorTo="#10b981"
-            borderWidth={1.5}
-          />
+        {/* Glow Layer ด้านหลัง */}
+        <div
+          aria-hidden="true"
+          className="from-primary/30 pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-linear-to-r via-orange-500/20 to-amber-500/30 opacity-70 blur-3xl transition-opacity sm:-inset-6 dark:opacity-45"
+        />
+
+        {/* 3D Transform Inner Container */}
+        <div ref={mockupInnerRef} className="relative origin-top transform-3d">
+          <div className="bg-background/60 ring-border relative w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl ring-1 backdrop-blur-xl sm:rounded-3xl sm:p-2.5">
+            <Safari
+              url="pos.sitepow.store/cashier"
+              className="w-full"
+              videoSrc="/hero-section.webm" // เปลี่ยนเป็น path วิดีโอที่ต้องการได้เลย
+              deferVideo={true}
+            >
+              <div className="size-full bg-neutral-200 dark:bg-neutral-800" />
+            </Safari>
+
+            {/* BorderBeam แบบคู่สลับสีเหมือน HeroSection */}
+            <BorderBeam
+              size={220}
+              duration={7}
+              colorFrom="#f97316"
+              colorTo="#3b82f6"
+              borderWidth={2}
+            />
+            <BorderBeam
+              size={220}
+              duration={7}
+              delay={3.5}
+              colorFrom="#10b981"
+              colorTo="#f59e0b"
+              borderWidth={2}
+            />
+          </div>
         </div>
       </div>
     </div>

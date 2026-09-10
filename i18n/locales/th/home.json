@@ -1,18 +1,34 @@
 {
   "hero": {
-    "titleStart": "เปลี่ยนเรื่องยุ่ง ๆ ให้เป็นเรื่องง่าย",
-    "titleGradient": "ของการขายสินค้าออนไลน์",
-    "description": "รวมระบบจัดการร้านค้าออนไลน์ (E-Commerce), ระบบคิดเงินหน้าร้าน (POS), ตัดสต็อกสินค้าหลายสาขาแบบ Real-time และ AI ตรวจสอบสลิปโอนเงินอัตโนมัติ ไว้ในที่เดียว",
-    "registerBtn": "สมัครเปิดร้านค้าฟรี",
-    "manageStoreBtn": "จัดการร้านค้าของคุณ",
-    "pricingBtn": "ดูราคาและแพ็กเกจ",
-    "badgeNew": "NEW 2.0",
-    "badgeText": "{gp}% GP Omnichannel POS & E-Commerce รวมสต็อกอัจฉริยะ",
-    "downloadPosBtn": "ดาวน์โหลด POS & ดูราคา",
-    "ratingText": "{rating}/5 จาก {merchants}+ ร้านค้า",
-    "trust1": "{gp}% GP ตลอดชีพ",
-    "trust2": "ไม่ต้องกรอกบัตรเครดิต",
-    "trust3": "เปิดร้านได้ใน {minutes} นาที"
+    "titleStart": "ขายหน้าร้าน ซิงค์ออนไลน์",
+    "titleGradient": "จบทุกช่องทาง ไม่ปวดหัวเรื่องสต็อก",
+    "description": "หยุดสลับแอป หยุดนับสต็อกมือ รวมระบบ POS หน้าร้าน เว็บขายของ และระบบตรวจสลิป AI ซิงค์คลังสินค้าเดียวกันแบบ Real-time ขายพร้อมกันกี่สาขาก็ไม่มีสต็อกหลุด",
+    "registerBtn": "ทดลองใช้ฟรี 14 วัน",
+    "manageStoreBtn": "เข้าสู่ระบบร้านค้า",
+    "pricingBtn": "ดูแพ็กเกจราคา",
+    "badgeNew": "OMNICHANNEL 2.0",
+    "badgeText": "ระบบเดียวคุมทั้งหน้าร้าน (POS) & ออนไลน์ ค่า GP 0%",
+    "downloadPosBtn": "ทดลองใช้ POS ฟรี",
+    "ratingText": "{rating}/5 ไว้วางใจโดย {merchants}+ ร้านค้าทั่วประเทศ",
+    "trust1": "เริ่มต้น {gp}% GP ไม่มีค่าบริการแอบแฝง",
+    "trust2": "ไม่ต้องผูกบัตรเครดิต",
+    "trust3": "ตั้งค่าพร้อมขายใน {minutes} นาที",
+    "floating": {
+      "salesTodayTitle": "ยอดขายรวมทุกช่องทาง",
+      "salesTodayAmount": "฿{amount}",
+      "salesTodayGrowth": "+{rate}%",
+      "qrTitle": "AI ตรวจสลิปอัตโนมัติ",
+      "qrDesc": "เช็กยอดแท้ ป้องกันสลิปปลอมทันที",
+      "stockTitle": "สต็อกกลางตัด Real-time",
+      "stockDesc": "{item} เหลือ {count} ชิ้น (ทุกสาขา)",
+      "offlineTitle": "เน็ตหลุด หน้าร้านไม่สะดุด",
+      "offlineDesc": "ขายออฟไลน์ได้ สลับซิงค์คลาวด์อัตโนมัติ",
+      "speedTitle": "คิดเงินไวใน {time} วินาที",
+      "speedDesc": "สแกนบาร์โค้ด • ตัดคลัง • ออกใบเสร็จทันที",
+      "orderTitle": "ออเดอร์ใหม่ #{orderNo}",
+      "orderDesc": "ออเดอร์เข้าเว็บ เด้งเตือนหน้าร้านทันที",
+      "cloudSyncText": "Omnichannel Sync 100% • หน้าร้านและออนไลน์สต็อกตรงกันเสมอ"
+    }
   },
   "logos": {
     "title": "ช่องทางชำระเงินและระบบขนส่งที่รองรับ"

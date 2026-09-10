@@ -171,8 +171,15 @@ export default async function middleware(req: NextRequest) {
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
   if (isRootDomain) {
     const langParam = url.searchParams.get('lang')
+    const requestHeaders = new Headers(req.headers)
+
     if (langParam && (langParam === 'th' || langParam === 'en')) {
-      const response = NextResponse.next()
+      requestHeaders.set('x-next-intl-locale', langParam)
+      const response = NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
       response.cookies.set('NEXT_LOCALE', langParam, {
         path: '/',
         maxAge: 60 * 60 * 24 * 365,
@@ -180,6 +187,17 @@ export default async function middleware(req: NextRequest) {
       })
       return response
     }
+
+    const cookieLocale = req.cookies.get('NEXT_LOCALE')?.value
+    if (cookieLocale && (cookieLocale === 'th' || cookieLocale === 'en')) {
+      requestHeaders.set('x-next-intl-locale', cookieLocale)
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      })
+    }
+
     return NextResponse.next()
   }
 

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 
-import { gsap, useGSAP } from '@/lib/gsap'
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 import { PricingCard } from './PricingCard'
@@ -22,45 +22,46 @@ export function PricingPackages() {
     () => {
       if (plansRef.current) {
         const cards = Array.from(plansRef.current.children)
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            { y: 45, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.85,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
+        gsap.fromTo(
+          cards,
+          { y: 50, scale: 0.95, opacity: 0 },
+          {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 0.85,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: plansRef.current,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
             },
-          )
-        })
+          },
+        )
       }
 
       if (commonRef.current) {
         const tiles = Array.from(commonRef.current.children)
-        tiles.forEach((tile) => {
-          gsap.fromTo(
-            tile,
-            { y: 30, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.7,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: tile,
-                start: 'top 92%',
-                toggleActions: 'play none none none',
-              },
+        gsap.fromTo(
+          tiles,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            stagger: 0.05,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: commonRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none none',
             },
-          )
-        })
+          },
+        )
       }
+
+      ScrollTrigger.refresh()
     },
     { scope: sectionRef, dependencies: [isMounted] },
   )
@@ -90,6 +91,7 @@ export function PricingPackages() {
       uniqueFeatures,
     }
   })
+
   const translatedCommonFeatures = COMMON_FEATURES.map((feature, index) => {
     let text = feature.text
     try {
@@ -100,20 +102,30 @@ export function PricingPackages() {
       text,
     }
   })
+
   return (
     <div
       ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:space-y-16 lg:px-8"
+      className="relative mx-auto w-full max-w-7xl space-y-12 px-3.5 sm:space-y-16 sm:px-6 lg:space-y-20 lg:px-8"
     >
+      {/* Background Soft Glow */}
+      <div
+        aria-hidden="true"
+        className="from-primary/15 pointer-events-none absolute top-24 left-1/2 -z-10 h-80 w-full max-w-4xl -translate-x-1/2 rounded-full bg-gradient-to-r via-orange-500/10 to-transparent blur-3xl"
+      />
+
+      {/* Main Pricing Cards Grid */}
       <div
         ref={plansRef}
-        className="grid w-full gap-3.5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+        className="grid w-full items-stretch gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
       >
         {translatedPlans.map((plan) => (
           <PricingCard key={plan.title} {...plan} />
         ))}
       </div>
-      <div className="space-y-4 sm:space-y-8">
+
+      {/* Common Features Section */}
+      <div className="space-y-6 sm:space-y-10">
         <MainSectionHeader
           as="h3"
           badge={t('commonFeatures.badge')}
@@ -123,17 +135,18 @@ export function PricingPackages() {
           }
           description={t('commonFeatures.description')}
         />
+
         <div
           ref={commonRef}
-          className="grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-3"
+          className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
         >
           {translatedCommonFeatures.map((feature, index) => (
             <div
               key={index}
-              className="bg-card/60 hover:bg-card border-border/70 hover:border-border flex items-start gap-2.5 rounded-xl border p-3 shadow-2xs transition-all duration-200 sm:gap-3 sm:rounded-2xl sm:p-4"
+              className="group border-border/70 bg-card/60 hover:border-primary/40 hover:bg-card/90 hover:shadow-primary/5 flex items-start gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-4.5"
             >
               <div
-                className="bg-primary/10 text-primary mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg sm:size-8 sm:rounded-xl"
+                className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 sm:size-9"
                 aria-hidden="true"
               >
                 {feature.icon}

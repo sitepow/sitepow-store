@@ -2,11 +2,14 @@
 import React, { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
 import Link from 'next/link'
 
 import { useGSAP } from '@gsap/react'
 import {
+  IconBrandAndroid,
+  IconBrandApple,
+  IconBrandFinder,
+  IconBrandWindows,
   IconCheck,
   IconClock,
   IconSparkles,
@@ -27,6 +30,7 @@ interface PlatformConfig {
   size: string
   requirements: string
   icon: React.ReactNode
+  badgeColor: string
   isFeatured?: boolean
 }
 
@@ -36,14 +40,12 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0 (Latest)',
     size: '85 MB',
     requirements: 'Windows 10 / 11 (64-bit)',
+    badgeColor:
+      'text-sky-500 bg-sky-500/10 group-hover:bg-sky-500 group-hover:text-white',
     icon: (
-      <Image
-        src="/images/platforms/windows.svg"
-        alt="Windows logo"
-        width={32}
-        height={32}
-        className="size-6.5 object-contain sm:size-7.5"
-        unoptimized
+      <IconBrandWindows
+        className="size-6 transition-transform duration-300 group-hover:scale-110 sm:size-7"
+        stroke={1.75}
       />
     ),
     isFeatured: true,
@@ -53,14 +55,12 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '45 MB',
     requirements: 'Android 8.0+',
+    badgeColor:
+      'text-emerald-500 bg-emerald-500/10 group-hover:bg-emerald-500 group-hover:text-white',
     icon: (
-      <Image
-        src="/images/platforms/android.svg"
-        alt="Android logo"
-        width={32}
-        height={32}
-        className="size-6.5 object-contain sm:size-7.5"
-        unoptimized
+      <IconBrandAndroid
+        className="size-6 transition-transform duration-300 group-hover:scale-110 sm:size-7"
+        stroke={1.75}
       />
     ),
   },
@@ -69,14 +69,12 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '38 MB',
     requirements: 'iPadOS / iOS 15.0+',
+    badgeColor:
+      'text-foreground bg-foreground/10 group-hover:bg-foreground group-hover:text-background',
     icon: (
-      <Image
-        src="/images/platforms/apple.svg"
-        alt="Apple iOS logo"
-        width={32}
-        height={32}
-        className="size-6.5 object-contain sm:size-7.5 dark:invert"
-        unoptimized
+      <IconBrandApple
+        className="size-6 transition-transform duration-300 group-hover:scale-110 sm:size-7"
+        stroke={1.75}
       />
     ),
   },
@@ -85,14 +83,12 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
     version: 'v2.4.0',
     size: '92 MB',
     requirements: 'macOS 12.0+ (Apple Silicon & Intel)',
+    badgeColor:
+      'text-indigo-500 bg-indigo-500/10 group-hover:bg-indigo-500 group-hover:text-white',
     icon: (
-      <Image
-        src="/images/platforms/macos.svg"
-        alt="macOS Finder logo"
-        width={32}
-        height={32}
-        className="size-6.5 rounded-md object-contain shadow-xs sm:size-7.5"
-        unoptimized
+      <IconBrandFinder
+        className="size-6 transition-transform duration-300 group-hover:scale-110 sm:size-7"
+        stroke={1.75}
       />
     ),
   },
@@ -177,7 +173,7 @@ export function DownloadPlatformsSection() {
         {platforms.map((platform) => (
           <div
             key={platform.id}
-            className={`relative flex flex-col justify-between rounded-2xl p-4 transition-all duration-300 sm:rounded-3xl sm:p-6 ${
+            className={`group relative flex flex-col justify-between rounded-2xl p-4 transition-all duration-300 sm:rounded-3xl sm:p-6 ${
               platform.isFeatured
                 ? 'border-primary bg-card/90 ring-primary/20 border-2 shadow-xl ring-1 lg:-translate-y-2'
                 : 'border-border/80 bg-card/60 hover:border-border border hover:shadow-md'
@@ -199,7 +195,9 @@ export function DownloadPlatformsSection() {
             )}
             <div>
               <div className="flex items-start justify-between">
-                <div className="bg-muted/60 border-border/50 flex size-11 items-center justify-center rounded-xl border shadow-xs sm:size-12 sm:rounded-2xl">
+                <div
+                  className={`border-border/50 flex size-11 items-center justify-center rounded-xl border shadow-xs transition-all duration-300 sm:size-12 sm:rounded-2xl ${platform.badgeColor}`}
+                >
                   {platform.icon}
                 </div>
                 <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5">
