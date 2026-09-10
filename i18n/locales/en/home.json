@@ -12,15 +12,7 @@
     "ratingText": "{rating}/5 from {merchants}+ merchants",
     "trust1": "{gp}% GP Lifetime",
     "trust2": "No credit card required",
-    "trust3": "Ready in {minutes} minutes",
-    "widget1Title": "Ultra-Fast POS Billing",
-    "widget1Desc": "⚡ {seconds}s/bill • Instant stock sync",
-    "widget2Title": "Real-Time AI Slip Verification",
-    "widget2Badge": "{accuracy}% Accurate",
-    "widget2Desc": "✓ Verified {amount} • Detects fake slips",
-    "widget3Title": "{gp}% GP Lifetime",
-    "widget3Badge": "+{profit}% Net Profit",
-    "widget3Desc": "📈 Keep 100% direct profit, 0% fee"
+    "trust3": "Ready in {minutes} minutes"
   },
   "logos": {
     "title": "Supported Payment Channels and Courier Partners"

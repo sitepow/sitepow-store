@@ -12,15 +12,7 @@
     "ratingText": "{rating}/5 จาก {merchants}+ ร้านค้า",
     "trust1": "{gp}% GP ตลอดชีพ",
     "trust2": "ไม่ต้องกรอกบัตรเครดิต",
-    "trust3": "เปิดร้านได้ใน {minutes} นาที",
-    "widget1Title": "หน้าร้าน POS คิดเงินไว",
-    "widget1Desc": "⚡ {seconds} วินาที/บิล • สต็อกซิงก์ทันที",
-    "widget2Title": "AI ตรวจสลิป Real-time",
-    "widget2Badge": "{accuracy}% แม่นยำ",
-    "widget2Desc": "✓ ตรวจยอด {amount} • ดักจับสลิปปลอม",
-    "widget3Title": "ขายฟรี {gp}% GP",
-    "widget3Badge": "+{profit}% กำไรสุทธิ",
-    "widget3Desc": "📈 รับเงินเต็มจำนวน ไม่ถูกหักส่วนแบ่ง"
+    "trust3": "เปิดร้านได้ใน {minutes} นาที"
   },
   "logos": {
     "title": "ช่องทางชำระเงินและระบบขนส่งที่รองรับ"

@@ -102,7 +102,7 @@ export function BlogsGridSection() {
     >
       <div
         ref={filterBarRef}
-        className="flex flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4"
+        className="flex flex-col items-center justify-between gap-3"
       >
         <div className="flex max-w-full flex-wrap items-center gap-1.5 overflow-x-auto pb-1">
           <button
