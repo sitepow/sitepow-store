@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { useCategories, useDeleteCategory } from '@/actions/hooks/category'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
@@ -23,11 +24,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+
 interface CategoriesTableProps {
   onEdit: (id: string) => void
 }
 
 export function CategoriesTable({ onEdit }: CategoriesTableProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.categories')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -42,7 +45,14 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
   const deleteCategoryMutation = useDeleteCategory()
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <div className="overflow-x-auto rounded-md border">
         <Table className="min-w-175 border-separate border-spacing-0">
           <TableHeader>
@@ -111,6 +121,6 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useTranslations } from 'next-intl'
 
 import { formatCurrency } from '@/utils/pricing'
@@ -27,6 +28,7 @@ interface SalesTrendChartProps {
 }
 
 export function SalesTrendChart({ data }: SalesTrendChartProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.dashboard.salesTrend')
   const salesTrend = data?.salesTrend ?? []
 
@@ -43,6 +45,9 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={salesTrend.length === 0}

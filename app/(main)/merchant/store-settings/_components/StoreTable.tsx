@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -154,6 +156,7 @@ function StoreRowActions({
 }
 
 export function StoreTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores')
   const [page, setPage] = useState(1)
 
@@ -163,7 +166,12 @@ export function StoreTable() {
   const deleteStoreMutation = useDeleteStore()
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
@@ -285,6 +293,6 @@ export function StoreTable() {
           onPageChange={(targetPage) => setPage(targetPage)}
         />
       )}
-    </>
+    </div>
   )
 }

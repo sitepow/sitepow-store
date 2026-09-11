@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { ZONE_LABELS } from '@/constants/shipping'
@@ -20,11 +22,17 @@ export function ShippingZoneTable({
 }: {
   originProvince: string
 }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.shipping')
   const originRegion = getRegionKey(originProvince)
 
   return (
-    <div className="rounded-md border">
+    <div
+      className="rounded-md border"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Table>
         <TableHeader>
           <TableRow>

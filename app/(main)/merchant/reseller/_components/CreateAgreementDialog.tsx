@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 
 import { useCreateResellerAgreement } from '@/actions/hooks/reseller'
 import { ResellerType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconFileCertificate, IconX } from '@tabler/icons-react'
 
@@ -48,6 +49,7 @@ export function CreateAgreementDialog({
   setOpen,
   onSuccess,
 }: CreateAgreementDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.reseller.createAgreement')
   const { selectedStoreId } = useStoreFilter()
   const createAgreementMutation = useCreateResellerAgreement()
@@ -121,7 +123,14 @@ export function CreateAgreementDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}>
-      <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md"
+      >
         <FormProvider {...methods}>
           <DialogHeader>
             <DialogHeaderIcon icon={IconFileCertificate} title={t('title')} />

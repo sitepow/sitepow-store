@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -27,6 +29,7 @@ interface DayOfWeekTrendChartProps {
 export function DayOfWeekTrendChart({
   dayOfWeekTrend,
 }: DayOfWeekTrendChartProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.dayOfWeekTrend')
 
   const chartConfig = useMemo(
@@ -40,6 +43,9 @@ export function DayOfWeekTrendChart({
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={dayOfWeekTrend.length === 0}

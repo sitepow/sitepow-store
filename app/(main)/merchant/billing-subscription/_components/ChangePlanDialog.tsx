@@ -13,6 +13,7 @@ import {
 } from '@/actions/hooks/subscription'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { UpgradeType } from '@/types/checkout'
 import { formatCurrency } from '@/utils/pricing'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
@@ -41,6 +42,7 @@ export function ChangePlanDialog({
   storeId,
   currentPlan,
 }: ChangePlanDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.billing.dialog')
   const tCommon = useTranslations('common.actions')
   const router = useRouter()
@@ -108,7 +110,14 @@ export function ChangePlanDialog({
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent
+        className="sm:max-w-2xl"
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconSettings}

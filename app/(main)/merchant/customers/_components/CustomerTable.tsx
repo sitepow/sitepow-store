@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState }
+from 'react'
+import { useCurrentStore } from '@/hooks/use-current-store'
 
 import { useTranslations } from 'next-intl'
 
@@ -31,6 +33,7 @@ import {
 } from '@/components/ui/table'
 
 export function CustomerTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.customers')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -70,7 +73,12 @@ export function CustomerTable() {
   const totalColumns = showManageColumn ? 9 : 8
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -184,6 +192,6 @@ export function CustomerTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

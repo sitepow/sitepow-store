@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 
 import { ACTOR_TYPE_TH, LOG_ACTION_TH } from '@/constants/translate'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { IconFilter, IconSearch } from '@tabler/icons-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -34,10 +35,17 @@ export function AuditLogFilters({
   actionFilter,
   onActionFilterChange,
 }: AuditLogFiltersProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.auditLogs')
 
   return (
-    <Card>
+    <Card
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <CardContent className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
         <Field>
           <FieldLabel>

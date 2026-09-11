@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -13,6 +15,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 export function StoreNameField({ isPending }: { isPending: boolean }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores.dialog')
   const {
     register,
@@ -41,7 +44,11 @@ export function StoreNameField({ isPending }: { isPending: boolean }) {
   }, [availability, debouncedName, setError, clearErrors, t])
 
   return (
-    <Field>
+    <Field
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <FieldLabel>{t('storeNameLabel')}</FieldLabel>
       <Input
         placeholder={t('storeNamePlaceholder')}

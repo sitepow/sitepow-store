@@ -14,6 +14,7 @@ import { useCreateResellerPOSOrder } from '@/actions/hooks/reseller'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { QUICK_AMOUNTS } from '@/constants/credit'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useSession } from '@/hooks/use-session'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { POSCheckoutInput } from '@/zod/order'
@@ -61,6 +62,7 @@ export function PosCheckoutModal({
   agreementId,
   onSuccess,
 }: PosCheckoutModalProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.pos.checkoutModal')
   const tCart = useTranslations('merchant.pos.cart')
   const clearCart = useCartStore((state) => state.clearCart)
@@ -298,7 +300,15 @@ export function PosCheckoutModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="overflow-x-hidden p-0">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        showCloseButton={false}
+        className="overflow-x-hidden p-0"
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DigitalPriceDisplay
             value={totalAmount}

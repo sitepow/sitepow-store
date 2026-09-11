@@ -1,13 +1,17 @@
+'use client'
+
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
 export function ProductPreviewContent() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const { control } = useFormContext()
   const { selectedStoreSlug } = useStoreFilter()
@@ -72,7 +76,14 @@ export function ProductPreviewContent() {
   )}`
 
   return (
-    <div className="text-foreground space-y-6">
+    <div
+      className="text-foreground space-y-6"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <div className="dark:bg-foreground/5 rounded-lg border p-4">
         <p className="mb-2 text-xs font-semibold uppercase opacity-60">
           {t('previewGoogleSearch')}

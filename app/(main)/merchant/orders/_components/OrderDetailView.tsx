@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -50,6 +52,7 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.orders.detail')
   const tStatuses = useTranslations('merchant.orders.statuses')
   const { copied, copy } = useCopyToClipboard()
@@ -109,7 +112,10 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           <IconEye size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconReceipt}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useCurrentStore } from '@/hooks/use-current-store'
 
 import {
   useCancelPendingPlanChange,
@@ -34,6 +35,7 @@ import {
 import { ChangePlanDialog } from './ChangePlanDialog'
 
 export function MerchantSubscriptionTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.billing')
   const { user } = useSession()
   const { data: subscriptions = [], isLoading } = useStoreSubscriptions(
@@ -42,7 +44,12 @@ export function MerchantSubscriptionTable() {
   const cancelPendingMutation = useCancelPendingPlanChange()
 
   return (
-    <div className="overflow-hidden rounded-xl border">
+    <div
+      className="overflow-hidden rounded-xl border"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Table>
         <TableHeader>
           <TableRow>

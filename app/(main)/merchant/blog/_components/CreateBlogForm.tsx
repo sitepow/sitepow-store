@@ -13,6 +13,7 @@ import { useBlogAi } from '@/actions/hooks/ai'
 import { useBlog, useCreateBlog, useUpdateBlog } from '@/actions/hooks/blog'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { Plan } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
@@ -80,9 +81,9 @@ interface CreateBlogFormProps {
 }
 
 export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.blog.form')
   const tCommon = useTranslations('common.actions')
-  const { store } = useStoreData()
   const router = useRouter()
   const { selectedStoreId } = useStoreFilter()
 
@@ -317,280 +318,298 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
   }
 
   return (
-    <FormProvider {...form}>
-      <Card className="mb-6">
-        <CardContent className="flex flex-wrap items-center gap-2.5">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" disabled={isPending}>
-                {isGenAi ? (
-                  <Spinner className="mr-2" />
-                ) : (
-                  <IconWand className="mr-2 size-4" />
-                )}
-                {t('aiTool')}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{t('aiGenerateLabel')}</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
-                }
-              >
-                {t('aiGenAll')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() =>
-                  handleAiTrigger(AiGenTask.TITLE, () => genAi(AiGenTask.TITLE))
-                }
-              >
-                {t('aiGenTitle')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  handleAiTrigger(AiGenTask.SLUG, () => genAi(AiGenTask.SLUG))
-                }
-              >
-                {t('aiGenSlug')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  handleAiTrigger(AiGenTask.TAGS, () => genAi(AiGenTask.TAGS))
-                }
-              >
-                {t('aiGenTags')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {isDirty && (
-            <Button
-              type="button"
-              disabled={isPending}
-              variant="outline"
-              onClick={handleResetForm}
-            >
-              <IconX className="mr-1 size-4" /> {t('resetChanges')}
-            </Button>
-          )}
-
-          {isDirty && (
-            <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-              {isPending && <Spinner className="mr-2" />}
-              {t('saveBlog')}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-      <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
-        <div className="space-y-8">
-          <FieldSet disabled={isPending}>
-            <FieldGroup className="grid gap-6">
-              <Field>
-                <FieldLabel className="required">{t('title')}</FieldLabel>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={t('titlePlaceholder')}
-                    {...register('title')}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      handleAiTrigger(AiGenTask.TITLE, () =>
-                        genAi(AiGenTask.TITLE),
-                      )
-                    }
-                    disabled={isPending}
-                  >
-                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
-                  </Button>
-                </div>
-                {errors.title && (
-                  <p className="text-destructive text-xs">
-                    {errors.title.message}
-                  </p>
-                )}
-              </Field>
-              <Field>
-                <FieldLabel className="required">{t('slug')}</FieldLabel>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="10-health-tips-2026"
-                    {...register('slug')}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      handleAiTrigger(AiGenTask.SLUG, () =>
-                        genAi(AiGenTask.SLUG),
-                      )
-                    }
-                    disabled={isPending}
-                  >
-                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
-                  </Button>
-                </div>
-                {errors.slug && (
-                  <p className="text-destructive text-xs">
-                    {errors.slug.message}
-                  </p>
-                )}
-              </Field>
-              <Field>
-                <FieldLabel>{t('coverImage')}</FieldLabel>
-                <div className="space-y-3">
-                  {previewImageUrl ? (
-                    <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
-                      <Image
-                        src={previewImageUrl}
-                        alt="Cover Preview"
-                        fill
-                        className="object-cover"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2"
-                        onClick={() =>
-                          setValue('image', '', {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <IconTrash className="size-4" />
-                      </Button>
-                    </div>
+    <div
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
+      <FormProvider {...form}>
+        <Card className="mb-6">
+          <CardContent className="flex flex-wrap items-center gap-2.5">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={isPending}>
+                  {isGenAi ? (
+                    <Spinner className="mr-2" />
                   ) : (
-                    <label className="border-muted-foreground/25 hover:bg-muted/50 flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors">
-                      <IconUpload className="text-muted-foreground mb-2 size-8" />
-                      <div className="text-sm">
-                        <span>{t('uploadText')}</span>
-                      </div>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {t('uploadRecommendation')}
-                      </p>
-                      <p className="text-muted-foreground/70 text-[11px]">
-                        {t('uploadFormats')}
-                      </p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                      />
-                    </label>
+                    <IconWand className="mr-2 size-4" />
                   )}
-                  {errors.image && (
+                  {t('aiTool')}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>{t('aiGenerateLabel')}</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
+                  }
+                >
+                  {t('aiGenAll')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.TITLE, () =>
+                      genAi(AiGenTask.TITLE),
+                    )
+                  }
+                >
+                  {t('aiGenTitle')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.SLUG, () => genAi(AiGenTask.SLUG))
+                  }
+                >
+                  {t('aiGenSlug')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.TAGS, () => genAi(AiGenTask.TAGS))
+                  }
+                >
+                  {t('aiGenTags')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {isDirty && (
+              <Button
+                type="button"
+                disabled={isPending}
+                variant="outline"
+                onClick={handleResetForm}
+              >
+                <IconX className="mr-1 size-4" /> {t('resetChanges')}
+              </Button>
+            )}
+
+            {isDirty && (
+              <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
+                {isPending && <Spinner className="mr-2" />}
+                {t('saveBlog')}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
+          <div className="space-y-8">
+            <FieldSet disabled={isPending}>
+              <FieldGroup className="grid gap-6">
+                <Field>
+                  <FieldLabel className="required">{t('title')}</FieldLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={t('titlePlaceholder')}
+                      {...register('title')}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        handleAiTrigger(AiGenTask.TITLE, () =>
+                          genAi(AiGenTask.TITLE),
+                        )
+                      }
+                      disabled={isPending}
+                    >
+                      {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
+                    </Button>
+                  </div>
+                  {errors.title && (
                     <p className="text-destructive text-xs">
-                      {String(errors.image.message)}
+                      {errors.title.message}
                     </p>
                   )}
-                </div>
-              </Field>
-              <Field>
-                <div className="mb-2 flex items-center justify-between">
-                  <FieldLabel>{t('content')}</FieldLabel>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleAiTrigger(AiGenTask.ALL, () => genAi(AiGenTask.ALL))
-                    }
-                    disabled={isPending}
-                  >
-                    {isGenAi ? (
-                      <Spinner className="mr-2" />
-                    ) : (
-                      <IconWand className="mr-2 size-4" />
-                    )}
-                    {t('aiWriteContent')}
-                  </Button>
-                </div>
-                <Controller
-                  control={control}
-                  name="content"
-                  render={({ field }) => (
-                    <BlogEditor
-                      value={field.value}
-                      onChange={(markdown) => field.onChange(markdown)}
+                </Field>
+                <Field>
+                  <FieldLabel className="required">{t('slug')}</FieldLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="10-health-tips-2026"
+                      {...register('slug')}
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        handleAiTrigger(AiGenTask.SLUG, () =>
+                          genAi(AiGenTask.SLUG),
+                        )
+                      }
+                      disabled={isPending}
+                    >
+                      {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
+                    </Button>
+                  </div>
+                  {errors.slug && (
+                    <p className="text-destructive text-xs">
+                      {errors.slug.message}
+                    </p>
                   )}
-                />
-                {errors.content && (
-                  <p className="text-destructive text-xs">
-                    {errors.content.message}
-                  </p>
-                )}
-              </Field>
-              <Field>
-                <FieldLabel>{t('tags')}</FieldLabel>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={t('tagsPlaceholder')}
-                    {...register('tags')}
+                </Field>
+                <Field>
+                  <FieldLabel>{t('coverImage')}</FieldLabel>
+                  <div className="space-y-3">
+                    {previewImageUrl ? (
+                      <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
+                        <Image
+                          src={previewImageUrl}
+                          alt="Cover Preview"
+                          fill
+                          className="object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2"
+                          onClick={() =>
+                            setValue('image', '', {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            })
+                          }
+                        >
+                          <IconTrash className="size-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="border-muted-foreground/25 hover:bg-muted/50 flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors">
+                        <IconUpload className="text-muted-foreground mb-2 size-8" />
+                        <div className="text-sm">
+                          <span>{t('uploadText')}</span>
+                        </div>
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {t('uploadRecommendation')}
+                        </p>
+                        <p className="text-muted-foreground/70 text-[11px]">
+                          {t('uploadFormats')}
+                        </p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    )}
+                    {errors.image && (
+                      <p className="text-destructive text-xs">
+                        {String(errors.image.message)}
+                      </p>
+                    )}
+                  </div>
+                </Field>
+                <Field>
+                  <div className="mb-2 flex items-center justify-between">
+                    <FieldLabel>{t('content')}</FieldLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        handleAiTrigger(AiGenTask.ALL, () =>
+                          genAi(AiGenTask.ALL),
+                        )
+                      }
+                      disabled={isPending}
+                    >
+                      {isGenAi ? (
+                        <Spinner className="mr-2" />
+                      ) : (
+                        <IconWand className="mr-2 size-4" />
+                      )}
+                      {t('aiWriteContent')}
+                    </Button>
+                  </div>
+                  <Controller
+                    control={control}
+                    name="content"
+                    render={({ field }) => (
+                      <BlogEditor
+                        value={field.value}
+                        onChange={(markdown) => field.onChange(markdown)}
+                      />
+                    )}
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      handleAiTrigger(AiGenTask.TAGS, () =>
-                        genAi(AiGenTask.TAGS),
-                      )
-                    }
-                    disabled={isPending}
-                  >
-                    {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
-                  </Button>
-                </div>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
+                  {errors.content && (
+                    <p className="text-destructive text-xs">
+                      {errors.content.message}
+                    </p>
+                  )}
+                </Field>
+                <Field>
+                  <FieldLabel>{t('tags')}</FieldLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={t('tagsPlaceholder')}
+                      {...register('tags')}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        handleAiTrigger(AiGenTask.TAGS, () =>
+                          genAi(AiGenTask.TAGS),
+                        )
+                      }
+                      disabled={isPending}
+                    >
+                      {isGenAi ? <Spinner /> : <IconWand className="size-4" />}
+                    </Button>
+                  </div>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          </div>
+          <div className="sticky top-6 space-y-6 xl:col-span-1">
+            <BlogPreviewContent />
+          </div>
         </div>
-        <div className="sticky top-6 space-y-6 xl:col-span-1">
-          <BlogPreviewContent />
-        </div>
-      </div>
-      <AlertDialog
-        open={!!aiTaskConfirm}
-        onOpenChange={() => setAiTaskConfirm(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t.rich('aiConfirmDescription', {
-                cost: aiTaskConfirm?.cost || 0,
-                b: (chunks) => (
-                  <span className="text-primary font-bold">{chunks}</span>
-                ),
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (aiTaskConfirm) {
-                  aiTaskConfirm.action()
-                  setAiTaskConfirm(null)
-                }
-              }}
-            >
-              {tCommon('confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </FormProvider>
+        <AlertDialog
+          open={!!aiTaskConfirm}
+          onOpenChange={() => setAiTaskConfirm(null)}
+        >
+          <AlertDialogContent
+            style={
+              {
+                '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+              } as React.CSSProperties
+            }
+          >
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t.rich('aiConfirmDescription', {
+                  cost: aiTaskConfirm?.cost || 0,
+                  b: (chunks) => (
+                    <span className="text-primary font-bold">{chunks}</span>
+                  ),
+                })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (aiTaskConfirm) {
+                    aiTaskConfirm.action()
+                    setAiTaskConfirm(null)
+                  }
+                }}
+              >
+                {tCommon('confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </FormProvider>
+    </div>
   )
 }

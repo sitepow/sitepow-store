@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -25,6 +27,7 @@ interface PeakHoursCardProps {
 }
 
 export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.peakHours')
 
   const chartConfig = useMemo(
@@ -40,6 +43,9 @@ export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={topBuyingHours.length === 0}

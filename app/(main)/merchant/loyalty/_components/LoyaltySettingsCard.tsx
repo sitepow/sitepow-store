@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { ComponentProps, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -37,6 +39,7 @@ export function LoyaltySettingsCard({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.loyalty.settings')
   const { selectedStoreId } = useStoreFilter()
   const { data: settings } = useLoyaltySettings(selectedStoreId)
@@ -83,7 +86,10 @@ export function LoyaltySettingsCard({
   }
 
   return (
-    <Card className={cn('h-fit', className)} {...props}>
+    <Card
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className={cn('h-fit', className)} {...props}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>{t('title')}</CardTitle>

@@ -1,6 +1,8 @@
+'use client'
+
+import { useCurrentStore } from '@/hooks/use-current-store'
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-'use client'
 
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -44,6 +46,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
 export function StoreProfileForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.storeProfile')
   const { selectedStoreId } = useStoreFilter()
   const { data: storeProfile } = useStoreProfile(selectedStoreId as string)
@@ -195,7 +198,11 @@ export function StoreProfileForm() {
     deleteMutation.isPending
 
   return (
-    <Card>
+    <Card
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <CardHeader>
         <PageTabHeader
           variant="secondary"

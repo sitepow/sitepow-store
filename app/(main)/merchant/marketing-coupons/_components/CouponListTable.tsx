@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -25,6 +27,7 @@ import {
 } from '@/components/ui/table'
 
 export function CouponListTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.marketing')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -38,7 +41,12 @@ export function CouponListTable() {
   const deleteCouponMutation = useDeleteCoupon()
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="bg-background overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
@@ -188,6 +196,6 @@ export function CouponListTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

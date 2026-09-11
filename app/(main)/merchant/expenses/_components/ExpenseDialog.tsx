@@ -15,6 +15,7 @@ import {
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
 import { ExpenseCategory } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
@@ -44,6 +45,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
+
 const getTodayString = () => new Date().toISOString().split('T')[0]
 
 const DEFAULT_VALUES = {
@@ -65,6 +67,7 @@ export function ExpenseDialog({
   open: boolean
   setOpen: (v: boolean) => void
 }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.expenses')
   const tCategories = useTranslations('merchant.expenses.categories')
   const { selectedStoreId } = useStoreFilter()
@@ -190,7 +193,14 @@ export function ExpenseDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}>
-      <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg"
+      >
         <FormProvider {...methods}>
           <DialogHeader>
             <DialogHeaderIcon

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useCallback, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -26,6 +28,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { NotificationRow } from './_components/NotificationRow'
 
 export function NotificationSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.notifications')
   const { selectedStoreId } = useStoreFilter()
   const { data: notificationSettings } = useNotificationSettings(
@@ -70,7 +73,11 @@ export function NotificationSettingsForm() {
   }
 
   return (
-    <Card>
+    <Card
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <CardHeader>
         <PageTabHeader
           variant="secondary"

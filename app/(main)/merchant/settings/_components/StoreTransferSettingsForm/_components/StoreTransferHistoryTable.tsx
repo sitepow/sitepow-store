@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { useTransferRequests } from '@/actions/hooks/store-transfer'
@@ -23,6 +25,7 @@ import {
 } from '@/components/ui/table'
 
 export function StoreTransferHistoryTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.transfer')
   const { selectedStoreId } = useStoreFilter()
   const { user } = useSession()

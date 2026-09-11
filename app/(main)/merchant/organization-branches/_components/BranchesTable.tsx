@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -28,6 +30,7 @@ interface BranchesTableProps {
 }
 
 export function BranchesTable({ onEdit }: BranchesTableProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.branches')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -41,7 +44,12 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
   const deleteBranchMutation = useDeleteBranch()
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -104,6 +112,6 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

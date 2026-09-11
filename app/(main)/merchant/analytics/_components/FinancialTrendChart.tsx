@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -27,6 +29,7 @@ interface FinancialTrendChartProps {
 }
 
 export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.financialTrend')
 
   const chartConfig = useMemo(
@@ -42,6 +45,9 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={data.length === 0}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import {
@@ -148,6 +150,7 @@ const FIELD_DICTIONARY: FieldDoc[] = [
 ]
 
 export function BulkImportGuideDialog() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.bulkImportGuide')
 
   return (
@@ -161,7 +164,10 @@ export function BulkImportGuideDialog() {
           <IconBook className="size-4" /> {t('triggerBtn')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl">
         <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
           <DialogHeaderIcon
             icon={IconBook}

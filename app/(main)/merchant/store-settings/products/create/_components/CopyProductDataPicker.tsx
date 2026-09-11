@@ -11,6 +11,7 @@ import { getProductById } from '@/actions/product'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 import { IconDatabaseImport } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
@@ -43,6 +44,7 @@ import { cn } from '@/lib/utils'
 type ProductPreview = Awaited<ReturnType<typeof getProductById>>
 
 export function CopyProductDataPicker({ storeId }: { storeId: string }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const [open, setOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -161,7 +163,14 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
           <IconDatabaseImport className="size-4" /> {t('copyFromDatabase')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex min-h-96 flex-col">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="flex min-h-96 flex-col"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconDatabaseImport}
@@ -186,7 +195,14 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
               <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="max-w-100 p-0">
+          <PopoverContent
+            style={
+              {
+                '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+              } as React.CSSProperties
+            }
+            className="max-w-100 p-0"
+          >
             <Command>
               <CommandInput placeholder={t('searchProductInputPlaceholder')} />
               <CommandList>

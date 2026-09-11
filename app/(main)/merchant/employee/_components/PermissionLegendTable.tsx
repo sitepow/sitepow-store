@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -23,6 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function PermissionLegendTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.employee.permissionLegend')
   const permissionEntries = Object.entries(PERMISSION_MAPPING) as [
     PermissionKey,
@@ -52,7 +55,10 @@ export function PermissionLegendTable() {
   }
 
   return (
-    <Tabs defaultValue={defaultDomain} className="w-full">
+    <Tabs
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} defaultValue={defaultDomain} className="w-full">
       <TabsList className="mb-4 flex w-full justify-start overflow-x-auto whitespace-nowrap">
         {domains.map((domain) => (
           <TabsTrigger key={domain} value={domain}>

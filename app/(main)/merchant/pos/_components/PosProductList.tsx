@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { POSProductItem } from '@/actions/pos/product'
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { ProductCard } from '@/app/sites/[domain]/_components/product/ProductCard'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
 import { getRemainingStock } from '@/utils/cart'
@@ -21,6 +22,7 @@ import {
   SelectedAddonPayload,
   SelectedOptionPayload,
 } from './PosProductOptionDialog'
+
 
 export type { SelectedOptionPayload, SelectedAddonPayload }
 
@@ -47,6 +49,7 @@ export function PosProductList({
   onAddToCart,
   isReseller = false,
 }: PosProductListProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
   const [selectedProduct, setSelectedProduct] = useState<POSProductItem | null>(
@@ -109,7 +112,14 @@ export function PosProductList({
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div
+      className="flex h-full flex-col gap-4"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <div className="relative">
         <IconSearch className="text-muted-foreground absolute top-2.5 left-3 size-4" />
         <Input

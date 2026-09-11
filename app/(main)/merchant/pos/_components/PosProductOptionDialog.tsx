@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { POSProductItem } from '@/actions/pos/product'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
@@ -62,6 +63,7 @@ export function PosProductOptionDialog({
   onClose,
   onConfirm,
 }: PosProductOptionDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
   const [selectedVariantId, setSelectedVariantId] = useState<string>(
@@ -220,7 +222,14 @@ export function PosProductOptionDialog({
 
   return (
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconBox}

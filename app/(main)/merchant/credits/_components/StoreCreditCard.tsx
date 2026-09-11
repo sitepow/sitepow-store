@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useStoreCredit } from '@/actions/hooks/credit'
 import { AVG_INPUT_TOKENS, AVG_OUTPUT_TOKENS } from '@/constants/ai'
 import { Plan } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CreditUsageType } from '@/types/ai'
@@ -24,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PurchaseCreditDialog } from './PurchaseCreditDialog'
 
 export function StoreCreditCard() {
+  const { currentStore } = useCurrentStore()
   const t = useTranslations('merchant.credits')
   const { selectedStoreId } = useStoreFilter()
   const storeId = selectedStoreId === ALL_STORES ? '' : selectedStoreId
@@ -47,7 +49,12 @@ export function StoreCreditCard() {
     balance > 0 ? Math.floor(balance / slipCost.credits) : 0
 
   return (
-    <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
+    <Card
+      className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <CardHeader className="pb-2">
         <CardDescription className="text-primary text-xs font-bold">
           {t('balance')}

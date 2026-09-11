@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { HOURS } from '@/constants/system'
@@ -15,6 +17,7 @@ interface HeatmapChartProps {
 }
 
 export function HeatmapChart({ heatmap }: HeatmapChartProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.heatmap')
   const days = [
     t('days.0'),
@@ -52,6 +55,9 @@ export function HeatmapChart({ heatmap }: HeatmapChartProps) {
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={heatmap.length === 0}

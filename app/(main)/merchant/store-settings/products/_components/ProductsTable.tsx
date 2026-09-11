@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -41,6 +43,7 @@ import {
 } from '@/components/ui/table'
 
 export function ProductsTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products')
   const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
@@ -70,7 +73,12 @@ export function ProductsTable() {
     : 0
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       {selectedStoreId !== ALL_STORES && (
         <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
           <CardHeader className="pb-2">
@@ -199,6 +207,6 @@ export function ProductsTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

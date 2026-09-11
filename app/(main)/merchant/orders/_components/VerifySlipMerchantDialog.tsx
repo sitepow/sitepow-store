@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -40,6 +42,7 @@ interface VerifySlipMerchantDialogProps {
 export function VerifySlipMerchantDialog({
   order,
 }: VerifySlipMerchantDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.orders.verifySlip')
   const [isOpen, setIsOpen] = useState(false)
   const { mutate: handleVerifySlip, isPending } = useApproveSlipManual()
@@ -64,7 +67,10 @@ export function VerifySlipMerchantDialog({
           <IconSearch size={16} /> {t('button')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="sm:max-w-lg">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconSearch}

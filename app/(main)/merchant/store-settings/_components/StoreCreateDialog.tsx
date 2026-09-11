@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -33,6 +35,7 @@ import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 
 export function StoreCreateDialog() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores')
   const tDialog = useTranslations('merchant.stores.dialog')
   const { selectedTab } = usePricingStore()
@@ -115,7 +118,10 @@ export function StoreCreateDialog() {
           {t('createStore')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="sm:max-w-2xl">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconBuildingStore}

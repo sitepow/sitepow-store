@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState }
+from 'react'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useForm } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
@@ -33,6 +35,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 
 export function PurchaseCreditDialog() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.credits.dialog')
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
@@ -104,7 +107,11 @@ export function PurchaseCreditDialog() {
           <IconPlus size={16} /> {t('trigger')}
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties}
+      >
         <DialogHeader>
           <DialogHeaderIcon icon={IconCoins} title={t('title')} />
         </DialogHeader>

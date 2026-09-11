@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useTranslations } from 'next-intl'
@@ -9,6 +8,7 @@ import {
   useResellerStocks,
 } from '@/actions/hooks/reseller'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
@@ -35,6 +35,8 @@ import {
 } from '@/components/ui/table'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
+/* eslint-disable @next/next/no-img-element */
+
 interface ResellerStockTableProps {
   onAcceptStock?: (stock: any) => void
   onReturnStock?: (stock: any) => void
@@ -46,6 +48,7 @@ export function ResellerStockTable({
   onReturnStock,
   onEditPrice,
 }: ResellerStockTableProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.reseller')
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId } = useResellerFilter()
@@ -79,7 +82,14 @@ export function ResellerStockTable({
   const totalColumns = (showActionColumn ? 8 : 7) + 1
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       {selectedAgreementId && summary && (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatsCard

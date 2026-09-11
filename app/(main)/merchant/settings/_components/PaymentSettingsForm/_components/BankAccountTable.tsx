@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
@@ -29,7 +31,9 @@ interface BankAccountTableProps {
   onEdit: (id: string) => void
 }
 
-export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
+export function BankAccountTable({
+ accounts, onEdit }: BankAccountTableProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.payment.table')
   const { selectedStoreId } = useStoreFilter()
   const { mutate: deleteAccount, isPending } = useDeleteBankAccount()

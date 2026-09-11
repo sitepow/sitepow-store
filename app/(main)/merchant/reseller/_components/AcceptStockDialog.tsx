@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect, useState } from 'react'
 
 import { useTranslations } from 'next-intl'

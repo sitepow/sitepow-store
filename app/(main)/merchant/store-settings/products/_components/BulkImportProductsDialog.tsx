@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -82,6 +84,7 @@ export function BulkImportProductsDialog({
   storeId,
   onSuccess,
 }: BulkImportProductsDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.bulkImport')
 
   const [currentStep, setCurrentStep] = useState<ImportStep>('upload')
@@ -323,7 +326,10 @@ export function BulkImportProductsDialog({
         onOpenChange(isOpen)
       }}
     >
-      <DialogContent className="flex max-h-[92vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[90vh] sm:w-full sm:max-w-3xl">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="flex max-h-[92vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[90vh] sm:w-full sm:max-w-3xl">
         <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
           <div className="flex flex-col items-center gap-2.5">
             <DialogHeaderIcon

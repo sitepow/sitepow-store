@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -16,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { SlugPreview } from './SlugPreview'
 
 export function StoreSlugField({ isPending }: { isPending: boolean }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores.dialog')
   const {
     register,
@@ -44,7 +47,11 @@ export function StoreSlugField({ isPending }: { isPending: boolean }) {
   }, [availability, debouncedSlug, setError, clearErrors, t])
 
   return (
-    <Field>
+    <Field
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <FieldLabel>{t('storeSlugLabel')}</FieldLabel>
       <div className="flex">
         <span className="bg-muted text-muted-foreground inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">

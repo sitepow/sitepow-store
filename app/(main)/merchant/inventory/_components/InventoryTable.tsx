@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import React, { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -39,6 +41,7 @@ import { StockEditDialog } from './StockEditDialog'
 import { StockTransferDialog } from './StockTransferDialog'
 
 export function InventoryTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
@@ -86,7 +89,12 @@ export function InventoryTable() {
   const totalColumns = canManageInventory ? 6 : 5
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="overflow-x-auto rounded-md border">
         <Table className="min-w-200">
           <TableHeader>
@@ -295,6 +303,6 @@ export function InventoryTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

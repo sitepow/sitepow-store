@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -30,6 +32,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function SecuritySettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.security')
   const { user } = useSession()
   const { selectedStoreId } = useStoreFilter()
@@ -97,7 +100,12 @@ export function SecuritySettingsForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Card>
         <CardHeader>
           <PageTabHeader

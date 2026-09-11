@@ -1,8 +1,10 @@
 'use client'
 
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 
 import { useTranslations } from 'next-intl'
+
+import { useCurrentStore } from '@/hooks/use-current-store'
 
 import {
   Card,
@@ -19,6 +21,7 @@ interface AnalyticsCardShellProps {
   emptyMessage?: string
   children?: ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
 export function AnalyticsCardShell({
@@ -28,12 +31,22 @@ export function AnalyticsCardShell({
   emptyMessage,
   children,
   className,
+  style,
 }: AnalyticsCardShellProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('common.empty')
   const resolvedEmptyMessage = emptyMessage ?? t('title')
 
   return (
-    <Card className={`border-border/60 overflow-hidden ${className ?? ''}`}>
+    <Card
+      className={`border-border/60 overflow-hidden ${className ?? ''}`}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          ...style,
+        } as React.CSSProperties
+      }
+    >
       <CardHeader>
         <CardTitle className="text-base font-bold">{title}</CardTitle>
         <CardDescription className="text-xs">{description}</CardDescription>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -37,6 +39,7 @@ interface PayoutDialogProps {
 }
 
 export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.reseller.payout')
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId: agreementId } = useResellerFilter()

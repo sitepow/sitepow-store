@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -21,6 +23,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function TaxSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.tax')
   const { selectedStoreId } = useStoreFilter()
   const { data: taxSetting } = useTaxSetting(selectedStoreId)
@@ -67,7 +70,11 @@ export function TaxSettingsForm() {
   const isVatRegistered = form.watch('isVatRegistered')
 
   return (
-    <Card>
+    <Card
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <CardHeader>
         <PageTabHeader
           variant="secondary"

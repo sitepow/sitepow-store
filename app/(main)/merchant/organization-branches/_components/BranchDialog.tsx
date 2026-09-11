@@ -11,6 +11,7 @@ import {
   useUpdateBranch,
 } from '@/actions/hooks/branch'
 import { THAI_DAYS } from '@/constants/system'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { OpeningHours } from '@/types/branch'
 import { CreateBranchFormValues, createBranchSchema } from '@/zod/branch'
@@ -33,6 +34,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 import { Address } from '@/lib/address/logic'
+
 
 const InputThaiAddress = CreateInput()
 
@@ -64,6 +66,7 @@ export function BranchDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.branches')
   const tCommon = useTranslations('common.actions')
   const { selectedStoreId } = useStoreFilter()
@@ -157,7 +160,14 @@ export function BranchDialog({
           {t('addBranch')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="sm:max-w-lg"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconBuildingStore}

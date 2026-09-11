@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -36,6 +38,7 @@ import { BankAccountDialog } from './_components/BankAccountDialog'
 import { BankAccountTable } from './_components/BankAccountTable'
 
 export function PaymentSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.payment')
   const { selectedStoreId } = useStoreFilter()
   const { data: paymentSetting } = usePaymentSetting(selectedStoreId)
@@ -109,7 +112,12 @@ export function PaymentSettingsForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Card>
         <CardHeader>
           <PageTabHeader

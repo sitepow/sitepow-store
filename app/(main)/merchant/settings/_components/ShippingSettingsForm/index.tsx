@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useCallback, useEffect } from 'react'
 import {
   Controller,
@@ -37,6 +39,7 @@ import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
 export function ShippingSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.shipping')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()

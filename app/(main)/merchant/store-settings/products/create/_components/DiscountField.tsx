@@ -5,6 +5,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 
 import { DiscountType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -19,6 +20,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 
 export function DiscountField({ index }: { index: number }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const { control } = useFormContext<ProductFormValues>()
 
@@ -28,7 +30,14 @@ export function DiscountField({ index }: { index: number }) {
   })
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="space-y-0.5">
           <span className="text-sm font-medium">{t('enableDiscount')}</span>

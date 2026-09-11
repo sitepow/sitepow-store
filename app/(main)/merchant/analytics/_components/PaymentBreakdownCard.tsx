@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { PAYMENT_METHOD_TH } from '@/constants/translate'
@@ -28,11 +30,15 @@ interface PaymentBreakdownCardProps {
 export function PaymentBreakdownCard({
   paymentBreakdown,
 }: PaymentBreakdownCardProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.paymentBreakdown')
   const totalBills = paymentBreakdown.reduce((acc, curr) => acc + curr.count, 0)
 
   return (
     <AnalyticsCardShell
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
       title={t('title')}
       description={t('description')}
       isEmpty={paymentBreakdown.length === 0}

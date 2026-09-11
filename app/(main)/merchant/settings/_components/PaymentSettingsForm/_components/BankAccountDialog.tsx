@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -73,6 +75,7 @@ export function BankAccountDialog({
   open: boolean
   setOpen: (v: boolean) => void
 }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.payment.dialog')
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateBankAccount()
@@ -140,7 +143,10 @@ export function BankAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className="sm:max-w-lg">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconBuildingBank}

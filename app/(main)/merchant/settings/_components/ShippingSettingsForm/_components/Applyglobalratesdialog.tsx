@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -35,6 +37,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 export function ApplyGlobalRatesDialog() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.shipping.applyGlobal')
   const [open, setOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string>('')
@@ -85,7 +88,10 @@ export function ApplyGlobalRatesDialog() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}>
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconCloudDownload}

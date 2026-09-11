@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
+
+import { useCurrentStore } from '@/hooks/use-current-store'
+/* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {

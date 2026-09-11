@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
@@ -43,6 +45,7 @@ export function ServiceConfigDialog({
   serviceName,
   serviceIndex,
 }: ServiceConfigDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.shipping.serviceConfig')
   const tZones = useTranslations('merchant.settings.shipping.zones')
   const [open, setOpen] = useState(false)
@@ -89,7 +92,10 @@ export function ServiceConfigDialog({
           <IconSettings size={14} /> {t('trigger')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="lg:min-w-lg" showCloseButton={false}>
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className="lg:min-w-lg" showCloseButton={false}>
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconTruckDelivery}

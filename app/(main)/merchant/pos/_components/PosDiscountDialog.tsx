@@ -13,6 +13,7 @@ import {
 } from '@/actions/hooks/storefront/discount'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
@@ -51,6 +52,7 @@ interface PosDiscountDialogProps {
 }
 
 export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.pos.discountDialog')
   const tPos = useTranslations('merchant.pos')
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
@@ -204,7 +206,14 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
             : t('addCustomerDiscount')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="sm:max-w-md"
+      >
         <DialogHeader>
           <DialogHeaderIcon icon={IconTicket} title={t('title')} />
         </DialogHeader>

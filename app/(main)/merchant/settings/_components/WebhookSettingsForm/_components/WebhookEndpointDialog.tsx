@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -42,6 +44,7 @@ export function WebhookEndpointDialog({
   setOpen,
   endpoint,
 }: WebhookEndpointDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.webhook.dialog')
   const tEvents = useTranslations('merchant.settings.webhook.events')
   const locale = useLocale()
@@ -143,7 +146,10 @@ export function WebhookEndpointDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className="sm:max-w-lg">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconWebhook}

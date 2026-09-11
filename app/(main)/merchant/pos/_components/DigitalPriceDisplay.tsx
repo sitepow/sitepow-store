@@ -2,7 +2,10 @@
 
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { cn } from '@/lib/utils'
+
 
 interface DigitalPriceDisplayProps {
   value: number
@@ -21,6 +24,7 @@ export function DigitalPriceDisplay({
   className,
   size = 'md',
 }: DigitalPriceDisplayProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.pos')
   const displayLabel = label ?? t('netPayable')
   const formattedValue = new Intl.NumberFormat('th-TH', {
@@ -62,6 +66,11 @@ export function DigitalPriceDisplay({
         sizeStyles.padding,
         className,
       )}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <div
         aria-hidden="true"

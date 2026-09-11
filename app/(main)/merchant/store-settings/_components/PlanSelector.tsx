@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
@@ -20,6 +22,7 @@ interface PlanSelectorProps {
 }
 
 export function PlanSelector({ isPending }: PlanSelectorProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores.dialog')
   const selectedTab = usePricingStore((state) => state.selectedTab)
   const {
@@ -34,7 +37,12 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
   })
 
   return (
-    <Field className="space-y-3 sm:col-span-2">
+    <Field
+      className="space-y-3 sm:col-span-2"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <RadioGroup
         value={selectedPlan}
         disabled={isPending}

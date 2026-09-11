@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { ComponentProps, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -37,6 +39,7 @@ export function CustomerPointsTable({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.loyalty')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -54,7 +57,10 @@ export function CustomerPointsTable({
   const isEnabled = settings?.isPointsEnabled ?? false
 
   return (
-    <Card className={cn('h-fit', className)} {...props}>
+    <Card
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className={cn('h-fit', className)} {...props}>
       <CardHeader>
         <CardTitle>{t('table.title')}</CardTitle>
         <CardDescription>{t('table.description')}</CardDescription>

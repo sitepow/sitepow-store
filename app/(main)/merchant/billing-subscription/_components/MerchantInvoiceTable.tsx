@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
+import { useCurrentStore } from '@/hooks/use-current-store'
 
 import { useCheckout } from '@/actions/hooks/checkout'
 import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
@@ -31,6 +32,7 @@ import {
 } from '@/components/ui/table'
 
 export function MerchantInvoiceTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.billing')
   const { user } = useSession()
   const { selectedStoreId } = useStoreFilter()
@@ -62,7 +64,12 @@ export function MerchantInvoiceTable() {
   }
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
@@ -149,6 +156,6 @@ export function MerchantInvoiceTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

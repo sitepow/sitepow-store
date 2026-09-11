@@ -5,6 +5,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 
 import { useCategoryOptions } from '@/actions/hooks/category'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
 
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/select'
 
 export function CategoryField({ isPending }: { isPending: boolean }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const {
     control,
@@ -30,7 +32,13 @@ export function CategoryField({ isPending }: { isPending: boolean }) {
   })
 
   return (
-    <Field>
+    <Field
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <FieldLabel>{t('categoryLabel')}</FieldLabel>
       <Controller
         name="categoryId"

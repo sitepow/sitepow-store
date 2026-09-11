@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -39,6 +41,7 @@ export function StockEditDialog({
   productTitle = '',
   variantTitle = '',
 }: StockEditDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.inventory')
   const [open, setOpen] = useState(false)
   const updateStockMutation = useUpdateStock()
@@ -97,7 +100,10 @@ export function StockEditDialog({
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="sm:max-w-md">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconSettings}

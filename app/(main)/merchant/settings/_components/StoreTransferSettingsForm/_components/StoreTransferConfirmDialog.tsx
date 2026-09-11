@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { useCreateTransferRequest } from '@/actions/hooks/store-transfer'
@@ -29,6 +31,7 @@ export function StoreTransferConfirmDialog({
   storeId,
   onClose,
 }: StoreTransferConfirmDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.transfer')
   const { user } = useSession()
   const createMutation = useCreateTransferRequest()
@@ -47,7 +50,10 @@ export function StoreTransferConfirmDialog({
         if (!v && !createMutation.isPending) onClose()
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className="sm:max-w-md">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconAlertTriangle}

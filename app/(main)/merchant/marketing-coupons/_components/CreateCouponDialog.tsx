@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -36,6 +38,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
 export function CouponCreateDialog() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.marketing')
   const tDialog = useTranslations('merchant.marketing.dialog')
   const { selectedStoreId } = useStoreFilter()
@@ -104,7 +107,10 @@ export function CouponCreateDialog() {
           {t('createCoupon')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="overflow-x-hidden sm:max-w-lg">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="overflow-x-hidden sm:max-w-lg">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconTicket}

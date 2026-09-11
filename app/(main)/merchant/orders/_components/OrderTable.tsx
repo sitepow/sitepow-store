@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -103,6 +105,7 @@ function OrderRowActions({ order }: { order: any }) {
 }
 
 export function OrderTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.orders')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
@@ -124,7 +127,12 @@ export function OrderTable() {
   }
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -385,6 +393,6 @@ export function OrderTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

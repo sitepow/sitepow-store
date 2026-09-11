@@ -1,6 +1,8 @@
+'use client'
+
+import { useCurrentStore } from '@/hooks/use-current-store'
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable jsx-a11y/alt-text */
-'use client'
 
 import { ComponentProps, useEffect, useMemo, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'

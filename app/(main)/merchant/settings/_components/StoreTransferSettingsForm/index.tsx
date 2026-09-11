@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -18,13 +20,19 @@ import { StoreTransferConfirmDialog } from './_components/StoreTransferConfirmDi
 import { StoreTransferHistoryTable } from './_components/StoreTransferHistoryTable'
 
 export function StoreTransferSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.transfer')
   const { selectedStoreId } = useStoreFilter()
   const [email, setEmail] = useState('')
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Card>
         <CardHeader>
           <PageTabHeader

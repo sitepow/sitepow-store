@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useFormContext } from 'react-hook-form'
 
 import { NotificationSettingsFormValues } from '@/zod/notification-settings'
@@ -17,11 +19,17 @@ export function NotificationRow({
   title,
   description,
 }: NotificationRowProps) {
+  const { currentStore, store } = useCurrentStore()
   const { watch, setValue, formState } =
     useFormContext<NotificationSettingsFormValues>()
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-5 py-5">
+    <div
+      className="flex flex-wrap items-center justify-between gap-5 py-5"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div>
         <span className="block text-sm font-medium">{title}</span>
         <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">

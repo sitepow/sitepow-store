@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 
 import { GetActivityLogItem } from '@/actions/activity-log'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { IconTerminal } from '@tabler/icons-react'
 
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
@@ -33,11 +34,19 @@ export function AuditLogDetailDialog({
   isOpen,
   onOpenChange,
 }: AuditLogDetailDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.auditLogs.detailDialog')
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent
+        className="max-w-md"
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconTerminal}

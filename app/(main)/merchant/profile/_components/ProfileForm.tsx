@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -32,6 +34,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.profile.form')
   const { data: profile } = useProfile()
   const updateProfileMutation = useUpdateProfile()
@@ -108,7 +111,12 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     deleteMutation.isPending
 
   return (
-    <Card {...props}>
+    <Card
+      {...props}
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <CardHeader>
         <CardTitle>{t('title')}</CardTitle>
         <CardDescription>{t('description')}</CardDescription>

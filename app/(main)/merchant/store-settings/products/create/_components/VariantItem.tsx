@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
+
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useMemo } from 'react'
 import {
@@ -13,6 +14,7 @@ import { useTranslations } from 'next-intl'
 
 import { useBranches } from '@/actions/hooks/branch'
 import { ProductType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { ProductFormValues } from '@/zod/product'
 import { IconTrash } from '@tabler/icons-react'
@@ -53,6 +55,7 @@ export function VariantItem({
   removeVariant,
   isOnlyOne,
 }: VariantItemProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const { control, setValue, watch } = useFormContext<ProductFormValues>()
 
@@ -137,6 +140,11 @@ export function VariantItem({
 
   return (
     <Card
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
       className={cn(
         'relative overflow-hidden rounded-lg border-l',
         isAvailable && 'border-primary',

@@ -5,6 +5,7 @@ import * as React from 'react'
 import { useTranslations } from 'next-intl'
 
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
 import {
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export function MetadataCombobox({ value, onChange }: Props) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const [open, setOpen] = React.useState(false)
 
@@ -53,7 +55,14 @@ export function MetadataCombobox({ value, onChange }: Props) {
           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-75 p-0">
+      <PopoverContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="w-75 p-0"
+      >
         <Command>
           <CommandInput placeholder={t('searchProperty')} />
           <CommandList>

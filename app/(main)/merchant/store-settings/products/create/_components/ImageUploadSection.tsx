@@ -1,10 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
+
+/* eslint-disable @next/next/no-img-element */
 
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 import { ImagePlus, Star, X } from 'lucide-react'
 
@@ -20,6 +22,7 @@ interface ImageUploadSectionProps {
 export function ImageUploadSection({
   showPrimaryControl = true,
 }: ImageUploadSectionProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.form')
   const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
@@ -71,7 +74,14 @@ export function ImageUploadSection({
   }
 
   return (
-    <FieldSet className="space-y-4">
+    <FieldSet
+      className="space-y-4"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <FieldLegend variant="label" className="text-lg font-bold">
         {t('mediaTitle', { count: fields.length })}
       </FieldLegend>

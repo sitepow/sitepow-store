@@ -15,7 +15,7 @@ import {
 } from '@/actions/hooks/category'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { Plan } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { buildCategoryPrompt } from '@/utils/ai'
 import { getPathR2FromUrl } from '@/utils/image'
@@ -64,7 +64,7 @@ export function CategoryDialog({
   onAdd?: () => void
 }) {
   const t = useTranslations('merchant.categories')
-  const { store } = useStoreData()
+  const { currentStore, store } = useCurrentStore()
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateCategory()
   const updateMutation = useUpdateCategory()
@@ -198,7 +198,10 @@ export function CategoryDialog({
             {t('addCategory')}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="sm:max-w-md">
           <FormProvider {...methods}>
             <DialogHeader>
               <DialogHeaderIcon
@@ -280,7 +283,10 @@ export function CategoryDialog({
         </DialogContent>
       </Dialog>
       <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties}>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('dialog.aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>

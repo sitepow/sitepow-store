@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -36,6 +38,7 @@ interface EmployeeTableProps {
 }
 
 export function EmployeeTable({ onEdit }: EmployeeTableProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.employee')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -76,7 +79,12 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   }
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -219,6 +227,6 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </>
+    </div>
   )
 }

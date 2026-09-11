@@ -14,6 +14,7 @@ import {
 import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   getPresetPermissionIds,
@@ -51,6 +52,7 @@ import {
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 
+
 const DEFAULT_VALUES = {
   name: '',
   email: '',
@@ -72,6 +74,7 @@ export function EmployeeDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.employee.dialog')
   const tEmp = useTranslations('merchant.employee')
   const { selectedStoreId } = useStoreFilter()
@@ -206,7 +209,14 @@ export function EmployeeDialog({
           {t('addEmployee')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="max-h-[90vh] overflow-y-auto sm:max-w-xl"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconUserPlus}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
@@ -19,6 +21,7 @@ interface PointsSettingsFieldProps {
 }
 
 export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores.dialog')
   const {
     register,
@@ -37,7 +40,12 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
   }, [currentPlan, setValue])
 
   return (
-    <>
+    <div
+      className="contents"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
         {t('step5')}
       </div>
@@ -95,6 +103,6 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
           </Field>
         </div>
       )}
-    </>
+    </div>
   )
 }

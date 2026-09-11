@@ -1,5 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
+
+import { useCurrentStore } from '@/hooks/use-current-store'
+/* eslint-disable @next/next/no-img-element */
 
 import { useState } from 'react'
 
@@ -34,6 +36,7 @@ import {
 } from '@/components/ui/table'
 
 export function ReviewTable() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.reviews')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -81,7 +84,12 @@ export function ReviewTable() {
   const totalColumns = showManageColumn ? 6 : 5
 
   return (
-    <>
+    <div
+      className="space-y-4"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -225,6 +233,6 @@ export function ReviewTable() {
           }}
         />
       )}
-    </>
+    </div>
   )
 }

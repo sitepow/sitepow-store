@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useLocale, useTranslations } from 'next-intl'
 
 import { getWebhookEvents } from '@/constants/webhook'
@@ -49,6 +51,7 @@ export function WebhookLogDetailDialog({
   onResend,
   isResending,
 }: WebhookLogDetailDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.webhook.logDetail')
   const tEvents = useTranslations('merchant.settings.webhook.events')
   const locale = useLocale()
@@ -76,7 +79,10 @@ export function WebhookLogDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent
+        style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties} className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconFileText}

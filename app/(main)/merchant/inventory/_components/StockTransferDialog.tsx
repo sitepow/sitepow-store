@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -49,6 +51,7 @@ export function StockTransferDialog({
   fromBranchId,
   fromBranchName,
 }: StockTransferDialogProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
@@ -107,7 +110,10 @@ export function StockTransferDialog({
           <IconPackageExport />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        style={{
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties} className="sm:max-w-md">
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconPackageExport}

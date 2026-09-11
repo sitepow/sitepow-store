@@ -53,17 +53,17 @@ const PAGE_SIZE_STYLES: Record<
   { wrapper: string; printSize: string; printMargin: string }
 > = {
   Slip: {
-    wrapper: 'max-w-[85mm] rounded-lg p-3 shadow-md',
+    wrapper: 'max-w-[85mm] p-3 shadow-md',
     printSize: '80mm auto',
     printMargin: '2mm',
   },
   Label: {
-    wrapper: 'max-w-[120mm] rounded-lg p-3 shadow-md',
+    wrapper: 'max-w-[120mm] p-3 shadow-md',
     printSize: '100mm 150mm',
     printMargin: '4mm',
   },
   Default: {
-    wrapper: 'min-h-[297mm] max-w-[210mm] rounded-lg p-8 shadow-md sm:p-12',
+    wrapper: 'min-h-[297mm] max-w-[210mm] p-8 shadow-md sm:p-12',
     printSize: 'A4 portrait',
     printMargin: '8mm',
   },
@@ -101,8 +101,8 @@ export function PrintLayout({
   }, [autoPrint])
 
   return (
-    <div className="min-h-screen bg-neutral-100 text-neutral-900 print:bg-white print:p-0">
-      <header className="no-print sticky top-0 z-50 border-b border-neutral-200 bg-white/95 shadow-xs backdrop-blur">
+    <div className="min-h-screen bg-neutral-100 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 print:bg-white print:p-0">
+      <header className="no-print sticky top-0 z-50 border-b border-neutral-200 bg-white/80 shadow-xs backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3">
           <nav
             className="flex flex-wrap items-center gap-1"
@@ -115,10 +115,10 @@ export function PrintLayout({
                   key={id}
                   type="button"
                   onClick={() => setDocType(id)}
-                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 border-b px-2.5 py-1.5 text-xs font-medium transition-colors ${
                     isActive
-                      ? 'bg-primary text-white'
-                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-neutral-600 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-800'
                   }`}
                 >
                   <Icon size={14} />
@@ -140,7 +140,7 @@ export function PrintLayout({
               variant="outline"
               size="sm"
               onClick={() => window.close()}
-              className="shrink-0 gap-1"
+              className="shrink-0 gap-1 border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
             >
               <IconX size={16} />
               <span className="hidden sm:inline">{t('closeWindow')}</span>
@@ -150,7 +150,7 @@ export function PrintLayout({
       </header>
       <main className="p-4 sm:p-8 print:p-0">
         <div
-          className={`mx-auto bg-white transition-all print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none ${pageStyle.wrapper}`}
+          className={`mx-auto bg-white text-neutral-900 transition-all print:m-0 print:min-h-0 print:max-w-none print:rounded-none print:p-0 print:shadow-none ${pageStyle.wrapper}`}
         >
           <ActiveDocument order={order} />
         </div>

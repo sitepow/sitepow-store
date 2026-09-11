@@ -1,3 +1,7 @@
+'use client'
+
+import React from 'react'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
@@ -8,6 +12,7 @@ import { CreateStoreFormValues } from '@/zod/store'
 import { FieldDescription } from '@/components/ui/field'
 
 export function SlugPreview() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.stores.dialog')
   const { control } = useFormContext<CreateStoreFormValues>()
 
@@ -21,7 +26,11 @@ export function SlugPreview() {
   }
 
   return (
-    <FieldDescription>
+    <FieldDescription
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       {t('slugPreview')}{' '}
       <span className="text-foreground font-medium">
         https://{formatSlug(storeSlug)}.sitepow.store

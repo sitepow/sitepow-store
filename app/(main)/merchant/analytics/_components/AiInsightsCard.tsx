@@ -1,7 +1,10 @@
 'use client'
 
+import React from 'react'
+
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
 import {
   IconClock,
   IconPackage,
@@ -42,10 +45,18 @@ interface AiInsightsCardProps {
 }
 
 export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.aiInsights')
 
   return (
-    <Card className="border-purple-200 bg-purple-50/30 dark:bg-purple-950/10">
+    <Card
+      className="border-purple-200 bg-purple-50/30 dark:bg-purple-950/10"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
           <IconSparkles className="size-5 shrink-0" />

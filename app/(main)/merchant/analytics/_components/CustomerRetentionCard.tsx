@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useTranslations } from 'next-intl'
 
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
@@ -20,10 +22,15 @@ interface CustomerRetentionCardProps {
 export function CustomerRetentionCard({
   retention,
 }: CustomerRetentionCardProps) {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.analytics.customerRetention')
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <AnalyticsCardShell
         title={t('title')}
         description={t('description')}

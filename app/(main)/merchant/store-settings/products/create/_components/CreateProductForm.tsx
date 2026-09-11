@@ -24,7 +24,7 @@ import { CreateProductInput } from '@/actions/product'
 import { PRODUCT_PRESETS_MASTER } from '@/constants/product-preset'
 import { PRODUCT_TYPE_OPTIONS } from '@/constants/translate'
 import { DiscountType, Plan, ProductType } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
 import { buildProductPrompt } from '@/utils/ai'
@@ -105,7 +105,7 @@ const dataURLtoFile = (dataurl: string, filename: string): File => {
 
 export function CreateProductForm({ productId }: { productId?: string }) {
   const t = useTranslations('merchant.products.form')
-  const { store } = useStoreData()
+  const { currentStore, store } = useCurrentStore()
   const [aiTaskConfirm, setAiTaskConfirm] = useState<{
     task: AiGenTask
     cost: number
@@ -510,6 +510,11 @@ export function CreateProductForm({ productId }: { productId?: string }) {
   }
 
   return (
+    <div
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
     <FormProvider {...form}>
       <Card>
         <CardContent className="flex flex-wrap items-center gap-2.5">
@@ -874,7 +879,11 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         open={!!aiTaskConfirm}
         onOpenChange={() => setAiTaskConfirm(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent
+          style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -902,5 +911,6 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         </AlertDialogContent>
       </AlertDialog>
     </FormProvider>
+    </div>
   )
 }

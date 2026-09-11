@@ -1,5 +1,7 @@
 'use client'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -63,6 +65,7 @@ import {
 } from './_components/WebhookLogDetailDialog'
 
 export function WebhookSettingsForm() {
+  const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.webhook')
   const tEvents = useTranslations('merchant.settings.webhook.events')
   const locale = useLocale()
@@ -252,7 +255,12 @@ export function WebhookSettingsForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6"
+      style={{
+        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+      } as React.CSSProperties}
+    >
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <PageTabHeader
