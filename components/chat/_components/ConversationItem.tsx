@@ -1,3 +1,5 @@
+import { useLocale, useTranslations } from 'next-intl'
+
 import { IconSparkles } from '@tabler/icons-react'
 import { User2 } from 'lucide-react'
 
@@ -33,7 +35,11 @@ interface ConversationItemProps {
   onClick: () => void
 }
 
-function formatChatTime(dateInput?: Date | string | null) {
+function formatChatTime(
+  dateInput: Date | string | null | undefined,
+  t: (key: any, options?: any) => string,
+  locale: string,
+) {
   if (!dateInput) return ''
   const date = new Date(dateInput)
   const now = new Date()
@@ -42,14 +48,18 @@ function formatChatTime(dateInput?: Date | string | null) {
   const diffHours = Math.floor(diffMinutes / 60)
   const diffDays = Math.floor(diffHours / 24)
 
-  if (diffMinutes < 1) return 'เมื่อสักครู่'
-  if (diffMinutes < 60) return `${diffMinutes} น.`
+  if (diffMinutes < 1) return t('justNow')
+  if (diffMinutes < 60)
+    return locale === 'th' ? `${diffMinutes} น.` : `${diffMinutes}m`
   if (diffHours < 24) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
-  if (diffDays === 1) return 'เมื่อวาน'
-  if (diffDays < 7) return `${diffDays} วันก่อน`
-  return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })
+  if (diffDays === 1) return t('yesterday')
+  if (diffDays < 7) return t('daysAgo', { days: diffDays })
+  return date.toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
+    day: 'numeric',
+    month: 'short',
+  })
 }
 
 export function ConversationItem({
@@ -57,9 +67,11 @@ export function ConversationItem({
   isSelected,
   onClick,
 }: ConversationItemProps) {
-  const displayName = conv.merchantName || conv.name || 'ลูกค้าทั่วไป'
+  const t = useTranslations('merchant.chat')
+  const locale = useLocale()
+  const displayName = conv.merchantName || conv.name || t('defaultCustomerName')
   const image = conv.customerImage || conv.storeLogo
-  const timeText = formatChatTime(conv.lastMessageAt)
+  const timeText = formatChatTime(conv.lastMessageAt, t, locale)
 
   return (
     <button
@@ -128,7 +140,7 @@ export function ConversationItem({
                 : 'text-muted-foreground',
             )}
           >
-            {conv.lastMessage ?? 'ยังไม่มีข้อความ'}
+            {conv.lastMessage ?? t('noMessages')}
           </p>
 
           {conv.unreadCount > 0 && (

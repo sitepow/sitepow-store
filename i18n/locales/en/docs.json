@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "title": "System Documentation & Webhook API | Sitepow Store",
+    "description": "Sitepow Store Webhook API documentation. Real-time order and payment notifications with HMAC-SHA256 signature verification code examples."
+  },
+  "badge": {
+    "apiDocs": "API & Webhook Documentation",
+    "version": "v1.0 (Stable)",
+    "security": "HMAC-SHA256"
+  },
+  "hero": {
+    "title": "Webhook API Integration Guide",
+    "description": "Receive real-time notifications when new orders are created, payments succeed, or orders are cancelled to seamlessly integrate with your inventory, game top-up automation, or CRM.",
+    "manageEndpoints": "Manage Endpoints & Webhook Secret",
+    "contactSupport": "Contact Developer Support"
+  },
+  "steps": {
+    "step1Title": "Configure Webhook Endpoint",
+    "step1Desc": "Specify an HTTPS URL on your server in store settings and select the events you wish to receive.",
+    "step2Title": "Verify Signature",
+    "step2Desc": "Sitepow sends the {header} header so you can verify authenticity using HMAC-SHA256.",
+    "step3Title": "Return HTTP 200",
+    "step3Desc": "Your server must respond with a 200 OK within 5 seconds to confirm receipt."
+  },
+  "events": {
+    "title": "Supported Event Types",
+    "recommendedBadge": "Recommended for Automation",
+    "createdTitle": "Order Created",
+    "createdDesc": "Dispatched immediately when a customer checks out via storefront or POS.",
+    "paidTitle": "Order Paid",
+    "paidDesc": "Dispatched when order payment is confirmed (ideal for game top-ups, code delivery, or digital goods automation).",
+    "cancelledTitle": "Order Cancelled",
+    "cancelledDesc": "Dispatched when an order is cancelled or expired, allowing you to restore stock in your system."
+  },
+  "headers": {
+    "title": "HTTP Request Headers",
+    "colName": "Header Name",
+    "colExample": "Example Value",
+    "colDesc": "Description",
+    "contentTypeDesc": "Always application/json format",
+    "signatureDesc": "Timestamp and HMAC signature for cryptographic verification",
+    "eventDesc": "The event type name",
+    "deliveryDesc": "Unique delivery attempt ID (for idempotency and deduplication)",
+    "userAgentDesc": "User-Agent identifier of Sitepow system"
+  },
+  "verification": {
+    "title": "Signature Verification",
+    "description": "For maximum security, every request includes the {header} header containing {format}",
+    "cardTitle": "Verification Procedure",
+    "cardDesc": "Calculate HMAC-SHA256 of {formula} using your Webhook Secret"
+  },
+  "payload": {
+    "title": "Sample Webhook JSON Payload",
+    "description": "Sample JSON payload delivered in the request body for event {event}:"
+  },
+  "bestPractices": {
+    "title": "Best Practices & Retry Policy",
+    "fast200Title": "Fast 200 OK Response",
+    "fast200Desc": "Webhook timeout is 5 seconds. If your processing involves external APIs or sending emails, respond with HTTP 200 immediately and push the task into a background queue (e.g., Redis, BullMQ, Celery).",
+    "idempotencyTitle": "Idempotent Processing",
+    "idempotencyDesc": "In case of network hiccups, the system may retry sending the event. Store X-Sitepow-Delivery or event.id in your database to ensure you do not process duplicate events.",
+    "retryTitle": "Retry Policy",
+    "retryDesc": "If your server returns 4xx, 5xx, or times out, Sitepow retries with exponential backoff up to 5 times (after 1m, 5m, 30m, 2h, and 6h).",
+    "autoDisableTitle": "Automatic Endpoint Suspension",
+    "autoDisableDesc": "If an endpoint fails more than 50 consecutive times, it is temporarily paused and an alert is sent to your store dashboard."
+  }
+}

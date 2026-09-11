@@ -4,6 +4,8 @@
 import { KeyboardEvent, useState } from 'react'
 import { UseFormRegister, UseFormSetValue } from 'react-hook-form'
 
+import { useTranslations } from 'next-intl'
+
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconBolt, IconSend2 } from '@tabler/icons-react'
 
@@ -15,14 +17,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'
-
-const DEFAULT_QUICK_REPLIES = [
-  'สวัสดีครับ มีอะไรให้เราช่วยเหลือไหมครับ',
-  'ขอบคุณสำหรับการสั่งซื้อครับ ทางร้านจะรีบดำเนินการจัดส่งให้โดยเร็วครับ',
-  'ทางเรากำลังตรวจสอบข้อมูลให้อยู่นะครับ กรุณารอสักครู่ครับ',
-  'ยินดีให้บริการครับ หากมีข้อสงสัยสอบถามเพิ่มเติมได้ตลอดเลยนะครับ',
-  'ขออภัยในความไม่สะดวกเป็นอย่างยิ่งครับ',
-]
 
 interface ChatInputProps {
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
@@ -39,8 +33,17 @@ export function ChatInput({
   disabled,
   showQuickReplies = true,
 }: ChatInputProps) {
+  const t = useTranslations('merchant.chat')
   const { store } = useStoreData()
   const [isFocused, setIsFocused] = useState(false)
+
+  const quickReplies = [
+    t('quickReply1'),
+    t('quickReply2'),
+    t('quickReply3'),
+    t('quickReply4'),
+    t('quickReply5'),
+  ]
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -70,11 +73,11 @@ export function ChatInput({
                 className="text-muted-foreground hover:text-foreground h-6 gap-1 px-2 text-xs font-normal"
               >
                 <IconBolt className="size-3 text-amber-500" />
-                <span>ข้อความด่วน</span>
+                <span>{t('quickRepliesShort')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-80 p-1">
-              {DEFAULT_QUICK_REPLIES.map((reply, i) => (
+              {quickReplies.map((reply, i) => (
                 <DropdownMenuItem
                   key={i}
                   className="cursor-pointer text-xs"
@@ -87,7 +90,7 @@ export function ChatInput({
           </DropdownMenu>
 
           <div className="flex items-center gap-1.5 overflow-x-auto">
-            {DEFAULT_QUICK_REPLIES.slice(0, 3).map((reply, i) => (
+            {quickReplies.slice(0, 3).map((reply, i) => (
               <button
                 key={i}
                 type="button"
@@ -106,7 +109,7 @@ export function ChatInput({
         <div className="relative flex-1">
           <Textarea
             {...register('content')}
-            placeholder="พิมพ์ข้อความตอบกลับ..."
+            placeholder={t('typeReplyPlaceholder')}
             rows={1}
             className="border-input/60 focus-visible:border-primary max-h-32 min-h-10 resize-none py-2 text-sm leading-relaxed"
             onKeyDown={handleKeyDown}
@@ -115,7 +118,7 @@ export function ChatInput({
           />
           {isFocused && (
             <span className="text-muted-foreground/60 absolute right-2 bottom-1.5 hidden text-[10px] select-none sm:inline">
-              Enter เพื่อส่ง • Shift+Enter ขึ้นบรรทัดใหม่
+              {t('enterToSendHint')}
             </span>
           )}
         </div>

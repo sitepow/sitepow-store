@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useCustomerConversations,
   useMarkAsRead,
@@ -59,6 +61,7 @@ export function ChatInbox({
   storeId,
   currentUserId,
 }: ChatInboxProps) {
+  const t = useTranslations('merchant.chat')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<FilterType>('all')
@@ -156,7 +159,7 @@ export function ChatInbox({
   }
 
   const customerName =
-    selectedConv?.merchantName || selectedConv?.name || 'ลูกค้าทั่วไป'
+    selectedConv?.merchantName || selectedConv?.name || t('defaultCustomerName')
   const customerAvatar =
     selectedConv?.customerImage || selectedConv?.storeLogo || null
 
@@ -178,10 +181,12 @@ export function ChatInbox({
               </div>
               <div>
                 <h3 className="text-sm font-semibold">
-                  {isCustomerMode ? 'แชทและข้อความ' : 'กล่องข้อความ'}
+                  {isCustomerMode ? t('customerChatTitle') : t('inboxTitle')}
                 </h3>
                 <span className="text-muted-foreground text-xs">
-                  {filteredConversations.length} การสนทนา
+                  {t('conversationCount', {
+                    count: filteredConversations.length,
+                  })}
                 </span>
               </div>
             </div>
@@ -189,7 +194,7 @@ export function ChatInbox({
             <div className="flex items-center gap-1">
               {totalUnread > 0 && (
                 <Badge variant="destructive" className="h-5 px-1.5 text-[11px]">
-                  {totalUnread} ยังไม่อ่าน
+                  {t('unreadBadge', { count: totalUnread })}
                 </Badge>
               )}
               <Tooltip>
@@ -203,7 +208,7 @@ export function ChatInbox({
                     <IconRefresh className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>รีเฟรชข้อมูล</TooltipContent>
+                <TooltipContent>{t('refresh')}</TooltipContent>
               </Tooltip>
             </div>
           </div>
@@ -213,7 +218,7 @@ export function ChatInbox({
             <div className="relative">
               <IconSearch className="text-muted-foreground absolute top-2.5 left-2.5 size-4" />
               <Input
-                placeholder="ค้นหาชื่อ, อีเมล หรือข้อความ..."
+                placeholder={t('searchPlaceholderInbox')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-9 pr-7 pl-8 text-xs"
@@ -239,16 +244,16 @@ export function ChatInbox({
               >
                 <TabsList className="grid h-7 w-full grid-cols-4 p-0.5 text-xs">
                   <TabsTrigger value="all" className="text-[11px]">
-                    ทั้งหมด
+                    {t('all')}
                   </TabsTrigger>
                   <TabsTrigger value="unread" className="text-[11px]">
-                    ยังไม่อ่าน
+                    {t('unread')}
                   </TabsTrigger>
                   <TabsTrigger value="ai" className="text-[11px]">
-                    AI ตอบ
+                    {t('aiTab')}
                   </TabsTrigger>
                   <TabsTrigger value="manual" className="text-[11px]">
-                    คนตอบ
+                    {t('manualTab')}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -276,11 +281,13 @@ export function ChatInbox({
                 <div className="bg-muted text-muted-foreground mb-3 flex size-12 items-center justify-center rounded-full">
                   <IconFilter className="size-6" />
                 </div>
-                <p className="text-sm font-medium">ไม่พบบทสนทนา</p>
+                <p className="text-sm font-medium">
+                  {t('noConversationsFound')}
+                </p>
                 <p className="text-muted-foreground mt-1 text-xs">
                   {searchQuery
-                    ? 'ลองค้นหาด้วยคำค้นหาอื่น'
-                    : 'ยังไม่มีข้อความในหมวดหมู่นี้'}
+                    ? t('tryDifferentSearch')
+                    : t('noMessagesInFolder')}
                 </p>
               </div>
             )}
@@ -341,11 +348,11 @@ export function ChatInbox({
                       {selectedConv.isAiEnabled ? (
                         <span className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400">
                           <IconSparkles className="size-3" />
-                          AI กำลังช่วยตอบ
+                          {t('aiHelping')}
                         </span>
                       ) : (
                         <span className="text-muted-foreground text-[11px]">
-                          โหมดตอบด้วยตนเอง
+                          {t('manualMode')}
                         </span>
                       )}
                     </div>
@@ -386,8 +393,8 @@ export function ChatInbox({
                       </TooltipTrigger>
                       <TooltipContent>
                         {selectedConv.isAiEnabled
-                          ? 'คลิกเพื่อปิด AI และตอบด้วยตนเอง'
-                          : 'คลิกเพื่อเปิด AI ช่วยตอบคำถามอัตโนมัติ'}
+                          ? t('clickToDisableAi')
+                          : t('clickToEnableAi')}
                       </TooltipContent>
                     </Tooltip>
                   )}
@@ -407,7 +414,7 @@ export function ChatInbox({
                           <IconInfoCircle className="size-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>ข้อมูลลูกค้า</TooltipContent>
+                      <TooltipContent>{t('customerInfo')}</TooltipContent>
                     </Tooltip>
                   )}
                 </div>
@@ -429,12 +436,9 @@ export function ChatInbox({
               <div className="bg-primary/10 text-primary mb-4 flex size-16 items-center justify-center rounded-2xl shadow-xs">
                 <IconMessages className="size-8" />
               </div>
-              <h3 className="text-base font-semibold">
-                เลือกบทสนทนาเพื่อเริ่มพูดคุย
-              </h3>
+              <h3 className="text-base font-semibold">{t('emptyChatTitle')}</h3>
               <p className="text-muted-foreground mt-1 max-w-sm text-xs leading-relaxed">
-                คลิกเลือกการสนทนาจากรายการทางด้านซ้ายเพื่อดูข้อความ
-                ประวัติการคุย และตอบกลับลูกค้าแบบ Real-time
+                {t('emptyChatDesc')}
               </p>
             </div>
           )}
@@ -445,7 +449,7 @@ export function ChatInbox({
           <div className="border-border/60 bg-card/30 flex w-72 flex-col border-l transition-all lg:w-80">
             {/* Header */}
             <div className="border-border/60 flex items-center justify-between border-b p-3.5">
-              <h4 className="text-sm font-semibold">ข้อมูลลูกค้า</h4>
+              <h4 className="text-sm font-semibold">{t('customerInfo')}</h4>
               <Button
                 variant="ghost"
                 size="icon"
@@ -470,21 +474,21 @@ export function ChatInbox({
                 </Avatar>
                 <h3 className="mt-2.5 text-sm font-semibold">{customerName}</h3>
                 <span className="text-muted-foreground text-xs">
-                  {selectedConv.customerRole || 'ลูกค้า'}
+                  {selectedConv.customerRole || t('defaultRole')}
                 </span>
               </div>
 
               {/* Contact info */}
               <div className="border-border/60 space-y-2.5 rounded-xl border p-3 text-xs">
                 <span className="text-muted-foreground block font-medium">
-                  ข้อมูลติดต่อ
+                  {t('contactInfo')}
                 </span>
 
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 truncate">
                     <IconMail className="text-muted-foreground size-3.5 shrink-0" />
                     <span className="truncate">
-                      {selectedConv.customerEmail || 'ไม่มีอีเมล'}
+                      {selectedConv.customerEmail || t('noEmail')}
                     </span>
                   </div>
                   {selectedConv.customerEmail && (
@@ -509,7 +513,7 @@ export function ChatInbox({
                   <div className="flex items-center gap-2 truncate">
                     <IconPhone className="text-muted-foreground size-3.5 shrink-0" />
                     <span className="truncate">
-                      {selectedConv.customerPhone || 'ไม่มีเบอร์โทร'}
+                      {selectedConv.customerPhone || t('noPhone')}
                     </span>
                   </div>
                   {selectedConv.customerPhone && (
@@ -534,11 +538,13 @@ export function ChatInbox({
               {/* Conversation Meta */}
               <div className="border-border/60 space-y-2.5 rounded-xl border p-3 text-xs">
                 <span className="text-muted-foreground block font-medium">
-                  สถานะการสนทนา
+                  {t('conversationStatus')}
                 </span>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">ระบบ AI ช่วยตอบ</span>
+                  <span className="text-muted-foreground">
+                    {t('aiAutoReply')}
+                  </span>
                   <Switch
                     checked={selectedConv.isAiEnabled}
                     disabled={isTogglingAi}
@@ -548,7 +554,7 @@ export function ChatInbox({
                 </div>
 
                 <div className="text-muted-foreground flex items-center justify-between">
-                  <span>รหัสบทสนทนา</span>
+                  <span>{t('conversationId')}</span>
                   <div className="flex items-center gap-1 text-[10px]">
                     <span>{selectedConv.id.slice(0, 8)}...</span>
                     <Button
@@ -568,7 +574,7 @@ export function ChatInbox({
 
                 {selectedConv.storeName && (
                   <div className="text-muted-foreground flex items-center justify-between">
-                    <span>ร้านค้า</span>
+                    <span>{t('store')}</span>
                     <span className="text-foreground font-medium">
                       {selectedConv.storeName}
                     </span>

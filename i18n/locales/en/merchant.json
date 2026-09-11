@@ -501,6 +501,157 @@
         "DIGITAL_ITEM": "Digital File / Key (Digital Item)",
         "DIGITAL_SERVICE": "Game Top-up / Service"
       }
+    },
+    "bulkImport": {
+      "title": "Bulk Import Products",
+      "description": "Supports CSV file format with data validation before importing into store database",
+      "step1": "1. Upload",
+      "step2": "2. Review ({count})",
+      "step3": "3. Completed",
+      "mobileStep1": "Step 1/3 : Upload File",
+      "mobileStep2": "Step 2/3 : Review Data ({count} items)",
+      "mobileStep3": "Step 3/3 : Completed",
+      "bannerTitle": "Need to explore field schema or download template?",
+      "bannerDesc": "Review required fields or download CSV template tailored to your product types",
+      "guideBtn": "Guide & Data Dictionary",
+      "downloadTemplateBtn": "Download Template",
+      "selectTemplateType": "Select Template Type",
+      "templateAll": "All Product Types (Recommended)",
+      "templatePhysical": "Physical Goods (PHYSICAL)",
+      "templateDigitalLink": "Downloadable Files (DIGITAL_LINK)",
+      "templateDigitalItem": "Digital Codes / Serials (DIGITAL_ITEM)",
+      "templateDigitalService": "Courses / Services (DIGITAL_SERVICE)",
+      "tabUpload": "Upload .CSV File",
+      "tabPaste": "Paste CSV Directly",
+      "dropzoneTitle": "Click to select file or drag & drop CSV here",
+      "dropzoneHint": "Supports only .csv files up to 10MB",
+      "pasteHeaderHint": "* First line can be column headers",
+      "analyzeBtn": "Analyze Data",
+      "statsTotal": "Total Items",
+      "statsValid": "Ready to Import",
+      "statsErrors": "Errors Found",
+      "colRow": "Row",
+      "colTitle": "Product Title",
+      "colSku": "SKU",
+      "colPrice": "Price",
+      "colCost": "Cost",
+      "colCategory": "Category",
+      "colStock": "Stock",
+      "colStatus": "Status",
+      "emptyFilteredRows": "No records found matching the filter",
+      "statusValid": "Valid",
+      "processingTitle": "Importing Products into System",
+      "processingDesc": "System is generating products and updating branch inventory. Please do not close this window.",
+      "resetBtn": "Choose Another File",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Import ({count} items)",
+      "confirmBtnShort": "Import ({count})",
+      "limitHint": "Supports up to 500 rows per batch",
+      "closeBtn": "Close Window",
+      "selectBranchFirst": "Please select a branch to assign product inventory",
+      "selectCsvFile": "Please select a .CSV file",
+      "fileTooLarge": "File exceeds 10MB limit",
+      "fileEmpty": "File is empty or cannot be read",
+      "invalidCsvFormat": "Invalid CSV format or missing required headers (Title, SKU, Price)",
+      "analyzeSuccess": "Validation complete: found {total} items ({valid} ready to import)",
+      "importSuccess": "Successfully imported {count} products",
+      "importError": "Failed to import products",
+      "errTitleMin": "Product title must be at least 2 characters",
+      "errSkuEmpty": "SKU is required",
+      "errPriceNonNegative": "Price must be a number >= 0",
+      "errCostNonNegative": "Cost price must be a number >= 0",
+      "errInvalidProductType": "Invalid product type (must be PHYSICAL, DIGITAL_LINK, DIGITAL_ITEM, DIGITAL_SERVICE)",
+      "errDigitalUrlRequired": "DIGITAL_LINK products require DigitalUrl",
+      "errDigitalItemContentRequired": "DIGITAL_ITEM products require DigitalItemContent",
+      "errDuplicateSku": "SKU is duplicated with another row in this file"
+    },
+    "bulkImportGuide": {
+      "triggerBtn": "Field Guide & Dictionary",
+      "title": "CSV Data Schema Dictionary & Guide",
+      "description": "Technical specifications and accepted field values for bulk product import via CSV",
+      "tabFields": "All Fields Table ({count})",
+      "tabFieldsShort": "Fields ({count})",
+      "tabProductTypes": "Product Types",
+      "tabProductTypesShort": "Product Types",
+      "mobileScrollHint": "← Scroll horizontally to view all columns →",
+      "colName": "Column (Header)",
+      "colRequired": "Requirement",
+      "colType": "Data Type",
+      "colDesc": "Description & Scope",
+      "colExample": "Example",
+      "requiredBadge": "Required",
+      "optionalBadge": "Optional",
+      "closeBtn": "Close Window",
+      "physicalTitle": "PHYSICAL (Physical Products)",
+      "physicalDesc": "Products requiring inventory, packaging, and WeightKg for accurate shipping rate calculation",
+      "physicalTip": "Recommended fields: InitialStock, WeightKg",
+      "digitalLinkTitle": "DIGITAL_LINK (Downloadable Files)",
+      "digitalLinkDesc": "Digital items like e-books, software, course materials. Customers get download links after payment.",
+      "digitalLinkTip": "Required field: DigitalUrl",
+      "digitalItemTitle": "DIGITAL_ITEM (Code / Serial)",
+      "digitalItemDesc": "Game keys, gift codes, coupons, or serial numbers delivered to customers via DigitalItemContent",
+      "digitalItemTip": "Required field: DigitalItemContent",
+      "digitalServiceTitle": "DIGITAL_SERVICE (Services)",
+      "digitalServiceDesc": "Professional services, appointments, or consultations. No shipping or weight needed.",
+      "digitalServiceTip": "Recommended fields: PointsAmount, Price",
+      "fields": {
+        "Title": {
+          "desc": "Primary product name shown on storefront and POS",
+          "example": "Cotton 100% Short-Sleeve T-Shirt"
+        },
+        "ProductType": {
+          "desc": "Product type determining inventory tracking, weight, shipping, and fulfillment",
+          "example": "PHYSICAL"
+        },
+        "VariantTitle": {
+          "desc": "Name of product option/variant. Defaults to \"Standard\" if left empty",
+          "example": "Size L Black"
+        },
+        "SKU": {
+          "desc": "Stock Keeping Unit or barcode (must be unique)",
+          "example": "TSHIRT-BLK-L"
+        },
+        "Price": {
+          "desc": "Retail selling price (non-negative integer or decimal)",
+          "example": "390"
+        },
+        "CostPrice": {
+          "desc": "Cost price used for profit & loss calculations (default 0)",
+          "example": "180"
+        },
+        "CategorySlug": {
+          "desc": "Slug of an existing product category. Unmatched will be uncategorized",
+          "example": "apparel"
+        },
+        "InitialStock": {
+          "desc": "Initial stock quantity allocated to the selected branch (default 0)",
+          "example": "50"
+        },
+        "WeightKg": {
+          "desc": "Product weight in kilograms (required for weight-based shipping calculation)",
+          "example": "0.35"
+        },
+        "DigitalUrl": {
+          "desc": "Download URL (required when ProductType = DIGITAL_LINK)",
+          "example": "https://drive.google.com/file/d/sample"
+        },
+        "DigitalItemContent": {
+          "desc": "Code, serial key, or secret sent to buyer (required when ProductType = DIGITAL_ITEM)",
+          "example": "STEAM-KEY-XXXX-YYYY"
+        },
+        "PointsAmount": {
+          "desc": "Reward points earned upon purchase (default 0)",
+          "example": "15"
+        },
+        "DiscountType": {
+          "desc": "Discount format for this variant (PERCENTAGE or FIXED)",
+          "example": "PERCENTAGE"
+        },
+        "DiscountAmount": {
+          "desc": "Discount value (10% if PERCENTAGE, 10 THB if FIXED)",
+          "example": "10"
+        }
+      }
     }
   },
   "categories": {
@@ -710,7 +861,8 @@
     "manual": "Manual Reply",
     "searchPlaceholder": "Search conversations, customer names, or messages...",
     "noConversations": "No conversations yet",
-    "noConversationsDesc": "When customers message your store, they will appear here",
+    "noConversationsDesc": "When a customer reaches out, conversations will appear here",
+    "noMessages": "No messages yet",
     "selectConversation": "Select a conversation to start chatting",
     "selectConversationDesc": "Choose a conversation from the left panel to view and reply to messages",
     "typePlaceholder": "Type a message...",
@@ -721,12 +873,54 @@
     "aiStatusActive": "AI Assistant is active for this customer",
     "aiStatusDisabled": "AI Disabled - you are replying manually",
     "toggleAi": "Enable AI for this customer",
+    "aiSettingForCustomer": "AI settings for this customer",
+    "enableAi": "Enable AI",
     "customerDetails": "Customer Details",
     "phone": "Phone",
     "email": "Email",
     "joined": "First Contact",
     "viewCustomer": "View Customer Details",
-    "openFullInbox": "Open Full Chat Inbox"
+    "openFullInbox": "Open Full Chat Inbox",
+    "inboxTitle": "Inbox",
+    "customerChatTitle": "Messages & Chat",
+    "conversationCount": "{count} conversations",
+    "unreadBadge": "{count} unread",
+    "refresh": "Refresh",
+    "searchPlaceholderInbox": "Search by name, email, or message...",
+    "aiTab": "AI Replied",
+    "manualTab": "Manual",
+    "noConversationsFound": "No conversations found",
+    "tryDifferentSearch": "Try a different search keyword",
+    "noMessagesInFolder": "No messages in this category",
+    "defaultCustomerName": "General Customer",
+    "aiHelping": "AI is assisting",
+    "manualMode": "Manual mode",
+    "clickToDisableAi": "Click to disable AI and reply manually",
+    "clickToEnableAi": "Click to enable AI automated replies",
+    "emptyChatTitle": "Select a conversation to start chatting",
+    "emptyChatDesc": "Choose a conversation from the left to view messages, chat history, and reply in real-time",
+    "customerInfo": "Customer Details",
+    "defaultRole": "Customer",
+    "contactInfo": "Contact Information",
+    "noEmail": "No email provided",
+    "noPhone": "No phone number",
+    "conversationStatus": "Conversation Status",
+    "aiAutoReply": "AI Assistant Auto-reply",
+    "conversationId": "Conversation ID",
+    "store": "Store",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "justNow": "Just now",
+    "daysAgo": "{days} days ago",
+    "startConversationHint": "Start the conversation by typing a message below",
+    "quickRepliesShort": "Quick Replies",
+    "typeReplyPlaceholder": "Type a reply message...",
+    "enterToSendHint": "Enter to send • Shift+Enter for new line",
+    "quickReply1": "Hello! How can we assist you today?",
+    "quickReply2": "Thank you for your order! We are preparing your shipment right away.",
+    "quickReply3": "We are looking into this for you. Please allow us a moment.",
+    "quickReply4": "We are glad to help! Feel free to ask if you have any questions.",
+    "quickReply5": "We sincerely apologize for any inconvenience caused."
   },
   "employee": {
     "title": "Staff Management",

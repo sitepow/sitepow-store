@@ -501,6 +501,157 @@
         "DIGITAL_ITEM": "สินค้าดิจิทัลแบบไฟล์/คีย์ (Digital Item)",
         "DIGITAL_SERVICE": "บริการเติมเกม/งานบริการ (Service)"
       }
+    },
+    "bulkImport": {
+      "title": "นำเข้าสินค้าเป็นชุด (Bulk Import Products)",
+      "description": "รองรับข้อมูลรูปแบบ CSV พร้อมระบบตรวจสอบความถูกต้องก่อนบันทึกจริง",
+      "step1": "1. อัปโหลด",
+      "step2": "2. ตรวจสอบ ({count})",
+      "step3": "3. บันทึกผล",
+      "mobileStep1": "ขั้นตอน 1/3 : อัปโหลดไฟล์",
+      "mobileStep2": "ขั้นตอน 2/3 : ตรวจสอบข้อมูล ({count} รายการ)",
+      "mobileStep3": "ขั้นตอน 3/3 : บันทึกผล",
+      "bannerTitle": "ต้องการศึกษาขอบเขตฟิลด์ หรือดาวน์โหลดแม่แบบ?",
+      "bannerDesc": "ตรวจสอบเงื่อนไขข้อมูลที่ยอมรับ หรือดาวน์โหลด Template CSV ตามประเภทสินค้าที่ต้องการ",
+      "guideBtn": "คู่มือ & Data Dictionary",
+      "downloadTemplateBtn": "ดาวน์โหลด Template",
+      "selectTemplateType": "เลือกประเภท Template",
+      "templateAll": "รวมทุกประเภทสินค้า (แนะนำ)",
+      "templatePhysical": "สินค้าจับต้องได้ (PHYSICAL)",
+      "templateDigitalLink": "ไฟล์ดาวน์โหลด (DIGITAL_LINK)",
+      "templateDigitalItem": "รหัสโค้ด / ซีเรียล (DIGITAL_ITEM)",
+      "templateDigitalService": "คอร์ส / บริการ (DIGITAL_SERVICE)",
+      "tabUpload": "อัปโหลดไฟล์ .CSV",
+      "tabPaste": "วางข้อมูลโดยตรง",
+      "dropzoneTitle": "คลิกเพื่อเลือกไฟล์ หรือลากไฟล์ CSV มาวางที่นี่",
+      "dropzoneHint": "รองรับเฉพาะไฟล์ .csv ขนาดไม่เกิน 10MB",
+      "pasteHeaderHint": "* บรรทัดแรกสามารถเป็นชื่อคอลัมน์ (Header) ได้",
+      "analyzeBtn": "ตรวจสอบข้อมูล",
+      "statsTotal": "รายการทั้งหมด",
+      "statsValid": "พร้อมนำเข้า",
+      "statsErrors": "พบข้อผิดพลาด",
+      "colRow": "แถว",
+      "colTitle": "ชื่อสินค้า",
+      "colSku": "SKU",
+      "colPrice": "ราคา",
+      "colCost": "ต้นทุน",
+      "colCategory": "หมวดหมู่",
+      "colStock": "สต็อก",
+      "colStatus": "สถานะ",
+      "emptyFilteredRows": "ไม่พบรายการตามเงื่อนไขที่เลือก",
+      "statusValid": "ผ่าน",
+      "processingTitle": "กำลังนำเข้าข้อมูลเข้าสู่ระบบ",
+      "processingDesc": "ระบบกำลังสร้างสินค้าและอัปเดตสต็อกสาขา กรุณาอย่าปิดหน้านี้",
+      "resetBtn": "เลือกไฟล์ใหม่",
+      "cancelBtn": "ยกเลิก",
+      "confirmBtn": "ยืนยันนำเข้า ({count} รายการ)",
+      "confirmBtnShort": "ยืนยัน ({count})",
+      "limitHint": "รองรับการนำเข้าสูงสุด 500 รายการต่อรอบ",
+      "closeBtn": "ปิดหน้าต่าง",
+      "selectBranchFirst": "กรุณาเลือกสาขาที่ต้องการเพิ่มสต็อกสินค้า",
+      "selectCsvFile": "กรุณาเลือกไฟล์ .CSV",
+      "fileTooLarge": "ไฟล์มีขนาดเกิน 10MB",
+      "fileEmpty": "ไฟล์ว่างเปล่าหรือไม่สามารถอ่านข้อมูลได้",
+      "invalidCsvFormat": "รูปแบบไฟล์ไม่ถูกต้อง หรือไม่พบคอลัมน์ที่จำเป็น (Title, SKU, Price)",
+      "analyzeSuccess": "ตรวจสอบข้อมูลเสร็จสิ้น พบ {total} รายการ (พร้อมนำเข้า {valid} รายการ)",
+      "importSuccess": "นำเข้าสินค้าสำเร็จ {count} รายการ",
+      "importError": "เกิดข้อผิดพลาดในการนำเข้าสินค้า",
+      "errTitleMin": "ชื่อสินค้าต้องมีอย่างน้อย 2 ตัวอักษร",
+      "errSkuEmpty": "SKU ห้ามว่าง",
+      "errPriceNonNegative": "ราคาต้องเป็นตัวเลขมากกว่าหรือเท่ากับ 0",
+      "errCostNonNegative": "ต้นทุนต้องเป็นตัวเลขมากกว่าหรือเท่ากับ 0",
+      "errInvalidProductType": "ประเภทสินค้าไม่ถูกต้อง (ต้องเป็น PHYSICAL, DIGITAL_LINK, DIGITAL_ITEM, DIGITAL_SERVICE)",
+      "errDigitalUrlRequired": "สินค้าประเภท DIGITAL_LINK ต้องระบุ DigitalUrl",
+      "errDigitalItemContentRequired": "สินค้าประเภท DIGITAL_ITEM ต้องระบุ DigitalItemContent",
+      "errDuplicateSku": "SKU นี้ซ้ำกับแถวอื่นในไฟล์"
+    },
+    "bulkImportGuide": {
+      "triggerBtn": "คู่มือฟิลด์ข้อมูล (Guide)",
+      "title": "คำอธิบายฟิลด์ข้อมูลนำเข้า (Data Schema Dictionary)",
+      "description": "รายละเอียด ขอบเขตค่า และข้อกำหนดทางเทคนิคสำหรับการนำเข้าสินค้าผ่าน CSV",
+      "tabFields": "ตารางฟิลด์ทั้งหมด ({count})",
+      "tabFieldsShort": "ฟิลด์ ({count})",
+      "tabProductTypes": "ประเภทสินค้า (Product Types)",
+      "tabProductTypesShort": "ประเภทสินค้า",
+      "mobileScrollHint": "← เลื่อนในแนวนอนเพื่อดูข้อมูลคอลัมน์ →",
+      "colName": "ชื่อคอลัมน์ (Header)",
+      "colRequired": "ความจำเป็น",
+      "colType": "ชนิดข้อมูล (Type)",
+      "colDesc": "คำอธิบายและขอบเขต",
+      "colExample": "ตัวอย่าง",
+      "requiredBadge": "บังคับ",
+      "optionalBadge": "ไม่บังคับ",
+      "closeBtn": "ปิดหน้าต่าง",
+      "physicalTitle": "PHYSICAL (สินค้ามีตัวตน)",
+      "physicalDesc": "สินค้าที่ต้องมีสต็อก มีการบรรจุหีบห่อ และต้องการข้อมูล WeightKg สำหรับคิดคำนวณค่าจัดส่งตามจริง",
+      "physicalTip": "ฟิลด์แนะนำ: InitialStock, WeightKg",
+      "digitalLinkTitle": "DIGITAL_LINK (ไฟล์ดาวน์โหลด)",
+      "digitalLinkDesc": "สินค้าดิจิทัล เช่น E-Book, ซอฟต์แวร์, คอร์สไฟล์ ลูกค้าจะได้รับลิงก์ดาวน์โหลดทันทีหลังชำระเงินเรียบร้อย",
+      "digitalLinkTip": "ฟิลด์บังคับ: DigitalUrl",
+      "digitalItemTitle": "DIGITAL_ITEM (รหัสโค้ด / Serial)",
+      "digitalItemDesc": "คีย์เกม บัตรเติมเงิน คูปอง หรือชุดตัวเลข โดยระบบจะนำเนื้อหาใน DigitalItemContent ไปส่งมอบให้ลูกค้า",
+      "digitalItemTip": "ฟิลด์บังคับ: DigitalItemContent",
+      "digitalServiceTitle": "DIGITAL_SERVICE (บริการ)",
+      "digitalServiceDesc": "บริการทางวิชาชีพ การจองคิว หรือให้คำปรึกษา ไม่จำเป็นต้องใช้น้ำหนักและการขนส่ง",
+      "digitalServiceTip": "ฟิลด์แนะนำ: PointsAmount, Price",
+      "fields": {
+        "Title": {
+          "desc": "ชื่อสินค้าหลักที่จะแสดงบนหน้าร้านและหน้า POS",
+          "example": "เสื้อยืดแขนสั้น Cotton 100%"
+        },
+        "ProductType": {
+          "desc": "ประเภทของสินค้า ส่งผลต่อการคำนวณน้ำหนัก การจัดส่ง และการส่งมอบ",
+          "example": "PHYSICAL"
+        },
+        "VariantTitle": {
+          "desc": "ชื่อตัวเลือกย่อยของสินค้า หากเว้นว่างไว้ระบบจะใช้ค่า \"Standard\"",
+          "example": "Size L สีดำ"
+        },
+        "SKU": {
+          "desc": "รหัสสินค้าหรือบาร์โค้ดประจำตัวเลือก (ห้ามซ้ำกันในระบบ)",
+          "example": "TSHIRT-BLK-L"
+        },
+        "Price": {
+          "desc": "ราคาขายหน้าร้าน (ตัวเลขจำนวนเต็มหรือทศนิยม ไม่ติดลบ)",
+          "example": "390"
+        },
+        "CostPrice": {
+          "desc": "ต้นทุนสินค้าเพื่อใช้คำนวณกำไร-ขาดทุนในรายงาน (ค่าเริ่มต้น 0)",
+          "example": "180"
+        },
+        "CategorySlug": {
+          "desc": "สลักของหมวดหมู่สินค้าที่มีอยู่แล้วในระบบ หากไม่ตรงจะจัดเป็นไม่มีหมวดหมู่",
+          "example": "apparel"
+        },
+        "InitialStock": {
+          "desc": "จำนวนสต็อกเริ่มต้นสำหรับสาขาที่เลือกทำงาน (ค่าเริ่มต้น 0)",
+          "example": "50"
+        },
+        "WeightKg": {
+          "desc": "น้ำหนักสินค้าหน่วยเป็น กิโลกรัม (จำเป็นต้องระบุหากคำนวณค่าส่งตามน้ำหนัก)",
+          "example": "0.35"
+        },
+        "DigitalUrl": {
+          "desc": "ลิงก์ดาวน์โหลดไฟล์ (บังคับระบุเมื่อ ProductType = DIGITAL_LINK)",
+          "example": "https://drive.google.com/file/d/sample"
+        },
+        "DigitalItemContent": {
+          "desc": "รหัสโค้ด, ซีเรียล หรือข้อความที่จะส่งให้ลูกค้า (บังคับระบุเมื่อ ProductType = DIGITAL_ITEM)",
+          "example": "STEAM-KEY-XXXX-YYYY"
+        },
+        "PointsAmount": {
+          "desc": "แต้มสะสมที่จะได้รับเมื่อซื้อสินค้าชิ้นนี้ (ค่าเริ่มต้น 0)",
+          "example": "15"
+        },
+        "DiscountType": {
+          "desc": "รูปแบบส่วนลดของสินค้าตัวเลือกนี้",
+          "example": "PERCENTAGE"
+        },
+        "DiscountAmount": {
+          "desc": "มูลค่าส่วนลด (หากเลือก PERCENTAGE คือ 10%, หากเลือก FIXED คือ 10 บาท)",
+          "example": "10"
+        }
+      }
     }
   },
   "categories": {
@@ -711,6 +862,7 @@
     "searchPlaceholder": "ค้นหาบทสนทนา, ชื่อลูกค้า, หรือข้อความ...",
     "noConversations": "ยังไม่มีบทสนทนา",
     "noConversationsDesc": "เมื่อมีลูกค้าทักเข้ามา บทสนทนาจะปรากฏที่นี่",
+    "noMessages": "ยังไม่มีข้อความ",
     "selectConversation": "เลือกบทสนทนาเพื่อเริ่มพูดคุย",
     "selectConversationDesc": "เลือกการสนทนาจากรายการทางด้านซ้ายเพื่ออ่านหรือตอบกลับข้อความ",
     "typePlaceholder": "พิมพ์ข้อความ...",
@@ -721,12 +873,54 @@
     "aiStatusActive": "AI กำลังช่วยตอบลูกค้า",
     "aiStatusDisabled": "ปิด AI แล้ว - คุณกำลังตอบเอง",
     "toggleAi": "เปิดใช้งาน AI สำหรับลูกค้ารายนี้",
+    "aiSettingForCustomer": "ตั้งค่า AI สำหรับลูกค้ารายนี้",
+    "enableAi": "เปิดใช้งาน AI",
     "customerDetails": "ข้อมูลลูกค้า",
     "phone": "เบอร์โทร",
     "email": "อีเมล",
     "joined": "เริ่มติดต่อเมื่อ",
     "viewCustomer": "ดูรายละเอียดลูกค้า",
-    "openFullInbox": "เปิดกล่องข้อความเต็มจอ"
+    "openFullInbox": "เปิดกล่องข้อความเต็มจอ",
+    "inboxTitle": "กล่องข้อความ",
+    "customerChatTitle": "แชทและข้อความ",
+    "conversationCount": "{count} การสนทนา",
+    "unreadBadge": "{count} ยังไม่อ่าน",
+    "refresh": "รีเฟรชข้อมูล",
+    "searchPlaceholderInbox": "ค้นหาชื่อ, อีเมล หรือข้อความ...",
+    "aiTab": "AI ตอบ",
+    "manualTab": "คนตอบ",
+    "noConversationsFound": "ไม่พบบทสนทนา",
+    "tryDifferentSearch": "ลองค้นหาด้วยคำค้นหาอื่น",
+    "noMessagesInFolder": "ยังไม่มีข้อความในหมวดหมู่นี้",
+    "defaultCustomerName": "ลูกค้าทั่วไป",
+    "aiHelping": "AI กำลังช่วยตอบ",
+    "manualMode": "โหมดตอบด้วยตนเอง",
+    "clickToDisableAi": "คลิกเพื่อปิด AI และตอบด้วยตนเอง",
+    "clickToEnableAi": "คลิกเพื่อเปิด AI ช่วยตอบคำถามอัตโนมัติ",
+    "emptyChatTitle": "เลือกบทสนทนาเพื่อเริ่มพูดคุย",
+    "emptyChatDesc": "คลิกเลือกการสนทนาจากรายการทางด้านซ้ายเพื่อดูข้อความ ประวัติการคุย และตอบกลับลูกค้าแบบ Real-time",
+    "customerInfo": "ข้อมูลลูกค้า",
+    "defaultRole": "ลูกค้า",
+    "contactInfo": "ข้อมูลติดต่อ",
+    "noEmail": "ไม่มีอีเมล",
+    "noPhone": "ไม่มีเบอร์โทร",
+    "conversationStatus": "สถานะการสนทนา",
+    "aiAutoReply": "ระบบ AI ช่วยตอบ",
+    "conversationId": "รหัสบทสนทนา",
+    "store": "ร้านค้า",
+    "today": "วันนี้",
+    "yesterday": "เมื่อวาน",
+    "justNow": "เมื่อสักครู่",
+    "daysAgo": "{days} วันก่อน",
+    "startConversationHint": "เริ่มต้นบทสนทนาโดยการพิมพ์ข้อความด้านล่าง",
+    "quickRepliesShort": "ข้อความด่วน",
+    "typeReplyPlaceholder": "พิมพ์ข้อความตอบกลับ...",
+    "enterToSendHint": "Enter เพื่อส่ง • Shift+Enter ขึ้นบรรทัดใหม่",
+    "quickReply1": "สวัสดีครับ มีอะไรให้เราช่วยเหลือไหมครับ",
+    "quickReply2": "ขอบคุณสำหรับการสั่งซื้อครับ ทางร้านจะรีบดำเนินการจัดส่งให้โดยเร็วครับ",
+    "quickReply3": "ทางเรากำลังตรวจสอบข้อมูลให้อยู่นะครับ กรุณารอสักครู่ครับ",
+    "quickReply4": "ยินดีให้บริการครับ หากมีข้อสงสัยสอบถามเพิ่มเติมได้ตลอดเลยนะครับ",
+    "quickReply5": "ขออภัยในความไม่สะดวกเป็นอย่างยิ่งครับ"
   },
   "employee": {
     "title": "จัดการพนักงาน",

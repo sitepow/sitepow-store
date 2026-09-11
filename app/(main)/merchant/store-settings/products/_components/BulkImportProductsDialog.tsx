@@ -3,6 +3,8 @@
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   IconAlertTriangle,
   IconBox,
@@ -80,6 +82,8 @@ export function BulkImportProductsDialog({
   storeId,
   onSuccess,
 }: BulkImportProductsDialogProps) {
+  const t = useTranslations('merchant.products.bulkImport')
+
   const [currentStep, setCurrentStep] = useState<ImportStep>('upload')
   const [inputTab, setInputTab] = useState<'file' | 'paste'>('file')
 
@@ -164,7 +168,7 @@ export function BulkImportProductsDialog({
       .filter(Boolean)
 
     if (lines.length === 0) {
-      toast.error('ไม่พบชุดข้อมูลในไฟล์')
+      toast.error(t('fileEmpty'))
       return
     }
 
@@ -209,13 +213,13 @@ export function BulkImportProductsDialog({
       const discountAmount = cols[13] ? parseFloat(cols[13]) : undefined
 
       let error = ''
-      if (!title) error = 'ต้องระบุชื่อสินค้า'
-      else if (!sku) error = 'ต้องระบุ SKU'
-      else if (isNaN(price) || price < 0) error = 'ราคาจำหน่ายไม่ถูกต้อง'
+      if (!title) error = t('errTitleMin')
+      else if (!sku) error = t('errSkuEmpty')
+      else if (isNaN(price) || price < 0) error = t('errPriceNonNegative')
       else if (productType === 'DIGITAL_LINK' && !digitalUrl) {
-        error = 'ประเภท DIGITAL_LINK ต้องมี URL ดาวน์โหลด'
+        error = t('errDigitalUrlRequired')
       } else if (productType === 'DIGITAL_ITEM' && !digitalItemContent) {
-        error = 'ประเภท DIGITAL_ITEM ต้องระบุ Code/ข้อความ'
+        error = t('errDigitalItemContentRequired')
       }
 
       rows.push({
@@ -245,7 +249,7 @@ export function BulkImportProductsDialog({
   const handleFileChange = (file: File | undefined) => {
     if (!file) return
     if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
-      toast.error('กรุณาเลือกไฟล์รูปแบบ .csv เท่านั้น')
+      toast.error(t('selectCsvFile'))
       return
     }
 
@@ -260,7 +264,7 @@ export function BulkImportProductsDialog({
 
   const handlePasteAnalyze = () => {
     if (!rawText.trim()) {
-      toast.error('กรุณาระบุข้อมูลสินค้า')
+      toast.error(t('fileEmpty'))
       return
     }
     processText(rawText)
@@ -269,7 +273,7 @@ export function BulkImportProductsDialog({
   const handleConfirmImport = async () => {
     const validRows = parsedRows.filter((r) => !r.error)
     if (validRows.length === 0) {
-      toast.error('ไม่มีรายการที่ถูกต้องสำหรับนำเข้า')
+      toast.error(t('emptyFilteredRows'))
       return
     }
 
@@ -283,12 +287,12 @@ export function BulkImportProductsDialog({
       await new Promise((r) => setTimeout(r, 400))
       setImportProgress(100)
 
-      toast.success(`นำเข้าสินค้าสำเร็จจำนวน ${validRows.length} รายการ`)
+      toast.success(t('importSuccess', { count: validRows.length }))
       handleFullReset()
       onOpenChange(false)
       onSuccess?.()
     } catch {
-      toast.error('เกิดข้อผิดพลาดระหว่างกระบวนการนำเข้า')
+      toast.error(t('importError'))
       setCurrentStep('preview')
     }
   }
@@ -324,8 +328,8 @@ export function BulkImportProductsDialog({
           <div className="flex flex-col items-center gap-2.5">
             <DialogHeaderIcon
               icon={IconFileSpreadsheet}
-              title="นำเข้าสินค้าเป็นชุด (Bulk Import Products)"
-              description="รองรับข้อมูลรูปแบบ CSV พร้อมระบบตรวจสอบความถูกต้องก่อนบันทึกจริง"
+              title={t('title')}
+              description={t('description')}
               className="pr-6 sm:pr-0"
             />
 
@@ -337,7 +341,7 @@ export function BulkImportProductsDialog({
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                1. อัปโหลด
+                {t('step1')}
               </span>
               <span className="text-muted-foreground">→</span>
               <span
@@ -347,7 +351,7 @@ export function BulkImportProductsDialog({
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                2. ตรวจสอบ ({validCount})
+                {t('step2', { count: validCount })}
               </span>
               <span className="text-muted-foreground">→</span>
               <span
@@ -357,7 +361,7 @@ export function BulkImportProductsDialog({
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                3. บันทึกผล
+                {t('step3')}
               </span>
             </div>
 
@@ -367,10 +371,10 @@ export function BulkImportProductsDialog({
                 className="px-2 py-0.5 text-[11px] font-semibold"
               >
                 {currentStep === 'upload'
-                  ? 'ขั้นตอน 1/3 : อัปโหลดไฟล์'
+                  ? t('mobileStep1')
                   : currentStep === 'preview'
-                    ? `ขั้นตอน 2/3 : ตรวจสอบข้อมูล (${validCount} รายการ)`
-                    : 'ขั้นตอน 3/3 : บันทึกผล'}
+                    ? t('mobileStep2', { count: validCount })
+                    : t('mobileStep3')}
               </Badge>
             </div>
           </div>
@@ -384,11 +388,10 @@ export function BulkImportProductsDialog({
                   <IconInfoCircle className="text-primary mt-0.5 h-5 w-5 shrink-0" />
                   <div className="text-xs">
                     <p className="text-foreground font-semibold">
-                      ต้องการศึกษาขอบเขตฟิลด์ หรือดาวน์โหลดแม่แบบ?
+                      {t('bannerTitle')}
                     </p>
                     <p className="text-muted-foreground mt-0.5">
-                      ตรวจสอบเงื่อนไขข้อมูลที่ยอมรับ หรือดาวน์โหลด Template CSV
-                      ตามประเภทสินค้าที่ต้องการ
+                      {t('bannerDesc')}
                     </p>
                   </div>
                 </div>
@@ -404,20 +407,20 @@ export function BulkImportProductsDialog({
                         className="bg-background w-full justify-center gap-1.5 text-xs shadow-sm sm:w-auto"
                       >
                         <IconDownload className="h-3.5 w-3.5" />
-                        ดาวน์โหลด Template
+                        {t('downloadTemplateBtn')}
                         <IconChevronDown className="h-3 w-3 opacity-60" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 text-xs">
                       <DropdownMenuLabel className="text-muted-foreground text-[11px] font-semibold">
-                        เลือกประเภท Template
+                        {t('selectTemplateType')}
                       </DropdownMenuLabel>
                       <DropdownMenuItem
                         onClick={() => handleDownloadTemplate('ALL')}
                         className="cursor-pointer gap-2"
                       >
                         <IconFileSpreadsheet className="size-4" />
-                        รวมทุกประเภทสินค้า (แนะนำ)
+                        {t('templateAll')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -425,21 +428,21 @@ export function BulkImportProductsDialog({
                         className="cursor-pointer gap-2"
                       >
                         <IconBox className="size-4" />
-                        สินค้าจับต้องได้ (PHYSICAL)
+                        {t('templatePhysical')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDownloadTemplate('DIGITAL_LINK')}
                         className="cursor-pointer gap-2"
                       >
                         <IconDeviceDesktop className="size-4" />
-                        ไฟล์ดาวน์โหลด (DIGITAL_LINK)
+                        {t('templateDigitalLink')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDownloadTemplate('DIGITAL_ITEM')}
                         className="cursor-pointer gap-2"
                       >
                         <IconKey className="size-4" />
-                        รหัสโค้ด / ซีเรียล (DIGITAL_ITEM)
+                        {t('templateDigitalItem')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() =>
@@ -448,7 +451,7 @@ export function BulkImportProductsDialog({
                         className="cursor-pointer gap-2"
                       >
                         <IconTruckDelivery className="size-4" />
-                        คอร์ส / บริการ (DIGITAL_SERVICE)
+                        {t('templateDigitalService')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -460,10 +463,10 @@ export function BulkImportProductsDialog({
               >
                 <TabsList className="mx-auto grid w-full max-w-sm grid-cols-2">
                   <TabsTrigger value="file" className="gap-1.5 text-xs">
-                    <IconFileUpload className="size-4" /> อัปโหลดไฟล์ .CSV
+                    <IconFileUpload className="size-4" /> {t('tabUpload')}
                   </TabsTrigger>
                   <TabsTrigger value="paste" className="gap-1.5 text-xs">
-                    <IconUpload className="size-4" /> วางข้อมูลโดยตรง
+                    <IconUpload className="size-4" /> {t('tabPaste')}
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="file" className="mt-4">
@@ -496,10 +499,10 @@ export function BulkImportProductsDialog({
                       <IconFileUpload className="text-primary h-6 w-6 sm:h-8 sm:w-8" />
                     </div>
                     <p className="text-foreground text-xs font-semibold sm:text-sm">
-                      คลิกเพื่อเลือกไฟล์ หรือลากไฟล์ CSV มาวางที่นี่
+                      {t('dropzoneTitle')}
                     </p>
                     <p className="text-muted-foreground mt-1 text-[11px] sm:text-xs">
-                      รองรับเฉพาะไฟล์ .csv ขนาดไม่เกิน 10MB
+                      {t('dropzoneHint')}
                     </p>
                   </div>
                 </TabsContent>
@@ -515,7 +518,7 @@ export function BulkImportProductsDialog({
                   />
                   <div className="text-muted-foreground flex flex-col items-start justify-between gap-2.5 text-xs sm:flex-row sm:items-center">
                     <span className="text-[11px] sm:text-xs">
-                      * บรรทัดแรกสามารถเป็นชื่อคอลัมน์ (Header) ได้
+                      {t('pasteHeaderHint')}
                     </span>
                     <Button
                       size="sm"
@@ -523,7 +526,7 @@ export function BulkImportProductsDialog({
                       disabled={!rawText.trim()}
                       className="w-full sm:w-auto"
                     >
-                      ตรวจสอบข้อมูล
+                      {t('analyzeBtn')}
                     </Button>
                   </div>
                 </TabsContent>
@@ -542,7 +545,7 @@ export function BulkImportProductsDialog({
                   }`}
                 >
                   <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
-                    รายการทั้งหมด
+                    {t('statsTotal')}
                   </p>
                   <p className="text-foreground mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
                     {parsedRows.length}
@@ -558,7 +561,7 @@ export function BulkImportProductsDialog({
                 >
                   <p className="flex items-center gap-1 truncate text-[11px] font-medium text-emerald-600 sm:text-xs">
                     <IconCheck className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
-                    <span className="truncate">พร้อมนำเข้า</span>
+                    <span className="truncate">{t('statsValid')}</span>
                   </p>
                   <p className="mt-0.5 text-lg font-bold text-emerald-600 sm:mt-1 sm:text-xl">
                     {validCount}
@@ -574,7 +577,7 @@ export function BulkImportProductsDialog({
                 >
                   <p className="text-destructive flex items-center gap-1 truncate text-[11px] font-medium sm:text-xs">
                     <IconAlertTriangle className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
-                    <span className="truncate">พบข้อผิดพลาด</span>
+                    <span className="truncate">{t('statsErrors')}</span>
                   </p>
                   <p className="text-destructive mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
                     {errorCount}
@@ -587,28 +590,28 @@ export function BulkImportProductsDialog({
                     <thead className="bg-muted/60 sticky top-0 border-b backdrop-blur-sm">
                       <tr>
                         <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
-                          แถว
+                          {t('colRow')}
                         </th>
                         <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
-                          ชื่อสินค้า
+                          {t('colTitle')}
                         </th>
                         <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
-                          SKU
+                          {t('colSku')}
                         </th>
                         <th className="text-muted-foreground p-2 text-right font-semibold whitespace-nowrap sm:p-2.5">
-                          ราคา
+                          {t('colPrice')}
                         </th>
                         <th className="text-muted-foreground p-2 text-right font-semibold whitespace-nowrap sm:p-2.5">
-                          ต้นทุน
+                          {t('colCost')}
                         </th>
                         <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
-                          หมวดหมู่
+                          {t('colCategory')}
                         </th>
                         <th className="text-muted-foreground p-2 text-center font-semibold whitespace-nowrap sm:p-2.5">
-                          สต็อก
+                          {t('colStock')}
                         </th>
                         <th className="text-muted-foreground p-2 text-center font-semibold whitespace-nowrap sm:p-2.5">
-                          สถานะ
+                          {t('colStatus')}
                         </th>
                       </tr>
                     </thead>
@@ -619,7 +622,7 @@ export function BulkImportProductsDialog({
                             colSpan={8}
                             className="text-muted-foreground p-8 text-center"
                           >
-                            ไม่พบรายการตามเงื่อนไขที่เลือก
+                            {t('emptyFilteredRows')}
                           </td>
                         </tr>
                       ) : (
@@ -673,7 +676,8 @@ export function BulkImportProductsDialog({
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
-                                  <IconCheck className="h-3 w-3" /> ผ่าน
+                                  <IconCheck className="h-3 w-3" />{' '}
+                                  {t('statusValid')}
                                 </span>
                               )}
                             </td>
@@ -693,10 +697,10 @@ export function BulkImportProductsDialog({
               </div>
               <div className="space-y-1">
                 <h3 className="text-base font-semibold">
-                  กำลังนำเข้าข้อมูลเข้าสู่ระบบ
+                  {t('processingTitle')}
                 </h3>
                 <p className="text-muted-foreground text-xs">
-                  ระบบกำลังสร้างสินค้าและอัปเดตสต็อกสาขา กรุณาอย่าปิดหน้านี้
+                  {t('processingDesc')}
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-2">
@@ -717,7 +721,7 @@ export function BulkImportProductsDialog({
                 className="w-full gap-1.5 text-xs sm:w-auto"
                 onClick={handleFullReset}
               >
-                <IconRefresh className="h-3.5 w-3.5" /> เลือกไฟล์ใหม่
+                <IconRefresh className="h-3.5 w-3.5" /> {t('resetBtn')}
               </Button>
               <div className="flex w-full items-center gap-2 sm:w-auto">
                 <Button
@@ -726,7 +730,7 @@ export function BulkImportProductsDialog({
                   className="flex-1 sm:flex-initial"
                   onClick={() => onOpenChange(false)}
                 >
-                  ยกเลิก
+                  {t('cancelBtn')}
                 </Button>
                 <Button
                   size="sm"
@@ -735,9 +739,11 @@ export function BulkImportProductsDialog({
                   className="flex-1 gap-1.5 whitespace-nowrap shadow-sm sm:flex-initial"
                 >
                   <IconUpload className="size-4" />
-                  <span className="sm:hidden">ยืนยัน ({validCount})</span>
+                  <span className="sm:hidden">
+                    {t('confirmBtnShort', { count: validCount })}
+                  </span>
                   <span className="hidden sm:inline">
-                    ยืนยันนำเข้า ({validCount} รายการ)
+                    {t('confirmBtn', { count: validCount })}
                   </span>
                 </Button>
               </div>
@@ -745,7 +751,7 @@ export function BulkImportProductsDialog({
           ) : currentStep === 'upload' ? (
             <div className="flex w-full flex-col-reverse items-center justify-between gap-2.5 sm:flex-row">
               <span className="text-muted-foreground text-center text-xs sm:text-left">
-                รองรับการนำเข้าสูงสุด 500 รายการต่อรอบ
+                {t('limitHint')}
               </span>
               <Button
                 variant="outline"
@@ -753,7 +759,7 @@ export function BulkImportProductsDialog({
                 className="w-full sm:w-auto"
                 onClick={() => onOpenChange(false)}
               >
-                ปิดหน้าต่าง
+                {t('closeBtn')}
               </Button>
             </div>
           ) : null}

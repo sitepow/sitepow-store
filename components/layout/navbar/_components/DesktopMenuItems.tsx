@@ -22,12 +22,9 @@ export function DesktopMenuItems() {
   const tNav = useTranslations('common.navbar')
   const tFeatures = useTranslations('home.features')
 
-  const navKeys: Array<'features' | 'pricing' | 'downloadPos' | 'contact'> = [
-    'features',
-    'pricing',
-    'downloadPos',
-    'contact',
-  ]
+  const navKeys: Array<
+    'features' | 'pricing' | 'downloadPos' | 'blogs' | 'docs' | 'contact'
+  > = ['features', 'pricing', 'downloadPos', 'blogs', 'docs', 'contact']
 
   return (
     <>
@@ -68,9 +65,7 @@ export function DesktopMenuItems() {
                           href="/features"
                           className="bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
                         >
-                          <span>
-                            {tNav("allFeaturesOverview")}
-                          </span>
+                          <span>{tNav('allFeaturesOverview')}</span>
                           <span>→</span>
                         </Link>
                       </NavigationMenuLink>

@@ -3,6 +3,8 @@
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { useLocale, useTranslations } from 'next-intl'
+
 import { useSendMessage, useToggleConversationAi } from '@/actions/hooks/chat'
 import { useChatMessages } from '@/hooks/use-chat-messages'
 import { useChatScroll } from '@/hooks/use-chat-scroll'
@@ -25,19 +27,23 @@ interface ChatWindowProps {
   headerContent?: React.ReactNode
 }
 
-function formatDateSeparator(dateStr: Date | string) {
+function formatDateSeparator(
+  dateStr: Date | string,
+  t: (key: any) => string,
+  locale: string,
+) {
   const date = new Date(dateStr)
   const today = new Date()
   const yesterday = new Date()
   yesterday.setDate(today.getDate() - 1)
 
   if (date.toDateString() === today.toDateString()) {
-    return 'วันนี้'
+    return t('today')
   }
   if (date.toDateString() === yesterday.toDateString()) {
-    return 'เมื่อวาน'
+    return t('yesterday')
   }
-  return date.toLocaleDateString('th-TH', {
+  return date.toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -52,6 +58,8 @@ export function ChatWindow({
   showAIToggleBar = true,
   headerContent,
 }: ChatWindowProps) {
+  const t = useTranslations('merchant.chat')
+  const locale = useLocale()
   const containerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChatMessages(conversationId)
   const { register, handleSubmit, reset, watch, setValue } =
@@ -86,7 +94,7 @@ export function ChatWindow({
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <p className="text-muted-foreground text-xs">
-              เริ่มต้นบทสนทนาโดยการพิมพ์ข้อความด้านล่าง
+              {t('startConversationHint')}
             </p>
           </div>
         )}
@@ -104,7 +112,7 @@ export function ChatWindow({
                 {isNewDay && (
                   <div className="my-2 flex items-center justify-center">
                     <span className="bg-background border-border/60 text-muted-foreground rounded-full border px-3 py-1 text-[11px] font-medium shadow-2xs select-none">
-                      {formatDateSeparator(msg.createdAt)}
+                      {formatDateSeparator(msg.createdAt, t, locale)}
                     </span>
                   </div>
                 )}

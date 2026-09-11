@@ -3,6 +3,7 @@ import blogs from './blogs.json'
 import common from './common.json'
 import contact from './contact.json'
 import customer from './customer.json'
+import docs from './docs.json'
 import downloadPos from './downloadPos.json'
 import features from './features.json'
 import home from './home.json'
@@ -22,6 +23,7 @@ export const th = {
   downloadPos,
   features,
   blogs,
+  docs,
 } as const
 
 export default th

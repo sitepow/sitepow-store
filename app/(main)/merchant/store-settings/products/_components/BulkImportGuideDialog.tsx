@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import {
   IconBook,
   IconBox,
@@ -146,6 +148,8 @@ const FIELD_DICTIONARY: FieldDoc[] = [
 ]
 
 export function BulkImportGuideDialog() {
+  const t = useTranslations('merchant.products.bulkImportGuide')
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -154,15 +158,15 @@ export function BulkImportGuideDialog() {
           size="sm"
           className="text-muted-foreground hover:text-foreground w-full justify-center gap-1.5 text-xs sm:w-auto"
         >
-          <IconBook className="size-4" /> คู่มือฟิลด์ข้อมูล (Guide)
+          <IconBook className="size-4" /> {t('triggerBtn')}
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl">
         <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
           <DialogHeaderIcon
             icon={IconBook}
-            title="คำอธิบายฟิลด์ข้อมูลนำเข้า (Data Schema Dictionary)"
-            description="รายละเอียด ขอบเขตค่า และข้อกำหนดทางเทคนิคสำหรับการนำเข้าสินค้าผ่าน CSV"
+            title={t('title')}
+            description={t('description')}
             className="pr-6 sm:pr-0"
           />
         </DialogHeader>
@@ -174,17 +178,15 @@ export function BulkImportGuideDialog() {
             <TabsList className="grid h-9 w-full grid-cols-2 sm:inline-flex sm:w-auto">
               <TabsTrigger value="fields" className="gap-1.5 text-xs">
                 <span className="sm:hidden">
-                  ฟิลด์ ({FIELD_DICTIONARY.length})
+                  {t('tabFieldsShort', { count: FIELD_DICTIONARY.length })}
                 </span>
                 <span className="hidden sm:inline">
-                  ตารางฟิลด์ทั้งหมด ({FIELD_DICTIONARY.length})
+                  {t('tabFields', { count: FIELD_DICTIONARY.length })}
                 </span>
               </TabsTrigger>
               <TabsTrigger value="product-types" className="gap-1.5 text-xs">
-                <span className="sm:hidden">ประเภทสินค้า</span>
-                <span className="hidden sm:inline">
-                  ประเภทสินค้า (Product Types)
-                </span>
+                <span className="sm:hidden">{t('tabProductTypesShort')}</span>
+                <span className="hidden sm:inline">{t('tabProductTypes')}</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -193,77 +195,88 @@ export function BulkImportGuideDialog() {
             className="m-0 flex-1 overflow-y-auto p-3.5 sm:p-6"
           >
             <div className="text-muted-foreground mb-2 flex items-center justify-between text-[11px] sm:hidden">
-              <span>← เลื่อนในแนวนอนเพื่อดูข้อมูลคอลัมน์ →</span>
+              <span>{t('mobileScrollHint')}</span>
             </div>
             <div className="overflow-x-auto rounded-xl border">
               <table className="w-full min-w-[680px] border-collapse text-left text-xs">
                 <thead className="bg-muted/80 sticky top-0 z-10 border-b backdrop-blur-sm">
                   <tr>
                     <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
-                      ชื่อคอลัมน์ (Header)
+                      {t('colName')}
                     </th>
                     <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
-                      ความจำเป็น
+                      {t('colRequired')}
                     </th>
                     <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
-                      ชนิดข้อมูล (Type)
+                      {t('colType')}
                     </th>
                     <th className="min-w-56 p-2.5 font-semibold sm:min-w-64 sm:p-3">
-                      คำอธิบายและขอบเขต
+                      {t('colDesc')}
                     </th>
                     <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
-                      ตัวอย่าง
+                      {t('colExample')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {FIELD_DICTIONARY.map((field) => (
-                    <tr key={field.name} className="hover:bg-muted/20">
-                      <td className="text-foreground p-2.5 font-semibold whitespace-nowrap sm:p-3">
-                        {field.name}
-                      </td>
-                      <td className="p-2.5 whitespace-nowrap sm:p-3">
-                        {field.required ? (
-                          <Badge
-                            variant="destructive"
-                            className="px-1.5 py-0 text-[10px]"
-                          >
-                            บังคับ
-                          </Badge>
-                        ) : (
-                          <Badge
-                            variant="secondary"
-                            className="px-1.5 py-0 text-[10px]"
-                          >
-                            ไม่บังคับ
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
-                        {field.type}
-                      </td>
-                      <td className="p-2.5 sm:p-3">
-                        <p className="text-foreground leading-relaxed">
-                          {field.description}
-                        </p>
-                        {field.allowedValues && (
-                          <div className="mt-1.5 flex flex-wrap gap-1">
-                            {field.allowedValues.map((v) => (
-                              <code
-                                key={v}
-                                className="bg-muted text-primary rounded px-1.5 py-0.5 text-[10px]"
-                              >
-                                {v}
-                              </code>
-                            ))}
-                          </div>
-                        )}
-                      </td>
-                      <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
-                        {field.example}
-                      </td>
-                    </tr>
-                  ))}
+                  {FIELD_DICTIONARY.map((field) => {
+                    const fieldDesc = t.has(`fields.${field.name}.desc` as any)
+                      ? t(`fields.${field.name}.desc` as any)
+                      : field.description
+                    const fieldExample = t.has(
+                      `fields.${field.name}.example` as any,
+                    )
+                      ? t(`fields.${field.name}.example` as any)
+                      : field.example
+
+                    return (
+                      <tr key={field.name} className="hover:bg-muted/20">
+                        <td className="text-foreground p-2.5 font-semibold whitespace-nowrap sm:p-3">
+                          {field.name}
+                        </td>
+                        <td className="p-2.5 whitespace-nowrap sm:p-3">
+                          {field.required ? (
+                            <Badge
+                              variant="destructive"
+                              className="px-1.5 py-0 text-[10px]"
+                            >
+                              {t('requiredBadge')}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="px-1.5 py-0 text-[10px]"
+                            >
+                              {t('optionalBadge')}
+                            </Badge>
+                          )}
+                        </td>
+                        <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
+                          {field.type}
+                        </td>
+                        <td className="p-2.5 sm:p-3">
+                          <p className="text-foreground leading-relaxed">
+                            {fieldDesc}
+                          </p>
+                          {field.allowedValues && (
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                              {field.allowedValues.map((v) => (
+                                <code
+                                  key={v}
+                                  className="bg-muted text-primary rounded px-1.5 py-0.5 text-[10px]"
+                                >
+                                  {v}
+                                </code>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
+                          {fieldExample}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -276,53 +289,49 @@ export function BulkImportGuideDialog() {
               <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconBox className="size-4 shrink-0" />
-                  PHYSICAL (สินค้ามีตัวตน)
+                  {t('physicalTitle')}
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  สินค้าที่ต้องมีสต็อก มีการบรรจุหีบห่อ และต้องการข้อมูล{' '}
-                  <code>WeightKg</code> สำหรับคิดคำนวณค่าจัดส่งตามจริง
+                  {t('physicalDesc')}
                 </p>
                 <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
-                  ฟิลด์แนะนำ: InitialStock, WeightKg
+                  {t('physicalTip')}
                 </div>
               </div>
               <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconDeviceDesktop className="size-4 shrink-0" />
-                  DIGITAL_LINK (ไฟล์ดาวน์โหลด)
+                  {t('digitalLinkTitle')}
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  สินค้าดิจิทัล เช่น E-Book, ซอฟต์แวร์, คอร์สไฟล์
-                  ลูกค้าจะได้รับลิงก์ดาวน์โหลดทันทีหลังชำระเงินเรียบร้อย
+                  {t('digitalLinkDesc')}
                 </p>
                 <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
-                  ฟิลด์บังคับ: DigitalUrl
+                  {t('digitalLinkTip')}
                 </div>
               </div>
               <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconKey className="size-4 shrink-0" />
-                  DIGITAL_ITEM (รหัสโค้ด / Serial)
+                  {t('digitalItemTitle')}
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  คีย์เกม บัตรเติมเงิน คูปอง หรือชุดตัวเลข โดยระบบจะนำเนื้อหาใน{' '}
-                  <code>DigitalItemContent</code> ไปส่งมอบให้ลูกค้า
+                  {t('digitalItemDesc')}
                 </p>
                 <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
-                  ฟิลด์บังคับ: DigitalItemContent
+                  {t('digitalItemTip')}
                 </div>
               </div>
               <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
                 <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconTruckDelivery className="size-4 shrink-0" />
-                  DIGITAL_SERVICE (บริการ)
+                  {t('digitalServiceTitle')}
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  บริการทางวิชาชีพ การจองคิว หรือให้คำปรึกษา
-                  ไม่จำเป็นต้องใช้น้ำหนักและการขนส่ง
+                  {t('digitalServiceDesc')}
                 </p>
                 <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
-                  ฟิลด์แนะนำ: PointsAmount, Price
+                  {t('digitalServiceTip')}
                 </div>
               </div>
             </div>
@@ -331,7 +340,7 @@ export function BulkImportGuideDialog() {
         <DialogFooter className="bg-muted/10 flex justify-end border-t p-3.5 sm:p-4">
           <DialogClose asChild>
             <Button variant="outline" size="sm" className="w-full sm:w-auto">
-              ปิดหน้าต่าง
+              {t('closeBtn')}
             </Button>
           </DialogClose>
         </DialogFooter>

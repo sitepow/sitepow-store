@@ -108,5 +108,7 @@ export const NAVBAR_ITEMS = [
     title: 'ดาวน์โหลดโปรแกรม POS',
     href: '/download-pos',
   },
+  { title: 'บทความ', href: '/blogs' },
+  { title: 'คู่มือระบบ', href: '/docs' },
   { title: 'ติดต่อเรา', href: '/contact' },
 ]

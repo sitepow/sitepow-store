@@ -26,12 +26,9 @@ export function MobileMenuItems({
   const tNav = useTranslations('common.navbar')
   const tFeatures = useTranslations('home.features')
 
-  const navKeys: Array<'features' | 'pricing' | 'downloadPos' | 'contact'> = [
-    'features',
-    'pricing',
-    'downloadPos',
-    'contact',
-  ]
+  const navKeys: Array<
+    'features' | 'pricing' | 'downloadPos' | 'blogs' | 'docs' | 'contact'
+  > = ['features', 'pricing', 'downloadPos', 'blogs', 'docs', 'contact']
 
   return (
     <div className="flex flex-col space-y-4 px-6 py-8">
