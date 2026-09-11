@@ -3,11 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
-import {
-  Dancing_Script,
-  IBM_Plex_Sans_Thai_Looped,
-  Inter,
-} from 'next/font/google'
+import localFont from 'next/font/local'
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -16,17 +12,57 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
-
-const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
-  subsets: ['latin', 'thai'],
-  weight: ['400', '500', '600', '700'],
+const pgHomeplace = localFont({
+  src: [
+    {
+      path: '../public/PG Homeplace Thin.ttf',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Thin.ttf',
+      weight: '200',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Thin.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Bold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Bold.ttf',
+      weight: '800',
+      style: 'normal',
+    },
+    {
+      path: '../public/PG Homeplace Bold.ttf',
+      weight: '900',
+      style: 'normal',
+    },
+  ],
   variable: '--font-sans',
-})
-
-const dancingScript = Dancing_Script({
-  subsets: ['latin'],
-  variable: '--font-signature',
+  display: 'swap',
+  declarations: [{ prop: 'size-adjust', value: '140%' }],
 })
 
 export const metadata: Metadata = {
@@ -313,14 +349,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={cn(
-        'h-full',
-        'antialiased',
-        ibmPlexSansThaiLooped.variable,
-        dancingScript.variable,
-        'font-sans',
-        inter.variable,
-      )}
+      className={cn('h-full', 'antialiased', pgHomeplace.variable, 'font-sans')}
       suppressHydrationWarning
     >
       <head>
