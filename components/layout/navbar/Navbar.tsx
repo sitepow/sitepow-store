@@ -98,15 +98,15 @@ export function Navbar() {
             )}
             <div className="flex flex-wrap gap-2">
               {!isAuth && (
-                <Button size="icon-lg" variant="ghost" asChild>
+                <Button size="icon-lg" variant="outline" asChild>
                   <Link href={loginHref} aria-label="เข้าสู่ระบบ">
                     <IconLogin className="size-[1.2rem]" />
                   </Link>
                 </Button>
               )}
-              <QuickSettingsMenu buttonVariant="ghost" />
+              <QuickSettingsMenu buttonVariant="outline" />
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon-lg"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="เมนูหลัก"

@@ -236,7 +236,10 @@ export function AllocateStockDialog({
                                       : 'border-border hover:bg-accent/50',
                                 )}
                               >
-                                <ProductImage src={imageUrl} />
+                                <ProductImage
+                                  src={imageUrl}
+                                  alt={variant.title}
+                                />
                                 <div className="min-w-0 flex-1 space-y-1">
                                   <p className="text-foreground leading-snug font-medium break-all whitespace-pre-line">
                                     {variant.title}

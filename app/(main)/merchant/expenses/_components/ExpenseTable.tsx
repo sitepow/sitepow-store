@@ -142,7 +142,10 @@ export function ExpenseTable({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <ProductImage src={expense.receiptImage} />
+                          <ProductImage
+                            src={expense.receiptImage}
+                            alt={expense.title}
+                          />
                           <span className="text-primary text-xs">
                             {t('viewReceiptImage')}
                           </span>

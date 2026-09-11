@@ -134,7 +134,10 @@ export function ProductsTable() {
                 return (
                   <TableRow key={product.id} className="hover:bg-muted/50">
                     <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      <ProductImage src={product.images?.[0]?.url} />
+                      <ProductImage
+                        src={product.images?.[0]?.url}
+                        alt={product.title}
+                      />
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">

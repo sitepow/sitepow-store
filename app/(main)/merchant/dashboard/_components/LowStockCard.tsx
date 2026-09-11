@@ -64,7 +64,7 @@ export function LowStockCard({ data }: LowStockCardProps) {
               {lowStock.map((item) => (
                 <TableRow key={item.id} className="hover:bg-muted/50">
                   <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 py-3 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                    <ProductImage src={item.imageUrl} />
+                    <ProductImage src={item.imageUrl} alt={item.productName} />
                   </TableCell>
                   <TableCell className="max-w-72 min-w-72 py-3 wrap-break-word whitespace-pre-line">
                     <div className="space-y-0.5">

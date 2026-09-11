@@ -1,23 +1,21 @@
 import { ComponentProps } from 'react'
 
-import { IconBox } from '@tabler/icons-react'
-
 import { cn } from '@/lib/utils'
 
 type EmptyImageProps = ComponentProps<'div'> & {
-  hideIcon?: boolean
+  text: string
 }
 
-export function EmptyImage({ className, hideIcon, ...props }: EmptyImageProps) {
+export function EmptyImage({ className, text, ...props }: EmptyImageProps) {
   return (
     <div
       className={cn(
-        'bg-muted/30 text-muted-foreground/50 flex size-full items-center justify-center text-center',
+        'bg-primary text-primary-foreground flex size-full items-center justify-center p-2 text-center',
         className,
       )}
       {...props}
     >
-      {!hideIcon && <IconBox className="size-6" />}
+      {text && <span className="line-clamp-3 select-none">{text}</span>}
     </div>
   )
 }

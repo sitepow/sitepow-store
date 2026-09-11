@@ -142,7 +142,10 @@ export function PackingSlipDoc({ order }: OrderDocComponentProps) {
                     <div className="mx-auto h-4 w-4 border border-neutral-500 bg-white" />
                   </td>
                   <td className="px-2 py-2 text-center">
-                    <ProductImage className="size-10 md:size-10" />
+                    <ProductImage
+                      className="size-10 md:size-10"
+                      alt={item.title}
+                    />
                   </td>
                   <td className="max-w-40 min-w-40 px-3 py-2 wrap-break-word whitespace-pre-line">
                     <p className="font-semibold text-neutral-950">

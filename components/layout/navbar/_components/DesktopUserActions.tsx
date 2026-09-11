@@ -38,7 +38,7 @@ export function DesktopUserActions({
           </a>
         </Button>
       )}
-      <QuickSettingsMenu buttonVariant="ghost" />
+      <QuickSettingsMenu buttonVariant="outline" />
     </>
   )
 }

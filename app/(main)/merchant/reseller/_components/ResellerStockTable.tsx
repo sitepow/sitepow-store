@@ -189,7 +189,10 @@ export function ResellerStockTable({
                   return (
                     <TableRow key={stock.id} className="hover:bg-muted/50">
                       <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                        <ProductImage src={imageUrl} />
+                        <ProductImage
+                          src={imageUrl}
+                          alt={stock.variant.title}
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="flex max-w-72 min-w-72 flex-col wrap-break-word whitespace-pre-line">

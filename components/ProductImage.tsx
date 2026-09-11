@@ -45,7 +45,7 @@ export function ProductImage({
           />
         )
       ) : (
-        <EmptyImage className="text-[10px]" />
+        <EmptyImage className="text-[10px]" text={alt} />
       )}
     </div>
   )

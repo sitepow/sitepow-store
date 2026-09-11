@@ -175,7 +175,10 @@ export function ProductVariantSelector() {
                           unoptimized
                         />
                       ) : (
-                        <EmptyImage className="text-[10px]" />
+                        <EmptyImage
+                          className="text-[10px]"
+                          text={variant.title}
+                        />
                       )}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">

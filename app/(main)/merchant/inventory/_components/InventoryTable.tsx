@@ -142,7 +142,10 @@ export function InventoryTable() {
                         </Button>
                       </TableCell>
                       <TableCell className="bg-background hover:bg-muted/50 sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                        <ProductImage src={product.images?.[0]?.url} />
+                        <ProductImage
+                          src={product.images?.[0]?.url}
+                          alt={product.title}
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
@@ -201,6 +204,7 @@ export function InventoryTable() {
                                   src={
                                     variant.image || product.images?.[0]?.url
                                   }
+                                  alt={variant.title}
                                 />
                               </div>
                             </TableCell>

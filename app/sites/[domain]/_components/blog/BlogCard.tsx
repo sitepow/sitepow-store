@@ -73,7 +73,7 @@ export function BlogCard({
               )}
             </div>
           ) : (
-            <EmptyImage />
+            <EmptyImage text={blog.title} />
           )}
         </div>
         <div

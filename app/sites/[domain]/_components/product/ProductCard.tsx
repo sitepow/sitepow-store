@@ -67,7 +67,7 @@ export function ProductCard({
       <div className="relative overflow-hidden rounded-t-xl">
         <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
           {!primaryImage ? (
-            <EmptyImage />
+            <EmptyImage text={product.title} />
           ) : isVideo ? (
             <video
               src={primaryImage.url}
@@ -94,7 +94,7 @@ export function ProductCard({
           </Badge>
         ) : (
           hasDiscount && (
-            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
+            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full border border-white text-center">
               {t('discountOff')} <br /> -{maxDiscountPercent}%
             </Badge>
           )

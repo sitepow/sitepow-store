@@ -114,7 +114,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             key={itemKey}
             className="flex items-start gap-3 border-b pb-2 text-sm last:border-b-0 last:pb-0"
           >
-            <ProductImage src={imageUrl} />
+            <ProductImage src={imageUrl} alt={item.title} />
             <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 flex-1 flex-col gap-0.5 break-all">
                 <span className="text-foreground leading-snug font-medium break-all">

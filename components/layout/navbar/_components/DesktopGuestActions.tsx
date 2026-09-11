@@ -22,7 +22,7 @@ export function DesktopGuestActions({
     <>
       <Link href={loginHref}>
         <Button
-          variant="ghost"
+          variant="outline"
           className="text-muted-foreground hover:text-foreground font-medium"
         >
           {t('login')}
@@ -33,7 +33,7 @@ export function DesktopGuestActions({
           {t('register')}
         </RainbowButton>
       </Link>
-      <QuickSettingsMenu buttonVariant="ghost" />
+      <QuickSettingsMenu buttonVariant="outline" />
     </>
   )
 }
