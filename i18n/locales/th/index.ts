@@ -9,7 +9,9 @@ import features from './features.json'
 import home from './home.json'
 import merchant from './merchant.json'
 import pricing from './pricing.json'
+import privacy from './privacy.json'
 import storefront from './storefront.json'
+import terms from './terms.json'
 
 export const th = {
   common,
@@ -24,6 +26,8 @@ export const th = {
   features,
   blogs,
   docs,
+  terms,
+  privacy,
 } as const
 
 export default th

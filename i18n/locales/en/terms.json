@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "title": "Terms and Conditions of Service | Sitepow Store",
+    "description": "Terms and Conditions governing the use of the Sitepow Store platform for merchants and system users, including online storefronts, POS systems, and payments."
+  },
+  "nav": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "badge": {
+    "label": "Terms of Service",
+    "version": "v1.2 (Latest)",
+    "updated": "Last updated: September 2026"
+  },
+  "hero": {
+    "title": "Terms and Conditions of Service",
+    "subtitle": "Please read these Terms and Conditions carefully prior to using the Sitepow Store platform to fully understand your legal rights, obligations, and relationship with us.",
+    "print": "Print Document / Save PDF",
+    "contact": "Contact Legal / Support"
+  },
+  "tocTitle": "Table of Contents",
+  "sections": {
+    "intro": {
+      "title": "1. Introduction and Scope of Services",
+      "p1": "These Terms and Conditions (\"Terms\") constitute a legally binding agreement between Sitepow Co., Ltd. (\"Sitepow\", \"Company\", \"we\", \"us\") and the individual or legal entity accessing or registering a store (\"User\", \"Merchant\", \"you\") through sitepow.store, the POS application, Webhook systems, and all related services.",
+      "p2": "By accessing, registering for, or using any part of Sitepow Store, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, please discontinue use of our services immediately."
+    },
+    "account": {
+      "title": "2. Account Registration and Security",
+      "p1": "Users must be at least 18 years of age or possess legal authorization from a parent or legal guardian, with full authority to bind themselves or the entity they represent. You agree to provide true, accurate, and current information during registration.",
+      "p2": "You are solely responsible for maintaining the strict confidentiality of your account credentials, passwords, Webhook secrets, and API keys. All activities that occur under your account are deemed to be your own actions.",
+      "p3": "If you discover or suspect unauthorized access to your account, you must notify the Company immediately via our official support channels so that protective measures may be taken."
+    },
+    "merchant": {
+      "title": "3. Merchant Rights, Responsibilities, and Prohibited Uses",
+      "p1": "Merchants must operate their business, sell products, and provide services in strict compliance with applicable laws and regulations of the Kingdom of Thailand and public order.",
+      "p2": "Merchants are strictly prohibited from selling or using the platform for any of the following:",
+      "forbidden1": "Illegal goods or services, narcotics, weapons, or hazardous materials",
+      "forbidden2": "Counterfeit goods or items infringing intellectual property, copyright, or trademark rights",
+      "forbidden3": "Illegal gambling, lottery schemes, or pyramid/Ponzi schemes",
+      "forbidden4": "Money laundering or fraudulent financial transactions",
+      "forbidden5": "Spamming, distributing pornography, hate speech, or phishing activities",
+      "p3": "Merchants bear direct legal responsibility to end customers regarding product fulfillment, quality, refunds, tax invoicing, and warranties. Sitepow provides technology infrastructure only."
+    },
+    "pricing": {
+      "title": "4. Fees, Payment, and Subscription Renewals",
+      "p1": "Sitepow offers free and paid subscription plans (Pro, Business, Enterprise) as detailed on our official Pricing page.",
+      "p2": "Subscription fees for monthly or annual billing cycles are charged in advance. Payments may be made via credit card, PromptPay, or approved payment methods. All stated prices exclude applicable VAT unless otherwise noted.",
+      "p3": "Paid subscription fees are strictly non-refundable, except where explicitly stated in writing or in the event of an erroneous duplicate charge originating from Company systems."
+    },
+    "ip": {
+      "title": "5. Intellectual Property and Merchant Content",
+      "p1": "All software, source code, system architectures, logos, trademarks, documentation, and user interfaces of Sitepow Store are the exclusive intellectual property of Sitepow Co., Ltd. Unauthorized reproduction, modification, distribution, or reverse engineering is strictly prohibited.",
+      "p2": "Store data, product listings, images, logos, and content uploaded by you remain your property. You grant Sitepow a non-exclusive license to host, backup, and process such data solely for the purpose of delivering platform services to you."
+    },
+    "sla": {
+      "title": "6. System Availability and Maintenance",
+      "p1": "We strive to deliver high service availability and reliability. However, temporary downtime may occur due to scheduled maintenance or external network/cloud provider issues.",
+      "p2": "The Company will endeavor to provide advance notice of scheduled maintenance via the store dashboard or official announcements. Sitepow is not liable for disruptions resulting from force majeure or external network failures."
+    },
+    "liability": {
+      "title": "7. Limitation of Liability",
+      "p1": "Sitepow Store is provided on an \"AS IS\" and \"AS AVAILABLE\" basis. The Company does not warrant that services will be completely error-free or uninterrupted at all times.",
+      "p2": "To the maximum extent permitted by law, the Company shall not be liable for indirect, incidental, consequential damages, lost profits, business interruption, or disputes arising between merchants and their end customers."
+    },
+    "termination": {
+      "title": "8. Account Suspension and Termination",
+      "p1": "The Company reserves the right to immediately suspend or terminate your account without prior notice if you violate these Terms, engage in fraud, or pose a security risk to the platform.",
+      "p2": "You may terminate your account at any time through store settings or by contacting our support team. Your data will be handled in accordance with our Privacy Policy."
+    },
+    "governingLaw": {
+      "title": "9. Governing Law and Dispute Resolution",
+      "p1": "These Terms shall be governed by and construed in accordance with the laws of the Kingdom of Thailand.",
+      "p2": "Any disputes arising out of or in connection with these Terms shall first be resolved through good-faith negotiation. If unresolved, disputes shall be submitted to the exclusive jurisdiction of the courts of Thailand."
+    },
+    "contact": {
+      "title": "10. Modifications and Contact Information",
+      "p1": "The Company reserves the right to modify these Terms at any time. Changes will be posted on this page, and continued use of the platform constitutes your acceptance of the revised Terms.",
+      "p2": "If you have any questions regarding these Terms, please contact us at:",
+      "company": "Sitepow Co., Ltd.",
+      "email": "Email: support@sitepow.store",
+      "line": "LINE Official: @830sdfow"
+    }
+  }
+}
