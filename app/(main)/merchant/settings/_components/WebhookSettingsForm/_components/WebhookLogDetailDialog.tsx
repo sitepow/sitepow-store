@@ -4,17 +4,21 @@ import { useLocale, useTranslations } from 'next-intl'
 
 import { getWebhookEvents } from '@/constants/webhook'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { IconCheck, IconCopy, IconRefresh } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconCopy,
+  IconFileText,
+  IconRefresh,
+} from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -74,19 +78,26 @@ export function WebhookLogDetailDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <DialogTitle>{t('title')}</DialogTitle>
-            <Badge variant={log.isSuccess ? 'default' : 'destructive'}>
-              {log.isSuccess ? 'Success' : 'Failed'}
-              {log.statusCode ? ` (${log.statusCode})` : ''}
-            </Badge>
-          </div>
-          <DialogDescription>
-            {t('event')}:{' '}
-            <span className="font-medium">{getEventLabel(log.event)}</span> •{' '}
-            {t('duration')}: {log.executionTimeMs}ms • {t('date')}:{' '}
-            {new Date(log.createdAt).toLocaleString()}
-          </DialogDescription>
+          <DialogHeaderIcon
+            icon={IconFileText}
+            title={
+              <span className="flex items-center gap-2">
+                <span>{t('title')}</span>
+                <Badge variant={log.isSuccess ? 'default' : 'destructive'}>
+                  {log.isSuccess ? 'Success' : 'Failed'}
+                  {log.statusCode ? ` (${log.statusCode})` : ''}
+                </Badge>
+              </span>
+            }
+            description={
+              <span>
+                {t('event')}:{' '}
+                <span className="font-medium">{getEventLabel(log.event)}</span>{' '}
+                • {t('duration')}: {log.executionTimeMs}ms • {t('date')}:{' '}
+                {new Date(log.createdAt).toLocaleString()}
+              </span>
+            }
+          />
         </DialogHeader>
         <div className="space-y-4 pt-2">
           {log.errorMessage && (

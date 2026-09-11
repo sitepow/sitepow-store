@@ -16,6 +16,7 @@ import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/credit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCoins, IconPlus } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,7 +24,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -106,7 +106,7 @@ export function PurchaseCreditDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogHeaderIcon icon={IconCoins} title={t('title')} />
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">

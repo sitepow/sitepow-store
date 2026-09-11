@@ -9,15 +9,15 @@ import { useTranslations } from 'next-intl'
 import { useCreateResellerAgreement } from '@/actions/hooks/reseller'
 import { ResellerType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconX } from '@tabler/icons-react'
+import { IconFileCertificate, IconX } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -124,7 +124,7 @@ export function CreateAgreementDialog({
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>{t('title')}</DialogTitle>
+            <DialogHeaderIcon icon={IconFileCertificate} title={t('title')} />
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>

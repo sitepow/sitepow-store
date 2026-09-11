@@ -31,13 +31,13 @@ import {
 } from '@tabler/icons-react'
 
 import { CustomerCard } from '@/components/CustomerCard'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { HighlightText } from '@/components/HighlightText'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -206,10 +206,7 @@ export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <IconTicket className="text-primary" />
-            {t('title')}
-          </DialogTitle>
+          <DialogHeaderIcon icon={IconTicket} title={t('title')} />
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="space-y-3">

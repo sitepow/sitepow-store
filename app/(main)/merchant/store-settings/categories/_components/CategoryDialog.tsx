@@ -22,8 +22,9 @@ import { getPathR2FromUrl } from '@/utils/image'
 import { formatSlug } from '@/utils/slug'
 import { CreateCategoryFormValues, createCategorySchema } from '@/zod/category'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus, IconWand } from '@tabler/icons-react'
+import { IconCategory, IconPlus, IconWand } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
 import {
   AlertDialog,
@@ -40,10 +41,8 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -202,10 +201,13 @@ export function CategoryDialog({
         <DialogContent className="sm:max-w-md">
           <FormProvider {...methods}>
             <DialogHeader>
-              <DialogTitle>
-                {categoryId ? t('dialog.editTitle') : t('dialog.createTitle')}
-              </DialogTitle>
-              <DialogDescription>{t('dialog.description')}</DialogDescription>
+              <DialogHeaderIcon
+                icon={IconCategory}
+                title={
+                  categoryId ? t('dialog.editTitle') : t('dialog.createTitle')
+                }
+                description={t('dialog.description')}
+              />
             </DialogHeader>
             <div className="grid gap-4">
               <Field>

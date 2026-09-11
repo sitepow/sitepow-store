@@ -12,14 +12,13 @@ import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -100,11 +99,11 @@ export function StockEditDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('editStockDialog.title')}</DialogTitle>
-          <DialogDescription>
-            {productTitle} {variantTitle ? `· ${variantTitle}` : ''}{' '}
-            {stock?.branch?.name ? `· ${stock.branch.name}` : ''}
-          </DialogDescription>
+          <DialogHeaderIcon
+            icon={IconSettings}
+            title={t('editStockDialog.title')}
+            description={`${productTitle ?? ''} ${variantTitle ? `· ${variantTitle}` : ''} ${stock?.branch?.name ? `· ${stock.branch.name}` : ''}`.trim()}
+          />
         </DialogHeader>
         <div className="grid gap-4">
           <Field>

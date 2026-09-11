@@ -15,14 +15,13 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageImport } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -128,10 +127,11 @@ export function StockAdjustmentDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('adjustment.title')}</DialogTitle>
-          <DialogDescription>
-            {variantLabel} · {branchName}
-          </DialogDescription>
+          <DialogHeaderIcon
+            icon={IconPackageImport}
+            title={t('adjustment.title')}
+            description={`${variantLabel} · ${branchName}`}
+          />
         </DialogHeader>
         <div className="grid gap-4">
           <Field>

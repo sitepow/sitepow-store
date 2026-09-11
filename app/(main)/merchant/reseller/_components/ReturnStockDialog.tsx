@@ -7,17 +7,17 @@ import { useTranslations } from 'next-intl'
 
 import { useReturnResellerStock } from '@/actions/hooks/reseller'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
+import { IconArrowBackUp } from '@tabler/icons-react'
 import { Loader2 } from 'lucide-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -96,8 +96,11 @@ export function ReturnStockDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconArrowBackUp}
+            title={t('title')}
+            description={t('description')}
+          />
         </DialogHeader>
         {stock && (
           <div className="space-y-4 py-2">

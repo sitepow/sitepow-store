@@ -7,16 +7,15 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 
 import { formatCurrency } from '@/utils/pricing'
-import { IconX } from '@tabler/icons-react'
+import { IconCurrencyDollar, IconX } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -143,8 +142,11 @@ export function EditCustomPriceDialog({
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>{t('title')}</DialogTitle>
-              <DialogDescription>{t('description')}</DialogDescription>
+              <DialogHeaderIcon
+                icon={IconCurrencyDollar}
+                title={t('title')}
+                description={t('description')}
+              />
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="min-w-0 space-y-1.5">

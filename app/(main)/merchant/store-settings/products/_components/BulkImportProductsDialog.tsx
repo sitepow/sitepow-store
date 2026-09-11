@@ -23,7 +23,12 @@ import {
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -314,16 +319,17 @@ export function BulkImportProductsDialog({
         onOpenChange(isOpen)
       }}
     >
-      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
-        <div className="bg-muted/20 border-b p-6">
-          <div className="flex items-center justify-between">
+      <DialogContent className="flex max-h-[92vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[90vh] sm:w-full sm:max-w-3xl">
+        <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
+          <div className="flex flex-col items-center gap-2.5">
             <DialogHeaderIcon
               icon={IconFileSpreadsheet}
               title="นำเข้าสินค้าเป็นชุด (Bulk Import Products)"
               description="รองรับข้อมูลรูปแบบ CSV พร้อมระบบตรวจสอบความถูกต้องก่อนบันทึกจริง"
+              className="pr-6 sm:pr-0"
             />
 
-            <div className="hidden items-center gap-2 text-xs font-medium sm:flex">
+            <div className="hidden items-center gap-2 pr-8 text-xs font-medium sm:flex">
               <span
                 className={`rounded-full border px-2.5 py-1 transition-colors ${
                   currentStep === 'upload'
@@ -354,26 +360,39 @@ export function BulkImportProductsDialog({
                 3. บันทึกผล
               </span>
             </div>
-          </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex items-center gap-1.5 sm:hidden">
+              <Badge
+                variant="secondary"
+                className="px-2 py-0.5 text-[11px] font-semibold"
+              >
+                {currentStep === 'upload'
+                  ? 'ขั้นตอน 1/3 : อัปโหลดไฟล์'
+                  : currentStep === 'preview'
+                    ? `ขั้นตอน 2/3 : ตรวจสอบข้อมูล (${validCount} รายการ)`
+                    : 'ขั้นตอน 3/3 : บันทึกผล'}
+              </Badge>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {currentStep === 'upload' && (
-            <div className="space-y-6">
-              <div className="border-primary/20 bg-primary/5 flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                  <IconInfoCircle className="text-primary h-5 w-5 shrink-0" />
+            <div className="space-y-4 sm:space-y-6">
+              <div className="border-primary/20 bg-primary/5 flex flex-col justify-between gap-3.5 rounded-xl border p-3.5 sm:p-4 md:flex-row md:items-center">
+                <div className="flex items-start gap-3">
+                  <IconInfoCircle className="text-primary mt-0.5 h-5 w-5 shrink-0" />
                   <div className="text-xs">
                     <p className="text-foreground font-semibold">
                       ต้องการศึกษาขอบเขตฟิลด์ หรือดาวน์โหลดแม่แบบ?
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground mt-0.5">
                       ตรวจสอบเงื่อนไขข้อมูลที่ยอมรับ หรือดาวน์โหลด Template CSV
                       ตามประเภทสินค้าที่ต้องการ
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 self-end sm:self-auto">
+                <div className="flex w-full shrink-0 flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
                   <BulkImportGuideDialog />
 
                   {/* Dropdown Menu ตัวเลือกแม่แบบ Template ครบ 4 ประเภท */}
@@ -382,7 +401,7 @@ export function BulkImportProductsDialog({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="bg-background gap-1.5 text-xs shadow-sm"
+                        className="bg-background w-full justify-center gap-1.5 text-xs shadow-sm sm:w-auto"
                       >
                         <IconDownload className="h-3.5 w-3.5" />
                         ดาวน์โหลด Template
@@ -460,7 +479,7 @@ export function BulkImportProductsDialog({
                       handleFileChange(e.dataTransfer.files?.[0])
                     }}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-10 transition-all duration-200 ${
+                    className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 sm:p-10 ${
                       isDragging
                         ? 'border-primary bg-primary/5 scale-[0.99]'
                         : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30'
@@ -473,33 +492,36 @@ export function BulkImportProductsDialog({
                       className="hidden"
                       onChange={(e) => handleFileChange(e.target.files?.[0])}
                     />
-                    <div className="bg-background mb-3 rounded-full border p-4 shadow-sm">
-                      <IconFileUpload className="text-primary h-8 w-8" />
+                    <div className="bg-background mb-2.5 rounded-full border p-3 shadow-sm sm:mb-3 sm:p-4">
+                      <IconFileUpload className="text-primary h-6 w-6 sm:h-8 sm:w-8" />
                     </div>
-                    <p className="text-foreground text-sm font-semibold">
+                    <p className="text-foreground text-xs font-semibold sm:text-sm">
                       คลิกเพื่อเลือกไฟล์ หรือลากไฟล์ CSV มาวางที่นี่
                     </p>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                    <p className="text-muted-foreground mt-1 text-[11px] sm:text-xs">
                       รองรับเฉพาะไฟล์ .csv ขนาดไม่เกิน 10MB
                     </p>
                   </div>
                 </TabsContent>
                 <TabsContent value="paste" className="mt-4 space-y-3">
                   <Textarea
-                    rows={8}
+                    rows={6}
                     placeholder={
                       'Title,ProductType,VariantTitle,SKU,Price,CostPrice,CategorySlug,InitialStock,WeightKg,DigitalUrl,DigitalItemContent,PointsAmount,DiscountType,DiscountAmount\nเสื้อยืดแขนสั้น,PHYSICAL,Free Size,TSHIRT-01,250,100,apparel,50,0.25,,,,PERCENTAGE,10'
                     }
                     value={rawText}
                     onChange={(e) => setRawText(e.target.value)}
-                    className="font-mono text-xs leading-relaxed"
+                    className="text-xs leading-relaxed"
                   />
-                  <div className="text-muted-foreground flex items-center justify-between text-xs">
-                    <span>* บรรทัดแรกสามารถเป็นชื่อคอลัมน์ (Header) ได้</span>
+                  <div className="text-muted-foreground flex flex-col items-start justify-between gap-2.5 text-xs sm:flex-row sm:items-center">
+                    <span className="text-[11px] sm:text-xs">
+                      * บรรทัดแรกสามารถเป็นชื่อคอลัมน์ (Header) ได้
+                    </span>
                     <Button
                       size="sm"
                       onClick={handlePasteAnalyze}
                       disabled={!rawText.trim()}
+                      className="w-full sm:w-auto"
                     >
                       ตรวจสอบข้อมูล
                     </Button>
@@ -510,80 +532,82 @@ export function BulkImportProductsDialog({
           )}
           {currentStep === 'preview' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <div
                   onClick={() => setFilterMode('all')}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
                     filterMode === 'all'
                       ? 'border-primary bg-primary/5 shadow-sm'
                       : 'bg-card hover:bg-muted/40'
                   }`}
                 >
-                  <p className="text-muted-foreground text-xs font-medium">
+                  <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
                     รายการทั้งหมด
                   </p>
-                  <p className="text-foreground mt-1 text-xl font-bold">
+                  <p className="text-foreground mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
                     {parsedRows.length}
                   </p>
                 </div>
                 <div
                   onClick={() => setFilterMode('valid')}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
                     filterMode === 'valid'
                       ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
                       : 'bg-card hover:bg-muted/40'
                   }`}
                 >
-                  <p className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <IconCheck className="h-3.5 w-3.5" /> พร้อมนำเข้า
+                  <p className="flex items-center gap-1 truncate text-[11px] font-medium text-emerald-600 sm:text-xs">
+                    <IconCheck className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
+                    <span className="truncate">พร้อมนำเข้า</span>
                   </p>
-                  <p className="mt-1 text-xl font-bold text-emerald-600">
+                  <p className="mt-0.5 text-lg font-bold text-emerald-600 sm:mt-1 sm:text-xl">
                     {validCount}
                   </p>
                 </div>
                 <div
                   onClick={() => setFilterMode('errors')}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
                     filterMode === 'errors'
                       ? 'border-destructive bg-destructive/10 shadow-sm'
                       : 'bg-card hover:bg-muted/40'
                   }`}
                 >
-                  <p className="text-destructive flex items-center gap-1 text-xs font-medium">
-                    <IconAlertTriangle className="h-3.5 w-3.5" /> พบข้อผิดพลาด
+                  <p className="text-destructive flex items-center gap-1 truncate text-[11px] font-medium sm:text-xs">
+                    <IconAlertTriangle className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
+                    <span className="truncate">พบข้อผิดพลาด</span>
                   </p>
-                  <p className="text-destructive mt-1 text-xl font-bold">
+                  <p className="text-destructive mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
                     {errorCount}
                   </p>
                 </div>
               </div>
               <div className="bg-card overflow-hidden rounded-xl border">
-                <div className="max-h-72 overflow-y-auto">
-                  <table className="w-full border-collapse text-left text-xs">
+                <div className="max-h-72 overflow-x-auto overflow-y-auto">
+                  <table className="w-full min-w-[640px] border-collapse text-left text-xs">
                     <thead className="bg-muted/60 sticky top-0 border-b backdrop-blur-sm">
                       <tr>
-                        <th className="text-muted-foreground p-2.5 font-semibold">
+                        <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
                           แถว
                         </th>
-                        <th className="text-muted-foreground p-2.5 font-semibold">
+                        <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
                           ชื่อสินค้า
                         </th>
-                        <th className="text-muted-foreground p-2.5 font-semibold">
+                        <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
                           SKU
                         </th>
-                        <th className="text-muted-foreground p-2.5 text-right font-semibold">
+                        <th className="text-muted-foreground p-2 text-right font-semibold whitespace-nowrap sm:p-2.5">
                           ราคา
                         </th>
-                        <th className="text-muted-foreground p-2.5 text-right font-semibold">
+                        <th className="text-muted-foreground p-2 text-right font-semibold whitespace-nowrap sm:p-2.5">
                           ต้นทุน
                         </th>
-                        <th className="text-muted-foreground p-2.5 font-semibold">
+                        <th className="text-muted-foreground p-2 font-semibold whitespace-nowrap sm:p-2.5">
                           หมวดหมู่
                         </th>
-                        <th className="text-muted-foreground p-2.5 text-center font-semibold">
+                        <th className="text-muted-foreground p-2 text-center font-semibold whitespace-nowrap sm:p-2.5">
                           สต็อก
                         </th>
-                        <th className="text-muted-foreground p-2.5 text-center font-semibold">
+                        <th className="text-muted-foreground p-2 text-center font-semibold whitespace-nowrap sm:p-2.5">
                           สถานะ
                         </th>
                       </tr>
@@ -608,22 +632,22 @@ export function BulkImportProductsDialog({
                                 : 'hover:bg-muted/30'
                             }`}
                           >
-                            <td className="text-muted-foreground p-2.5 font-mono">
+                            <td className="text-muted-foreground p-2 whitespace-nowrap sm:p-2.5">
                               #{row.index}
                             </td>
-                            <td className="max-w-45 truncate p-2.5 font-medium">
+                            <td className="max-w-45 truncate p-2 font-medium sm:p-2.5">
                               {row.title || '—'}
                             </td>
-                            <td className="text-muted-foreground p-2.5 font-mono">
+                            <td className="text-muted-foreground p-2 whitespace-nowrap sm:p-2.5">
                               {row.sku || '—'}
                             </td>
-                            <td className="p-2.5 text-right font-medium">
+                            <td className="p-2 text-right font-medium whitespace-nowrap sm:p-2.5">
                               ฿{row.price.toLocaleString()}
                             </td>
-                            <td className="text-muted-foreground p-2.5 text-right">
+                            <td className="text-muted-foreground p-2 text-right whitespace-nowrap sm:p-2.5">
                               ฿{row.costPrice?.toLocaleString() || '0'}
                             </td>
-                            <td className="p-2.5">
+                            <td className="p-2 whitespace-nowrap sm:p-2.5">
                               {row.categorySlug ? (
                                 <Badge
                                   variant="outline"
@@ -635,10 +659,10 @@ export function BulkImportProductsDialog({
                                 <span className="text-muted-foreground">—</span>
                               )}
                             </td>
-                            <td className="p-2.5 text-center font-semibold">
+                            <td className="p-2 text-center font-semibold whitespace-nowrap sm:p-2.5">
                               {row.initialStock ?? 0}
                             </td>
-                            <td className="p-2.5 text-center">
+                            <td className="p-2 text-center whitespace-nowrap sm:p-2.5">
                               {row.error ? (
                                 <span
                                   className="bg-destructive/10 text-destructive inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -677,28 +701,29 @@ export function BulkImportProductsDialog({
               </div>
               <div className="w-full max-w-xs space-y-2">
                 <Progress value={importProgress} className="h-2" />
-                <span className="text-muted-foreground font-mono text-xs">
+                <span className="text-muted-foreground text-xs">
                   {importProgress}%
                 </span>
               </div>
             </div>
           )}
         </div>
-        <div className="bg-muted/10 flex items-center justify-between border-t p-4">
+        <DialogFooter className="bg-muted/10 flex flex-col-reverse gap-2.5 border-t p-3.5 sm:flex-row sm:items-center sm:justify-between sm:p-4">
           {currentStep === 'preview' ? (
             <>
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-1.5 text-xs"
+                className="w-full gap-1.5 text-xs sm:w-auto"
                 onClick={handleFullReset}
               >
                 <IconRefresh className="h-3.5 w-3.5" /> เลือกไฟล์ใหม่
               </Button>
-              <div className="flex gap-2">
+              <div className="flex w-full items-center gap-2 sm:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="flex-1 sm:flex-initial"
                   onClick={() => onOpenChange(false)}
                 >
                   ยกเลิก
@@ -707,28 +732,32 @@ export function BulkImportProductsDialog({
                   size="sm"
                   onClick={handleConfirmImport}
                   disabled={validCount === 0}
-                  className="gap-1.5 shadow-sm"
+                  className="flex-1 gap-1.5 whitespace-nowrap shadow-sm sm:flex-initial"
                 >
                   <IconUpload className="size-4" />
-                  ยืนยันนำเข้า ({validCount} รายการ)
+                  <span className="sm:hidden">ยืนยัน ({validCount})</span>
+                  <span className="hidden sm:inline">
+                    ยืนยันนำเข้า ({validCount} รายการ)
+                  </span>
                 </Button>
               </div>
             </>
           ) : currentStep === 'upload' ? (
-            <>
-              <span className="text-muted-foreground text-xs">
+            <div className="flex w-full flex-col-reverse items-center justify-between gap-2.5 sm:flex-row">
+              <span className="text-muted-foreground text-center text-xs sm:text-left">
                 รองรับการนำเข้าสูงสุด 500 รายการต่อรอบ
               </span>
               <Button
                 variant="outline"
                 size="sm"
+                className="w-full sm:w-auto"
                 onClick={() => onOpenChange(false)}
               >
                 ปิดหน้าต่าง
               </Button>
-            </>
+            </div>
           ) : null}
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

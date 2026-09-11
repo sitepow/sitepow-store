@@ -15,6 +15,7 @@ import { ProductFormValues } from '@/zod/product'
 import { IconDatabaseImport } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -29,7 +30,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {
@@ -163,7 +163,10 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
       </DialogTrigger>
       <DialogContent className="flex min-h-96 flex-col">
         <DialogHeader>
-          <DialogTitle>{t('copyProductFrom')}</DialogTitle>
+          <DialogHeaderIcon
+            icon={IconDatabaseImport}
+            title={t('copyProductFrom')}
+          />
         </DialogHeader>
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>

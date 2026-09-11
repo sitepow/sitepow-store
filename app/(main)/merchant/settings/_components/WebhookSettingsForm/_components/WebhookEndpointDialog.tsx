@@ -15,16 +15,16 @@ import { WEBHOOK_EVENTS, getWebhookEvents } from '@/constants/webhook'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { WebhookEndpointFormValues, webhookEndpointSchema } from '@/zod/webhook'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconWebhook } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -145,10 +145,11 @@ export function WebhookEndpointDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? t('editTitle') : t('addTitle')}
-          </DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconWebhook}
+            title={isEditing ? t('editTitle') : t('addTitle')}
+            description={t('description')}
+          />
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
           <Field>

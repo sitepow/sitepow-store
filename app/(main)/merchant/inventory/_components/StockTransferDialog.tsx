@@ -15,14 +15,13 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageExport } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -110,8 +109,11 @@ export function StockTransferDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('transfer.title')}</DialogTitle>
-          <DialogDescription>{variantLabel}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconPackageExport}
+            title={t('transfer.title')}
+            description={variantLabel}
+          />
         </DialogHeader>
 
         <div className="grid gap-4">

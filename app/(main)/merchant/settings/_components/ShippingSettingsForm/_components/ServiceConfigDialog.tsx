@@ -13,16 +13,20 @@ import {
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { ShippingFormValues } from '@/zod/shipping'
-import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'
+import {
+  IconPlus,
+  IconSettings,
+  IconTrash,
+  IconTruckDelivery,
+} from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -87,8 +91,11 @@ export function ServiceConfigDialog({
       </DialogTrigger>
       <DialogContent className="lg:min-w-lg" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{t('title', { serviceName })}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconTruckDelivery}
+            title={t('title', { serviceName })}
+            description={t('description')}
+          />
         </DialogHeader>
         <Tabs
           value={activeTab}

@@ -11,17 +11,16 @@ import { DiscountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CreateCouponFormValues, createCouponSchema } from '@/zod/coupon'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus } from '@tabler/icons-react'
+import { IconPlus, IconTicket } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -107,8 +106,11 @@ export function CouponCreateDialog() {
       </DialogTrigger>
       <DialogContent className="overflow-x-hidden sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{tDialog('title')}</DialogTitle>
-          <DialogDescription>{tDialog('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconTicket}
+            title={tDialog('title')}
+            description={tDialog('description')}
+          />
         </DialogHeader>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field className="sm:col-span-2">

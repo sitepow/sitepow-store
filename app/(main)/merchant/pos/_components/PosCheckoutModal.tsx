@@ -27,6 +27,7 @@ import {
   IconReceipt,
 } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { OrderDocType } from '@/components/pdf/types'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -35,7 +36,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -307,9 +307,10 @@ export function PosCheckoutModal({
           />
           <div className="space-y-5 px-5 pt-4">
             <DialogHeader className="p-0 text-left">
-              <DialogTitle className="text-base font-semibold">
-                {t('selectPaymentMethod')}
-              </DialogTitle>
+              <DialogHeaderIcon
+                icon={IconCash}
+                title={t('selectPaymentMethod')}
+              />
             </DialogHeader>
             <div
               className={cn(

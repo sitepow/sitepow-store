@@ -25,6 +25,7 @@ import {
 } from '@tabler/icons-react'
 
 import { CustomerCard } from '@/components/CustomerCard'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { OrderItemsSummary } from '@/components/order/ItemsSummary'
 import { OrderStatusBadges } from '@/components/order/StatusBadges'
 import { OrderTrackingForm } from '@/components/order/TrackingForm'
@@ -32,9 +33,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {
@@ -112,12 +111,13 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] gap-2.5 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {t('orderTitle', { orderNumber: order.orderNumber })}
-          </DialogTitle>
-          <DialogDescription>
-            {t('orderDate', { date: formatDateTime(order.createdAt) })}
-          </DialogDescription>
+          <DialogHeaderIcon
+            icon={IconReceipt}
+            title={t('orderTitle', { orderNumber: order.orderNumber })}
+            description={t('orderDate', {
+              date: formatDateTime(order.createdAt),
+            })}
+          />
           <OrderStatusBadges
             status={order.status}
             paymentMethod={order.paymentMethod}

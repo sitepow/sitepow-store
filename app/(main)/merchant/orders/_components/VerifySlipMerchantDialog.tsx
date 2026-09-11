@@ -12,14 +12,13 @@ import { formatBankAccount } from '@/utils/slip'
 import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
@@ -67,26 +66,31 @@ export function VerifySlipMerchantDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {t('title', { orderNumber: order.orderNumber })}
-          </DialogTitle>
-          <DialogDescription className="space-y-1">
-            <span className="text-foreground block font-medium">
-              {t('amountDue')}{' '}
-              <span className="text-primary">
-                {formatCurrency(order.totalAmount)}
+          <DialogHeaderIcon
+            icon={IconSearch}
+            title={t('title', { orderNumber: order.orderNumber })}
+            description={
+              <span className="block space-y-1">
+                <span className="text-foreground block font-medium">
+                  {t('amountDue')}{' '}
+                  <span className="text-primary">
+                    {formatCurrency(order.totalAmount)}
+                  </span>
+                </span>
+                {order.bankAccount && (
+                  <span className="text-foreground block font-medium">
+                    {t('bankInfo', {
+                      bank: order.bankAccount.bankName,
+                      account: formatBankAccount(
+                        order.bankAccount.accountNumber,
+                      ),
+                      name: order.bankAccount.accountName,
+                    })}
+                  </span>
+                )}
               </span>
-            </span>
-            {order.bankAccount && (
-              <span className="text-foreground block font-medium">
-                {t('bankInfo', {
-                  bank: order.bankAccount.bankName,
-                  account: formatBankAccount(order.bankAccount.accountNumber),
-                  name: order.bankAccount.accountName,
-                })}
-              </span>
-            )}
-          </DialogDescription>
+            }
+          />
         </DialogHeader>
         <div className="flex flex-col items-center justify-center py-4">
           {order.paymentProof ? (

@@ -16,8 +16,10 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { BankAccountFormValues, bankAccountSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconBuildingBank } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -30,10 +32,8 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -142,10 +142,11 @@ export function BankAccountDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {bankAccountId ? t('editTitle') : t('addTitle')}
-          </DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconBuildingBank}
+            title={bankAccountId ? t('editTitle') : t('addTitle')}
+            description={t('description')}
+          />
         </DialogHeader>
         {isLoadingAccount && bankAccountId ? (
           <div className="flex justify-center py-8">

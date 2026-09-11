@@ -21,6 +21,7 @@ import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { ProductImage } from '@/components/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -29,7 +30,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -170,7 +170,7 @@ export function AllocateStockDialog({
       <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>{t('title')}</DialogTitle>
+            <DialogHeaderIcon icon={IconPackage} title={t('title')} />
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="bg-muted/40 space-y-3 rounded-lg border p-3">

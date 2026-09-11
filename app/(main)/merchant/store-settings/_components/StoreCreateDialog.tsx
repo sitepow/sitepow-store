@@ -14,17 +14,16 @@ import { CheckoutType } from '@/types/checkout'
 import { formatSlug } from '@/utils/slug'
 import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus } from '@tabler/icons-react'
+import { IconBuildingStore, IconPlus } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
@@ -117,9 +116,12 @@ export function StoreCreateDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
-        <DialogHeader className="space-y-2">
-          <DialogTitle>{tDialog('title')}</DialogTitle>
-          <DialogDescription>{tDialog('description')}</DialogDescription>
+        <DialogHeader>
+          <DialogHeaderIcon
+            icon={IconBuildingStore}
+            title={tDialog('title')}
+            description={tDialog('description')}
+          />
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="grid gap-5 sm:grid-cols-2">

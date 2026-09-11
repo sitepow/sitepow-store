@@ -6,13 +6,8 @@ import { GetActivityLogItem } from '@/actions/activity-log'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconTerminal } from '@tabler/icons-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
 
 export interface ActivityLogItem {
   id: string
@@ -44,13 +39,11 @@ export function AuditLogDetailDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
-            <IconTerminal size={18} className="text-muted-foreground" />
-            {t('title')}
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            {t('description')}
-          </DialogDescription>
+          <DialogHeaderIcon
+            icon={IconTerminal}
+            title={t('title')}
+            description={t('description')}
+          />
         </DialogHeader>
         <div className="bg-foreground/5 text-foreground max-h-90 overflow-x-auto rounded-md border p-4 text-[11px] leading-relaxed">
           <pre>

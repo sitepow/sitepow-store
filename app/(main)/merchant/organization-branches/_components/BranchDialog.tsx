@@ -15,17 +15,16 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { OpeningHours } from '@/types/branch'
 import { CreateBranchFormValues, createBranchSchema } from '@/zod/branch'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconPlus } from '@tabler/icons-react'
+import { IconBuildingStore, IconPlus } from '@tabler/icons-react'
 
 import { CreateInput } from '@/components/AddressAutoField'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -160,10 +159,11 @@ export function BranchDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {branchId ? t('editBranch') : t('addBranch')}
-          </DialogTitle>
-          <DialogDescription>{t('dialog.description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconBuildingStore}
+            title={branchId ? t('editBranch') : t('addBranch')}
+            description={t('dialog.description')}
+          />
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="flex items-center justify-between rounded-lg border p-3">

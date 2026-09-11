@@ -13,7 +13,9 @@ import { CartItem } from '@/types/sites/cart'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
+import { IconBox } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { ProductImage } from '@/components/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,7 +25,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -221,15 +222,12 @@ export function PosProductOptionDialog({
     <Dialog open={!!product} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t('productOptions')}</DialogTitle>
+          <DialogHeaderIcon
+            icon={IconBox}
+            title={t('productOptions')}
+            description={product?.title}
+          />
         </DialogHeader>
-        {product?.title && (
-          <div className="border-b pb-3">
-            <span className="text-sm font-medium break-all whitespace-pre-line">
-              {product.title}
-            </span>
-          </div>
-        )}
         <ScrollArea className="max-h-[60vh] pr-4">
           <div className="space-y-5 py-2">
             {product.variants.length > 0 && (

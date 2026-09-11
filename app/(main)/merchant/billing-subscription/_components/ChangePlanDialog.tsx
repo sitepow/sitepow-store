@@ -19,15 +19,14 @@ import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 
@@ -111,8 +110,11 @@ export function ChangePlanDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconSettings}
+            title={t('title')}
+            description={t('description')}
+          />
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="flex flex-col items-center gap-5">

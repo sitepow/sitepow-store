@@ -21,9 +21,16 @@ import {
 } from '@/utils/employee'
 import { createEmployeeSchema } from '@/zod/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconKey, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
+import {
+  IconKey,
+  IconPlus,
+  IconTrash,
+  IconUserPlus,
+  IconX,
+} from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { MultiSelect } from '@/components/MultiSelect'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,7 +38,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -202,9 +208,10 @@ export function EmployeeDialog({
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>
-            {employeeId ? t('editTitle') : t('createTitle')}
-          </DialogTitle>
+          <DialogHeaderIcon
+            icon={IconUserPlus}
+            title={employeeId ? t('editTitle') : t('createTitle')}
+          />
         </DialogHeader>
         <div className="grid gap-4">
           <Field>

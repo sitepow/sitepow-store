@@ -20,8 +20,9 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { ExpenseFormValues, createExpenseSchema } from '@/zod/expense'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconX } from '@tabler/icons-react'
+import { IconReceipt, IconX } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -30,7 +31,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -193,9 +193,12 @@ export function ExpenseDialog({
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>
-              {expenseId ? t('dialog.editTitle') : t('dialog.createTitle')}
-            </DialogTitle>
+            <DialogHeaderIcon
+              icon={IconReceipt}
+              title={
+                expenseId ? t('dialog.editTitle') : t('dialog.createTitle')
+              }
+            />
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>

@@ -15,14 +15,13 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { IconCloudDownload } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -88,8 +87,11 @@ export function ApplyGlobalRatesDialog() {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogHeaderIcon
+            icon={IconCloudDownload}
+            title={t('title')}
+            description={t('description')}
+          />
         </DialogHeader>
 
         <Field>

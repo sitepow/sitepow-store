@@ -6,13 +6,13 @@ import { useCreateTransferRequest } from '@/actions/hooks/store-transfer'
 import { useSession } from '@/hooks/use-session'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -49,15 +49,13 @@ export function StoreTransferConfirmDialog({
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <IconAlertTriangle size={18} className="text-destructive" />
-            {t('confirmTitle')}
-          </DialogTitle>
+          <DialogHeaderIcon
+            icon={IconAlertTriangle}
+            iconClassName="border-destructive/20 bg-destructive/10 text-destructive"
+            title={t('confirmTitle')}
+            description={t('confirmDesc', { email: toEmail })}
+          />
         </DialogHeader>
-
-        <p className="text-muted-foreground text-sm">
-          {t('confirmDesc', { email: toEmail })}
-        </p>
 
         <DialogFooter className="flex gap-2 border-t pt-4">
           <Button

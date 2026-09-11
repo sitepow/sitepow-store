@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { IconPackage } from '@tabler/icons-react'
+
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -89,8 +90,11 @@ export function AcceptStockDialog({
       <DialogContent className="sm:max-w-106.25">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{t('title')}</DialogTitle>
-            <DialogDescription>{t('description')}</DialogDescription>
+            <DialogHeaderIcon
+              icon={IconPackage}
+              title={t('title')}
+              description={t('description')}
+            />
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="min-w-0 space-y-1.5">

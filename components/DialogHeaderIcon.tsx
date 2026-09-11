@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils'
 
 interface DialogHeaderIconProps {
   icon: React.ElementType<{ className?: string }>
-  title: string
-  description?: string
+  title: React.ReactNode
+  description?: React.ReactNode
   className?: string
   iconClassName?: string
 }

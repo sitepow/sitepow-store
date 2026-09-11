@@ -10,8 +10,9 @@ import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useCreateResellerPayout } from '@/actions/hooks/reseller'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconX } from '@tabler/icons-react'
+import { IconReceiptRefund, IconX } from '@tabler/icons-react'
 
+import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,7 +20,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -123,7 +123,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogTitle>{t('title')}</DialogTitle>
+            <DialogHeaderIcon icon={IconReceiptRefund} title={t('title')} />
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>

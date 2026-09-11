@@ -11,7 +11,14 @@ import {
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface FieldDoc {
@@ -145,53 +152,66 @@ export function BulkImportGuideDialog() {
         <Button
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-foreground gap-1.5 text-xs"
+          className="text-muted-foreground hover:text-foreground w-full justify-center gap-1.5 text-xs sm:w-auto"
         >
           <IconBook className="size-4" /> คู่มือฟิลด์ข้อมูล (Guide)
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[85vh] max-w-3xl flex-col overflow-hidden">
-        <DialogHeaderIcon
-          icon={IconBook}
-          title="คำอธิบายฟิลด์ข้อมูลนำเข้า (Data Schema Dictionary)"
-          description="รายละเอียด ขอบเขตค่า และข้อกำหนดทางเทคนิคสำหรับการนำเข้าสินค้าผ่าน
-            CSV"
-        />
+      <DialogContent className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl">
+        <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
+          <DialogHeaderIcon
+            icon={IconBook}
+            title="คำอธิบายฟิลด์ข้อมูลนำเข้า (Data Schema Dictionary)"
+            description="รายละเอียด ขอบเขตค่า และข้อกำหนดทางเทคนิคสำหรับการนำเข้าสินค้าผ่าน CSV"
+            className="pr-6 sm:pr-0"
+          />
+        </DialogHeader>
         <Tabs
           defaultValue="fields"
           className="flex flex-1 flex-col overflow-hidden"
         >
-          <div className="bg-muted/5 border-b px-6 pt-3">
-            <TabsList className="h-9">
+          <div className="bg-muted/5 border-b px-4 py-2.5 sm:px-6 sm:py-3">
+            <TabsList className="grid h-9 w-full grid-cols-2 sm:inline-flex sm:w-auto">
               <TabsTrigger value="fields" className="gap-1.5 text-xs">
-                ตารางฟิลด์ทั้งหมด ({FIELD_DICTIONARY.length})
+                <span className="sm:hidden">
+                  ฟิลด์ ({FIELD_DICTIONARY.length})
+                </span>
+                <span className="hidden sm:inline">
+                  ตารางฟิลด์ทั้งหมด ({FIELD_DICTIONARY.length})
+                </span>
               </TabsTrigger>
               <TabsTrigger value="product-types" className="gap-1.5 text-xs">
-                ประเภทสินค้า (Product Types)
+                <span className="sm:hidden">ประเภทสินค้า</span>
+                <span className="hidden sm:inline">
+                  ประเภทสินค้า (Product Types)
+                </span>
               </TabsTrigger>
             </TabsList>
           </div>
           <TabsContent
             value="fields"
-            className="m-0 flex-1 overflow-y-auto p-6"
+            className="m-0 flex-1 overflow-y-auto p-3.5 sm:p-6"
           >
+            <div className="text-muted-foreground mb-2 flex items-center justify-between text-[11px] sm:hidden">
+              <span>← เลื่อนในแนวนอนเพื่อดูข้อมูลคอลัมน์ →</span>
+            </div>
             <div className="overflow-x-auto rounded-xl border">
-              <table className="w-full min-w-175 border-collapse text-left text-xs">
+              <table className="w-full min-w-[680px] border-collapse text-left text-xs">
                 <thead className="bg-muted/80 sticky top-0 z-10 border-b backdrop-blur-sm">
                   <tr>
-                    <th className="p-3 font-semibold whitespace-nowrap">
+                    <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
                       ชื่อคอลัมน์ (Header)
                     </th>
-                    <th className="p-3 font-semibold whitespace-nowrap">
+                    <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
                       ความจำเป็น
                     </th>
-                    <th className="p-3 font-semibold whitespace-nowrap">
+                    <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
                       ชนิดข้อมูล (Type)
                     </th>
-                    <th className="min-w-60 p-3 font-semibold">
+                    <th className="min-w-56 p-2.5 font-semibold sm:min-w-64 sm:p-3">
                       คำอธิบายและขอบเขต
                     </th>
-                    <th className="p-3 font-semibold whitespace-nowrap">
+                    <th className="p-2.5 font-semibold whitespace-nowrap sm:p-3">
                       ตัวอย่าง
                     </th>
                   </tr>
@@ -199,10 +219,10 @@ export function BulkImportGuideDialog() {
                 <tbody className="divide-y">
                   {FIELD_DICTIONARY.map((field) => (
                     <tr key={field.name} className="hover:bg-muted/20">
-                      <td className="text-foreground p-3 font-mono font-semibold whitespace-nowrap">
+                      <td className="text-foreground p-2.5 font-semibold whitespace-nowrap sm:p-3">
                         {field.name}
                       </td>
-                      <td className="p-3 whitespace-nowrap">
+                      <td className="p-2.5 whitespace-nowrap sm:p-3">
                         {field.required ? (
                           <Badge
                             variant="destructive"
@@ -219,10 +239,10 @@ export function BulkImportGuideDialog() {
                           </Badge>
                         )}
                       </td>
-                      <td className="text-muted-foreground p-3 font-mono whitespace-nowrap">
+                      <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
                         {field.type}
                       </td>
-                      <td className="p-3">
+                      <td className="p-2.5 sm:p-3">
                         <p className="text-foreground leading-relaxed">
                           {field.description}
                         </p>
@@ -231,7 +251,7 @@ export function BulkImportGuideDialog() {
                             {field.allowedValues.map((v) => (
                               <code
                                 key={v}
-                                className="bg-muted text-primary rounded px-1.5 py-0.5 font-mono text-[10px]"
+                                className="bg-muted text-primary rounded px-1.5 py-0.5 text-[10px]"
                               >
                                 {v}
                               </code>
@@ -239,7 +259,7 @@ export function BulkImportGuideDialog() {
                           </div>
                         )}
                       </td>
-                      <td className="text-muted-foreground p-3 font-mono whitespace-nowrap">
+                      <td className="text-muted-foreground p-2.5 whitespace-nowrap sm:p-3">
                         {field.example}
                       </td>
                     </tr>
@@ -250,11 +270,11 @@ export function BulkImportGuideDialog() {
           </TabsContent>
           <TabsContent
             value="product-types"
-            className="m-0 flex-1 space-y-4 overflow-y-auto p-6"
+            className="m-0 flex-1 space-y-4 overflow-y-auto p-3.5 sm:p-6"
           >
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-card space-y-2 rounded-xl border p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconBox className="size-4 shrink-0" />
                   PHYSICAL (สินค้ามีตัวตน)
                 </div>
@@ -262,12 +282,12 @@ export function BulkImportGuideDialog() {
                   สินค้าที่ต้องมีสต็อก มีการบรรจุหีบห่อ และต้องการข้อมูล{' '}
                   <code>WeightKg</code> สำหรับคิดคำนวณค่าจัดส่งตามจริง
                 </p>
-                <div className="bg-muted text-muted-foreground rounded p-2 font-mono text-[11px]">
+                <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
                   ฟิลด์แนะนำ: InitialStock, WeightKg
                 </div>
               </div>
-              <div className="bg-card space-y-2 rounded-xl border p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+              <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconDeviceDesktop className="size-4 shrink-0" />
                   DIGITAL_LINK (ไฟล์ดาวน์โหลด)
                 </div>
@@ -275,12 +295,12 @@ export function BulkImportGuideDialog() {
                   สินค้าดิจิทัล เช่น E-Book, ซอฟต์แวร์, คอร์สไฟล์
                   ลูกค้าจะได้รับลิงก์ดาวน์โหลดทันทีหลังชำระเงินเรียบร้อย
                 </p>
-                <div className="bg-muted text-muted-foreground rounded p-2 font-mono text-[11px]">
+                <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
                   ฟิลด์บังคับ: DigitalUrl
                 </div>
               </div>
-              <div className="bg-card space-y-2 rounded-xl border p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+              <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconKey className="size-4 shrink-0" />
                   DIGITAL_ITEM (รหัสโค้ด / Serial)
                 </div>
@@ -288,12 +308,12 @@ export function BulkImportGuideDialog() {
                   คีย์เกม บัตรเติมเงิน คูปอง หรือชุดตัวเลข โดยระบบจะนำเนื้อหาใน{' '}
                   <code>DigitalItemContent</code> ไปส่งมอบให้ลูกค้า
                 </p>
-                <div className="bg-muted text-muted-foreground rounded p-2 font-mono text-[11px]">
+                <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
                   ฟิลด์บังคับ: DigitalItemContent
                 </div>
               </div>
-              <div className="bg-card space-y-2 rounded-xl border p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+              <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
                   <IconTruckDelivery className="size-4 shrink-0" />
                   DIGITAL_SERVICE (บริการ)
                 </div>
@@ -301,13 +321,20 @@ export function BulkImportGuideDialog() {
                   บริการทางวิชาชีพ การจองคิว หรือให้คำปรึกษา
                   ไม่จำเป็นต้องใช้น้ำหนักและการขนส่ง
                 </p>
-                <div className="bg-muted text-muted-foreground rounded p-2 font-mono text-[11px]">
+                <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
                   ฟิลด์แนะนำ: PointsAmount, Price
                 </div>
               </div>
             </div>
           </TabsContent>
         </Tabs>
+        <DialogFooter className="bg-muted/10 flex justify-end border-t p-3.5 sm:p-4">
+          <DialogClose asChild>
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              ปิดหน้าต่าง
+            </Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

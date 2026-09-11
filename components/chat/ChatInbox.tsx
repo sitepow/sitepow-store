@@ -549,7 +549,7 @@ export function ChatInbox({
 
                 <div className="text-muted-foreground flex items-center justify-between">
                   <span>รหัสบทสนทนา</span>
-                  <div className="flex items-center gap-1 font-mono text-[10px]">
+                  <div className="flex items-center gap-1 text-[10px]">
                     <span>{selectedConv.id.slice(0, 8)}...</span>
                     <Button
                       variant="ghost"
