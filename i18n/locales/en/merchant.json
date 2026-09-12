@@ -501,7 +501,29 @@
         "PHYSICAL": "Physical Goods (Physical)",
         "DIGITAL_LINK": "Digital Download Link (Digital Link)",
         "DIGITAL_ITEM": "Digital File / Key (Digital Item)",
-        "DIGITAL_SERVICE": "Game Top-up / Service"
+        "DIGITAL_SERVICE": "Game Top-up / Service",
+        "AFFILIATE_LINK": "Affiliate / External Link (Affiliate Link)"
+      },
+      "affiliateLinks": {
+        "title": "Affiliate Links",
+        "description": "Add product links from Shopee, Lazada, TikTok Shop, or external stores with pricing and discount badges",
+        "addLink": "Add Affiliate Link",
+        "platform": "Platform",
+        "selectPlatform": "Select platform",
+        "url": "Product Affiliate URL",
+        "urlPlaceholder": "https://s.shopee.co.th/... or https://...",
+        "label": "Button Label / Store Badge (Optional)",
+        "labelPlaceholder": "e.g. Official Shopee Mall Store",
+        "price": "Selling Price (THB)",
+        "pricePlaceholder": "0",
+        "originalPrice": "Original Price before discount (THB)",
+        "originalPricePlaceholder": "0",
+        "isOnSale": "On Sale",
+        "discountText": "Discount Badge / Promo Text",
+        "discountTextPlaceholder": "e.g. 30% OFF, Flash Sale, Free Shipping",
+        "noLinksAlert": "Please add at least 1 affiliate link for this product",
+        "removeLink": "Remove link",
+        "linkNumber": "Link #{index}"
       }
     },
     "bulkImport": {
@@ -523,6 +545,7 @@
       "templateDigitalLink": "Downloadable Files (DIGITAL_LINK)",
       "templateDigitalItem": "Digital Codes / Serials (DIGITAL_ITEM)",
       "templateDigitalService": "Courses / Services (DIGITAL_SERVICE)",
+      "templateAffiliate": "Affiliate Link Products (AFFILIATE_LINK)",
       "tabUpload": "Upload .CSV File",
       "tabPaste": "Paste CSV Directly",
       "dropzoneTitle": "Click to select file or drag & drop CSV here",
@@ -599,6 +622,9 @@
       "digitalServiceTitle": "DIGITAL_SERVICE (Services)",
       "digitalServiceDesc": "Professional services, appointments, or consultations. No shipping or weight needed.",
       "digitalServiceTip": "Recommended fields: PointsAmount, Price",
+      "affiliateLinkTitle": "AFFILIATE_LINK (Affiliate Link)",
+      "affiliateLinkDesc": "Products with external links to Shopee, Lazada, TikTok Shop, or other sites. Customers click directly to purchase on target platforms.",
+      "affiliateLinkTip": "Recommended fields: DigitalUrl (primary link), Price (selling price), DiscountAmount",
       "fields": {
         "Title": {
           "desc": "Primary product name shown on storefront and POS",

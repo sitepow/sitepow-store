@@ -10,6 +10,7 @@ import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
 import { IconAlertCircle, IconBuildingStore } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
+import { ExternalLink } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 
@@ -50,9 +51,10 @@ export function ProductCard({
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
+  const isAffiliate = product.productType === 'AFFILIATE_LINK'
   const primaryImage = product.images?.[0]
   const isVideo = isVideoUrl(primaryImage?.url)
-  const isOutOfStock = quantity !== undefined && quantity <= 0
+  const isOutOfStock = !isAffiliate && quantity !== undefined && quantity <= 0
 
   const content = (
     <div
@@ -85,6 +87,12 @@ export function ProductCard({
             />
           )}
         </div>
+        {isAffiliate && (
+          <Badge className="absolute top-2 left-2 flex items-center gap-1 bg-amber-500 text-[10px] font-semibold text-white shadow-sm hover:bg-amber-600">
+            <ExternalLink className="size-3" />
+            {t('affiliateBuy.badge')}
+          </Badge>
+        )}
         {isOutOfStock ? (
           <Badge
             variant="destructive"

@@ -73,6 +73,7 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
+import { AffiliateLinksSection } from './AffiliateLinksSection'
 import { CategoryField } from './CategoryField'
 import { CopyProductDataPicker } from './CopyProductDataPicker'
 import { ImageUploadSection } from './ImageUploadSection'
@@ -105,6 +106,7 @@ const dataURLtoFile = (dataurl: string, filename: string): File => {
 
 export function CreateProductForm({ productId }: { productId?: string }) {
   const t = useTranslations('merchant.products.form')
+  const tAffiliate = useTranslations('merchant.products.form.affiliateLinks')
   const { currentStore, store } = useCurrentStore()
   const [aiTaskConfirm, setAiTaskConfirm] = useState<{
     task: AiGenTask
@@ -168,6 +170,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
     metadata: [{ key: 'brand', value: '' }],
     tags: '',
     productType: ProductType.PHYSICAL,
+    affiliateLinks: [],
   }
 
   const form = useForm<ProductFormValues>({
@@ -430,52 +433,98 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         }),
       )
 
-      const processedVariants = await Promise.all(
-        data.variants.map(async (v) => {
-          let variantImageUrl: string | null =
-            typeof v.image === 'string' ? v.image : null
-          const rawVariantFile = v.image?.file || v.image
+      if (data.productType === ProductType.AFFILIATE_LINK) {
+        if (!data.affiliateLinks || data.affiliateLinks.length === 0) {
+          toast.error(tAffiliate('noLinksAlert'))
+          return
+        }
+      }
 
-          if (rawVariantFile instanceof File) {
-            const formData = new FormData()
-            formData.append('file', rawVariantFile)
-            const res = await uploadMutation.mutateAsync(formData)
-            if (res?.success && res?.url) {
-              variantImageUrl = res.url
-            }
-          }
+      let processedVariants: CreateProductInput['variants'] = []
 
-          return {
-            id: v.id,
-            title: v.title,
-            price: v.price,
-            costPrice: v.costPrice ?? 0,
-            sku: v.sku,
-            image: variantImageUrl,
-            digitalUrl: v.digitalUrl ?? '',
-            stocks: v.stocks.map((s) => ({
-              branchId: s.branchId,
-              quantity: s.quantity ?? 0,
-              minStock: s.minStock ?? 0,
-            })),
+      if (data.productType === ProductType.AFFILIATE_LINK) {
+        const firstLink = data.affiliateLinks?.[0]
+        const hasDiscount = Boolean(
+          firstLink?.isDiscounted &&
+          firstLink?.originalPrice &&
+          firstLink?.price !== undefined &&
+          firstLink.originalPrice > firstLink.price,
+        )
+        const discountAmount =
+          hasDiscount &&
+          firstLink?.originalPrice &&
+          firstLink?.price !== undefined
+            ? firstLink.originalPrice - firstLink.price
+            : 0
+
+        processedVariants = [
+          {
+            id: data.variants?.[0]?.id,
+            title: firstLink?.label || 'Default',
+            price: firstLink?.price ?? 0,
+            costPrice: 0,
+            sku: data.variants?.[0]?.sku || `AFF-${data.slug}`,
+            image: null,
+            digitalUrl: firstLink?.url || '',
+            stocks: [],
             discount: {
-              active: v.discount.active ?? false,
-              type: v.discount.type ?? DiscountType.PERCENTAGE,
-              amount: v.discount.amount ?? 0,
+              active: hasDiscount,
+              type: 'FIXED',
+              amount: discountAmount,
             },
-            rewardPoints: {
-              isActive: v.rewardPoints.isActive ?? false,
-              amount: v.rewardPoints.amount ?? 0,
-            },
-            digitalItems:
-              v.digitalItems?.map((item) => ({
-                content: item.content ?? '',
-                isUsed: !!item.isUsed,
-              })) || [],
-            isAvailable: v.isAvailable ?? false,
-          }
-        }),
-      )
+            rewardPoints: { isActive: false, amount: 0 },
+            digitalItems: [],
+            isAvailable: true,
+          },
+        ]
+      } else {
+        processedVariants = await Promise.all(
+          data.variants.map(async (v) => {
+            let variantImageUrl: string | null =
+              typeof v.image === 'string' ? v.image : null
+            const rawVariantFile = v.image?.file || v.image
+
+            if (rawVariantFile instanceof File) {
+              const formData = new FormData()
+              formData.append('file', rawVariantFile)
+              const res = await uploadMutation.mutateAsync(formData)
+              if (res?.success && res?.url) {
+                variantImageUrl = res.url
+              }
+            }
+
+            return {
+              id: v.id,
+              title: v.title,
+              price: v.price,
+              costPrice: v.costPrice ?? 0,
+              sku: v.sku,
+              image: variantImageUrl,
+              digitalUrl: v.digitalUrl ?? '',
+              stocks: v.stocks.map((s) => ({
+                branchId: s.branchId,
+                quantity: s.quantity ?? 0,
+                minStock: s.minStock ?? 0,
+              })),
+              discount: {
+                active: v.discount.active ?? false,
+                type: v.discount.type ?? DiscountType.PERCENTAGE,
+                amount: v.discount.amount ?? 0,
+              },
+              rewardPoints: {
+                isActive: v.rewardPoints.isActive ?? false,
+                amount: v.rewardPoints.amount ?? 0,
+              },
+              digitalItems:
+                v.digitalItems?.map((item) => ({
+                  content: item.content ?? '',
+                  isUsed: !!item.isUsed,
+                })) || [],
+              isAvailable: v.isAvailable ?? false,
+            }
+          }),
+        )
+      }
 
       const payload: CreateProductInput = {
         storeId: selectedStoreId,
@@ -493,6 +542,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
         })),
         metadata: data.metadata,
         productType: data.productType as ProductType,
+        affiliateLinks: data.affiliateLinks as any,
       }
 
       if (productId) {
@@ -511,406 +561,418 @@ export function CreateProductForm({ productId }: { productId?: string }) {
 
   return (
     <div
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
-    <FormProvider {...form}>
-      <Card>
-        <CardContent className="flex flex-wrap items-center gap-2.5">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" disabled={isGenAll}>
-                {isGenAll ? (
-                  <Spinner className="mr-2" />
-                ) : (
-                  <IconWand className="mr-2 size-4" />
-                )}{' '}
-                {t('aiTools')}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>{t('createContent')}</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.ALL, () => genAll())}
-              >
-                {t('aiThinkAll')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleAiTrigger(AiGenTask.SLUG, () => genSlug())}
-              >
-                {t('aiThinkSlug')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>{t('loadPresets')}</DropdownMenuLabel>
-              {PRODUCT_PRESETS_MASTER.map((preset) => (
+      <FormProvider {...form}>
+        <Card>
+          <CardContent className="flex flex-wrap items-center gap-2.5">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={isGenAll}>
+                  {isGenAll ? (
+                    <Spinner className="mr-2" />
+                  ) : (
+                    <IconWand className="mr-2 size-4" />
+                  )}{' '}
+                  {t('aiTools')}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>{t('createContent')}</DropdownMenuLabel>
                 <DropdownMenuItem
-                  key={preset.id}
-                  onClick={() => handleApplyPreset(preset.id)}
+                  onClick={() => handleAiTrigger(AiGenTask.ALL, () => genAll())}
                 >
-                  <IconDatabase className="mr-2 size-4" /> {preset.label}
+                  {t('aiThinkAll')}
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleAiTrigger(AiGenTask.SLUG, () => genSlug())
+                  }
+                >
+                  {t('aiThinkSlug')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>{t('loadPresets')}</DropdownMenuLabel>
+                {PRODUCT_PRESETS_MASTER.map((preset) => (
+                  <DropdownMenuItem
+                    key={preset.id}
+                    onClick={() => handleApplyPreset(preset.id)}
+                  >
+                    <IconDatabase className="mr-2 size-4" /> {preset.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <CopyProductDataPicker storeId={selectedStoreId!} />
+            <CopyProductDataPicker storeId={selectedStoreId!} />
 
-          {isDirty && (
-            <Button
-              type="button"
-              disabled={isPending}
-              variant="outline"
-              onClick={handleResetForm}
-            >
-              <IconX /> {t('clearSettings')}
-            </Button>
-          )}
+            {isDirty && (
+              <Button
+                type="button"
+                disabled={isPending}
+                variant="outline"
+                onClick={handleResetForm}
+              >
+                <IconX /> {t('clearSettings')}
+              </Button>
+            )}
 
-          {isDirty && (
-            <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
-              {isPending && <Spinner />}
-              {isPending ? t('savingProduct') : t('saveProduct')}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+            {isDirty && (
+              <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
+                {isPending && <Spinner />}
+                {isPending ? t('savingProduct') : t('saveProduct')}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
-      <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
-        <div className="space-y-10">
-          <FieldSet disabled={isPending}>
-            <FieldGroup className="mt-4 grid gap-6">
-              <ProductTitleField
-                isPending={isPending}
-                onAiTrigger={(action) =>
-                  handleAiTrigger(AiGenTask.TITLE, action)
-                }
-              />
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <ProductSlugField
+        <div className="text-foreground grid grid-cols-1 items-start gap-10 xl:grid-cols-2">
+          <div className="space-y-10">
+            <FieldSet disabled={isPending}>
+              <FieldGroup className="mt-4 grid gap-6">
+                <ProductTitleField
                   isPending={isPending}
                   onAiTrigger={(action) =>
-                    handleAiTrigger(AiGenTask.SLUG, action)
+                    handleAiTrigger(AiGenTask.TITLE, action)
                   }
                 />
-                <CategoryField isPending={isPending} />
-              </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <ProductSlugField
+                    isPending={isPending}
+                    onAiTrigger={(action) =>
+                      handleAiTrigger(AiGenTask.SLUG, action)
+                    }
+                  />
+                  <CategoryField isPending={isPending} />
+                </div>
+                <Controller
+                  control={form.control}
+                  name="isPublished"
+                  render={({ field }) => (
+                    <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FieldLabel className="text-base font-semibold">
+                          {t('displayStorefront')}
+                        </FieldLabel>
+                        <p className="text-muted-foreground text-xs">
+                          {t('displayStorefrontDesc')}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isPending}
+                      />
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </FieldSet>
+
+            <Field>
+              <FieldLabel>{t('productType')}</FieldLabel>
               <Controller
                 control={form.control}
-                name="isPublished"
+                name="productType"
                 render={({ field }) => (
-                  <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FieldLabel className="text-base font-semibold">
-                        {t('displayStorefront')}
-                      </FieldLabel>
-                      <p className="text-muted-foreground text-xs">
-                        {t('displayStorefrontDesc')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={isPending}
-                    />
-                  </Field>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('selectProductType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRODUCT_TYPE_OPTIONS.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {t(`productTypes.${type.value}` as any)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               />
-            </FieldGroup>
-          </FieldSet>
+            </Field>
 
-          <Field>
-            <FieldLabel>{t('productType')}</FieldLabel>
-            <Controller
-              control={form.control}
-              name="productType"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('selectProductType')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRODUCT_TYPE_OPTIONS.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {t(`productTypes.${type.value}` as any)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </Field>
+            <ImageUploadSection />
 
-          <ImageUploadSection />
-
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
-            <FieldLegend variant="label" className="text-lg font-bold">
-              {t('variantsTitle')}
-            </FieldLegend>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  handleAiTrigger(AiGenTask.VARIANTS, () => genVariants())
-                }
-                disabled={isGenVariants}
-              >
-                {isGenVariants ? (
-                  <Spinner />
-                ) : (
-                  <IconWand className="mr-2 size-4" />
-                )}
-                {t('aiVariants')}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() =>
-                  appendVariant({
-                    title: '',
-                    price: 0,
-                    sku: '',
-                    image: null,
-                    stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
-                    discount: {
-                      active: false,
-                      type: DiscountType.PERCENTAGE,
-                      amount: 0,
-                    },
-                    rewardPoints: { isActive: false, amount: 0 },
-                    isAvailable: true,
-                  })
-                }
-              >
-                <PlusCircle className="mr-2 size-4" /> {t('addVariant')}
-              </Button>
-            </div>
-          </div>
-
-          <FieldGroup className="space-y-4">
-            {variantFields.map((item, index) => (
-              <VariantItem
-                key={item.id}
-                index={index}
-                removeVariant={removeVariant}
-                isOnlyOne={variantFields.length === 1}
-              />
-            ))}
-          </FieldGroup>
-
-          <FieldSet
-            disabled={isPending}
-            className="dark:bg-foreground/5 border-l-primary rounded-lg border p-4"
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-              <FieldLegend variant="label" className="text-lg font-bold">
-                {t('metadataTitle')}
-              </FieldLegend>
-              <div className="flex flex-wrap gap-2.5">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    handleAiTrigger(AiGenTask.METADATA, () => genMeta())
-                  }
-                  disabled={isGenMeta}
-                >
-                  {isGenMeta ? (
-                    <Spinner />
-                  ) : (
-                    <IconWand className="mr-2 size-4" />
-                  )}
-                  {t('aiMetadata')}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => appendMetadata({ key: '', value: '' })}
-                >
-                  <CirclePlus className="mr-1 size-4" /> {t('addField')}
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {metadataFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex flex-wrap items-start gap-2"
-                >
-                  <div className="w-1/3">
-                    <Controller
-                      control={form.control}
-                      name={`metadata.${index}.key`}
-                      render={({ field: selectField }) => (
-                        <MetadataCombobox
-                          value={selectField.value!}
-                          onChange={selectField.onChange}
-                        />
+            {form.watch('productType') === ProductType.AFFILIATE_LINK ? (
+              <AffiliateLinksSection />
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                  <FieldLegend variant="label" className="text-lg font-bold">
+                    {t('variantsTitle')}
+                  </FieldLegend>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        handleAiTrigger(AiGenTask.VARIANTS, () => genVariants())
+                      }
+                      disabled={isGenVariants}
+                    >
+                      {isGenVariants ? (
+                        <Spinner />
+                      ) : (
+                        <IconWand className="mr-2 size-4" />
                       )}
-                    />
+                      {t('aiVariants')}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() =>
+                        appendVariant({
+                          title: '',
+                          price: 0,
+                          sku: '',
+                          image: null,
+                          stocks: [{ branchId: '', quantity: 0, minStock: 0 }],
+                          discount: {
+                            active: false,
+                            type: DiscountType.PERCENTAGE,
+                            amount: 0,
+                          },
+                          rewardPoints: { isActive: false, amount: 0 },
+                          isAvailable: true,
+                        })
+                      }
+                    >
+                      <PlusCircle className="mr-2 size-4" /> {t('addVariant')}
+                    </Button>
                   </div>
-                  <Input
-                    placeholder={t('propertyValuePlaceholder')}
-                    className="flex-1"
-                    {...register(`metadata.${index}.value`)}
-                  />
+                </div>
+
+                <FieldGroup className="space-y-4">
+                  {variantFields.map((item, index) => (
+                    <VariantItem
+                      key={item.id}
+                      index={index}
+                      removeVariant={removeVariant}
+                      isOnlyOne={variantFields.length === 1}
+                    />
+                  ))}
+                </FieldGroup>
+              </>
+            )}
+
+            <FieldSet
+              disabled={isPending}
+              className="dark:bg-foreground/5 border-l-primary rounded-lg border p-4"
+            >
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+                <FieldLegend variant="label" className="text-lg font-bold">
+                  {t('metadataTitle')}
+                </FieldLegend>
+                <div className="flex flex-wrap gap-2.5">
                   <Button
                     type="button"
-                    variant="destructive"
-                    size="icon-lg"
-                    onClick={() => removeMetadata(index)}
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.METADATA, () => genMeta())
+                    }
+                    disabled={isGenMeta}
                   >
-                    <IconTrash />
+                    {isGenMeta ? (
+                      <Spinner />
+                    ) : (
+                      <IconWand className="mr-2 size-4" />
+                    )}
+                    {t('aiMetadata')}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => appendMetadata({ key: '', value: '' })}
+                  >
+                    <CirclePlus className="mr-1 size-4" /> {t('addField')}
                   </Button>
                 </div>
-              ))}
-            </div>
-            <Field className="mt-4">
-              <FieldLabel>{t('tagsLabel')}</FieldLabel>
-              <div className="flex gap-2">
-                <Input
-                  placeholder={t('tagsPlaceholder')}
-                  {...register('tags')}
-                  disabled={isPending}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    handleAiTrigger(AiGenTask.TAGS, () => genTags())
-                  }
-                  disabled={isGenTags}
-                >
-                  {isGenTags ? <Spinner /> : <IconWand />}
-                </Button>
               </div>
-            </Field>
-          </FieldSet>
-
-          <FieldSet
-            disabled={isPending}
-            className="dark:bg-foreground/5 border-l-primary rounded-lg border p-6"
-          >
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
-              <FieldLegend variant="label" className="text-lg font-bold">
-                {t('addonsTitle')}
-              </FieldLegend>
-              <div className="flex flex-wrap gap-2.5">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    handleAiTrigger(AiGenTask.ADDONS, () => genAddons())
-                  }
-                  disabled={isGenAddons}
-                >
-                  {isGenAddons ? (
-                    <Spinner />
-                  ) : (
-                    <IconWand className="mr-2 size-4" />
-                  )}
-                  {t('aiAddons')}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() =>
-                    appendAddon({ title: '', price: 0, isAvailable: true })
-                  }
-                >
-                  <PlusCircle className="mr-2 size-4" /> {t('addAddon')}
-                </Button>
-              </div>
-            </div>
-            <FieldGroup className="grid gap-4">
-              {addonFields.map((item, index) => (
-                <Card key={item.id}>
-                  <CardContent className="flex items-end gap-3 pt-6">
-                    <div className="grid flex-1 gap-3">
-                      <Field>
-                        <FieldLabel className="text-xs">
-                          {t('addonNamePlaceholder')}
-                        </FieldLabel>
-                        <Input {...register(`addons.${index}.title`)} />
-                      </Field>
-                      <Field>
-                        <FieldLabel className="text-xs">
-                          {t('extraPrice')}
-                        </FieldLabel>
-                        <Input
-                          type="number"
-                          {...register(`addons.${index}.price`, {
-                            valueAsNumber: true,
-                          })}
-                        />
-                      </Field>
+              <div className="space-y-3">
+                {metadataFields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="flex flex-wrap items-start gap-2"
+                  >
+                    <div className="w-1/3">
+                      <Controller
+                        control={form.control}
+                        name={`metadata.${index}.key`}
+                        render={({ field: selectField }) => (
+                          <MetadataCombobox
+                            value={selectField.value!}
+                            onChange={selectField.onChange}
+                          />
+                        )}
+                      />
                     </div>
+                    <Input
+                      placeholder={t('propertyValuePlaceholder')}
+                      className="flex-1"
+                      {...register(`metadata.${index}.value`)}
+                    />
                     <Button
                       type="button"
                       variant="destructive"
                       size="icon-lg"
-                      onClick={() => removeAddon(index)}
+                      onClick={() => removeMetadata(index)}
                     >
                       <IconTrash />
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-              {addonFields.length === 0 && (
-                <div className="text-muted-foreground rounded-lg border-2 border-dashed py-6 text-center md:col-span-2">
-                  {t('noAddons')}
+                  </div>
+                ))}
+              </div>
+              <Field className="mt-4">
+                <FieldLabel>{t('tagsLabel')}</FieldLabel>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={t('tagsPlaceholder')}
+                    {...register('tags')}
+                    disabled={isPending}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.TAGS, () => genTags())
+                    }
+                    disabled={isGenTags}
+                  >
+                    {isGenTags ? <Spinner /> : <IconWand />}
+                  </Button>
                 </div>
-              )}
-            </FieldGroup>
-          </FieldSet>
-        </div>
+              </Field>
+            </FieldSet>
 
-        <div className="sticky top-6 space-y-6 xl:col-span-1">
-          <ProductPreviewContent />
-        </div>
-      </div>
-
-      <AlertDialog
-        open={!!aiTaskConfirm}
-        onOpenChange={() => setAiTaskConfirm(null)}
-      >
-        <AlertDialogContent
-          style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t.rich('aiConfirmDesc', {
-                cost: aiTaskConfirm?.cost ?? 0,
-                highlight: (chunks) => (
-                  <span className="text-primary">{chunks}</span>
-                ),
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (aiTaskConfirm) {
-                  aiTaskConfirm.action()
-                  setAiTaskConfirm(null)
-                }
-              }}
+            <FieldSet
+              disabled={isPending}
+              className="dark:bg-foreground/5 border-l-primary rounded-lg border p-6"
             >
-              {t('aiConfirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </FormProvider>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+                <FieldLegend variant="label" className="text-lg font-bold">
+                  {t('addonsTitle')}
+                </FieldLegend>
+                <div className="flex flex-wrap gap-2.5">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      handleAiTrigger(AiGenTask.ADDONS, () => genAddons())
+                    }
+                    disabled={isGenAddons}
+                  >
+                    {isGenAddons ? (
+                      <Spinner />
+                    ) : (
+                      <IconWand className="mr-2 size-4" />
+                    )}
+                    {t('aiAddons')}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() =>
+                      appendAddon({ title: '', price: 0, isAvailable: true })
+                    }
+                  >
+                    <PlusCircle className="mr-2 size-4" /> {t('addAddon')}
+                  </Button>
+                </div>
+              </div>
+              <FieldGroup className="grid gap-4">
+                {addonFields.map((item, index) => (
+                  <Card key={item.id}>
+                    <CardContent className="flex items-end gap-3 pt-6">
+                      <div className="grid flex-1 gap-3">
+                        <Field>
+                          <FieldLabel className="text-xs">
+                            {t('addonNamePlaceholder')}
+                          </FieldLabel>
+                          <Input {...register(`addons.${index}.title`)} />
+                        </Field>
+                        <Field>
+                          <FieldLabel className="text-xs">
+                            {t('extraPrice')}
+                          </FieldLabel>
+                          <Input
+                            type="number"
+                            {...register(`addons.${index}.price`, {
+                              valueAsNumber: true,
+                            })}
+                          />
+                        </Field>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon-lg"
+                        onClick={() => removeAddon(index)}
+                      >
+                        <IconTrash />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+                {addonFields.length === 0 && (
+                  <div className="text-muted-foreground rounded-lg border-2 border-dashed py-6 text-center md:col-span-2">
+                    {t('noAddons')}
+                  </div>
+                )}
+              </FieldGroup>
+            </FieldSet>
+          </div>
+
+          <div className="sticky top-6 space-y-6 xl:col-span-1">
+            <ProductPreviewContent />
+          </div>
+        </div>
+
+        <AlertDialog
+          open={!!aiTaskConfirm}
+          onOpenChange={() => setAiTaskConfirm(null)}
+        >
+          <AlertDialogContent
+            style={
+              {
+                '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+              } as React.CSSProperties
+            }
+          >
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('aiConfirmTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t.rich('aiConfirmDesc', {
+                  cost: aiTaskConfirm?.cost ?? 0,
+                  highlight: (chunks) => (
+                    <span className="text-primary">{chunks}</span>
+                  ),
+                })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (aiTaskConfirm) {
+                    aiTaskConfirm.action()
+                    setAiTaskConfirm(null)
+                  }
+                }}
+              >
+                {t('aiConfirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </FormProvider>
     </div>
   )
 }

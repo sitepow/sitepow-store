@@ -50,9 +50,12 @@ export function ProductSpecification() {
   }
 
   const details = product.details as Record<string, unknown> | null
+  const specEntries = Object.entries(details || {}).filter(
+    ([key]) => key !== 'affiliateLinks',
+  )
   const tags = product.tags ?? []
 
-  const hasSpecs = details && Object.keys(details).length > 0
+  const hasSpecs = specEntries.length > 0
   const hasTags = tags.length > 0
 
   if (!hasSpecs && !hasTags) {
@@ -68,7 +71,7 @@ export function ProductSpecification() {
             <Separator className="flex-1" />
           </div>
           <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
-            {Object.entries(details).map(([key, value]) => (
+            {specEntries.map(([key, value]) => (
               <div key={key} className="flex flex-col border-b pb-2">
                 <span className="text-sm">
                   {metadataLabelMap[key] ?? key.replace(/_/g, ' ')}

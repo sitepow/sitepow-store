@@ -14,6 +14,10 @@ import {
   ProductType,
 } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import {
+  AffiliatePlatform,
+  AffiliateProductLink,
+} from '@/types/affiliate-product'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatSlug } from '@/utils/slug'
@@ -59,6 +63,7 @@ export interface CreateProductInput {
   addons?: { title: string; price: number; isAvailable: boolean }[]
   metadata?: { key: string; value: string }[]
   productType: ProductType
+  affiliateLinks?: AffiliateProductLink[]
 }
 
 const productSelect = {
@@ -304,9 +309,15 @@ export async function createProduct(input: CreateProductInput) {
           .filter(Boolean)
       : []
 
-    const details = metadata?.length
+    const detailsObj: Record<string, any> = metadata?.length
       ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
-      : undefined
+      : {}
+
+    if (input.affiliateLinks && input.affiliateLinks.length > 0) {
+      detailsObj.affiliateLinks = input.affiliateLinks
+    }
+
+    const details = Object.keys(detailsObj).length > 0 ? detailsObj : undefined
 
     const [product] = await prisma.$transaction([
       prisma.product.create({
@@ -315,7 +326,7 @@ export async function createProduct(input: CreateProductInput) {
           storeId,
           categoryId,
           isPublished,
-          details,
+          details: details as unknown as Prisma.InputJsonValue,
           tags: {
             create: tagsArray.map((name) => ({ name })),
           },
@@ -627,6 +638,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       where: { id },
       select: {
         storeId: true,
+        details: true,
         images: { select: { url: true } },
         variants: { select: { id: true, title: true, image: true } },
       },
@@ -739,9 +751,23 @@ export async function updateProduct(id: string, input: CreateProductInput) {
           .map((t) => t.trim())
           .filter(Boolean)
       : []
-    const details = metadata?.length
+
+    const existingDetails =
+      (existingProduct.details as Record<string, any>) || {}
+    const metadataObj = metadata?.length
       ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
-      : undefined
+      : {}
+
+    const detailsObj: Record<string, any> = {
+      ...existingDetails,
+      ...metadataObj,
+    }
+
+    if (input.affiliateLinks !== undefined) {
+      detailsObj.affiliateLinks = input.affiliateLinks
+    }
+
+    const details = Object.keys(detailsObj).length > 0 ? detailsObj : undefined
 
     await prisma.$transaction(async (tx) => {
       await tx.product.update({
@@ -750,7 +776,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
           ...rest,
           categoryId,
           isPublished,
-          details,
+          details: details as unknown as Prisma.InputJsonValue,
         },
       })
 
@@ -1291,6 +1317,41 @@ export async function bulkImportProducts(input: BulkImportProductsInput) {
             finalSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`
           }
 
+          const isAffiliate = firstItem.productType === 'AFFILIATE_LINK'
+          const affiliateLinks: AffiliateProductLink[] | undefined = isAffiliate
+            ? items.map((item, idx) => {
+                let platform: AffiliatePlatform = 'OTHER'
+                const url = (item.digitalUrl || '').toLowerCase()
+                if (url.includes('shopee.')) platform = 'SHOPEE'
+                else if (url.includes('lazada.')) platform = 'LAZADA'
+                else if (url.includes('tiktok.')) platform = 'TIKTOK'
+
+                const originalPrice =
+                  item.discountAmount && item.discountAmount > 0
+                    ? item.discountType === 'PERCENTAGE'
+                      ? Math.round(
+                          (item.price / (1 - item.discountAmount / 100)) * 100,
+                        ) / 100
+                      : item.price + item.discountAmount
+                    : undefined
+
+                return {
+                  id: `aff-${Date.now()}-${idx}`,
+                  platform,
+                  url: item.digitalUrl?.trim() || '',
+                  label: item.variantTitle?.trim() || '',
+                  price: item.price,
+                  originalPrice,
+                  isDiscounted: Boolean(
+                    originalPrice && originalPrice > item.price,
+                  ),
+                  discountText: item.discountAmount
+                    ? `${item.discountAmount}${item.discountType === 'PERCENTAGE' ? '%' : '฿'} OFF`
+                    : undefined,
+                }
+              })
+            : undefined
+
           const product = await tx.product.create({
             data: {
               title,
@@ -1299,6 +1360,9 @@ export async function bulkImportProducts(input: BulkImportProductsInput) {
               storeId: input.storeId,
               categoryId: catId,
               isPublished: true,
+              details: affiliateLinks
+                ? ({ affiliateLinks } as unknown as Prisma.InputJsonValue)
+                : undefined,
               variants: {
                 create: items.map((v) => {
                   const hasDiscount = Boolean(

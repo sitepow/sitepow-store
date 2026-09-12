@@ -39,6 +39,11 @@ export function ProductAddToCart() {
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
+
+  if (product?.productType === ProductType.AFFILIATE_LINK) {
+    return null
+  }
+
   const isPhysical = product?.productType === ProductType.PHYSICAL
   const isDigitalItem = product?.productType === ProductType.DIGITAL_ITEM
   const stock = selectedVariant

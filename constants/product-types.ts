@@ -1,6 +1,6 @@
 import { ComponentType } from 'react'
 
-import { Box, Download, Headset, Key } from 'lucide-react'
+import { Box, Download, ExternalLink, Headset, Key } from 'lucide-react'
 
 export interface ProductTypeFeature {
   title: string
@@ -32,5 +32,11 @@ export const PRODUCT_TYPE_FEATURES: ProductTypeFeature[] = [
     description:
       'เชื่อมต่อผ่าน Webhook ไปยังระบบ Logic หลังบ้านของคุณโดยตรง เหมาะสำหรับ<hilight>งานจ้างทำของ, ปั๊ม Rank หรือบริการที่คุณต้องการจัดการเองผ่าน API</hilight>',
     icon: Headset,
+  },
+  {
+    title: 'สินค้าแอฟฟิลิเอต (Affiliate Link)',
+    description:
+      'รวมลิงก์สินค้านายหน้า Shopee, Lazada, TikTok Shop และร้านค้าภายนอก พร้อม<hilight>ระบบเปรียบเทียบราคาและปุ่มคลิกสั่งซื้อตรงไปยังแพลตฟอร์ม</hilight>',
+    icon: ExternalLink,
   },
 ]

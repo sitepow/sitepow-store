@@ -183,12 +183,15 @@ export const transformProductToFormValues = (
       price: Number(a.price),
       isAvailable: a.isAvailable,
     })),
-    metadata: Object.entries(
-      (product.details as Record<string, string>) || {},
-    ).map(([key, value]) => ({
-      key,
-      value,
-    })),
+    metadata: Object.entries((product.details as Record<string, any>) || {})
+      .filter(([key]) => key !== 'affiliateLinks')
+      .map(([key, value]) => ({
+        key,
+        value: typeof value === 'string' ? value : JSON.stringify(value),
+      })),
+    affiliateLinks: Array.isArray((product.details as any)?.affiliateLinks)
+      ? (product.details as any).affiliateLinks
+      : [],
   }
 }
 
@@ -201,6 +204,10 @@ export const getStockQuantity = (
 ): number => {
   if (!variant) {
     return 0
+  }
+
+  if (productType === ProductType.AFFILIATE_LINK) {
+    return 999
   }
 
   if (productType === ProductType.PHYSICAL) {

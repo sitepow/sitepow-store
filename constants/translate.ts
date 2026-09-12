@@ -251,6 +251,8 @@ export const PRODUCT_TYPE_TH: Record<ProductType, string> = {
   [ProductType.DIGITAL_LINK]: 'สินค้าดิจิทัลแบบลิงก์ (Digital Link)',
   [ProductType.DIGITAL_ITEM]: 'สินค้าดิจิทัลแบบไฟล์/คีย์ (Digital Item)',
   [ProductType.DIGITAL_SERVICE]: 'บริการเติมเกม/งานบริการ (Service)',
+  [ProductType.AFFILIATE_LINK]:
+    'สินค้าแอฟฟิลิเอต / ลิงก์ภายนอก (Affiliate Link)',
 }
 
 export const PRODUCT_TYPE_EN: Record<ProductType, string> = {
@@ -258,6 +260,7 @@ export const PRODUCT_TYPE_EN: Record<ProductType, string> = {
   [ProductType.DIGITAL_LINK]: 'Digital Product (Link)',
   [ProductType.DIGITAL_ITEM]: 'Digital Product (File/Key)',
   [ProductType.DIGITAL_SERVICE]: 'Service / Game Top-up',
+  [ProductType.AFFILIATE_LINK]: 'Affiliate / External Link Product',
 }
 
 export const PRODUCT_TYPE_OPTIONS = Object.entries(PRODUCT_TYPE_TH).map(

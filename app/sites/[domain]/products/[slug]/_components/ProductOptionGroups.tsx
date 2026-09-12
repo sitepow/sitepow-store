@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -27,6 +28,10 @@ export function ProductOptionGroups() {
     toggleOption,
     isLoading,
   } = useProductPurchaseStore()
+
+  if (product?.productType === ProductType.AFFILIATE_LINK) {
+    return null
+  }
 
   const hasOptionGroups = product?.options?.length !== 0
 

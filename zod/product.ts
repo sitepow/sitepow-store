@@ -58,6 +58,17 @@ const metadataSchema = z.object({
   value: z.string(),
 })
 
+export const affiliateLinkSchema = z.object({
+  id: z.string().optional(),
+  platform: z.enum(['SHOPEE', 'LAZADA', 'TIKTOK', 'OTHER']).default('OTHER'),
+  url: z.string().min(1, { message: 'กรุณาระบุลิงก์สินค้า' }),
+  label: z.string().optional().or(z.literal('')),
+  price: z.number().min(0, { message: 'ราคาต้องไม่ต่ำกว่า 0' }).default(0),
+  originalPrice: z.number().min(0).optional(),
+  isDiscounted: z.boolean().default(false),
+  discountText: z.string().optional().or(z.literal('')),
+})
+
 export const productFormSchema = z.object({
   title: z
     .string()
@@ -84,6 +95,7 @@ export const productFormSchema = z.object({
   metadata: z.array(metadataSchema).default([]),
   tags: z.string().optional().or(z.literal('')),
   productType: z.enum(ProductType).default(ProductType.PHYSICAL),
+  affiliateLinks: z.array(affiliateLinkSchema).default([]),
 })
 
 export type ProductFormValues = z.input<typeof productFormSchema>

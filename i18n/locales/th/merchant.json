@@ -501,7 +501,29 @@
         "PHYSICAL": "สินค้าทั่วไป (Physical)",
         "DIGITAL_LINK": "สินค้าดิจิทัลแบบลิงก์ (Digital Link)",
         "DIGITAL_ITEM": "สินค้าดิจิทัลแบบไฟล์/คีย์ (Digital Item)",
-        "DIGITAL_SERVICE": "บริการเติมเกม/งานบริการ (Service)"
+        "DIGITAL_SERVICE": "บริการเติมเกม/งานบริการ (Service)",
+        "AFFILIATE_LINK": "สินค้าแอฟฟิลิเอต / ลิงก์ภายนอก (Affiliate Link)"
+      },
+      "affiliateLinks": {
+        "title": "ลิงก์แอฟฟิลิเอต (Affiliate Links)",
+        "description": "ระบุลิงก์สินค้าจาก Shopee, Lazada, TikTok Shop หรือร้านค้าภายนอก พร้อมราคาและป้ายส่วนลด",
+        "addLink": "เพิ่มลิงก์แอฟฟิลิเอต",
+        "platform": "แพลตฟอร์ม",
+        "selectPlatform": "เลือกแพลตฟอร์ม",
+        "url": "ลิงก์สินค้า (Affiliate URL)",
+        "urlPlaceholder": "https://s.shopee.co.th/... หรือ https://...",
+        "label": "ชื่อปุ่ม / ป้ายร้านค้า (ระบุหรือไม่ก็ได้)",
+        "labelPlaceholder": "เช่น ร้านทางการ Shopee Mall",
+        "price": "ราคาขาย (บาท)",
+        "pricePlaceholder": "0",
+        "originalPrice": "ราคาเต็มก่อนลด (บาท)",
+        "originalPricePlaceholder": "0",
+        "isOnSale": "กำลังลดราคา (On Sale)",
+        "discountText": "ข้อความส่วนลด / ป้ายโปรโมชั่น",
+        "discountTextPlaceholder": "เช่น ลด 30%, Flash Sale, ส่งฟรี",
+        "noLinksAlert": "กรุณาเพิ่มอย่างน้อย 1 ลิงก์แอฟฟิลิเอตสำหรับสินค้านี้",
+        "removeLink": "ลบลิงก์นี้",
+        "linkNumber": "ลิงก์ที่ {index}"
       }
     },
     "bulkImport": {
@@ -523,6 +545,7 @@
       "templateDigitalLink": "ไฟล์ดาวน์โหลด (DIGITAL_LINK)",
       "templateDigitalItem": "รหัสโค้ด / ซีเรียล (DIGITAL_ITEM)",
       "templateDigitalService": "คอร์ส / บริการ (DIGITAL_SERVICE)",
+      "templateAffiliate": "สินค้าแอฟฟิลิเอต (AFFILIATE_LINK)",
       "tabUpload": "อัปโหลดไฟล์ .CSV",
       "tabPaste": "วางข้อมูลโดยตรง",
       "dropzoneTitle": "คลิกเพื่อเลือกไฟล์ หรือลากไฟล์ CSV มาวางที่นี่",
@@ -599,6 +622,9 @@
       "digitalServiceTitle": "DIGITAL_SERVICE (บริการ)",
       "digitalServiceDesc": "บริการทางวิชาชีพ การจองคิว หรือให้คำปรึกษา ไม่จำเป็นต้องใช้น้ำหนักและการขนส่ง",
       "digitalServiceTip": "ฟิลด์แนะนำ: PointsAmount, Price",
+      "affiliateLinkTitle": "AFFILIATE_LINK (สินค้าแอฟฟิลิเอต)",
+      "affiliateLinkDesc": "สินค้าที่มีลิงก์แนะนำไปซื้อที่ Shopee, Lazada, TikTok Shop หรือร้านค้าภายนอก ลูกค้าคลิกสั่งซื้อตรงไปยังแพลตฟอร์มได้ทันที",
+      "affiliateLinkTip": "ฟิลด์แนะนำ: DigitalUrl (ลิงก์หลัก), Price (ราคาขาย), DiscountAmount",
       "fields": {
         "Title": {
           "desc": "ชื่อสินค้าหลักที่จะแสดงบนหน้าร้านและหน้า POS",

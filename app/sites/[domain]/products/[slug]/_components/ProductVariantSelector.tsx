@@ -38,6 +38,10 @@ export function ProductVariantSelector() {
     setSelectedBranch,
   } = useProductPurchaseStore()
 
+  if (product?.productType === ProductType.AFFILIATE_LINK) {
+    return null
+  }
+
   const isPhysical = product?.productType === ProductType.PHYSICAL
   const hasVariant = product?.variants?.length !== 0
 

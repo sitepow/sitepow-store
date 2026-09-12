@@ -14,6 +14,7 @@ const storefrontSectionProductSelect = {
   title: true,
   slug: true,
   categoryId: true,
+  productType: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },

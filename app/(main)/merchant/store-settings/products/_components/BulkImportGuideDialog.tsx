@@ -1,13 +1,13 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
 import {
   IconBook,
   IconBox,
   IconDeviceDesktop,
+  IconExternalLink,
   IconKey,
   IconTruckDelivery,
 } from '@tabler/icons-react'
@@ -54,6 +54,7 @@ const FIELD_DICTIONARY: FieldDoc[] = [
       'DIGITAL_LINK',
       'DIGITAL_ITEM',
       'DIGITAL_SERVICE',
+      'AFFILIATE_LINK',
     ],
   },
   {
@@ -165,9 +166,13 @@ export function BulkImportGuideDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl">
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="flex max-h-[90vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:w-full sm:max-w-4xl"
+      >
         <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
           <DialogHeaderIcon
             icon={IconBook}
@@ -338,6 +343,18 @@ export function BulkImportGuideDialog() {
                 </p>
                 <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
                   {t('digitalServiceTip')}
+                </div>
+              </div>
+              <div className="bg-card space-y-2 rounded-xl border p-3.5 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold sm:text-sm">
+                  <IconExternalLink className="size-4 shrink-0" />
+                  {t('affiliateLinkTitle')}
+                </div>
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  {t('affiliateLinkDesc')}
+                </p>
+                <div className="bg-muted text-muted-foreground rounded p-2 text-[11px]">
+                  {t('affiliateLinkTip')}
                 </div>
               </div>
             </div>

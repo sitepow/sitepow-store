@@ -14,6 +14,7 @@ const storefrontProductListSelect = {
   title: true,
   slug: true,
   categoryId: true,
+  productType: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },
@@ -50,6 +51,7 @@ const storefrontProductDetailSelect = {
       title: true,
       price: true,
       image: true,
+      digitalUrl: true,
       isAvailable: true,
       discountActive: true,
       discountType: true,
@@ -232,10 +234,12 @@ export async function getStorefrontProductDetail(
     storefrontProductKeys.detail(storeSlug, productSlug),
   )
 
+  const decodedSlug = decodeURIComponent(productSlug)
+
   const product = await withCache(cacheKey, async () => {
     const res = await prisma.product.findFirst({
       where: {
-        slug: productSlug,
+        OR: [{ slug: productSlug }, { slug: decodedSlug }, { id: productSlug }],
         isPublished: true,
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
       },

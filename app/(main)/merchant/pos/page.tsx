@@ -181,6 +181,7 @@ export default function MerchantPOSPage() {
       weight: variant.weight ?? 0,
       variant: {
         ...variant,
+        digitalUrl: null,
         price: Number(variant.price),
       },
       selectedOptions: formattedOptions,

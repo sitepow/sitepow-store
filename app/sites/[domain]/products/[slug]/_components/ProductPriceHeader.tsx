@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
+import { ProductType } from '@/generated/prisma/enums'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { Label } from '@/components/ui/label'
@@ -16,6 +17,24 @@ export function ProductPriceHeader() {
     useProductPurchaseStore()
   const totalPrice = getTotalPrice()
   const points = getCurrentPoints()
+  const isAffiliate = product?.productType === ProductType.AFFILIATE_LINK
+  const rawAffiliateLinks = (product?.details as any)?.affiliateLinks
+  const affiliateLinks = Array.isArray(rawAffiliateLinks)
+    ? rawAffiliateLinks
+    : []
+
+  const affiliatePrices = affiliateLinks
+    .map((l: any) => l.price)
+    .filter((p: any): p is number => typeof p === 'number' && p > 0)
+
+  const minAffiliatePrice =
+    affiliatePrices.length > 0 ? Math.min(...affiliatePrices) : totalPrice
+  const maxAffiliatePrice =
+    affiliatePrices.length > 0 ? Math.max(...affiliatePrices) : totalPrice
+  const hasPriceRange =
+    isAffiliate &&
+    affiliatePrices.length > 1 &&
+    minAffiliatePrice !== maxAffiliatePrice
 
   return (
     <>
@@ -35,14 +54,18 @@ export function ProductPriceHeader() {
             <Label className="text-lg font-semibold">{t('price')}</Label>
             <div className="flex items-end gap-2">
               <data
-                value={totalPrice}
+                value={isAffiliate ? minAffiliatePrice : totalPrice}
                 className="text-primary text-4xl font-bold sm:text-5xl"
               >
-                {formatCurrency(totalPrice || 0)}
+                {isAffiliate && hasPriceRange
+                  ? `${formatCurrency(minAffiliatePrice)} - ${formatCurrency(maxAffiliatePrice)}`
+                  : formatCurrency(
+                      isAffiliate ? minAffiliatePrice : totalPrice || 0,
+                    )}
               </data>
             </div>
 
-            {points > 0 && (
+            {!isAffiliate && points > 0 && (
               <p>
                 {t.rich('earnPoints', {
                   points: formatNumber(points),

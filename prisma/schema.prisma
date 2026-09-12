@@ -879,6 +879,7 @@ enum ProductType {
   DIGITAL_LINK
   DIGITAL_ITEM
   DIGITAL_SERVICE
+  AFFILIATE_LINK
 }
 
 model Product {

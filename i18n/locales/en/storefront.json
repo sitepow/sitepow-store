@@ -230,6 +230,19 @@
       "viewEarnings": "View Earnings & Payouts",
       "shareTitle": "Recommend: {title}",
       "shareText": "Check out {title} at a special price here!"
+    },
+    "affiliateBuy": {
+      "badge": "Featured / Affiliate",
+      "title": "Order via Official Stores / Partner Platforms",
+      "description": "This item is sold via external platforms. Click your preferred store to proceed with your order.",
+      "buyOn": "Buy on {platform}",
+      "buyNow": "Buy Now",
+      "onSale": "On Sale",
+      "saveAmount": "Save {amount}",
+      "externalNotice": "You will be redirected to {platform} website or app to complete your purchase securely.",
+      "availableDeals": "Available Store Deals ({count})",
+      "bestPrice": "Best Price",
+      "openStore": "Open Store"
     }
   },
   "blogs": {

@@ -17,6 +17,7 @@ import {
   IconClock,
   IconDeviceDesktop,
   IconDownload,
+  IconExternalLink,
   IconFileSpreadsheet,
   IconFileUpload,
   IconInfoCircle,
@@ -61,7 +62,12 @@ import { BulkImportGuideDialog } from './BulkImportGuideDialog'
 export interface BulkProductRow {
   index: number
   title: string
-  productType: 'PHYSICAL' | 'DIGITAL_LINK' | 'DIGITAL_ITEM' | 'DIGITAL_SERVICE'
+  productType:
+    | 'PHYSICAL'
+    | 'DIGITAL_LINK'
+    | 'DIGITAL_ITEM'
+    | 'DIGITAL_SERVICE'
+    | 'AFFILIATE_LINK'
   variantTitle: string
   sku: string
   price: number
@@ -87,7 +93,12 @@ interface BulkImportProductsDialogProps {
 type ImportStep = 'upload' | 'preview' | 'processing'
 type FilterMode = 'all' | 'valid' | 'errors'
 type TemplateType =
-  'ALL' | 'PHYSICAL' | 'DIGITAL_LINK' | 'DIGITAL_ITEM' | 'DIGITAL_SERVICE'
+  | 'ALL'
+  | 'PHYSICAL'
+  | 'DIGITAL_LINK'
+  | 'DIGITAL_ITEM'
+  | 'DIGITAL_SERVICE'
+  | 'AFFILIATE_LINK'
 
 export function BulkImportProductsDialog({
   open,
@@ -145,6 +156,7 @@ export function BulkImportProductsDialog({
         'คู่มือการตลาด E-Book 2026,DIGITAL_LINK,Standard,EBOOK-MKT-01,299,0,books,999,,https://drive.google.com/file/d/sample,,,',
         'Gift Card 500 THB,DIGITAL_ITEM,Standard,GC-500-01,500,480,gift-card,1,,,CARD-ABCD-1234-XYZ,10,,',
         'บริการตรวจสุขภาพประจำปี,DIGITAL_SERVICE,Standard,SRV-HEALTH-01,1500,600,service,999,,,,50,,',
+        'หูฟังไร้สาย Bluetooth,AFFILIATE_LINK,Shopee Mall,AFF-SHP-EAR-01,399,0,electronics,999,,https://s.shopee.co.th/sample,,,PERCENTAGE,20',
       ],
       PHYSICAL: [
         'เสื้อยืด Oversize สีดำ,PHYSICAL,Free Size,TSHIRT-BLK-OS,450,180,apparel,50,0.25,,,,PERCENTAGE,10',
@@ -162,6 +174,11 @@ export function BulkImportProductsDialog({
         'บริการตรวจสุขภาพประจำปี,DIGITAL_SERVICE,Standard,SRV-HEALTH-01,1500,600,service,999,,,,50,,',
         'ปรึกษาผู้เชี่ยวชาญ 1 ชม.,DIGITAL_SERVICE,Standard,SRV-CONSULT-01,2500,0,service,999,,,,100,,',
       ],
+      AFFILIATE_LINK: [
+        'หูฟังไร้สาย Bluetooth,AFFILIATE_LINK,Shopee Mall,AFF-SHP-EAR-01,399,0,electronics,999,,https://s.shopee.co.th/sample,,,PERCENTAGE,20',
+        'โต๊ะคอมพิวเตอร์ปรับระดับ,AFFILIATE_LINK,Lazada Official,AFF-LAZ-DSK-01,2490,0,furniture,999,,https://s.lazada.co.th/s.sample,,,FIXED,500',
+        'ไมโครโฟนไร้สายมือถือ,AFFILIATE_LINK,TikTok Shop,AFF-TIK-MIC-01,590,0,gadgets,999,,https://vt.tiktok.com/sample,,,',
+      ],
     }
 
     const fileNames: Record<TemplateType, string> = {
@@ -170,6 +187,7 @@ export function BulkImportProductsDialog({
       DIGITAL_LINK: 'products_template_digital_link.csv',
       DIGITAL_ITEM: 'products_template_digital_item.csv',
       DIGITAL_SERVICE: 'products_template_digital_service.csv',
+      AFFILIATE_LINK: 'products_template_affiliate.csv',
     }
 
     const csvContent = headers + '\n' + samples[type].join('\n')
@@ -215,6 +233,7 @@ export function BulkImportProductsDialog({
           'DIGITAL_LINK',
           'DIGITAL_ITEM',
           'DIGITAL_SERVICE',
+          'AFFILIATE_LINK',
         ].includes(rawType)
           ? rawType
           : 'PHYSICAL'
@@ -240,7 +259,10 @@ export function BulkImportProductsDialog({
       if (!title) error = t('errTitleMin')
       else if (!sku) error = t('errSkuEmpty')
       else if (isNaN(price) || price < 0) error = t('errPriceNonNegative')
-      else if (productType === 'DIGITAL_LINK' && !digitalUrl) {
+      else if (
+        (productType === 'DIGITAL_LINK' || productType === 'AFFILIATE_LINK') &&
+        !digitalUrl
+      ) {
         error = t('errDigitalUrlRequired')
       } else if (productType === 'DIGITAL_ITEM' && !digitalItemContent) {
         error = t('errDigitalItemContentRequired')
@@ -502,6 +524,13 @@ export function BulkImportProductsDialog({
                       >
                         <IconTruckDelivery className="size-4" />
                         {t('templateDigitalService')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDownloadTemplate('AFFILIATE_LINK')}
+                        className="cursor-pointer gap-2"
+                      >
+                        <IconExternalLink className="size-4" />
+                        {t('templateAffiliate')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
