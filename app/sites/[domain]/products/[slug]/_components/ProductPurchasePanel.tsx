@@ -7,6 +7,7 @@ import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 import { useProductPurchaseStore } from '../../store'
 import { ProductAddToCart } from './ProductAddToCart'
 import { ProductAddonSelector } from './ProductAddonSelector'
+import { ProductAffiliateShare } from './ProductAffiliateShare'
 import { ProductOptionGroups } from './ProductOptionGroups'
 import { ProductPriceHeader } from './ProductPriceHeader'
 import { ProductVariantSelector } from './ProductVariantSelector'
@@ -38,6 +39,7 @@ export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
       <ProductOptionGroups />
       <ProductAddonSelector />
       <ProductAddToCart />
+      <ProductAffiliateShare storeSlug={storeSlug} productSlug={productSlug} />
     </>
   )
 }

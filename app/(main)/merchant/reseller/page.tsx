@@ -17,6 +17,7 @@ import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   IconBuildingStore,
+  IconCoin,
   IconFilePlus,
   IconLock,
   IconPlus,
@@ -30,8 +31,10 @@ import { ResellerAgreementSelectField } from '@/components/ResellerAgreementSele
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { AcceptStockDialog } from './_components/AcceptStockDialog'
+import { AffiliateManagementView } from './_components/AffiliateManagementView'
 import { AllocateStockDialog } from './_components/AllocateStockDialog'
 import { CreateAgreementDialog } from './_components/CreateAgreementDialog'
 import { EditCustomPriceDialog } from './_components/EditCustomPriceDialog'
@@ -44,6 +47,10 @@ export default function ResellerManagementPage() {
   const alertId = 'reseller-info-alert'
   const isDismissed = useAlertStore((state) => state.isDismissed(alertId))
   const dismissAlert = useAlertStore((state) => state.dismissAlert)
+
+  const [mainTab, setMainTab] = useState<'consignment' | 'affiliate'>(
+    'consignment',
+  )
 
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId, setSelectedAgreementId } = useResellerFilter()
@@ -151,48 +158,85 @@ export default function ResellerManagementPage() {
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
-        icon={IconBuildingStore}
-        title={t('title')}
-        description={t('description')}
+        icon={mainTab === 'consignment' ? IconBuildingStore : IconCoin}
+        title={mainTab === 'consignment' ? t('title') : t('affiliate.title')}
+        description={
+          mainTab === 'consignment'
+            ? t('description')
+            : t('affiliate.description')
+        }
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
-            <ResellerAgreementSelectField
-              mode="all"
-              disabled={selectedStoreId === ALL_STORES}
-            />
-            {canCreateReseller && (
-              <Button
-                variant="outline"
-                onClick={() => setCreateAgreementOpen(true)}
-                disabled={selectedStoreId === ALL_STORES}
-              >
-                <IconFilePlus />
-                {t('newAgreement')}
-              </Button>
-            )}
-            {canCreateReseller && isSupplier && (
-              <Button
-                onClick={() => handleOpenAllocate()}
-                disabled={!selectedAgreementId}
-              >
-                <IconPlus />
-                {t('allocateStock')}
-              </Button>
-            )}
-            {canUpdateFinance && isSupplier && (
-              <Button
-                variant="outline"
-                onClick={handleOpenPayout}
-                disabled={!selectedAgreementId}
-              >
-                <IconReceiptRefund />
-                {t('recordPayout')}
-              </Button>
+            {mainTab === 'consignment' && (
+              <>
+                <ResellerAgreementSelectField
+                  mode="all"
+                  disabled={selectedStoreId === ALL_STORES}
+                />
+                {canCreateReseller && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setCreateAgreementOpen(true)}
+                    disabled={selectedStoreId === ALL_STORES}
+                  >
+                    <IconFilePlus />
+                    {t('newAgreement')}
+                  </Button>
+                )}
+                {canCreateReseller && isSupplier && (
+                  <Button
+                    onClick={() => handleOpenAllocate()}
+                    disabled={!selectedAgreementId}
+                  >
+                    <IconPlus />
+                    {t('allocateStock')}
+                  </Button>
+                )}
+                {canUpdateFinance && isSupplier && (
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenPayout}
+                    disabled={!selectedAgreementId}
+                  >
+                    <IconReceiptRefund />
+                    {t('recordPayout')}
+                  </Button>
+                )}
+              </>
             )}
           </div>
         }
       />
+
+      {/* TAB SELECTOR: CONSIGNMENT VS AFFILIATE */}
+      <div className="mb-4">
+        <Tabs
+          value={mainTab}
+          onValueChange={(val) =>
+            setMainTab(val as 'consignment' | 'affiliate')
+          }
+          className="w-full"
+        >
+          <TabsList className="bg-muted/70 grid w-full max-w-md grid-cols-2">
+            <TabsTrigger
+              value="consignment"
+              className="gap-2 text-xs font-bold sm:text-sm"
+            >
+              <IconBuildingStore className="size-4" />
+              {t('tabs.consignment')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="affiliate"
+              className="gap-2 text-xs font-bold sm:text-sm"
+            >
+              <IconCoin className="size-4" />
+              {t('tabs.affiliate')}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       {selectedStoreId === ALL_STORES ? (
         <ActionRequiredAlert
           icon={<IconLock />}
@@ -205,6 +249,8 @@ export default function ResellerManagementPage() {
           title={t('noAccessTitle')}
           description={t('noAccessDescription')}
         />
+      ) : mainTab === 'affiliate' ? (
+        <AffiliateManagementView storeId={selectedStoreId} />
       ) : (
         <div className="space-y-4">
           {!isDismissed && canUpdateReseller && (
@@ -238,40 +284,30 @@ export default function ResellerManagementPage() {
           />
           <AllocateStockDialog
             open={allocateDialogOpen}
-            setOpen={(open) => {
-              setAllocateDialogOpen(open)
-              if (!open) setSelectedStock(null)
-            }}
+            setOpen={setAllocateDialogOpen}
+          />
+          <AcceptStockDialog
+            open={acceptStockOpen}
+            onOpenChange={setAcceptStockOpen}
+            onConfirm={onConfirmAccept}
+            isLoading={isAccepting}
+            stock={selectedStock}
+          />
+          <ReturnStockDialog
+            open={returnStockOpen}
+            setOpen={setReturnStockOpen}
+            stock={selectedReturnStock}
+          />
+          <EditCustomPriceDialog
+            open={editPriceOpen}
+            setOpen={setEditPriceOpen}
+            onSave={onSaveCustomPrice}
+            isLoading={isSavingPrice}
+            stock={selectedPriceStock}
           />
           <PayoutDialog open={payoutDialogOpen} setOpen={setPayoutDialogOpen} />
         </div>
       )}
-      <AcceptStockDialog
-        open={acceptStockOpen}
-        onOpenChange={(open) => {
-          setAcceptStockOpen(open)
-          if (!open) setSelectedStock(null)
-        }}
-        stock={selectedStock}
-        isLoading={isAccepting}
-        onConfirm={onConfirmAccept}
-      />
-      <ReturnStockDialog
-        stock={selectedReturnStock}
-        open={returnStockOpen}
-        setOpen={setReturnStockOpen}
-      />
-      <EditCustomPriceDialog
-        open={editPriceOpen}
-        setOpen={(open) => {
-          setEditPriceOpen(open)
-          if (!open) setSelectedPriceStock(null)
-        }}
-        stock={selectedPriceStock}
-        isLoading={isSavingPrice}
-        onSave={onSaveCustomPrice}
-        defaultCommissionRate={selectedPriceStock?.defaultCommissionRate || 0}
-      />
     </Sidebar>
   )
 }

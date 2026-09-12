@@ -27,6 +27,7 @@ import {
   ProductType,
   UserRole,
 } from '@/generated/prisma/enums'
+import { getStoredAffiliateCode } from '@/hooks/use-affiliate-tracking'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -428,6 +429,8 @@ export default function StoreCartPage() {
       paymentMethodEnum !== PaymentMethod.CASH_ON_DELIVERY &&
       paymentMethodEnum !== PaymentMethod.MANUAL_QR_PROMPTPAY
 
+    const affiliateCode = getStoredAffiliateCode(storeSlug) ?? undefined
+
     createOrderMutation.mutate(
       {
         storeSlug,
@@ -442,6 +445,7 @@ export default function StoreCartPage() {
         couponId: appliedCoupon?.id,
         usedPoints,
         earnedPoints: summary.totalPoints,
+        affiliateCode,
         items: items.map((item) => ({
           productId: item.productId,
           variantId: item.variant.id,

@@ -136,6 +136,7 @@
     "subdistrict": "Subdistrict",
     "district": "District",
     "province": "Province",
+    "postalCode": "Postal Code",
     "saveAddress": "Save Address",
     "addShippingTaxAddress": "Add Shipping/Tax Address",
     "addressLabel": "Address Label (e.g. Home, Office) *",
@@ -251,5 +252,105 @@
     "deleteAccountBtn": "Delete Account",
     "deleting": "Deleting...",
     "reset": "Reset Changes"
+  },
+  "affiliate": {
+    "title": "Affiliate Program",
+    "description": "Promote and share product links to earn commissions directly into your wallet",
+    "disabledTitle": "Affiliate Program Not Available",
+    "disabledDesc": "This store has not enabled the affiliate program yet. Please stay tuned for future announcements.",
+    "unauthenticatedTitle": "Sign In Required",
+    "unauthenticatedDesc": "Please sign in to your customer account to get your referral code and track commissions.",
+    "loginBtn": "Sign In",
+    "commissionBanner": "Earn {rate}% Commission on Every Order",
+    "commissionBannerDesc": "Simply share your store or product link. When someone buys through it, commission is automatically credited to you.",
+    "referralCode": "Referral Code: {code}",
+    "storeLink": "Your Store Link (Ready to share)",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "generateProductLink": "Generate Link for Specific Product",
+    "selectProduct": "Select product to share...",
+    "copyProductLink": "Copy Product Link",
+    "stats": {
+      "availableBalance": "Available Balance",
+      "requestPayout": "Request Payout",
+      "pendingCommission": "Pending Commission",
+      "pendingDesc": "Awaiting order completion and return window clearance",
+      "totalEarned": "Total Earned",
+      "withdrawn": "Withdrawn {amount}",
+      "totalReferredOrders": "Referred Orders",
+      "referredOrdersDesc": "From buyers who ordered through your links",
+      "ordersUnit": "orders"
+    },
+    "tabs": {
+      "referrals": "Orders ({count})",
+      "payouts": "Payouts ({count})",
+      "bank": "Payout Account"
+    },
+    "referralTable": {
+      "title": "Referred Orders History",
+      "description": "When buyers order successfully, your commission enters pending status",
+      "empty": "No referred orders through your links yet. Start sharing with friends!",
+      "date": "Date",
+      "orderNumber": "Order #",
+      "orderTotal": "Order Total",
+      "rate": "Rate",
+      "commission": "Commission",
+      "status": "Status"
+    },
+    "payoutTable": {
+      "title": "Payout Request History",
+      "description": "Your withdrawal requests and merchant transfer status",
+      "empty": "No payout history yet",
+      "date": "Requested Date",
+      "amount": "Amount",
+      "account": "Destination Account",
+      "promptPay": "PromptPay",
+      "status": "Status",
+      "slip": "Payment Slip",
+      "viewSlip": "View Slip"
+    },
+    "bankForm": {
+      "title": "Payout Account Information",
+      "description": "Provide bank or PromptPay details where you would like to receive commission payouts",
+      "promptPay": "PromptPay Number",
+      "promptPayPlaceholder": "Phone number or National ID",
+      "bankName": "Bank Name",
+      "bankNamePlaceholder": "e.g. Kasikorn, SCB, Bangkok Bank",
+      "accountNo": "Account Number",
+      "accountNoPlaceholder": "Bank account number",
+      "accountName": "Account Name",
+      "accountNamePlaceholder": "Account holder full name",
+      "save": "Save Account Information"
+    },
+    "payoutDialog": {
+      "title": "Request Commission Payout",
+      "description": "Available balance: {balance} (Minimum: ฿{min})",
+      "amountLabel": "Withdrawal Amount (THB)",
+      "amountPlaceholder": "Enter amount (min {min})",
+      "promptPayLabel": "PromptPay (optional)",
+      "bankLabel": "Bank Name",
+      "accountNoLabel": "Account Number",
+      "accountNameLabel": "Account Name",
+      "cancel": "Cancel",
+      "confirm": "Submit Payout Request"
+    },
+    "statusLabels": {
+      "approved": "Approved",
+      "paid": "Paid",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "pendingPayout": "Pending Transfer"
+    },
+    "toasts": {
+      "linkCopied": "Link copied to clipboard",
+      "invalidAmount": "Please enter a valid amount",
+      "minWithdrawal": "Minimum withdrawal is ฿{min}",
+      "insufficientBalance": "Insufficient balance",
+      "requireBankOrPromptPay": "Please provide bank or PromptPay details",
+      "payoutSuccess": "Payout request submitted successfully",
+      "payoutError": "Failed to submit payout request",
+      "bankSaved": "Payout account details saved successfully",
+      "bankSaveError": "Failed to save account details"
+    }
   }
 }

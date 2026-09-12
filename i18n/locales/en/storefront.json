@@ -214,7 +214,23 @@
     "sellerNotePlaceholder": "Enter note to seller here",
     "selectBranch": "Please select a branch",
     "discountPercent": "{percent}% OFF",
-    "plusPoints": "+ {points} Points"
+    "plusPoints": "+ {points} Points",
+    "affiliateShare": {
+      "badge": "Affiliate Program",
+      "earnCommission": "Share & Earn Commission up to",
+      "perOrder": "({rate}% per order)",
+      "description": "Share this product link with friends or followers. Earn instant commission on every completed order.",
+      "calculatedFrom": "Calculated as {rate}% of product price {price}",
+      "shareBtn": "Share Product",
+      "copyBtn": "Copy Link",
+      "copied": "Copied!",
+      "linkCopiedToast": "Product referral link copied! Share it to start earning commissions.",
+      "loginPrompt": "Sign in to get your referral link and earn {amount} commission",
+      "loginBtn": "Sign In to Share & Earn",
+      "viewEarnings": "View Earnings & Payouts",
+      "shareTitle": "Recommend: {title}",
+      "shareText": "Check out {title} at a special price here!"
+    }
   },
   "blogs": {
     "title": "Articles & Insights",

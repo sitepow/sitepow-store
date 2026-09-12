@@ -78,6 +78,12 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     icon: IconStar,
   },
   {
+    value: 'affiliate',
+    label: 'นายหน้าแชร์ลิงก์',
+    tab: 'affiliate',
+    icon: IconCoin,
+  },
+  {
     value: 'profile',
     label: 'โปรไฟล์ส่วนตัว',
     tab: 'profile',

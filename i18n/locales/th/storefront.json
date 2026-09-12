@@ -213,7 +213,23 @@
     "sellerNotePlaceholder": "กรอกข้อความถึงผู้ขายที่นี่",
     "selectBranch": "กรุณาเลือกสาขา",
     "discountPercent": "ส่วนลด {percent}%",
-    "plusPoints": "+ {points} แต้ม"
+    "plusPoints": "+ {points} แต้ม",
+    "affiliateShare": {
+      "badge": "นายหน้าแชร์ลิงก์",
+      "earnCommission": "แชร์สินค้านี้ รับค่าคอมมิชชั่นสูงสุด",
+      "perOrder": "({rate}% ต่อออเดอร์)",
+      "description": "เพียงแชร์ลิงก์สินค้านี้ เมื่อมีคนสั่งซื้อ คุณจะได้รับค่าคอมมิชชั่นเข้ากระเป๋าทันที",
+      "calculatedFrom": "คำนวณจาก {rate}% ของราคา {price}",
+      "shareBtn": "แชร์สินค้า",
+      "copyBtn": "คัดลอกลิงก์",
+      "copied": "คัดลอกแล้ว!",
+      "linkCopiedToast": "คัดลอกลิงก์แนะนำสินค้าเรียบร้อยแล้ว นำไปแชร์เพื่อรับคอมมิชชั่นได้ทันที",
+      "loginPrompt": "เข้าสู่ระบบเพื่อรับลิงก์แชร์และรับค่าคอมมิชชั่น {amount}",
+      "loginBtn": "เข้าสู่ระบบเพื่อรับลิงก์แชร์",
+      "viewEarnings": "ดูรายได้และถอนเงิน",
+      "shareTitle": "แนะนำ: {title}",
+      "shareText": "ช้อป {title} ราคาพิเศษได้ที่นี่!"
+    }
   },
   "blogs": {
     "title": "บทความและสาระน่ารู้",

@@ -557,6 +557,53 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       })
     }
 
+    if (input.affiliateCode && orders.length > 0) {
+      try {
+        const affiliateSetting = await tx.storeAffiliateSetting.findUnique({
+          where: { storeId: store.id },
+        })
+        if (affiliateSetting?.isEnabled) {
+          const affiliateAccount = await tx.affiliateAccount.findUnique({
+            where: {
+              storeId_referralCode: {
+                storeId: store.id,
+                referralCode: input.affiliateCode,
+              },
+            },
+          })
+
+          if (
+            affiliateAccount &&
+            affiliateAccount.isActive &&
+            affiliateAccount.customerId !== input.customerId
+          ) {
+            const commissionRate = Number(
+              affiliateSetting.defaultCommissionRate,
+            )
+            for (const ord of orders) {
+              const orderTotal = Number(ord.totalAmount)
+              const commissionAmount =
+                Math.round(orderTotal * (commissionRate / 100) * 100) / 100
+              if (commissionAmount > 0) {
+                await tx.affiliateReferral.create({
+                  data: {
+                    orderId: ord.id,
+                    affiliateAccountId: affiliateAccount.id,
+                    commissionAmount,
+                    commissionRate,
+                    orderAmount: orderTotal,
+                    status: 'PENDING',
+                  },
+                })
+              }
+            }
+          }
+        }
+      } catch (affErr) {
+        console.error('Affiliate attribution error:', affErr)
+      }
+    }
+
     return orders
   })
 

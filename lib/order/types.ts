@@ -35,6 +35,7 @@ interface BaseOrderInput {
   bankAccountId?: string
   usedPoints?: number
   earnedPoints?: number
+  affiliateCode?: string
   items: OrderItemInput[]
 }
 

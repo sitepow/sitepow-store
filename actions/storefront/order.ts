@@ -248,6 +248,7 @@ export async function createOrder(input: CreateOrderInput) {
       couponId: input.couponId,
       usedPoints: input.usedPoints,
       earnedPoints: input.earnedPoints,
+      affiliateCode: input.affiliateCode,
       items: input.items,
       isPOS: false,
     })

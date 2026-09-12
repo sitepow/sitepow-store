@@ -19,6 +19,8 @@ export interface StatsCardProps {
   badge?: string
   className?: string
   valueClassName?: string
+  action?: React.ReactNode
+  children?: React.ReactNode
 }
 
 export function StatsCard({
@@ -30,6 +32,8 @@ export function StatsCard({
   badge,
   className,
   valueClassName,
+  action,
+  children,
 }: StatsCardProps) {
   // Automatically extract inline trend from description if present (e.g., "+12.5%", "-3.2%")
   const descTrend = React.useMemo(() => {
@@ -132,6 +136,9 @@ export function StatsCard({
             {description}
           </p>
         ) : null}
+
+        {action && <div className="pt-2">{action}</div>}
+        {children}
       </div>
     </div>
   )
