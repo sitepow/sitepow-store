@@ -70,7 +70,12 @@ export async function createResellerPOSOrder(
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const agreement = await prisma.resellerAgreement.findUnique({
@@ -91,6 +96,8 @@ export async function createResellerPOSOrder(
     ) {
       return {
         success: false,
+        messageTH: 'สัญญาฝากขายไม่อยู่ในสถานะใช้งาน หรือสัญญาหมดอายุแล้ว',
+        messageEN: 'Consignment agreement is inactive or expired',
         message: 'สัญญาฝากขายไม่อยู่ในสถานะใช้งาน หรือสัญญาหมดอายุแล้ว',
       }
     }
@@ -223,15 +230,23 @@ export async function createResellerPOSOrder(
 
     return {
       success: true,
+      messageTH: 'สร้างคำสั่งซื้อฝากขายสำเร็จ รอการชำระเงิน',
+      messageEN: 'Consignment order created successfully, awaiting payment',
       message: 'สร้างคำสั่งซื้อฝากขายสำเร็จ รอการชำระเงิน',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
     console.error(error)
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการทำรายการ'
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการทำรายการ',
+      messageTH: errMessage,
+      messageEN:
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while processing order',
+      message: errMessage,
     }
   }
 }
@@ -240,7 +255,12 @@ export async function getResellerStocks(agreementId: string) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (!agreementId) {
@@ -313,12 +333,18 @@ export async function getResellerStocks(agreementId: string) {
       data: serializeDecimal(formattedStocks),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการดึงข้อมูลสต็อก'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการดึงข้อมูลสต็อก',
+          : 'An error occurred while fetching stock data',
+      message: errMessage,
     }
   }
 }
@@ -333,11 +359,21 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (input.quantity <= 0) {
-      return { success: false, message: 'จำนวนจัดสรรต้องมากกว่า 0' }
+      return {
+        success: false,
+        messageTH: 'จำนวนจัดสรรต้องมากกว่า 0',
+        messageEN: 'Allocation quantity must be greater than 0',
+        message: 'จำนวนจัดสรรต้องมากกว่า 0',
+      }
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -405,14 +441,23 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
 
     return {
       success: true,
+      messageTH: 'เพิ่มสต็อกฝากขายเรียบร้อยแล้ว (รอตัวแทนกดรับสินค้า)',
+      messageEN:
+        'Consignment stock added successfully (pending reseller acceptance)',
       message: 'เพิ่มสต็อกฝากขายเรียบร้อยแล้ว (รอตัวแทนกดรับสินค้า)',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการเติมสต็อก'
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการเติมสต็อก',
+      messageTH: errMessage,
+      messageEN:
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while allocating stock',
+      message: errMessage,
     }
   }
 }
@@ -427,7 +472,12 @@ export async function acceptResellerStock(input: AcceptResellerStockInput) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -472,16 +522,24 @@ export async function acceptResellerStock(input: AcceptResellerStockInput) {
 
     return {
       success: true,
+      messageTH: 'ยืนยันการรับสินค้าเข้าสต็อกเรียบร้อยแล้ว',
+      messageEN: 'Stock acceptance confirmed successfully',
       message: 'ยืนยันการรับสินค้าเข้าสต็อกเรียบร้อยแล้ว',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการยืนยันรับสินค้า'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการยืนยันรับสินค้า',
+          : 'An error occurred while accepting stock',
+      message: errMessage,
     }
   }
 }
@@ -490,7 +548,12 @@ export async function getResellerPayoutSummary(agreementId: string) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (!agreementId) {
@@ -511,7 +574,12 @@ export async function getResellerPayoutSummary(agreementId: string) {
     })
 
     if (!agreement) {
-      return { success: false, message: 'ไม่พบข้อมูลสัญญาฝากขาย' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลสัญญาฝากขาย',
+        messageEN: 'Consignment agreement not found',
+        message: 'ไม่พบข้อมูลสัญญาฝากขาย',
+      }
     }
 
     const orders = await prisma.order.findMany({
@@ -598,12 +666,18 @@ export async function getResellerPayoutSummary(agreementId: string) {
       }),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการคำนวณสรุปยอดเบิกจ่าย'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการคำนวณสรุปยอดเบิกจ่าย',
+          : 'An error occurred while calculating payout summary',
+      message: errMessage,
     }
   }
 }
@@ -619,7 +693,12 @@ export async function createResellerPayout(input: CreateResellerPayoutInput) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const payout = await prisma.resellerPayout.create({
@@ -639,18 +718,30 @@ export async function createResellerPayout(input: CreateResellerPayoutInput) {
 
     return {
       success: true,
+      messageTH: input.paymentProof
+        ? 'บันทึกการจ่ายเงินสำเร็จ'
+        : 'ยื่นขอเบิกจ่ายเงินสำเร็จ',
+      messageEN: input.paymentProof
+        ? 'Payment recorded successfully'
+        : 'Payout request submitted successfully',
       message: input.paymentProof
         ? 'บันทึกการจ่ายเงินสำเร็จ'
         : 'ยื่นขอเบิกจ่ายเงินสำเร็จ',
       data: serializeDecimal(payout),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการบันทึก Payout'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการบันทึก Payout',
+          : 'An error occurred while processing payout',
+      message: errMessage,
     }
   }
 }
@@ -661,7 +752,12 @@ export async function getAllResellerAgreements(storeId: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (!storeId) {
@@ -698,12 +794,18 @@ export async function getAllResellerAgreements(storeId: string) {
       data: serializeDecimal(agreements),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการดึงข้อมูลสัญญาทั้งหมด'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการดึงข้อมูลสัญญาทั้งหมด',
+          : 'An error occurred while fetching agreements',
+      message: errMessage,
     }
   }
 }
@@ -714,7 +816,12 @@ export async function getResellerAgreements(storeId: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (!storeId) {
@@ -754,12 +861,18 @@ export async function getResellerAgreements(storeId: string) {
       data: serializeDecimal(agreements),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการดึงข้อมูลสัญญา'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการดึงข้อมูลสัญญา',
+          : 'An error occurred while fetching agreements',
+      message: errMessage,
     }
   }
 }
@@ -779,11 +892,21 @@ export async function createResellerAgreement(
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (!data.supplierStoreId) {
-      return { success: false, message: 'กรุณาระบุร้านค้าผู้ให้ฝากขาย' }
+      return {
+        success: false,
+        messageTH: 'กรุณาระบุร้านค้าผู้ให้ฝากขาย',
+        messageEN: 'Please specify supplier store',
+        message: 'กรุณาระบุร้านค้าผู้ให้ฝากขาย',
+      }
     }
 
     let resellerUserId: string | null = null
@@ -805,6 +928,8 @@ export async function createResellerAgreement(
       if (!targetUser) {
         return {
           success: false,
+          messageTH: 'ไม่พบข้อมูลผู้ใช้งานที่ตรงกับ Email หรือ ID ที่ระบุ',
+          messageEN: 'User not found with the specified email or ID',
           message: 'ไม่พบข้อมูลผู้ใช้งานที่ตรงกับ Email หรือ ID ที่ระบุ',
         }
       }
@@ -930,17 +1055,23 @@ export async function createResellerAgreement(
 
     return {
       success: true,
+      messageTH: 'สร้างสัญญาและกำหนดสิทธิ์ตัวแทนจำหน่ายสำเร็จ',
+      messageEN: 'Reseller agreement and permissions created successfully',
       message: 'สร้างสัญญาและกำหนดสิทธิ์ตัวแทนจำหน่ายสำเร็จ',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
     console.error(error)
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการสร้างสัญญา'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการสร้างสัญญา',
+          : 'An error occurred while creating agreement',
+      message: errMessage,
     }
   }
 }
@@ -956,15 +1087,30 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (input.quantity <= 0) {
-      return { success: false, message: 'จำนวนที่ต้องการคืนต้องมากกว่า 0' }
+      return {
+        success: false,
+        messageTH: 'จำนวนที่ต้องการคืนต้องมากกว่า 0',
+        messageEN: 'Quantity to return must be greater than 0',
+        message: 'จำนวนที่ต้องการคืนต้องมากกว่า 0',
+      }
     }
 
     if (!input.targetBranchId) {
-      return { success: false, message: 'กรุณาระบุสาขาปลายทางที่ต้องการรับคืน' }
+      return {
+        success: false,
+        messageTH: 'กรุณาระบุสาขาปลายทางที่ต้องการรับคืน',
+        messageEN: 'Please specify destination branch for return',
+        message: 'กรุณาระบุสาขาปลายทางที่ต้องการรับคืน',
+      }
     }
 
     const result = await prisma.$transaction(async (tx) => {
@@ -1054,16 +1200,22 @@ export async function returnResellerStock(input: ReturnResellerStockInput) {
 
     return {
       success: true,
+      messageTH: 'รับคืนสต็อกเข้าสาขาเรียบร้อยแล้ว',
+      messageEN: 'Stock returned to branch successfully',
       message: 'รับคืนสต็อกเข้าสาขาเรียบร้อยแล้ว',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการดึงคืนสต็อก'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการดึงคืนสต็อก',
+          : 'An error occurred while returning stock',
+      message: errMessage,
     }
   }
 }
@@ -1109,11 +1261,21 @@ export async function upsertResellerCustomPrice(
   try {
     const userSession = await getCurrentUser()
     if (!userSession?.id) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (input.customPrice < 0) {
-      return { success: false, message: 'ราคาส่งต้องไม่ติดลบ' }
+      return {
+        success: false,
+        messageTH: 'ราคาส่งต้องไม่ติดลบ',
+        messageEN: 'Wholesale price cannot be negative',
+        message: 'ราคาส่งต้องไม่ติดลบ',
+      }
     }
 
     const result = await prisma.resellerCustomPrice.upsert({
@@ -1142,16 +1304,24 @@ export async function upsertResellerCustomPrice(
 
     return {
       success: true,
+      messageTH: 'บันทึกราคาส่งเฉพาะรายการเรียบร้อยแล้ว',
+      messageEN: 'Item wholesale price saved successfully',
       message: 'บันทึกราคาส่งเฉพาะรายการเรียบร้อยแล้ว',
       data: serializeDecimal(result),
     }
   } catch (error: unknown) {
+    const errMessage =
+      error instanceof Error
+        ? error.message
+        : 'เกิดข้อผิดพลาดในการบันทึกราคาส่ง'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการบันทึกราคาส่ง',
+          : 'An error occurred while saving wholesale price',
+      message: errMessage,
     }
   }
 }

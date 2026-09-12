@@ -240,7 +240,12 @@ export async function createBranch(input: CreateBranchInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const { storeId, isMain = false } = input
@@ -254,6 +259,8 @@ export async function createBranch(input: CreateBranchInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -264,7 +271,12 @@ export async function createBranch(input: CreateBranchInput) {
     })
 
     if (!currentUser?.email) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+        message: 'ไม่พบข้อมูลผู้ใช้งาน',
+      }
     }
 
     const branch = await prisma.$transaction(async (tx) => {
@@ -360,7 +372,13 @@ export async function createBranch(input: CreateBranchInput) {
 
     await invalidateEmployeePermissionCache(userId, storeId)
 
-    return { success: true, data: branch }
+    return {
+      success: true,
+      messageTH: 'สร้างสาขาสำเร็จ',
+      messageEN: 'Branch created successfully',
+      message: 'สร้างสาขาสำเร็จ',
+      data: branch,
+    }
   } catch (error) {
     console.error(error)
     return {
@@ -372,14 +390,24 @@ export async function createBranch(input: CreateBranchInput) {
 export async function updateBranch(id: string, input: UpdateBranchInput) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Branch ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Branch ID',
+        messageEN: 'Branch ID not found',
+        message: 'ไม่พบ Branch ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const existingBranch = await prisma.branch.findUnique({
@@ -388,7 +416,12 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
     })
 
     if (!existingBranch) {
-      return { success: false, message: 'ไม่พบข้อมูลสาขา' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลสาขา',
+        messageEN: 'Branch not found',
+        message: 'ไม่พบข้อมูลสาขา',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -400,6 +433,8 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -419,7 +454,13 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
-    return { success: true, data: updatedBranch }
+    return {
+      success: true,
+      messageTH: 'อัปเดตข้อมูลสาขาสำเร็จ',
+      messageEN: 'Branch updated successfully',
+      message: 'อัปเดตข้อมูลสาขาสำเร็จ',
+      data: updatedBranch,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -429,14 +470,24 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
 export async function setMainBranch(id: string, storeId: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Branch ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Branch ID',
+        messageEN: 'Branch ID not found',
+        message: 'ไม่พบ Branch ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -448,6 +499,8 @@ export async function setMainBranch(id: string, storeId: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -478,7 +531,13 @@ export async function setMainBranch(id: string, storeId: string) {
       details: { type: 'set_main' },
     })
 
-    return { success: true, data: updatedBranch }
+    return {
+      success: true,
+      messageTH: 'ตั้งเป็นสาขาหลักสำเร็จ',
+      messageEN: 'Set as main branch successfully',
+      message: 'ตั้งเป็นสาขาหลักสำเร็จ',
+      data: updatedBranch,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -488,14 +547,24 @@ export async function setMainBranch(id: string, storeId: string) {
 export async function deleteBranch(id: string, storeId: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Branch ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Branch ID',
+        messageEN: 'Branch ID not found',
+        message: 'ไม่พบ Branch ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -507,6 +576,8 @@ export async function deleteBranch(id: string, storeId: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -517,12 +588,22 @@ export async function deleteBranch(id: string, storeId: string) {
     })
 
     if (branch?.isMain) {
-      return { success: false, message: 'ไม่สามารถลบสาขาหลักได้' }
+      return {
+        success: false,
+        messageTH: 'ไม่สามารถลบสาขาหลักได้',
+        messageEN: 'Cannot delete the main branch',
+        message: 'ไม่สามารถลบสาขาหลักได้',
+      }
     }
 
     const branchCount = await prisma.branch.count({ where: { storeId } })
     if (branchCount <= 1) {
-      return { success: false, message: 'ต้องมีสาขาอย่างน้อย 1 สาขา' }
+      return {
+        success: false,
+        messageTH: 'ต้องมีสาขาอย่างน้อย 1 สาขา',
+        messageEN: 'There must be at least one branch',
+        message: 'ต้องมีสาขาอย่างน้อย 1 สาขา',
+      }
     }
 
     await prisma.$transaction(async (tx) => {
@@ -545,7 +626,12 @@ export async function deleteBranch(id: string, storeId: string) {
 
     await invalidateEmployeePermissionCache(userId, storeId)
 
-    return { success: true, message: 'ลบสาขาสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบสาขาสำเร็จ',
+      messageEN: 'Branch deleted successfully',
+      message: 'ลบสาขาสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

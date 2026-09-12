@@ -4,6 +4,10 @@ import { SLIP_CREDIT_COST } from '@/constants/ai'
 import { mapBankCodeToSlip2Go } from '@/constants/bank'
 import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/slip'
 import {
+  SERVER_ERROR_MESSAGE_EN,
+  SERVER_ERROR_MESSAGE_TH,
+} from '@/constants/system'
+import {
   ActorType,
   BankAccountType,
   LogAction,
@@ -34,6 +38,8 @@ export async function verifySlip(
   if (!store) {
     return {
       success: false,
+      messageTH: 'ไม่พบข้อมูลร้านค้า',
+      messageEN: 'Store information not found',
       message: 'ไม่พบข้อมูลร้านค้า',
       shouldDeleteImage: false,
     }
@@ -46,6 +52,8 @@ export async function verifySlip(
   if (!customer) {
     return {
       success: false,
+      messageTH: 'ไม่พบข้อมูลลูกค้า',
+      messageEN: 'Customer not found',
       message: 'ไม่พบข้อมูลลูกค้า',
       shouldDeleteImage: false,
     }
@@ -59,6 +67,8 @@ export async function verifySlip(
   if (!order) {
     return {
       success: false,
+      messageTH: 'ไม่พบข้อมูลออเดอร์',
+      messageEN: 'Order not found',
       message: 'ไม่พบข้อมูลออเดอร์',
       shouldDeleteImage: false,
     }
@@ -72,6 +82,8 @@ export async function verifySlip(
   if (!paymentSetting || !paymentSetting.bankAccounts.length) {
     return {
       success: false,
+      messageTH: 'ร้านค้ายังไม่ได้ตั้งค่าบัญชีธนาคารสำหรับรับเงิน',
+      messageEN: 'Store has not configured a receiving bank account',
       message: 'ร้านค้ายังไม่ได้ตั้งค่าบัญชีธนาคารสำหรับรับเงิน',
       shouldDeleteImage: false,
     }
@@ -107,9 +119,12 @@ export async function verifySlip(
         data: { isBlocked: false, blockedUntil: null, fakeSlipCount: 0 },
       })
     } else {
+      const blockMsg = getBlockMessage(customerStore.blockedUntil)
       return {
         success: false,
-        message: getBlockMessage(customerStore.blockedUntil),
+        messageTH: blockMsg,
+        messageEN: blockMsg,
+        message: blockMsg,
         shouldDeleteImage: true,
       }
     }
@@ -119,6 +134,8 @@ export async function verifySlip(
   if (store.balance.toNumber() < cost) {
     return {
       success: false,
+      messageTH: 'ยอดเครดิตร้านค้าไม่เพียงพอ',
+      messageEN: 'Insufficient store credit balance',
       message: 'ยอดเครดิตร้านค้าไม่เพียงพอ',
       shouldDeleteImage: true,
     }
@@ -173,6 +190,10 @@ export async function verifySlip(
       success: true,
       requiresManualCheck: true,
       shouldDeleteImage: false,
+      messageTH:
+        'อัปโหลดสลิปเรียบร้อย เราได้บันทึกสลิปนี้เพื่อให้แอดมินตรวจสอบยอดด้วยตนเอง',
+      messageEN:
+        'Slip uploaded successfully. We have recorded this slip for manual verification by admin.',
       message:
         'อัพโหลดสลิปเรียบร้อย เราได้บันทึกสลิปนี้เพื่อให้แอดมินตรวจสอบยอดด้วยตนเอง',
     }
@@ -319,10 +340,19 @@ export async function verifySlip(
       .catch((err) => console.error(err))
   }
 
+  const responseMsgTH = isSlipValid
+    ? 'ตรวจสอบสลิปสำเร็จ'
+    : getSlipErrorMessage(result.code, result.message)
+  const responseMsgEN = isSlipValid
+    ? 'Slip verified successfully'
+    : result.message || getSlipErrorMessage(result.code, result.message)
+
   return {
     success: isSlipValid,
     shouldDeleteImage: !isSlipValid,
-    message: responseMessage,
+    messageTH: responseMsgTH,
+    messageEN: responseMsgEN,
+    message: responseMsgTH,
   }
 }
 
@@ -332,14 +362,24 @@ export async function approveSlipManual(
 ) {
   try {
     if (!orderId) {
-      return { success: false, message: 'ไม่พบรหัสออเดอร์' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบรหัสออเดอร์',
+        messageEN: 'Order ID not found',
+        message: 'ไม่พบรหัสออเดอร์',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const order = await prisma.order.findUnique({
@@ -353,7 +393,12 @@ export async function approveSlipManual(
     })
 
     if (!order) {
-      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลออเดอร์',
+        messageEN: 'Order not found',
+        message: 'ไม่พบข้อมูลออเดอร์',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -365,6 +410,11 @@ export async function approveSlipManual(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH:
+          authCheck.messageTH ||
+          authCheck.message ||
+          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -455,16 +505,29 @@ export async function approveSlipManual(
         .catch((err) => console.error(err))
     }
 
+    const approveMsgTH =
+      action === SlipVerificationAction.APPROVE
+        ? 'อนุมัติสลิปสำเร็จ'
+        : 'ปฏิเสธและลบรูปสลิป รีเซ็ตออเดอร์สำเร็จ'
+    const approveMsgEN =
+      action === SlipVerificationAction.APPROVE
+        ? 'Slip approved successfully'
+        : 'Slip rejected and order reset successfully'
+
     return {
       success: true,
-      message:
-        action === SlipVerificationAction.APPROVE
-          ? 'อนุมัติสลิปสำเร็จ'
-          : 'ปฏิเสธและลบรูปสลิป รีเซ็ตออเดอร์สำเร็จ',
+      messageTH: approveMsgTH,
+      messageEN: approveMsgEN,
+      message: approveMsgTH,
       data: updatedOrder,
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }

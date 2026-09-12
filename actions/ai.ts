@@ -62,6 +62,10 @@ export async function generateProductAi(
     if (!hasTitle && !hasImages) {
       return {
         success: false,
+        messageTH:
+          'โปรดระบุชื่อสินค้าหรืออัปโหลดรูปภาพสินค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ข้อมูลได้อย่างแม่นยำครับ',
+        messageEN:
+          'Please provide a product title or upload product images before AI analysis',
         message:
           'โปรดระบุชื่อสินค้าหรืออัปโหลดรูปภาพสินค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ข้อมูลได้อย่างแม่นยำครับ',
       }
@@ -127,6 +131,8 @@ export async function generateProductAi(
 
     return {
       success: true,
+      messageTH: 'สร้างข้อมูลเรียบร้อย',
+      messageEN: 'Data generated successfully',
       message: 'สร้างข้อมูลเรียบร้อย',
       data: JSON.parse(responseText),
     }
@@ -155,6 +161,9 @@ export async function generateCategoryAi(
     if (!title || title.trim().length === 0) {
       return {
         success: false,
+        messageTH:
+          'โปรดระบุชื่อหมวดหมู่สินค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ครับ',
+        messageEN: 'Please enter category name first for AI analysis',
         message: 'โปรดระบุชื่อหมวดหมู่สินค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ครับ',
       }
     }
@@ -205,6 +214,8 @@ export async function generateCategoryAi(
 
     return {
       success: true,
+      messageTH: 'สร้างข้อมูลหมวดหมู่เรียบร้อย',
+      messageEN: 'Category data generated successfully',
       message: 'สร้างข้อมูลหมวดหมู่เรียบร้อย',
       data: JSON.parse(responseText) as {
         title: string
@@ -238,6 +249,8 @@ export async function generateBlogAi(
     if (task !== AiGenTask.ALL && !title?.trim()) {
       return {
         success: false,
+        messageTH: 'โปรดระบุชื่อบทความเบื้องต้น เพื่อให้ AI นำไปประมวลผลครับ',
+        messageEN: 'Please enter a preliminary article title for AI processing',
         message: 'โปรดระบุชื่อบทความเบื้องต้น เพื่อให้ AI นำไปประมวลผลครับ',
       }
     }
@@ -291,6 +304,8 @@ export async function generateBlogAi(
 
     return {
       success: true,
+      messageTH: 'สร้างเนื้อหาบทความเรียบร้อยแล้ว',
+      messageEN: 'Article content generated successfully',
       message: 'สร้างเนื้อหาบทความเรียบร้อยแล้ว',
       data: JSON.parse(responseText) as Partial<BlogFormValues>,
     }
@@ -317,6 +332,8 @@ export async function generateAnalyticsInsightsAi(
     if (!analyticsOverviewData) {
       return {
         success: false,
+        messageTH: 'ไม่พบข้อมูล Analytics สำหรับวิเคราะห์',
+        messageEN: 'Analytics data not found for analysis',
         message: 'ไม่พบข้อมูล Analytics สำหรับวิเคราะห์',
       }
     }
@@ -327,6 +344,8 @@ export async function generateAnalyticsInsightsAi(
     if (Number(store.balance) < costEstimate.credits) {
       return {
         success: false,
+        messageTH: 'เครดิตของคุณไม่เพียงพอสำหรับการวิเคราะห์',
+        messageEN: 'Insufficient credits for analysis',
         message: 'เครดิตของคุณไม่เพียงพอสำหรับการวิเคราะห์',
       }
     }
@@ -370,6 +389,8 @@ export async function generateAnalyticsInsightsAi(
 
     return {
       success: true,
+      messageTH: 'วิเคราะห์ข้อมูลสำเร็จ',
+      messageEN: 'Analysis completed successfully',
       message: 'วิเคราะห์ข้อมูลสำเร็จ',
       data: JSON.parse(responseText),
     }

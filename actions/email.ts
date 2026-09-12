@@ -21,11 +21,19 @@ export async function verifyOtp({ otp }: { otp: string }) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบเซสชันการเข้าสู่ระบบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบเซสชันการเข้าสู่ระบบ',
+        messageEN: 'No login session found',
+      }
     }
 
     if (!otp) {
-      return { success: false, message: 'โปรดระบุรหัส OTP' }
+      return {
+        success: false,
+        messageTH: 'โปรดระบุรหัส OTP',
+        messageEN: 'Please enter the OTP code',
+      }
     }
 
     const user = await prisma.user.findUnique({
@@ -35,15 +43,27 @@ export async function verifyOtp({ otp }: { otp: string }) {
     })
 
     if (!user) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     if (!user.otpExpires || user.otpExpires < new Date()) {
-      return { success: false, message: 'รหัส OTP หมดอายุแล้ว' }
+      return {
+        success: false,
+        messageTH: 'รหัส OTP หมดอายุแล้ว',
+        messageEN: 'OTP code has expired',
+      }
     }
 
     if (user.otp !== otp) {
-      return { success: false, message: 'รหัส OTP ไม่ถูกต้อง' }
+      return {
+        success: false,
+        messageTH: 'รหัส OTP ไม่ถูกต้อง',
+        messageEN: 'Invalid OTP code',
+      }
     }
 
     await prisma.user.update({
@@ -51,10 +71,18 @@ export async function verifyOtp({ otp }: { otp: string }) {
       data: { otp: null, otpExpires: null, emailVerified: true },
     })
 
-    return { success: true, message: 'ยืนยัน OTP สำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ยืนยัน OTP สำเร็จ',
+      messageEN: 'OTP verified successfully',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการยืนยัน OTP' }
+    return {
+      success: false,
+      messageTH: 'เกิดข้อผิดพลาดในการยืนยัน OTP',
+      messageEN: 'Error verifying OTP',
+    }
   }
 }
 
@@ -77,7 +105,11 @@ export async function resendOtp() {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบเซสชันการเข้าสู่ระบบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบเซสชันการเข้าสู่ระบบ',
+        messageEN: 'No login session found',
+      }
     }
 
     const user = await prisma.user.findUnique({
@@ -86,13 +118,18 @@ export async function resendOtp() {
     })
 
     if (!user) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     if (user.emailVerified) {
       return {
         success: false,
-        message: 'บัญชีนี้ได้รับการยืนยันอีเมลเรียบร้อยแล้ว',
+        messageTH: 'บัญชีนี้ได้รับการยืนยันอีเมลเรียบร้อยแล้ว',
+        messageEN: 'This account email has already been verified',
       }
     }
 
@@ -107,7 +144,8 @@ export async function resendOtp() {
         const remainingSeconds = Math.ceil((cooldownInMs - timePassed) / SECOND)
         return {
           success: false,
-          message: `กรุณารออีก ${remainingSeconds} วินาที ก่อนขอรหัส OTP ใหม่`,
+          messageTH: `กรุณารออีก ${remainingSeconds} วินาที ก่อนขอรหัส OTP ใหม่`,
+          messageEN: `Please wait ${remainingSeconds} seconds before requesting a new OTP`,
         }
       }
     }
@@ -129,11 +167,16 @@ export async function resendOtp() {
     } catch {
       return {
         success: false,
-        message: 'ระบบส่งอีเมลขัดข้อง กรุณาลองใหม่อีกครั้งในภายหลัง',
+        messageTH: 'ระบบส่งอีเมลขัดข้อง กรุณาลองใหม่อีกครั้งในภายหลัง',
+        messageEN: 'Email service error. Please try again later',
       }
     }
 
-    return { success: true, message: 'ส่งรหัส OTP ใหม่ไปยังอีเมลของคุณแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ส่งรหัส OTP ใหม่ไปยังอีเมลของคุณแล้ว',
+      messageEN: 'New OTP has been sent to your email',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

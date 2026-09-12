@@ -76,11 +76,8 @@ export function RegisterForm() {
     mutationFn: registerUser,
     onSuccess: async (res, variables) => {
       if (res && !res.success) {
-        toast.error(res.message || t('failed'))
         return
       }
-
-      toast.success(res?.message || t('success'))
 
       const response = await authClient.signIn.email({
         email: variables.email,

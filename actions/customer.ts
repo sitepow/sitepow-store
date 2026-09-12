@@ -157,7 +157,12 @@ export async function unblockCustomer(customerId: string, storeId: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
     if (!userId) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+      return {
+        success: false,
+        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+        messageEN: 'Unauthorized',
+        message: 'ไม่มีสิทธิ์เข้าถึง',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -167,7 +172,12 @@ export async function unblockCustomer(customerId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
+      }
     }
 
     const updatedCustomerStore = await prisma.customerStore.update({
@@ -192,7 +202,12 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       entityId: updatedCustomerStore.id,
     })
 
-    return { success: true, message: 'ปลดล็อกลูกค้าสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ปลดล็อกลูกค้าสำเร็จ',
+      messageEN: 'Customer unblocked successfully',
+      message: 'ปลดล็อกลูกค้าสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -204,7 +219,12 @@ export async function blockCustomer(customerId: string, storeId: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
     if (!userId) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+      return {
+        success: false,
+        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+        messageEN: 'Unauthorized',
+        message: 'ไม่มีสิทธิ์เข้าถึง',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -214,7 +234,12 @@ export async function blockCustomer(customerId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
+      }
     }
 
     const updatedCustomerStore = await prisma.customerStore.update({
@@ -238,7 +263,12 @@ export async function blockCustomer(customerId: string, storeId: string) {
       entityId: updatedCustomerStore.id,
     })
 
-    return { success: true, message: 'บล็อกลูกค้าสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'บล็อกลูกค้าสำเร็จ',
+      messageEN: 'Customer blocked successfully',
+      message: 'บล็อกลูกค้าสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -261,6 +291,8 @@ export interface POSCustomerSearch {
 export type SearchCustomerResponse = {
   success: boolean
   data?: POSCustomerSearch
+  messageTH?: string
+  messageEN?: string
   message?: string
 }
 
@@ -275,11 +307,21 @@ export async function searchCustomer({
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ' }
+    return {
+      success: false,
+      messageTH: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ',
+      messageEN: 'Access denied, please sign in',
+      message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ',
+    }
   }
 
   if (!query || !query.trim()) {
-    return { success: false, message: 'กรุณากรอกข้อมูลสำหรับค้นหา' }
+    return {
+      success: false,
+      messageTH: 'กรุณากรอกข้อมูลสำหรับค้นหา',
+      messageEN: 'Please enter search query',
+      message: 'กรุณากรอกข้อมูลสำหรับค้นหา',
+    }
   }
 
   try {
@@ -290,7 +332,12 @@ export async function searchCustomer({
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
+      }
     }
 
     const cleanQuery = query.trim()
@@ -323,12 +370,19 @@ export async function searchCustomer({
     })
 
     if (!customerStore) {
-      return { success: false, message: 'ไม่พบข้อมูลสมาชิกในระบบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลสมาชิกในระบบ',
+        messageEN: 'Member not found in the system',
+        message: 'ไม่พบข้อมูลสมาชิกในระบบ',
+      }
     }
 
     if (customerStore.isBlocked) {
       return {
         success: false,
+        messageTH: 'สมาชิกรายนี้ถูกระงับการใช้งานในร้านนี้',
+        messageEN: 'This member has been suspended from this store',
         message: 'สมาชิกรายนี้ถูกระงับการใช้งานในร้านนี้',
       }
     }
@@ -340,6 +394,8 @@ export async function searchCustomer({
 
     return {
       success: true,
+      messageTH: 'พบข้อมูลสมาชิก พร้อมใช้แต้มสะสมสำหรับร้านนี้',
+      messageEN: 'Member found, ready to use reward points for this store',
       message: 'พบข้อมูลสมาชิก พร้อมใช้แต้มสะสมสำหรับร้านนี้',
       data: {
         id: customerStore.customer.id,
@@ -359,6 +415,8 @@ export async function searchCustomer({
 export type CreateCustomerResponse = {
   success: boolean
   data?: POSCustomerSearch
+  messageTH?: string
+  messageEN?: string
   message?: string
 }
 
@@ -369,11 +427,21 @@ export async function createCustomer(
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+    return {
+      success: false,
+      messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+      messageEN: 'Unauthorized',
+      message: 'ไม่มีสิทธิ์เข้าถึง',
+    }
   }
 
   if (!input.storeId) {
-    return { success: false, message: 'กรุณาระบุรหัสร้านค้า (storeId)' }
+    return {
+      success: false,
+      messageTH: 'กรุณาระบุรหัสร้านค้า (storeId)',
+      messageEN: 'Please specify storeId',
+      message: 'กรุณาระบุรหัสร้านค้า (storeId)',
+    }
   }
 
   try {
@@ -384,7 +452,12 @@ export async function createCustomer(
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
+      }
     }
 
     const cleanPhone = input.phone.trim()
@@ -432,6 +505,9 @@ export async function createCustomer(
 
     return {
       success: true,
+      messageTH: 'สร้างสมาชิกใหม่สำเร็จ พร้อมใช้สะสมแต้มสำหรับร้านนี้',
+      messageEN:
+        'New member created successfully, ready to use reward points for this store',
       message: 'สร้างสมาชิกใหม่สำเร็จ พร้อมใช้สะสมแต้มสำหรับร้านนี้',
       data: {
         id: customer.id,

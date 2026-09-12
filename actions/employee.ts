@@ -224,7 +224,12 @@ export async function createEmployee(input: CreateEmployeeInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -236,6 +241,8 @@ export async function createEmployee(input: CreateEmployeeInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -256,7 +263,12 @@ export async function createEmployee(input: CreateEmployeeInput) {
     })
 
     if (alreadyInStore) {
-      return { success: false, message: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว' }
+      return {
+        success: false,
+        messageTH: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว',
+        messageEN: 'This employee is already in this store',
+        message: 'พนักงานคนนี้อยู่ในร้านนี้แล้ว',
+      }
     }
 
     const employeeStore = await prisma.employeeStore.create({
@@ -299,6 +311,8 @@ export async function createEmployee(input: CreateEmployeeInput) {
 
     return {
       success: true,
+      messageTH: `บันทึกข้อมูลสำเร็จแล้ว (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
+      messageEN: `Employee saved successfully (Default password: ${DEFAULT_PASSWORD_EMPLOYEE})`,
       message: `บันทึกข้อมูลสำเร็จแล้ว (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
       data: employeeStore,
     }
@@ -311,14 +325,24 @@ export async function createEmployee(input: CreateEmployeeInput) {
 export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Employee ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Employee ID',
+        messageEN: 'Employee ID not found',
+        message: 'ไม่พบ Employee ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -330,6 +354,8 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -344,7 +370,12 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     })
 
     if (!existingEmployeeStore) {
-      return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลพนักงาน',
+        messageEN: 'Employee data not found',
+        message: 'ไม่พบข้อมูลพนักงาน',
+      }
     }
 
     const updated = await prisma.$transaction(async (tx) => {
@@ -397,7 +428,12 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
     })
 
     if (!updated) {
-      return { success: false, message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' }
+      return {
+        success: false,
+        messageTH: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล',
+        messageEN: 'An error occurred while updating employee data',
+        message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล',
+      }
     }
 
     if (existingEmployeeStore.employee.userId) {
@@ -416,7 +452,13 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       details: { updatedFields: Object.keys(input), type: 'updated' },
     })
 
-    return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
+    return {
+      success: true,
+      messageTH: 'บันทึกข้อมูลสำเร็จแล้ว',
+      messageEN: 'Employee updated successfully',
+      message: 'บันทึกข้อมูลสำเร็จแล้ว',
+      data: updated,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -426,7 +468,12 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
 export async function deleteEmployee(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Employee ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Employee ID',
+        messageEN: 'Employee ID not found',
+        message: 'ไม่พบ Employee ID',
+      }
     }
 
     const employeeStore = await prisma.employeeStore.findUnique({
@@ -448,12 +495,19 @@ export async function deleteEmployee(id: string) {
     })
 
     if (!employeeStore) {
-      return { success: false, message: 'ไม่พบข้อมูลพนักงาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลพนักงาน',
+        messageEN: 'Employee data not found',
+        message: 'ไม่พบข้อมูลพนักงาน',
+      }
     }
 
     if (employeeStore.employee?.userId === employeeStore.store.ownerId) {
       return {
         success: false,
+        messageTH: 'ไม่สามารถลบข้อมูลบัญชีเจ้าของร้านได้',
+        messageEN: 'Cannot delete the store owner account',
         message: 'ไม่สามารถลบข้อมูลบัญชีเจ้าของร้านได้',
       }
     }
@@ -462,7 +516,12 @@ export async function deleteEmployee(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -474,6 +533,8 @@ export async function deleteEmployee(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -538,6 +599,8 @@ export async function deleteEmployee(id: string) {
 
     return {
       success: true,
+      messageTH: 'ลบพนักงานและข้อมูลที่เกี่ยวข้องทั้งหมดสำเร็จ',
+      messageEN: 'Employee and all associated data deleted successfully',
       message: 'ลบพนักงานและข้อมูลที่เกี่ยวข้องทั้งหมดสำเร็จ',
     }
   } catch (error) {

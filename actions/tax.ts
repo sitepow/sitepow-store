@@ -48,7 +48,11 @@ export async function updateTaxSetting(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -60,7 +64,8 @@ export async function updateTaxSetting(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -83,7 +88,8 @@ export async function updateTaxSetting(
 
     return {
       success: true,
-      message: 'บันทึกการตั้งค่าสำเร็จแล้ว',
+      messageTH: 'บันทึกการตั้งค่าสำเร็จแล้ว',
+      messageEN: 'Tax settings updated successfully',
       data: serializeDecimal(result),
     }
   } catch (error) {

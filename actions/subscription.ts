@@ -3,6 +3,10 @@
 import { PLAN_DETAILS, PLAN_RANK } from '@/constants/plan'
 import { PRICING_VALUE } from '@/constants/pricing'
 import {
+  SERVER_ERROR_MESSAGE_EN,
+  SERVER_ERROR_MESSAGE_TH,
+} from '@/constants/system'
+import {
   ActorType,
   InvoiceStatus,
   LogAction,
@@ -158,14 +162,24 @@ export async function changePlan(
 ) {
   try {
     if (!storeId) {
-      return { success: false, message: 'ไม่พบ Store ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Store ID',
+        messageEN: 'Store ID not found',
+        message: 'ไม่พบ Store ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -177,6 +191,11 @@ export async function changePlan(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH:
+          authCheck.messageTH ||
+          authCheck.message ||
+          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -193,7 +212,12 @@ export async function changePlan(
     })
 
     if (!subscription) {
-      return { success: false, message: 'ไม่พบข้อมูล Subscription' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูล Subscription',
+        messageEN: 'Subscription not found',
+        message: 'ไม่พบข้อมูล Subscription',
+      }
     }
 
     const monthsDiff = Math.max(
@@ -217,6 +241,8 @@ export async function changePlan(
     if (subscription.plan === newPlan && currentBillingCycle === billingCycle) {
       return {
         success: false,
+        messageTH: 'คุณกำลังใช้งานแพลนและรอบบิลนี้อยู่แล้ว',
+        messageEN: 'You are already on this plan and billing cycle',
         message: 'คุณกำลังใช้งานแพลนและรอบบิลนี้อยู่แล้ว',
       }
     }
@@ -302,6 +328,8 @@ export async function changePlan(
 
       return {
         success: true,
+        messageTH: `เปลี่ยนแพลนเป็น ${newPlan} เรียบร้อยแล้ว`,
+        messageEN: `Successfully changed plan to ${newPlan}`,
         message: `เปลี่ยนแพลนเป็น ${newPlan} เรียบร้อยแล้ว`,
       }
     } else {
@@ -330,12 +358,19 @@ export async function changePlan(
 
       return {
         success: true,
+        messageTH: `ตั้งค่าเปลี่ยนแพลนเป็น ${newPlan} (${billingCycle}) เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
+        messageEN: `Scheduled plan change to ${newPlan} (${billingCycle}) when current cycle ends`,
         message: `ตั้งค่าเปลี่ยนแพลนเป็น ${newPlan} (${billingCycle}) เมื่อรอบปัจจุบันสิ้นสุดแล้ว`,
       }
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }
 
@@ -448,7 +483,12 @@ export async function initiatePlanUpgrade(
 
   try {
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -460,6 +500,11 @@ export async function initiatePlanUpgrade(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH:
+          authCheck.messageTH ||
+          authCheck.message ||
+          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -492,7 +537,12 @@ export async function initiatePlanUpgrade(
     })
 
     if (!sub || !lastInvoice) {
-      return { success: false, message: 'ไม่พบข้อมูลการชำระเงินเดิม' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลการชำระเงินเดิม',
+        messageEN: 'Previous payment information not found',
+        message: 'ไม่พบข้อมูลการชำระเงินเดิม',
+      }
     }
 
     const { finalPrice: newPlanPrice } = calculatePlanPrice(
@@ -532,7 +582,12 @@ export async function initiatePlanUpgrade(
     return { success: true, url: null }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }
 
@@ -600,14 +655,24 @@ export async function calculateUpgradeCost(
 export async function cancelPendingPlanChange(storeId: string) {
   try {
     if (!storeId) {
-      return { success: false, message: 'ไม่พบ Store ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Store ID',
+        messageEN: 'Store ID not found',
+        message: 'ไม่พบ Store ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -619,6 +684,11 @@ export async function cancelPendingPlanChange(storeId: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH:
+          authCheck.messageTH ||
+          authCheck.message ||
+          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -643,9 +713,19 @@ export async function cancelPendingPlanChange(storeId: string) {
       },
     })
 
-    return { success: true, message: 'ยกเลิกการรอเปลี่ยนแพลนเรียบร้อยแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ยกเลิกการรอเปลี่ยนแพลนเรียบร้อยแล้ว',
+      messageEN: 'Pending plan change cancelled successfully',
+      message: 'ยกเลิกการรอเปลี่ยนแพลนเรียบร้อยแล้ว',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }

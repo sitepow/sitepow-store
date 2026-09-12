@@ -258,7 +258,11 @@ export async function createCategory(input: CreateCategoryInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -270,7 +274,8 @@ export async function createCategory(input: CreateCategoryInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -279,7 +284,11 @@ export async function createCategory(input: CreateCategoryInput) {
     })
 
     if (existing) {
-      return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้' }
+      return {
+        success: false,
+        messageTH: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้',
+        messageEN: 'This slug is already in use in this store',
+      }
     }
 
     const category = await prisma.category.create({ data: input })
@@ -293,7 +302,12 @@ export async function createCategory(input: CreateCategoryInput) {
       details: { title: input.title, slug: input.slug, type: 'created' },
     })
 
-    return { success: true, message: 'สร้างหมวดหมู่สำเร็จแล้ว', data: category }
+    return {
+      success: true,
+      messageTH: 'สร้างหมวดหมู่สำเร็จแล้ว',
+      messageEN: 'Category created successfully',
+      data: category,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -303,14 +317,22 @@ export async function createCategory(input: CreateCategoryInput) {
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Category ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Category ID',
+        messageEN: 'Category ID not found',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const targetCategory = await prisma.category.findUnique({
@@ -319,7 +341,11 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     })
 
     if (!targetCategory) {
-      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลหมวดหมู่',
+        messageEN: 'Category data not found',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -331,7 +357,8 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -363,7 +390,8 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 
     return {
       success: true,
-      message: 'อัพเดตหมวดหมู่สำเร็จแล้ว',
+      messageTH: 'อัพเดตหมวดหมู่สำเร็จแล้ว',
+      messageEN: 'Category updated successfully',
       data: category,
     }
   } catch (error) {
@@ -375,14 +403,22 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 export async function deleteCategory(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Category ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Category ID',
+        messageEN: 'Category ID not found',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const category = await prisma.category.findUnique({
@@ -396,7 +432,11 @@ export async function deleteCategory(id: string) {
     })
 
     if (!category) {
-      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลหมวดหมู่',
+        messageEN: 'Category data not found',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -408,7 +448,8 @@ export async function deleteCategory(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -432,7 +473,11 @@ export async function deleteCategory(id: string) {
       await invalidateStorefrontCategoryCache(category.store.slug)
     }
 
-    return { success: true, message: 'ลบหมวดหมู่สำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ลบหมวดหมู่สำเร็จแล้ว',
+      messageEN: 'Category deleted successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

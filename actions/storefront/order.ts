@@ -195,10 +195,15 @@ export async function getStorefrontOrders({
 
 export async function createOrder(input: CreateOrderInput) {
   try {
-    const { isAuthorized, message, userId } = await requireVerifiedUser()
+    const { isAuthorized, messageTH, messageEN, userId } =
+      await requireVerifiedUser()
 
     if (!isAuthorized) {
-      return { success: false, message }
+      return {
+        success: false,
+        messageTH: messageTH || 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: messageEN || 'Please sign in to proceed',
+      }
     }
 
     const customer = await prisma.customer.findUnique({
@@ -212,7 +217,11 @@ export async function createOrder(input: CreateOrderInput) {
     })
 
     if (!customer) {
-      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลลูกค้า',
+        messageEN: 'Customer data not found',
+      }
     }
 
     const store = await prisma.store.findUnique({
@@ -221,7 +230,11 @@ export async function createOrder(input: CreateOrderInput) {
     })
 
     if (!store) {
-      return { success: false, message: 'ไม่พบร้านค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบร้านค้า',
+        messageEN: 'Store not found',
+      }
     }
 
     const createdOrders = await createOrderCore({
@@ -284,7 +297,8 @@ export async function createOrder(input: CreateOrderInput) {
 
     return {
       success: true,
-      message: 'สั่งซื้อสินค้าสำเร็จแล้ว',
+      messageTH: 'สั่งซื้อสินค้าสำเร็จแล้ว',
+      messageEN: 'Order placed successfully',
       data: serializeDecimal(createdOrders[0]),
       allOrders: serializeDecimal(createdOrders),
     }
@@ -298,7 +312,8 @@ export async function createOrder(input: CreateOrderInput) {
 
     return {
       success: false,
-      message: errorMessage,
+      messageTH: errorMessage || 'เกิดข้อผิดพลาดในการสั่งซื้อ',
+      messageEN: errorMessage || 'Failed to place order',
     }
   }
 }

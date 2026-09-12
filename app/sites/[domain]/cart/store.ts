@@ -20,6 +20,32 @@ export interface AppliedCoupon {
   discountAmount: number
 }
 
+const getClientLocale = (): 'th' | 'en' => {
+  if (typeof document !== 'undefined') {
+    const htmlLang = document.documentElement.lang
+    if (htmlLang === 'en' || htmlLang === 'th') return htmlLang
+
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)
+    if (cookieMatch && (cookieMatch[1] === 'en' || cookieMatch[1] === 'th')) {
+      return cookieMatch[1]
+    }
+  }
+  return 'th'
+}
+
+const CART_MESSAGES = {
+  th: {
+    consignmentStockOut: 'สต็อกฝากขายหมดแล้ว',
+    branchStockOut: 'สินค้าในสาขานี้หมดแล้ว',
+    addedToCart: 'เพิ่มสินค้าลงในตะกร้าแล้ว',
+  },
+  en: {
+    consignmentStockOut: 'Consignment stock sold out',
+    branchStockOut: 'Out of stock at this branch',
+    addedToCart: 'Added to cart',
+  },
+} as const
+
 interface CartStore {
   items: CartItem[]
   appliedCoupon: AppliedCoupon | null
@@ -48,6 +74,8 @@ export const useCartStore = create<CartStore>()(
       usedPoints: 0,
       addItem: (newItem, messages) => {
         const { items } = get()
+        const locale = getClientLocale()
+        const defaultMessages = CART_MESSAGES[locale]
 
         const getAvailableStock = () => {
           if (
@@ -84,8 +112,9 @@ export const useCartStore = create<CartStore>()(
         ) {
           toast.error(
             newItem.isReseller
-              ? (messages?.consignmentStockOut ?? 'Consignment stock sold out')
-              : (messages?.branchStockOut ?? 'Branch stock sold out'),
+              ? (messages?.consignmentStockOut ??
+                  defaultMessages.consignmentStockOut)
+              : (messages?.branchStockOut ?? defaultMessages.branchStockOut),
           )
           return
         }
@@ -128,7 +157,7 @@ export const useCartStore = create<CartStore>()(
           }
           set({ items: [...items, cartItem] })
         }
-        toast.success(messages?.addedToCart ?? 'Added to cart')
+        toast.success(messages?.addedToCart ?? defaultMessages.addedToCart)
       },
       removeItem: (cartItemId) => {
         set((state) => ({

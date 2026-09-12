@@ -73,7 +73,12 @@ export async function addStoreDomain(storeId: string, domain: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -86,6 +91,8 @@ export async function addStoreDomain(storeId: string, domain: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -102,6 +109,8 @@ export async function addStoreDomain(storeId: string, domain: string) {
     if (!cleanDomain || !domainRegex.test(cleanDomain)) {
       return {
         success: false,
+        messageTH: 'รูปแบบโดเมนไม่ถูกต้อง กรุณากรอกชื่อโดเมนให้ถูกต้อง',
+        messageEN: 'Invalid domain format. Please enter a valid domain name',
         message: 'รูปแบบโดเมนไม่ถูกต้อง กรุณากรอกชื่อโดเมนให้ถูกต้อง',
       }
     }
@@ -110,6 +119,8 @@ export async function addStoreDomain(storeId: string, domain: string) {
     if (cleanDomain.endsWith(`.${baseDomain}`) || cleanDomain === baseDomain) {
       return {
         success: false,
+        messageTH: `ไม่สามารถใช้โดเมน ${baseDomain} เป็น Custom Domain ได้`,
+        messageEN: `Cannot use domain ${baseDomain} as a custom domain`,
         message: `ไม่สามารถใช้โดเมน ${baseDomain} เป็น Custom Domain ได้`,
       }
     }
@@ -122,7 +133,12 @@ export async function addStoreDomain(storeId: string, domain: string) {
     })
 
     if (existingDomain) {
-      return { success: false, message: 'โดเมนนี้ถูกใช้งานในระบบแล้ว' }
+      return {
+        success: false,
+        messageTH: 'โดเมนนี้ถูกใช้งานในระบบแล้ว',
+        messageEN: 'This domain is already in use in the system',
+        message: 'โดเมนนี้ถูกใช้งานในระบบแล้ว',
+      }
     }
 
     const cfResult = await addCloudflareCustomHostname(cleanDomain)
@@ -131,7 +147,14 @@ export async function addStoreDomain(storeId: string, domain: string) {
         cfResult.errors?.[0]?.message ||
         'ไม่สามารถลงทะเบียนโดเมนกับ Cloudflare ได้'
       console.error('Cloudflare Error:', cfResult.errors)
-      return { success: false, message: errorMessage }
+      return {
+        success: false,
+        messageTH: errorMessage,
+        messageEN:
+          cfResult.errors?.[0]?.message ||
+          'Unable to register domain with Cloudflare',
+        message: errorMessage,
+      }
     }
 
     const store = await prisma.store.update({
@@ -158,10 +181,20 @@ export async function addStoreDomain(storeId: string, domain: string) {
       details: { domain: cleanDomain },
     })
 
-    return { success: true, message: 'เพิ่มโดเมนเรียบร้อยแล้ว' }
+    return {
+      success: true,
+      messageTH: 'เพิ่มโดเมนเรียบร้อยแล้ว',
+      messageEN: 'Domain added successfully',
+      message: 'เพิ่มโดเมนเรียบร้อยแล้ว',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการเพิ่มโดเมน' }
+    return {
+      success: false,
+      messageTH: 'เกิดข้อผิดพลาดในการเพิ่มโดเมน',
+      messageEN: 'An error occurred while adding the domain',
+      message: 'เกิดข้อผิดพลาดในการเพิ่มโดเมน',
+    }
   }
 }
 
@@ -170,7 +203,12 @@ export async function removeStoreDomain(storeId: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -183,6 +221,8 @@ export async function removeStoreDomain(storeId: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -224,10 +264,20 @@ export async function removeStoreDomain(storeId: string) {
       },
     })
 
-    return { success: true, message: 'ลบโดเมนเรียบร้อยแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ลบโดเมนเรียบร้อยแล้ว',
+      messageEN: 'Domain removed successfully',
+      message: 'ลบโดเมนเรียบร้อยแล้ว',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการลบโดเมน' }
+    return {
+      success: false,
+      messageTH: 'เกิดข้อผิดพลาดในการลบโดเมน',
+      messageEN: 'An error occurred while removing the domain',
+      message: 'เกิดข้อผิดพลาดในการลบโดเมน',
+    }
   }
 }
 
@@ -236,7 +286,12 @@ export async function verifyStoreDomain(storeId: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -246,7 +301,12 @@ export async function verifyStoreDomain(storeId: string) {
     })
 
     if (!store?.customDomain) {
-      return { success: false, message: 'ไม่พบโดเมนที่ต้องการตรวจสอบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบโดเมนที่ต้องการตรวจสอบ',
+        messageEN: 'Domain to verify not found',
+        message: 'ไม่พบโดเมนที่ต้องการตรวจสอบ',
+      }
     }
 
     const baseDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'sitepow.store'
@@ -306,6 +366,12 @@ export async function verifyStoreDomain(storeId: string) {
 
     return {
       success: isVerified,
+      messageTH: isVerified
+        ? 'ยืนยันโดเมนสำเร็จ โดเมนพร้อมใช้งานแล้ว'
+        : 'ตรวจสอบไม่พบ CNAME Record หรือค่ายังไม่อัปเดต กรุณารอ 5-15 นาทีแล้วลองใหม่',
+      messageEN: isVerified
+        ? 'Domain verified successfully and is ready to use'
+        : 'CNAME record not found or not yet propagated. Please wait 5-15 minutes and try again',
       message: isVerified
         ? 'ยืนยันโดเมนสำเร็จ โดเมนพร้อมใช้งานแล้ว'
         : 'ตรวจสอบไม่พบ CNAME Record หรือค่ายังไม่อัปเดต กรุณารอ 5-15 นาทีแล้วลองใหม่',

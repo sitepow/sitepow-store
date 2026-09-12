@@ -37,7 +37,8 @@ export async function createCheckoutSession(params: CheckoutParams) {
     if (!session?.url) {
       return {
         success: false,
-        message: 'ไม่สามารถสร้างเซสชันการชำระเงินได้',
+        messageTH: 'ไม่สามารถสร้างเซสชันการชำระเงินได้',
+        messageEN: 'Failed to create checkout session',
       }
     }
 
@@ -61,7 +62,8 @@ export async function createStoreCheckoutSession(
     if (!paymentSetting || !paymentSetting.stripeSecretKey) {
       return {
         success: false,
-        message: 'ร้านค้านี้ยังไม่ได้ตั้งค่าระบบชำระเงิน Stripe',
+        messageTH: 'ร้านค้านี้ยังไม่ได้ตั้งค่าระบบชำระเงิน Stripe',
+        messageEN: 'This store has not configured Stripe payment yet',
       }
     }
 
@@ -96,7 +98,8 @@ export async function createStoreCheckoutSession(
     if (!session?.url) {
       return {
         success: false,
-        message: 'ไม่สามารถสร้างเซสชันการชำระเงินของร้านค้าได้',
+        messageTH: 'ไม่สามารถสร้างเซสชันการชำระเงินของร้านค้าได้',
+        messageEN: 'Failed to create store checkout session',
       }
     }
 

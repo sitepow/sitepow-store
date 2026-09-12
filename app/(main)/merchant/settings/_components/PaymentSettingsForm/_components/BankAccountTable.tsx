@@ -1,14 +1,11 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
-import toast from 'react-hot-toast'
-
 import { useTranslations } from 'next-intl'
 
 import { useDeleteBankAccount } from '@/actions/hooks/payment'
 import { PaymentSettingPayload } from '@/actions/payment'
 import { BankAccountType } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { IconEdit } from '@tabler/icons-react'
@@ -31,21 +28,14 @@ interface BankAccountTableProps {
   onEdit: (id: string) => void
 }
 
-export function BankAccountTable({
- accounts, onEdit }: BankAccountTableProps) {
+export function BankAccountTable({ accounts, onEdit }: BankAccountTableProps) {
   const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.settings.payment.table')
   const { selectedStoreId } = useStoreFilter()
   const { mutate: deleteAccount, isPending } = useDeleteBankAccount()
 
   const handleDelete = (id: string) => {
-    deleteAccount(
-      { id, storeId: selectedStoreId },
-      {
-        onSuccess: () => toast.success(t('deleteSuccess')),
-        onError: (err) => toast.error(err.message),
-      },
-    )
+    deleteAccount({ id, storeId: selectedStoreId })
   }
 
   if (accounts.length === 0) {

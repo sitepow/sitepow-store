@@ -103,6 +103,7 @@ export async function syncStoreRolesAndPermissions(storeId: string) {
 
   return {
     success: true,
-    message: 'รีเซ็ตและซิงค์สิทธิ์ของ Role ทั้งหมดเรียบร้อยแล้ว',
+    messageTH: 'รีเซ็ตและซิงค์สิทธิ์ของ Role ทั้งหมดเรียบร้อยแล้ว',
+    messageEN: 'Successfully reset and synced all role permissions',
   }
 }

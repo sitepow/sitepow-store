@@ -85,6 +85,8 @@ export interface AppliedCouponData {
 
 export interface ValidateCouponResult {
   success: boolean
+  messageTH?: string
+  messageEN?: string
   message?: string
   data?: AppliedCouponData
 }
@@ -97,7 +99,11 @@ export async function validateCoupon(
     const code = input.code.toLocaleUpperCase()
 
     if (!code) {
-      return { success: false, message: 'กรุณากรอกรหัสส่วนลด' }
+      return {
+        success: false,
+        messageTH: 'กรุณากรอกรหัสส่วนลด',
+        messageEN: 'Please enter a coupon code',
+      }
     }
 
     const store = await prisma.store.findUnique({
@@ -106,7 +112,11 @@ export async function validateCoupon(
     })
 
     if (!store) {
-      return { success: false, message: 'ไม่พบร้านค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบร้านค้า',
+        messageEN: 'Store not found',
+      }
     }
 
     const coupon = await prisma.coupon.findFirst({
@@ -114,26 +124,36 @@ export async function validateCoupon(
     })
 
     if (!coupon) {
-      return { success: false, message: 'ไม่พบรหัสส่วนลดนี้' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบรหัสส่วนลดนี้',
+        messageEN: 'Coupon code not found',
+      }
     }
 
     const now = new Date()
     if (now < coupon.startDate || now > coupon.endDate) {
       return {
         success: false,
-        message: 'รหัสส่วนลดนี้หมดอายุหรือยังไม่เริ่มใช้งาน',
+        messageTH: 'รหัสส่วนลดนี้หมดอายุหรือยังไม่เริ่มใช้งาน',
+        messageEN: 'This coupon has expired or is not yet active',
       }
     }
 
     if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
-      return { success: false, message: 'รหัสส่วนลดนี้ถูกใช้งานครบจำนวนแล้ว' }
+      return {
+        success: false,
+        messageTH: 'รหัสส่วนลดนี้ถูกใช้งานครบจำนวนแล้ว',
+        messageEN: 'This coupon usage limit has been reached',
+      }
     }
 
     const minOrderAmount = Number(coupon.minOrderAmount ?? 0)
     if (subtotal < minOrderAmount) {
       return {
         success: false,
-        message: `ยอดสั่งซื้อขั้นต่ำ ${minOrderAmount.toLocaleString()} บาท สำหรับรหัสนี้`,
+        messageTH: `ยอดสั่งซื้อขั้นต่ำ ${minOrderAmount.toLocaleString()} บาท สำหรับรหัสนี้`,
+        messageEN: `Minimum order of ${minOrderAmount.toLocaleString()} THB required for this coupon`,
       }
     }
 
@@ -150,7 +170,8 @@ export async function validateCoupon(
 
     return {
       success: true,
-      message: 'ใช้รหัสส่วนลดสำเร็จ',
+      messageTH: 'ใช้รหัสส่วนลดสำเร็จ',
+      messageEN: 'Coupon applied successfully',
       data: {
         id: coupon.id,
         code: coupon.code,

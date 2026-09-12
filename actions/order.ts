@@ -354,14 +354,24 @@ export async function updateOrderStatus(
 ) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Order ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Order ID',
+        messageEN: 'Order ID not found',
+        message: 'ไม่พบ Order ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     if (status === OrderStatus.CANCELLED) {
@@ -380,7 +390,12 @@ export async function updateOrderStatus(
     })
 
     if (!order) {
-      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลออเดอร์',
+        messageEN: 'Order not found',
+        message: 'ไม่พบข้อมูลออเดอร์',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -392,6 +407,8 @@ export async function updateOrderStatus(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -485,7 +502,12 @@ export async function updateOrderStatus(
         .catch((err) => console.error(err))
     }
 
-    return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'อัปเดตสถานะออเดอร์สำเร็จ',
+      messageEN: 'Order status updated successfully',
+      message: 'อัปเดตสถานะออเดอร์สำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -495,14 +517,24 @@ export async function updateOrderStatus(
 export async function cancelOrder(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Order ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Order ID',
+        messageEN: 'Order ID not found',
+        message: 'ไม่พบ Order ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const currentUserId = userSession?.id
 
     if (!currentUserId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const order = await prisma.order.findUnique({
@@ -537,7 +569,12 @@ export async function cancelOrder(id: string) {
     })
 
     if (!order) {
-      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลออเดอร์',
+        messageEN: 'Order not found',
+        message: 'ไม่พบข้อมูลออเดอร์',
+      }
     }
 
     const isOrderCustomer =
@@ -557,6 +594,8 @@ export async function cancelOrder(id: string) {
     ) {
       return {
         success: false,
+        messageTH: 'ออเดอร์ที่ชำระเงินแล้ว ไม่สามารถยกเลิกได้',
+        messageEN: 'Paid orders cannot be cancelled',
         message: 'ออเดอร์ที่ชำระเงินแล้ว ไม่สามารถยกเลิกได้',
       }
     }
@@ -573,6 +612,8 @@ export async function cancelOrder(id: string) {
       if (!authCheck.isAuthorized) {
         return {
           success: false,
+          messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+          messageEN: authCheck.messageEN || 'Insufficient permissions',
           message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
@@ -596,7 +637,12 @@ export async function cancelOrder(id: string) {
       cancelledAt: new Date().toISOString(),
     }).catch((err) => console.error(err))
 
-    return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ',
+      messageEN: 'Order cancelled and stock restored successfully',
+      message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ',
+    }
   } catch (error: unknown) {
     console.error(error)
     let errorMessage
@@ -607,6 +653,8 @@ export async function cancelOrder(id: string) {
 
     return {
       success: false,
+      messageTH: errorMessage || 'เกิดข้อผิดพลาดในการยกเลิกออเดอร์',
+      messageEN: errorMessage || 'An error occurred while cancelling order',
       message: errorMessage,
     }
   }

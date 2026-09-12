@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
@@ -108,11 +107,8 @@ export function CreateAgreementDialog({
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
-            toast.success(t('success'))
             onSuccess?.(res.data.id)
             handleClose()
-          } else {
-            toast.error(res.message || t('error'))
           }
         },
       },

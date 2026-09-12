@@ -1,15 +1,13 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
 import { UpdateProfileSchema } from '@/zod/profile'
@@ -96,7 +94,6 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
         {
           onSuccess: () => {
             reset({ ...values, phone: values.phone })
-            toast.success(t('success'))
           },
         },
       )
@@ -113,9 +110,11 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
   return (
     <Card
       {...props}
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <CardHeader>
         <CardTitle>{t('title')}</CardTitle>

@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import toast from 'react-hot-toast'
 
+import { useLocale } from 'next-intl'
+
 import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/query'
-import { SERVER_ERROR_MESSAGE } from '@/constants/system'
+import {
+  SERVER_ERROR_MESSAGE_EN,
+  SERVER_ERROR_MESSAGE_TH,
+} from '@/constants/system'
 import {
   MutationCache,
   QueryCache,
@@ -15,38 +20,62 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const QueryProviders = ({ children }: PropsWithChildren) => {
+  const locale = useLocale()
+  const localeRef = useRef(locale)
+  localeRef.current = locale
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
         queryCache: new QueryCache({
           onError: () => {
-            toast.error(SERVER_ERROR_MESSAGE)
+            const isEn = localeRef.current === 'en'
+            toast.error(
+              isEn ? SERVER_ERROR_MESSAGE_EN : SERVER_ERROR_MESSAGE_TH,
+            )
           },
         }),
         mutationCache: new MutationCache({
           onError: () => {
-            toast.error(SERVER_ERROR_MESSAGE)
+            const isEn = localeRef.current === 'en'
+            toast.error(
+              isEn ? SERVER_ERROR_MESSAGE_EN : SERVER_ERROR_MESSAGE_TH,
+            )
           },
           onSuccess: (result: unknown) => {
             const isResponse = (
               res: unknown,
-            ): res is { success: boolean; message: string } => {
+            ): res is {
+              success: boolean
+              messageTH?: string
+              messageEN?: string
+              message?: string
+            } => {
               return (
                 typeof res === 'object' &&
                 res !== null &&
                 'success' in res &&
-                'message' in res
+                ('messageTH' in res || 'messageEN' in res || 'message' in res)
               )
             }
 
             if (isResponse(result)) {
+              const isEn = localeRef.current === 'en'
+              const message = isEn
+                ? result.messageEN || result.messageTH || result.message
+                : result.messageTH || result.messageEN || result.message
+
               if (result.success) {
-                toast.success(result.message)
+                if (message) {
+                  toast.success(message)
+                }
               } else {
-                if (!result.message) {
-                  toast.error(SERVER_ERROR_MESSAGE)
+                if (!message) {
+                  toast.error(
+                    isEn ? SERVER_ERROR_MESSAGE_EN : SERVER_ERROR_MESSAGE_TH,
+                  )
                 } else {
-                  toast.error(result.message)
+                  toast.error(message)
                 }
               }
             }

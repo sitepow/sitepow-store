@@ -51,7 +51,12 @@ export async function getMerchantConversations(storeSlug: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'ไม่พบผู้ใช้งาน' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบผู้ใช้งาน',
+      messageEN: 'User not found',
+      message: 'ไม่พบผู้ใช้งาน',
+    }
   }
 
   const cacheKey = `merchant:convs:${userId}:${storeSlug}`
@@ -63,7 +68,12 @@ export async function getMerchantConversations(storeSlug: string) {
     })
 
     if (!store) {
-      return { success: false, message: 'ไม่พบร้านค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบร้านค้า',
+        messageEN: 'Store not found',
+        message: 'ไม่พบร้านค้า',
+      }
     }
 
     const isOwner = store.ownerId === userId
@@ -76,7 +86,12 @@ export async function getMerchantConversations(storeSlug: string) {
       })
 
       if (!authCheck.isAuthorized) {
-        return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+        return {
+          success: false,
+          messageTH: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้',
+          messageEN: 'Access denied for this store',
+          message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้',
+        }
       }
     }
 
@@ -100,7 +115,12 @@ export async function getOrCreateStoreConversation(storeId: string) {
   const userId = userSession?.id
 
   if (!userId || !storeId) {
-    return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งานหรือร้านค้า' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบข้อมูลผู้ใช้งานหรือร้านค้า',
+      messageEN: 'User or store data not found',
+      message: 'ไม่พบข้อมูลผู้ใช้งานหรือร้านค้า',
+    }
   }
 
   const store = await prisma.store.findUnique({
@@ -109,12 +129,19 @@ export async function getOrCreateStoreConversation(storeId: string) {
   })
 
   if (!store) {
-    return { success: false, message: 'ไม่พบร้านค้า' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบร้านค้า',
+      messageEN: 'Store not found',
+      message: 'ไม่พบร้านค้า',
+    }
   }
 
   if (store.ownerId === userId) {
     return {
       success: false,
+      messageTH: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
+      messageEN: 'Store owners cannot chat with their own store',
       message: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
     }
   }
@@ -158,11 +185,21 @@ export async function getConversation(
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'ไม่พบผู้ใช้งาน' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบผู้ใช้งาน',
+      messageEN: 'User not found',
+      message: 'ไม่พบผู้ใช้งาน',
+    }
   }
 
   if (type === ConversationType.STORE && !storeId) {
-    return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบข้อมูลร้านค้า',
+      messageEN: 'Store data not found',
+      message: 'ไม่พบข้อมูลร้านค้า',
+    }
   }
 
   let conversation = await prisma.conversation.findFirst({
@@ -184,12 +221,19 @@ export async function getConversation(
       })
 
       if (!store) {
-        return { success: false, message: 'ไม่พบร้านค้า' }
+        return {
+          success: false,
+          messageTH: 'ไม่พบร้านค้า',
+          messageEN: 'Store not found',
+          message: 'ไม่พบร้านค้า',
+        }
       }
 
       if (store.ownerId === userId) {
         return {
           success: false,
+          messageTH: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
+          messageEN: 'Store owners cannot chat with their own store',
           message: 'เจ้าของร้านไม่สามารถแชทกับร้านตัวเองได้',
         }
       }
@@ -232,7 +276,12 @@ export async function getCustomerConversations() {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบสิทธิ์เข้าถึง',
+      messageEN: 'Access denied',
+      message: 'ไม่พบสิทธิ์เข้าถึง',
+    }
   }
 
   const conversations = await prisma.conversation.findMany({
@@ -274,11 +323,21 @@ export async function getSupportConversations(storeId?: string) {
   const userRole = userSession?.role
 
   if (!userId) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบสิทธิ์เข้าถึง',
+      messageEN: 'Access denied',
+      message: 'ไม่พบสิทธิ์เข้าถึง',
+    }
   }
 
   if (userRole !== UserRole.SUPPORT && userRole !== UserRole.MERCHANT) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึง' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบสิทธิ์เข้าถึง',
+      messageEN: 'Access denied',
+      message: 'ไม่พบสิทธิ์เข้าถึง',
+    }
   }
 
   let storeFilter: { storeId?: string; storeIdIn?: string[] } = {}
@@ -291,7 +350,12 @@ export async function getSupportConversations(storeId?: string) {
       })
 
       if (!store) {
-        return { success: false, message: 'ไม่พบร้านค้านี้' }
+        return {
+          success: false,
+          messageTH: 'ไม่พบร้านค้านี้',
+          messageEN: 'Store not found',
+          message: 'ไม่พบร้านค้านี้',
+        }
       }
 
       const isOwner = store.ownerId === userId
@@ -304,7 +368,12 @@ export async function getSupportConversations(storeId?: string) {
         })
 
         if (!authCheck.isAuthorized) {
-          return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้' }
+          return {
+            success: false,
+            messageTH: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้',
+            messageEN: 'Access denied for this store',
+            message: 'ไม่พบสิทธิ์เข้าถึงร้านค้านี้',
+          }
         }
       }
 
@@ -386,7 +455,12 @@ export async function sendMessage(
   const userRole = userSession?.role as UserRole
 
   if (!userId) {
-    return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+      messageEN: 'User data not found',
+      message: 'ไม่พบข้อมูลผู้ใช้งาน',
+    }
   }
 
   const members = await prisma.conversationMember.findMany({
@@ -401,7 +475,12 @@ export async function sendMessage(
 
   const hasAccess = await checkAccessWithCache(conversationId, userId, userRole)
   if (!hasAccess) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบสิทธิ์เข้าถึงห้องแชท',
+      messageEN: 'Access denied to this chat',
+      message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท',
+    }
   }
 
   const result = await prisma
@@ -707,12 +786,22 @@ export async function toggleConversationAi(
   const userRole = userSession?.role as UserRole
 
   if (!userId) {
-    return { success: false, message: 'ไม่ได้รับอนุญาต' }
+    return {
+      success: false,
+      messageTH: 'ไม่ได้รับอนุญาต',
+      messageEN: 'Unauthorized',
+      message: 'ไม่ได้รับอนุญาต',
+    }
   }
 
   const hasAccess = await checkAccessWithCache(conversationId, userId, userRole)
   if (!hasAccess) {
-    return { success: false, message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท' }
+    return {
+      success: false,
+      messageTH: 'ไม่พบสิทธิ์เข้าถึงห้องแชท',
+      messageEN: 'Access denied to this chat',
+      message: 'ไม่พบสิทธิ์เข้าถึงห้องแชท',
+    }
   }
 
   try {
@@ -720,7 +809,12 @@ export async function toggleConversationAi(
       where: { id: conversationId },
       data: { isAiEnabled: enabled },
     })
-    return { success: true, message: 'ปรับการตั้งค่า AI สำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ปรับการตั้งค่า AI สำเร็จ',
+      messageEN: 'AI settings updated successfully',
+      message: 'ปรับการตั้งค่า AI สำเร็จ',
+    }
   } catch {
     return { success: false }
   }

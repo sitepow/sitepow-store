@@ -168,14 +168,22 @@ export async function createAddress(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     const customerId = await getCustomerId(userId)
     const storeId = await getStoreIdBySlug(storeSlug)
 
     if (!customerId || !storeId) {
-      return { success: false, message: 'ไม่พบข้อมูลร้านค้าหรือลูกค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลร้านค้าหรือลูกค้า',
+        messageEN: 'Store or customer data not found',
+      }
     }
 
     const countInStore = await prisma.address.count({
@@ -192,7 +200,12 @@ export async function createAddress(
       select: addressDetailSelect,
     })
 
-    return { success: true, message: 'บันทึกที่อยู่สำเร็จแล้ว', data: address }
+    return {
+      success: true,
+      messageTH: 'บันทึกที่อยู่สำเร็จแล้ว',
+      messageEN: 'Address saved successfully',
+      data: address,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -208,7 +221,11 @@ export async function updateAddress(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     const customerId = await getCustomerId(userId)
@@ -218,7 +235,11 @@ export async function updateAddress(
     })
 
     if (!address || address.customerId !== customerId) {
-      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลที่อยู่',
+        messageEN: 'Address not found',
+      }
     }
 
     const updated = await prisma.address.update({
@@ -227,7 +248,12 @@ export async function updateAddress(
       select: addressDetailSelect,
     })
 
-    return { success: true, message: 'อัปเดตที่อยู่สำเร็จแล้ว', data: updated }
+    return {
+      success: true,
+      messageTH: 'อัปเดตที่อยู่สำเร็จแล้ว',
+      messageEN: 'Address updated successfully',
+      data: updated,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -240,7 +266,11 @@ export async function deleteAddress(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     const customerId = await getCustomerId(userId)
@@ -250,7 +280,11 @@ export async function deleteAddress(id: string) {
     })
 
     if (!address || address.customerId !== customerId) {
-      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลที่อยู่',
+        messageEN: 'Address not found',
+      }
     }
 
     await prisma.address.delete({ where: { id } })
@@ -269,7 +303,11 @@ export async function deleteAddress(id: string) {
       }
     }
 
-    return { success: true, message: 'ลบที่อยู่สำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ลบที่อยู่สำเร็จแล้ว',
+      messageEN: 'Address deleted successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -281,7 +319,13 @@ export async function setDefaultAddress(id: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
-    if (!userId) return { success: false }
+    if (!userId) {
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
+    }
 
     const customerId = await getCustomerId(userId)
 
@@ -291,7 +335,11 @@ export async function setDefaultAddress(id: string) {
     })
 
     if (!targetAddress || targetAddress.customerId !== customerId) {
-      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลที่อยู่',
+        messageEN: 'Address not found',
+      }
     }
 
     await prisma.$transaction([
@@ -308,7 +356,11 @@ export async function setDefaultAddress(id: string) {
       }),
     ])
 
-    return { success: true, message: 'ตั้งค่าที่อยู่เริ่มต้นสำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'ตั้งค่าที่อยู่เริ่มต้นสำเร็จแล้ว',
+      messageEN: 'Default address set successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

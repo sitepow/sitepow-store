@@ -177,7 +177,12 @@ export async function createCoupon(input: CreateCouponInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -189,6 +194,8 @@ export async function createCoupon(input: CreateCouponInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -204,7 +211,12 @@ export async function createCoupon(input: CreateCouponInput) {
     })
 
     if (existing) {
-      return { success: false, message: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว' }
+      return {
+        success: false,
+        messageTH: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว',
+        messageEN: 'This coupon code is already in use in this store',
+        message: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว',
+      }
     }
 
     const coupon = await prisma.coupon.create({
@@ -231,6 +243,8 @@ export async function createCoupon(input: CreateCouponInput) {
 
     return {
       success: true,
+      messageTH: 'สร้างคูปองสำเร็จ',
+      messageEN: 'Coupon created successfully',
       message: 'สร้างคูปองสำเร็จ',
       data: serializeDecimal(coupon),
     }
@@ -243,14 +257,24 @@ export async function createCoupon(input: CreateCouponInput) {
 export async function updateCoupon(id: string, input: UpdateCouponInput) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Coupon ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Coupon ID',
+        messageEN: 'Coupon ID not found',
+        message: 'ไม่พบ Coupon ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const existingCoupon = await prisma.coupon.findUnique({
@@ -259,7 +283,12 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
     })
 
     if (!existingCoupon) {
-      return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลคูปอง',
+        messageEN: 'Coupon not found',
+        message: 'ไม่พบข้อมูลคูปอง',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -271,6 +300,8 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -289,6 +320,8 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       if (duplicateCode) {
         return {
           success: false,
+          messageTH: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว',
+          messageEN: 'This coupon code is already in use in this store',
           message: 'รหัสคูปองนี้ถูกใช้งานในร้านนี้ไปแล้ว',
         }
       }
@@ -315,6 +348,8 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
 
     return {
       success: true,
+      messageTH: 'อัปเดตคูปองสำเร็จ',
+      messageEN: 'Coupon updated successfully',
       message: 'อัปเดตคูปองสำเร็จ',
       data: serializeDecimal(updated),
     }
@@ -327,14 +362,24 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
 export async function deleteCoupon(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบ Coupon ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Coupon ID',
+        messageEN: 'Coupon ID not found',
+        message: 'ไม่พบ Coupon ID',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const coupon = await prisma.coupon.findUnique({
@@ -343,7 +388,12 @@ export async function deleteCoupon(id: string) {
     })
 
     if (!coupon || !coupon.storeId) {
-      return { success: false, message: 'ไม่พบข้อมูลคูปอง' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลคูปอง',
+        messageEN: 'Coupon not found',
+        message: 'ไม่พบข้อมูลคูปอง',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -355,6 +405,8 @@ export async function deleteCoupon(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -370,7 +422,12 @@ export async function deleteCoupon(id: string) {
       details: { code: coupon.code, type: 'deleted' },
     })
 
-    return { success: true, message: 'ลบคูปองสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบคูปองสำเร็จ',
+      messageEN: 'Coupon deleted successfully',
+      message: 'ลบคูปองสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

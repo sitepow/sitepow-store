@@ -185,7 +185,11 @@ export async function createBlog(input: CreateBlogInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -197,7 +201,8 @@ export async function createBlog(input: CreateBlogInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -224,13 +229,18 @@ export async function createBlog(input: CreateBlogInput) {
 
     await invalidateBlogCache(blog.store.slug)
 
-    return { success: true, message: 'สร้างบทความสำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'สร้างบทความสำเร็จแล้ว',
+      messageEN: 'Blog article created successfully',
+    }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return {
           success: false,
-          message: 'บทความนี้มี slug ซ้ำกับบทความอื่นในระบบแล้ว',
+          messageTH: 'บทความนี้มี slug ซ้ำกับบทความอื่นในระบบแล้ว',
+          messageEN: 'This blog slug is already in use',
         }
       }
     }
@@ -281,7 +291,11 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+    }
   }
 
   try {
@@ -291,7 +305,11 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
     })
 
     if (!existingBlog) {
-      return { success: false, message: 'ไม่พบบทความ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบทความ',
+        messageEN: 'Blog article not found',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -303,7 +321,8 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -339,13 +358,18 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
 
     await invalidateBlogCache(updatedBlog.store.slug)
 
-    return { success: true, message: 'อัปเดตบทความสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'อัปเดตบทความสำเร็จ',
+      messageEN: 'Blog article updated successfully',
+    }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return {
           success: false,
-          message: 'บทความนี้มี slug ซ้ำกับบทความอื่นในระบบแล้ว',
+          messageTH: 'บทความนี้มี slug ซ้ำกับบทความอื่นในระบบแล้ว',
+          messageEN: 'This blog slug is already in use',
         }
       }
     }
@@ -360,7 +384,11 @@ export async function deleteBlog(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const blog = await prisma.blog.findUnique({
@@ -379,7 +407,11 @@ export async function deleteBlog(id: string) {
     })
 
     if (!blog) {
-      return { success: false, message: 'ไม่พบบทความ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบทความ',
+        messageEN: 'Blog article not found',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -391,7 +423,8 @@ export async function deleteBlog(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -415,7 +448,11 @@ export async function deleteBlog(id: string) {
 
     await invalidateBlogCache(blog.store.slug)
 
-    return { success: true, message: 'ลบบทความสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบบทความสำเร็จ',
+      messageEN: 'Blog article deleted successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

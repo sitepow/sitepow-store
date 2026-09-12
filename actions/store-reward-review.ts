@@ -10,14 +10,22 @@ import { prisma } from '@/lib/prisma'
 export async function getReviewRewardConfig(storeId: string) {
   try {
     if (!storeId) {
-      return { success: false, message: 'ไม่พบ Store ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Store ID',
+        messageEN: 'Store ID not found',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -29,7 +37,8 @@ export async function getReviewRewardConfig(storeId: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -69,14 +78,22 @@ export async function updateReviewRewardConfig(
 ) {
   try {
     if (!storeId) {
-      return { success: false, message: 'ไม่พบ Store ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Store ID',
+        messageEN: 'Store ID not found',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -88,7 +105,8 @@ export async function updateReviewRewardConfig(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -115,7 +133,8 @@ export async function updateReviewRewardConfig(
 
     return {
       success: true,
-      message: 'บันทึกการตั้งค่าคะแนนรีวิวเรียบร้อยแล้ว',
+      messageTH: 'บันทึกการตั้งค่าคะแนนรีวิวเรียบร้อยแล้ว',
+      messageEN: 'Review reward configuration updated successfully',
       data: serializeDecimal(config),
     }
   } catch (error) {

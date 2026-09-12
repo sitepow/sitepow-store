@@ -181,7 +181,11 @@ export async function createExpense(input: CreateExpenseInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+      return {
+        success: false,
+        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+        messageEN: 'Access denied',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -191,7 +195,11 @@ export async function createExpense(input: CreateExpenseInput) {
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+      }
     }
 
     const expense = await prisma.expense.create({
@@ -222,7 +230,8 @@ export async function createExpense(input: CreateExpenseInput) {
 
     return {
       success: true,
-      message: 'บันทึกค่าใช้จ่ายสำเร็จ',
+      messageTH: 'บันทึกค่าใช้จ่ายสำเร็จ',
+      messageEN: 'Expense recorded successfully',
       data: serializeDecimal(expense),
     }
   } catch (error) {
@@ -237,7 +246,11 @@ export async function updateExpense(input: UpdateExpenseInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+      return {
+        success: false,
+        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+        messageEN: 'Access denied',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -247,7 +260,11 @@ export async function updateExpense(input: UpdateExpenseInput) {
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+      }
     }
 
     const existingExpense = await prisma.expense.findUnique({
@@ -258,7 +275,8 @@ export async function updateExpense(input: UpdateExpenseInput) {
     if (!existingExpense) {
       return {
         success: false,
-        message: 'ไม่พบรายการค่าใช้จ่ายที่ต้องการอัปเดต',
+        messageTH: 'ไม่พบรายการค่าใช้จ่ายที่ต้องการอัปเดต',
+        messageEN: 'Expense item to update not found',
       }
     }
 
@@ -302,7 +320,8 @@ export async function updateExpense(input: UpdateExpenseInput) {
 
     return {
       success: true,
-      message: 'อัปเดตค่าใช้จ่ายสำเร็จ',
+      messageTH: 'อัปเดตค่าใช้จ่ายสำเร็จ',
+      messageEN: 'Expense updated successfully',
       data: serializeDecimal(updatedExpense),
     }
   } catch (error) {
@@ -317,7 +336,11 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
+      return {
+        success: false,
+        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
+        messageEN: 'Access denied',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -327,7 +350,11 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+      }
     }
 
     const expense = await prisma.expense.findUnique({
@@ -339,7 +366,11 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     })
 
     if (!expense) {
-      return { success: false, message: 'ไม่พบรายการค่าใช้จ่าย' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบรายการค่าใช้จ่าย',
+        messageEN: 'Expense item not found',
+      }
     }
 
     if (expense.receiptImage) {
@@ -363,7 +394,11 @@ export async function deleteExpense(expenseId: string, storeId: string) {
       },
     })
 
-    return { success: true, message: 'ลบรายการค่าใช้จ่ายสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบรายการค่าใช้จ่ายสำเร็จ',
+      messageEN: 'Expense deleted successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

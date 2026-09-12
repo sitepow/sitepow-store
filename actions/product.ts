@@ -245,7 +245,12 @@ export async function createProduct(input: CreateProductInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -257,14 +262,21 @@ export async function createProduct(input: CreateProductInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
-    const { canCreate, message } = await checkCanCreateProduct(input.storeId)
+    const quotaCheck = await checkCanCreateProduct(input.storeId)
 
-    if (!canCreate) {
-      return { success: false, message }
+    if (!quotaCheck.canCreate) {
+      return {
+        success: false,
+        messageTH: quotaCheck.messageTH || quotaCheck.message,
+        messageEN: quotaCheck.messageEN || quotaCheck.message,
+        message: quotaCheck.message,
+      }
     }
 
     const {
@@ -376,18 +388,27 @@ export async function createProduct(input: CreateProductInput) {
       details: { title: rest.title, slug: rest.slug, categoryId },
     })
 
-    return { success: true, message: 'สร้างสินค้าสำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'สร้างสินค้าสำเร็จแล้ว',
+      messageEN: 'Product created successfully',
+      message: 'สร้างสินค้าสำเร็จแล้ว',
+    }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return {
           success: false,
+          messageTH: 'สินค้านี้มี slug ซ้ำกับสินค้าอื่นในระบบแล้ว',
+          messageEN: 'A product with this slug already exists',
           message: 'สินค้านี้มี slug ซ้ำกับสินค้าอื่นในระบบแล้ว',
         }
       }
       if (error.code === 'P2003') {
         return {
           success: false,
+          messageTH: 'ไม่พบข้อมูลที่เชื่อมโยง เช่น หมวดหมู่หรือสาขาที่ระบุ',
+          messageEN: 'Linked data not found (e.g. category or branch)',
           message: 'ไม่พบข้อมูลที่เชื่อมโยง เช่น หมวดหมู่หรือสาขาที่ระบุ',
         }
       }
@@ -403,7 +424,12 @@ export async function deleteProduct(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const product = await prisma.product.findUnique({
@@ -419,7 +445,12 @@ export async function deleteProduct(id: string) {
     })
 
     if (!product) {
-      return { success: false, message: 'ไม่พบสินค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบสินค้า',
+        messageEN: 'Product not found',
+        message: 'ไม่พบสินค้า',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -431,6 +462,8 @@ export async function deleteProduct(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -455,6 +488,8 @@ export async function deleteProduct(id: string) {
 
         return {
           success: false,
+          messageTH: `ไม่สามารถลบสินค้านี้ได้ เนื่องจากตัวเลือก (${blockedVariantTitles}) ยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
+          messageEN: `Cannot delete this product because variants (${blockedVariantTitles}) still have consignment stock with resellers. Please return stock to branch first`,
           message: `ไม่สามารถลบสินค้านี้ได้ เนื่องจากตัวเลือก (${blockedVariantTitles}) ยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
         }
       }
@@ -500,13 +535,24 @@ export async function deleteProduct(id: string) {
       details: { title: product.title },
     })
 
-    return { success: true, message: 'ลบสินค้าสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบสินค้าสำเร็จ',
+      messageEN: 'Product deleted successfully',
+      message: 'ลบสินค้าสำเร็จ',
+    }
   } catch (error: unknown) {
     console.error(error)
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลบสินค้า'
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการลบสินค้า',
+      messageTH: errMessage,
+      messageEN:
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while deleting product',
+      message: errMessage,
     }
   }
 }
@@ -562,7 +608,12 @@ export async function updateProduct(id: string, input: CreateProductInput) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -576,7 +627,12 @@ export async function updateProduct(id: string, input: CreateProductInput) {
     })
 
     if (!existingProduct) {
-      return { success: false, message: 'ไม่พบสินค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบสินค้า',
+        messageEN: 'Product not found',
+        message: 'ไม่พบสินค้า',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -588,6 +644,8 @@ export async function updateProduct(id: string, input: CreateProductInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -631,6 +689,8 @@ export async function updateProduct(id: string, input: CreateProductInput) {
 
         return {
           success: false,
+          messageTH: `ไม่สามารถลบตัวเลือกสินค้า (${blockedVariantTitles}) ได้ เนื่องจากยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
+          messageEN: `Cannot delete variants (${blockedVariantTitles}) because they still have consignment stock with resellers. Please return stock to branch first`,
           message: `ไม่สามารถลบตัวเลือกสินค้า (${blockedVariantTitles}) ได้ เนื่องจากยังมีสต็อกฝากขายค้างอยู่ที่ตัวแทน กรุณาดึงสต็อกคืนเข้าสาขาก่อนทำรายการลบ`,
         }
       }
@@ -808,15 +868,24 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       }
     })
 
-    return { success: true, message: 'อัปเดตสินค้าสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'อัปเดตสินค้าสำเร็จ',
+      messageEN: 'Product updated successfully',
+      message: 'อัปเดตสินค้าสำเร็จ',
+    }
   } catch (error: unknown) {
     console.error(error)
+    const errMessage =
+      error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการอัปเดตสินค้า'
     return {
       success: false,
-      message:
+      messageTH: errMessage,
+      messageEN:
         error instanceof Error
           ? error.message
-          : 'เกิดข้อผิดพลาดในการอัปเดตสินค้า',
+          : 'An error occurred while updating product',
+      message: errMessage,
     }
   }
 }
@@ -911,7 +980,12 @@ export async function toggleProductVisibility(
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      messageEN: 'Please sign in to proceed',
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -924,7 +998,12 @@ export async function toggleProductVisibility(
     })
 
     if (!product) {
-      return { success: false, message: 'ไม่พบสินค้า' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบสินค้า',
+        messageEN: 'Product not found',
+        message: 'ไม่พบสินค้า',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -936,6 +1015,8 @@ export async function toggleProductVisibility(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -949,6 +1030,12 @@ export async function toggleProductVisibility(
 
     return {
       success: true,
+      messageTH: isPublished
+        ? 'แสดงสินค้าที่หน้าร้านแล้ว'
+        : 'ซ่อนสินค้าจากหน้าร้านแล้ว',
+      messageEN: isPublished
+        ? 'Product is now visible on storefront'
+        : 'Product is now hidden from storefront',
       message: isPublished
         ? 'แสดงสินค้าที่หน้าร้านแล้ว'
         : 'ซ่อนสินค้าจากหน้าร้านแล้ว',

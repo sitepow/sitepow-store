@@ -1,7 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -19,6 +17,7 @@ import {
 import { StoreWebhookEndpointItem } from '@/actions/webhook'
 import { getWebhookEvents } from '@/constants/webhook'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   IconAlertCircle,
@@ -148,27 +147,16 @@ export function WebhookSettingsForm() {
     endpoint: StoreWebhookEndpointItem,
     checked: boolean,
   ) => {
-    updateEndpoint(
-      {
-        endpointId: endpoint.id,
-        storeId: selectedStoreId,
-        data: {
-          url: endpoint.url,
-          description: endpoint.description,
-          events: endpoint.events,
-          isActive: checked,
-        },
+    updateEndpoint({
+      endpointId: endpoint.id,
+      storeId: selectedStoreId,
+      data: {
+        url: endpoint.url,
+        description: endpoint.description,
+        events: endpoint.events,
+        isActive: checked,
       },
-      {
-        onSuccess: (res) => {
-          if (res.success) {
-            toast.success(checked ? t('enabledSuccess') : t('disabledSuccess'))
-          } else {
-            toast.error(res.message || t('error'))
-          }
-        },
-      },
-    )
+    })
   }
 
   const handleDelete = (id: string) => {
@@ -176,47 +164,29 @@ export function WebhookSettingsForm() {
       deleteEndpoint(id, {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success(t('deleteSuccess'))
             if (selectedEndpointId === id) {
               setSelectedEndpointId(undefined)
             }
-          } else {
-            toast.error(res.message || t('error'))
           }
         },
-        onError: (err) => toast.error(err.message),
       })
     }
   }
 
   const handleRegenerate = (id: string) => {
     if (confirm(t('regenerateConfirm'))) {
-      regenerateSecret(id, {
-        onSuccess: (res) => {
-          if (res.success) {
-            toast.success(t('regenerateSuccess'))
-          } else {
-            toast.error(res.message || t('error'))
-          }
-        },
-      })
+      regenerateSecret(id)
     }
   }
 
   const handleTestPing = (id: string) => {
     setTestingEndpointId(id)
     testPing(id, {
-      onSuccess: (res) => {
+      onSuccess: () => {
         setTestingEndpointId(null)
-        if (res.success) {
-          toast.success(res.message)
-        } else {
-          toast.error(res.message)
-        }
       },
-      onError: (err) => {
+      onError: () => {
         setTestingEndpointId(null)
-        toast.error(err.message)
       },
     })
   }
@@ -224,17 +194,11 @@ export function WebhookSettingsForm() {
   const handleResendLog = (logId: string) => {
     setResendingLogId(logId)
     resendLog(logId, {
-      onSuccess: (res) => {
+      onSuccess: () => {
         setResendingLogId(null)
-        if (res.success) {
-          toast.success(res.message)
-        } else {
-          toast.error(res.message)
-        }
       },
-      onError: (err) => {
+      onError: () => {
         setResendingLogId(null)
-        toast.error(err.message)
       },
     })
   }
@@ -257,9 +221,11 @@ export function WebhookSettingsForm() {
   return (
     <div
       className="space-y-6"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

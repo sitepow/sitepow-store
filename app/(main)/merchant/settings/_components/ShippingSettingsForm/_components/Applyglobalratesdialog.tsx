@@ -1,9 +1,6 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
-import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
@@ -12,6 +9,7 @@ import {
   useGlobalShippingMetadata,
   useGlobalShippingRateMatrixProvinces,
 } from '@/actions/hooks/global-shipping-rate-matrix'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
@@ -64,9 +62,6 @@ export function ApplyGlobalRatesDialog() {
         onSuccess: () => {
           setOpen(false)
         },
-        onError: (err) => {
-          toast.error(err.message)
-        },
       },
     )
   }
@@ -89,9 +84,12 @@ export function ApplyGlobalRatesDialog() {
       </DialogTrigger>
 
       <DialogContent
-        style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}>
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconCloudDownload}

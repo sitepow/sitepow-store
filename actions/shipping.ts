@@ -98,7 +98,11 @@ export async function updateStoreShippingSettings(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -110,7 +114,8 @@ export async function updateStoreShippingSettings(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -175,7 +180,11 @@ export async function updateStoreShippingSettings(
       details: { branchId, setting: 'shipping' },
     })
 
-    return { success: true, message: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว',
+      messageEN: 'Shipping settings updated successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

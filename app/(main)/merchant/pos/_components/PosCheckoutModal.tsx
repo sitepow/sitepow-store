@@ -241,8 +241,6 @@ export function PosCheckoutModal({
               ),
               { duration: 6000 },
             )
-          } else {
-            toast.success(t('orderSuccess'))
           }
         }
       }

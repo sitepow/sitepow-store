@@ -1,7 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -10,6 +8,7 @@ import { useTranslations } from 'next-intl'
 
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useCreateResellerPayout } from '@/actions/hooks/reseller'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconReceiptRefund, IconX } from '@tabler/icons-react'
@@ -106,10 +105,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success(res.message || t('toastSuccess'))
             handleClose()
-          } else {
-            toast.error(res.message || t('toastError'))
           }
         },
       },

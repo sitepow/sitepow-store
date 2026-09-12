@@ -1,7 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -14,6 +12,7 @@ import {
 } from '@/actions/hooks/webhook'
 import { StoreWebhookEndpointItem } from '@/actions/webhook'
 import { WEBHOOK_EVENTS, getWebhookEvents } from '@/constants/webhook'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { WebhookEndpointFormValues, webhookEndpointSchema } from '@/zod/webhook'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -110,14 +109,8 @@ export function WebhookEndpointDialog({
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success(t('updateSuccess'))
               setOpen(false)
-            } else {
-              toast.error(res.message || t('error'))
             }
-          },
-          onError: (err) => {
-            toast.error(err.message)
           },
         },
       )
@@ -130,14 +123,8 @@ export function WebhookEndpointDialog({
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success(t('createSuccess'))
               setOpen(false)
-            } else {
-              toast.error(res.message || t('error'))
             }
-          },
-          onError: (err) => {
-            toast.error(err.message)
           },
         },
       )
@@ -147,9 +134,13 @@ export function WebhookEndpointDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className="sm:max-w-lg">
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="sm:max-w-lg"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconWebhook}

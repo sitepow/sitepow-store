@@ -5,6 +5,8 @@ import {
   OTP_EXPIRY_MINUTES,
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
+  SERVER_ERROR_MESSAGE_EN,
+  SERVER_ERROR_MESSAGE_TH,
 } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { RegisterFormInputs } from '@/types/register'
@@ -30,7 +32,12 @@ export async function registerUser(values: RegisterFormInputs) {
     const { email, password, confirmPassword, userRole } = values
 
     if (password !== confirmPassword) {
-      return { success: false, message: 'รหัสผ่านไม่ตรงกัน' }
+      return {
+        success: false,
+        messageTH: 'รหัสผ่านไม่ตรงกัน',
+        messageEN: 'Passwords do not match',
+        message: 'รหัสผ่านไม่ตรงกัน',
+      }
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -43,7 +50,12 @@ export async function registerUser(values: RegisterFormInputs) {
 
     if (existingUser) {
       if (existingUser.role === userRole) {
-        return { success: false, message: 'อีเมลนี้ถูกใช้งานในระบบแล้ว' }
+        return {
+          success: false,
+          messageTH: 'อีเมลนี้ถูกใช้งานในระบบแล้ว',
+          messageEN: 'This email is already in use',
+          message: 'อีเมลนี้ถูกใช้งานในระบบแล้ว',
+        }
       }
 
       if (
@@ -57,6 +69,10 @@ export async function registerUser(values: RegisterFormInputs) {
 
         return {
           success: true,
+          messageTH:
+            'อัปเดตบัญชีของคุณเป็นผู้ขายเรียบร้อย กรุณาเข้าสู่ระบบเพื่อตั้งค่าร้านค้า',
+          messageEN:
+            'Your account has been updated to merchant. Please log in to set up your store',
           message:
             'อัปเดตบัญชีของคุณเป็นผู้ขายเรียบร้อย กรุณาเข้าสู่ระบบเพื่อตั้งค่าร้านค้า',
         }
@@ -76,6 +92,10 @@ export async function registerUser(values: RegisterFormInputs) {
         }
         return {
           success: true,
+          messageTH:
+            'บัญชีร้านค้าของคุณสามารถใช้ซื้อสินค้าได้ทันที กรุณาเข้าสู่ระบบ',
+          messageEN:
+            'Your merchant account can be used to purchase products immediately. Please log in',
           message:
             'บัญชีร้านค้าของคุณสามารถใช้ซื้อสินค้าได้ทันที กรุณาเข้าสู่ระบบ',
         }
@@ -119,6 +139,10 @@ export async function registerUser(values: RegisterFormInputs) {
       console.error(error)
       return {
         success: true,
+        messageTH:
+          'ลงทะเบียนสำเร็จเรียบร้อยแล้ว แต่ระบบไม่สามารถส่งอีเมล OTP ได้ในขณะนี้ กรุณากดขอ OTP ใหม่อีกครั้ง',
+        messageEN:
+          'Registration successful, but failed to send OTP email at this time. Please request OTP again',
         message:
           'ลงทะเบียนสำเร็จเรียบร้อยแล้ว แต่ระบบไม่สามารถส่งอีเมล OTP ได้ในขณะนี้ กรุณากดขอ OTP ใหม่อีกครั้ง',
       }
@@ -126,12 +150,21 @@ export async function registerUser(values: RegisterFormInputs) {
 
     return {
       success: true,
+      messageTH:
+        'ลงทะเบียนสำเร็จเรียบร้อยแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยัน OTP!',
+      messageEN:
+        'Registration successful! Please check your email to verify OTP!',
       message:
         'ลงทะเบียนสำเร็จเรียบร้อยแล้ว! กรุณาตรวจสอบอีเมลเพื่อยืนยัน OTP!',
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }
 
@@ -144,7 +177,12 @@ export async function requestForgotPasswordOtp(input: RequestOtpInput) {
     })
 
     if (!user) {
-      return { success: false, message: 'ไม่พบผู้ใช้งานด้วยอีเมลนี้ในระบบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบผู้ใช้งานด้วยอีเมลนี้ในระบบ',
+        messageEN: 'No user found with this email in the system',
+        message: 'ไม่พบผู้ใช้งานด้วยอีเมลนี้ในระบบ',
+      }
     }
 
     const now = new Date()
@@ -175,19 +213,32 @@ export async function requestForgotPasswordOtp(input: RequestOtpInput) {
       console.error(error)
       return {
         success: false,
+        messageTH: 'ไม่สามารถส่งอีเมล OTP ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง',
+        messageEN: 'Failed to send OTP email at this time. Please try again',
+        message: 'ไม่สามารถส่งอีเมล OTP ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง',
       }
     }
 
+    const otpMsgTH = isOtpValid
+      ? 'ส่งรหัส OTP เดิมที่ยังไม่หมดอายุไปยังอีเมลเรียบร้อยแล้ว'
+      : 'ส่งรหัส OTP ใหม่ไปยังอีเมลเรียบร้อยแล้ว'
+    const otpMsgEN = isOtpValid
+      ? 'Existing valid OTP has been sent to your email'
+      : 'A new OTP has been sent to your email'
+
     return {
       success: true,
-      message: isOtpValid
-        ? 'ส่งรหัส OTP เดิมที่ยังไม่หมดอายุไปยังอีเมลเรียบร้อยแล้ว'
-        : 'ส่งรหัส OTP ใหม่ไปยังอีเมลเรียบร้อยแล้ว',
+      messageTH: otpMsgTH,
+      messageEN: otpMsgEN,
+      message: otpMsgTH,
     }
   } catch (error) {
     console.error(error)
     return {
       success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
     }
   }
 }
@@ -201,19 +252,39 @@ export async function resetPasswordWithOtp(input: ResetPasswordWithOtpInput) {
     })
 
     if (!user) {
-      return { success: false, message: 'ไม่พบผู้ใช้งานในระบบ' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบผู้ใช้งานในระบบ',
+        messageEN: 'User not found in system',
+        message: 'ไม่พบผู้ใช้งานในระบบ',
+      }
     }
 
     if (!user.otp || !user.otpExpires) {
-      return { success: false, message: 'กรุณากดขอรหัส OTP ก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณากดขอรหัส OTP ก่อนทำรายการ',
+        messageEN: 'Please request an OTP first',
+        message: 'กรุณากดขอรหัส OTP ก่อนทำรายการ',
+      }
     }
 
     if (user.otp !== otp) {
-      return { success: false, message: 'รหัส OTP ไม่ถูกต้อง' }
+      return {
+        success: false,
+        messageTH: 'รหัส OTP ไม่ถูกต้อง',
+        messageEN: 'Invalid OTP code',
+        message: 'รหัส OTP ไม่ถูกต้อง',
+      }
     }
 
     if (new Date() > new Date(user.otpExpires)) {
-      return { success: false, message: 'รหัส OTP หมดอายุแล้ว กรุณาขอรหัสใหม่' }
+      return {
+        success: false,
+        messageTH: 'รหัส OTP หมดอายุแล้ว กรุณาขอรหัสใหม่',
+        messageEN: 'OTP code has expired. Please request a new one',
+        message: 'รหัส OTP หมดอายุแล้ว กรุณาขอรหัสใหม่',
+      }
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12)
@@ -240,12 +311,17 @@ export async function resetPasswordWithOtp(input: ResetPasswordWithOtpInput) {
 
     return {
       success: true,
+      messageTH: 'ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว',
+      messageEN: 'Password reset successfully',
       message: 'ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว',
     }
   } catch (error) {
     console.error(error)
     return {
       success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
     }
   }
 }

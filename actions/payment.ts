@@ -75,7 +75,12 @@ export async function upsertPaymentSetting(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -87,6 +92,8 @@ export async function upsertPaymentSetting(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -109,6 +116,8 @@ export async function upsertPaymentSetting(
 
     return {
       success: true,
+      messageTH: 'บันทึกการตั้งค่าการชำระเงินสำเร็จแล้ว',
+      messageEN: 'Payment settings saved successfully',
       message: 'บันทึกการตั้งค่าการชำระเงินสำเร็จแล้ว',
       data: setting,
     }
@@ -127,7 +136,12 @@ export async function createBankAccount(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -139,6 +153,8 @@ export async function createBankAccount(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -181,7 +197,13 @@ export async function createBankAccount(
       },
     })
 
-    return { success: true, message: 'เพิ่มบัญชีธนาคารสำเร็จ', data: account }
+    return {
+      success: true,
+      messageTH: 'เพิ่มบัญชีธนาคารสำเร็จ',
+      messageEN: 'Bank account added successfully',
+      message: 'เพิ่มบัญชีธนาคารสำเร็จ',
+      data: account,
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -194,14 +216,24 @@ export async function updateBankAccount(
 ) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบัญชีธนาคาร',
+        messageEN: 'Bank account not found',
+        message: 'ไม่พบบัญชีธนาคาร',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const account = await prisma.bankAccount.findUnique({
@@ -213,7 +245,12 @@ export async function updateBankAccount(
     })
 
     if (!account) {
-      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบัญชีธนาคาร',
+        messageEN: 'Bank account not found',
+        message: 'ไม่พบบัญชีธนาคาร',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -225,6 +262,8 @@ export async function updateBankAccount(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -257,6 +296,8 @@ export async function updateBankAccount(
 
     return {
       success: true,
+      messageTH: 'แก้ไขบัญชีธนาคารสำเร็จ',
+      messageEN: 'Bank account updated successfully',
       message: 'แก้ไขบัญชีธนาคารสำเร็จ',
       data: updatedAccount,
     }
@@ -269,14 +310,24 @@ export async function updateBankAccount(
 export async function deleteBankAccount(id: string) {
   try {
     if (!id) {
-      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบัญชีธนาคาร',
+        messageEN: 'Bank account not found',
+        message: 'ไม่พบบัญชีธนาคาร',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
     }
 
     const account = await prisma.bankAccount.findUnique({
@@ -285,7 +336,12 @@ export async function deleteBankAccount(id: string) {
     })
 
     if (!account) {
-      return { success: false, message: 'ไม่พบบัญชีธนาคาร' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบบัญชีธนาคาร',
+        messageEN: 'Bank account not found',
+        message: 'ไม่พบบัญชีธนาคาร',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -297,6 +353,8 @@ export async function deleteBankAccount(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -312,7 +370,12 @@ export async function deleteBankAccount(id: string) {
       details: { setting: 'bank_account', type: 'deleted' },
     })
 
-    return { success: true, message: 'ลบบัญชีธนาคารสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'ลบบัญชีธนาคารสำเร็จ',
+      messageEN: 'Bank account deleted successfully',
+      message: 'ลบบัญชีธนาคารสำเร็จ',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

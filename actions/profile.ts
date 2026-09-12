@@ -57,7 +57,11 @@ export async function updateProfile(input: UpdateProfileInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     const fullName = `${input.firstName.trim()} ${input.lastName.trim()}`.trim()
@@ -82,7 +86,8 @@ export async function updateProfile(input: UpdateProfileInput) {
 
     return {
       success: true,
-      message: 'บันทึกข้อมูลสำเร็จแล้ว',
+      messageTH: 'บันทึกข้อมูลสำเร็จแล้ว',
+      messageEN: 'Profile updated successfully',
       data: serializeDecimal(updated),
     }
   } catch (error) {

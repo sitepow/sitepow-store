@@ -70,14 +70,22 @@ export async function updateStoreProfile(
 ) {
   try {
     if (!storeId) {
-      return { success: false, message: 'ไม่พบ Store ID' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบ Store ID',
+        messageEN: 'Store ID not found',
+      }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+      }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -89,7 +97,8 @@ export async function updateStoreProfile(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
       }
     }
 
@@ -99,7 +108,11 @@ export async function updateStoreProfile(
         select: { id: true },
       })
       if (existing) {
-        return { success: false, message: 'URL Slug นี้ถูกใช้งานไปแล้ว' }
+        return {
+          success: false,
+          messageTH: 'URL Slug นี้ถูกใช้งานไปแล้ว',
+          messageEN: 'This URL slug is already taken',
+        }
       }
     }
 
@@ -124,7 +137,11 @@ export async function updateStoreProfile(
 
     await invalidateStoreCache(store?.slug)
 
-    return { success: true, message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }
+    return {
+      success: true,
+      messageTH: 'บันทึกข้อมูลร้านค้าสำเร็จ',
+      messageEN: 'Store profile updated successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }

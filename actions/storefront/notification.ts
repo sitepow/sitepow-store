@@ -34,7 +34,11 @@ export async function updateNotificationSettings(
     const userId = userSession?.id
 
     if (!userId) {
-      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
+        messageEN: 'User not found',
+      }
     }
 
     await prisma.user.update({
@@ -45,7 +49,11 @@ export async function updateNotificationSettings(
       },
     })
 
-    return { success: true, message: 'บันทึกการตั้งค่าสำเร็จแล้ว' }
+    return {
+      success: true,
+      messageTH: 'บันทึกการตั้งค่าสำเร็จแล้ว',
+      messageEN: 'Notification settings updated successfully',
+    }
   } catch (error) {
     console.error(error)
     return { success: false }
