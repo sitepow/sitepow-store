@@ -126,3 +126,59 @@ ${JSON.stringify(analyticsData, null, 2)}
 5. ข้อเสนอแนะเชิงรุก 3-4 ข้อที่ร้านค้าต้องลงมือทำทันที
 `
 }
+
+export function buildAffiliateProductPrompt(input: {
+  url: string
+  platform: string
+  rawTitle?: string
+  scrapedTitle?: string
+  scrapedDescription?: string
+  scrapedPrice?: number
+  scrapedImage?: string
+  scrapedImages?: string[]
+  scrapedVideo?: string
+  rawNotes?: string
+}) {
+  const targetProductTitle = input.rawTitle || input.scrapedTitle
+
+  return `คุณคือผู้เชี่ยวชาญด้าน Copywriting และการตลาดออนไลน์สำหรับสินค้า Affiliate (Shopee, Lazada, TikTok Shop) "โปรดตอบกลับเป็นภาษาไทยเท่านั้น"
+
+เป้าหมายของคุณ:
+แปลงข้อมูลสินค้าจากลิงก์มาร์เก็ตเพลส (${input.platform}) ให้กลายเป็น "หน้าสินค้าที่มีเสน่ห์ น่าซื้อ น่าเชื่อถือ และเขียนเรียบเรียงใหม่ทั้งหมด" โดยไม่ใช้คำสแปมจากมาร์เก็ตเพลส
+
+${
+  targetProductTitle
+    ? `[สำคัญที่สุด - สินค้าเป้าหมาย]:
+คุณต้องเขียนข้อมูลสินค้าสำหรับ: "${targetProductTitle}" เท่านั้น!
+ห้ามเปลี่ยนเป็นสินค้าชนิดอื่น หรือสุ่มสินค้าที่ไม่เกี่ยวข้องเด็ดขาด`
+    : ''
+}
+
+กฎเหล็กสำคัญที่สุด (CRITICAL COPYWRITING RULES):
+1. [ชื่อสินค้า]: ห้ามก็อปปี้ชื่อสินค้าแบบมาร์เก็ตเพลสเดิมๆ เช่น "ส่งฟรี แท้ 100% ด่วน เก็บเงินปลายทาง ประกันศูนย์ 1 ปี"
+   - ต้องเขียนใหม่ให้เป็นชื่อสินค้าที่กระชับ พรีเมียม ตรงไปตรงมา และมีจุดเด่นหลัก (เช่น "ลำโพงบลูทูธพกพา ดีไซน์เรโทร เบสแน่น กันน้ำ IPX5")
+2. [URL Slug]: สร้าง slug ภาษาอังกฤษแบบ kebab-case ที่สั้น ตรงตามคีย์เวิร์ด เช่น "retro-portable-bluetooth-speaker"
+3. [รายละเอียดสินค้า (Description)]: เขียนเนื้อหาให้น่าซื้อ แบ่งเป็นสัดส่วนชัดเจน:
+   - สรุปสั้นๆ ถึงปัญหาที่แก้ไขหรือความคุ้มค่า (Hook สั้นๆ 2-3 บรรทัด)
+   - ฟังก์ชันเด่นและประโยชน์ (Bullet points พร้อมอิโมจิสวยงาม 4-6 ข้อ)
+   - ข้อมูลสเปกและการใช้งาน (Specifications)
+   - ความมั่นใจในการสั่งซื้อ (บริการและการรับประกัน)
+4. [ราคาและส่วนลด]:
+   - กำหนด price (ราคาขาย) และ originalPrice (ราคาตั้ง/ราคาเต็ม)
+   - หากตรวจพบว่ามีส่วนลด ให้ตั้ง isOnSale: true และระบุ discountText เช่น "ลด 30%", "Flash Sale", "คุ้มค่าที่สุด"
+5. [Tags]: คำค้นหาที่ตรงกับสินค้า 4-6 แท็ก คั่นด้วยเครื่องหมายจุลภาค
+6. [Metadata]: สกัดคุณสมบัติที่สำคัญอย่างน้อย 3-5 รายการ (เช่น แบรนด์, วัสดุ, การเชื่อมต่อ, ขนาด, สี, การรับประกัน)
+
+ข้อมูลสินค้า:
+- แพลตฟอร์ม: ${input.platform}
+- URL สินค้า: ${input.url}
+${targetProductTitle ? `- ชื่อสินค้า: "${targetProductTitle}"` : ''}
+${input.scrapedDescription ? `- ข้อมูลสรุปที่ตรวจพบ: "${input.scrapedDescription.slice(0, 1000)}"` : ''}
+${input.scrapedPrice ? `- ราคาที่ตรวจพบ: ${input.scrapedPrice} บาท` : ''}
+${input.scrapedImage ? `- ลิงก์รูปภาพหลัก: ${input.scrapedImage}` : ''}
+${input.scrapedImages && input.scrapedImages.length > 0 ? `- ลิงก์รูปภาพทั้งหมด: ${JSON.stringify(input.scrapedImages.slice(0, 8))}` : ''}
+${input.scrapedVideo ? `- ลิงก์วิดีโอ: ${input.scrapedVideo}` : ''}
+${input.rawNotes ? `- ข้อความเน้นย้ำเพิ่มเติมจากเจ้าของร้าน: "${input.rawNotes}"` : ''}
+
+กรุณาส่งกลับเป็น JSON ที่ตรงตามโครงสร้าง Schema ที่กำหนดอย่างเคร่งครัด`
+}

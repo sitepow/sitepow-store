@@ -1,10 +1,13 @@
 import { UseFormReturn } from 'react-hook-form'
 
 import {
+  GenerateAffiliateProductInput,
+  generateAffiliateProductAi,
   generateAnalyticsInsightsAi,
   generateBlogAi,
   generateCategoryAi,
   generateProductAi,
+  scrapeAffiliateProductUrl,
 } from '@/actions/ai'
 import { DiscountType } from '@/generated/prisma/enums'
 import { AiGenTask } from '@/types/ai'
@@ -147,6 +150,22 @@ export function useAnalyticsAi(storeId: string) {
   return useMutation({
     mutationFn: async (data: AnalyticsData) => {
       return await generateAnalyticsInsightsAi(data, storeId)
+    },
+  })
+}
+
+export function useGenerateAffiliateProductAi() {
+  return useMutation({
+    mutationFn: async (input: GenerateAffiliateProductInput) => {
+      return await generateAffiliateProductAi(input)
+    },
+  })
+}
+
+export function useScrapeAffiliateProduct() {
+  return useMutation({
+    mutationFn: async (url: string) => {
+      return await scrapeAffiliateProductUrl(url)
     },
   })
 }

@@ -37,6 +37,7 @@ export interface CreateProductInput {
   title: string
   slug: string
   tags?: string
+  description?: string
   images?: { url: string; isPrimary: boolean }[]
   isPublished?: boolean
   variants: {
@@ -296,6 +297,8 @@ export async function createProduct(input: CreateProductInput) {
       metadata,
       tags,
       images,
+      description,
+      affiliateLinks,
       storeId,
       categoryId,
       isPublished = true,
@@ -313,11 +316,51 @@ export async function createProduct(input: CreateProductInput) {
       ? Object.fromEntries(metadata.map(({ key, value }) => [key, value]))
       : {}
 
-    if (input.affiliateLinks && input.affiliateLinks.length > 0) {
-      detailsObj.affiliateLinks = input.affiliateLinks
+    if (description && description.trim()) {
+      detailsObj.description = description.trim()
+    }
+
+    if (affiliateLinks && affiliateLinks.length > 0) {
+      detailsObj.affiliateLinks = affiliateLinks
     }
 
     const details = Object.keys(detailsObj).length > 0 ? detailsObj : undefined
+
+    // Resolve fallback branch if any stock is missing branchId
+    let defaultBranchId: string | null = null
+    const needsFallbackBranch = variants.some(
+      (v) =>
+        !v.stocks ||
+        v.stocks.length === 0 ||
+        v.stocks.some((s) => !s.branchId || s.branchId.trim() === ''),
+    )
+    if (needsFallbackBranch) {
+      const defaultBranch = await prisma.branch.findFirst({
+        where: { storeId: input.storeId, isMain: true },
+        select: { id: true },
+      })
+      if (defaultBranch) {
+        defaultBranchId = defaultBranch.id
+      } else {
+        const anyBranch = await prisma.branch.findFirst({
+          where: { storeId: input.storeId },
+          select: { id: true },
+        })
+        if (anyBranch) {
+          defaultBranchId = anyBranch.id
+        } else {
+          const newBranch = await prisma.branch.create({
+            data: {
+              storeId: input.storeId,
+              name: 'สำนักงานใหญ่ (Main Branch)',
+              isMain: true,
+            },
+            select: { id: true },
+          })
+          defaultBranchId = newBranch.id
+        }
+      }
+    }
 
     const [product] = await prisma.$transaction([
       prisma.product.create({
@@ -358,11 +401,22 @@ export async function createProduct(input: CreateProductInput) {
                   })) ?? [],
               },
               stocks: {
-                create: v.stocks.map((s) => ({
-                  branchId: s.branchId,
-                  quantity: s.quantity,
-                  minStock: s.minStock,
-                })),
+                create: (v.stocks && v.stocks.length > 0
+                  ? v.stocks
+                  : [
+                      {
+                        branchId: defaultBranchId || '',
+                        quantity: 0,
+                        minStock: 0,
+                      },
+                    ]
+                )
+                  .map((s) => ({
+                    branchId: s.branchId || defaultBranchId || '',
+                    quantity: s.quantity ?? 0,
+                    minStock: s.minStock ?? 0,
+                  }))
+                  .filter((s) => Boolean(s.branchId)),
               },
               isAvailable: v.isAvailable ?? false,
             })),
@@ -674,6 +728,8 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       metadata,
       tags,
       images,
+      description,
+      affiliateLinks,
       categoryId,
       isPublished,
       ...rest
@@ -763,8 +819,16 @@ export async function updateProduct(id: string, input: CreateProductInput) {
       ...metadataObj,
     }
 
-    if (input.affiliateLinks !== undefined) {
-      detailsObj.affiliateLinks = input.affiliateLinks
+    if (description !== undefined) {
+      if (description.trim()) {
+        detailsObj.description = description.trim()
+      } else {
+        delete detailsObj.description
+      }
+    }
+
+    if (affiliateLinks !== undefined) {
+      detailsObj.affiliateLinks = affiliateLinks
     }
 
     const details = Object.keys(detailsObj).length > 0 ? detailsObj : undefined

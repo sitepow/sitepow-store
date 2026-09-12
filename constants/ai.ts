@@ -311,3 +311,81 @@ export const ANALYTICS_INSIGHTS_SCHEMA = {
     'retentionAndMarketingStrategy',
   ],
 }
+
+export const AFFILIATE_PRODUCT_AI_SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: {
+      type: SchemaType.STRING,
+      description:
+        'ชื่อสินค้าที่เขียนใหม่แบบมืออาชีพ สละสลวย น่าซื้อ (ไม่ใช่ก็อปปี้ชื่อดิบจากมาร์เก็ตเพลส)',
+    },
+    slug: {
+      type: SchemaType.STRING,
+      description:
+        'URL slug ภาษาอังกฤษ ตัวพิมพ์เล็กและขีดกลาง เช่น ergonomic-chair-pro',
+    },
+    description: {
+      type: SchemaType.STRING,
+      description:
+        'เนื้อหาโฆษณาและรายละเอียดสินค้าน่าซื้อ มีการจัดโครงสร้าง มีจุดเด่น จุดขาย และสเปกสินค้า',
+    },
+    price: {
+      type: SchemaType.NUMBER,
+      description: 'ราคาขายจริง (ตัวเลข ไม่ติดลบ)',
+    },
+    originalPrice: {
+      type: SchemaType.NUMBER,
+      description: 'ราคาเต็มก่อนลด (ถ้าไม่มีให้เท่ากับราคาขาย)',
+    },
+    isOnSale: {
+      type: SchemaType.BOOLEAN,
+      description: 'กำลังลดราคาหรือไม่',
+    },
+    discountText: {
+      type: SchemaType.STRING,
+      description: 'ข้อความป้ายโปรโมชั่น เช่น ลด 30%, Flash Sale, ส่งฟรี',
+    },
+    platform: {
+      type: SchemaType.STRING,
+      description: 'SHOPEE, LAZADA, TIKTOK, หรือ OTHER',
+    },
+    platformLabel: {
+      type: SchemaType.STRING,
+      description: 'ชื่อป้ายร้านค้า เช่น Shopee Mall, LazMall, ร้านทางการ',
+    },
+    imageUrl: {
+      type: SchemaType.STRING,
+      description: 'URL รูปภาพสินค้าหลักที่ตรวจพบ',
+    },
+    images: {
+      type: SchemaType.ARRAY,
+      description: 'รายการ URL รูปภาพสินค้าทั้งหมด',
+      items: {
+        type: SchemaType.STRING,
+      },
+    },
+    videoUrl: {
+      type: SchemaType.STRING,
+      description: 'URL วิดีโอสินค้าถ้ามี (เช่น TikTok หรือ mp4)',
+    },
+    tags: {
+      type: SchemaType.STRING,
+      description:
+        'แท็กสินค้า คั่นด้วยจุลภาค เช่น เก้าอี้ทำงาน, สุขภาพ, ergonomic',
+    },
+    metadata: {
+      type: SchemaType.ARRAY,
+      description: 'คุณสมบัติและสเปกสินค้า เช่น แบรนด์, วัสดุ, การรับประกัน',
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          key: { type: SchemaType.STRING },
+          value: { type: SchemaType.STRING },
+        },
+        required: ['key', 'value'],
+      },
+    },
+  },
+  required: ['title', 'slug', 'description', 'price', 'platform', 'isOnSale'],
+}

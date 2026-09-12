@@ -1,7 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import imageCompression from 'browser-image-compression'
 
-import { getR2PresignedUrl, r2DeleteImage } from '../r2'
+import {
+  getR2PresignedUrl,
+  r2DeleteImage,
+  uploadMultipleExternalUrlsToR2,
+} from '../r2'
 
 const COMPRESSION_OPTIONS = {
   maxSizeMB: 1,
@@ -108,5 +112,19 @@ export function useR2UploadImage(folder: string) {
 export function useR2DeleteImage() {
   return useMutation({
     mutationFn: async (fileName: string) => await r2DeleteImage(fileName),
+  })
+}
+
+export function useUploadExternalImagesToR2() {
+  return useMutation({
+    mutationFn: async ({
+      urls,
+      folder,
+    }: {
+      urls: string[]
+      folder: string
+    }) => {
+      return await uploadMultipleExternalUrlsToR2(urls, folder)
+    },
   })
 }

@@ -52,3 +52,95 @@ export const AFFILIATE_PLATFORM_CONFIG: Record<
     borderClass: 'border-indigo-500/30 hover:border-indigo-500',
   },
 }
+
+export function detectAffiliatePlatform(url: string): AffiliatePlatform {
+  try {
+    const parsed = new URL(url)
+    const host = parsed.hostname.toLowerCase()
+    if (host.includes('shopee') || host.includes('shp.ee')) return 'SHOPEE'
+    if (host.includes('lazada')) return 'LAZADA'
+    if (host.includes('tiktok')) return 'TIKTOK'
+    return 'OTHER'
+  } catch {
+    const lower = url.toLowerCase()
+    if (lower.includes('shopee') || lower.includes('shp.ee')) return 'SHOPEE'
+    if (lower.includes('lazada')) return 'LAZADA'
+    if (lower.includes('tiktok')) return 'TIKTOK'
+    return 'OTHER'
+  }
+}
+
+export interface ParsedMarketplaceInput {
+  url?: string
+  title?: string
+  price?: number
+  discountText?: string
+  platform: AffiliatePlatform
+}
+
+export function parseMarketplaceInput(rawText: string): ParsedMarketplaceInput {
+  const text = rawText.trim()
+  const urlMatch = text.match(/https?:\/\/[^\s"'<>]+/i)
+  const url = urlMatch ? urlMatch[0] : undefined
+  let cleanedText = url ? text.replace(url, '').trim() : text
+
+  const platform = detectAffiliatePlatform(url || text)
+
+  let price: number | undefined
+  const priceMatch =
+    cleanedText.match(
+      /(?:฿|ราคา\s*[:\s]*|THB\s*)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+    ) || cleanedText.match(/([0-9,]+(?:\.[0-9]{1,2})?)\s*(?:บาท|.-)/i)
+  if (priceMatch && priceMatch[1]) {
+    const p = parseFloat(priceMatch[1].replace(/,/g, ''))
+    if (!isNaN(p) && p > 0) price = p
+  }
+
+  let discountText: string | undefined
+  const discountMatch = cleanedText.match(
+    /\[?\s*(?:ลด|ส่วนลด)\s*([0-9]+%)\s*\]?/i,
+  )
+  if (discountMatch) {
+    discountText = `ลด ${discountMatch[1]}`
+  }
+
+  let titleFromUrl: string | undefined
+  if (url) {
+    try {
+      const parsed = new URL(url)
+      const pathname = decodeURIComponent(parsed.pathname)
+      const shopeeSlugMatch = pathname.match(/\/([^\/]+)-i\.\d+\.\d+/)
+      if (shopeeSlugMatch && shopeeSlugMatch[1]) {
+        titleFromUrl = shopeeSlugMatch[1].replace(/-/g, ' ').trim()
+      }
+      const lazadaSlugMatch = pathname.match(/\/products\/([^\/]+)-i\d+/)
+      if (lazadaSlugMatch && lazadaSlugMatch[1]) {
+        titleFromUrl = lazadaSlugMatch[1].replace(/-/g, ' ').trim()
+      }
+    } catch {}
+  }
+
+  let title = titleFromUrl
+  cleanedText = cleanedText
+    .replace(
+      /ซื้อได้ที่\s*(?:Shopee|Lazada|TikTok)\s*(?:ตอนนี้เลย|เลย)!?/gi,
+      '',
+    )
+    .replace(/ดูวิดีโอนี้ใน\s*TikTok/gi, '')
+    .replace(/\[\s*ลด\s*[0-9]+%\s*\]/gi, '')
+    .replace(
+      /(?:ราคา|฿|THB)\s*[:\s]*[0-9,]+(?:\.[0-9]{1,2})?\s*(?:บาท|.-)?/gi,
+      '',
+    )
+    .replace(/[0-9,]+(?:\.[0-9]{1,2})?\s*(?:บาท|.-)/gi, '')
+    .replace(/\s*(?:ราคา|฿|THB)\s*$/gi, '')
+    .replace(/[|•]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (cleanedText.length > 3) {
+    title = cleanedText
+  }
+
+  return { url, title, price, discountText, platform }
+}

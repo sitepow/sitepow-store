@@ -13,6 +13,7 @@ import {
   IconFileSpreadsheet,
   IconLock,
   IconPlus,
+  IconSparkles,
 } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -21,6 +22,7 @@ import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 
+import { AiAffiliateProductDialog } from './_components/AiAffiliateProductDialog'
 import { BulkImportProductsDialog } from './_components/BulkImportProductsDialog'
 import { ProductsTable } from './_components/ProductsTable'
 
@@ -33,6 +35,7 @@ export default function MerchantStoreSettingsProductsPage() {
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
+  const [isAiAffiliateOpen, setIsAiAffiliateOpen] = useState(false)
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
 
   const isStoreSelected = selectedStoreId && selectedStoreId !== ALL_STORES
@@ -48,6 +51,15 @@ export default function MerchantStoreSettingsProductsPage() {
             <StoreSelectField />
             {canCreateProducts && (
               <>
+                <Button
+                  variant="outline"
+                  disabled={!isStoreSelected}
+                  onClick={() => setIsAiAffiliateOpen(true)}
+                  className="border-primary/30 text-primary hover:bg-primary/5 flex items-center gap-1.5"
+                >
+                  <IconSparkles className="h-4 w-4" />
+                  {t('aiAffiliateBtn')}
+                </Button>
                 <Button
                   variant="outline"
                   disabled={!isStoreSelected}
@@ -79,6 +91,12 @@ export default function MerchantStoreSettingsProductsPage() {
       ) : (
         <ProductsTable />
       )}
+
+      <AiAffiliateProductDialog
+        open={isAiAffiliateOpen}
+        onOpenChange={setIsAiAffiliateOpen}
+        storeId={selectedStoreId}
+      />
 
       <BulkImportProductsDialog
         open={isBulkImportOpen}
