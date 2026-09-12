@@ -21,6 +21,7 @@ export interface StatsCardProps {
   valueClassName?: string
   action?: React.ReactNode
   children?: React.ReactNode
+  onClick?: () => void
 }
 
 export function StatsCard({
@@ -34,6 +35,7 @@ export function StatsCard({
   valueClassName,
   action,
   children,
+  onClick,
 }: StatsCardProps) {
   // Automatically extract inline trend from description if present (e.g., "+12.5%", "-3.2%")
   const descTrend = React.useMemo(() => {
@@ -55,11 +57,13 @@ export function StatsCard({
 
   return (
     <div
+      onClick={onClick}
       className={cn(
         'group relative flex flex-col justify-between overflow-hidden rounded-2xl border',
         'border-border/70 bg-card/85 p-4.5 backdrop-blur-md transition-all duration-300 sm:p-5',
         'hover:border-primary/40 hover:shadow-primary/5 hover:-translate-y-0.5 hover:shadow-lg',
         'dark:bg-card/40 dark:hover:border-primary/30 dark:border-white/10',
+        onClick && 'cursor-pointer select-none',
         className,
       )}
     >

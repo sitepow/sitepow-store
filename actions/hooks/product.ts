@@ -7,8 +7,10 @@ import {
 } from '@tanstack/react-query'
 
 import {
+  BulkImportProductsInput,
   CreateProductInput,
   GetProductsParams,
+  bulkImportProducts,
   createProduct,
   deleteProduct,
   getProductById,
@@ -109,4 +111,19 @@ export function useProductQuota(storeId: string) {
       enabled: !!storeId && storeId !== ALL_STORES,
     }),
   )
+}
+
+export function useBulkImportProducts() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: BulkImportProductsInput) => bulkImportProducts(input),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all })
+      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
+      queryClient.invalidateQueries({
+        queryKey: productKeys.quota(variables.storeId),
+      })
+    },
+  })
 }

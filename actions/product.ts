@@ -3,7 +3,12 @@
 import { invalidateStorefrontProductCache } from '@/actions/query-keys/storefront/invalidation/product'
 import { PLAN_DETAILS } from '@/constants/plan'
 import {
+  SERVER_ERROR_MESSAGE_EN,
+  SERVER_ERROR_MESSAGE_TH,
+} from '@/constants/system'
+import {
   ActorType,
+  DiscountType,
   LogAction,
   Prisma,
   ProductType,
@@ -11,6 +16,7 @@ import {
 import { ALL_STORES } from '@/stores/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
+import { formatSlug } from '@/utils/slug'
 import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
@@ -1042,6 +1048,350 @@ export async function toggleProductVisibility(
     }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
+  }
+}
+
+export interface BulkImportProductItem {
+  title: string
+  productType: ProductType
+  variantTitle?: string
+  sku: string
+  price: number
+  costPrice?: number
+  categorySlug?: string
+  initialStock?: number
+  weight?: number
+  digitalUrl?: string
+  digitalItemContent?: string
+  pointsAmount?: number
+  discountType?: 'PERCENTAGE' | 'FIXED'
+  discountAmount?: number
+}
+
+export interface BulkImportProductsInput {
+  storeId: string
+  branchId?: string
+  products: BulkImportProductItem[]
+}
+
+export async function bulkImportProducts(input: BulkImportProductsInput) {
+  try {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
+    }
+
+    if (!input.storeId || input.storeId === ALL_STORES) {
+      return {
+        success: false,
+        messageTH: 'กรุณาเลือกร้านค้าก่อนทำรายการ',
+        messageEN: 'Please select a store to proceed',
+        message: 'กรุณาเลือกร้านค้าก่อนทำรายการ',
+      }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: input.storeId,
+      permission: 'canCreateProducts',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    if (!input.products || input.products.length === 0) {
+      return {
+        success: false,
+        messageTH: 'ไม่มีรายการสินค้าที่พร้อมนำเข้า',
+        messageEN: 'No valid products to import',
+        message: 'ไม่มีรายการสินค้าที่พร้อมนำเข้า',
+      }
+    }
+
+    // 1. Group items by product title to support multiple variants per product
+    const productGroups = new Map<string, BulkImportProductItem[]>()
+    for (const item of input.products) {
+      const trimmedTitle = item.title?.trim()
+      if (!trimmedTitle) continue
+      const existing = productGroups.get(trimmedTitle) || []
+      existing.push(item)
+      productGroups.set(trimmedTitle, existing)
+    }
+
+    const newProductCount = productGroups.size
+    if (newProductCount === 0) {
+      return {
+        success: false,
+        messageTH: 'ไม่มีรายการสินค้าที่ถูกต้องสำหรับการนำเข้า',
+        messageEN: 'No valid products found for import',
+        message: 'ไม่มีรายการสินค้าที่ถูกต้องสำหรับการนำเข้า',
+      }
+    }
+
+    // 2. Check store existence & subscription quota
+    const store = await prisma.store.findUnique({
+      where: { id: input.storeId },
+      select: { id: true, slug: true, plan: true, productCount: true },
+    })
+
+    if (!store) {
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลร้านค้า',
+        messageEN: 'Store not found',
+        message: 'ไม่พบข้อมูลร้านค้า',
+      }
+    }
+
+    const maxProducts = PLAN_DETAILS[store.plan]?.maxProducts ?? null
+    if (
+      maxProducts !== null &&
+      store.productCount + newProductCount > maxProducts
+    ) {
+      const remainingQuota = Math.max(0, maxProducts - store.productCount)
+      return {
+        success: false,
+        messageTH: `โควตาสินค้าไม่เพียงพอ (คงเหลือ ${remainingQuota} รายการ แต่ต้องการนำเข้า ${newProductCount} สินค้า)`,
+        messageEN: `Insufficient product quota (${remainingQuota} remaining, attempting to import ${newProductCount} products)`,
+        message: `โควตาสินค้าไม่เพียงพอ (คงเหลือ ${remainingQuota} รายการ)`,
+      }
+    }
+
+    // 3. Resolve target branch
+    let targetBranchId = input.branchId
+    if (targetBranchId) {
+      const validBranch = await prisma.branch.findFirst({
+        where: { id: targetBranchId, storeId: input.storeId },
+        select: { id: true },
+      })
+      if (!validBranch) targetBranchId = undefined
+    }
+
+    if (!targetBranchId) {
+      const defaultBranch = await prisma.branch.findFirst({
+        where: { storeId: input.storeId },
+        orderBy: [{ isMain: 'desc' }, { createdAt: 'asc' }],
+        select: { id: true },
+      })
+      if (defaultBranch) {
+        targetBranchId = defaultBranch.id
+      } else {
+        const newBranch = await prisma.branch.create({
+          data: {
+            storeId: input.storeId,
+            name: 'สำนักงานใหญ่ (Main Branch)',
+            isMain: true,
+          },
+          select: { id: true },
+        })
+        targetBranchId = newBranch.id
+      }
+    }
+
+    // 4. Resolve categories
+    const existingCategories = await prisma.category.findMany({
+      where: { storeId: input.storeId },
+      select: { id: true, slug: true, title: true },
+    })
+
+    let defaultCategoryId = existingCategories[0]?.id
+    if (!defaultCategoryId) {
+      const newCat = await prisma.category.create({
+        data: {
+          storeId: input.storeId,
+          title: 'ทั่วไป',
+          slug: 'general',
+        },
+        select: { id: true },
+      })
+      defaultCategoryId = newCat.id
+    }
+
+    const categoryBySlug = new Map<string, string>()
+    for (const cat of existingCategories) {
+      categoryBySlug.set(cat.slug.toLowerCase(), cat.id)
+      categoryBySlug.set(cat.title.toLowerCase(), cat.id)
+      categoryBySlug.set(cat.id, cat.id)
+    }
+
+    // 5. Check duplicate SKUs against database
+    const allSkus = input.products
+      .map((p) => p.sku?.trim())
+      .filter((s): s is string => Boolean(s))
+
+    if (allSkus.length > 0) {
+      const existingVariantsWithSku = await prisma.productVariant.findMany({
+        where: {
+          product: { storeId: input.storeId },
+          sku: { in: allSkus },
+        },
+        select: { sku: true },
+      })
+
+      if (existingVariantsWithSku.length > 0) {
+        const dupSkus = existingVariantsWithSku
+          .map((v) => v.sku)
+          .slice(0, 5)
+          .join(', ')
+        return {
+          success: false,
+          messageTH: `พบ SKU ที่ซ้ำกับสินค้าที่มีอยู่ในระบบแล้ว (${dupSkus})`,
+          messageEN: `Duplicate SKUs found in existing store database (${dupSkus})`,
+          message: `พบ SKU ที่ซ้ำกับสินค้าที่มีอยู่ในระบบแล้ว (${dupSkus})`,
+        }
+      }
+    }
+
+    // 6. Create products and variants inside transaction
+    let importedVariantsCount = 0
+
+    await prisma.$transaction(
+      async (tx) => {
+        for (const [title, items] of productGroups) {
+          const firstItem = items[0]
+          const catId =
+            (firstItem.categorySlug &&
+              categoryBySlug.get(
+                firstItem.categorySlug.toLowerCase().trim(),
+              )) ||
+            defaultCategoryId
+
+          let baseSlug = formatSlug(title)
+          if (!baseSlug) {
+            baseSlug = `product-${Math.random().toString(36).substring(2, 8)}`
+          }
+
+          let finalSlug = baseSlug
+          const slugExists = await tx.product.findUnique({
+            where: {
+              storeId_slug: { storeId: input.storeId, slug: finalSlug },
+            },
+            select: { id: true },
+          })
+          if (slugExists) {
+            finalSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`
+          }
+
+          const product = await tx.product.create({
+            data: {
+              title,
+              slug: finalSlug,
+              productType: firstItem.productType,
+              storeId: input.storeId,
+              categoryId: catId,
+              isPublished: true,
+              variants: {
+                create: items.map((v) => {
+                  const hasDiscount = Boolean(
+                    v.discountType && v.discountAmount && v.discountAmount > 0,
+                  )
+                  return {
+                    title: v.variantTitle?.trim() || 'Standard',
+                    price: v.price,
+                    costPrice: v.costPrice ?? 0,
+                    sku: v.sku.trim(),
+                    weight: v.weight ?? null,
+                    digitalUrl: v.digitalUrl?.trim() || null,
+                    discountActive: hasDiscount,
+                    discountType: hasDiscount
+                      ? (v.discountType as DiscountType)
+                      : null,
+                    discountAmount: hasDiscount ? v.discountAmount : null,
+                    pointsActive: Boolean(v.pointsAmount && v.pointsAmount > 0),
+                    pointsAmount: v.pointsAmount ?? 0,
+                    isAvailable: true,
+                    digitalItems:
+                      v.productType === 'DIGITAL_ITEM' && v.digitalItemContent
+                        ? {
+                            create: [
+                              {
+                                content: v.digitalItemContent.trim(),
+                                isUsed: false,
+                              },
+                            ],
+                          }
+                        : undefined,
+                    stocks: {
+                      create: [
+                        {
+                          branchId: targetBranchId!,
+                          quantity: v.initialStock ?? 0,
+                          minStock: 0,
+                        },
+                      ],
+                    },
+                  }
+                }),
+              },
+            },
+            select: { id: true },
+          })
+
+          importedVariantsCount += items.length
+
+          await createLog({
+            action: LogAction.CREATE_PRODUCT,
+            actorType: ActorType.MERCHANT,
+            storeId: input.storeId,
+            entity: 'Product',
+            entityId: product.id,
+            details: { title, slug: finalSlug, variantsCount: items.length },
+          })
+        }
+
+        // Increment store productCount
+        await tx.store.update({
+          where: { id: input.storeId },
+          data: { productCount: { increment: newProductCount } },
+        })
+      },
+      { timeout: 30000 },
+    )
+
+    // Invalidate storefront caches
+    if (store.slug) {
+      await Promise.all([
+        invalidateStorefrontProductCache(store.slug),
+        invalidateStorefrontCategoryCache(store.slug),
+      ])
+    }
+
+    return {
+      success: true,
+      data: {
+        productCount: newProductCount,
+        variantsCount: importedVariantsCount,
+      },
+      messageTH: `นำเข้าสินค้าสำเร็จแล้ว ${importedVariantsCount} รายการ (${newProductCount} สินค้า)`,
+      messageEN: `Successfully imported ${importedVariantsCount} items (${newProductCount} products)`,
+      message: `นำเข้าสินค้าสำเร็จแล้ว ${importedVariantsCount} รายการ (${newProductCount} สินค้า)`,
+    }
+  } catch (error) {
+    console.error('bulkImportProducts error:', error)
+    return {
+      success: false,
+      messageTH: SERVER_ERROR_MESSAGE_TH,
+      messageEN: SERVER_ERROR_MESSAGE_EN,
+      message: SERVER_ERROR_MESSAGE_TH,
+    }
   }
 }

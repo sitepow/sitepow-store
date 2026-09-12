@@ -55,7 +55,7 @@ export default function MerchantStoreSettingsProductsPage() {
                   className="flex items-center gap-1.5"
                 >
                   <IconFileSpreadsheet className="h-4 w-4" />
-                  นำเข้าเป็นชุด
+                  {t('bulkImportBtn')}
                 </Button>
                 <Button asChild>
                   <Link href={'/merchant/store-settings/products/create'}>

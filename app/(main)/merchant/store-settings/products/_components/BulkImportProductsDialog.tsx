@@ -5,6 +5,9 @@ import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
+import { useBranchOptions } from '@/actions/hooks/branch'
+import { useBulkImportProducts } from '@/actions/hooks/product'
+import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import {
   IconAlertTriangle,
@@ -41,8 +44,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+
+import { cn } from '@/lib/utils'
 
 import { BulkImportGuideDialog } from './BulkImportGuideDialog'
 
@@ -85,6 +97,16 @@ export function BulkImportProductsDialog({
 }: BulkImportProductsDialogProps) {
   const { currentStore, store } = useCurrentStore()
   const t = useTranslations('merchant.products.bulkImport')
+
+  const { data: branchOptions = [] } = useBranchOptions(storeId)
+  const [selectedBranchId, setSelectedBranchId] = useState<string>('')
+  const bulkImportMutation = useBulkImportProducts()
+
+  const activeBranchId =
+    selectedBranchId ||
+    branchOptions.find((b) => b.isMain)?.id ||
+    branchOptions[0]?.id ||
+    ''
 
   const [currentStep, setCurrentStep] = useState<ImportStep>('upload')
   const [inputTab, setInputTab] = useState<'file' | 'paste'>('file')
@@ -280,21 +302,40 @@ export function BulkImportProductsDialog({
     }
 
     setCurrentStep('processing')
-    setImportProgress(20)
+    setImportProgress(25)
 
     try {
-      await new Promise((r) => setTimeout(r, 600))
-      setImportProgress(60)
+      const res = await bulkImportMutation.mutateAsync({
+        storeId,
+        branchId: activeBranchId || undefined,
+        products: validRows.map((r) => ({
+          title: r.title,
+          productType: r.productType,
+          variantTitle: r.variantTitle,
+          sku: r.sku,
+          price: r.price,
+          costPrice: r.costPrice,
+          categorySlug: r.categorySlug,
+          initialStock: r.initialStock,
+          weight: r.weight,
+          digitalUrl: r.digitalUrl,
+          digitalItemContent: r.digitalItemContent,
+          pointsAmount: r.pointsAmount,
+          discountType: r.discountType,
+          discountAmount: r.discountAmount,
+        })),
+      })
 
-      await new Promise((r) => setTimeout(r, 400))
+      if (!res.success) {
+        setCurrentStep('preview')
+        return
+      }
+
       setImportProgress(100)
-
-      toast.success(t('importSuccess', { count: validRows.length }))
       handleFullReset()
       onOpenChange(false)
       onSuccess?.()
     } catch {
-      toast.error(t('importError'))
       setCurrentStep('preview')
     }
   }
@@ -466,6 +507,43 @@ export function BulkImportProductsDialog({
                   </DropdownMenu>
                 </div>
               </div>
+
+              {branchOptions.length > 0 && (
+                <div className="bg-muted/20 flex flex-col gap-2 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-3.5">
+                  <div>
+                    <p className="text-foreground text-xs font-semibold">
+                      {t('targetBranch')}
+                    </p>
+                    <p className="text-muted-foreground text-[11px]">
+                      {t('selectBranchFirst')}
+                    </p>
+                  </div>
+                  <div className="w-full sm:w-64">
+                    <Select
+                      value={activeBranchId}
+                      onValueChange={setSelectedBranchId}
+                    >
+                      <SelectTrigger className="bg-background h-9 text-xs">
+                        <SelectValue
+                          placeholder={t('targetBranchPlaceholder')}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branchOptions.map((b) => (
+                          <SelectItem
+                            key={b.id}
+                            value={b.id}
+                            className="text-xs"
+                          >
+                            {b.name} {b.isMain ? `(${t('mainBranch')})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
               <Tabs
                 value={inputTab}
                 onValueChange={(v) => setInputTab(v as 'file' | 'paste')}
@@ -544,54 +622,87 @@ export function BulkImportProductsDialog({
           )}
           {currentStep === 'preview' && (
             <div className="space-y-4">
+              {branchOptions.length > 0 && (
+                <div className="bg-muted/20 flex flex-col gap-2 rounded-xl border p-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-3.5 sm:py-2.5">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <span className="text-foreground font-semibold">
+                      {t('targetBranch')}:
+                    </span>
+                    <span className="text-muted-foreground text-[11px]">
+                      ({t('selectBranchFirst')})
+                    </span>
+                  </div>
+                  <div className="w-full sm:w-60">
+                    <Select
+                      value={activeBranchId}
+                      onValueChange={setSelectedBranchId}
+                    >
+                      <SelectTrigger className="bg-background h-8 text-xs">
+                        <SelectValue
+                          placeholder={t('targetBranchPlaceholder')}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branchOptions.map((b) => (
+                          <SelectItem
+                            key={b.id}
+                            value={b.id}
+                            className="text-xs"
+                          >
+                            {b.name} {b.isMain ? `(${t('mainBranch')})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <div
+                <StatsCard
+                  title={t('statsTotal')}
+                  value={parsedRows.length}
+                  icon={IconFileSpreadsheet}
+                  valueClassName="text-lg sm:text-2xl font-bold"
                   onClick={() => setFilterMode('all')}
-                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
+                  className={cn(
+                    'p-2.5 transition-all duration-200 sm:p-4',
                     filterMode === 'all'
-                      ? 'border-primary bg-primary/5 shadow-sm'
-                      : 'bg-card hover:bg-muted/40'
-                  }`}
-                >
-                  <p className="text-muted-foreground truncate text-[11px] font-medium sm:text-xs">
-                    {t('statsTotal')}
-                  </p>
-                  <p className="text-foreground mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
-                    {parsedRows.length}
-                  </p>
-                </div>
-                <div
+                      ? 'border-primary ring-primary/25 bg-primary/5 shadow-sm ring-2'
+                      : 'hover:border-primary/40 opacity-85 hover:opacity-100',
+                  )}
+                />
+                <StatsCard
+                  title={t('statsValid')}
+                  value={validCount}
+                  icon={IconCheck}
+                  valueClassName="text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400"
                   onClick={() => setFilterMode('valid')}
-                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
+                  className={cn(
+                    'p-2.5 transition-all duration-200 sm:p-4',
                     filterMode === 'valid'
-                      ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
-                      : 'bg-card hover:bg-muted/40'
-                  }`}
-                >
-                  <p className="flex items-center gap-1 truncate text-[11px] font-medium text-emerald-600 sm:text-xs">
-                    <IconCheck className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
-                    <span className="truncate">{t('statsValid')}</span>
-                  </p>
-                  <p className="mt-0.5 text-lg font-bold text-emerald-600 sm:mt-1 sm:text-xl">
-                    {validCount}
-                  </p>
-                </div>
-                <div
+                      ? 'border-emerald-500 bg-emerald-500/10 shadow-sm ring-2 ring-emerald-500/25'
+                      : 'opacity-85 hover:border-emerald-500/40 hover:opacity-100',
+                  )}
+                />
+                <StatsCard
+                  title={t('statsErrors')}
+                  value={errorCount}
+                  icon={IconAlertTriangle}
+                  valueClassName={cn(
+                    'text-lg sm:text-2xl font-bold',
+                    errorCount > 0
+                      ? 'text-destructive'
+                      : 'text-muted-foreground',
+                  )}
                   onClick={() => setFilterMode('errors')}
-                  className={`cursor-pointer rounded-xl border p-2.5 transition-all sm:p-3.5 ${
+                  className={cn(
+                    'p-2.5 transition-all duration-200 sm:p-4',
                     filterMode === 'errors'
-                      ? 'border-destructive bg-destructive/10 shadow-sm'
-                      : 'bg-card hover:bg-muted/40'
-                  }`}
-                >
-                  <p className="text-destructive flex items-center gap-1 truncate text-[11px] font-medium sm:text-xs">
-                    <IconAlertTriangle className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
-                    <span className="truncate">{t('statsErrors')}</span>
-                  </p>
-                  <p className="text-destructive mt-0.5 text-lg font-bold sm:mt-1 sm:text-xl">
-                    {errorCount}
-                  </p>
-                </div>
+                      ? 'border-destructive ring-destructive/25 bg-destructive/10 shadow-sm ring-2'
+                      : 'hover:border-destructive/40 opacity-85 hover:opacity-100',
+                  )}
+                />
               </div>
               <div className="bg-card overflow-hidden rounded-xl border">
                 <div className="max-h-72 overflow-x-auto overflow-y-auto">
@@ -744,7 +855,7 @@ export function BulkImportProductsDialog({
                 <Button
                   size="sm"
                   onClick={handleConfirmImport}
-                  disabled={validCount === 0}
+                  disabled={validCount === 0 || bulkImportMutation.isPending}
                   className="flex-1 gap-1.5 whitespace-nowrap shadow-sm sm:flex-initial"
                 >
                   <IconUpload className="size-4" />
