@@ -1,4 +1,4 @@
-import { Message as PrismaMessage } from '@/generated/prisma/client'
+import type { Message as PrismaMessage } from '@/generated/prisma/browser'
 import { UserRole } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { IconSparkles } from '@tabler/icons-react'

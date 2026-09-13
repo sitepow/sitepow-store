@@ -8,6 +8,8 @@ import {
   useDeleteAddress,
   useSetDefaultAddress,
 } from '@/actions/hooks/storefront/address'
+import { COUNTRY_METADATA } from '@/constants/shipping'
+import { CountryCode } from '@/generated/prisma/enums'
 import { formatPromptPay } from '@/utils/slip'
 import { IconArrowForward, IconBriefcase, IconHome } from '@tabler/icons-react'
 
@@ -72,14 +74,41 @@ export function AddressTable() {
                     ) : (
                       <IconHome size={16} />
                     )}
+                    {addr.country && addr.country !== CountryCode.TH && (
+                      <span title={COUNTRY_METADATA[addr.country]?.nameEN}>
+                        {COUNTRY_METADATA[addr.country]?.flag}
+                      </span>
+                    )}
                     <span>{addr.name}</span>
                     {addr.isDefault && <Badge>{t('defaultBadge')}</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>{addr.receiverName}</TableCell>
-                <TableCell>{formatPromptPay(addr.phone)}</TableCell>
+                <TableCell>
+                  {addr.country && addr.country !== CountryCode.TH
+                    ? addr.phone
+                    : formatPromptPay(addr.phone)}
+                </TableCell>
                 <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                  {`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province} ${addr.postalCode}`}
+                  {addr.country && addr.country !== CountryCode.TH
+                    ? [
+                        addr.addressLine,
+                        addr.district,
+                        addr.province,
+                        addr.postalCode,
+                        COUNTRY_METADATA[addr.country]?.nameEN || addr.country,
+                      ]
+                        .filter(Boolean)
+                        .join(', ')
+                    : [
+                        addr.addressLine,
+                        addr.subDistrict,
+                        addr.district,
+                        addr.province,
+                        addr.postalCode,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">

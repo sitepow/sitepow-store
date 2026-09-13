@@ -6,7 +6,8 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 
 import { useCreateAddress } from '@/actions/hooks/storefront/address'
-import { AddressType } from '@/generated/prisma/enums'
+import { COUNTRY_METADATA } from '@/constants/shipping'
+import { AddressType, CountryCode } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { formatPhoneInput } from '@/utils/slip'
 import { AddressSchema, addressSchema } from '@/zod/address'
@@ -27,6 +28,13 @@ import { Field, FieldError, FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -55,12 +63,15 @@ export function CustomerAddressCreateDialog() {
   } = useForm<AddressSchema>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
+      country: CountryCode.TH,
       type: AddressType.SHIPPING,
       branchCode: '00000',
     },
   })
 
   const type = watch('type')
+  const country = watch('country')
+  const isThai = country === CountryCode.TH
   const showShippingFields =
     type === AddressType.SHIPPING || type === AddressType.BOTH
   const showTaxFields = type === AddressType.TAX || type === AddressType.BOTH
@@ -85,6 +96,9 @@ export function CustomerAddressCreateDialog() {
     createAddress(
       {
         ...data,
+        country: data.country,
+        subDistrict: data.subDistrict ?? null,
+        district: data.district ?? null,
         phone: rawPhone,
         receiverName: data.receiverName ?? null,
         taxName: data.taxName ?? null,
@@ -218,6 +232,42 @@ export function CustomerAddressCreateDialog() {
               </div>
             )}
             <Field className="col-span-2">
+              <Label>ประเทศ / Country *</Label>
+              <Controller
+                control={control}
+                name="country"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(val) => {
+                      field.onChange(val as CountryCode)
+                      setValue('subDistrict', '')
+                      setValue('district', '')
+                      setValue('province', '')
+                      setValue('postalCode', '')
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="เลือกประเทศ / Select Country" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {Object.values(COUNTRY_METADATA).map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-base">{c.flag}</span>
+                            <span className="font-medium">{c.nameTH}</span>
+                            <span className="text-muted-foreground text-xs">
+                              ({c.nameEN})
+                            </span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </Field>
+            <Field className="col-span-2">
               <Label>{t('phoneRequired')}</Label>
               <Controller
                 name="phone"
@@ -226,9 +276,15 @@ export function CustomerAddressCreateDialog() {
                   <Input
                     {...field}
                     value={value ?? ''}
-                    placeholder="08X-XXX-XXXX"
+                    placeholder={
+                      isThai
+                        ? '08X-XXX-XXXX'
+                        : `${COUNTRY_METADATA[country]?.phonePrefix ?? '+'} 123 4567`
+                    }
                     onChange={(e) => {
-                      const formatted = formatPhoneInput(e.target.value)
+                      const formatted = isThai
+                        ? formatPhoneInput(e.target.value)
+                        : e.target.value
                       onChange(formatted)
                     }}
                   />
@@ -240,70 +296,105 @@ export function CustomerAddressCreateDialog() {
               <Label>{t('addressLineRequired')}</Label>
               <Input
                 {...register('addressLine')}
-                placeholder={t('addressLinePlaceholder')}
+                placeholder={
+                  isThai
+                    ? t('addressLinePlaceholder')
+                    : 'Street Address, Apartment, Suite, etc.'
+                }
               />
               <FieldError>{errors.addressLine?.message}</FieldError>
             </Field>
-            <Field>
-              <Label>{t('subDistrictRequired')}</Label>
-              <Controller
-                control={control}
-                name="subDistrict"
-                render={({ field }) => (
-                  <InputThaiAddress.District
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onSelect={handleAddressAutoSelect}
+            {isThai ? (
+              <>
+                <Field>
+                  <Label>{t('subDistrictRequired')}</Label>
+                  <Controller
+                    control={control}
+                    name="subDistrict"
+                    render={({ field }) => (
+                      <InputThaiAddress.District
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onSelect={handleAddressAutoSelect}
+                      />
+                    )}
                   />
-                )}
-              />
-              <FieldError>{errors.subDistrict?.message}</FieldError>
-            </Field>
-            <Field>
-              <Label>{t('districtRequired')}</Label>
-              <Controller
-                control={control}
-                name="district"
-                render={({ field }) => (
-                  <InputThaiAddress.Amphoe
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onSelect={handleAddressAutoSelect}
+                  <FieldError>{errors.subDistrict?.message}</FieldError>
+                </Field>
+                <Field>
+                  <Label>{t('districtRequired')}</Label>
+                  <Controller
+                    control={control}
+                    name="district"
+                    render={({ field }) => (
+                      <InputThaiAddress.Amphoe
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onSelect={handleAddressAutoSelect}
+                      />
+                    )}
                   />
-                )}
-              />
-              <FieldError>{errors.district?.message}</FieldError>
-            </Field>
-            <Field>
-              <Label>{t('provinceRequired')}</Label>
-              <Controller
-                control={control}
-                name="province"
-                render={({ field }) => (
-                  <InputThaiAddress.Province
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onSelect={handleAddressAutoSelect}
+                  <FieldError>{errors.district?.message}</FieldError>
+                </Field>
+                <Field>
+                  <Label>{t('provinceRequired')}</Label>
+                  <Controller
+                    control={control}
+                    name="province"
+                    render={({ field }) => (
+                      <InputThaiAddress.Province
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onSelect={handleAddressAutoSelect}
+                      />
+                    )}
                   />
-                )}
-              />
-              <FieldError>{errors.province?.message}</FieldError>
-            </Field>
-            <Field>
-              <Label>{t('postalCodeRequired')}</Label>
-              <Controller
-                control={control}
-                name="postalCode"
-                render={({ field }) => (
-                  <InputThaiAddress.Zipcode
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onSelect={handleAddressAutoSelect}
+                  <FieldError>{errors.province?.message}</FieldError>
+                </Field>
+                <Field>
+                  <Label>{t('postalCodeRequired')}</Label>
+                  <Controller
+                    control={control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <InputThaiAddress.Zipcode
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onSelect={handleAddressAutoSelect}
+                      />
+                    )}
                   />
-                )}
-              />
-              <FieldError>{errors.postalCode?.message}</FieldError>
-            </Field>
+                  <FieldError>{errors.postalCode?.message}</FieldError>
+                </Field>
+              </>
+            ) : (
+              <>
+                <Field className="col-span-1">
+                  <Label>เมือง / City *</Label>
+                  <Input
+                    {...register('district')}
+                    placeholder="City, District or Town"
+                  />
+                  <FieldError>{errors.district?.message}</FieldError>
+                </Field>
+                <Field className="col-span-1">
+                  <Label>รัฐ / มณฑล / State / Region *</Label>
+                  <Input
+                    {...register('province')}
+                    placeholder="State, Province or Region"
+                  />
+                  <FieldError>{errors.province?.message}</FieldError>
+                </Field>
+                <Field className="col-span-2">
+                  <Label>รหัสไปรษณีย์ / Postal Code / ZIP *</Label>
+                  <Input
+                    {...register('postalCode')}
+                    placeholder="Postal / ZIP Code (e.g. 90210, SW1A 1AA)"
+                  />
+                  <FieldError>{errors.postalCode?.message}</FieldError>
+                </Field>
+              </>
+            )}
           </FieldGroup>
           <DialogFooter className="flex flex-wrap border-t pt-5">
             <Button

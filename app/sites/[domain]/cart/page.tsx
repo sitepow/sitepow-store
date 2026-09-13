@@ -23,6 +23,7 @@ import {
 } from '@/actions/hooks/storefront/shipping'
 import {
   BankAccountType,
+  CountryCode,
   CurrencyCode,
   PaymentMethod,
   ProductType,
@@ -122,8 +123,26 @@ export default function StoreCartPage() {
     useState<CheckoutStep | null>(null)
 
   const { data: addressOptions = [] } = useAddressOptions(store?.slug!)
-  const { data: shippingOptions = [] } = useStorefrontShippingOptions(storeSlug)
+  const selectedAddressData = addressOptions.find(
+    (a) => a.id === selectedAddress,
+  )
+  const destinationCountry =
+    (selectedAddressData as any)?.country ?? CountryCode.TH
+
+  const { data: shippingOptions = [] } = useStorefrontShippingOptions(
+    storeSlug,
+    destinationCountry,
+  )
   const { data: paymentOptions } = useStorefrontPaymentOptions(storeSlug)
+
+  useEffect(() => {
+    if (
+      selectedShipping &&
+      !shippingOptions.some((s) => s.id === selectedShipping)
+    ) {
+      setSelectedShipping('')
+    }
+  }, [shippingOptions, selectedShipping])
 
   const createOrderMutation = useCreateOrder()
   const storeCheckoutMutation = useStoreCheckout()
@@ -185,10 +204,6 @@ export default function StoreCartPage() {
     ]
   }, [paymentOptions, t])
 
-  const selectedAddressData = addressOptions.find(
-    (a) => a.id === selectedAddress,
-  )
-
   const selectedPaymentData = paymentMethods.find(
     (p) => p.id === selectedPayment,
   )
@@ -230,6 +245,7 @@ export default function StoreCartPage() {
 
   const { data: shippingCalculationData } = useShippingCalculation({
     storeId: store?.id ?? '',
+    destinationCountry,
     destinationProvince: destinationProvince,
     destinationPostcode: destinationPostcode,
     groups: physicalGroups.map((g) => ({

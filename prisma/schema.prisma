@@ -582,6 +582,39 @@ model StoreServiceZoneRate {
   @@index([storeCourierServiceId])
 }
 
+model ShippingZone {
+  id      String @id @default(uuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  name      String
+  countries CountryCode[]
+
+  rates ShippingZoneRate[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model ShippingZoneRate {
+  id             String       @id @default(uuid())
+  shippingZoneId String
+  shippingZone   ShippingZone @relation(fields: [shippingZoneId], references: [id], onDelete: Cascade)
+
+  name          String
+  estimatedDays String?
+  minWeight     Decimal @default(0.00) @db.Decimal(10, 3)
+  maxWeight     Decimal @db.Decimal(10, 3)
+  fee           Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shippingZoneId])
+}
+
 model PaymentSetting {
   id      String @id @default(uuid())
   storeId String @unique
@@ -686,6 +719,7 @@ model Store {
   productCount         Int                   @default(0)
   shippingSetting      ShippingSetting?
   storeCourierServices StoreCourierService[]
+  shippingZones        ShippingZone[]
 
   taxId           String?
   isVatRegistered Boolean @default(false)
@@ -1117,8 +1151,8 @@ model Address {
   receiverName String?
 
   addressLine String
-  subDistrict String
-  district    String
+  subDistrict String?
+  district    String?
   province    String
   postalCode  String
   country     CountryCode @default(TH)
@@ -1135,6 +1169,7 @@ model Address {
   @@index([customerId])
   @@index([storeId])
   @@index([customerId, storeId])
+  @@index([country])
 }
 
 model Order {

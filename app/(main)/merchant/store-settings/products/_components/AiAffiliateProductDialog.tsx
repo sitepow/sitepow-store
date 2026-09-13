@@ -150,6 +150,159 @@ export function AiAffiliateProductDialog({
     }
   }, [categories, selectedCategoryId])
 
+  // Draft auto-save and restore key
+  const DRAFT_KEY = `ai_affiliate_product_draft_${storeId || 'default'}`
+  const isRestoredRef = useRef(false)
+
+  // Restore draft from localStorage
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_KEY)
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft)
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.step) setStep(parsed.step)
+          if (typeof parsed.productUrl === 'string')
+            setProductUrl(parsed.productUrl)
+          if (typeof parsed.rawTitle === 'string') setRawTitle(parsed.rawTitle)
+          if (typeof parsed.affiliateUrl === 'string')
+            setAffiliateUrl(parsed.affiliateUrl)
+          if (typeof parsed.selectedCategoryId === 'string')
+            setSelectedCategoryId(parsed.selectedCategoryId)
+          if (parsed.platform) setPlatform(parsed.platform)
+          if (typeof parsed.notes === 'string') setNotes(parsed.notes)
+          if (parsed.liveScraped) setLiveScraped(parsed.liveScraped)
+          if (typeof parsed.title === 'string') setTitle(parsed.title)
+          if (typeof parsed.slug === 'string') setSlug(parsed.slug)
+          if (typeof parsed.price === 'number') setPrice(parsed.price)
+          if (typeof parsed.originalPrice === 'number')
+            setOriginalPrice(parsed.originalPrice)
+          if (typeof parsed.isOnSale === 'boolean') setIsOnSale(parsed.isOnSale)
+          if (typeof parsed.discountText === 'string')
+            setDiscountText(parsed.discountText)
+          if (typeof parsed.platformLabel === 'string')
+            setPlatformLabel(parsed.platformLabel)
+          if (Array.isArray(parsed.images)) setImages(parsed.images)
+          if (typeof parsed.primaryImageIndex === 'number')
+            setPrimaryImageIndex(parsed.primaryImageIndex)
+          if (typeof parsed.videoUrl === 'string') setVideoUrl(parsed.videoUrl)
+          if (typeof parsed.tags === 'string') setTags(parsed.tags)
+          if (typeof parsed.description === 'string')
+            setDescription(parsed.description)
+          if (Array.isArray(parsed.specs)) setSpecs(parsed.specs)
+          if (typeof parsed.destinationUrl === 'string')
+            setDestinationUrl(parsed.destinationUrl)
+        }
+      }
+    } catch (e) {
+      console.error(
+        'Failed to restore AI affiliate draft from localStorage:',
+        e,
+      )
+    } finally {
+      isRestoredRef.current = true
+    }
+  }, [DRAFT_KEY])
+
+  // Debounced auto-save draft to localStorage
+  useEffect(() => {
+    if (!isRestoredRef.current) {
+      return
+    }
+
+    const hasData = Boolean(
+      productUrl.trim() ||
+      rawTitle.trim() ||
+      affiliateUrl.trim() ||
+      notes.trim() ||
+      title.trim() ||
+      images.length > 0 ||
+      step === 'preview',
+    )
+
+    if (!hasData) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      try {
+        const draft = {
+          step,
+          productUrl,
+          rawTitle,
+          affiliateUrl,
+          selectedCategoryId,
+          platform,
+          notes,
+          liveScraped,
+          title,
+          slug,
+          price,
+          originalPrice,
+          isOnSale,
+          discountText,
+          platformLabel,
+          images,
+          primaryImageIndex,
+          videoUrl,
+          tags,
+          description,
+          specs,
+          destinationUrl,
+        }
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+      } catch (err) {
+        console.error('Failed to auto-save AI affiliate draft:', err)
+      }
+    }, 600)
+
+    return () => clearTimeout(timer)
+  }, [
+    DRAFT_KEY,
+    step,
+    productUrl,
+    rawTitle,
+    affiliateUrl,
+    selectedCategoryId,
+    platform,
+    notes,
+    liveScraped,
+    title,
+    slug,
+    price,
+    originalPrice,
+    isOnSale,
+    discountText,
+    platformLabel,
+    images,
+    primaryImageIndex,
+    videoUrl,
+    tags,
+    description,
+    specs,
+    destinationUrl,
+  ])
+
+  const hasDraft = Boolean(
+    productUrl.trim() ||
+    rawTitle.trim() ||
+    affiliateUrl.trim() ||
+    notes.trim() ||
+    title.trim() ||
+    images.length > 0 ||
+    step === 'preview',
+  )
+
+  const handleClearDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_KEY)
+    } catch (e) {
+      console.error(e)
+    }
+    handleFullReset()
+    toast.success('ล้างข้อมูลแบบร่างเรียบร้อยแล้ว')
+  }
+
   // Progress ticker during generation
   useEffect(() => {
     let timer: NodeJS.Timeout
@@ -617,6 +770,11 @@ export function AiAffiliateProductDialog({
 
       if (res.success) {
         toast.success(res.messageTH || t('successToast'), { id: saveToast })
+        try {
+          localStorage.removeItem(DRAFT_KEY)
+        } catch (e) {
+          console.error(e)
+        }
         handleFullReset()
         onOpenChange(false)
         onSuccess?.()
@@ -637,7 +795,6 @@ export function AiAffiliateProductDialog({
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
-        if (!isOpen) handleFullReset()
         onOpenChange(isOpen)
       }}
     >
@@ -659,51 +816,70 @@ export function AiAffiliateProductDialog({
             />
 
             {/* Desktop Step Indicator */}
-            <div className="hidden items-center gap-2 pr-8 text-xs font-medium sm:flex">
-              <span
-                className={`rounded-full border px-2.5 py-1 transition-colors ${
-                  step === 'input'
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-background text-muted-foreground'
-                }`}
-              >
-                {t('step1')}
-              </span>
-              <span className="text-muted-foreground">→</span>
-              <span
-                className={`rounded-full border px-2.5 py-1 transition-colors ${
-                  step === 'preview'
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-background text-muted-foreground'
-                }`}
-              >
-                {t('step2', {
-                  title: title ? title.slice(0, 16) + '...' : 'Preview',
-                })}
-              </span>
+            <div className="hidden items-center justify-between pr-8 text-xs font-medium sm:flex">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`rounded-full border px-2.5 py-1 transition-colors ${
+                    step === 'input'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-background text-muted-foreground'
+                  }`}
+                >
+                  {t('step1')}
+                </span>
+                <span className="text-muted-foreground">→</span>
+                <span
+                  className={`rounded-full border px-2.5 py-1 transition-colors ${
+                    step === 'preview'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-background text-muted-foreground'
+                  }`}
+                >
+                  {t('step2', {
+                    title: title ? title.slice(0, 16) + '...' : 'Preview',
+                  })}
+                </span>
+              </div>
+              {hasDraft && (
+                <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  บันทึกแบบร่างอัตโนมัติ
+                </span>
+              )}
             </div>
 
             {/* Mobile Step Indicator */}
-            <div className="flex w-full items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium sm:hidden">
-              <span
-                className={`flex-1 rounded-full border py-1 text-center transition-colors ${
-                  step === 'input'
-                    ? 'border-primary bg-primary/10 text-primary font-semibold'
-                    : 'border-border bg-background text-muted-foreground'
-                }`}
-              >
-                1. {t('step1')}
-              </span>
-              <span className="text-muted-foreground">→</span>
-              <span
-                className={`flex-1 rounded-full border py-1 text-center transition-colors ${
-                  step === 'preview'
-                    ? 'border-primary bg-primary/10 text-primary font-semibold'
-                    : 'border-border bg-background text-muted-foreground'
-                }`}
-              >
-                2. พรีวิว & บันทึก
-              </span>
+            <div className="flex flex-col gap-1 sm:hidden">
+              <div className="flex w-full items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium">
+                <span
+                  className={`flex-1 rounded-full border py-1 text-center transition-colors ${
+                    step === 'input'
+                      ? 'border-primary bg-primary/10 text-primary font-semibold'
+                      : 'border-border bg-background text-muted-foreground'
+                  }`}
+                >
+                  1. {t('step1')}
+                </span>
+                <span className="text-muted-foreground">→</span>
+                <span
+                  className={`flex-1 rounded-full border py-1 text-center transition-colors ${
+                    step === 'preview'
+                      ? 'border-primary bg-primary/10 text-primary font-semibold'
+                      : 'border-border bg-background text-muted-foreground'
+                  }`}
+                >
+                  2.{' '}
+                  {t('step2', {
+                    title: title ? title.slice(0, 12) + '...' : 'Preview',
+                  })}
+                </span>
+              </div>
+              {hasDraft && (
+                <div className="text-muted-foreground flex items-center justify-end gap-1 text-[10px]">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  บันทึกแบบร่างอัตโนมัติ
+                </div>
+              )}
             </div>
           </div>
         </DialogHeader>
@@ -1464,18 +1640,29 @@ export function AiAffiliateProductDialog({
 
         <DialogFooter className="bg-muted/10 border-t p-3 sm:p-6">
           {step === 'input' ? (
-            <div className="flex w-full flex-col-reverse items-stretch justify-end gap-2 sm:flex-row sm:items-center">
-              <Button
-                variant="outline"
-                disabled={generateMutation.isPending}
-                onClick={() => {
-                  handleFullReset()
-                  onOpenChange(false)
-                }}
-                className="w-full text-xs sm:w-auto sm:text-sm"
-              >
-                {t('btnBack')}
-              </Button>
+            <div className="flex w-full flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={generateMutation.isPending}
+                  onClick={() => onOpenChange(false)}
+                  className="w-full text-xs sm:w-auto sm:text-sm"
+                >
+                  {t('btnBack')}
+                </Button>
+                {hasDraft && (
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    disabled={generateMutation.isPending}
+                    onClick={handleClearDraft}
+                    className="text-muted-foreground hover:text-destructive w-full gap-1 text-xs sm:w-auto sm:text-sm"
+                  >
+                    <IconTrash className="h-3.5 w-3.5" />
+                    ล้างแบบร่าง
+                  </Button>
+                )}
+              </div>
               <Button
                 disabled={!productUrl.trim() || generateMutation.isPending}
                 onClick={handleStartGenerate}
@@ -1496,18 +1683,33 @@ export function AiAffiliateProductDialog({
             </div>
           ) : (
             <div className="flex w-full flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center">
-              <Button
-                variant="outline"
-                disabled={
-                  createProductMutation.isPending ||
-                  uploadExternalImagesMutation.isPending
-                }
-                onClick={() => setStep('input')}
-                className="w-full gap-1.5 text-xs sm:w-auto sm:text-sm"
-              >
-                <IconArrowLeft className="h-4 w-4" />
-                {t('btnBack')}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={
+                    createProductMutation.isPending ||
+                    uploadExternalImagesMutation.isPending
+                  }
+                  onClick={() => setStep('input')}
+                  className="w-full gap-1.5 text-xs sm:w-auto sm:text-sm"
+                >
+                  <IconArrowLeft className="h-4 w-4" />
+                  {t('btnBack')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  disabled={
+                    createProductMutation.isPending ||
+                    uploadExternalImagesMutation.isPending
+                  }
+                  onClick={handleClearDraft}
+                  className="text-muted-foreground hover:text-destructive gap-1 text-xs sm:text-sm"
+                >
+                  <IconTrash className="h-3.5 w-3.5" />
+                  ล้างแบบร่าง
+                </Button>
+              </div>
               <Button
                 disabled={
                   createProductMutation.isPending ||

@@ -15,6 +15,7 @@ const addressOptionSelect = {
   district: true,
   subDistrict: true,
   postalCode: true,
+  country: true,
   isDefault: true,
   storeId: true,
 } satisfies Prisma.AddressSelect
@@ -29,6 +30,7 @@ const addressDetailSelect = {
   district: true,
   province: true,
   postalCode: true,
+  country: true,
   receiverName: true,
   taxName: true,
   taxId: true,

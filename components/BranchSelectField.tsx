@@ -1,11 +1,13 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import { useTranslations } from 'next-intl'
 
 import { useBranchOptions } from '@/actions/hooks/branch'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
 import {
@@ -25,6 +27,32 @@ export function BranchSelectField() {
   const { selectedBranchId, setSelectedBranchId } = useBranchFilter()
   const { data: branches = [], isLoading } = useBranchOptions(selectedStoreId)
 
+  // Fallback to ALL_BRANCHES if selected branch is invalid or no longer exists in branches list
+  useEffect(() => {
+    if (isLoading) return
+
+    if (!selectedStoreId || selectedStoreId === ALL_STORES) {
+      if (selectedBranchId !== ALL_BRANCHES) {
+        setSelectedBranchId(ALL_BRANCHES)
+      }
+      return
+    }
+
+    const isValidBranch =
+      selectedBranchId === ALL_BRANCHES ||
+      branches.some((b) => b.id === selectedBranchId)
+
+    if (!isValidBranch) {
+      setSelectedBranchId(ALL_BRANCHES)
+    }
+  }, [
+    isLoading,
+    selectedStoreId,
+    branches,
+    selectedBranchId,
+    setSelectedBranchId,
+  ])
+
   if (!isMounted) {
     return null
   }
@@ -36,28 +64,30 @@ export function BranchSelectField() {
       : (currentBranch?.name ?? t('allBranchesPlaceholder'))
 
   return (
-    <Field className="text-foreground w-full sm:w-fit">
-      <FieldLabel>
-        <IconFilter size={14} />
-        {t('selectBranchLabel')}
+    <Field className="text-foreground w-full max-w-full min-w-0 sm:w-64 sm:max-w-64">
+      <FieldLabel className="max-w-full min-w-0">
+        <IconFilter size={14} className="shrink-0" />
+        <span className="truncate">{t('selectBranchLabel')}</span>
       </FieldLabel>
       <Select
         value={selectedBranchId}
         onValueChange={setSelectedBranchId}
-        disabled={isLoading || !selectedStoreId}
+        disabled={
+          isLoading || !selectedStoreId || selectedStoreId === ALL_STORES
+        }
       >
         <SelectTrigger
-          className="w-full *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate sm:w-64"
+          className="w-full max-w-full min-w-0 overflow-hidden *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate *:data-[slot=select-value]:overflow-hidden sm:w-64 sm:max-w-64 [&_[data-slot=select-value]_span]:block [&_[data-slot=select-value]_span]:min-w-0 [&_[data-slot=select-value]_span]:truncate"
           title={currentBranchTitle}
         >
           <SelectValue placeholder={t('allBranchesPlaceholder')} />
         </SelectTrigger>
-        <SelectContent className="w-full max-w-[calc(100vw-2rem)] min-w-48 sm:w-64 sm:max-w-xs">
+        <SelectContent className="w-[calc(100vw-2rem)] max-w-xs min-w-48 sm:w-64 sm:max-w-64">
           <SelectItem
             value={ALL_BRANCHES}
-            className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+            className="w-full max-w-full min-w-0 overflow-hidden py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate *:[span]:last:overflow-hidden"
           >
-            <span className="block truncate">
+            <span className="block min-w-0 truncate">
               {t('allBranchesOption', { count: branches.length })}
             </span>
           </SelectItem>
@@ -65,10 +95,10 @@ export function BranchSelectField() {
             <SelectItem
               key={branch.id}
               value={branch.id}
-              className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+              className="w-full max-w-full min-w-0 overflow-hidden py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate *:[span]:last:overflow-hidden"
               title={branch.name}
             >
-              <span className="block truncate">{branch.name}</span>
+              <span className="block min-w-0 truncate">{branch.name}</span>
             </SelectItem>
           ))}
         </SelectContent>

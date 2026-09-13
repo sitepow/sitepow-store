@@ -47,6 +47,26 @@ export function StoreSelectField() {
     }
   }, [setupStatus, selectedStoreId, setSetupStatus])
 
+  // Fallback to ALL_STORES if selected store is invalid or no longer exists in stores list
+  useEffect(() => {
+    if (isLoading) return
+
+    const isValidStore =
+      selectedStoreId === ALL_STORES ||
+      stores.some((s) => s.id === selectedStoreId)
+
+    if (!isValidStore) {
+      setSelectedStoreId(ALL_STORES)
+      setSelectedStoreSlug('')
+    }
+  }, [
+    isLoading,
+    stores,
+    selectedStoreId,
+    setSelectedStoreId,
+    setSelectedStoreSlug,
+  ])
+
   if (!isMounted) {
     return null
   }
@@ -58,10 +78,10 @@ export function StoreSelectField() {
       : (currentStore?.name ?? t('allStoresPlaceholder'))
 
   return (
-    <Field className="text-foreground w-full sm:w-fit">
-      <FieldLabel>
-        <IconFilter size={14} />
-        {t('selectStoreLabel')}
+    <Field className="text-foreground w-full max-w-full min-w-0 sm:w-64 sm:max-w-64">
+      <FieldLabel className="max-w-full min-w-0">
+        <IconFilter size={14} className="shrink-0" />
+        <span className="truncate">{t('selectStoreLabel')}</span>
       </FieldLabel>
       <Select
         value={selectedStoreId}
@@ -80,17 +100,17 @@ export function StoreSelectField() {
         disabled={isLoading}
       >
         <SelectTrigger
-          className="w-full *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate sm:w-64"
+          className="w-full max-w-full min-w-0 overflow-hidden *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate *:data-[slot=select-value]:overflow-hidden sm:w-64 sm:max-w-64 [&_[data-slot=select-value]_span]:block [&_[data-slot=select-value]_span]:min-w-0 [&_[data-slot=select-value]_span]:truncate"
           title={currentStoreTitle}
         >
           <SelectValue placeholder={t('allStoresPlaceholder')} />
         </SelectTrigger>
-        <SelectContent className="w-full max-w-[calc(100vw-2rem)] min-w-48 sm:w-64 sm:max-w-xs">
+        <SelectContent className="w-[calc(100vw-2rem)] max-w-xs min-w-48 sm:w-64 sm:max-w-64">
           <SelectItem
             value={ALL_STORES}
-            className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+            className="w-full max-w-full min-w-0 overflow-hidden py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate *:[span]:last:overflow-hidden"
           >
-            <span className="block truncate">
+            <span className="block min-w-0 truncate">
               {t('allStoresOption', { count: stores.length })}
             </span>
           </SelectItem>
@@ -98,10 +118,10 @@ export function StoreSelectField() {
             <SelectItem
               key={store.id}
               value={store.id}
-              className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+              className="w-full max-w-full min-w-0 overflow-hidden py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate *:[span]:last:overflow-hidden"
               title={store.name}
             >
-              <span className="block truncate">{store.name}</span>
+              <span className="block min-w-0 truncate">{store.name}</span>
             </SelectItem>
           ))}
         </SelectContent>
