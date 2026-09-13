@@ -48,8 +48,14 @@ export function StoreSelectField() {
   }, [setupStatus, selectedStoreId, setSetupStatus])
 
   if (!isMounted) {
-    return
+    return null
   }
+
+  const currentStore = stores.find((s) => s.id === selectedStoreId)
+  const currentStoreTitle =
+    selectedStoreId === ALL_STORES
+      ? t('allStoresOption', { count: stores.length })
+      : (currentStore?.name ?? t('allStoresPlaceholder'))
 
   return (
     <Field className="text-foreground w-full sm:w-fit">
@@ -73,16 +79,29 @@ export function StoreSelectField() {
         }}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-full sm:w-64">
+        <SelectTrigger
+          className="w-full *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate sm:w-64"
+          title={currentStoreTitle}
+        >
           <SelectValue placeholder={t('allStoresPlaceholder')} />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_STORES}>
-            {t('allStoresOption', { count: stores.length })}
+        <SelectContent className="w-full max-w-[calc(100vw-2rem)] min-w-48 sm:w-64 sm:max-w-xs">
+          <SelectItem
+            value={ALL_STORES}
+            className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+          >
+            <span className="block truncate">
+              {t('allStoresOption', { count: stores.length })}
+            </span>
           </SelectItem>
           {stores.map((store) => (
-            <SelectItem key={store.id} value={store.id}>
-              {store.name}
+            <SelectItem
+              key={store.id}
+              value={store.id}
+              className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+              title={store.name}
+            >
+              <span className="block truncate">{store.name}</span>
             </SelectItem>
           ))}
         </SelectContent>

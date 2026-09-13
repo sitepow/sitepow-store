@@ -41,6 +41,7 @@ import {
   IconVideo,
   IconWorld,
 } from '@tabler/icons-react'
+import { ImagePlus, Star, X } from 'lucide-react'
 
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
@@ -63,6 +64,8 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+
+import { cn } from '@/lib/utils'
 
 interface AiAffiliateProductDialogProps {
   open: boolean
@@ -443,9 +446,15 @@ export function AiAffiliateProductDialog({
     setIsAddingImageUrl(false)
   }
 
-  const handleRemoveImage = (idx: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== idx))
-    if (primaryImageIndex >= idx && primaryImageIndex > 0) {
+  const handleSetPrimary = (targetIndex: number) => {
+    setPrimaryImageIndex(targetIndex)
+  }
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+    if (primaryImageIndex === index) {
+      setPrimaryImageIndex(0)
+    } else if (primaryImageIndex > index) {
       setPrimaryImageIndex((prev) => prev - 1)
     }
   }
@@ -638,10 +647,10 @@ export function AiAffiliateProductDialog({
             '--primary': currentStore?.primaryColor ?? store?.primaryColor,
           } as React.CSSProperties
         }
-        className="flex max-h-[92vh] w-[calc(100vw-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[90vh] sm:w-full sm:max-w-3xl"
+        className="flex max-h-[94vh] w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden p-0 sm:max-h-[90vh] sm:w-full sm:max-w-3xl"
       >
-        <DialogHeader className="bg-muted/20 border-b p-4 text-left sm:p-6">
-          <div className="flex flex-col items-center gap-2.5">
+        <DialogHeader className="bg-muted/20 border-b p-3.5 text-left sm:p-6">
+          <div className="flex flex-col gap-2.5">
             <DialogHeaderIcon
               icon={IconSparkles}
               title={t('title')}
@@ -649,6 +658,7 @@ export function AiAffiliateProductDialog({
               className="pr-6 sm:pr-0"
             />
 
+            {/* Desktop Step Indicator */}
             <div className="hidden items-center gap-2 pr-8 text-xs font-medium sm:flex">
               <span
                 className={`rounded-full border px-2.5 py-1 transition-colors ${
@@ -672,10 +682,33 @@ export function AiAffiliateProductDialog({
                 })}
               </span>
             </div>
+
+            {/* Mobile Step Indicator */}
+            <div className="flex w-full items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium sm:hidden">
+              <span
+                className={`flex-1 rounded-full border py-1 text-center transition-colors ${
+                  step === 'input'
+                    ? 'border-primary bg-primary/10 text-primary font-semibold'
+                    : 'border-border bg-background text-muted-foreground'
+                }`}
+              >
+                1. {t('step1')}
+              </span>
+              <span className="text-muted-foreground">→</span>
+              <span
+                className={`flex-1 rounded-full border py-1 text-center transition-colors ${
+                  step === 'preview'
+                    ? 'border-primary bg-primary/10 text-primary font-semibold'
+                    : 'border-border bg-background text-muted-foreground'
+                }`}
+              >
+                2. พรีวิว & บันทึก
+              </span>
+            </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6">
           {step === 'input' ? (
             <div className="space-y-4">
               {generateMutation.isPending ? (
@@ -703,36 +736,37 @@ export function AiAffiliateProductDialog({
               ) : (
                 <>
                   <Field>
-                    <FieldLabel className="flex items-center justify-between">
+                    <FieldLabel className="flex flex-wrap items-center justify-between gap-1.5">
                       <span>{t('productUrlLabel')} *</span>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
                         <Badge
                           variant="outline"
-                          className="bg-[#EE4D2D]/10 text-[10px] text-[#EE4D2D]"
+                          className="bg-[#EE4D2D]/10 text-[9px] text-[#EE4D2D] sm:text-[10px]"
                         >
                           Shopee
                         </Badge>
                         <Badge
                           variant="outline"
-                          className="bg-[#0F146D]/10 text-[10px] text-[#0F146D] dark:text-blue-400"
+                          className="bg-[#0F146D]/10 text-[9px] text-[#0F146D] sm:text-[10px] dark:text-blue-400"
                         >
                           Lazada
                         </Badge>
                         <Badge
                           variant="outline"
-                          className="bg-black/10 text-[10px] text-black dark:bg-white/10 dark:text-white"
+                          className="bg-black/10 text-[9px] text-black sm:text-[10px] dark:bg-white/10 dark:text-white"
                         >
                           TikTok Shop
                         </Badge>
                       </div>
                     </FieldLabel>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row">
                       <Input
                         type="text"
                         placeholder={t('productUrlPlaceholder')}
                         value={productUrl}
                         onChange={(e) => handleUrlInputChange(e.target.value)}
                         autoFocus
+                        className="flex-1 text-xs sm:text-sm"
                       />
                       <Button
                         type="button"
@@ -741,14 +775,12 @@ export function AiAffiliateProductDialog({
                           !productUrl.trim() || scrapeMutation.isPending
                         }
                         onClick={() => handleFetchLive()}
-                        className="shrink-0 gap-1.5"
+                        className="h-9 shrink-0 gap-1.5 text-xs sm:h-10 sm:text-sm"
                       >
                         {scrapeMutation.isPending ? (
                           <>
                             <IconLoader2 className="h-4 w-4 animate-spin" />
-                            <span className="hidden sm:inline">
-                              {t('fetchingLive')}
-                            </span>
+                            <span>{t('fetchingLive')}</span>
                           </>
                         ) : (
                           <>
@@ -765,7 +797,7 @@ export function AiAffiliateProductDialog({
 
                   {/* Live Web Data Card Preview */}
                   {liveScraped && (
-                    <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+                    <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 sm:p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                           <IconCheck className="h-4 w-4" />
@@ -774,13 +806,16 @@ export function AiAffiliateProductDialog({
                           </span>
                         </div>
                         {liveScraped.price ? (
-                          <Badge variant="secondary" className="font-semibold">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs font-semibold"
+                          >
                             ฿{liveScraped.price.toLocaleString()}
                           </Badge>
                         ) : null}
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-start gap-3 sm:items-center">
                         {liveScraped.image && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -790,7 +825,7 @@ export function AiAffiliateProductDialog({
                           />
                         )}
                         <div className="min-w-0 flex-1 space-y-1">
-                          <p className="truncate text-sm leading-tight font-semibold">
+                          <p className="line-clamp-2 text-xs leading-tight font-semibold sm:text-sm">
                             {liveScraped.title}
                           </p>
                           <p className="text-muted-foreground line-clamp-2 text-xs">
@@ -808,13 +843,13 @@ export function AiAffiliateProductDialog({
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 border-t border-emerald-500/20 pt-1">
+                      <div className="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-emerald-500/20 pt-2 sm:flex-row sm:items-center">
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={handleUseLiveDirectly}
-                          className="h-8 gap-1.5 text-xs"
+                          className="h-8 w-full gap-1.5 text-xs sm:w-auto"
                         >
                           <span>{t('useDirectlyBtn')}</span>
                         </Button>
@@ -823,7 +858,7 @@ export function AiAffiliateProductDialog({
                           size="sm"
                           onClick={handleStartGenerate}
                           disabled={generateMutation.isPending}
-                          className="h-8 gap-1.5 text-xs"
+                          className="h-8 w-full gap-1.5 text-xs sm:w-auto"
                         >
                           <IconSparkles className="h-3.5 w-3.5" />
                           <span>{t('generateBtn')}</span>
@@ -912,8 +947,8 @@ export function AiAffiliateProductDialog({
           ) : (
             <div className="space-y-6">
               {/* Product Visual Card Preview */}
-              <div className="bg-muted/20 flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-center">
-                <div className="bg-background relative flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border">
+              <div className="bg-muted/20 flex flex-row items-start gap-3 rounded-xl border p-3 sm:items-center sm:gap-4 sm:p-4">
+                <div className="bg-background relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border sm:h-28 sm:w-28">
                   {primaryImageSrc ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -929,37 +964,43 @@ export function AiAffiliateProductDialog({
                   )}
                   {videoUrl && (
                     <span className="absolute right-1 bottom-1 rounded-full bg-black/70 p-1 text-white">
-                      <IconPlayerPlay className="h-3.5 w-3.5" />
+                      <IconPlayerPlay className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </span>
                   )}
                 </div>
 
-                <div className="flex-1 space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
+                <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span
-                      className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${platformCfg.badgeClass}`}
+                      className={`inline-flex items-center rounded px-2 py-0.5 text-[10px] font-semibold sm:text-xs ${platformCfg.badgeClass}`}
                     >
                       {platformCfg.name}
                     </span>
                     {isOnSale && (
-                      <Badge variant="destructive" className="text-xs">
+                      <Badge
+                        variant="destructive"
+                        className="px-1.5 py-0 text-[10px] sm:text-xs"
+                      >
                         {discountText || 'ลดราคา'}
                       </Badge>
                     )}
                     {videoUrl && (
-                      <Badge variant="secondary" className="gap-1 text-xs">
-                        <IconVideo className="h-3 w-3" />
+                      <Badge
+                        variant="secondary"
+                        className="gap-1 px-1.5 py-0 text-[10px] sm:text-xs"
+                      >
+                        <IconVideo className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                         มีวิดีโอ
                       </Badge>
                     )}
                   </div>
 
-                  <h3 className="text-foreground line-clamp-2 text-base font-medium">
+                  <h3 className="text-foreground line-clamp-2 text-sm leading-snug font-medium sm:text-base">
                     {title || 'ชื่อสินค้า'}
                   </h3>
 
                   <div className="flex items-baseline gap-2">
-                    <span className="text-primary text-lg font-bold">
+                    <span className="text-primary text-base font-bold sm:text-lg">
                       ฿{Number(price).toLocaleString()}
                     </span>
                     {isOnSale && originalPrice > price && (
@@ -972,13 +1013,13 @@ export function AiAffiliateProductDialog({
               </div>
 
               {/* Product Media Gallery & Video Section */}
-              <div className="space-y-4 rounded-xl border p-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="flex items-center gap-1.5 text-sm font-semibold">
+              <div className="space-y-4 rounded-xl border p-3 sm:p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="flex items-center gap-1.5 text-xs font-semibold sm:text-sm">
                     <IconPhoto className="text-primary h-4 w-4" />
                     <span>{t('imagesTitle', { count: images.length })}</span>
                   </h4>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     <input
                       type="file"
                       ref={imageFileInputRef}
@@ -993,20 +1034,26 @@ export function AiAffiliateProductDialog({
                       size="sm"
                       onClick={() => imageFileInputRef.current?.click()}
                       disabled={uploadImageMutation.isPending}
-                      className="h-7 text-xs"
+                      className="h-7 px-2 text-xs sm:px-3"
                     >
                       <IconUpload className="mr-1 h-3.5 w-3.5" />
-                      {t('uploadImageBtn')}
+                      <span className="hidden sm:inline">
+                        {t('uploadImageBtn')}
+                      </span>
+                      <span className="sm:hidden">อัปโหลด</span>
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsAddingImageUrl(!isAddingImageUrl)}
-                      className="h-7 text-xs"
+                      className="h-7 px-2 text-xs sm:px-3"
                     >
                       <IconPlus className="mr-1 h-3.5 w-3.5" />
-                      {t('addImageUrlBtn')}
+                      <span className="hidden sm:inline">
+                        {t('addImageUrlBtn')}
+                      </span>
+                      <span className="sm:hidden">ใส่ลิงก์</span>
                     </Button>
                   </div>
                 </div>
@@ -1028,76 +1075,93 @@ export function AiAffiliateProductDialog({
                       type="button"
                       size="sm"
                       onClick={handleAddImageUrl}
-                      className="h-8 text-xs"
+                      className="h-8 shrink-0 text-xs"
                     >
                       เพิ่ม
                     </Button>
                   </div>
                 )}
 
-                {/* Images grid */}
-                <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-6">
-                  {images.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className={`group bg-muted/20 relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border ${
-                        primaryImageIndex === idx
-                          ? 'border-primary ring-primary/40 ring-2'
-                          : 'border-border'
-                      }`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={img}
-                        alt={`image-${idx}`}
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          ;(e.target as HTMLElement).style.display = 'none'
-                        }}
-                      />
+                {/* Images grid matching ImageUploadSection */}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                  {images.map((img, index) => {
+                    const isPrimary = index === primaryImageIndex
 
-                      {/* Primary badge or select button */}
-                      {primaryImageIndex === idx ? (
-                        <span className="bg-primary absolute top-1 left-1 rounded px-1 py-0.5 text-[10px] font-medium text-white shadow">
-                          {t('primaryBadge')}
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setPrimaryImageIndex(idx)}
-                          title={t('setPrimaryImage')}
-                          className="hover:bg-primary absolute top-1 left-1 rounded bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <IconStar className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-
-                      {/* Delete image button */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(idx)}
-                        className="text-destructive hover:bg-destructive absolute top-1 right-1 rounded bg-black/60 p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white"
+                    return (
+                      <div
+                        key={index}
+                        className={cn(
+                          'bg-muted/20 relative flex aspect-square w-full shrink-0 items-center justify-center overflow-hidden border border-dashed p-1.5',
+                          isPrimary ? 'border-primary' : 'border-border',
+                        )}
                       >
-                        <IconTrash className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
-
-                  {images.length === 0 && (
-                    <div className="text-muted-foreground col-span-full flex flex-col items-center justify-center py-6 text-center text-xs">
-                      <IconPhoto className="mb-1 h-8 w-8 opacity-40" />
-                      <span>
-                        ยังไม่มีรูปภาพสินค้า
-                        สามารถกดอัปโหลดหรือเพิ่มลิงก์รูปภาพได้
-                      </span>
-                    </div>
-                  )}
+                        <div className="group relative size-full">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img}
+                            alt={`product-${index}`}
+                            className="size-full object-cover"
+                            onError={(e) => {
+                              ;(e.target as HTMLElement).style.display = 'none'
+                            }}
+                          />
+                          {isPrimary && (
+                            <div className="pointer-events-none absolute top-1.5 left-1.5 z-10">
+                              <span className="bg-primary flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-white shadow">
+                                <Star className="size-3 fill-white" />
+                                {t('primaryBadge')}
+                              </span>
+                            </div>
+                          )}
+                          <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-100 transition-opacity">
+                            {!isPrimary && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon-lg"
+                                className="size-8"
+                                onClick={() => handleSetPrimary(index)}
+                                title={
+                                  t('setPrimaryImage') || 'ตั้งเป็นรูปหลัก'
+                                }
+                              >
+                                <Star className="size-4" />
+                              </Button>
+                            )}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon-lg"
+                              className="size-8"
+                              onClick={() => handleRemoveImage(index)}
+                              title={t('deleteImage') || 'ลบรูปภาพ'}
+                            >
+                              <X className="size-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center border border-dashed transition-colors">
+                    <ImagePlus className="size-5" />
+                    <span className="mt-2 text-xs font-medium">
+                      {t('uploadImageBtn')}
+                    </span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
                 </div>
 
                 {/* Video section */}
                 <div className="space-y-2 border-t pt-3">
                   <div className="flex items-center justify-between">
-                    <FieldLabel className="flex items-center gap-1.5">
+                    <FieldLabel className="flex items-center gap-1.5 text-xs sm:text-sm">
                       <IconVideo className="text-primary h-4 w-4" />
                       <span>{t('videoTitle')}</span>
                     </FieldLabel>
@@ -1115,10 +1179,13 @@ export function AiAffiliateProductDialog({
                         size="sm"
                         onClick={() => videoFileInputRef.current?.click()}
                         disabled={uploadVideoMutation.isPending}
-                        className="h-7 text-xs"
+                        className="h-7 px-2 text-xs sm:px-3"
                       >
                         <IconUpload className="mr-1 h-3.5 w-3.5" />
-                        {t('uploadVideoBtn')}
+                        <span className="hidden sm:inline">
+                          {t('uploadVideoBtn')}
+                        </span>
+                        <span className="sm:hidden">อัปโหลดวิดีโอ</span>
                       </Button>
                     </div>
                   </div>
@@ -1207,9 +1274,11 @@ export function AiAffiliateProductDialog({
                   </Field>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                   <Field>
-                    <FieldLabel>{t('fieldPrice')} *</FieldLabel>
+                    <FieldLabel className="text-xs sm:text-sm">
+                      {t('fieldPrice')} *
+                    </FieldLabel>
                     <Input
                       type="number"
                       min={0}
@@ -1217,11 +1286,14 @@ export function AiAffiliateProductDialog({
                       onChange={(e) =>
                         setPrice(parseFloat(e.target.value) || 0)
                       }
+                      className="text-xs sm:text-sm"
                     />
                   </Field>
 
                   <Field>
-                    <FieldLabel>{t('fieldOriginalPrice')}</FieldLabel>
+                    <FieldLabel className="text-xs sm:text-sm">
+                      {t('fieldOriginalPrice')}
+                    </FieldLabel>
                     <Input
                       type="number"
                       min={0}
@@ -1229,18 +1301,21 @@ export function AiAffiliateProductDialog({
                       onChange={(e) =>
                         setOriginalPrice(parseFloat(e.target.value) || 0)
                       }
+                      className="text-xs sm:text-sm"
                     />
                   </Field>
 
                   <Field>
-                    <FieldLabel>{t('fieldPlatform')}</FieldLabel>
+                    <FieldLabel className="text-xs sm:text-sm">
+                      {t('fieldPlatform')}
+                    </FieldLabel>
                     <Select
                       value={platform}
                       onValueChange={(val) =>
                         setPlatform(val as AffiliatePlatform)
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-xs sm:text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -1254,17 +1329,20 @@ export function AiAffiliateProductDialog({
                   </Field>
 
                   <Field>
-                    <FieldLabel>{t('fieldPlatformLabel')}</FieldLabel>
+                    <FieldLabel className="text-xs sm:text-sm">
+                      {t('fieldPlatformLabel')}
+                    </FieldLabel>
                     <Input
                       placeholder="Shopee Mall, LazMall"
                       value={platformLabel}
                       onChange={(e) => setPlatformLabel(e.target.value)}
+                      className="text-xs sm:text-sm"
                     />
                   </Field>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-6 rounded-lg border p-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col items-start gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:gap-6">
+                  <div className="flex items-center gap-2.5">
                     <Switch
                       checked={isOnSale}
                       onCheckedChange={setIsOnSale}
@@ -1272,14 +1350,14 @@ export function AiAffiliateProductDialog({
                     />
                     <label
                       htmlFor="isOnSaleSwitch"
-                      className="cursor-pointer text-sm font-medium"
+                      className="cursor-pointer text-xs font-medium sm:text-sm"
                     >
                       {t('fieldIsOnSale')}
                     </label>
                   </div>
 
                   {isOnSale && (
-                    <div className="flex-1">
+                    <div className="w-full sm:flex-1">
                       <Input
                         placeholder={t('fieldDiscountText')}
                         value={discountText}
@@ -1291,27 +1369,35 @@ export function AiAffiliateProductDialog({
                 </div>
 
                 <Field>
-                  <FieldLabel>{t('affiliateUrlLabel')}</FieldLabel>
+                  <FieldLabel className="text-xs sm:text-sm">
+                    {t('affiliateUrlLabel')}
+                  </FieldLabel>
                   <Input
                     type="url"
                     value={destinationUrl}
                     onChange={(e) => setDestinationUrl(e.target.value)}
+                    className="text-xs sm:text-sm"
                   />
                 </Field>
 
                 <Field>
-                  <FieldLabel>{t('fieldTags')}</FieldLabel>
+                  <FieldLabel className="text-xs sm:text-sm">
+                    {t('fieldTags')}
+                  </FieldLabel>
                   <Input
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="เก้าอี้เพื่อสุขภาพ, ergonomic, WFH"
+                    className="text-xs sm:text-sm"
                   />
                 </Field>
 
                 <Field>
-                  <FieldLabel>{t('fieldDescription')}</FieldLabel>
+                  <FieldLabel className="text-xs sm:text-sm">
+                    {t('fieldDescription')}
+                  </FieldLabel>
                   <Textarea
-                    rows={8}
+                    rows={6}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="text-xs leading-relaxed"
@@ -1321,13 +1407,15 @@ export function AiAffiliateProductDialog({
                 {/* Specifications / Metadata */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <FieldLabel>{t('fieldSpecs')}</FieldLabel>
+                    <FieldLabel className="text-xs sm:text-sm">
+                      {t('fieldSpecs')}
+                    </FieldLabel>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={handleAddSpec}
-                      className="h-7 text-xs"
+                      className="h-7 px-2 text-xs sm:px-3"
                     >
                       <IconPlus className="mr-1 h-3.5 w-3.5" />
                       {t('addSpec')}
@@ -1336,14 +1424,17 @@ export function AiAffiliateProductDialog({
 
                   <div className="space-y-2">
                     {specs.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-1.5 sm:gap-2"
+                      >
                         <Input
                           placeholder={t('specKey')}
                           value={item.key}
                           onChange={(e) =>
                             handleUpdateSpec(idx, 'key', e.target.value)
                           }
-                          className="w-1/3 text-xs"
+                          className="w-2/5 text-xs sm:w-1/3"
                         />
                         <Input
                           placeholder={t('specValue')}
@@ -1358,7 +1449,7 @@ export function AiAffiliateProductDialog({
                           variant="ghost"
                           size="icon"
                           onClick={() => handleRemoveSpec(idx)}
-                          className="text-destructive h-8 w-8"
+                          className="text-destructive h-8 w-8 shrink-0"
                         >
                           <IconTrash className="h-4 w-4" />
                         </Button>
@@ -1371,9 +1462,9 @@ export function AiAffiliateProductDialog({
           )}
         </div>
 
-        <DialogFooter className="bg-muted/10 border-t p-4 sm:p-6">
+        <DialogFooter className="bg-muted/10 border-t p-3 sm:p-6">
           {step === 'input' ? (
-            <div className="flex w-full items-center justify-end gap-2">
+            <div className="flex w-full flex-col-reverse items-stretch justify-end gap-2 sm:flex-row sm:items-center">
               <Button
                 variant="outline"
                 disabled={generateMutation.isPending}
@@ -1381,13 +1472,14 @@ export function AiAffiliateProductDialog({
                   handleFullReset()
                   onOpenChange(false)
                 }}
+                className="w-full text-xs sm:w-auto sm:text-sm"
               >
                 {t('btnBack')}
               </Button>
               <Button
                 disabled={!productUrl.trim() || generateMutation.isPending}
                 onClick={handleStartGenerate}
-                className="gap-2"
+                className="w-full gap-2 text-xs sm:w-auto sm:text-sm"
               >
                 {generateMutation.isPending ? (
                   <>
@@ -1403,7 +1495,7 @@ export function AiAffiliateProductDialog({
               </Button>
             </div>
           ) : (
-            <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex w-full flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center">
               <Button
                 variant="outline"
                 disabled={
@@ -1411,7 +1503,7 @@ export function AiAffiliateProductDialog({
                   uploadExternalImagesMutation.isPending
                 }
                 onClick={() => setStep('input')}
-                className="gap-1.5"
+                className="w-full gap-1.5 text-xs sm:w-auto sm:text-sm"
               >
                 <IconArrowLeft className="h-4 w-4" />
                 {t('btnBack')}
@@ -1423,7 +1515,7 @@ export function AiAffiliateProductDialog({
                   !title.trim()
                 }
                 onClick={handleSaveProduct}
-                className="gap-2"
+                className="w-full gap-2 text-xs sm:w-auto sm:text-sm"
               >
                 {createProductMutation.isPending ||
                 uploadExternalImagesMutation.isPending ? (

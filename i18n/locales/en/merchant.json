@@ -727,6 +727,7 @@
       "addImageUrlBtn": "Add Image URL",
       "setPrimaryImage": "Set as Primary",
       "primaryBadge": "Primary",
+      "deleteImage": "Delete image",
       "videoTitle": "Product Video (TikTok / MP4 / YouTube)",
       "videoPlaceholder": "Paste video URL (TikTok link, MP4 file, or YouTube)",
       "uploadVideoBtn": "Upload Video (MP4)",

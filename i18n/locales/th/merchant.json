@@ -727,6 +727,7 @@
       "addImageUrlBtn": "เพิ่มลิงก์รูป",
       "setPrimaryImage": "ตั้งเป็นรูปหลัก",
       "primaryBadge": "รูปหลัก",
+      "deleteImage": "ลบรูปภาพ",
       "videoTitle": "วิดีโอสินค้า (TikTok / MP4 / YouTube)",
       "videoPlaceholder": "ใส่ URL วิดีโอ เช่น ลิงก์ TikTok, ไฟล์ mp4, หรือ YouTube",
       "uploadVideoBtn": "อัปโหลดวิดีโอ (MP4)",

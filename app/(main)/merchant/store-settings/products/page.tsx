@@ -47,35 +47,37 @@ export default function MerchantStoreSettingsProductsPage() {
         title={t('title')}
         description={t('description')}
         endContent={
-          <div className="flex flex-wrap items-end gap-3">
-            <StoreSelectField />
+          <div className="flex w-full flex-wrap items-end gap-2 sm:w-auto sm:gap-3">
+            <div className="w-full sm:w-auto">
+              <StoreSelectField />
+            </div>
             {canCreateProducts && (
-              <>
+              <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                 <Button
                   variant="outline"
                   disabled={!isStoreSelected}
                   onClick={() => setIsAiAffiliateOpen(true)}
-                  className="border-primary/30 text-primary hover:bg-primary/5 flex items-center gap-1.5"
+                  className="border-primary/30 text-primary hover:bg-primary/5 flex flex-1 items-center justify-center gap-1.5 text-xs sm:flex-initial sm:text-sm"
                 >
-                  <IconSparkles className="h-4 w-4" />
-                  {t('aiAffiliateBtn')}
+                  <IconSparkles className="h-4 w-4 shrink-0" />
+                  <span>{t('aiAffiliateBtn')}</span>
                 </Button>
                 <Button
                   variant="outline"
                   disabled={!isStoreSelected}
                   onClick={() => setIsBulkImportOpen(true)}
-                  className="flex items-center gap-1.5"
+                  className="flex flex-1 items-center justify-center gap-1.5 text-xs sm:flex-initial sm:text-sm"
                 >
-                  <IconFileSpreadsheet className="h-4 w-4" />
-                  {t('bulkImportBtn')}
+                  <IconFileSpreadsheet className="h-4 w-4 shrink-0" />
+                  <span>{t('bulkImportBtn')}</span>
                 </Button>
-                <Button asChild>
+                <Button asChild className="w-full text-xs sm:w-auto sm:text-sm">
                   <Link href={'/merchant/store-settings/products/create'}>
-                    <IconPlus />
-                    {t('addProduct')}
+                    <IconPlus className="h-4 w-4 shrink-0" />
+                    <span>{t('addProduct')}</span>
                   </Link>
                 </Button>
-              </>
+              </div>
             )}
           </div>
         }

@@ -782,6 +782,25 @@ export async function scrapeAffiliateProductUrl(
   }
 }
 
+function cleanAffiliateTextWithoutEmojis(text: string): string {
+  if (!text) return ''
+  return text
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\uFE0E\uFE0F\u200D]/g, '')
+    .split('\n')
+    .map((line) => {
+      const trimmed = line.trim()
+      if (!trimmed) return ''
+      if (/^[•*▪▫►–—]\s*/.test(trimmed)) {
+        return trimmed.replace(/^[•*▪▫►–—]\s*/, '- ')
+      }
+      return trimmed
+    })
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 export async function generateAffiliateProductAi(
   input: GenerateAffiliateProductInput,
 ): Promise<{
@@ -858,6 +877,8 @@ export async function generateAffiliateProductAi(
 
     const model = genAI.getGenerativeModel({
       model: GEMINI_MODEL,
+      systemInstruction:
+        'คุณคือนักเขียนข้อมูลสินค้าและการตลาดออนไลน์ระดับมืออาชีพ เขียนรายละเอียดสินค้าที่มีการจัดย่อหน้า เว้นบรรทัดให้อ่านง่าย สบายตา ห้ามใส่อีโมจิ (No Emojis) ใดๆ ทั้งสิ้น และหากมีรายการลิสต์ (List) ให้ใช้เครื่องหมายขีด (-) นำหน้าเท่านั้น',
       generationConfig: {
         responseMimeType: 'application/json',
         responseSchema: AFFILIATE_PRODUCT_AI_SCHEMA,
@@ -920,12 +941,16 @@ export async function generateAffiliateProductAi(
       ),
     )
 
+    const rawTitleResult =
+      parsed.title || effectiveTitle || scraped.title || 'สินค้าแนะนำ'
+    const rawDescription = parsed.description || scraped.description || ''
+
     const data: GeneratedAffiliateProductData = {
-      title: parsed.title || effectiveTitle || scraped.title || 'สินค้าแนะนำ',
+      title: cleanAffiliateTextWithoutEmojis(rawTitleResult),
       slug:
         parsed.slug ||
         `aff-${detectedPlatform.toLowerCase()}-${Date.now().toString(36)}`,
-      description: parsed.description || scraped.description || '',
+      description: cleanAffiliateTextWithoutEmojis(rawDescription),
       price: rawPrice,
       originalPrice: rawOriginalPrice >= rawPrice ? rawOriginalPrice : rawPrice,
       isOnSale: Boolean(
@@ -940,8 +965,13 @@ export async function generateAffiliateProductAi(
       imageUrl: allImages[0] || '',
       images: allImages,
       videoUrl: parsed.videoUrl || scraped.videoUrl || undefined,
-      tags: parsed.tags || '',
-      metadata: Array.isArray(parsed.metadata) ? parsed.metadata : [],
+      tags: cleanAffiliateTextWithoutEmojis(parsed.tags || ''),
+      metadata: Array.isArray(parsed.metadata)
+        ? parsed.metadata.map((item: any) => ({
+            key: cleanAffiliateTextWithoutEmojis(item.key || ''),
+            value: cleanAffiliateTextWithoutEmojis(item.value || ''),
+          }))
+        : [],
       affiliateUrl: destinationAffiliateUrl,
       originalProductUrl: cleanUrl,
     }

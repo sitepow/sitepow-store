@@ -26,8 +26,14 @@ export function BranchSelectField() {
   const { data: branches = [], isLoading } = useBranchOptions(selectedStoreId)
 
   if (!isMounted) {
-    return
+    return null
   }
+
+  const currentBranch = branches.find((b) => b.id === selectedBranchId)
+  const currentBranchTitle =
+    selectedBranchId === ALL_BRANCHES
+      ? t('allBranchesOption', { count: branches.length })
+      : (currentBranch?.name ?? t('allBranchesPlaceholder'))
 
   return (
     <Field className="text-foreground w-full sm:w-fit">
@@ -40,16 +46,29 @@ export function BranchSelectField() {
         onValueChange={setSelectedBranchId}
         disabled={isLoading || !selectedStoreId}
       >
-        <SelectTrigger className="w-full sm:w-64">
+        <SelectTrigger
+          className="w-full *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate sm:w-64"
+          title={currentBranchTitle}
+        >
           <SelectValue placeholder={t('allBranchesPlaceholder')} />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_BRANCHES}>
-            {t('allBranchesOption', { count: branches.length })}
+        <SelectContent className="w-full max-w-[calc(100vw-2rem)] min-w-48 sm:w-64 sm:max-w-xs">
+          <SelectItem
+            value={ALL_BRANCHES}
+            className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+          >
+            <span className="block truncate">
+              {t('allBranchesOption', { count: branches.length })}
+            </span>
           </SelectItem>
           {branches.map((branch) => (
-            <SelectItem key={branch.id} value={branch.id}>
-              {branch.name}
+            <SelectItem
+              key={branch.id}
+              value={branch.id}
+              className="w-full min-w-0 py-2.5 *:[span]:last:min-w-0 *:[span]:last:truncate"
+              title={branch.name}
+            >
+              <span className="block truncate">{branch.name}</span>
             </SelectItem>
           ))}
         </SelectContent>

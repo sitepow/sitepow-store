@@ -328,7 +328,7 @@ export const AFFILIATE_PRODUCT_AI_SCHEMA: Schema = {
     description: {
       type: SchemaType.STRING,
       description:
-        'เนื้อหาโฆษณาและรายละเอียดสินค้าน่าซื้อ มีการจัดโครงสร้าง มีจุดเด่น จุดขาย และสเปกสินค้า',
+        'รายละเอียดสินค้าที่มีการเว้นบรรทัด ขึ้นบรรทัดใหม่ จัดย่อหน้าให้อ่านง่าย ห้ามใส่อีโมจิเด็ดขาด หากมีรายการ List ให้ใช้เครื่องหมายขีด (-) นำหน้า',
     },
     price: {
       type: SchemaType.NUMBER,

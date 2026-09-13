@@ -1,7 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -13,6 +11,7 @@ import {
   useProducts,
 } from '@/actions/hooks/product'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
@@ -75,9 +74,11 @@ export function ProductsTable() {
   return (
     <div
       className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       {selectedStoreId !== ALL_STORES && (
         <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
