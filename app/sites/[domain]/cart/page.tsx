@@ -154,7 +154,36 @@ export default function StoreCartPage() {
     review: IconShoppingCartCheck,
   }
 
+  const isDomesticThaiOrder =
+    destinationCountry === CountryCode.TH &&
+    currentCurrency === CurrencyCode.THB
+
   const paymentMethods = useMemo(() => {
+    // If international destination or foreign currency, PromptPay and Bank Transfer are reserved for Thailand only.
+    // Only international Stripe options (Credit Card, Google Pay, Apple Pay) are displayed.
+    if (!isDomesticThaiOrder) {
+      if (!paymentOptions?.isStripeEnabled) {
+        return []
+      }
+      return [
+        {
+          id: PaymentMethod.STRIPE_CREDIT_CARD,
+          title: t('stripeCard'),
+          description: t('stripeCardDesc'),
+        },
+        {
+          id: PaymentMethod.STRIPE_GOOGLE_PAY,
+          title: '(Stripe) Google Pay',
+          description: t('googlePayDesc'),
+        },
+        {
+          id: PaymentMethod.STRIPE_APPLE_PAY,
+          title: '(Stripe) Apple Pay',
+          description: t('applePayDesc'),
+        },
+      ]
+    }
+
     return [
       ...(paymentOptions?.isBankTransferEnabled
         ? paymentOptions.bankAccounts.map((acc) => {
@@ -202,7 +231,7 @@ export default function StoreCartPage() {
           ]
         : []),
     ]
-  }, [paymentOptions, t])
+  }, [paymentOptions, isDomesticThaiOrder, t])
 
   const selectedPaymentData = paymentMethods.find(
     (p) => p.id === selectedPayment,
@@ -414,7 +443,15 @@ export default function StoreCartPage() {
   ])
 
   useEffect(() => {
-    if (!selectedPayment && paymentMethods.length > 0) {
+    if (paymentMethods.length === 0) {
+      if (selectedPayment) {
+        setSelectedPayment('')
+      }
+      return
+    }
+
+    const isCurrentValid = paymentMethods.some((p) => p.id === selectedPayment)
+    if (!isCurrentValid) {
       const firstPayment = paymentMethods[0].id
       setSelectedPayment(firstPayment)
       setUserSelectedSection((prev) =>
@@ -781,10 +818,23 @@ export default function StoreCartPage() {
               isDisabled={!isAuthenticated}
             >
               <div className="space-y-3">
+                {!isDomesticThaiOrder && paymentMethods.length > 0 && (
+                  <div className="border-primary/20 bg-primary/5 text-primary flex items-center gap-2 rounded-xl border p-3 text-xs">
+                    <IconLock size={16} className="shrink-0" />
+                    <span>
+                      การสั่งซื้อระหว่างประเทศรองรับการชำระเงินผ่านระบบสากล
+                      Stripe (บัตรเครดิต/เดบิต, Apple Pay, Google Pay) เท่านั้น
+                    </span>
+                  </div>
+                )}
                 {paymentMethods.length === 0 && (
                   <ActionRequiredAlert
                     title={t('errorTitle')}
-                    description={t('noPaymentError')}
+                    description={
+                      !isDomesticThaiOrder
+                        ? 'ร้านค้านี้ยังไม่ได้เปิดใช้งานการชำระเงินสากล (Stripe) สำหรับการสั่งซื้อระหว่างประเทศ'
+                        : t('noPaymentError')
+                    }
                   />
                 )}
                 {paymentMethods.length !== 0 && (

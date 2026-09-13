@@ -7,6 +7,7 @@ import {
   generateBlogAi,
   generateCategoryAi,
   generateProductAi,
+  generateStoreSeoAi,
   scrapeAffiliateProductUrl,
 } from '@/actions/ai'
 import { DiscountType } from '@/generated/prisma/enums'
@@ -166,6 +167,22 @@ export function useScrapeAffiliateProduct() {
   return useMutation({
     mutationFn: async (url: string) => {
       return await scrapeAffiliateProductUrl(url)
+    },
+  })
+}
+
+export function useStoreSeoAi() {
+  return useMutation({
+    mutationFn: async ({
+      storeName,
+      storeDescription,
+      storeId,
+    }: {
+      storeName: string
+      storeDescription?: string
+      storeId: string
+    }) => {
+      return await generateStoreSeoAi(storeName, storeDescription, storeId)
     },
   })
 }

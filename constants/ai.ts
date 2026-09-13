@@ -182,6 +182,28 @@ export const CATEGORY_SCHEMA: Schema = {
   required: ['title', 'slug'],
 }
 
+export const STORE_SEO_SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    seoTitle: {
+      type: SchemaType.STRING,
+      description:
+        'หัวข้อ SEO (Meta Title) ที่กระชับ น่าสนใจ และดึงดูดการค้นหา ความยาวประมาณ 50-60 ตัวอักษร',
+    },
+    seoDescription: {
+      type: SchemaType.STRING,
+      description:
+        'คำอธิบาย SEO (Meta Description) ที่น่าเชื่อถือ ชวนคลิก ความยาวประมาณ 130-160 ตัวอักษร',
+    },
+    seoKeywords: {
+      type: SchemaType.STRING,
+      description:
+        'คำค้นหา SEO ที่เกี่ยวข้องกับร้านค้า 5-8 คำ คั่นด้วยเครื่องหมายจุลภาค (,)',
+    },
+  },
+  required: ['seoTitle', 'seoDescription', 'seoKeywords'],
+}
+
 export const BLOG_SCHEMA: Schema = {
   type: SchemaType.OBJECT,
   properties: {

@@ -4,9 +4,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
+import { useStoreSeoAi } from '@/actions/hooks/ai'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import {
   useStoreProfile,
@@ -20,7 +22,12 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBuildingStore, IconCoins, IconSearch } from '@tabler/icons-react'
+import {
+  IconBuildingStore,
+  IconCoins,
+  IconSearch,
+  IconSparkles,
+} from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -67,6 +74,7 @@ export function StoreProfileForm() {
     handleSubmit,
     reset,
     setValue,
+    getValues,
     control,
     watch,
     formState: { isDirty, errors },
@@ -194,11 +202,54 @@ export function StoreProfileForm() {
     )
   }
 
+  const { mutateAsync: generateSeo, isPending: isGeneratingSeo } =
+    useStoreSeoAi()
+
+  const handleGenerateSeo = async () => {
+    const storeName = getValues('name')
+    if (!storeName || storeName.trim().length < 2) {
+      toast.error(
+        'กรุณาระบุชื่อร้านค้าอย่างน้อย 2 ตัวอักษร เพื่อให้ AI ช่วยคิด SEO',
+      )
+      return
+    }
+
+    const toastId = toast.loading('AI กำลังวิเคราะห์และคิดข้อมูล SEO ให้...')
+    try {
+      const storeDescription = getValues('description')
+      const res = await generateSeo({
+        storeName: storeName.trim(),
+        storeDescription: storeDescription?.trim() || undefined,
+        storeId: selectedStoreId as string,
+      })
+
+      if (res.success && res.data) {
+        setValue('seoTitle', res.data.seoTitle, { shouldDirty: true })
+        setValue('seoDescription', res.data.seoDescription, {
+          shouldDirty: true,
+        })
+        setValue('seoKeywords', res.data.seoKeywords, { shouldDirty: true })
+        toast.success(
+          'AI คิดข้อมูล SEO ให้เรียบร้อยแล้ว คุณสามารถปรับแต่งเพิ่มเติมได้ตามต้องการ',
+          { id: toastId },
+        )
+      } else {
+        toast.error(
+          res.messageTH || res.message || 'ไม่สามารถสร้างข้อมูล SEO ได้',
+          { id: toastId },
+        )
+      }
+    } catch {
+      toast.error('เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI', { id: toastId })
+    }
+  }
+
   const isPending =
     profileMutation.isPending ||
     uploadLogoMutation.isPending ||
     uploadBannerMutation.isPending ||
-    deleteMutation.isPending
+    deleteMutation.isPending ||
+    isGeneratingSeo
 
   return (
     <Card
@@ -426,16 +477,38 @@ export function StoreProfileForm() {
             </div>
             <Separator />
             <div className="space-y-5 rounded-xl border p-4 sm:p-5">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <IconSearch size={18} className="text-primary" />
-                  <h4 className="text-base font-semibold">
-                    {t('seoSettingsTitle')}
-                  </h4>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <IconSearch size={18} className="text-primary" />
+                    <h4 className="text-base font-semibold">
+                      {t('seoSettingsTitle')}
+                    </h4>
+                  </div>
+                  <p className="text-muted-foreground text-xs leading-relaxed">
+                    {t('seoSettingsDesc')}
+                  </p>
                 </div>
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  {t('seoSettingsDesc')}
-                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isPending}
+                  onClick={handleGenerateSeo}
+                  className="border-primary/40 hover:border-primary hover:bg-primary/5 text-primary shrink-0 gap-1.5"
+                >
+                  {isGeneratingSeo ? (
+                    <>
+                      <Spinner />
+                      <span>กำลังคิด SEO...</span>
+                    </>
+                  ) : (
+                    <>
+                      <IconSparkles size={16} />
+                      <span>ให้ AI ช่วยคิด SEO</span>
+                    </>
+                  )}
+                </Button>
               </div>
               <div className="border-input bg-muted/20 flex flex-wrap items-center justify-between gap-5 rounded-xl border border-dashed p-4">
                 <div className="space-y-1 pr-4">

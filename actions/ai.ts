@@ -9,6 +9,7 @@ import {
   GEMINI_MODEL,
   PRODUCT_SCHEMA,
   PRODUCT_SCHEMA_PARTS,
+  STORE_SEO_SCHEMA,
 } from '@/constants/ai'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { Plan, TransactionType } from '@/generated/prisma/enums'
@@ -24,6 +25,7 @@ import {
   buildBlogPrompt,
   buildCategoryPrompt,
   buildProductPrompt,
+  buildStoreSeoPrompt,
   calculateAiCost,
   estimateCost,
 } from '@/utils/ai'
@@ -233,6 +235,97 @@ export async function generateCategoryAi(
   } catch (error) {
     console.error(error)
     return { success: false }
+  }
+}
+
+export async function generateStoreSeoAi(
+  storeName: string,
+  storeDescription: string | undefined,
+  storeId: string,
+) {
+  try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { balance: true, plan: true },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    if (!storeName || storeName.trim().length === 0) {
+      return {
+        success: false,
+        messageTH: 'โปรดระบุชื่อร้านค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ SEO ครับ',
+        messageEN: 'Please enter store name first for AI SEO analysis',
+        message: 'โปรดระบุชื่อร้านค้าก่อน เพื่อให้ AI ช่วยวิเคราะห์ SEO ครับ',
+      }
+    }
+
+    const prompt = buildStoreSeoPrompt(
+      storeName.trim(),
+      storeDescription?.trim(),
+    )
+
+    const costEstimate = await handleUserPrompt(prompt, store.plan)
+    if (Number(store.balance) < costEstimate.credits) {
+      return { success: false, message: 'เครดิตของคุณไม่เพียงพอ' }
+    }
+
+    const model = genAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: STORE_SEO_SCHEMA,
+      },
+    })
+
+    const result = await model.generateContent(prompt)
+    const responseText = result.response.text()
+
+    const usage = result.response.usageMetadata
+    const inputTokens = usage?.promptTokenCount || 0
+    const outputTokens = usage?.candidatesTokenCount || 0
+
+    const actualCost = calculateAiCost(
+      GEMINI_MODEL,
+      inputTokens,
+      outputTokens,
+      PLAN_DETAILS[store.plan].aiUsageMultiplier,
+    )
+
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: storeId },
+        data: { balance: { decrement: actualCost } },
+      }),
+      prisma.transaction.create({
+        data: {
+          storeId,
+          amount: actualCost,
+          type: TransactionType.AI_USAGE,
+          description: `AI คิดข้อมูล SEO ร้านค้า (${storeName}) (Tokens: ${inputTokens}+${outputTokens})`,
+        },
+      }),
+    ])
+
+    return {
+      success: true,
+      messageTH: 'สร้างข้อมูล SEO เรียบร้อย',
+      messageEN: 'Store SEO generated successfully',
+      message: 'สร้างข้อมูล SEO เรียบร้อย',
+      data: JSON.parse(responseText) as {
+        seoTitle: string
+        seoDescription: string
+        seoKeywords: string
+      },
+    }
+  } catch (error) {
+    console.error('generateStoreSeoAi error:', error)
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการประมวลผลของ AI กรุณาลองใหม่อีกครั้ง',
+    }
   }
 }
 
