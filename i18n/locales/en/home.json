@@ -13,6 +13,7 @@
     "trust1": "Starting at {gp}% GP, No Hidden Fees",
     "trust2": "No Credit Card Required",
     "trust3": "Setup and Sell in {minutes} Mins",
+    "trust4": "Worldwide Shipping & Multi-Currency",
     "floating": {
       "salesTodayTitle": "Total Omnichannel Sales",
       "salesTodayAmount": "${amount}",
@@ -27,7 +28,7 @@
       "speedDesc": "Scan • Deduct Inventory • Print Receipt",
       "orderTitle": "New Order #{orderNo}",
       "orderDesc": "Online orders routed instantly to store",
-      "cloudSyncText": "100% Cloud-Synced • In-Store & Online Stock Always Aligned"
+      "cloudSyncText": "Omnichannel Sync 100% • Stock Aligned • Global Shipping & Multi-Currency"
     }
   },
   "logos": {
@@ -131,6 +132,16 @@
         "name": "CRM, Loyalty Points & Coupons",
         "description": "Build customer retention with reward points, promo codes, flash sales, BOGO offers, and reseller networks.",
         "cta": "View CRM & Coupons"
+      },
+      "global": {
+        "name": "Worldwide Shipping & Multi-Currency",
+        "description": "Configure zone-based shipping rates worldwide. Automatic multi-currency conversion (THB, USD, EUR, JPY, GBP) with international Stripe card checkout.",
+        "cta": "Explore Global Shipping",
+        "badges": {
+          "zoneRates": "🌍 Zone Shipping Rates",
+          "multiCurrency": "💵 Multi-Currency",
+          "stripeGlobal": "💳 Stripe Global"
+        }
       }
     }
   },
@@ -164,6 +175,10 @@
       {
         "q": "Can I migrate existing products from Shopee or Lazada?",
         "a": "Absolutely! You can import large product catalogs in bulk via CSV or JSON files, allowing you to launch your store within minutes."
+      },
+      {
+        "q": "Does Sitepow Store support international shipping and multi-currency?",
+        "a": "Absolutely! You can configure flexible zone-based shipping rate matrices for both domestic and global destinations (Asia, Europe, North America, etc.), display auto-converted multi-currency prices (THB, USD, JPY, EUR, GBP), and accept worldwide credit cards via Stripe."
       }
     ]
   },

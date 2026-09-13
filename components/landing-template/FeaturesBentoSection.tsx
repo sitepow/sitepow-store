@@ -14,6 +14,7 @@ import {
   IconKey,
   IconRobot,
   IconUsers,
+  IconWorld,
 } from '@tabler/icons-react'
 
 import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid'
@@ -39,6 +40,13 @@ export interface FeaturesBentoSectionProps {
     inventory?: BentoCardData
     digital?: BentoCardData
     crm?: BentoCardData
+    global?: BentoCardData & {
+      badges?: {
+        zoneRates?: string
+        multiCurrency?: string
+        stripeGlobal?: string
+      }
+    }
   }
 }
 
@@ -88,6 +96,22 @@ export function FeaturesBentoSection({
     name: t('cards.crm.name'),
     description: t('cards.crm.description'),
     cta: t('cards.crm.cta'),
+  }
+  const cardGlobal = propCards?.global ?? {
+    name: t('cards.global.name'),
+    description: t('cards.global.description'),
+    cta: t('cards.global.cta'),
+  }
+  const globalBadges = {
+    zoneRates:
+      propCards?.global?.badges?.zoneRates ??
+      t('cards.global.badges.zoneRates'),
+    multiCurrency:
+      propCards?.global?.badges?.multiCurrency ??
+      t('cards.global.badges.multiCurrency'),
+    stripeGlobal:
+      propCards?.global?.badges?.stripeGlobal ??
+      t('cards.global.badges.stripeGlobal'),
   }
 
   useGSAP(
@@ -284,7 +308,7 @@ export function FeaturesBentoSection({
             />
             <BentoCard
               name={cardCrm.name}
-              className="col-span-1 md:col-span-2 lg:col-span-3"
+              className="col-span-1 md:col-span-2 lg:col-span-2"
               Icon={IconUsers}
               description={cardCrm.description}
               href="/features/crm"
@@ -303,6 +327,32 @@ export function FeaturesBentoSection({
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-neutral-900 dark:via-neutral-900/80" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent dark:from-neutral-900/70" />
+                    </div>
+                  </div>
+                </>
+              }
+            />
+            <BentoCard
+              name={cardGlobal.name}
+              className="col-span-1 md:col-span-2 lg:col-span-1"
+              Icon={IconWorld}
+              description={cardGlobal.description}
+              href="/features/logistics"
+              cta={cardGlobal.cta}
+              background={
+                <>
+                  <div className="absolute -top-10 -right-10 size-48 rounded-full bg-emerald-500/10 blur-2xl" />
+                  <div className="absolute inset-x-0 bottom-3 flex flex-col items-center justify-end px-4 pb-2 opacity-50 transition-all duration-500 group-hover:scale-105 group-hover:opacity-95">
+                    <div className="flex flex-wrap items-center justify-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        {globalBadges.zoneRates}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                        {globalBadges.multiCurrency}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-600 dark:text-violet-400">
+                        {globalBadges.stripeGlobal}
+                      </span>
                     </div>
                   </div>
                 </>

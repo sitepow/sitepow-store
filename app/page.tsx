@@ -92,7 +92,7 @@ export default async function HomePage() {
 
   const staticBlogs = getStaticBlogs(locale).slice(0, 4)
 
-  const faqItems = [0, 1, 2, 3, 4].map((idx) => ({
+  const faqItems = [0, 1, 2, 3, 4, 5].map((idx) => ({
     q: tFaq(`items.${idx}.q`),
     a: tFaq(`items.${idx}.a`),
   }))
@@ -149,6 +149,7 @@ export default async function HomePage() {
           trust1={tHero('trust1', { gp: 0 })}
           trust2={tHero('trust2')}
           trust3={tHero('trust3', { minutes: 3 })}
+          trust4={tHero('trust4')}
           floatSalesTitle={tHero('floating.salesTodayTitle')}
           floatSalesAmount={tHero('floating.salesTodayAmount', {
             amount: '24,850',
@@ -226,6 +227,16 @@ export default async function HomePage() {
             name: tBento('cards.crm.name'),
             description: tBento('cards.crm.description'),
             cta: tBento('cards.crm.cta'),
+          },
+          global: {
+            name: tBento('cards.global.name'),
+            description: tBento('cards.global.description'),
+            cta: tBento('cards.global.cta'),
+            badges: {
+              zoneRates: tBento('cards.global.badges.zoneRates'),
+              multiCurrency: tBento('cards.global.badges.multiCurrency'),
+              stripeGlobal: tBento('cards.global.badges.stripeGlobal'),
+            },
           },
         }}
       />

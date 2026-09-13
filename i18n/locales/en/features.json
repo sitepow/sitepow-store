@@ -755,6 +755,11 @@
           "title": "Credit & Debit Card Gateway",
           "description": "Accept international cards with bank-level encryption standards via Stripe.",
           "badge": "International"
+        },
+        {
+          "title": "Multi-Currency & International Stripe",
+          "description": "Support multi-currency checkouts (THB, USD, EUR, JPY, GBP, SGD) via Stripe, enabling global customers to pay smoothly.",
+          "badge": "Multi-Currency"
         }
       ],
       "faqs": [
@@ -1089,6 +1094,11 @@
           "title": "Smart Shipping Rate Matrix",
           "description": "Configure tiered weight-based pricing and conditional free shipping rules flexibly.",
           "badge": "Profit Safe"
+        },
+        {
+          "title": "Worldwide & Regional Shipping Zones",
+          "description": "Configure tiered shipping rates across nationwide and international zones, calculated accurately by parcel weight.",
+          "badge": "Global Shipping"
         }
       ],
       "faqs": [

@@ -1,57 +1,36 @@
 'use client'
-import { useRef } from 'react';
+import { useRef } from 'react'
 
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
+import { UserRole } from '@/generated/prisma/enums'
+import { useIsMounted } from '@/hooks/use-is-mounted'
+import { useSession } from '@/hooks/use-session'
+import {
+  IconAlertTriangle,
+  IconArrowRight,
+  IconBolt,
+  IconBuildingStore,
+  IconCheck,
+  IconDeviceLaptop,
+  IconQrcode,
+  IconReceipt2,
+  IconStarFilled,
+  IconTrendingUp,
+  IconWifiOff,
+} from '@tabler/icons-react'
+import { ArrowRight } from 'lucide-react'
 
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
+import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
+import { BorderBeam } from '@/components/magicui/border-beam'
+import { RainbowButton } from '@/components/magicui/rainbow-button'
+import { Safari } from '@/components/magicui/safari'
+import { Button } from '@/components/ui/button'
 
-
-
-import { UserRole } from '@/generated/prisma/enums';
-import { useIsMounted } from '@/hooks/use-is-mounted';
-import { useSession } from '@/hooks/use-session';
-import { IconAlertTriangle, IconArrowRight, IconBolt, IconBuildingStore, IconCheck, IconDeviceLaptop, IconQrcode, IconReceipt2, IconStarFilled, IconTrendingUp, IconWifiOff } from '@tabler/icons-react';
-import { ArrowRight } from 'lucide-react';
-
-
-
-import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern';
-import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text';
-import { BorderBeam } from '@/components/magicui/border-beam';
-import { RainbowButton } from '@/components/magicui/rainbow-button';
-import { Safari } from '@/components/magicui/safari';
-import { Button } from '@/components/ui/button';
-
-
-
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap';
-import { getManageUrl } from '@/lib/manage-url';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
+import { getManageUrl } from '@/lib/manage-url'
 
 export interface HeroSectionProps {
   badgeNew?: string
@@ -66,6 +45,7 @@ export interface HeroSectionProps {
   trust1?: string
   trust2?: string
   trust3?: string
+  trust4?: string
   // Floating Widgets Props (Optional Overrides)
   floatSalesTitle?: string
   floatSalesAmount?: string
@@ -96,6 +76,7 @@ export function HeroSection({
   trust1,
   trust2,
   trust3,
+  trust4,
   floatSalesTitle,
   floatSalesAmount,
   floatSalesGrowth,
@@ -134,6 +115,7 @@ export function HeroSection({
   const resolvedTrust1 = trust1 ?? t('trust1', { gp: 0 })
   const resolvedTrust2 = trust2 ?? t('trust2')
   const resolvedTrust3 = trust3 ?? t('trust3', { minutes: 3 })
+  const resolvedTrust4 = trust4 ?? t('trust4')
 
   // Floating Widgets Translations (มี default interpolation ให้พร้อม)
   const resolvedFloatSalesTitle =
@@ -498,6 +480,16 @@ export function HeroSection({
               />
               {resolvedTrust3}
             </span>
+            {resolvedTrust4 && (
+              <span className="text-foreground/90 flex items-center gap-1 font-semibold">
+                <IconCheck
+                  size={13}
+                  className="shrink-0 text-emerald-500"
+                  strokeWidth={3}
+                />
+                {resolvedTrust4}
+              </span>
+            )}
           </div>
         </div>
 

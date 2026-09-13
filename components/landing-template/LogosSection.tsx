@@ -8,12 +8,14 @@ import {
   IconBolt,
   IconBrandMastercard,
   IconBrandStripe,
+  IconCoins,
   IconDeviceMobile,
   IconPackage,
   IconQrcode,
   IconRobot,
   IconShieldCheck,
   IconTruck,
+  IconWorld,
 } from '@tabler/icons-react'
 
 import { Marquee } from '@/components/magicui/marquee'
@@ -41,6 +43,16 @@ const LOGO_ITEMS = [
   { name: 'Flash Express', icon: IconTruck, note: 'Flash Express' },
   { name: 'Kerry Express', icon: IconPackage, note: 'Kerry Express' },
   { name: 'Thailand Post', icon: IconTruck, note: 'Thailand Post EMS' },
+  {
+    name: 'Worldwide Shipping',
+    icon: IconWorld,
+    note: 'Worldwide Zone Rates',
+  },
+  {
+    name: 'Multi-Currency',
+    icon: IconCoins,
+    note: 'THB, USD, EUR, JPY',
+  },
   {
     name: 'Digital Key Codes',
     icon: IconDeviceMobile,

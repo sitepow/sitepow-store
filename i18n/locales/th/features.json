@@ -761,6 +761,11 @@
           "title": "Credit / Debit Card via Stripe",
           "description": "รองรับการชำระเงินจากลูกค้าต่างประเทศหรือลูกค้าที่ต้องการสะสมแต้มบัตรเครดิตได้อย่างปลอดภัย",
           "badge": "Global Ready"
+        },
+        {
+          "title": "Multi-Currency & International Payments",
+          "description": "รองรับหลายสกุลเงินสากล (THB, USD, EUR, JPY, GBP, SGD) พร้อมรับชำระผ่าน Stripe ได้ทั่วโลก",
+          "badge": "Multi-Currency"
         }
       ],
       "faqs": [
@@ -1101,6 +1106,11 @@
           "title": "Smart Shipping Rate Matrix",
           "description": "ตั้งค่าเรทค่าจัดส่งได้อย่างยืดหยุ่น เช่น ส่งฟรีเมื่อซื้อครบยอด หรือคิดตามน้ำหนักจริงเพื่อไม่ให้เข้าเนื้อ",
           "badge": "Profit Safe"
+        },
+        {
+          "title": "Worldwide & Regional Shipping Zones",
+          "description": "กำหนดค่าจัดส่งแยกตามโซน ทั้งทั่วประเทศและส่งข้ามแดนไปทั่วโลก คำนวณค่าส่งแม่นยำตามน้ำหนักและปลายทาง",
+          "badge": "Global Shipping"
         }
       ],
       "faqs": [
