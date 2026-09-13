@@ -2733,5 +2733,64 @@
       "autoCalculatedNotice": "Automatically calculated from real store revenue and expenses for this period.",
       "emptyPartners": "No active partners found. Please go to 'Partners & Rules' tab to configure rules first."
     }
+  },
+  "payroll": {
+    "title": "Employee Payroll & Wages",
+    "description": "Manage employee salaries, monthly settlement, payouts, and automated recording into store expenses",
+    "tabs": {
+      "settlement": "Monthly Payroll",
+      "staff": "Staff & Salaries",
+      "history": "Payroll History"
+    },
+    "summary": {
+      "totalBase": "Total Base Salaries",
+      "totalBaseDesc": "Starting base pay & wage sum",
+      "totalAdditions": "Total Additions (OT/Bonus/Comm)",
+      "totalAdditionsDesc": "Overtime, commissions & bonuses",
+      "totalDeductions": "Total Deductions",
+      "totalDeductionsDesc": "Absence, tax, social security",
+      "totalNet": "Total Net Payroll",
+      "totalNetDesc": "Total amount disbursed to staff"
+    },
+    "staff": {
+      "add": "Add Employee",
+      "edit": "Edit Employee",
+      "name": "Full Name",
+      "code": "Employee Code",
+      "department": "Department",
+      "position": "Position",
+      "salaryType": "Pay Type",
+      "baseSalary": "Base Salary / Wage",
+      "bankInfo": "Bank / Transfer Info",
+      "socialSecurity": "Social Security",
+      "taxPercent": "Withholding Tax (%)",
+      "status": "Employment Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "actions": "Actions",
+      "deleteConfirm": "Are you sure you want to delete this employee configuration?",
+      "empty": "No employees configured yet. Click above to add one."
+    },
+    "settlement": {
+      "selectPeriod": "Select Period",
+      "status": "Cycle Status",
+      "open": "In Progress",
+      "closed": "Closed",
+      "employeeList": "Employee Payroll Calculations",
+      "markPaid": "Mark Paid",
+      "viewSlip": "View Slip",
+      "slipDetail": "Payroll Payment Slip",
+      "slipImage": "Slip Image",
+      "paidDate": "Paid Date",
+      "paymentNote": "Payment Note",
+      "syncExpense": "Record as Store Expense",
+      "syncSuccess": "Payroll successfully recorded in store expenses.",
+      "closePayroll": "Close Cycle & Sync Expense",
+      "reopenPayroll": "Reopen for Editing",
+      "printPayslip": "Print Payslip",
+      "printAllPayslips": "Print All Payslips",
+      "autoNotice": "Net payroll is recorded into Store Expenses (SALARY category) upon closing or syncing.",
+      "expenseLinked": "Linked to Store Expenses"
+    }
   }
 }

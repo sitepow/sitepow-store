@@ -15,6 +15,7 @@ import {
   IconPackage,
   IconReceipt,
   IconReceiptTax,
+  IconReportMoney,
   IconSettings,
   IconShoppingCart,
   IconStar,
@@ -200,6 +201,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     tab: 'employee',
     icon: IconUserCog,
     permissionKey: 'canViewEmployee',
+  },
+  {
+    value: 'payroll',
+    label: 'เงินเดือน & ค่าจ้างพนักงาน',
+    tab: 'payroll',
+    icon: IconReportMoney,
+    permissionKey: 'canViewExpenses',
   },
   {
     value: 'reviews',

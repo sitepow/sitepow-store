@@ -783,6 +783,8 @@ model Store {
   affiliateAccounts      AffiliateAccount[]
   profitPartners         ProfitPartner[]
   monthlySettlements     MonthlySettlement[]
+  employeeSalaryConfigs  EmployeeSalaryConfig[]
+  monthlyPayrolls        MonthlyPayroll[]
 
   translations Json?
 
@@ -1667,6 +1669,8 @@ model Expense {
   expenseDate DateTime @default(now())
   note        String?  @db.Text
 
+  monthlyPayrolls MonthlyPayroll[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -2026,3 +2030,103 @@ model ProfitPayout {
   @@index([settlementId])
   @@index([partnerId])
 }
+
+enum SalaryType {
+  MONTHLY
+  DAILY
+  HOURLY
+  COMMISSION
+}
+
+model EmployeeSalaryConfig {
+  id                String               @id @default(uuid())
+  storeId           String
+  store             Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  employeeId        String?
+  employeeName      String
+  employeeCode      String?
+  department        String?
+  position          String?
+  salaryType        SalaryType           @default(MONTHLY)
+  baseSalary        Decimal              @default(0) @db.Decimal(10, 2)
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+  promptpayNumber   String?
+  socialSecurity    Boolean              @default(false)
+  taxPercent        Decimal?             @default(0) @db.Decimal(5, 2)
+  isActive          Boolean              @default(true)
+  note              String?              @db.Text
+
+  payrollItems      MonthlyPayrollItem[]
+
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([storeId])
+}
+
+model MonthlyPayroll {
+  id              String               @id @default(uuid())
+  storeId         String
+  store           Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  period          String
+  periodLabel     String
+  startDate       DateTime
+  endDate         DateTime
+  totalBaseSalary Decimal              @default(0) @db.Decimal(12, 2)
+  totalOvertime   Decimal              @default(0) @db.Decimal(12, 2)
+  totalBonus      Decimal              @default(0) @db.Decimal(12, 2)
+  totalCommission Decimal              @default(0) @db.Decimal(12, 2)
+  totalDeductions Decimal              @default(0) @db.Decimal(12, 2)
+  totalNetSalary  Decimal              @default(0) @db.Decimal(12, 2)
+  totalPaid       Decimal              @default(0) @db.Decimal(12, 2)
+  isClosed        Boolean              @default(false)
+  closedAt        DateTime?
+  expenseId       String?
+  expense         Expense?             @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  note            String?              @db.Text
+
+  items           MonthlyPayrollItem[]
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@unique([storeId, period])
+  @@index([storeId])
+  @@index([expenseId])
+}
+
+model MonthlyPayrollItem {
+  id               String                @id @default(uuid())
+  monthlyPayrollId String
+  monthlyPayroll   MonthlyPayroll        @relation(fields: [monthlyPayrollId], references: [id], onDelete: Cascade)
+  employeeConfigId String?
+  employeeConfig   EmployeeSalaryConfig? @relation(fields: [employeeConfigId], references: [id], onDelete: SetNull)
+  employeeName     String
+  employeeCode     String?
+  department       String?
+  position         String?
+  salaryType       SalaryType            @default(MONTHLY)
+  baseSalary       Decimal               @default(0) @db.Decimal(10, 2)
+  overtimeAmount   Decimal               @default(0) @db.Decimal(10, 2)
+  bonusAmount      Decimal               @default(0) @db.Decimal(10, 2)
+  commissionAmount Decimal               @default(0) @db.Decimal(10, 2)
+  deductionAmount  Decimal               @default(0) @db.Decimal(10, 2)
+  netSalary        Decimal               @default(0) @db.Decimal(10, 2)
+  status           PayoutStatus          @default(PENDING)
+  paidAt           DateTime?
+  slipImage        String?
+  paymentNote      String?               @db.Text
+  bankName         String?
+  bankAccount      String?
+  bankAccountName  String?
+  promptPay        String?
+
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([monthlyPayrollId])
+  @@index([employeeConfigId])
+}
+

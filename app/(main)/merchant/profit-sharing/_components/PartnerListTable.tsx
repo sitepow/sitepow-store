@@ -275,7 +275,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                         </div>
                       )}
                       {partner.bankAccount && (
-                        <div className="text-muted-foreground flex items-center justify-between font-mono">
+                        <div className="text-muted-foreground flex items-center justify-between">
                           <span>
                             {partner.bankAccount}{' '}
                             {partner.bankAccountName

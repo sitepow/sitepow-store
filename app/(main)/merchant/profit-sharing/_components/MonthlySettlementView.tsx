@@ -624,7 +624,7 @@ export function MonthlySettlementView({
                           </div>
                         )}
                         {payout.bankAccount && (
-                          <div className="font-mono">
+                          <div className="">
                             {payout.bankAccount}{' '}
                             {payout.bankAccountName
                               ? `(${payout.bankAccountName})`
