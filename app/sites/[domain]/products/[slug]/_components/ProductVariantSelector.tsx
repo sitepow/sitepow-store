@@ -46,14 +46,13 @@ export function ProductVariantSelector() {
     setSelectedBranch,
   } = useProductPurchaseStore()
 
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
-
   const isPhysical = product?.productType === ProductType.PHYSICAL
   const hasVariant = product?.variants?.length !== 0
 
   const allBranches = useMemo(() => {
+    if (product?.productType === ProductType.AFFILIATE_LINK) {
+      return []
+    }
     const branchMap = new Map()
     product?.variants?.forEach((variant) => {
       variant.stocks?.forEach((stock) => {
@@ -72,7 +71,7 @@ export function ProductVariantSelector() {
   }, [product, t])
 
   useEffect(() => {
-    if (!isPhysical) {
+    if (!isPhysical || product?.productType === ProductType.AFFILIATE_LINK) {
       return
     }
 
@@ -81,7 +80,17 @@ export function ProductVariantSelector() {
     if (!selectedBranchId && firstBranch) {
       setSelectedBranch(firstBranch.branchId, firstBranch.branchName)
     }
-  }, [allBranches, selectedBranchId, setSelectedBranch, isPhysical])
+  }, [
+    allBranches,
+    selectedBranchId,
+    setSelectedBranch,
+    isPhysical,
+    product?.productType,
+  ])
+
+  if (product?.productType === ProductType.AFFILIATE_LINK) {
+    return null
+  }
 
   return (
     <>

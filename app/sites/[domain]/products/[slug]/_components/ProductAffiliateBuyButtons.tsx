@@ -86,13 +86,31 @@ export function ProductAffiliateBuyButtons({ product }: Props) {
             AFFILIATE_PLATFORM_CONFIG.OTHER
 
           const price = link.price ?? Number(product.variants?.[0]?.price ?? 0)
-          const originalPrice = link.originalPrice
-          const hasDiscount =
-            Boolean(
-              link.isDiscounted && originalPrice && originalPrice > price,
-            ) || Boolean(originalPrice && originalPrice > price)
+          const rawOriginalPrice =
+            link.originalPrice ??
+            (product.variants?.[0]?.discountActive &&
+            product.variants?.[0]?.discountAmount
+              ? product.variants[0].discountType === 'PERCENTAGE'
+                ? Math.round(
+                    (price /
+                      (1 - Number(product.variants[0].discountAmount) / 100)) *
+                      100,
+                  ) / 100
+                : price + Number(product.variants[0].discountAmount)
+              : undefined)
+          const originalPrice = rawOriginalPrice
+          const hasDiscount = Boolean(
+            (link.isDiscounted || (originalPrice && originalPrice > price)) &&
+            originalPrice &&
+            originalPrice > price,
+          )
           const discountSavings =
             hasDiscount && originalPrice ? originalPrice - price : 0
+          const discountBadgeText =
+            link.discountText ||
+            (hasDiscount && originalPrice
+              ? `-${Math.round(((originalPrice - price) / originalPrice) * 100)}%`
+              : null)
 
           return (
             <Card
@@ -112,13 +130,13 @@ export function ProductAffiliateBuyButtons({ product }: Props) {
                         {link.label}
                       </span>
                     )}
-                    {(link.discountText || hasDiscount) && (
+                    {(discountBadgeText || hasDiscount) && (
                       <Badge
                         variant="secondary"
                         className="bg-destructive/10 text-destructive flex items-center gap-1 text-[11px] font-medium"
                       >
                         <Tag className="size-3" />
-                        {link.discountText || t('onSale')}
+                        {discountBadgeText || t('onSale')}
                       </Badge>
                     )}
                   </div>

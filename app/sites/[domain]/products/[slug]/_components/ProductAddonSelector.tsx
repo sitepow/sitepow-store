@@ -36,15 +36,11 @@ export function ProductAddonSelector() {
     isLoading,
   } = useProductPurchaseStore()
 
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
-
   const hasAddons = product?.addons?.length !== 0
 
   const isOutOfStock = useMemo(() => {
-    if (!product) {
-      return true
+    if (!product || product.productType === ProductType.AFFILIATE_LINK) {
+      return false
     }
 
     const activeVariant = selectedVariant || product.variants[0]
@@ -60,6 +56,10 @@ export function ProductAddonSelector() {
 
     return stock <= 0
   }, [product, selectedVariant, selectedBranchId])
+
+  if (product?.productType === ProductType.AFFILIATE_LINK) {
+    return null
+  }
 
   if (isLoading) {
     return (

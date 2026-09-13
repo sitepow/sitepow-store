@@ -5,6 +5,8 @@ import { useEffect } from 'react'
 import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 import { ProductType } from '@/generated/prisma/enums'
 
+import { Skeleton } from '@/components/ui/skeleton'
+
 import { useProductPurchaseStore } from '../../store'
 import { ProductAddToCart } from './ProductAddToCart'
 import { ProductAddonSelector } from './ProductAddonSelector'
@@ -39,7 +41,12 @@ export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
   return (
     <>
       <ProductPriceHeader />
-      {isAffiliateProduct && product ? (
+      {isLoading || !product ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-28 w-full rounded-xl" />
+        </div>
+      ) : isAffiliateProduct ? (
         <ProductAffiliateBuyButtons product={product} />
       ) : (
         <>

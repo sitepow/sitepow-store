@@ -8,6 +8,7 @@ import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
+import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,8 +22,14 @@ export function ProductPriceHeader() {
   const { currentCurrency, convert } = useStorefrontCurrency(
     (store as any)?.baseCurrency,
   )
-  const { product, getCurrentPoints, getTotalPrice, isLoading } =
-    useProductPurchaseStore()
+  const {
+    product,
+    price,
+    selectedVariant,
+    getCurrentPoints,
+    getTotalPrice,
+    isLoading,
+  } = useProductPurchaseStore()
   const totalPrice = getTotalPrice()
   const points = getCurrentPoints()
   const isAffiliate = product?.productType === ProductType.AFFILIATE_LINK
@@ -35,14 +42,39 @@ export function ProductPriceHeader() {
     .map((l: any) => l.price)
     .filter((p: any): p is number => typeof p === 'number' && p > 0)
 
-  const minAffiliatePrice =
+  const fallbackMinAffiliatePrice =
     affiliatePrices.length > 0 ? Math.min(...affiliatePrices) : totalPrice
-  const maxAffiliatePrice =
+  const fallbackMaxAffiliatePrice =
     affiliatePrices.length > 0 ? Math.max(...affiliatePrices) : totalPrice
-  const hasPriceRange =
+
+  const affiliateMinPrice = price?.net?.min || fallbackMinAffiliatePrice
+  const affiliateMaxPrice = price?.net?.max || fallbackMaxAffiliatePrice
+  const hasAffiliatePriceRange =
+    isAffiliate && affiliateMinPrice !== affiliateMaxPrice
+
+  const affiliateMinOrigPrice = price?.original?.min || 0
+  const affiliateMaxOrigPrice = price?.original?.max || 0
+  const hasAffiliateOrigPriceRange =
+    affiliateMinOrigPrice !== affiliateMaxOrigPrice
+  const hasAffiliateDiscount =
     isAffiliate &&
-    affiliatePrices.length > 1 &&
-    minAffiliatePrice !== maxAffiliatePrice
+    Boolean(price?.hasDiscount && affiliateMinOrigPrice > affiliateMinPrice)
+  const affiliateDiscountPercent = price?.maxDiscountPercent || 0
+  const customDiscountText =
+    affiliateLinks[0]?.discountText ||
+    (affiliateDiscountPercent > 0 ? `-${affiliateDiscountPercent}%` : null)
+
+  // Normal product discount check
+  const normalOrigPrice = Number(selectedVariant?.price ?? 0)
+  const hasNormalDiscount =
+    !isAffiliate &&
+    Boolean(selectedVariant?.discountActive && normalOrigPrice > totalPrice)
+  const normalDiscountPercent =
+    hasNormalDiscount && normalOrigPrice > 0
+      ? selectedVariant?.discountType === 'PERCENTAGE'
+        ? Number(selectedVariant.discountAmount)
+        : Math.round(((normalOrigPrice - totalPrice) / normalOrigPrice) * 100)
+      : 0
 
   const localizedTitle =
     getLocalizedField(product, 'title', locale) || product?.title
@@ -53,7 +85,6 @@ export function ProductPriceHeader() {
         <Skeleton className="h-10 w-3/4 rounded-lg" />
       ) : (
         <h1 className="text-start text-xl leading-tight font-bold sm:text-2xl lg:text-3xl">
-          {product?.title}
           {localizedTitle}
         </h1>
       )}
@@ -64,20 +95,61 @@ export function ProductPriceHeader() {
         ) : (
           <>
             <Label className="text-lg font-semibold">{t('price')}</Label>
-            <div className="flex items-end gap-2">
+            <div className="flex flex-wrap items-baseline gap-3">
               <data
-                value={isAffiliate ? minAffiliatePrice : totalPrice}
+                value={isAffiliate ? affiliateMinPrice : totalPrice}
                 className="text-primary text-4xl font-bold sm:text-5xl"
               >
-                {isAffiliate && hasPriceRange
-                  ? `${formatCurrency(convert(minAffiliatePrice), currentCurrency)} - ${formatCurrency(convert(maxAffiliatePrice), currentCurrency)}`
+                {isAffiliate && hasAffiliatePriceRange
+                  ? `${formatCurrency(convert(affiliateMinPrice), currentCurrency)} - ${formatCurrency(convert(affiliateMaxPrice), currentCurrency)}`
                   : formatCurrency(
                       convert(
-                        isAffiliate ? minAffiliatePrice : totalPrice || 0,
+                        isAffiliate ? affiliateMinPrice : totalPrice || 0,
                       ),
                       currentCurrency,
                     )}
               </data>
+
+              {/* Affiliate full price with strikethrough */}
+              {isAffiliate &&
+                hasAffiliateDiscount &&
+                affiliateMinOrigPrice > 0 && (
+                  <span className="text-muted-foreground text-xl font-normal line-through sm:text-2xl">
+                    {hasAffiliateOrigPriceRange
+                      ? `${formatCurrency(convert(affiliateMinOrigPrice), currentCurrency)} - ${formatCurrency(convert(affiliateMaxOrigPrice), currentCurrency)}`
+                      : formatCurrency(
+                          convert(affiliateMinOrigPrice),
+                          currentCurrency,
+                        )}
+                  </span>
+                )}
+
+              {/* Affiliate discount badge */}
+              {isAffiliate && hasAffiliateDiscount && customDiscountText && (
+                <Badge
+                  variant="destructive"
+                  className="bg-destructive/10 text-destructive border-0 px-2.5 py-0.5 text-sm font-semibold"
+                >
+                  {customDiscountText}
+                </Badge>
+              )}
+
+              {/* Normal product full price with strikethrough */}
+              {!isAffiliate && hasNormalDiscount && (
+                <>
+                  <span className="text-muted-foreground text-xl font-normal line-through sm:text-2xl">
+                    {formatCurrency(convert(normalOrigPrice), currentCurrency)}
+                  </span>
+                  {normalDiscountPercent > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="bg-destructive/10 text-destructive border-0 px-2.5 py-0.5 text-sm font-semibold"
+                    >
+                      -{normalDiscountPercent}%
+                    </Badge>
+                  )}
+                </>
+              )}
             </div>
 
             {!isAffiliate && points > 0 && (

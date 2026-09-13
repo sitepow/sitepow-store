@@ -11,7 +11,9 @@ export interface CalculatedProduct {
 }
 
 export interface ProductForCalculation {
-  variants: {
+  productType?: ProductType | string | null
+  details?: any
+  variants?: {
     price: number
     discountActive: boolean
     discountType: 'PERCENTAGE' | 'FIXED' | null
@@ -62,6 +64,104 @@ const getStats = (prices: number[]): PriceStats => {
 export const calculateProduct = (
   product: ProductForCalculation,
 ): CalculatedProduct => {
+  const isAffiliate = product?.productType === ProductType.AFFILIATE_LINK
+
+  if (isAffiliate) {
+    const rawLinks = (product.details as any)?.affiliateLinks
+    const links = Array.isArray(rawLinks) ? rawLinks : []
+    const validLinks = links.filter(
+      (l: any) => typeof l?.price === 'number' && l.price > 0,
+    )
+
+    if (validLinks.length > 0) {
+      const netPrices: number[] = []
+      const originalPrices: number[] = []
+      const discountPercentages: number[] = []
+
+      validLinks.forEach((l: any) => {
+        const salePrice = Number(l.price)
+        const origPrice =
+          typeof l.originalPrice === 'number' && l.originalPrice > 0
+            ? Number(l.originalPrice)
+            : salePrice
+
+        const hasLinkDiscount = Boolean(
+          (l.isDiscounted || origPrice > salePrice) && origPrice > salePrice,
+        )
+
+        netPrices.push(salePrice)
+        originalPrices.push(hasLinkDiscount ? origPrice : salePrice)
+
+        if (hasLinkDiscount && origPrice > 0) {
+          discountPercentages.push(
+            Math.round(((origPrice - salePrice) / origPrice) * 100),
+          )
+        } else {
+          discountPercentages.push(0)
+        }
+      })
+
+      const hasDiscount = netPrices.some((net, i) => net < originalPrices[i])
+
+      return {
+        original: getStats(originalPrices),
+        net: getStats(netPrices),
+        hasDiscount,
+        maxDiscountPercent: hasDiscount ? Math.max(...discountPercentages) : 0,
+      }
+    }
+
+    // Fallback: If no links in details, check variants
+    const variants = product.variants ?? []
+    if (variants.length > 0) {
+      const netPrices: number[] = []
+      const originalPrices: number[] = []
+      const discountPercentages: number[] = []
+
+      variants.forEach((v) => {
+        const salePrice = Number(v.price || 0)
+        let origPrice = salePrice
+        let hasVariantDiscount = false
+
+        if (
+          v.discountActive &&
+          v.discountAmount &&
+          Number(v.discountAmount) > 0
+        ) {
+          hasVariantDiscount = true
+          if (v.discountType === 'PERCENTAGE') {
+            origPrice =
+              Math.round(
+                (salePrice / (1 - Number(v.discountAmount) / 100)) * 100,
+              ) / 100
+          } else {
+            origPrice = salePrice + Number(v.discountAmount)
+          }
+        }
+
+        netPrices.push(salePrice)
+        originalPrices.push(origPrice)
+
+        if (hasVariantDiscount && origPrice > 0) {
+          discountPercentages.push(
+            Math.round(((origPrice - salePrice) / origPrice) * 100),
+          )
+        } else {
+          discountPercentages.push(0)
+        }
+      })
+
+      const hasDiscount = netPrices.some((net, i) => net < originalPrices[i])
+
+      return {
+        original: getStats(originalPrices),
+        net: getStats(netPrices),
+        hasDiscount,
+        maxDiscountPercent: hasDiscount ? Math.max(...discountPercentages) : 0,
+      }
+    }
+  }
+
   const variants = product.variants ?? []
 
   if (variants.length === 0) {

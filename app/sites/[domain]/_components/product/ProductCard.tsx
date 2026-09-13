@@ -34,7 +34,7 @@ const productCardVariants = cva(
 )
 
 interface ProductCardProps extends VariantProps<typeof productCardVariants> {
-  product: SectionProductItem
+  product: SectionProductItem | any
   className?: string
   onClick?: () => void
   href?: string
@@ -139,14 +139,21 @@ export function ProductCard({
             value={hasDiscount ? net?.min : original?.min}
             className="text-primary text-lg font-bold sm:text-xl lg:text-2xl"
           >
-            {formatCurrency(
-              convert((hasDiscount ? net?.min : original?.min) || 0),
-              currentCurrency,
-            )}
+            {hasDiscount && net
+              ? net.min !== net.max
+                ? `${formatCurrency(convert(net.min), currentCurrency)} - ${formatCurrency(convert(net.max), currentCurrency)}`
+                : formatCurrency(convert(net.min), currentCurrency)
+              : original
+                ? original.min !== original.max
+                  ? `${formatCurrency(convert(original.min), currentCurrency)} - ${formatCurrency(convert(original.max), currentCurrency)}`
+                  : formatCurrency(convert(original.min), currentCurrency)
+                : formatCurrency(0, currentCurrency)}
           </data>
-          {hasDiscount && (
+          {hasDiscount && original && (
             <span className="text-muted-foreground text-sm line-through">
-              {formatCurrency(convert(original?.min || 0), currentCurrency)}
+              {original.min !== original.max
+                ? `${formatCurrency(convert(original.min), currentCurrency)} - ${formatCurrency(convert(original.max), currentCurrency)}`
+                : formatCurrency(convert(original.min), currentCurrency)}
             </span>
           )}
         </div>
