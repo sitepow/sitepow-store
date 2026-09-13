@@ -5,6 +5,12 @@ import { notFound } from 'next/navigation'
 import { getStore } from '@/actions/store'
 import { BASE_FAVICON } from '@/constants/favicon'
 import { StoreStatus } from '@/generated/prisma/enums'
+import {
+  buildRobots,
+  getStorePreviewImage,
+  getStoreUrl,
+  toAbsoluteUrl,
+} from '@/utils/storefront-seo'
 
 import { AlertLayout } from '@/components/layout/AlertLayout'
 
@@ -24,10 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const t = await getTranslations('storefront.metadata')
-  const storeDomain = store.customDomain || domain
-  const url = storeDomain.includes('.')
-    ? `https://${storeDomain}`
-    : `https://${storeDomain}.sitepow.store`
+  const url = getStoreUrl(store, domain)
 
   const storeName = store.seoTitle || store.name
   const storeDescription =
@@ -42,9 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         .filter(Boolean)
     : undefined
 
-  const isSearchable =
-    store.status === StoreStatus.ACTIVE &&
-    Boolean(store.allowSearchEngineIndex ?? true)
+  const previewImage = getStorePreviewImage(store, null, url)
 
   return {
     metadataBase: new URL(url),
@@ -67,30 +68,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: storeDescription,
       url,
       siteName: store.name,
-      images: store.logo ? [store.logo] : undefined,
+      locale: 'th_TH',
+      images: [
+        {
+          url: previewImage,
+          width: 1200,
+          height: 630,
+          alt: storeName,
+        },
+      ],
       type: 'website',
     },
-    robots: isSearchable
-      ? {
-          index: true,
-          follow: true,
-          googleBot: {
-            index: true,
-            follow: true,
-            'max-video-preview': -1,
-            'max-image-preview': 'large',
-            'max-snippet': -1,
-          },
-        }
-      : {
-          index: false,
-          follow: false,
-          nocache: true,
-          googleBot: {
-            index: false,
-            follow: false,
-          },
-        },
+    twitter: {
+      card: 'summary_large_image',
+      title: storeName,
+      description: storeDescription,
+      images: [previewImage],
+    },
+    robots: buildRobots(store),
   }
 }
 
@@ -111,10 +106,8 @@ export default async function StoreLayout({ children, params }: Props) {
     return <AlertLayout title={t('storeSuspended')} />
   }
 
-  const storeDomain = store.customDomain || domain
-  const url = storeDomain.includes('.')
-    ? `https://${storeDomain}`
-    : `https://${storeDomain}.sitepow.store`
+  const url = getStoreUrl(store, domain)
+  const previewImage = getStorePreviewImage(store, null, url)
 
   const storeJsonLd = {
     '@context': 'https://schema.org',
@@ -127,11 +120,21 @@ export default async function StoreLayout({ children, params }: Props) {
         description: store.seoDescription || store.description || undefined,
       },
       {
+        '@type': 'OnlineStore',
+        '@id': `${url}/#store`,
+        name: store.name,
+        url,
+        logo: store.logo ? toAbsoluteUrl(store.logo, url) : undefined,
+        image: previewImage,
+        description: store.seoDescription || store.description || undefined,
+        currenciesAccepted: store.baseCurrency || 'THB',
+      },
+      {
         '@type': 'Organization',
         '@id': `${url}/#organization`,
         name: store.name,
         url,
-        logo: store.logo || undefined,
+        logo: store.logo ? toAbsoluteUrl(store.logo, url) : undefined,
       },
     ],
   }

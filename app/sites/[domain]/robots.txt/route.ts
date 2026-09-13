@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getStore } from '@/actions/store'
 import { StoreStatus } from '@/generated/prisma/enums'
+import { getStoreUrl } from '@/utils/storefront-seo'
 
 type Props = {
   params: Promise<{ domain: string }>
@@ -16,7 +17,7 @@ export async function GET(_req: Request, { params }: Props) {
   if (!store) {
     return new NextResponse('User-agent: *\nDisallow: /', {
       status: 404,
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     })
   }
 
@@ -28,28 +29,30 @@ export async function GET(_req: Request, { params }: Props) {
     const robotsTxt = `User-agent: *\nDisallow: /`
     return new NextResponse(robotsTxt, {
       headers: {
-        'Content-Type': 'text/plain',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control':
+          'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+        'X-Robots-Tag': 'noindex, nofollow',
       },
     })
   }
 
-  const storeDomain = store.customDomain || domain
-  const baseUrl = storeDomain.includes('.')
-    ? `https://${storeDomain}`
-    : `https://${storeDomain}.sitepow.store`
+  const baseUrl = getStoreUrl(store, domain)
 
   const robotsTxt = `User-agent: *
 Allow: /
 Disallow: /user/
 Disallow: /cart/
+Disallow: /login
+Disallow: /register
 
 Sitemap: ${baseUrl}/sitemap.xml`
 
   return new NextResponse(robotsTxt, {
     headers: {
-      'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control':
+        'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
     },
   })
 }
