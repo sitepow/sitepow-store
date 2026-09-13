@@ -11,6 +11,7 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
+import { getStoreFontFamily } from '@/constants/fonts'
 import { NavigationItem } from '@/constants/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -107,6 +108,14 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
   const hasBadgesToShow = isMerchant || isPointsEnabled
 
+  const fontFamily = currentStore?.fontFamily ?? store?.fontFamily ?? 'default'
+  const resolvedFont = getStoreFontFamily(fontFamily)
+  const storeThemeStyle = {
+    '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+    '--font-sans': resolvedFont,
+    fontFamily: resolvedFont,
+  } as React.CSSProperties
+
   const tNav = useTranslations('merchant.navigation')
   const tShell = useTranslations('merchant.shell')
 
@@ -150,7 +159,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider style={storeThemeStyle}>
       <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
           {logoImage ? (
@@ -303,11 +312,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       </RootSidebar>
       <main
         className="bg-background text-foreground w-full min-w-0 space-y-5 p-3 sm:p-5"
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
+        style={storeThemeStyle}
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}

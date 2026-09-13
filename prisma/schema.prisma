@@ -710,6 +710,7 @@ model Store {
   logo         String?
   coverImage   String?
   primaryColor String? @default("#f97316")
+  fontFamily   String? @default("default")
   description  String? @db.Text
 
   phone        String?

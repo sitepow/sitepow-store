@@ -2,6 +2,7 @@
 
 import { ComponentProps } from 'react'
 
+import { getStoreFontFamily } from '@/constants/fonts'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 
@@ -21,11 +22,18 @@ export function StoreLayoutCheckout({
   const { isAuthenticated, user } = useSession()
 
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
+  const fontVar = getStoreFontFamily(store?.fontFamily)
 
   return (
     <div
       className="flex flex-col gap-10"
-      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
+      style={
+        {
+          '--primary': store?.primaryColor,
+          '--font-sans': fontVar,
+          fontFamily: fontVar,
+        } as React.CSSProperties
+      }
     >
       <StoreNavbarCheckout />
       <main className={cn(className, 'mt-24 sm:mt-20 lg:mt-24')} {...props}>

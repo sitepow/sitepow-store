@@ -20,6 +20,7 @@ const storeProfileSelect = {
   coverImage: true,
   description: true,
   primaryColor: true,
+  fontFamily: true,
   baseCurrency: true,
   allowSearchEngineIndex: true,
   seoTitle: true,
