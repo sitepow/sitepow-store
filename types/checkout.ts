@@ -1,3 +1,5 @@
+import { CurrencyCode } from '@/generated/prisma/enums'
+
 export enum CheckoutType {
   SUBSCRIPTION = 'SUBSCRIPTION',
   CREDIT = 'CREDIT',
@@ -36,6 +38,7 @@ export interface CreateStoreCheckoutParams {
   orderIds?: string
   description: string
   amount: number
+  currency?: string | CurrencyCode
   customerEmail?: string
   successUrl: string
   cancelUrl: string

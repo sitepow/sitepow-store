@@ -84,6 +84,8 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
     totalAmount,
   } = order
 
+  const currency = (order as any)?.customerCurrency || 'THB'
+
   return (
     <div className="space-y-2 rounded-lg border p-4">
       <div className="text-sm font-semibold">
@@ -162,11 +164,11 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                 <div className="flex shrink-0 flex-col items-start whitespace-nowrap">
                   {hasDiscount && (
                     <span className="text-muted-foreground text-xs line-through">
-                      {formatCurrency(totalOriginalPrice)}
+                      {formatCurrency(totalOriginalPrice, currency)}
                     </span>
                   )}
                   <span className="text-primary font-semibold">
-                    {formatCurrency(totalPrice)}
+                    {formatCurrency(totalPrice, currency)}
                   </span>
                 </div>
               </div>
@@ -177,12 +179,12 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
       <div className="mt-3 space-y-1.5 border-t pt-3">
         <SummaryRow
           label={tr('subtotal', undefined, 'รวมราคาสินค้า')}
-          value={formatCurrency(rawSubtotal)}
+          value={formatCurrency(rawSubtotal, currency)}
         />
         {productDiscount > 0 && (
           <SummaryRow
             label={tr('productDiscount', undefined, 'ส่วนลดสินค้า')}
-            value={formatCurrency(productDiscount)}
+            value={formatCurrency(productDiscount, currency)}
             isDiscount
           />
         )}
@@ -197,7 +199,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
                   )
                 : tr('shippingFee', undefined, 'ค่าจัดส่ง')
             }
-            value={formatCurrency(shippingFee)}
+            value={formatCurrency(shippingFee, currency)}
           />
         )}
         {!!coupon && couponDiscount > 0 && (
@@ -207,7 +209,7 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
               { code: coupon.code },
               `ส่วนลดคูปอง (${coupon.code})`,
             )}
-            value={formatCurrency(couponDiscount)}
+            value={formatCurrency(couponDiscount, currency)}
             isDiscount
           />
         )}
@@ -218,14 +220,14 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
               { points: formatNumber(usedPoints ?? 0) },
               `ส่วนลดจากแต้มสะสม (${formatNumber(usedPoints ?? 0)} แต้ม)`,
             )}
-            value={formatCurrency(pointsDiscount)}
+            value={formatCurrency(pointsDiscount, currency)}
             isDiscount
           />
         )}
         {!!codFee && (
           <SummaryRow
             label={tr('codFee', undefined, 'ค่าธรรมเนียมเก็บเงินปลายทาง (COD)')}
-            value={formatCurrency(codFee)}
+            value={formatCurrency(codFee, currency)}
           />
         )}
         {(earnedPoints ?? 0) > 0 && (
@@ -237,9 +239,26 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
             )}
           </p>
         )}
-        <div className="text-foreground flex justify-between border-t pt-2.5 text-base font-bold">
-          <span>{tr('totalPayment', undefined, 'ยอดชำระทั้งสิ้น')}</span>
-          <HighlightText>{formatCurrency(totalAmount)}</HighlightText>
+        <div className="text-foreground flex flex-col items-end border-t pt-2.5 text-base font-bold">
+          <div className="flex w-full justify-between">
+            <span>{tr('totalPayment', undefined, 'ยอดชำระทั้งสิ้น')}</span>
+            <HighlightText>
+              {formatCurrency(totalAmount, currency)}
+            </HighlightText>
+          </div>
+          {(order as any)?.baseCurrency &&
+            (order as any)?.customerCurrency &&
+            (order as any)?.customerCurrency !== (order as any)?.baseCurrency &&
+            (order as any)?.totalAmountBase !== undefined && (
+              <span className="text-muted-foreground text-xs font-normal">
+                (~
+                {formatCurrency(
+                  Number((order as any).totalAmountBase),
+                  (order as any).baseCurrency,
+                )}
+                )
+              </span>
+            )}
         </div>
       </div>
     </div>

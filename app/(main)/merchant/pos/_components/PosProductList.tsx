@@ -8,6 +8,7 @@ import { POSProductItem } from '@/actions/pos/product'
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { ProductCard } from '@/app/sites/[domain]/_components/product/ProductCard'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
 import { getRemainingStock } from '@/utils/cart'
@@ -22,7 +23,6 @@ import {
   SelectedAddonPayload,
   SelectedOptionPayload,
 } from './PosProductOptionDialog'
-
 
 export type { SelectedOptionPayload, SelectedAddonPayload }
 
@@ -50,6 +50,7 @@ export function PosProductList({
   isReseller = false,
 }: PosProductListProps) {
   const { currentStore, store } = useCurrentStore()
+  const { baseCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
   const [selectedProduct, setSelectedProduct] = useState<POSProductItem | null>(
@@ -149,6 +150,7 @@ export function PosProductList({
                   product={product as unknown as SectionProductItem}
                   quantity={totalStock}
                   isReseller={isItemReseller}
+                  baseCurrency={baseCurrency}
                 />
               )
             })}

@@ -1,6 +1,8 @@
+import { getLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 
 import { getStorefrontBlogDetail } from '@/actions/storefront/blog'
+import { getLocalizedField } from '@/utils/intl'
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { SectionContainer } from '@/components/SectionContainer'
@@ -21,14 +23,20 @@ export default async function StoreBlogDescriptionPage({ params }: Props) {
     notFound()
   }
 
-  const readingTime = Math.ceil(blog.content.length / 500) || 5
+  const locale = await getLocale()
+  const localizedTitle = getLocalizedField(blog, 'title', locale) || blog.title
+  const localizedContent =
+    getLocalizedField(blog, 'content', locale) || blog.content
+
+  const readingTime = Math.ceil(localizedContent.length / 500) || 5
 
   return (
     <StoreLayout>
       <SectionContainer>
         <BlogHeader createdAt={blog.createdAt} readingTime={readingTime} />
         <div className="mx-auto max-w-3xl py-8 text-start">
-          {blog.content && <MarkdownRenderer content={blog.content} />}
+          <h1 className="mb-6 text-3xl font-bold">{localizedTitle}</h1>
+          {localizedContent && <MarkdownRenderer content={localizedContent} />}
           <BlogTags tags={blog.tags} />
         </div>
       </SectionContainer>

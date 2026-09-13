@@ -18,7 +18,8 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System",
-    "language": "Language"
+    "language": "Language",
+    "currency": "Currency"
   },
   "footer": {
     "description": "Next-gen intelligent store management and POS platform for modern commerce. Connecting in-store and online omnichannel with 0% GP, AI slip verification, and automated inventory sync.",

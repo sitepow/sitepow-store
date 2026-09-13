@@ -1,10 +1,9 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useTranslations } from 'next-intl'
 
-import { formatCurrency } from '@/utils/pricing'
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import {
   Area,
   AreaChart,
@@ -27,13 +26,16 @@ interface TopVariantsCardProps {
 
 export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.analytics.topVariants')
 
   return (
     <AnalyticsCardShell
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
       title={t('title')}
       description={t('description')}
       isEmpty={topVariants.length === 0}

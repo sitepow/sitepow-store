@@ -2,9 +2,12 @@
 
 import { useMemo } from 'react'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
+import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -20,6 +23,11 @@ import { useProductPurchaseStore } from '../../store'
 
 export function ProductOptionGroups() {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
   const {
     product,
     selectedVariant,
@@ -77,7 +85,9 @@ export function ProductOptionGroups() {
       {product?.options?.map((option, idx) => (
         <div key={idx} className="space-y-4">
           <div className="flex items-center gap-2">
-            <Label className="text-lg font-semibold">{option.title}</Label>
+            <Label className="text-lg font-semibold">
+              {getLocalizedField(option, 'title', locale) || option.title}
+            </Label>
             {option.require && (
               <Badge variant="outline" className="border-primary text-primary">
                 * {t('required')}
@@ -112,11 +122,15 @@ export function ProductOptionGroups() {
                       disabled={isOutOfStock}
                     />
                     <span className="flex-1 text-sm font-medium">
-                      {choice.name}
+                      {getLocalizedField(choice, 'name', locale) || choice.name}
                     </span>
                     {choice.extraPrice > 0 && (
                       <span className="text-primary text-sm font-semibold">
-                        +{formatCurrency(choice.extraPrice)}
+                        +
+                        {formatCurrency(
+                          convert(choice.extraPrice),
+                          currentCurrency,
+                        )}
                       </span>
                     )}
                   </Label>

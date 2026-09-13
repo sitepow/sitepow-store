@@ -23,6 +23,7 @@ import {
 } from '@/actions/hooks/storefront/shipping'
 import {
   BankAccountType,
+  CurrencyCode,
   PaymentMethod,
   ProductType,
   UserRole,
@@ -31,6 +32,7 @@ import { getStoredAffiliateCode } from '@/hooks/use-affiliate-tracking'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
@@ -69,6 +71,9 @@ type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 export default function StoreCartPage() {
   const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
   const isMounted = useIsMounted()
   const router = useRouter()
   const params = useParams()
@@ -446,6 +451,7 @@ export default function StoreCartPage() {
         usedPoints,
         earnedPoints: summary.totalPoints,
         affiliateCode,
+        customerCurrency: currentCurrency,
         items: items.map((item) => ({
           productId: item.productId,
           variantId: item.variant.id,
@@ -485,6 +491,7 @@ export default function StoreCartPage() {
                   orders: orderNumbersString,
                 }),
                 amount: calculatedGrandTotal,
+                currency: currentCurrency,
                 successUrl: `${window.location.origin}/user/orders`,
                 cancelUrl: `${window.location.origin}/user/orders`,
               })
@@ -580,7 +587,7 @@ export default function StoreCartPage() {
                   <h3 className="font-bold" suppressHydrationWarning>
                     {t('totalToPay')}{' '}
                     <span className="font-extrabold">
-                      {formatCurrency(grandTotal)}
+                      {formatCurrency(convert(grandTotal), currentCurrency)}
                     </span>
                   </h3>
                   <p className="text-muted-foreground text-xs">
@@ -682,7 +689,10 @@ export default function StoreCartPage() {
                                 <>
                                   <span>
                                     {t('shippingFeePrefix')}{' '}
-                                    {formatCurrency(method.fee ?? 0)}
+                                    {formatCurrency(
+                                      convert(method.fee ?? 0),
+                                      currentCurrency,
+                                    )}
                                   </span>{' '}
                                   <br />
                                   <span>
@@ -723,7 +733,10 @@ export default function StoreCartPage() {
                           <span>
                             {t('shippingFeePrefix')}{' '}
                             {selectedShippingData.fee !== null
-                              ? formatCurrency(selectedShippingData.fee)
+                              ? formatCurrency(
+                                  convert(selectedShippingData.fee),
+                                  currentCurrency,
+                                )
                               : t('notSupportWeight')}
                           </span>{' '}
                           <br />
@@ -810,7 +823,7 @@ export default function StoreCartPage() {
                 />
                 <SummaryRow
                   label={t('totalShippingFee')}
-                  value={formatCurrency(shippingFee)}
+                  value={formatCurrency(convert(shippingFee), currentCurrency)}
                 />
                 <div>
                   <CartSummary summary={summary} />
@@ -822,7 +835,11 @@ export default function StoreCartPage() {
                         label={t('pointsDiscountLabel')}
                         value={
                           <HighlightText>
-                            - {formatCurrency(pointsDiscount)}
+                            -{' '}
+                            {formatCurrency(
+                              convert(pointsDiscount),
+                              currentCurrency,
+                            )}
                           </HighlightText>
                         }
                       />
@@ -834,7 +851,11 @@ export default function StoreCartPage() {
                         })}
                         value={
                           <HighlightText>
-                            - {formatCurrency(couponDiscount)}
+                            -{' '}
+                            {formatCurrency(
+                              convert(couponDiscount),
+                              currentCurrency,
+                            )}
                           </HighlightText>
                         }
                       />
@@ -844,7 +865,7 @@ export default function StoreCartPage() {
                 <div className="border-border mt-4 border-t pt-2">
                   <SummaryTotal
                     label={t('orderTotal')}
-                    value={formatCurrency(grandTotal)}
+                    value={formatCurrency(convert(grandTotal), currentCurrency)}
                   />
                 </div>
                 {isAuthenticated && (

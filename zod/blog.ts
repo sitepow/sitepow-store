@@ -16,6 +16,7 @@ export const blogFormSchema = z.object({
     .or(z.literal('')),
   content: z.string().optional().or(z.literal('')),
   tags: z.string().optional().or(z.literal('')),
+  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 export type BlogFormValues = z.input<typeof blogFormSchema>

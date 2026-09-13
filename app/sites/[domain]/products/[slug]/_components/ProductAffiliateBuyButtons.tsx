@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 
 import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import {
   AFFILIATE_PLATFORM_CONFIG,
   AffiliatePlatform,
@@ -21,6 +23,10 @@ interface Props {
 
 export function ProductAffiliateBuyButtons({ product }: Props) {
   const t = useTranslations('storefront.products.affiliateBuy')
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const rawLinks = (product?.details as any)?.affiliateLinks
   let links: AffiliateProductLink[] = Array.isArray(rawLinks) ? rawLinks : []
@@ -119,17 +125,23 @@ export function ProductAffiliateBuyButtons({ product }: Props) {
 
                   <div className="flex items-baseline gap-2">
                     <span className="text-primary text-xl font-bold sm:text-2xl">
-                      {formatCurrency(price)}
+                      {formatCurrency(convert(price), currentCurrency)}
                     </span>
                     {hasDiscount && originalPrice && (
                       <span className="text-muted-foreground text-xs line-through">
-                        {formatCurrency(originalPrice)}
+                        {formatCurrency(
+                          convert(originalPrice),
+                          currentCurrency,
+                        )}
                       </span>
                     )}
                     {discountSavings > 0 && (
                       <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                         {t('saveAmount', {
-                          amount: formatCurrency(discountSavings),
+                          amount: formatCurrency(
+                            convert(discountSavings),
+                            currentCurrency,
+                          ),
                         })}
                       </span>
                     )}

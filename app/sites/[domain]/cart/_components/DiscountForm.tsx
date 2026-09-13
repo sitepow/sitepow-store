@@ -11,6 +11,7 @@ import {
 } from '@/actions/hooks/storefront/discount'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
@@ -45,6 +46,9 @@ interface DiscountFormProps {
 export function DiscountForm({ subtotal }: DiscountFormProps) {
   const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const params = useParams()
   const storeSlug = params.domain as string
@@ -160,7 +164,10 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                   />
                   <span className="text-muted-foreground text-sm">
                     {t.rich('redeemWorth', {
-                      amount: formatCurrency(pointsDiscount),
+                      amount: formatCurrency(
+                        convert(pointsDiscount),
+                        currentCurrency,
+                      ),
                       strong: (chunks) => (
                         <strong className="text-primary">{chunks}</strong>
                       ),
@@ -170,7 +177,10 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                 <p className="text-muted-foreground text-xs">
                   {t('pointsRateInfo', {
                     points: formatNumber(customerPoints),
-                    rate: formatCurrency(pointRedeemRate),
+                    rate: formatCurrency(
+                      convert(pointRedeemRate),
+                      currentCurrency,
+                    ),
                   })}
                 </p>
               </div>
@@ -189,7 +199,11 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                 </span>
                 <div className="flex items-center gap-2">
                   <span className="text-primary text-sm font-semibold">
-                    -{formatCurrency(appliedCoupon.discountAmount)}
+                    -
+                    {formatCurrency(
+                      convert(appliedCoupon.discountAmount),
+                      currentCurrency,
+                    )}
                   </span>
                   <Button
                     variant="outline"
@@ -230,7 +244,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
               label={t('pointsDiscountLabel')}
               value={
                 <HighlightText>
-                  - {formatCurrency(pointsDiscount)}
+                  - {formatCurrency(convert(pointsDiscount), currentCurrency)}
                 </HighlightText>
               }
             />
@@ -238,14 +252,14 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
               label={t('couponDiscount')}
               value={
                 <HighlightText>
-                  - {formatCurrency(couponDiscount)}
+                  - {formatCurrency(convert(couponDiscount), currentCurrency)}
                 </HighlightText>
               }
             />
             <Separator />
             <SummaryTotal
               label={t('totalDiscount')}
-              value={formatCurrency(totalDiscount)}
+              value={formatCurrency(convert(totalDiscount), currentCurrency)}
             />
           </div>
         </div>

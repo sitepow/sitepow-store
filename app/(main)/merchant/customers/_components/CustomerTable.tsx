@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useState }
-from 'react'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import React, { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -13,9 +11,11 @@ import {
 } from '@/actions/hooks/customer'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
@@ -34,6 +34,7 @@ import {
 
 export function CustomerTable() {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.customers')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -75,9 +76,11 @@ export function CustomerTable() {
   return (
     <div
       className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <div className="rounded-md border">
         <Table>

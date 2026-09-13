@@ -19,6 +19,7 @@ export interface CreateBlogInput {
   content: string
   image: string
   tags?: string[]
+  translations?: any
 }
 
 const blogSelect = {
@@ -27,6 +28,7 @@ const blogSelect = {
   slug: true,
   image: true,
   tags: true,
+  translations: true,
   createdAt: true,
   updatedAt: true,
   store: {
@@ -214,6 +216,7 @@ export async function createBlog(input: CreateBlogInput) {
         content: input.content,
         image: input.image,
         tags: input.tags ?? [],
+        translations: input.translations ?? undefined,
       },
       select: blogSelect,
     })
@@ -334,6 +337,7 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
         content: input.content,
         image: input.image,
         tags: input.tags ?? [],
+        translations: input.translations ?? undefined,
       },
       select: {
         id: true,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
@@ -12,14 +12,19 @@ import { usePaymentSettingStatus } from '@/actions/hooks/payment'
 import { useCreatePOSOrder } from '@/actions/hooks/pos/order'
 import { useCreateResellerPOSOrder } from '@/actions/hooks/reseller'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
-import { QUICK_AMOUNTS } from '@/constants/credit'
-import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import {
+  CurrencyCode,
+  OrderStatus,
+  PaymentMethod,
+} from '@/generated/prisma/enums'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useSession } from '@/hooks/use-session'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { POSCheckoutInput } from '@/zod/order'
 import {
   IconCash,
+  IconCreditCard,
   IconExternalLink,
   IconFileInvoice,
   IconPackageExport,
@@ -44,6 +49,44 @@ import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 
 import { DigitalPriceDisplay } from './DigitalPriceDisplay'
+
+function getQuickCashAmounts(
+  payableAmount: number,
+  currency: CurrencyCode,
+): number[] {
+  let denoms = [10, 20, 50, 100, 500, 1000]
+  if (currency === CurrencyCode.THB) {
+    denoms = [100, 500, 1000]
+  } else if (currency === CurrencyCode.JPY) {
+    denoms = [1000, 5000, 10000]
+  } else if (currency === CurrencyCode.KRW) {
+    denoms = [5000, 10000, 50000]
+  } else if (currency === CurrencyCode.VND) {
+    denoms = [50000, 100000, 500000]
+  } else if (
+    ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NZD', 'SGD', 'CHF'].includes(currency)
+  ) {
+    denoms = [5, 10, 20, 50, 100]
+  }
+
+  const higher = denoms.filter((d) => d > payableAmount)
+  if (higher.length >= 3) {
+    return higher.slice(0, 3)
+  }
+  if (higher.length > 0) {
+    const last = higher[higher.length - 1]
+    const result = [...higher]
+    let next = last * 2
+    while (result.length < 3) {
+      result.push(next)
+      next += last
+    }
+    return result
+  }
+  const step = denoms[denoms.length - 1]
+  const base = Math.ceil(payableAmount / step) * step
+  return [base, base + step, base + step * 2]
+}
 
 interface PosCheckoutModalProps {
   open: boolean
@@ -83,6 +126,15 @@ export function PosCheckoutModal({
   const targetCheckStoreId =
     isResellerMode && supplierStoreId ? supplierStoreId : currentStoreId
 
+  const { currency, currencyInfo, formatCurrency, formatRawCurrency, convert } =
+    useMerchantCurrency(targetCheckStoreId)
+
+  const payableAmount = convert(totalAmount)
+  const quickAmounts = useMemo(
+    () => getQuickCashAmounts(payableAmount, currency),
+    [payableAmount, currency],
+  )
+
   const { data: isStripeAvailable = false } =
     usePaymentSettingStatus(targetCheckStoreId)
 
@@ -109,8 +161,8 @@ export function PosCheckoutModal({
   const isCash =
     !isResellerMode && paymentMethod === PaymentMethod.CASH_ON_DELIVERY
 
-  const changeAmount = receivedAmount - totalAmount
-  const isValidCash = isCash ? receivedAmount >= totalAmount : true
+  const changeAmount = receivedAmount - payableAmount
+  const isValidCash = isCash ? receivedAmount >= payableAmount : true
 
   const isCurrentPaymentValid = isCash
     ? isValidCash
@@ -130,7 +182,9 @@ export function PosCheckoutModal({
       toast.error(
         isResellerMode
           ? t('resellerStripeDisabled')
-          : t('stripeRequiredPromptPay'),
+          : currency === CurrencyCode.THB
+            ? t('stripeRequiredPromptPay')
+            : t('stripeSystemNotReady'),
       )
       return
     }
@@ -153,7 +207,9 @@ export function PosCheckoutModal({
         toast.error(
           isResellerMode
             ? t('resellerPaymentSystemNotReady')
-            : t('promptPaySystemNotReady'),
+            : currency === CurrencyCode.THB
+              ? t('promptPaySystemNotReady')
+              : t('stripeSystemNotReady'),
         )
         return
       }
@@ -186,6 +242,7 @@ export function PosCheckoutModal({
                 orderNumber: createdOrder.orderNumber,
               }),
               amount: Number(createdOrder.totalAmount),
+              currency,
               successUrl,
               cancelUrl: `${window.location.origin}/merchant/orders`,
             },
@@ -251,6 +308,7 @@ export function PosCheckoutModal({
         agreementId,
         supplierStoreId: data.storeId,
         branchId: data.branchId,
+        customerCurrency: currency,
         items: cartItems.map((item) => ({
           variantId: item.variant.id,
           quantity: item.quantity,
@@ -267,6 +325,7 @@ export function PosCheckoutModal({
       storeId: data.storeId,
       branchId: data.branchId,
       customerId: data.customerId,
+      customerCurrency: currency,
       usedPoints:
         data.usedPoints && data.usedPoints > 0 ? data.usedPoints : undefined,
       earnedPoints,
@@ -356,18 +415,32 @@ export function PosCheckoutModal({
                       : 'border-border text-muted-foreground',
                   )}
                 >
-                  <IconQrcode className="size-7" />
+                  {currency === CurrencyCode.THB ? (
+                    <IconQrcode className="size-7" />
+                  ) : (
+                    <IconCreditCard className="size-7" />
+                  )}
                   <span className="text-sm">
-                    {isResellerMode ? t('resellerPromptPay') : t('promptPay')}
+                    {currency === CurrencyCode.THB
+                      ? isResellerMode
+                        ? t('resellerPromptPay')
+                        : t('promptPay')
+                      : t('stripeCard')}
                   </span>
                 </button>
               ) : (
                 <div className="border-border text-muted-foreground bg-muted/20 relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center">
-                  <IconQrcode className="text-muted-foreground/60 size-6" />
+                  {currency === CurrencyCode.THB ? (
+                    <IconQrcode className="text-muted-foreground/60 size-6" />
+                  ) : (
+                    <IconCreditCard className="text-muted-foreground/60 size-6" />
+                  )}
                   <span className="text-xs font-medium">
                     {isResellerMode
                       ? t('resellerPaymentUnavailable')
-                      : t('promptPayUnavailable')}
+                      : currency === CurrencyCode.THB
+                        ? t('promptPayUnavailable')
+                        : t('stripeCardUnavailable')}
                   </span>
                   {!isResellerMode && (
                     <Link
@@ -402,7 +475,7 @@ export function PosCheckoutModal({
                   <div className="relative">
                     <Input
                       type="number"
-                      min={totalAmount}
+                      min={payableAmount}
                       value={receivedAmount || ''}
                       onChange={(e) =>
                         setValue('receivedAmount', Number(e.target.value))
@@ -412,7 +485,7 @@ export function PosCheckoutModal({
                       className="h-12 pr-12 text-right text-xl font-bold tracking-wide"
                     />
                     <span className="text-muted-foreground absolute top-3 right-3 text-sm font-semibold">
-                      {t('baht')}
+                      {currencyInfo.symbol}
                     </span>
                   </div>
                 </div>
@@ -422,11 +495,11 @@ export function PosCheckoutModal({
                     variant="outline"
                     size="sm"
                     className="h-9 font-medium"
-                    onClick={() => handleQuickAmount(totalAmount)}
+                    onClick={() => handleQuickAmount(payableAmount)}
                   >
                     {t('exactAmount')}
                   </Button>
-                  {QUICK_AMOUNTS.map((amt) => (
+                  {quickAmounts.map((amt) => (
                     <Button
                       key={amt}
                       type="button"
@@ -461,7 +534,7 @@ export function PosCheckoutModal({
                     )}
                   >
                     {receivedAmount > 0
-                      ? formatCurrency(Math.abs(changeAmount))
+                      ? formatRawCurrency(Math.abs(changeAmount))
                       : '-'}
                   </span>
                 </div>

@@ -3,9 +3,9 @@
 import { useTranslations } from 'next-intl'
 
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 
 import { cn } from '@/lib/utils'
-
 
 interface DigitalPriceDisplayProps {
   value: number
@@ -14,23 +14,29 @@ interface DigitalPriceDisplayProps {
   digits?: number
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
+  skipConvert?: boolean
 }
 
 export function DigitalPriceDisplay({
   value,
   label,
-  currency = '฿',
-  digits = 2,
+  currency,
+  digits,
   className,
   size = 'md',
+  skipConvert = false,
 }: DigitalPriceDisplayProps) {
   const { currentStore, store } = useCurrentStore()
+  const { currencyInfo, convert } = useMerchantCurrency()
   const t = useTranslations('merchant.pos')
   const displayLabel = label ?? t('netPayable')
-  const formattedValue = new Intl.NumberFormat('th-TH', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  }).format(value)
+  const activeCurrency = currency ?? currencyInfo.symbol
+  const activeDigits = digits ?? (currencyInfo.isZeroDecimal ? 0 : 2)
+  const numericValue = skipConvert ? value : convert(value)
+  const formattedValue = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: activeDigits,
+    maximumFractionDigits: activeDigits,
+  }).format(numericValue)
 
   const sizeStyles = {
     sm: {
@@ -101,7 +107,7 @@ export function DigitalPriceDisplay({
               sizeStyles.icon,
             )}
           >
-            {currency}
+            {activeCurrency}
           </span>
         </div>
       </div>

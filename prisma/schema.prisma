@@ -1196,7 +1196,9 @@ model Order {
   resellerAgreement   ResellerAgreement? @relation(fields: [resellerAgreementId], references: [id], onDelete: SetNull)
   affiliateReferral   AffiliateReferral?
 
+  baseCurrency     CurrencyCode @default(THB)
   customerCurrency CurrencyCode @default(THB)
+  exchangeRate     Decimal      @default(1) @db.Decimal(12, 6)
   totalAmountBase  Decimal
 
   slipHistories SlipVerificationHistory[]

@@ -56,6 +56,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
       usedPoints: input.usedPoints,
       earnedPoints: input.earnedPoints,
       items: input.items,
+      customerCurrency: input.customerCurrency,
       isPOS: true,
     })
 

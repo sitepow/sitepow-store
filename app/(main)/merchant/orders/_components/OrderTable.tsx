@@ -1,7 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
@@ -11,7 +9,12 @@ import { useOrders } from '@/actions/hooks/order'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { UploadSlipDialog } from '@/app/sites/[domain]/user/orders/_components/UploadSlipDialog'
 import { ORDER_STATUS_TH } from '@/constants/translate'
-import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
+import {
+  CurrencyCode,
+  OrderStatus,
+  PaymentMethod,
+} from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { useOrderSSE } from '@/hooks/use-order-sse'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -129,9 +132,11 @@ export function OrderTable() {
   return (
     <div
       className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <div className="rounded-md border">
         <Table>
@@ -303,7 +308,24 @@ export function OrderTable() {
                         .join(', ')}
                     </TableCell>
                     <TableCell className={cn(isCancelled && 'line-through')}>
-                      {formatCurrency(Number(order.totalAmount))}
+                      <div className="flex flex-col">
+                        <span className="font-semibold">
+                          {formatCurrency(
+                            Number(order.totalAmountBase ?? order.totalAmount),
+                            (order.baseCurrency as any) || CurrencyCode.THB,
+                          )}
+                        </span>
+                        {order.customerCurrency &&
+                          order.baseCurrency &&
+                          order.customerCurrency !== order.baseCurrency && (
+                            <span className="text-muted-foreground text-xs font-normal">
+                              {formatCurrency(
+                                Number(order.totalAmount),
+                                order.customerCurrency as any,
+                              )}
+                            </span>
+                          )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -343,7 +365,8 @@ export function OrderTable() {
                                   description: t('stripePaymentDesc', {
                                     orderNumber: order.orderNumber,
                                   }),
-                                  amount: order.totalAmount,
+                                  amount: Number(order.totalAmount),
+                                  currency: order.customerCurrency || 'THB',
                                   successUrl: `${window.location.origin}/merchant/orders`,
                                   cancelUrl: `${window.location.origin}/merchant/orders`,
                                 })

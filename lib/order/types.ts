@@ -1,5 +1,6 @@
 import {
   ActorType,
+  CurrencyCode,
   OrderStatus,
   PaymentMethod,
   ProductType,
@@ -36,6 +37,7 @@ interface BaseOrderInput {
   usedPoints?: number
   earnedPoints?: number
   affiliateCode?: string
+  customerCurrency?: CurrencyCode
   items: OrderItemInput[]
 }
 

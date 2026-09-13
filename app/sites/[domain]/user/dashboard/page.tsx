@@ -9,6 +9,8 @@ import { useStorefrontDashboard } from '@/actions/hooks/storefront/dashboard'
 import { AnalyticsCardShell } from '@/app/(main)/merchant/analytics/_components/_components/AnalyticsCardShell'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/navigation'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'
 import {
@@ -34,6 +36,10 @@ export default function StoreUserDashboardPage() {
   const t = useTranslations('customer.dashboard')
   const params = useParams()
   const storeSlug = params.domain as string
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const { data, isLoading } = useStorefrontDashboard(storeSlug)
 
@@ -75,7 +81,7 @@ export default function StoreUserDashboardPage() {
     ? [
         {
           title: t('totalSpentStore'),
-          value: formatCurrency(stats.totalSpent),
+          value: formatCurrency(convert(stats.totalSpent), currentCurrency),
           description: t('totalSpentDesc'),
           icon: CreditCard,
         },
@@ -154,7 +160,9 @@ export default function StoreUserDashboardPage() {
                       tickMargin={8}
                       stroke="#888888"
                       fontSize={12}
-                      tickFormatter={(value) => formatCurrency(value)}
+                      tickFormatter={(value) =>
+                        formatCurrency(convert(value), currentCurrency)
+                      }
                       width={60}
                     />
                     <ChartTooltip

@@ -1,3 +1,4 @@
+import { CurrencyCode } from '@/generated/prisma/enums'
 import z from 'zod'
 
 export const storeProfileSchema = z.object({
@@ -22,6 +23,7 @@ export const storeProfileSchema = z.object({
   coverImage: z.any().optional(),
   description: z.string().optional(),
   primaryColor: z.string().optional().nullable(),
+  baseCurrency: z.enum(CurrencyCode),
   allowSearchEngineIndex: z.boolean(),
   seoTitle: z.string().optional().nullable(),
   seoDescription: z.string().optional().nullable(),

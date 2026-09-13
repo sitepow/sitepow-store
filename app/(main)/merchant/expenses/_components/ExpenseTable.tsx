@@ -1,17 +1,16 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
 /* eslint-disable @next/next/no-img-element */
-
 import { useTranslations } from 'next-intl'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useDeleteExpense, useExpenses } from '@/actions/hooks/expenses'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
-import { formatCurrency } from '@/utils/pricing'
 import { IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -44,6 +43,7 @@ export function ExpenseTable({
   onEdit,
 }: ExpenseTableProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.expenses')
   const tCategories = useTranslations('merchant.expenses.categories')
   const { selectedStoreId } = useStoreFilter()
@@ -84,9 +84,11 @@ export function ExpenseTable({
   return (
     <div
       className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <div className="rounded-md border">
         <Table>

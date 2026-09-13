@@ -14,6 +14,7 @@ const storefrontBlogListSelect = {
   slug: true,
   image: true,
   tags: true,
+  translations: true,
   createdAt: true,
 } satisfies Prisma.BlogSelect
 
@@ -24,6 +25,7 @@ const storefrontBlogDetailSelect = {
   image: true,
   tags: true,
   content: true,
+  translations: true,
   createdAt: true,
 } satisfies Prisma.BlogSelect
 

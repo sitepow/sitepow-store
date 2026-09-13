@@ -177,11 +177,13 @@ export const transformProductToFormValues = (
         amount: v.pointsAmount,
       },
       isAvailable: v.isAvailable ?? false,
+      translations: (v as any).translations ?? null,
     })),
     addons: product.addons.map((a) => ({
       title: a.title,
       price: Number(a.price),
       isAvailable: a.isAvailable,
+      translations: (a as any).translations ?? null,
     })),
     metadata: Object.entries((product.details as Record<string, any>) || {})
       .filter(([key]) => key !== 'affiliateLinks')
@@ -192,6 +194,7 @@ export const transformProductToFormValues = (
     affiliateLinks: Array.isArray((product.details as any)?.affiliateLinks)
       ? (product.details as any).affiliateLinks
       : [],
+    translations: (product as any).translations ?? null,
   }
 }
 

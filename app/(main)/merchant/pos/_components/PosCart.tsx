@@ -10,6 +10,7 @@ import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CartItem } from '@/types/sites/cart'
 import {
@@ -17,7 +18,7 @@ import {
   calculateGrandTotal,
   getRemainingStock,
 } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -59,6 +60,7 @@ export function PosCart({
   onClearCart,
 }: PosCartProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency, baseCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.pos')
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -289,6 +291,7 @@ export function PosCart({
                         onUpdateQuantity={onUpdateQuantity}
                         onRemove={onRemoveItem}
                         isMaxStock={isMaxStock}
+                        baseCurrency={baseCurrency}
                       />
                     )
                   })}
@@ -303,7 +306,7 @@ export function PosCart({
                 <PosDiscountDialog subtotal={cartSummary.finalPrice} />
               )}
             <div className="w-full">
-              <CartSummary summary={summaryData} />
+              <CartSummary summary={summaryData} baseCurrency={baseCurrency} />
             </div>
             <div className="flex w-full gap-2">
               <Button

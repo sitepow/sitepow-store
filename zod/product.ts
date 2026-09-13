@@ -45,12 +45,14 @@ export const variantSchema = z.object({
   rewardPoints: rewardPointsSchema,
   digitalItems: z.array(digitalItemSchema).default([]),
   isAvailable: z.boolean().default(true),
+  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 const addonSchema = z.object({
   title: z.string().min(1, { message: 'กรุณาระบุชื่อบริการเสริม' }),
   price: z.number().min(0),
   isAvailable: z.boolean().default(true),
+  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 const metadataSchema = z.object({
@@ -96,6 +98,7 @@ export const productFormSchema = z.object({
   tags: z.string().optional().or(z.literal('')),
   productType: z.enum(ProductType).default(ProductType.PHYSICAL),
   affiliateLinks: z.array(affiliateLinkSchema).default([]),
+  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 export type ProductFormValues = z.input<typeof productFormSchema>

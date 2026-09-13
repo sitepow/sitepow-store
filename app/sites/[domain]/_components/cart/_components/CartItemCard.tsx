@@ -2,6 +2,9 @@
 
 import { useTranslations } from 'next-intl'
 
+import { CurrencyCode } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
@@ -19,6 +22,7 @@ interface CartItemCardProps {
   isMaxStock?: boolean
   productClassName?: string
   textClassName?: string
+  baseCurrency?: CurrencyCode
 }
 
 export function CartItemCard({
@@ -28,8 +32,13 @@ export function CartItemCard({
   isMaxStock = false,
   productClassName,
   textClassName,
+  baseCurrency,
 }: CartItemCardProps) {
   const t = useTranslations('storefront.products')
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    baseCurrency || (store as any)?.baseCurrency,
+  )
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
   const isResellerItem = item.isReseller || Boolean(item.agreementId)
@@ -104,11 +113,14 @@ export function CartItemCard({
             <div className="flex flex-col">
               {hasDiscount && (
                 <span className="text-muted-foreground text-xs line-through sm:text-sm">
-                  {formatCurrency(originalUnitPrice * item.quantity)}
+                  {formatCurrency(
+                    convert(originalUnitPrice * item.quantity),
+                    currentCurrency,
+                  )}
                 </span>
               )}
               <p className="text-primary text-sm font-bold sm:text-base">
-                {formatCurrency(item.totalPrice)}
+                {formatCurrency(convert(item.totalPrice), currentCurrency)}
               </p>
             </div>
             {onRemove && (

@@ -2,7 +2,7 @@
 
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
 import {
@@ -11,6 +11,7 @@ import {
   mapSelectedOptions,
   validateRequiredOptions,
 } from '@/utils/cart'
+import { getLocalizedField } from '@/utils/intl'
 import { formatNumber } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
@@ -26,6 +27,7 @@ import { QuantitySelector } from './QuantitySelector'
 
 export function ProductAddToCart() {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
   const {
     product,
     quantity,
@@ -104,7 +106,8 @@ export function ProductAddToCart() {
     addItem(
       {
         productId: product.id,
-        productTitle: product.title,
+        productTitle:
+          getLocalizedField(product, 'title', locale) || product.title,
         branchId: selectedBranchId ?? '',
         branchName: selectedBranchName ?? '',
         weight: selectedVariant.weight || 0,

@@ -68,7 +68,9 @@ const orderSelect = {
   width: true,
   height: true,
   length: true,
+  baseCurrency: true,
   customerCurrency: true,
+  exchangeRate: true,
   totalAmountBase: true,
   resellerAgreementId: true,
   resellerAgreement: {

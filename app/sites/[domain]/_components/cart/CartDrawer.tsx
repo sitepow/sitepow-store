@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { ShoppingCartIcon } from 'lucide-react'
@@ -27,6 +28,9 @@ import { CartSummary } from './_components/CartSummary'
 export function CartDrawer() {
   const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
   const summary = getCartSummary()
@@ -91,7 +95,10 @@ export function CartDrawer() {
                 className="h-12 w-full text-lg shadow-md sm:text-lg"
               >
                 {t('checkoutButton', {
-                  amount: formatCurrency(summary.finalPrice),
+                  amount: formatCurrency(
+                    convert(summary.finalPrice),
+                    currentCurrency,
+                  ),
                 })}
               </Button>
             </Link>

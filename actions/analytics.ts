@@ -160,6 +160,7 @@ export async function getAnalyticsOverview(
       },
       select: {
         id: true,
+        totalAmountBase: true,
         totalAmount: true,
         createdAt: true,
         customerId: true,
@@ -263,7 +264,9 @@ export async function getAnalyticsOverview(
   orders.forEach((o) => {
     const { key } = getPeriodInfo(o.createdAt)
     if (periodMap[key]) {
-      periodMap[key].item.revenue += Number(o.totalAmount)
+      periodMap[key].item.revenue += Number(
+        (o as any).totalAmountBase ?? o.totalAmount,
+      )
     }
   })
 
@@ -303,7 +306,7 @@ export async function getAnalyticsOverview(
 
   orders.forEach((o) => {
     const { dayOfWeek: day, hour } = getThaiDateParts(o.createdAt)
-    const amount = Number(o.totalAmount)
+    const amount = Number((o as any).totalAmountBase ?? o.totalAmount)
 
     dayOfWeekMap[day].orderCount += 1
     dayOfWeekMap[day].totalSales += amount

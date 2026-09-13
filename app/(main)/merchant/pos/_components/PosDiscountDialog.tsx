@@ -14,9 +14,10 @@ import {
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { calculateMaxUsablePoints } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
 import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
 import { POSCheckoutInput } from '@/zod/order'
@@ -53,6 +54,7 @@ interface PosDiscountDialogProps {
 
 export function PosDiscountDialog({ subtotal }: PosDiscountDialogProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.pos.discountDialog')
   const tPos = useTranslations('merchant.pos')
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()

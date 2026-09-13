@@ -1,9 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -14,12 +12,15 @@ import {
   useStoreProfile,
   useUpdateStoreProfile,
 } from '@/actions/hooks/store-profile'
+import { ALL_CURRENCIES } from '@/constants/currencies'
 import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
+import { CurrencyCode } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBuildingStore, IconSearch } from '@tabler/icons-react'
+import { IconBuildingStore, IconCoins, IconSearch } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -80,6 +81,7 @@ export function StoreProfileForm() {
       coverImage: '',
       primaryColor: '',
       description: '',
+      baseCurrency: CurrencyCode.THB,
       allowSearchEngineIndex: true,
       seoTitle: '',
       seoDescription: '',
@@ -134,6 +136,7 @@ export function StoreProfileForm() {
         taxId: storeProfile.taxId ?? '',
         description: storeProfile.description ?? '',
         primaryColor: storeProfile.primaryColor ?? '',
+        baseCurrency: (storeProfile as any).baseCurrency ?? CurrencyCode.THB,
         allowSearchEngineIndex: storeProfile.allowSearchEngineIndex ?? true,
         seoTitle: storeProfile.seoTitle ?? '',
         seoDescription: storeProfile.seoDescription ?? '',
@@ -199,9 +202,11 @@ export function StoreProfileForm() {
 
   return (
     <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <CardHeader>
         <PageTabHeader
@@ -380,6 +385,43 @@ export function StoreProfileForm() {
                   disabled={isPending}
                 />
                 <FieldError>{errors?.description?.message}</FieldError>
+              </Field>
+              <Field>
+                <FieldLabel className="flex items-center gap-2">
+                  <IconCoins size={16} className="text-primary" />
+                  <span>สกุลเงินหลักของร้าน (Base Currency)</span>
+                </FieldLabel>
+                <Controller
+                  control={control}
+                  name="baseCurrency"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isPending}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="เลือกสกุลเงินหลัก" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {ALL_CURRENCIES.map((curr) => (
+                          <SelectItem key={curr.code} value={curr.code}>
+                            <span className="mr-2">{curr.flag}</span>
+                            <span className="font-medium">{curr.code}</span>
+                            <span className="text-muted-foreground ml-2 text-xs">
+                              ({curr.symbol} - {curr.name})
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FieldDescription>
+                  ราคาสินค้า บริการ
+                  และรายงานทางการเงินของร้านค้าจะอ้างอิงตามสกุลเงินหลักนี้เป็นหลัก
+                </FieldDescription>
+                <FieldError>{errors?.baseCurrency?.message}</FieldError>
               </Field>
             </div>
             <Separator />

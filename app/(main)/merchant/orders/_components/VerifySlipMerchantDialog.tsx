@@ -1,13 +1,13 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { useApproveSlipManual } from '@/actions/hooks/verify-slip'
+import { CurrencyCode } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { SlipVerificationAction } from '@/types/slip'
 import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount } from '@/utils/slip'
@@ -31,6 +31,9 @@ interface VerifySlipMerchantDialogProps {
     orderNumber: string
     paymentProof?: string | null
     totalAmount: number
+    totalAmountBase?: number
+    baseCurrency?: CurrencyCode
+    customerCurrency?: CurrencyCode
     bankAccount?: {
       bankName: string
       accountNumber: string
@@ -68,9 +71,13 @@ export function VerifySlipMerchantDialog({
         </Button>
       </DialogTrigger>
       <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-lg">
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
+        className="sm:max-w-lg"
+      >
         <DialogHeader>
           <DialogHeaderIcon
             icon={IconSearch}
@@ -79,9 +86,25 @@ export function VerifySlipMerchantDialog({
               <span className="block space-y-1">
                 <span className="text-foreground block font-medium">
                   {t('amountDue')}{' '}
-                  <span className="text-primary">
-                    {formatCurrency(order.totalAmount)}
+                  <span className="text-primary font-semibold">
+                    {formatCurrency(
+                      order.totalAmount,
+                      order.customerCurrency || CurrencyCode.THB,
+                    )}
                   </span>
+                  {order.customerCurrency &&
+                    order.baseCurrency &&
+                    order.customerCurrency !== order.baseCurrency &&
+                    order.totalAmountBase !== undefined && (
+                      <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                        (~
+                        {formatCurrency(
+                          order.totalAmountBase,
+                          order.baseCurrency,
+                        )}
+                        )
+                      </span>
+                    )}
                 </span>
                 {order.bankAccount && (
                   <span className="text-foreground block font-medium">

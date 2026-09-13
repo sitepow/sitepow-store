@@ -50,7 +50,13 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
-const DEFAULT_VALUES = { title: '', slug: '', description: '', image: '' }
+const DEFAULT_VALUES = {
+  title: '',
+  slug: '',
+  description: '',
+  image: '',
+  translations: { en: { title: '', description: '' } },
+}
 
 export function CategoryDialog({
   categoryId,
@@ -103,6 +109,9 @@ export function CategoryDialog({
         ...categoryData,
         description: categoryData.description ?? '',
         image: categoryData.image ?? '',
+        translations: (categoryData as any).translations ?? {
+          en: { title: '', description: '' },
+        },
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -199,9 +208,13 @@ export function CategoryDialog({
           </Button>
         </DialogTrigger>
         <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-md">
+          style={
+            {
+              '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+            } as React.CSSProperties
+          }
+          className="sm:max-w-md"
+        >
           <FormProvider {...methods}>
             <DialogHeader>
               <DialogHeaderIcon
@@ -260,6 +273,32 @@ export function CategoryDialog({
                 />
                 <FieldError>{errors?.description?.message}</FieldError>
               </Field>
+              <div className="bg-muted/20 space-y-3 rounded-lg border p-3">
+                <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold">
+                  <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
+                </div>
+                <Field>
+                  <FieldLabel className="text-xs">
+                    Category Title (EN)
+                  </FieldLabel>
+                  <Input
+                    placeholder="e.g. Beverages, Electronics"
+                    {...register('translations.en.title')}
+                    disabled={isPending}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel className="text-xs">
+                    Category Description (EN)
+                  </FieldLabel>
+                  <Textarea
+                    placeholder="Category description in English..."
+                    rows={2}
+                    {...register('translations.en.description')}
+                    disabled={isPending}
+                  />
+                </Field>
+              </div>
             </div>
             <DialogFooter className="gap-2">
               <Button
@@ -284,9 +323,12 @@ export function CategoryDialog({
       </Dialog>
       <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
         <AlertDialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties}>
+          style={
+            {
+              '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+            } as React.CSSProperties
+          }
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{t('dialog.aiConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>

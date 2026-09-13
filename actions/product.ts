@@ -60,11 +60,18 @@ export interface CreateProductInput {
     discount: { active: boolean; type: 'PERCENTAGE' | 'FIXED'; amount: number }
     rewardPoints: { isActive: boolean; amount: number }
     isAvailable: boolean
+    translations?: any
   }[]
-  addons?: { title: string; price: number; isAvailable: boolean }[]
+  addons?: {
+    title: string
+    price: number
+    isAvailable: boolean
+    translations?: any
+  }[]
   metadata?: { key: string; value: string }[]
   productType: ProductType
   affiliateLinks?: AffiliateProductLink[]
+  translations?: any
 }
 
 const productSelect = {
@@ -74,10 +81,12 @@ const productSelect = {
   isPublished: true,
   createdAt: true,
   productType: true,
+  translations: true,
   category: {
     select: {
       id: true,
       title: true,
+      translations: true,
     },
   },
   store: {
@@ -101,6 +110,7 @@ const productSelect = {
       costPrice: true,
       sku: true,
       digitalUrl: true,
+      translations: true,
     },
   },
 } satisfies Prisma.ProductSelect
@@ -419,6 +429,7 @@ export async function createProduct(input: CreateProductInput) {
                   .filter((s) => Boolean(s.branchId)),
               },
               isAvailable: v.isAvailable ?? false,
+              translations: v.translations ?? undefined,
             })),
           },
           addons: {
@@ -427,6 +438,7 @@ export async function createProduct(input: CreateProductInput) {
                 title: a.title,
                 price: a.price,
                 isAvailable: a.isAvailable,
+                translations: a.translations ?? undefined,
               })) ?? [],
           },
         },
@@ -871,6 +883,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
             title: a.title,
             price: a.price,
             isAvailable: a.isAvailable,
+            translations: a.translations ?? undefined,
           })),
         })
       }
@@ -897,6 +910,7 @@ export async function updateProduct(id: string, input: CreateProductInput) {
           pointsActive: v.rewardPoints.isActive,
           pointsAmount: v.rewardPoints.amount,
           isAvailable: v.isAvailable,
+          translations: v.translations ?? undefined,
         }
 
         let currentVariantId = variantId

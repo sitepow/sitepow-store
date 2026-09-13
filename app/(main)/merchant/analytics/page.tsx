@@ -9,9 +9,10 @@ import { useAnalyticsOverview } from '@/actions/hooks/analytics'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import {
   IconArrowUpRight,
   IconChartBar,
@@ -47,6 +48,7 @@ export default function AnalyticsPage() {
   const t = useTranslations('merchant.analytics')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
+  const { formatCurrency } = useMerchantCurrency()
 
   const [startDate, setStartDate] = useState(() => {
     const now = new Date()

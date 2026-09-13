@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo } from 'react'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
+import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice, getStockQuantity } from '@/utils/product'
 
@@ -29,6 +32,11 @@ import { useProductPurchaseStore } from '../../store'
 
 export function ProductVariantSelector() {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
   const {
     product,
     selectedVariant,
@@ -188,6 +196,8 @@ export function ProductVariantSelector() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="text-sm font-medium wrap-break-word whitespace-pre-line">
                         {variant.title}
+                        {getLocalizedField(variant, 'title', locale) ||
+                          variant.title}
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {hasDiscount &&
@@ -208,15 +218,24 @@ export function ProductVariantSelector() {
                         {hasDiscount ? (
                           <div className="flex items-baseline gap-1.5">
                             <span className="text-primary text-sm font-bold">
-                              {formatCurrency(netPrice)}
+                              {formatCurrency(
+                                convert(netPrice),
+                                currentCurrency,
+                              )}
                             </span>
                             <span className="text-muted-foreground text-[10px] line-through">
-                              {formatCurrency(variant.price)}
+                              {formatCurrency(
+                                convert(variant.price),
+                                currentCurrency,
+                              )}
                             </span>
                           </div>
                         ) : (
                           <span className="text-primary text-sm font-semibold">
-                            {formatCurrency(variant.price)}
+                            {formatCurrency(
+                              convert(variant.price),
+                              currentCurrency,
+                            )}
                           </span>
                         )}
                       </div>

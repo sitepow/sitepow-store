@@ -1,7 +1,9 @@
 'use server'
 
+import { convertCurrency, getExchangeRate } from '@/constants/currencies'
 import {
   AgreementStatus,
+  CurrencyCode,
   DefaultRole,
   DiscountType,
   OrderStatus,
@@ -58,6 +60,7 @@ export interface CreateResellerPOSOrderInput {
   supplierStoreId: string
   branchId: string
   agreementId: string
+  customerCurrency?: CurrencyCode
   items: {
     variantId: string
     quantity: number
@@ -82,6 +85,9 @@ export async function createResellerPOSOrder(
       where: { id: input.agreementId },
       include: {
         customPrices: true,
+        supplierStore: {
+          select: { baseCurrency: true },
+        },
       },
     })
 
@@ -202,11 +208,24 @@ export async function createResellerPOSOrder(
         })
       }
 
+      const supplierCurrency =
+        agreement.supplierStore?.baseCurrency ?? CurrencyCode.THB
+      const customerCurrency = input.customerCurrency ?? supplierCurrency
+      const exchangeRate = getExchangeRate(supplierCurrency, customerCurrency)
+      const convertedTotal = convertCurrency(
+        Number(orderTotal),
+        supplierCurrency,
+        customerCurrency,
+      )
+
       const order = await tx.order.create({
         data: {
           storeId: input.supplierStoreId,
           orderNumber: `RS-POS-${Date.now()}`,
-          totalAmount: orderTotal,
+          baseCurrency: supplierCurrency,
+          customerCurrency: customerCurrency,
+          exchangeRate,
+          totalAmount: convertedTotal,
           totalAmountBase: orderTotal,
           status: OrderStatus.PENDING,
           resellerAgreementId: input.agreementId,

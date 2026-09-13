@@ -4,9 +4,13 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import { setUserLocale } from '@/actions/locale'
+import { ALL_CURRENCIES } from '@/constants/currencies'
 import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
+import { CurrencyCode } from '@/generated/prisma/enums'
+import { useCurrencyStore } from '@/stores/use-currency-store'
 import {
   IconCheck,
+  IconCoins,
   IconLanguage,
   IconMoon,
   IconSettings,
@@ -43,6 +47,7 @@ export function QuickSettingsMenu({
   const router = useRouter()
   const currentLocale = useLocale()
   const t = useTranslations('common.settings')
+  const { currency: currentCurrency, setCurrency } = useCurrencyStore()
 
   const switchLocale = async (locale: string) => {
     if (currentLocale === locale) {
@@ -54,6 +59,11 @@ export function QuickSettingsMenu({
     router.refresh()
   }
 
+  const switchCurrency = (currencyCode: CurrencyCode) => {
+    setCurrency(currencyCode)
+    router.refresh()
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -62,7 +72,7 @@ export function QuickSettingsMenu({
           <span className="sr-only">Quick Settings</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>{t('title')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
@@ -101,6 +111,31 @@ export function QuickSettingsMenu({
                 <DropdownMenuItem key={lng} onClick={() => switchLocale(lng)}>
                   <span>{LANGUAGE_NAMES[lng] || lng}</span>
                   {currentLocale === lng && (
+                    <IconCheck className="ml-auto size-4" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <IconCoins className="mr-2 size-4" />
+            <span>{t('currency')}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
+              {ALL_CURRENCIES.map((curr) => (
+                <DropdownMenuItem
+                  key={curr.code}
+                  onClick={() => switchCurrency(curr.code)}
+                >
+                  <span className="mr-1.5">{curr.flag}</span>
+                  <span className="font-medium">{curr.code}</span>
+                  <span className="text-muted-foreground ml-1.5 text-xs">
+                    ({curr.symbol})
+                  </span>
+                  {currentCurrency === curr.code && (
                     <IconCheck className="ml-auto size-4" />
                   )}
                 </DropdownMenuItem>

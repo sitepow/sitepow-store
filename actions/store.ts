@@ -79,6 +79,7 @@ const storeDropdownSelect = {
   slug: true,
   logo: true,
   primaryColor: true,
+  baseCurrency: true,
 } satisfies Prisma.StoreSelect
 
 const storeSelect = {
@@ -135,6 +136,8 @@ export type StoreData = Prisma.StoreGetPayload<{
     slug: true
     coverImage: true
     primaryColor: true
+    baseCurrency: true
+    translations: true
   }
 }>
 
@@ -165,6 +168,8 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         seoTitle: true,
         seoDescription: true,
         seoKeywords: true,
+        baseCurrency: true,
+        translations: true,
       },
     })
   })

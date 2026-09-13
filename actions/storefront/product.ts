@@ -15,6 +15,7 @@ const storefrontProductListSelect = {
   slug: true,
   categoryId: true,
   productType: true,
+  translations: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },
@@ -27,6 +28,7 @@ const storefrontProductListSelect = {
       discountType: true,
       discountAmount: true,
       discountActive: true,
+      translations: true,
     },
     take: 1,
   },
@@ -38,9 +40,10 @@ const storefrontProductDetailSelect = {
   slug: true,
   productType: true,
   details: true,
+  translations: true,
   tags: { select: { name: true } },
   category: {
-    select: { id: true, title: true, slug: true },
+    select: { id: true, title: true, slug: true, translations: true },
   },
   images: {
     select: { id: true, url: true, isPrimary: true },
@@ -62,6 +65,7 @@ const storefrontProductDetailSelect = {
       width: true,
       height: true,
       length: true,
+      translations: true,
       stocks: {
         select: {
           quantity: true,
@@ -83,14 +87,21 @@ const storefrontProductDetailSelect = {
       title: true,
       maxSelect: true,
       require: true,
+      translations: true,
       choices: {
-        select: { id: true, name: true, extraPrice: true },
+        select: { id: true, name: true, extraPrice: true, translations: true },
       },
     },
   },
   addons: {
     where: { isAvailable: true },
-    select: { id: true, title: true, price: true, isAvailable: true },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      isAvailable: true,
+      translations: true,
+    },
   },
   reviews: {
     select: {

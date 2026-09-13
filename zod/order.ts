@@ -1,4 +1,5 @@
 import {
+  CurrencyCode,
   OrderStatus,
   PaymentMethod,
   ProductType,
@@ -34,6 +35,7 @@ export const posCheckoutSchema = z.object({
   paymentMethod: z.enum(PaymentMethod).default(PaymentMethod.CASH_ON_DELIVERY),
   receivedAmount: z.number().optional(),
   changeAmount: z.number().optional(),
+  customerCurrency: z.enum(CurrencyCode).optional(),
   items: z.array(orderItemSchema).min(1, 'ไม่มีสินค้าในตะกร้า'),
 })
 

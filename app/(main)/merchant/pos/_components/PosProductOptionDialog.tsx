@@ -7,10 +7,11 @@ import { useTranslations } from 'next-intl'
 import { POSProductItem } from '@/actions/pos/product'
 import { DiscountType } from '@/generated/prisma/enums'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { calculateNetPrice } from '@/utils/product'
 import {
   IconBox,
@@ -64,6 +65,7 @@ export function PosProductOptionDialog({
   onConfirm,
 }: PosProductOptionDialogProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.pos')
   const { selectedBranchId } = useBranchFilter()
 

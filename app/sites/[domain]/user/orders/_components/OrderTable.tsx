@@ -130,7 +130,10 @@ export function OrderTable({ search }: OrderTableProps) {
                       {getItemsSummary(order.items)}
                     </TableCell>
                     <TableCell className={cn(isCancelled && 'line-through')}>
-                      {formatCurrency(order.totalAmount)}
+                      {formatCurrency(
+                        order.totalAmount,
+                        (order as any).customerCurrency,
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -168,6 +171,7 @@ export function OrderTable({ search }: OrderTableProps) {
                                     orderNumber: order.orderNumber,
                                   }),
                                   amount: order.totalAmount,
+                                  currency: (order as any).customerCurrency,
                                   successUrl: `${window.location.origin}/user/orders`,
                                   cancelUrl: `${window.location.origin}/user/orders`,
                                 })
@@ -186,6 +190,7 @@ export function OrderTable({ search }: OrderTableProps) {
                               orderNumber={order.orderNumber}
                               customerId={order.customerId!}
                               totalAmount={order.totalAmount}
+                              currency={(order as any).customerCurrency}
                               bankAccounts={
                                 order.bankAccount ? [order.bankAccount] : []
                               }

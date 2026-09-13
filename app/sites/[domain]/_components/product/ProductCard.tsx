@@ -1,10 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
+import { CurrencyCode } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
+import { getLocalizedField } from '@/utils/intl'
 import { isVideoUrl } from '@/utils/media'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
@@ -36,6 +40,7 @@ interface ProductCardProps extends VariantProps<typeof productCardVariants> {
   href?: string
   quantity?: number
   isReseller?: boolean
+  baseCurrency?: CurrencyCode
 }
 
 export function ProductCard({
@@ -46,8 +51,17 @@ export function ProductCard({
   href,
   quantity,
   isReseller,
+  baseCurrency,
 }: ProductCardProps) {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    baseCurrency || (store as any)?.baseCurrency,
+  )
+  const localizedTitle =
+    getLocalizedField(product, 'title', locale) || product.title
+
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
@@ -109,9 +123,9 @@ export function ProductCard({
         )}
       </div>
       <div className="flex flex-col items-center gap-1 p-1.5">
-        {product.title && (
+        {localizedTitle && (
           <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
-            {product.title}
+            {localizedTitle}
           </h3>
         )}
         {isReseller && (
@@ -125,11 +139,14 @@ export function ProductCard({
             value={hasDiscount ? net?.min : original?.min}
             className="text-primary text-lg font-bold sm:text-xl lg:text-2xl"
           >
-            {formatCurrency((hasDiscount ? net?.min : original?.min) || 0)}
+            {formatCurrency(
+              convert((hasDiscount ? net?.min : original?.min) || 0),
+              currentCurrency,
+            )}
           </data>
           {hasDiscount && (
             <span className="text-muted-foreground text-sm line-through">
-              {formatCurrency(original?.min || 0)}
+              {formatCurrency(convert(original?.min || 0), currentCurrency)}
             </span>
           )}
         </div>

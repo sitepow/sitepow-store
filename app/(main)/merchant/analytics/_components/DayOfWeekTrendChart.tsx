@@ -1,12 +1,12 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { formatNumber } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
 import {
@@ -30,6 +30,7 @@ export function DayOfWeekTrendChart({
   dayOfWeekTrend,
 }: DayOfWeekTrendChartProps) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.analytics.dayOfWeekTrend')
 
   const chartConfig = useMemo(
@@ -43,9 +44,11 @@ export function DayOfWeekTrendChart({
 
   return (
     <AnalyticsCardShell
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
       title={t('title')}
       description={t('description')}
       isEmpty={dayOfWeekTrend.length === 0}

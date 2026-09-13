@@ -7,9 +7,10 @@ import { useDashboard } from '@/actions/hooks/dashboard'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import {
   IconBuildingStore,
   IconCurrencyDollar,
@@ -55,6 +56,7 @@ export default function MerchantDashboardPage() {
   const t = useTranslations('merchant.dashboard')
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
+  const { formatCurrency } = useMerchantCurrency()
 
   const {
     canViewDashboard,

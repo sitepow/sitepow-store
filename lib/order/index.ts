@@ -1,6 +1,8 @@
+import { convertCurrency, getExchangeRate } from '@/constants/currencies'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
+  CurrencyCode,
   LogAction,
   OrderStatus,
   PaymentMethod,
@@ -35,6 +37,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       logo: true,
       phone: true,
       email: true,
+      baseCurrency: true,
       isPointsEnabled: true,
       pointEarningRate: true,
       pointRedeemRate: true,
@@ -116,6 +119,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       maxDiscount: coupon.maxDiscount ? Number(coupon.maxDiscount) : null,
     }
   }
+
+  const baseCurrency = (store.baseCurrency as CurrencyCode) ?? CurrencyCode.THB
+  const customerCurrency = input.customerCurrency ?? baseCurrency
+  const exchangeRate = getExchangeRate(baseCurrency, customerCurrency)
 
   const variantIds = Array.from(
     new Set(input.items.map((i) => i.variantId).filter(Boolean)),
@@ -291,10 +298,19 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         ? `${baseOrderNumber}-${orderCounter++}`
         : baseOrderNumber
 
+      const convertedTotal = convertCurrency(
+        groupTotal,
+        baseCurrency,
+        customerCurrency,
+      )
+
       const order = await tx.order.create({
         data: {
           orderNumber: subOrderNumber,
-          totalAmount: groupTotal,
+          baseCurrency,
+          customerCurrency,
+          exchangeRate,
+          totalAmount: convertedTotal,
           totalAmountBase: groupTotal,
           status: defaultStatus,
           paidAt:
@@ -382,10 +398,19 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         select: { id: true },
       })
 
+      const convertedDigitalTotal = convertCurrency(
+        digitalTotal,
+        baseCurrency,
+        customerCurrency,
+      )
+
       const order = await tx.order.create({
         data: {
           orderNumber: subOrderNumber,
-          totalAmount: digitalTotal,
+          baseCurrency,
+          customerCurrency,
+          exchangeRate,
+          totalAmount: convertedDigitalTotal,
           totalAmountBase: digitalTotal,
           status: defaultStatus,
           paidAt:
@@ -490,10 +515,19 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
 
         const variant = variantMap.get(serviceItem.variantId)
 
+        const convertedServiceTotal = convertCurrency(
+          serviceTotal,
+          baseCurrency,
+          customerCurrency,
+        )
+
         const order = await tx.order.create({
           data: {
             orderNumber: subOrderNumber,
-            totalAmount: serviceTotal,
+            baseCurrency,
+            customerCurrency,
+            exchangeRate,
+            totalAmount: convertedServiceTotal,
             totalAmountBase: serviceTotal,
             status: defaultStatus,
             paidAt:
@@ -637,6 +671,7 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       status: true,
       customerId: true,
       totalAmount: true,
+      totalAmountBase: true,
       usedPoints: true,
       earnedPoints: true,
       couponId: true,
@@ -755,7 +790,9 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
         })
       }
 
-      const amountToDeduct = Number(order.totalAmount ?? 0)
+      const amountToDeduct = Number(
+        order.totalAmountBase ?? order.totalAmount ?? 0,
+      )
       if (amountToDeduct > 0) {
         await tx.customerStore.update({
           where: {

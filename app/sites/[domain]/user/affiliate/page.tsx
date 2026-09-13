@@ -15,6 +15,8 @@ import {
 } from '@/actions/hooks/storefront/affiliate'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/navigation'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconBuildingBank,
@@ -75,6 +77,10 @@ export default function StoreUserAffiliatePage() {
   const locale = useLocale()
   const params = useParams()
   const storeSlug = (params?.domain as string) || ''
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const { data, isLoading } = useCustomerAffiliateDashboard(storeSlug)
   const { data: products = [] } = useStorefrontAffiliateProducts(storeSlug)
@@ -348,7 +354,7 @@ export default function StoreUserAffiliatePage() {
             {/* Available Balance */}
             <StatsCard
               title={t('stats.availableBalance')}
-              value={formatCurrency(availableBalance)}
+              value={formatCurrency(convert(availableBalance), currentCurrency)}
               icon={IconWallet}
               className="border-primary/30"
               valueClassName="text-primary font-black"
@@ -367,7 +373,10 @@ export default function StoreUserAffiliatePage() {
             {/* Pending Commission */}
             <StatsCard
               title={t('stats.pendingCommission')}
-              value={formatCurrency(stats?.pendingCommission ?? 0)}
+              value={formatCurrency(
+                convert(stats?.pendingCommission ?? 0),
+                currentCurrency,
+              )}
               description={t('stats.pendingDesc')}
               icon={IconReceipt2}
             />
@@ -375,9 +384,15 @@ export default function StoreUserAffiliatePage() {
             {/* Total Earned */}
             <StatsCard
               title={t('stats.totalEarned')}
-              value={formatCurrency(stats?.totalEarned ?? 0)}
+              value={formatCurrency(
+                convert(stats?.totalEarned ?? 0),
+                currentCurrency,
+              )}
               description={t('stats.withdrawn', {
-                amount: formatCurrency(stats?.totalWithdrawn ?? 0),
+                amount: formatCurrency(
+                  convert(stats?.totalWithdrawn ?? 0),
+                  currentCurrency,
+                ),
               })}
               icon={IconCoin}
             />
@@ -465,13 +480,20 @@ export default function StoreUserAffiliatePage() {
                                 {r.order?.orderNumber || r.orderId}
                               </TableCell>
                               <TableCell className="text-right font-medium">
-                                {formatCurrency(Number(r.orderAmount))}
+                                {formatCurrency(
+                                  convert(Number(r.orderAmount)),
+                                  currentCurrency,
+                                )}
                               </TableCell>
                               <TableCell className="text-muted-foreground text-right text-xs">
                                 {Number(r.commissionRate)}%
                               </TableCell>
                               <TableCell className="text-primary text-right font-bold">
-                                +{formatCurrency(Number(r.commissionAmount))}
+                                +
+                                {formatCurrency(
+                                  convert(Number(r.commissionAmount)),
+                                  currentCurrency,
+                                )}
                               </TableCell>
                               <TableCell className="text-center">
                                 <Badge
@@ -545,7 +567,10 @@ export default function StoreUserAffiliatePage() {
                                 )}
                               </TableCell>
                               <TableCell className="text-foreground text-right font-bold">
-                                {formatCurrency(Number(p.amount))}
+                                {formatCurrency(
+                                  convert(Number(p.amount)),
+                                  currentCurrency,
+                                )}
                               </TableCell>
                               <TableCell className="text-xs">
                                 {p.promptPayNumber ? (
@@ -686,7 +711,10 @@ export default function StoreUserAffiliatePage() {
                 </DialogTitle>
                 <DialogDescription className="text-xs">
                   {t('payoutDialog.description', {
-                    balance: formatCurrency(availableBalance),
+                    balance: formatCurrency(
+                      convert(availableBalance),
+                      currentCurrency,
+                    ),
                     min: minWithdrawal,
                   })}
                 </DialogDescription>

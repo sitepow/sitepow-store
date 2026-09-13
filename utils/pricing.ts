@@ -1,6 +1,7 @@
 import { GetSubscriptionItemSerialized } from '@/actions/subscription'
+import { isZeroDecimalCurrency } from '@/constants/currencies'
 import { PRICING_OPTIONS } from '@/constants/pricing'
-import { SubStatus } from '@/generated/prisma/enums'
+import { CurrencyCode, SubStatus } from '@/generated/prisma/enums'
 import { differenceInDays, differenceInMonths } from 'date-fns'
 
 export const calculatePlanPrice = (
@@ -29,17 +30,30 @@ export const calculatePlanPrice = (
   }
 }
 
-export const formatCurrency = (num: number) => {
-  return num.toLocaleString('th-TH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+export const formatCurrency = (
+  num: number,
+  currency: CurrencyCode | string = CurrencyCode.THB,
+  locale?: string,
+) => {
+  const currencyCode =
+    (currency?.toUpperCase() as CurrencyCode) || CurrencyCode.THB
+  const isZeroDecimal = isZeroDecimalCurrency(currencyCode)
+  const defaultLocale =
+    locale || (currencyCode === CurrencyCode.THB ? 'th-TH' : 'en-US')
+
+  const formatted = num.toLocaleString(defaultLocale, {
+    minimumFractionDigits: isZeroDecimal ? 0 : 2,
+    maximumFractionDigits: isZeroDecimal ? 0 : 2,
     style: 'currency',
-    currency: 'THB',
+    currency: currencyCode,
   })
+
+  // Normalize non-breaking spaces (U+00A0 / U+202F) to standard spaces to prevent wide gaps
+  return formatted.replace(/[\u00a0\u202f]/g, ' ')
 }
 
 export const formatNumber = (num: number) => {
-  return num.toLocaleString()
+  return num.toLocaleString().replace(/[\u00a0\u202f]/g, ' ')
 }
 
 export interface SubscriptionStatusInfo {

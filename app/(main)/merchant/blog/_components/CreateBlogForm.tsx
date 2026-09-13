@@ -234,6 +234,9 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
         image: blog.image || '',
         content: blog.content || '',
         tags: blog.tags?.join(', ') || '',
+        translations: (blog as any).translations ?? {
+          en: { title: '', content: '' },
+        },
       })
     }
   }, [blog, reset])
@@ -297,6 +300,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
         image: finalImageUrl,
         content: data.content || '',
         tags: tagsArray,
+        translations: data.translations ?? undefined,
       }
 
       if (blogId) {
@@ -543,6 +547,32 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     </p>
                   )}
                 </Field>
+                <div className="rounded-xl border p-4 bg-muted/20 space-y-4">
+                  <div className="flex items-center gap-2 font-medium text-sm text-muted-foreground">
+                    <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
+                  </div>
+                  <Field>
+                    <FieldLabel className="text-xs">Blog Title (EN)</FieldLabel>
+                    <Input
+                      placeholder="English Blog Title..."
+                      {...register('translations.en.title')}
+                      disabled={isPending}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel className="text-xs">Blog Content (EN)</FieldLabel>
+                    <Controller
+                      control={control}
+                      name="translations.en.content"
+                      render={({ field }) => (
+                        <BlogEditor
+                          value={field.value || ''}
+                          onChange={(markdown) => field.onChange(markdown)}
+                        />
+                      )}
+                    />
+                  </Field>
+                </div>
                 <Field>
                   <FieldLabel>{t('tags')}</FieldLabel>
                   <div className="flex gap-2">

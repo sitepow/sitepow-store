@@ -4,7 +4,9 @@ import { ComponentProps } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { CurrencyCode } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { HighlightText } from '@/components/HighlightText'
@@ -24,15 +26,20 @@ interface CartSummaryCustomData {
 
 interface CartSummaryProps extends ComponentProps<'div'> {
   summary?: CartSummaryCustomData
+  baseCurrency?: CurrencyCode
 }
 
 export function CartSummary({
   className,
   summary: customSummary,
+  baseCurrency,
   ...props
 }: CartSummaryProps) {
   const t = useTranslations('storefront')
   const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    baseCurrency || (store as any)?.baseCurrency,
+  )
   const { getCartSummary } = useCartStore()
   const summary = customSummary ?? getCartSummary()
 
@@ -44,14 +51,18 @@ export function CartSummary({
     >
       <SummaryRow
         label={t('products.price')}
-        value={formatCurrency(summary.subtotal)}
+        value={formatCurrency(convert(summary.subtotal), currentCurrency)}
       />
       {summary.totalDiscount > 0 && (
         <SummaryRow
           label={t('cart.discount')}
           value={
             <HighlightText>
-              - {formatCurrency(Math.abs(summary.totalDiscount))}
+              -{' '}
+              {formatCurrency(
+                convert(Math.abs(summary.totalDiscount)),
+                currentCurrency,
+              )}
             </HighlightText>
           }
         />
@@ -64,7 +75,7 @@ export function CartSummary({
       )}
       <SummaryRow
         label={t('cart.actualTotal')}
-        value={formatCurrency(summary.finalPrice)}
+        value={formatCurrency(convert(summary.finalPrice), currentCurrency)}
       />
     </div>
   )

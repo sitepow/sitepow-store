@@ -16,6 +16,10 @@ const storefrontOrderSelect = {
   id: true,
   orderNumber: true,
   totalAmount: true,
+  baseCurrency: true,
+  customerCurrency: true,
+  exchangeRate: true,
+  totalAmountBase: true,
   status: true,
   paymentMethod: true,
   trackingNumber: true,
@@ -249,6 +253,7 @@ export async function createOrder(input: CreateOrderInput) {
       usedPoints: input.usedPoints,
       earnedPoints: input.earnedPoints,
       affiliateCode: input.affiliateCode,
+      customerCurrency: input.customerCurrency,
       items: input.items,
       isPOS: false,
     })

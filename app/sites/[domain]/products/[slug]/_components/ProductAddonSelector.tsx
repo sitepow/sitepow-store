@@ -2,9 +2,12 @@
 
 import { useMemo } from 'react'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
+import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -19,6 +22,11 @@ import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddonSelector() {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
   const {
     product,
     selectedVariant,
@@ -104,10 +112,10 @@ export function ProductAddonSelector() {
                       isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
                     )}
                   >
-                    {addon.title}
+                    {getLocalizedField(addon, 'title', locale) || addon.title}
                   </span>
                   <span className="text-primary text-sm font-semibold">
-                    + {formatCurrency(addon.price)}
+                    + {formatCurrency(convert(addon.price), currentCurrency)}
                   </span>
                 </Label>
               )

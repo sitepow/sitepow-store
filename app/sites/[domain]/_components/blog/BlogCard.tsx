@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { StorefrontBlogListItem } from '@/actions/storefront/blog'
+import { getLocalizedField } from '@/utils/intl'
 import { isVideoUrl } from '@/utils/media'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { ArrowRightIcon } from 'lucide-react'
@@ -43,6 +44,8 @@ export function BlogCard({
   isFeatured,
 }: BlogCardProps) {
   const t = useTranslations('storefront.blogs')
+  const locale = useLocale()
+  const localizedTitle = getLocalizedField(blog, 'title', locale) || blog.title
   const isVideo = isVideoUrl(blog.image)
 
   return (
@@ -88,7 +91,7 @@ export function BlogCard({
               isFeatured && 'lg:text-center lg:text-2xl',
             )}
           >
-            {blog.title}
+            {localizedTitle}
           </h3>
           <div
             className={cn(

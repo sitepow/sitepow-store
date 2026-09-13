@@ -1,5 +1,6 @@
 'use server'
 
+import { isZeroDecimalCurrency } from '@/constants/currencies'
 import {
   CheckoutParams,
   CreateStoreCheckoutParams,
@@ -69,17 +70,28 @@ export async function createStoreCheckoutSession(
 
     const storeStripe = getStripeInstance(paymentSetting.stripeSecretKey)
 
+    const currency = (params.currency || 'thb').toLowerCase()
+    const isZeroDecimal = isZeroDecimalCurrency(currency)
+    const unitAmount = isZeroDecimal
+      ? Math.round(params.amount)
+      : Math.round(params.amount * 100)
+
+    const paymentMethodTypes =
+      currency === 'thb'
+        ? [PaymentMethod.CARD, PaymentMethod.PROMPTPAY]
+        : [PaymentMethod.CARD]
+
     const session = await storeStripe.checkout.sessions.create({
-      payment_method_types: [PaymentMethod.CARD, PaymentMethod.PROMPTPAY],
+      payment_method_types: paymentMethodTypes,
       customer_email: params.customerEmail,
       line_items: [
         {
           price_data: {
-            currency: 'thb',
+            currency,
             product_data: {
               name: params.description,
             },
-            unit_amount: Math.round(params.amount * 100),
+            unit_amount: unitAmount,
           },
           quantity: 1,
         },
@@ -89,6 +101,7 @@ export async function createStoreCheckoutSession(
         ...(params.orderId ? { orderId: params.orderId } : {}),
         ...(params.orderIds ? { orderIds: params.orderIds } : {}),
         storeId: params.storeId,
+        currency: currency.toUpperCase(),
         ...params.metadata,
       },
       success_url: params.successUrl,

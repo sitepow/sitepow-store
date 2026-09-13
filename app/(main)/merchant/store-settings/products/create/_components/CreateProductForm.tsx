@@ -521,6 +521,7 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                   isUsed: !!item.isUsed,
                 })) || [],
               isAvailable: v.isAvailable ?? false,
+              translations: v.translations,
             }
           }),
         )
@@ -539,10 +540,12 @@ export function CreateProductForm({ productId }: { productId?: string }) {
           title: a.title,
           price: a.price,
           isAvailable: a.isAvailable ?? true,
+          translations: a.translations,
         })),
         metadata: data.metadata,
         productType: data.productType as ProductType,
         affiliateLinks: data.affiliateLinks as any,
+        translations: data.translations,
       }
 
       if (productId) {
@@ -640,6 +643,19 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     handleAiTrigger(AiGenTask.TITLE, action)
                   }
                 />
+                <div className="rounded-lg border p-3.5 bg-muted/20 space-y-2">
+                  <div className="text-xs font-semibold flex items-center gap-1.5 text-muted-foreground">
+                    <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
+                  </div>
+                  <Field>
+                    <FieldLabel className="text-xs">Product Title (EN)</FieldLabel>
+                    <Input
+                      placeholder="Product title in English..."
+                      {...register('translations.en.title')}
+                      disabled={isPending}
+                    />
+                  </Field>
+                </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <ProductSlugField
                     isPending={isPending}

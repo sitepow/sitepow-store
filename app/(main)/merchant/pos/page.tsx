@@ -158,6 +158,7 @@ export default function MerchantPOSPage() {
       title: addon.title,
       price: addon.price,
       isAvailable: true,
+      translations: (addon as any).translations ?? null,
     }))
 
     const unitPrice = calculateCartUnitPrice({
@@ -183,6 +184,7 @@ export default function MerchantPOSPage() {
         ...variant,
         digitalUrl: null,
         price: Number(variant.price),
+        translations: (variant as any).translations ?? null,
       },
       selectedOptions: formattedOptions,
       selectedAddons: formattedAddons,

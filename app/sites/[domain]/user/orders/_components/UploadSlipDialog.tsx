@@ -44,6 +44,7 @@ interface UploadSlipDialogProps {
   orderNumber: string
   customerId: string
   totalAmount: number
+  currency?: string
   createdAt: string | Date
   bankAccounts: (Pick<
     BankAccount,
@@ -65,11 +66,13 @@ export function UploadSlipDialog({
   orderNumber,
   customerId,
   totalAmount,
+  currency,
   createdAt,
   bankAccounts,
 }: UploadSlipDialogProps) {
   const t = useTranslations('customer.orders')
   const { store } = useStoreData()
+  const effectiveCurrency = currency || (store as any)?.baseCurrency || 'THB'
   const { userId } = useSession()
   const [isOpen, setIsOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -242,14 +245,14 @@ export function UploadSlipDialog({
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('amountToPay')}</span>
             <span className="text-primary font-bold">
-              {formatCurrency(totalAmount ?? 0)}
+              {formatCurrency(totalAmount ?? 0, effectiveCurrency)}
             </span>
           </div>
         </div>
         <ActionRequiredAlert
           title={t('importantNoticeTitle')}
           description={t('slipNoticeDesc', {
-            totalAmount: formatCurrency(totalAmount ?? 0),
+            totalAmount: formatCurrency(totalAmount ?? 0, effectiveCurrency),
             orderNumber,
           })}
         />

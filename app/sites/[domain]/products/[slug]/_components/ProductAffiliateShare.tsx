@@ -9,6 +9,8 @@ import { usePathname, useSearchParams } from 'next/navigation'
 
 import { useCustomerAffiliateDashboard } from '@/actions/hooks/storefront/affiliate'
 import { UserRole } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency } from '@/utils/pricing'
 import {
   IconCheck,
@@ -38,6 +40,11 @@ export function ProductAffiliateShare({
   const t = useTranslations('storefront.products.affiliateShare')
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
 
   const { data, isLoading } = useCustomerAffiliateDashboard(storeSlug)
   const { product, selectedVariant, getTotalPrice, getVariantPrice } =
@@ -148,7 +155,7 @@ export function ProductAffiliateShare({
           </p>
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-primary text-2xl font-black tracking-tight sm:text-3xl">
-              +{formatCurrency(commissionAmount)}
+              +{formatCurrency(convert(commissionAmount), currentCurrency)}
             </span>
             <span className="text-muted-foreground text-xs font-semibold">
               {t('perOrder', { rate })}
@@ -157,7 +164,7 @@ export function ProductAffiliateShare({
           <p className="text-muted-foreground text-[11px]">
             {t('calculatedFrom', {
               rate,
-              price: formatCurrency(currentPrice),
+              price: formatCurrency(convert(currentPrice), currentCurrency),
             })}
           </p>
         </div>
@@ -224,7 +231,12 @@ export function ProductAffiliateShare({
         ) : (
           <div className="space-y-2 pt-1">
             <p className="text-muted-foreground text-xs">
-              {t('loginPrompt', { amount: formatCurrency(commissionAmount) })}
+              {t('loginPrompt', {
+                amount: formatCurrency(
+                  convert(commissionAmount),
+                  currentCurrency,
+                ),
+              })}
             </p>
             <Button asChild className="h-10 w-full gap-2 font-bold shadow-xs">
               <Link href={loginHref}>

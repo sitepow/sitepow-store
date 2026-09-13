@@ -1,15 +1,15 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { ComponentProps, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
@@ -40,6 +40,7 @@ export function CustomerPointsTable({
   ...props
 }: ComponentProps<typeof Card>) {
   const { currentStore, store } = useCurrentStore()
+  const { formatCurrency } = useMerchantCurrency()
   const t = useTranslations('merchant.loyalty')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -58,9 +59,14 @@ export function CustomerPointsTable({
 
   return (
     <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className={cn('h-fit', className)} {...props}>
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
+      className={cn('h-fit', className)}
+      {...props}
+    >
       <CardHeader>
         <CardTitle>{t('table.title')}</CardTitle>
         <CardDescription>{t('table.description')}</CardDescription>

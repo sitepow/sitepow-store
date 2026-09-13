@@ -18,6 +18,7 @@ const categorySelect = {
   slug: true,
   description: true,
   image: true,
+  translations: true,
 } satisfies Prisma.CategorySelect
 
 export type GetCategoriesItem = Prisma.CategoryGetPayload<{
@@ -49,6 +50,7 @@ export interface CreateCategoryInput {
   storeId: string
   description?: string | null
   image?: string | null
+  translations?: any
 }
 
 export type UpdateCategoryInput = Partial<Omit<CreateCategoryInput, 'storeId'>>

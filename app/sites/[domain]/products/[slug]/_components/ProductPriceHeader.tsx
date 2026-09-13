@@ -1,8 +1,11 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStorefrontCurrency } from '@/stores/use-currency-store'
+import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { Label } from '@/components/ui/label'
@@ -13,6 +16,11 @@ import { useProductPurchaseStore } from '../../store'
 
 export function ProductPriceHeader() {
   const t = useTranslations('storefront.products')
+  const locale = useLocale()
+  const { store } = useStoreData()
+  const { currentCurrency, convert } = useStorefrontCurrency(
+    (store as any)?.baseCurrency,
+  )
   const { product, getCurrentPoints, getTotalPrice, isLoading } =
     useProductPurchaseStore()
   const totalPrice = getTotalPrice()
@@ -36,6 +44,9 @@ export function ProductPriceHeader() {
     affiliatePrices.length > 1 &&
     minAffiliatePrice !== maxAffiliatePrice
 
+  const localizedTitle =
+    getLocalizedField(product, 'title', locale) || product?.title
+
   return (
     <>
       {isLoading ? (
@@ -43,6 +54,7 @@ export function ProductPriceHeader() {
       ) : (
         <h1 className="text-start text-xl leading-tight font-bold sm:text-2xl lg:text-3xl">
           {product?.title}
+          {localizedTitle}
         </h1>
       )}
 
@@ -58,9 +70,12 @@ export function ProductPriceHeader() {
                 className="text-primary text-4xl font-bold sm:text-5xl"
               >
                 {isAffiliate && hasPriceRange
-                  ? `${formatCurrency(minAffiliatePrice)} - ${formatCurrency(maxAffiliatePrice)}`
+                  ? `${formatCurrency(convert(minAffiliatePrice), currentCurrency)} - ${formatCurrency(convert(maxAffiliatePrice), currentCurrency)}`
                   : formatCurrency(
-                      isAffiliate ? minAffiliatePrice : totalPrice || 0,
+                      convert(
+                        isAffiliate ? minAffiliatePrice : totalPrice || 0,
+                      ),
+                      currentCurrency,
                     )}
               </data>
             </div>

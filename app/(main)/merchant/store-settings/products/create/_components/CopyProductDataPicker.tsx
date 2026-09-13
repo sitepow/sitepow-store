@@ -135,7 +135,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     }
 
     if (selectedFields.includes('addons')) {
-      setValue('addons', previewData.addons, {
+      setValue('addons', previewData.addons as any, {
         shouldDirty: true,
       })
     }

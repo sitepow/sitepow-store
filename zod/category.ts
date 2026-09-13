@@ -12,6 +12,7 @@ export const createCategorySchema = z.object({
     }),
   description: z.string().optional().or(z.literal('')),
   image: z.any().optional(),
+  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 export type CreateCategoryFormValues = z.input<typeof createCategorySchema>

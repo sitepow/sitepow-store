@@ -15,6 +15,7 @@ const storefrontSectionProductSelect = {
   slug: true,
   categoryId: true,
   productType: true,
+  translations: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },
@@ -27,6 +28,7 @@ const storefrontSectionProductSelect = {
       discountType: true,
       discountAmount: true,
       discountActive: true,
+      translations: true,
     },
     take: 1,
   },
@@ -43,6 +45,7 @@ export type StorefrontSection = {
   title: string
   slug: string
   image: string | null
+  translations?: any
   products: SectionProductItem[]
 }
 
@@ -63,7 +66,13 @@ export async function getStorefrontCategoriesProductsSections(
           },
         },
       },
-      select: { id: true, title: true, slug: true, image: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        image: true,
+        translations: true,
+      },
       orderBy: { title: 'asc' },
     })
 
