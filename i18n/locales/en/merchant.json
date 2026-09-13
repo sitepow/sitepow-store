@@ -8,6 +8,7 @@
     "store-settings/categories": "Categories",
     "inventory": "Inventory",
     "expenses": "Expenses",
+    "profit-sharing": "Profit Sharing & Partners",
     "reseller": "Reseller",
     "customers": "Customers",
     "chat": "Store Chat",
@@ -2657,6 +2658,80 @@
       "deliveryNoteSub": "Delivery Note",
       "packingSlip": "Packing Slip",
       "packingSlipSub": "Packing Slip / Pick List"
+    }
+  },
+  "profitSharing": {
+    "title": "Profit Sharing & Partners",
+    "description": "Manage shareholder profit ratios, system fees, developer compensation, and monthly settlements",
+    "noAccessTitle": "Access Restricted",
+    "noAccessDescription": "Please contact the store owner to request access to financial data.",
+    "tabs": {
+      "settlement": "Monthly Settlement",
+      "partners": "Partners & Rules",
+      "history": "Settlement History"
+    },
+    "metrics": {
+      "revenue": "Gross Revenue",
+      "cogsAndExpense": "Cost & Expenses",
+      "cogs": "COGS",
+      "expense": "Store Expenses",
+      "netProfit": "Net Profit for Allocation",
+      "totalAllocated": "Total Allocated Payout",
+      "retainedEarnings": "Retained Store Earnings",
+      "allocatedPercent": "Allocated: {percent}%"
+    },
+    "roles": {
+      "SHAREHOLDER": "Shareholder / Co-Owner",
+      "DEVELOPER": "Developer / Tech Lead",
+      "SYSTEM": "System / Hosting Fee",
+      "MARKETING": "Marketing / Sales",
+      "INVESTOR": "Investor",
+      "OTHER": "Other"
+    },
+    "shareTypes": {
+      "NET_PROFIT_PERCENT": "% of Net Profit",
+      "REVENUE_PERCENT": "% of Gross Revenue",
+      "FIXED_MONTHLY": "Fixed Monthly Amount"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid"
+    },
+    "partners": {
+      "addPartner": "Add Partner / Beneficiary",
+      "editPartner": "Edit Partner",
+      "partnerName": "Partner / Beneficiary Name",
+      "partnerRole": "Role / Responsibility",
+      "shareType": "Share Model",
+      "shareValue": "Percentage (%) or Fixed (THB)",
+      "bank": "Bank",
+      "bankAccount": "Account Number",
+      "accountName": "Account Name",
+      "promptPay": "PromptPay",
+      "note": "Note",
+      "status": "Active Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "actions": "Actions",
+      "deleteConfirm": "Are you sure you want to delete this partner?",
+      "empty": "No partners or beneficiaries added yet. Click above to add one."
+    },
+    "settlement": {
+      "selectPeriod": "Select Period",
+      "financialSummary": "Monthly Financial Breakdown",
+      "partnerPayoutList": "Profit Distribution Breakdown",
+      "calculatedPayout": "Calculated Payout",
+      "markPaid": "Mark as Paid",
+      "viewSlip": "View Slip",
+      "slipDetail": "Transfer Proof Slip",
+      "slipImage": "Slip Image",
+      "paidDate": "Transfer Date",
+      "paymentNote": "Payment Note",
+      "closeSettlement": "Close Monthly Cycle",
+      "settlementClosed": "Cycle Closed",
+      "printStatement": "Print Statement",
+      "autoCalculatedNotice": "Automatically calculated from real store revenue and expenses for this period.",
+      "emptyPartners": "No active partners found. Please go to 'Partners & Rules' tab to configure rules first."
     }
   }
 }

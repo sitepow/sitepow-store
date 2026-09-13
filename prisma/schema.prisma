@@ -781,6 +781,8 @@ model Store {
   marketplaceSyncLogs    MarketplaceSyncLog[]
   affiliateSetting       StoreAffiliateSetting?
   affiliateAccounts      AffiliateAccount[]
+  profitPartners         ProfitPartner[]
+  monthlySettlements     MonthlySettlement[]
 
   translations Json?
 
@@ -1935,4 +1937,92 @@ model AffiliatePayout {
 
   @@index([affiliateAccountId])
   @@index([status])
+}
+
+enum PartnerRole {
+  SHAREHOLDER
+  DEVELOPER
+  SYSTEM
+  MARKETING
+  INVESTOR
+  OTHER
+}
+
+enum ShareType {
+  NET_PROFIT_PERCENT
+  REVENUE_PERCENT
+  FIXED_MONTHLY
+}
+
+model ProfitPartner {
+  id              String         @id @default(uuid())
+  storeId         String
+  store           Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name            String
+  role            PartnerRole    @default(SHAREHOLDER)
+  shareType       ShareType      @default(NET_PROFIT_PERCENT)
+  shareValue      Decimal        @db.Decimal(10, 2)
+  bankName        String?
+  bankAccount     String?
+  bankAccountName String?
+  promptPay       String?
+  note            String?        @db.Text
+  isActive        Boolean        @default(true)
+  payouts         ProfitPayout[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model MonthlySettlement {
+  id               String         @id @default(uuid())
+  storeId          String
+  store            Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  period           String
+  periodLabel      String
+  startDate        DateTime
+  endDate          DateTime
+  totalRevenue     Decimal        @default(0) @db.Decimal(12, 2)
+  totalCogs        Decimal        @default(0) @db.Decimal(12, 2)
+  totalExpense     Decimal        @default(0) @db.Decimal(12, 2)
+  netProfit        Decimal        @default(0) @db.Decimal(12, 2)
+  totalAllocated   Decimal        @default(0) @db.Decimal(12, 2)
+  retainedEarnings Decimal        @default(0) @db.Decimal(12, 2)
+  isClosed         Boolean        @default(false)
+  payouts          ProfitPayout[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, period])
+  @@index([storeId])
+}
+
+model ProfitPayout {
+  id               String            @id @default(uuid())
+  settlementId     String
+  settlement       MonthlySettlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  partnerId        String
+  partner          ProfitPartner     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  partnerName      String
+  role             PartnerRole
+  shareType        ShareType
+  shareValue       Decimal           @db.Decimal(10, 2)
+  calculatedAmount Decimal           @db.Decimal(12, 2)
+  status           PayoutStatus      @default(PENDING)
+  paidAt           DateTime?
+  slipImage        String?
+  paymentNote      String?           @db.Text
+  bankName         String?
+  bankAccount      String?
+  bankAccountName  String?
+  promptPay        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([settlementId])
+  @@index([partnerId])
 }

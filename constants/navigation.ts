@@ -14,6 +14,7 @@ import {
   IconNews,
   IconPackage,
   IconReceipt,
+  IconReceiptTax,
   IconSettings,
   IconShoppingCart,
   IconStar,
@@ -171,6 +172,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     hasSeparatorBefore: true,
     groupLabel: 'การจัดการและบุคลากร',
     permissionKey: 'canViewExpenses',
+  },
+  {
+    value: 'profit-sharing',
+    label: 'ส่วนแบ่งกำไร & หุ้นส่วน',
+    tab: 'profit-sharing',
+    icon: IconReceiptTax,
+    permissionKey: 'canViewFinance',
   },
   {
     value: 'reseller',

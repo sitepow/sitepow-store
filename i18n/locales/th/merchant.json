@@ -8,6 +8,7 @@
     "store-settings/categories": "หมวดหมู่สินค้า",
     "inventory": "คลังสินค้า",
     "expenses": "จัดการค่าใช้จ่าย",
+    "profit-sharing": "ส่วนแบ่งกำไร & หุ้นส่วน",
     "reseller": "ตัวแทนจำหน่าย",
     "customers": "จัดการลูกค้า",
     "chat": "แชทของร้านค้า",
@@ -2665,6 +2666,80 @@
       "deliveryNoteSub": "Delivery Note",
       "packingSlip": "ใบจัดสินค้า",
       "packingSlipSub": "Packing Slip / Pick List"
+    }
+  },
+  "profitSharing": {
+    "title": "ส่วนแบ่งกำไร & หุ้นส่วน",
+    "description": "จัดการสัดส่วนกำไรของผู้ถือหุ้น ค่าดูแลระบบ ค่าเดฟ และตัดรอบแบ่งเงินรายเดือน",
+    "noAccessTitle": "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+    "noAccessDescription": "โปรดติดต่อเจ้าของร้านค้าเพื่อขอสิทธิ์การเข้าถึงข้อมูลการเงิน",
+    "tabs": {
+      "settlement": "ตัดรอบแบ่งเงินรายเดือน",
+      "partners": "จัดการหุ้นส่วนและข้อตกลง",
+      "history": "ประวัติการตัดรอบย้อนหลัง"
+    },
+    "metrics": {
+      "revenue": "ยอดขายรวมรอบนี้",
+      "cogsAndExpense": "ต้นทุน & ค่าใช้จ่าย",
+      "cogs": "ต้นทุนสินค้า",
+      "expense": "ค่าใช้จ่ายร้าน",
+      "netProfit": "กำไรสุทธิสำหรับจัดสรร",
+      "totalAllocated": "ส่วนแบ่งที่จัดสรรแล้ว",
+      "retainedEarnings": "กำไรสะสมคงเหลือในร้าน",
+      "allocatedPercent": "สัดส่วนที่จัดสรรแล้ว {percent}%"
+    },
+    "roles": {
+      "SHAREHOLDER": "หุ้นส่วนหลัก / เจ้าของร่วม",
+      "DEVELOPER": "เดฟ / นักพัฒนาระบบ",
+      "SYSTEM": "ค่าระบบ / เซิร์ฟเวอร์",
+      "MARKETING": "การตลาด / เซลล์",
+      "INVESTOR": "นักลงทุน",
+      "OTHER": "อื่นๆ"
+    },
+    "shareTypes": {
+      "NET_PROFIT_PERCENT": "% จากกำไรสุทธิ",
+      "REVENUE_PERCENT": "% จากยอดขายรวม",
+      "FIXED_MONTHLY": "ยอดคงที่ต่อเดือน"
+    },
+    "status": {
+      "PENDING": "รอโอนเงิน",
+      "PAID": "โอนเงินแล้ว"
+    },
+    "partners": {
+      "addPartner": "เพิ่มผู้รับส่วนแบ่ง / หุ้นส่วน",
+      "editPartner": "แก้ไขข้อมูลหุ้นส่วน",
+      "partnerName": "ชื่อผู้รับส่วนแบ่ง / หุ้นส่วน",
+      "partnerRole": "บทบาท / หน้าที่",
+      "shareType": "รูปแบบการแบ่งเงิน",
+      "shareValue": "สัดส่วน (%) หรือ ยอดเงิน (บาท)",
+      "bank": "ธนาคาร",
+      "bankAccount": "เลขที่บัญชี",
+      "accountName": "ชื่อบัญชี",
+      "promptPay": "พร้อมเพย์",
+      "note": "หมายเหตุ",
+      "status": "สถานะการทำงาน",
+      "active": "เปิดใช้งาน",
+      "inactive": "ปิดการใช้งาน",
+      "actions": "การจัดการ",
+      "deleteConfirm": "คุณต้องการลบรายชื่อนี้ใช่หรือไม่?",
+      "empty": "ยังไม่มีรายชื่อหุ้นส่วนหรือผู้รับส่วนแบ่ง คลิกปุ่มด้านบนเพื่อเพิ่ม"
+    },
+    "settlement": {
+      "selectPeriod": "เลือกรอบเดือน",
+      "financialSummary": "สรุปตัวเลขทางการเงินประจำรอบ",
+      "partnerPayoutList": "รายการจัดสรรเงินตามส่วนแบ่ง",
+      "calculatedPayout": "ยอดที่ต้องได้รับ",
+      "markPaid": "แจ้งโอนเงิน",
+      "viewSlip": "ดูสลิปโอนเงิน",
+      "slipDetail": "หลักฐานการโอนเงิน",
+      "slipImage": "รูปภาพสลิป",
+      "paidDate": "วันที่โอนเงิน",
+      "paymentNote": "บันทึกการโอน",
+      "closeSettlement": "บันทึกปิดรอบนี้",
+      "settlementClosed": "รอบบัญชีนี้ปิดแล้ว",
+      "printStatement": "พิมพ์ใบสำคัญสรุปยอด",
+      "autoCalculatedNotice": "ระบบคำนวณจากยอดขายและค่าใช้จ่ายจริงของร้านค้าในรอบเดือนนี้อัตโนมัติ",
+      "emptyPartners": "ยังไม่มีหุ้นส่วนที่เปิดใช้งาน โปรดไปที่แท็บ 'จัดการหุ้นส่วน' เพื่อกำหนดสัดส่วนก่อน"
     }
   }
 }
