@@ -1,15 +1,15 @@
 'use client'
-import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { Check, Copy, Share2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
 export function BlogShareButton({ title }: { title: string }) {
   const t = useTranslations('blogs')
-  const [copied, setCopied] = useState(false)
+  const { copied, copy } = useCopyToClipboard()
 
   const handleShare = async () => {
     if (typeof window !== 'undefined' && navigator.share) {
@@ -21,12 +21,8 @@ export function BlogShareButton({ title }: { title: string }) {
         return
       } catch {}
     }
-    if (typeof window !== 'undefined' && navigator.clipboard) {
-      try {
-        await navigator.clipboard.writeText(window.location.href)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
-      } catch {}
+    if (typeof window !== 'undefined') {
+      await copy(window.location.href)
     }
   }
 

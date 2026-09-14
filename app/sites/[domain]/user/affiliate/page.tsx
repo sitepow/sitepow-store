@@ -13,7 +13,7 @@ import {
   useStorefrontAffiliateProducts,
   useUpdateCustomerAffiliateBank,
 } from '@/actions/hooks/storefront/affiliate'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStorefrontCurrency } from '@/stores/use-currency-store'

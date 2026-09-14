@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useBranches, useDeleteBranch } from '@/actions/hooks/branch'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 

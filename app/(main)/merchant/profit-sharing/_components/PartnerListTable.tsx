@@ -10,7 +10,7 @@ import {
   useProfitPartners,
   useToggleProfitPartnerStatus,
 } from '@/actions/hooks/profit-sharing'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import {
   PartnerRole,
   ProfitPartnerItem,

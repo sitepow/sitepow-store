@@ -11,7 +11,7 @@ import {
   useEmployeePermission,
   useEmployees,
 } from '@/actions/hooks/employee'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

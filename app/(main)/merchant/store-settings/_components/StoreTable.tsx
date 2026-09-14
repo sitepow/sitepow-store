@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useDeleteStore, useStores } from '@/actions/hooks/store'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { SettingsTab } from '@/constants/settings'
 import { StoreStatus } from '@/generated/prisma/enums'

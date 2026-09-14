@@ -24,19 +24,9 @@ import { CreateCategoryFormValues, createCategorySchema } from '@/zod/category'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCategory, IconPlus, IconWand } from '@tabler/icons-react'
 
+import { AiCreditConfirmDialog } from '@/components/AiCreditConfirmDialog'
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -321,40 +311,10 @@ export function CategoryDialog({
           </FormProvider>
         </DialogContent>
       </Dialog>
-      <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
-        <AlertDialogContent
-          style={
-            {
-              '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-            } as React.CSSProperties
-          }
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('dialog.aiConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t.rich('dialog.aiConfirmDescription', {
-                cost: aiConfirm?.cost ?? 0,
-                b: (chunks) => (
-                  <span className="text-primary font-bold">{chunks}</span>
-                ),
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('dialog.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (aiConfirm) {
-                  aiConfirm.action()
-                  setAiConfirm(null)
-                }
-              }}
-            >
-              {t('dialog.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AiCreditConfirmDialog
+        confirmData={aiConfirm}
+        onOpenChange={() => setAiConfirm(null)}
+      />
     </>
   )
 }

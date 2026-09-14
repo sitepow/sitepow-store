@@ -2,19 +2,23 @@
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { PaginatedResponse, PaginationParams } from '@/types/pagination'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
+import {
+  createPaginationMeta,
+  getEmptyPaginatedResponse,
+  sanitizePagination,
+} from '@/utils/pagination'
 import { CreateCustomerInput } from '@/zod/customer'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { resolveStoreFilter } from '@/lib/store'
 
-export interface GetCustomersParams {
-  storeId: string
-  page?: number
-  limit?: number
-  search?: string
+export interface GetCustomersParams extends PaginationParams {
+  storeId?: string
 }
 
 const customerStoreSelect = {
@@ -40,86 +44,54 @@ export type GetCustomersItem = Prisma.CustomerStoreGetPayload<{
   select: typeof customerStoreSelect
 }>
 
-export interface GetCustomersResponse {
-  data: DecimalToNumber<GetCustomersItem[]>
-  meta: {
-    currentPage: number
-    limit: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-  }
-}
+export type GetCustomersResponse = PaginatedResponse<
+  DecimalToNumber<GetCustomersItem>
+>
 
 export async function getCustomers({
   storeId,
   page = 1,
   limit = 10,
   search,
-}: GetCustomersParams): Promise<GetCustomersResponse> {
-  const emptyResponse: GetCustomersResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
-
+}: GetCustomersParams = {}): Promise<GetCustomersResponse> {
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 
   try {
-    const whereClause: Prisma.CustomerStoreWhereInput = {}
+    const storeAccess = await resolveStoreFilter({
+      userId,
+      storeId,
+      permission: 'canViewCustomers',
+    })
 
-    if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canViewCustomers',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return emptyResponse
-      }
-
-      whereClause.storeId = storeId
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+    if (!storeAccess.isAuthorized) {
+      return getEmptyPaginatedResponse(page, limit)
     }
 
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(20, limit))
-    const skip = (sanitizedPage - 1) * sanitizedLimit
+    const {
+      page: sanitizedPage,
+      limit: sanitizedLimit,
+      skip,
+    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 20 })
 
-    if (search) {
-      whereClause.customer = {
-        OR: [
-          { firstName: { contains: search, mode: 'insensitive' } },
-          { lastName: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { phone: { contains: search, mode: 'insensitive' } },
-        ],
-      }
+    const whereClause: Prisma.CustomerStoreWhereInput = {
+      ...storeAccess.storeFilter,
+      ...(search
+        ? {
+            customer: {
+              OR: [
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } },
+                { phone: { contains: search, mode: 'insensitive' } },
+              ],
+            },
+          }
+        : {}),
     }
 
     const [totalItems, customerStores] = await Promise.all([
@@ -133,22 +105,13 @@ export async function getCustomers({
       }),
     ])
 
-    const totalPages = Math.ceil(totalItems / sanitizedLimit)
-
     return {
       data: serializeDecimal(customerStores),
-      meta: {
-        currentPage: sanitizedPage,
-        limit: sanitizedLimit,
-        totalItems,
-        totalPages,
-        hasNextPage: sanitizedPage < totalPages,
-        hasPreviousPage: sanitizedPage > 1,
-      },
+      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
     }
   } catch (error) {
     console.error(error)
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 }
 

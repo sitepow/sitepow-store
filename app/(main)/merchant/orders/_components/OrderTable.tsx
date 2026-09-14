@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 
 import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useOrders } from '@/actions/hooks/order'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { UploadSlipDialog } from '@/app/sites/[domain]/user/orders/_components/UploadSlipDialog'
 import { ORDER_STATUS_TH } from '@/constants/translate'
 import {

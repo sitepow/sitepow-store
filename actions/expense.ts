@@ -2,24 +2,28 @@
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { PaginatedResponse, PaginationParams } from '@/types/pagination'
 import { buildExpenseDateWithServerTime } from '@/utils/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
+import {
+  createPaginationMeta,
+  getEmptyPaginatedResponse,
+  sanitizePagination,
+} from '@/utils/pagination'
 import { CreateExpenseInput, UpdateExpenseInput } from '@/zod/expense'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { resolveStoreFilter } from '@/lib/store'
 
 import { r2DeleteImage } from './r2'
 
-export interface GetExpensesParams {
-  storeId: string
+export interface GetExpensesParams extends PaginationParams {
+  storeId?: string
   branchId?: string
-  page?: number
-  limit?: number
-  search?: string
   category?: string
   startDate?: string | Date
   endDate?: string | Date
@@ -49,17 +53,9 @@ export type GetExpenseItem = Prisma.ExpenseGetPayload<{
   select: typeof expenseSelect
 }>
 
-export interface GetExpensesResponse {
-  data: DecimalToNumber<GetExpenseItem[]>
-  meta: {
-    currentPage: number
-    limit: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-  }
-}
+export type GetExpensesResponse = PaginatedResponse<
+  DecimalToNumber<GetExpenseItem>
+>
 
 export async function getExpenses({
   storeId,
@@ -70,54 +66,27 @@ export async function getExpenses({
   category,
   startDate,
   endDate,
-}: GetExpensesParams): Promise<GetExpensesResponse> {
-  const emptyResponse: GetExpensesResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
-
+}: GetExpensesParams = {}): Promise<GetExpensesResponse> {
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 
   try {
-    const whereClause: Prisma.ExpenseWhereInput = {}
+    const storeAccess = await resolveStoreFilter({
+      userId,
+      storeId,
+      permission: 'canViewExpenses',
+    })
 
-    if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canViewExpenses',
-      })
+    if (!storeAccess.isAuthorized) {
+      return getEmptyPaginatedResponse(page, limit)
+    }
 
-      if (!authCheck.isAuthorized) {
-        return emptyResponse
-      }
-
-      whereClause.storeId = storeId
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+    const whereClause: Prisma.ExpenseWhereInput = {
+      ...storeAccess.storeFilter,
     }
 
     if (branchId) {
@@ -141,9 +110,11 @@ export async function getExpenses({
       if (endDate) whereClause.expenseDate.lte = new Date(endDate)
     }
 
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(50, limit))
-    const skip = (sanitizedPage - 1) * sanitizedLimit
+    const {
+      page: sanitizedPage,
+      limit: sanitizedLimit,
+      skip,
+    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 50 })
 
     const [totalItems, expenses] = await Promise.all([
       prisma.expense.count({ where: whereClause }),
@@ -156,22 +127,13 @@ export async function getExpenses({
       }),
     ])
 
-    const totalPages = Math.ceil(totalItems / sanitizedLimit)
-
     return {
       data: serializeDecimal(expenses),
-      meta: {
-        currentPage: sanitizedPage,
-        limit: sanitizedLimit,
-        totalItems,
-        totalPages,
-        hasNextPage: sanitizedPage < totalPages,
-        hasPreviousPage: sanitizedPage > 1,
-      },
+      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
     }
   } catch (error) {
     console.error(error)
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 }
 

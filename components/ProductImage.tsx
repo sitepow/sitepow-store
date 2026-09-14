@@ -1,7 +1,8 @@
 import Image from 'next/image'
 
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { isVideoUrl } from '@/utils/media'
+
+import { EmptyImage } from '@/components/EmptyImage'
 
 import { cn } from '@/lib/utils'
 

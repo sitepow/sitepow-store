@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 
 import { useBranchOptions } from '@/actions/hooks/branch'
 import { useBulkImportProducts } from '@/actions/hooks/product'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import {
   IconAlertTriangle,

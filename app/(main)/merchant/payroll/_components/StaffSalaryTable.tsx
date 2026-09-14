@@ -9,7 +9,7 @@ import {
   useSyncEmployeesFromStore,
   useToggleEmployeeSalaryConfigStatus,
 } from '@/actions/hooks/payroll'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { SalaryType } from '@/generated/prisma/enums'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { EmployeeSalaryConfigItem } from '@/types/payroll'

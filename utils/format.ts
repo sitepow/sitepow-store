@@ -1,3 +1,5 @@
+export { formatCurrency, formatNumber } from './pricing'
+
 export const stringToArray = (
   value: string | undefined | null,
   separator = ',',
@@ -30,4 +32,16 @@ export const cleanTag = (text: React.ReactNode, tagTarget: string) => {
     return text.replace(regex, '')
   }
   return text
+}
+
+/**
+ * Combines firstName and lastName into a cleaned full name, with fallback.
+ */
+export function formatFullName(
+  firstName?: string | null,
+  lastName?: string | null,
+  fallback = '-',
+): string {
+  const full = [firstName?.trim(), lastName?.trim()].filter(Boolean).join(' ')
+  return full || fallback
 }

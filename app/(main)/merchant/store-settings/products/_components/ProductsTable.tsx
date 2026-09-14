@@ -10,7 +10,7 @@ import {
   useProductQuota,
   useProducts,
 } from '@/actions/hooks/product'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

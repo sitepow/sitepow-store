@@ -4,7 +4,7 @@ import { useCurrentStore } from '@/hooks/use-current-store'
 
 import { useTranslations } from 'next-intl'
 
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { formatNumber } from '@/utils/pricing'
 import { IconArrowUpRight, IconUserCheck, IconUsers } from '@tabler/icons-react'
 

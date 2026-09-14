@@ -2,7 +2,7 @@
 
 import React from 'react'
 
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { MonthlyPayrollRecord } from '@/types/payroll'
 import {

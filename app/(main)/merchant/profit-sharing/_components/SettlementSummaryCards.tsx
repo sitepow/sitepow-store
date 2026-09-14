@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import {
   IconArrowUpRight,

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useTransactions } from '@/actions/hooks/transaction'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { getLabel } from '@/constants/translate'
 import { TransactionType } from '@/generated/prisma/enums'
 import { useCurrentStore } from '@/hooks/use-current-store'

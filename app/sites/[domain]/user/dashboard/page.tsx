@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 
 import { useStorefrontDashboard } from '@/actions/hooks/storefront/dashboard'
 import { AnalyticsCardShell } from '@/app/(main)/merchant/analytics/_components/_components/AnalyticsCardShell'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStorefrontCurrency } from '@/stores/use-currency-store'

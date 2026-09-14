@@ -1,13 +1,19 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { PaginatedResponse, PaginationParams } from '@/types/pagination'
 import { getPathR2FromUrl } from '@/utils/image'
+import {
+  createPaginationMeta,
+  getEmptyPaginatedResponse,
+  sanitizePagination,
+} from '@/utils/pagination'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { resolveStoreFilter } from '@/lib/store'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
 import { r2DeleteImage } from './r2'
@@ -25,24 +31,9 @@ export type GetCategoriesItem = Prisma.CategoryGetPayload<{
   select: typeof categorySelect
 }>
 
-export interface GetCategoriesResponse {
-  data: GetCategoriesItem[]
-  meta: {
-    currentPage: number
-    limit: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-  }
-}
+export type GetCategoriesResponse = PaginatedResponse<GetCategoriesItem>
 
-interface GetCategoriesParams {
-  page?: number
-  limit?: number
-  search?: string
-  storeId?: string
-}
+interface GetCategoriesParams extends PaginationParams {}
 
 export interface CreateCategoryInput {
   title: string
@@ -110,61 +101,33 @@ export async function getCategories({
   search,
   storeId,
 }: GetCategoriesParams = {}): Promise<GetCategoriesResponse> {
-  const emptyResponse: GetCategoriesResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
-
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 
   try {
-    const whereClause: Prisma.CategoryWhereInput = {}
+    const storeAccess = await resolveStoreFilter({
+      userId,
+      storeId,
+      permission: 'canViewCategory',
+    })
 
-    if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canViewCategory',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return emptyResponse
-      }
-
-      whereClause.storeId = storeId
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+    if (!storeAccess.isAuthorized) {
+      return getEmptyPaginatedResponse(page, limit)
     }
 
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(20, limit))
-    const skip = (sanitizedPage - 1) * sanitizedLimit
+    const {
+      page: sanitizedPage,
+      limit: sanitizedLimit,
+      skip,
+    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 20 })
 
-    if (search) {
-      whereClause.title = { contains: search, mode: 'insensitive' }
+    const whereClause: Prisma.CategoryWhereInput = {
+      ...storeAccess.storeFilter,
+      ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
     }
 
     const [totalItems, categories] = await Promise.all([
@@ -177,21 +140,12 @@ export async function getCategories({
       }),
     ])
 
-    const totalPages = Math.ceil(totalItems / sanitizedLimit)
-
     return {
       data: categories,
-      meta: {
-        currentPage: sanitizedPage,
-        limit: sanitizedLimit,
-        totalItems,
-        totalPages,
-        hasNextPage: sanitizedPage < totalPages,
-        hasPreviousPage: sanitizedPage > 1,
-      },
+      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
     }
   } catch {
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 }
 
@@ -207,41 +161,21 @@ export async function getCategoryOptions(filters?: {
       return []
     }
 
-    const whereClause: Prisma.CategoryWhereInput = {}
+    const storeAccess = await resolveStoreFilter({
+      userId,
+      storeId: filters?.storeId,
+      permission: 'canViewCategory',
+    })
 
-    if (
-      filters?.storeId &&
-      filters.storeId !== ALL_STORES &&
-      filters.storeId !== ''
-    ) {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId: filters.storeId,
-        permission: 'canViewCategory',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return []
-      }
-
-      whereClause.storeId = filters.storeId
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+    if (!storeAccess.isAuthorized) {
+      return []
     }
 
-    if (filters?.search) {
-      whereClause.title = { contains: filters.search, mode: 'insensitive' }
+    const whereClause: Prisma.CategoryWhereInput = {
+      ...storeAccess.storeFilter,
+      ...(filters?.search
+        ? { title: { contains: filters.search, mode: 'insensitive' } }
+        : {}),
     }
 
     return await prisma.category.findMany({

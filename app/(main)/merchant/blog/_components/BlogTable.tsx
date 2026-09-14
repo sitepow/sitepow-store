@@ -9,7 +9,7 @@ import Link from 'next/link'
 
 import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconTag } from '@tabler/icons-react'
 

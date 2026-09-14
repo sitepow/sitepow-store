@@ -9,7 +9,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCategory, IconLock } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { MerchantStoreGuard } from '@/components/MerchantStoreGuard'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -19,7 +19,6 @@ import { CategoryDialog } from './_components/CategoryDialog'
 
 export default function MerchantStoreSettingsCategoriesPage() {
   const t = useTranslations('merchant.categories')
-  const { selectedStoreId } = useStoreFilter()
   const {
     canViewCategory,
     canCreateCategory,
@@ -61,17 +60,14 @@ export default function MerchantStoreSettingsCategoriesPage() {
           </div>
         }
       />
-      {selectedStoreId === ALL_STORES ? (
-        <ActionRequiredAlert />
-      ) : !isPermissionLoading && !canViewCategory ? (
-        <ActionRequiredAlert
-          icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
-        />
-      ) : (
+      <MerchantStoreGuard
+        isAuthorized={canViewCategory}
+        isPermissionLoading={isPermissionLoading}
+        noAccessTitle={t('noAccessTitle')}
+        noAccessDescription={t('noAccessDescription')}
+      >
         <CategoriesTable onEdit={handleEdit} />
-      )}
+      </MerchantStoreGuard>
     </Sidebar>
   )
 }

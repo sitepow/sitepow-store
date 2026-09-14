@@ -14,7 +14,7 @@ import {
   useUpdateAffiliateReferralStatus,
   useUpdateStoreAffiliateSetting,
 } from '@/actions/hooks/affiliate'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconCheck,

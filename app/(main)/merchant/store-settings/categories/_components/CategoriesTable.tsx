@@ -5,13 +5,13 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useCategories, useDeleteCategory } from '@/actions/hooks/category'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { ProductImage } from '@/components/ProductImage'
+import { StorePagination } from '@/components/StorePagination'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 
 interface CategoriesTableProps {
   onEdit: (id: string) => void
@@ -112,15 +111,7 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
           </TableBody>
         </Table>
       </div>
-      {meta && meta.totalPages > 1 && (
-        <StorePagination
-          currentPage={meta.currentPage}
-          totalPages={meta.totalPages}
-          hasNextPage={meta.hasNextPage}
-          hasPreviousPage={meta.hasPreviousPage}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
-      )}
+      {meta && <StorePagination meta={meta} onPageChange={setPage} />}
     </div>
   )
 }

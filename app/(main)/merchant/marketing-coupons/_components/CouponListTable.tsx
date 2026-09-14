@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { useCoupons, useDeleteCoupon } from '@/actions/hooks/coupon'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/components/StorePagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatShortDate } from '@/utils/date'
 import { IconCalendar, IconHierarchy } from '@tabler/icons-react'

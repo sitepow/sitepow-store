@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { useDashboard } from '@/actions/hooks/dashboard'
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useBranchFilter } from '@/stores/use-branch-filter'

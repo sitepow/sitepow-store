@@ -3,6 +3,12 @@
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import { PaginatedResponse, PaginationParams } from '@/types/pagination'
+import {
+  createPaginationMeta,
+  getEmptyPaginatedResponse,
+  sanitizePagination,
+} from '@/utils/pagination'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -11,6 +17,7 @@ import {
   verifyEmployeePermission,
 } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { resolveStoreFilter } from '@/lib/store'
 
 import { initializeStoreRolesAndPermissions } from './permission'
 import { invalidateEmployeePermissionCache } from './query-keys/invalidation/permission'
@@ -27,11 +34,8 @@ export interface UpdateBranchInput {
   address?: string
 }
 
-interface GetBranchesParams {
-  storeId: string
-  page?: number
-  limit?: number
-  search?: string
+interface GetBranchesParams extends PaginationParams {
+  storeId?: string
 }
 
 const branchSelect = {
@@ -54,17 +58,7 @@ export type GetBranchesItem = Prisma.BranchGetPayload<{
   select: typeof branchSelect
 }>
 
-export interface GetBranchesResponse {
-  data: GetBranchesItem[]
-  meta: {
-    currentPage: number
-    limit: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-  }
-}
+export type GetBranchesResponse = PaginatedResponse<GetBranchesItem>
 
 const branchOptionSelect = {
   id: true,
@@ -107,62 +101,34 @@ export async function getBranches({
   page = 1,
   limit = 10,
   search,
-}: GetBranchesParams): Promise<GetBranchesResponse> {
-  const emptyResponse: GetBranchesResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
-
+}: GetBranchesParams = {}): Promise<GetBranchesResponse> {
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 
   try {
-    const whereClause: Prisma.BranchWhereInput = {}
+    const storeAccess = await resolveStoreFilter({
+      userId,
+      storeId,
+      permission: 'canViewBranches',
+    })
 
-    if (storeId && storeId !== ALL_STORES && storeId !== '') {
-      const authCheck = await verifyEmployeePermission({
-        userId,
-        storeId,
-        permission: 'canViewBranches',
-      })
-
-      if (!authCheck.isAuthorized) {
-        return emptyResponse
-      }
-
-      whereClause.storeId = storeId
-    } else {
-      const userStores = await prisma.store.findMany({
-        where: {
-          OR: [
-            { ownerId: userId },
-            { employeeStores: { some: { employee: { userId } } } },
-          ],
-        },
-        select: { id: true },
-      })
-
-      const storeIds = userStores.map((s) => s.id)
-      whereClause.storeId = { in: storeIds }
+    if (!storeAccess.isAuthorized) {
+      return getEmptyPaginatedResponse(page, limit)
     }
 
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(20, limit))
-    const skip = (sanitizedPage - 1) * sanitizedLimit
+    const {
+      page: sanitizedPage,
+      limit: sanitizedLimit,
+      skip,
+    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 20 })
 
-    if (search) {
-      whereClause.name = { contains: search, mode: 'insensitive' }
+    const whereClause: Prisma.BranchWhereInput = {
+      ...storeAccess.storeFilter,
+      ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
     }
 
     const [totalItems, branches] = await Promise.all([
@@ -176,22 +142,13 @@ export async function getBranches({
       }),
     ])
 
-    const totalPages = Math.ceil(totalItems / sanitizedLimit)
-
     return {
       data: branches,
-      meta: {
-        currentPage: sanitizedPage,
-        limit: sanitizedLimit,
-        totalItems,
-        totalPages,
-        hasNextPage: sanitizedPage < totalPages,
-        hasPreviousPage: sanitizedPage > 1,
-      },
+      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
     }
   } catch (error) {
     console.error(error)
-    return emptyResponse
+    return getEmptyPaginatedResponse(page, limit)
   }
 }
 
