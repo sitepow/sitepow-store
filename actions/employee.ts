@@ -281,10 +281,11 @@ export async function createEmployee(input: CreateEmployeeInput) {
             branchId: assignment.branchId,
             roleId: assignment.roleId,
             customPermissions: {
-              create:
-                assignment.permissionIds?.map((permissionId) => ({
+              create: Array.from(new Set(assignment.permissionIds || [])).map(
+                (permissionId) => ({
                   permissionId,
-                })) || [],
+                }),
+              ),
             },
           })),
         },
@@ -411,10 +412,11 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
                 branchId: assignment.branchId,
                 roleId: assignment.roleId,
                 customPermissions: {
-                  create:
-                    assignment.permissionIds?.map((permissionId) => ({
-                      permissionId,
-                    })) || [],
+                  create: Array.from(
+                    new Set(assignment.permissionIds || []),
+                  ).map((permissionId) => ({
+                    permissionId,
+                  })),
                 },
               },
             })

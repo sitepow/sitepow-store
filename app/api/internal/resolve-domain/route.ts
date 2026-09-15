@@ -17,10 +17,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Domain missing' }, { status: 400 })
   }
 
+  const cleanDomain = domain
+    .toLowerCase()
+    .trim()
+    .replace(/^www\./, '')
+
   try {
     const store = await prisma.store.findFirst({
       where: {
-        customDomain: domain.toLowerCase(),
+        OR: [
+          { customDomain: cleanDomain },
+          { customDomain: `www.${cleanDomain}` },
+        ],
         customDomainStatus: DomainStatus.ACTIVE,
       },
       select: {

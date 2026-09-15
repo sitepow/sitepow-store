@@ -25,9 +25,20 @@ function getRequestHostname(req: NextRequest): string {
     req.nextUrl.host ||
     ''
   return host
+    .split(',')[0]
+    .trim()
     .replace(/^www\./, '')
     .split(':')[0]
     .toLowerCase()
+}
+
+function isIpAddress(host: string): boolean {
+  return (
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(host) ||
+    host === '0.0.0.0' ||
+    host === '127.0.0.1' ||
+    host.includes(':')
+  )
 }
 
 function getManageOrigin(req: NextRequest): string {
@@ -65,7 +76,20 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // Block malformed Server Action probes from bots/scanners (e.g. Next-Action: x)
+  const nextAction = req.headers.get('next-action')
+  if (nextAction && !/^[a-f0-9]{32,64}$/i.test(nextAction)) {
+    return new NextResponse('Invalid Action', { status: 400 })
+  }
+
   const hostname = getRequestHostname(req)
+
+  // In production, block direct IP address access from being processed as store custom domains
+  if (isProd && isIpAddress(hostname)) {
+    return NextResponse.redirect(
+      new URL(`${url.pathname}${url.search}`, getMainOrigin(req)),
+    )
+  }
 
   // In development, redirect localhost to lvh.me to ensure cross-subdomain cookies work consistently
   if (
@@ -223,12 +247,7 @@ export default async function middleware(req: NextRequest) {
       )
     }
   } else {
-    const protocol = req.headers.get('x-forwarded-proto') || 'https'
-    const hostHeader =
-      req.headers.get('x-forwarded-host') || req.headers.get('host') || ''
-    const origin = `${protocol}://${hostHeader}`
-
-    storeSlug = await getStoreSlugByDomain(hostname, origin)
+    storeSlug = await getStoreSlugByDomain(hostname)
 
     if (!storeSlug) {
       return NextResponse.rewrite(new URL('/404', req.url))

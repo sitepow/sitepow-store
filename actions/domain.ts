@@ -357,10 +357,14 @@ export async function verifyStoreDomain(storeId: string) {
       },
     })
 
-    if (isVerified) {
+    if (isVerified && store.customDomain) {
+      const cleanCustomDomain = store.customDomain
+        .toLowerCase()
+        .replace(/^www\./, '')
       await Promise.all([
-        redis.del(`domain:slug:${store.customDomain}`),
-        redis.del(`slug:domain:${store.slug}`),
+        redis.setex(`domain:slug:${cleanCustomDomain}`, 604800, store.slug),
+        redis.setex(`slug:domain:${store.slug}`, 604800, cleanCustomDomain),
+        invalidateCacheByPattern(`domain:slug:${cleanCustomDomain}`),
       ]).catch(console.error)
     }
 
