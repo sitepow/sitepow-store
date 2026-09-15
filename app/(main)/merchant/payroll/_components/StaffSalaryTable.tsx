@@ -3,13 +3,14 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import {
   useDeleteEmployeeSalaryConfig,
   useEmployeeSalaryConfigs,
   useSyncEmployeesFromStore,
   useToggleEmployeeSalaryConfigStatus,
 } from '@/actions/hooks/payroll'
-import { StatsCard } from '@/components/StatsCard'
 import { SalaryType } from '@/generated/prisma/enums'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { EmployeeSalaryConfigItem } from '@/types/payroll'
@@ -28,6 +29,7 @@ import {
   IconWallet,
 } from '@tabler/icons-react'
 
+import { StatsCard } from '@/components/StatsCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -53,6 +55,8 @@ interface StaffSalaryTableProps {
 }
 
 export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
+  const tStaff = useTranslations('merchant.payroll.staff')
+  const tTypes = useTranslations('merchant.payroll.salaryTypes')
   const { formatCurrency } = useMerchantCurrency()
   const { data: res, isLoading } = useEmployeeSalaryConfigs(storeId)
   const deleteMutation = useDeleteEmployeeSalaryConfig()
@@ -69,12 +73,12 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
     try {
       const result = await syncEmployeesMutation.mutateAsync(storeId)
       if (result.success) {
-        toast.success(result.message || 'ดึงข้อมูลพนักงานสำเร็จ')
+        toast.success(result.message || tStaff('syncSuccess'))
       } else {
-        toast.error(result.message || 'ไม่สามารถดึงข้อมูลพนักงานได้')
+        toast.error(result.message || tStaff('syncFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการดึงข้อมูลพนักงาน')
+      toast.error(tStaff('syncFailed'))
     }
   }
 
@@ -92,9 +96,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
   }
 
   const handleDelete = async (staff: EmployeeSalaryConfigItem) => {
-    if (
-      !confirm(`คุณต้องการลบข้อมูลพนักงาน "${staff.employeeName}" ใช่หรือไม่?`)
-    ) {
+    if (!confirm(tStaff('deleteConfirm'))) {
       return
     }
 
@@ -105,12 +107,12 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
       })
 
       if (result.success) {
-        toast.success('ลบข้อมูลพนักงานเรียบร้อยแล้ว')
+        toast.success(tStaff('deleteSuccess'))
       } else {
-        toast.error(result.message || 'ไม่สามารถลบข้อมูลได้')
+        toast.error(result.message || tStaff('deleteFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการลบข้อมูล')
+      toast.error(tStaff('deleteFailed'))
     }
   }
 
@@ -124,14 +126,14 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
       if (result.success) {
         toast.success(
           result.data?.isActive
-            ? `เปิดใช้งาน ${staff.employeeName} แล้ว`
-            : `ปิดการใช้งาน ${staff.employeeName} แล้ว`,
+            ? `${staff.employeeName} (${tStaff('active')})`
+            : `${staff.employeeName} (${tStaff('inactive')})`,
         )
       } else {
-        toast.error(result.message || 'ไม่สามารถเปลี่ยนสถานะได้')
+        toast.error(result.message || tStaff('saveFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการเปลี่ยนสถานะ')
+      toast.error(tStaff('saveFailed'))
     }
   }
 
@@ -140,13 +142,13 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
       case SalaryType.MONTHLY:
         return (
           <Badge variant="outline" className="border-blue-200 text-blue-600">
-            รายเดือน
+            {tTypes('MONTHLY')}
           </Badge>
         )
       case SalaryType.DAILY:
         return (
           <Badge variant="outline" className="border-amber-200 text-amber-600">
-            รายวัน
+            {tTypes('DAILY')}
           </Badge>
         )
       case SalaryType.HOURLY:
@@ -155,7 +157,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
             variant="outline"
             className="border-emerald-200 text-emerald-600"
           >
-            รายชั่วโมง
+            {tTypes('HOURLY')}
           </Badge>
         )
       case SalaryType.COMMISSION:
@@ -164,7 +166,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
             variant="outline"
             className="border-purple-200 text-purple-600"
           >
-            คอมมิชชั่น
+            {tTypes('COMMISSION')}
           </Badge>
         )
     }
@@ -175,25 +177,27 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
       {/* 1. Summary Cards with StatsCard */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
-          title="จำนวนพนักงานทั้งหมด"
-          value={`${staffList.length} คน`}
-          description="พนักงานที่ลงทะเบียนในระบบ"
+          title={tStaff('totalStaff')}
+          value={tStaff('staffUnit', { count: staffList.length })}
+          description={tStaff('description')}
           icon={IconUsers}
         />
         <StatsCard
-          title="ฐานเงินเดือนรวมต่อเดือน"
+          title={tStaff('totalBasePerMonth')}
           value={formatCurrency(totalBase)}
-          description="เฉพาะพนักงานที่เปิดใช้งานอยู่"
+          description={tStaff('activeStaff')}
           icon={IconWallet}
           valueClassName="text-primary font-bold"
         />
         <StatsCard
-          title="พนักงานที่เปิดใช้งาน"
-          value={`${activeStaff.length} / ${staffList.length} คน`}
-          description="พร้อมสำหรับการตัดรอบเงินเดือน"
+          title={tStaff('activeStaff')}
+          value={`${activeStaff.length} / ${staffList.length}`}
+          description={tStaff('hasSocialSecurityDesc')}
           icon={IconUserCheck}
           badge={
-            activeStaff.length === staffList.length ? 'ครบทุกคน' : 'มีปิดใช้งาน'
+            activeStaff.length === staffList.length
+              ? tStaff('active')
+              : tStaff('inactive')
           }
         />
       </div>
@@ -204,11 +208,9 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
           <div>
             <CardTitle className="flex items-center gap-2 text-lg">
               <IconUser className="text-primary size-5" />
-              รายชื่อพนักงานและฐานเงินเดือน
+              {tStaff('title')}
             </CardTitle>
-            <CardDescription>
-              กำหนดค่าจ้าง ตำแหน่ง บัญชีธนาคาร และสิทธิประโยชน์ของพนักงานในร้าน
-            </CardDescription>
+            <CardDescription>{tStaff('description')}</CardDescription>
           </div>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <Button
@@ -217,12 +219,12 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
               onClick={handleSyncFromEmployees}
               disabled={syncEmployeesMutation.isPending}
               className="flex-1 text-xs sm:flex-initial"
-              title="ดึงข้อมูลพนักงานจากหน้าระบบจัดการพนักงาน (/merchant/employee)"
+              title={tStaff('syncFromEmployees')}
             >
               <IconRefresh className="mr-1 size-3.5" />
               {syncEmployeesMutation.isPending
-                ? 'กำลังดึงข้อมูล...'
-                : 'ดึงพนักงานจากระบบ'}
+                ? tStaff('dialog.saving')
+                : tStaff('syncFromEmployees')}
             </Button>
             <Button
               size="sm"
@@ -230,7 +232,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
               className="flex-1 text-xs sm:flex-initial"
             >
               <IconPlus className="mr-1 size-3.5" />
-              เพิ่มพนักงานใหม่
+              {tStaff('add')}
             </Button>
           </div>
         </CardHeader>
@@ -238,12 +240,11 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="text-muted-foreground animate-pulse p-8 text-center text-sm">
-              กำลังโหลดข้อมูลพนักงาน...
+              {tStaff('dialog.saving')}
             </div>
           ) : staffList.length === 0 ? (
             <div className="text-muted-foreground p-8 text-center text-sm">
-              ยังไม่มีข้อมูลพนักงาน กดปุ่ม &quot;เพิ่มพนักงานใหม่&quot;
-              เพื่อเริ่มต้น
+              {tStaff('empty')}
             </div>
           ) : (
             <>
@@ -252,13 +253,19 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>พนักงาน / รหัส</TableHead>
-                      <TableHead>แผนก & ตำแหน่ง</TableHead>
-                      <TableHead>ประเภทการจ้าง</TableHead>
-                      <TableHead className="text-right">ฐานเงินเดือน</TableHead>
-                      <TableHead>ข้อมูลรับเงิน</TableHead>
-                      <TableHead className="text-center">สถานะ</TableHead>
-                      <TableHead className="text-right">การจัดการ</TableHead>
+                      <TableHead>{tStaff('thColEmployee')}</TableHead>
+                      <TableHead>{tStaff('position')}</TableHead>
+                      <TableHead>{tStaff('thColSalaryType')}</TableHead>
+                      <TableHead className="text-right">
+                        {tStaff('thColBaseSalary')}
+                      </TableHead>
+                      <TableHead>{tStaff('thColBank')}</TableHead>
+                      <TableHead className="text-center">
+                        {tStaff('thColStatus')}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {tStaff('thColActions')}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -284,7 +291,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                             {staff.position || '-'}
                           </div>
                           <div className="text-muted-foreground text-xs">
-                            {staff.department || 'ไม่ระบุแผนก'}
+                            {staff.department || '-'}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -303,12 +310,14 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                             )}
                             {staff.bankAccountNumber && (
                               <div className="text-muted-foreground">
-                                บัญชี: {staff.bankAccountNumber}
+                                {tStaff('dialog.bankAccountNumber')}:{' '}
+                                {staff.bankAccountNumber}
                               </div>
                             )}
                             {staff.promptpayNumber && (
                               <div className="text-muted-foreground">
-                                พร้อมเพย์: {staff.promptpayNumber}
+                                {tStaff('accountPromptPay')}:{' '}
+                                {staff.promptpayNumber}
                               </div>
                             )}
                             {!staff.bankName &&
@@ -321,52 +330,43 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                         <TableCell className="text-center">
                           {staff.isActive ? (
                             <Badge className="border-emerald-200 bg-emerald-500/10 text-emerald-600">
-                              ทำงานอยู่
+                              {tStaff('active')}
                             </Badge>
                           ) : (
                             <Badge
                               variant="outline"
                               className="text-muted-foreground"
                             >
-                              พักงาน/ปิด
+                              {tStaff('inactive')}
                             </Badge>
                           )}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
+                              variant="outline"
+                              size="icon-lg"
                               title={
                                 staff.isActive
-                                  ? 'ปิดการใช้งาน'
-                                  : 'เปิดการใช้งาน'
+                                  ? tStaff('inactive')
+                                  : tStaff('active')
                               }
                               onClick={() => handleToggle(staff)}
                             >
-                              <IconPower
-                                className={`size-4 ${
-                                  staff.isActive
-                                    ? 'text-emerald-600'
-                                    : 'text-muted-foreground'
-                                }`}
-                              />
+                              <IconPower className="size-4" />
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                              title="แก้ไขข้อมูล"
+                              variant="outline"
+                              size="icon-lg"
+                              title={tStaff('edit')}
                               onClick={() => handleOpenEdit(staff)}
                             >
-                              <IconEdit className="text-muted-foreground size-4" />
+                              <IconEdit className="size-4" />
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8 text-rose-500 hover:text-rose-600"
-                              title="ลบพนักงาน"
+                              variant="outline"
+                              size="icon-lg"
+                              title={tStaff('actions')}
                               onClick={() => handleDelete(staff)}
                             >
                               <IconTrash className="size-4" />
@@ -395,21 +395,21 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                         </div>
                         <div className="text-muted-foreground text-xs">
                           {staff.employeeCode ? `${staff.employeeCode} • ` : ''}
-                          {staff.position || 'พนักงาน'}
+                          {staff.position || '-'}
                           {staff.department ? ` (${staff.department})` : ''}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         {staff.isActive ? (
                           <Badge className="border-emerald-200 bg-emerald-500/10 text-xs text-emerald-600">
-                            ทำงานอยู่
+                            {tStaff('active')}
                           </Badge>
                         ) : (
                           <Badge
                             variant="outline"
                             className="text-muted-foreground text-xs"
                           >
-                            ปิดใช้งาน
+                            {tStaff('inactive')}
                           </Badge>
                         )}
                         {getSalaryTypeBadge(staff.salaryType)}
@@ -418,7 +418,7 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
 
                     <div className="bg-muted/30 flex items-center justify-between rounded-lg p-2.5 text-sm">
                       <span className="text-muted-foreground text-xs">
-                        ฐานเงินเดือน:
+                        {tStaff('baseSalary')}:
                       </span>
                       <span className="text-primary font-semibold">
                         {formatCurrency(staff.baseSalary)}
@@ -437,12 +437,14 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                         )}
                         {staff.bankAccountNumber && (
                           <div className="text-muted-foreground">
-                            เลขบัญชี: {staff.bankAccountNumber}
+                            {tStaff('dialog.bankAccountNumber')}:{' '}
+                            {staff.bankAccountNumber}
                           </div>
                         )}
                         {staff.promptpayNumber && (
                           <div className="text-muted-foreground">
-                            พร้อมเพย์: {staff.promptpayNumber}
+                            {tStaff('accountPromptPay')}:{' '}
+                            {staff.promptpayNumber}
                           </div>
                         )}
                       </div>
@@ -451,26 +453,23 @@ export function StaffSalaryTable({ storeId }: StaffSalaryTableProps) {
                     <div className="border-border/40 flex items-center gap-2 border-t pt-1">
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="flex-1 text-xs"
+                        size="icon-lg"
                         onClick={() => handleOpenEdit(staff)}
                       >
                         <IconEdit className="mr-1 size-3.5" />
-                        แก้ไข
+                        {tStaff('edit')}
                       </Button>
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="flex-1 text-xs"
+                        size="icon-lg"
                         onClick={() => handleToggle(staff)}
                       >
                         <IconPower className="mr-1 size-3.5" />
-                        {staff.isActive ? 'ปิดพักงาน' : 'เปิดใช้งาน'}
+                        {staff.isActive ? tStaff('inactive') : tStaff('active')}
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        className="px-2 text-xs text-rose-500"
+                        variant="outline"
+                        size="icon-lg"
                         onClick={() => handleDelete(staff)}
                       >
                         <IconTrash className="size-3.5" />

@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { useAnalyticsOverview } from '@/actions/hooks/analytics'
 import {
@@ -69,27 +69,14 @@ interface MonthlySettlementViewProps {
   storeName?: string
 }
 
-const MONTH_NAMES = [
-  'มกราคม',
-  'กุมภาพันธ์',
-  'มีนาคม',
-  'เมษายน',
-  'พฤษภาคม',
-  'มิถุนายน',
-  'กรกฎาคม',
-  'สิงหาคม',
-  'กันยายน',
-  'ตุลาคม',
-  'พฤศจิกายน',
-  'ธันวาคม',
-]
-
 export function MonthlySettlementView({
   storeId,
   storeName,
 }: MonthlySettlementViewProps) {
   const t = useTranslations('merchant.profitSharing')
+  const locale = useLocale()
   const { format } = useMerchantCurrency()
+  const dateLocale = locale === 'th' ? 'th-TH' : 'en-US'
 
   const currentYear = new Date().getFullYear()
   const periodOptions = useMemo(() => {
@@ -98,17 +85,21 @@ export function MonthlySettlementView({
       for (let m = 12; m >= 1; m--) {
         const monthStr = m.toString().padStart(2, '0')
         const periodKey = `${y}-${monthStr}`
-        const thaiYear = y + 543
+        const d = new Date(y, m - 1, 1)
+        const label = d.toLocaleDateString(dateLocale, {
+          month: 'long',
+          year: 'numeric',
+        })
         list.push({
           value: periodKey,
-          label: `${MONTH_NAMES[m - 1]} ${thaiYear}`,
+          label,
           year: y,
           month: m,
         })
       }
     }
     return list
-  }, [currentYear])
+  }, [currentYear, dateLocale])
 
   const [selectedPeriod, setSelectedPeriod] = useState<string>(() => {
     const now = new Date()
@@ -284,10 +275,10 @@ export function MonthlySettlementView({
       {
         onSuccess: (res) => {
           if (res.success) {
-            toast.success('บันทึกข้อมูลการตัดรอบลงฐานข้อมูลเรียบร้อยแล้ว')
+            toast.success(t('settlement.toastSaveSuccess'))
             onDone?.()
           } else {
-            toast.error(res.message || 'ไม่สามารถบันทึกข้อมูลได้')
+            toast.error(res.message || t('settlement.toastSaveFailed'))
           }
         },
       },
@@ -308,9 +299,7 @@ export function MonthlySettlementView({
 
   const handleCloseCycle = () => {
     if (
-      window.confirm(
-        `ยืนยันการปิดรอบบัญชี "${periodLabel}"? หลังจากปิดแล้วจะคงตัวเลขนี้ไว้เป็นประวัติ`,
-      )
+      window.confirm(t('settlement.closeCycleConfirm', { period: periodLabel }))
     ) {
       if (existingRecord?.id) {
         closeSettlement(
@@ -322,9 +311,9 @@ export function MonthlySettlementView({
           {
             onSuccess: (res: any) => {
               if (res?.success) {
-                toast.success(`ปิดรอบบัญชี ${periodLabel} เรียบร้อยแล้ว`)
+                toast.success(t('settlement.toastCloseSuccess'))
               } else {
-                toast.error(res?.message || 'ไม่สามารถปิดรอบบัญชีได้')
+                toast.error(res?.message || t('settlement.toastCloseFailed'))
               }
             },
           },
@@ -365,7 +354,9 @@ export function MonthlySettlementView({
           {
             onSuccess: (res: any) => {
               if (res?.success) {
-                toast.success(`ปิดรอบบัญชี ${periodLabel} เรียบร้อยแล้ว`)
+                toast.success(t('settlement.toastCloseSuccess'))
+              } else {
+                toast.error(res?.message || t('settlement.toastCloseFailed'))
               }
             },
           },
@@ -385,7 +376,9 @@ export function MonthlySettlementView({
         {
           onSuccess: (res: any) => {
             if (res?.success) {
-              toast.success('เปิดรอบแก้ไขเรียบร้อยแล้ว')
+              toast.success(t('settlement.toastReopenSuccess'))
+            } else {
+              toast.error(res?.message || t('settlement.toastReopenFailed'))
             }
           },
         },
@@ -428,7 +421,7 @@ export function MonthlySettlementView({
                 className="inline-flex items-center gap-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
               >
                 <IconLock className="size-3" />
-                {t('settlement.settlementClosed')} (DB)
+                {t('settlement.settlementClosed')}
               </Badge>
             ) : (
               <Badge
@@ -437,8 +430,8 @@ export function MonthlySettlementView({
               >
                 <IconLockOpen className="size-3" />
                 {existingRecord
-                  ? 'บันทึกใน DB แล้ว (ยังไม่ปิดรอบ)'
-                  : 'ฉบับร่างคำนวณอัตโนมัติ'}
+                  ? t('settlement.savedInDb')
+                  : t('settlement.autoDraft')}
               </Badge>
             )}
           </div>
@@ -449,11 +442,11 @@ export function MonthlySettlementView({
             variant="outline"
             size="sm"
             onClick={() => refetchAnalytics()}
-            title="รีเฟรชข้อมูลยอดขายและค่าใช้จ่ายล่าสุด"
+            title={t('settlement.refreshTooltip')}
             className="text-xs"
           >
             <IconRefresh className="mr-1 size-3.5" />
-            ดึงยอดล่าสุด
+            {t('settlement.refreshLatest')}
           </Button>
 
           <Button
@@ -466,7 +459,7 @@ export function MonthlySettlementView({
             <span className="hidden sm:inline">
               {t('settlement.printStatement')}
             </span>
-            <span className="sm:hidden">พิมพ์ใบสรุป</span>
+            <span className="sm:hidden">{t('settlement.printShort')}</span>
           </Button>
 
           {!isClosed ? (
@@ -488,7 +481,7 @@ export function MonthlySettlementView({
               className="col-span-2 text-xs sm:col-span-1"
             >
               <IconLockOpen className="mr-1 size-3.5" />
-              เปิดรอบแก้ไข
+              {t('settlement.reopenSettlement')}
             </Button>
           )}
         </div>
@@ -520,8 +513,7 @@ export function MonthlySettlementView({
                 {t('settlement.partnerPayoutList')} ({periodLabel})
               </CardTitle>
               <CardDescription>
-                แจกแจงยอดเงินที่แต่ละหุ้นส่วนหรือระบบจะได้รับ
-                พร้อมแนบหลักฐานการโอน
+                {t('settlement.partnerPayoutListDesc')}
               </CardDescription>
             </div>
             {!isClosed && (
@@ -532,10 +524,10 @@ export function MonthlySettlementView({
                 disabled={isSaving}
               >
                 {isSaving
-                  ? 'กำลังบันทึก...'
+                  ? t('settlement.saving')
                   : existingRecord
-                    ? 'อัปเดตยอดใน DB'
-                    : 'บันทึกยอดรอบนี้ลง DB'}
+                    ? t('settlement.updateInDb')
+                    : t('settlement.saveToDb')}
               </Button>
             )}
           </div>
@@ -599,12 +591,13 @@ export function MonthlySettlementView({
                       <div className="text-muted-foreground text-xs">
                         {payout.shareType === ShareType.FIXED_MONTHLY ? (
                           <span>
-                            ยอดคงที่ ฿
-                            {Number(payout.shareValue).toLocaleString()}
+                            {t('settlement.fixedAmountPrefix')}{' '}
+                            {format(Number(payout.shareValue))}
                           </span>
                         ) : (
                           <span>
-                            สัดส่วน {Number(payout.shareValue)}% (
+                            {t('settlement.shareRatioPrefix')}{' '}
+                            {Number(payout.shareValue)}% (
                             {t(`shareTypes.${payout.shareType}` as any)})
                           </span>
                         )}
@@ -659,7 +652,9 @@ export function MonthlySettlementView({
                         onClick={() => handleOpenSlip(payout)}
                       >
                         <IconFileCheck className="mr-1 size-3.5" />
-                        {isPaid ? 'ดูสลิป / แก้ไข' : t('settlement.markPaid')}
+                        {isPaid
+                          ? t('settlement.viewSlipOrEdit')
+                          : t('settlement.markPaid')}
                       </Button>
                     </div>
                   </div>
@@ -673,14 +668,18 @@ export function MonthlySettlementView({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ผู้รับส่วนแบ่ง / บทบาท</TableHead>
-                  <TableHead>เงื่อนไขส่วนแบ่ง</TableHead>
+                  <TableHead>{t('settlement.thColPartner')}</TableHead>
+                  <TableHead>{t('settlement.thColCondition')}</TableHead>
                   <TableHead className="text-right">
                     {t('settlement.calculatedPayout')}
                   </TableHead>
-                  <TableHead>ช่องทางรับเงิน</TableHead>
-                  <TableHead className="text-center">สถานะการจ่าย</TableHead>
-                  <TableHead className="text-right">การดำเนินการ</TableHead>
+                  <TableHead>{t('settlement.thColPaymentChannel')}</TableHead>
+                  <TableHead className="text-center">
+                    {t('settlement.thColStatus')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('settlement.thColActions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -742,8 +741,8 @@ export function MonthlySettlementView({
                           <div className="text-sm font-medium">
                             {payout.shareType === ShareType.FIXED_MONTHLY ? (
                               <span>
-                                คงที่ ฿
-                                {Number(payout.shareValue).toLocaleString()}
+                                {t('settlement.fixedAmountPrefix')}{' '}
+                                {format(Number(payout.shareValue))}
                               </span>
                             ) : (
                               <span>{Number(payout.shareValue)}%</span>
@@ -833,7 +832,7 @@ export function MonthlySettlementView({
                             >
                               <IconFileCheck className="mr-1 size-3.5" />
                               {isPaid
-                                ? 'ดูสลิป/แก้ไข'
+                                ? t('settlement.viewSlipOrEdit')
                                 : t('settlement.markPaid')}
                             </Button>
                           </div>

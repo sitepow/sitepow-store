@@ -4,7 +4,6 @@ import React from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { StatsCard } from '@/components/StatsCard'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import {
   IconArrowUpRight,
@@ -14,6 +13,8 @@ import {
   IconShoppingCart,
   IconWallet,
 } from '@tabler/icons-react'
+
+import { StatsCard } from '@/components/StatsCard'
 
 interface SettlementSummaryCardsProps {
   revenue: number
@@ -47,7 +48,7 @@ export function SettlementSummaryCards({
       <StatsCard
         title={t('revenue')}
         value={format(revenue)}
-        description="ยอดขายสุทธิที่ชำระเงินแล้วในรอบเดือนนี้"
+        description={t('revenueDesc')}
         icon={IconShoppingCart}
       />
 
@@ -55,7 +56,10 @@ export function SettlementSummaryCards({
       <StatsCard
         title={t('cogsAndExpense')}
         value={format(totalCostAndExpense)}
-        description={`ต้นทุน ${format(cogs)} • ค่าใช้จ่าย ${format(expense)}`}
+        description={t('cogsAndExpenseDesc', {
+          cogs: format(cogs),
+          expense: format(expense),
+        })}
         icon={IconReceipt}
       />
 
@@ -63,7 +67,7 @@ export function SettlementSummaryCards({
       <StatsCard
         title={t('netProfit')}
         value={format(netProfit)}
-        description="รายรับรวม - ต้นทุนสินค้า - ค่าใช้จ่ายร้าน"
+        description={t('netProfitDesc')}
         icon={IconWallet}
       />
 
@@ -71,8 +75,11 @@ export function SettlementSummaryCards({
       <StatsCard
         title={t('totalAllocated')}
         value={format(totalAllocated)}
-        description={`เงินสำรองร้านค้าคงเหลือ: ${format(retainedEarnings)} (${100 - allocatedPercent}%)`}
-        badge={`จัดสรรแล้ว ${allocatedPercent}%`}
+        description={t('retainedEarningsDesc', {
+          retained: format(retainedEarnings),
+          percent: 100 - allocatedPercent,
+        })}
+        badge={t('allocatedPercent', { percent: allocatedPercent })}
         icon={IconCoins}
       />
     </div>

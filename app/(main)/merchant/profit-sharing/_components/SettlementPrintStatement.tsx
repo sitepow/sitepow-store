@@ -2,6 +2,8 @@
 
 import React from 'react'
 
+import { useLocale, useTranslations } from 'next-intl'
+
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { MonthlySettlementRecord } from '@/types/profit-sharing'
 import { IconPrinter, IconX } from '@tabler/icons-react'
@@ -26,11 +28,19 @@ export function SettlementPrintStatement({
   open,
   setOpen,
   settlement,
-  storeName = 'ร้านค้า',
+  storeName,
 }: SettlementPrintStatementProps) {
+  const t = useTranslations('merchant.profitSharing.settlement.statement')
+  const tShareTypes = useTranslations('merchant.profitSharing.shareTypes')
+  const tStatus = useTranslations('merchant.profitSharing.status')
+  const tSettlement = useTranslations('merchant.profitSharing.settlement')
+  const locale = useLocale()
   const { format } = useMerchantCurrency()
 
   if (!settlement) return null
+
+  const displayStoreName = storeName || t('storeFallback')
+  const dateLocale = locale === 'th' ? 'th-TH' : 'en-US'
 
   const handlePrint = () => {
     window.print()
@@ -41,12 +51,10 @@ export function SettlementPrintStatement({
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl print:border-none print:p-0 print:shadow-none">
         <DialogHeader className="print:hidden">
           <div className="flex items-center justify-between">
-            <DialogTitle>
-              ใบสำคัญสรุปการแบ่งกำไรและค่าใช้จ่ายระบบ (Statement)
-            </DialogTitle>
+            <DialogTitle>{t('modalTitle')}</DialogTitle>
             <Button size="sm" onClick={handlePrint}>
               <IconPrinter className="mr-1.5 size-4" />
-              พิมพ์เอกสาร (Print / PDF)
+              {t('printButton')}
             </Button>
           </div>
         </DialogHeader>
@@ -61,38 +69,42 @@ export function SettlementPrintStatement({
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-gray-900">
-                  ใบสรุปรายการส่วนแบ่งกำไรและผลตอบแทนหุ้นส่วน
+                  {t('docHeading')}
                 </h1>
                 <p className="mt-0.5 text-sm font-medium text-gray-600">
-                  MONTHLY PROFIT SHARING & SETTLEMENT STATEMENT
+                  {t('docSubHeading')}
                 </p>
                 <div className="mt-2 space-y-0.5 text-xs text-gray-500">
                   <div>
-                    <span className="font-semibold">ร้านค้า:</span> {storeName}
+                    <span className="font-semibold">{t('store')}</span>{' '}
+                    {displayStoreName}
                   </div>
                   <div>
-                    <span className="font-semibold">ประจำงวด:</span>{' '}
+                    <span className="font-semibold">{t('period')}</span>{' '}
                     {settlement.periodLabel} (
-                    {new Date(settlement.startDate).toLocaleDateString('th-TH')}{' '}
-                    ถึง{' '}
-                    {new Date(settlement.endDate).toLocaleDateString('th-TH')})
+                    {new Date(settlement.startDate).toLocaleDateString(
+                      dateLocale,
+                    )}{' '}
+                    {t('to')}{' '}
+                    {new Date(settlement.endDate).toLocaleDateString(
+                      dateLocale,
+                    )}
+                    )
                   </div>
                 </div>
               </div>
               <div className="space-y-0.5 text-right text-xs text-gray-500">
                 <div>
-                  <span className="font-semibold">เลขที่เอกสาร:</span> PS-
+                  <span className="font-semibold">{t('docNo')}</span> PS-
                   {settlement.period.replace('-', '')}
                 </div>
                 <div>
-                  <span className="font-semibold">วันที่พิมพ์:</span>{' '}
-                  {new Date().toLocaleDateString('th-TH')}
+                  <span className="font-semibold">{t('printDate')}</span>{' '}
+                  {new Date().toLocaleDateString(dateLocale)}
                 </div>
                 <div>
                   <span className="mt-1 inline-block rounded border bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-800">
-                    {settlement.isClosed
-                      ? 'ปิดรอบแล้ว (CLOSED)'
-                      : 'ฉบับร่าง (DRAFT)'}
+                    {settlement.isClosed ? t('statusClosed') : t('statusDraft')}
                   </span>
                 </div>
               </div>
@@ -102,29 +114,25 @@ export function SettlementPrintStatement({
           {/* Financial Breakdown Table */}
           <div className="space-y-2">
             <h2 className="text-xs font-bold tracking-wider text-gray-700 uppercase">
-              1. สรุปผลประกอบการประจำรอบ (Operating Results)
+              {t('sec1Title')}
             </h2>
             <table className="w-full border-collapse border border-gray-300 text-xs">
               <tbody>
                 <tr className="border-b border-gray-300 bg-gray-50">
-                  <td className="p-2 font-medium">
-                    ยอดขายรวมสุทธิ (Gross Revenue)
-                  </td>
+                  <td className="p-2 font-medium">{t('grossRevenue')}</td>
                   <td className="p-2 text-right font-bold text-gray-900">
                     {format(Number(settlement.totalRevenue))}
                   </td>
                 </tr>
                 <tr className="border-b border-gray-300">
-                  <td className="p-2 text-gray-600">
-                    หัก: ต้นทุนสินค้าขาย (Cost of Goods Sold - COGS)
-                  </td>
+                  <td className="p-2 text-gray-600">{t('cogs')}</td>
                   <td className="p-2 text-right text-gray-700">
                     - {format(Number(settlement.totalCogs))}
                   </td>
                 </tr>
                 <tr className="border-b border-gray-300">
                   <td className="p-2 text-gray-600">
-                    หัก: ค่าใช้จ่ายดำเนินงานร้านค้า (Operating Expenses)
+                    {t('operatingExpenses')}
                   </td>
                   <td className="p-2 text-right text-gray-700">
                     - {format(Number(settlement.totalExpense))}
@@ -132,7 +140,7 @@ export function SettlementPrintStatement({
                 </tr>
                 <tr className="border-b border-gray-300 bg-blue-50 font-bold">
                   <td className="p-2 text-blue-900">
-                    กำไรสุทธิสำหรับจัดสรร (Net Profit for Distribution)
+                    {t('netProfitForAlloc')}
                   </td>
                   <td className="p-2 text-right text-blue-900">
                     {format(Number(settlement.netProfit))}
@@ -145,17 +153,17 @@ export function SettlementPrintStatement({
           {/* Partner Payout Table */}
           <div className="space-y-2">
             <h2 className="text-xs font-bold tracking-wider text-gray-700 uppercase">
-              2. รายการจัดสรรส่วนแบ่งและค่าตอบแทน (Distribution Schedule)
+              {t('sec2Title')}
             </h2>
             <table className="w-full border-collapse border border-gray-300 text-xs">
               <thead>
                 <tr className="border-b border-gray-300 bg-gray-100">
-                  <th className="p-2 text-left">ลำดับ</th>
-                  <th className="p-2 text-left">ผู้รับส่วนแบ่ง / บทบาท</th>
-                  <th className="p-2 text-center">ประเภทส่วนแบ่ง</th>
-                  <th className="p-2 text-center">สัดส่วน</th>
-                  <th className="p-2 text-right">ยอดเงินจัดสรร</th>
-                  <th className="p-2 text-center">สถานะ</th>
+                  <th className="p-2 text-left">{t('thNo')}</th>
+                  <th className="p-2 text-left">{t('thPartner')}</th>
+                  <th className="p-2 text-center">{t('thCondition')}</th>
+                  <th className="p-2 text-center">{t('thShareRatio')}</th>
+                  <th className="p-2 text-right">{t('thAllocated')}</th>
+                  <th className="p-2 text-center">{t('thStatus')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -175,15 +183,16 @@ export function SettlementPrintStatement({
                       </div>
                     </td>
                     <td className="p-2 text-center text-gray-600">
-                      {p.shareType === 'NET_PROFIT_PERCENT'
-                        ? '% กำไรสุทธิ'
-                        : p.shareType === 'REVENUE_PERCENT'
-                          ? '% ยอดขาย'
-                          : 'ยอดคงที่'}
+                      {tShareTypes(
+                        p.shareType as
+                          | 'NET_PROFIT_PERCENT'
+                          | 'REVENUE_PERCENT'
+                          | 'FIXED_MONTHLY',
+                      )}
                     </td>
                     <td className="p-2 text-center font-medium">
                       {p.shareType === 'FIXED_MONTHLY'
-                        ? `฿${Number(p.shareValue).toLocaleString()}`
+                        ? format(Number(p.shareValue))
                         : `${Number(p.shareValue)}%`}
                     </td>
                     <td className="p-2 text-right font-bold text-gray-900">
@@ -197,7 +206,9 @@ export function SettlementPrintStatement({
                             : 'bg-amber-100 text-amber-800'
                         }`}
                       >
-                        {p.status === 'PAID' ? 'โอนแล้ว' : 'รอโอน'}
+                        {p.status === 'PAID'
+                          ? tStatus('PAID')
+                          : tStatus('PENDING')}
                       </span>
                     </td>
                   </tr>
@@ -205,7 +216,7 @@ export function SettlementPrintStatement({
                 {/* Total row */}
                 <tr className="border-t-2 border-gray-400 bg-gray-50 font-bold">
                   <td colSpan={4} className="p-2 text-right text-gray-800">
-                    รวมยอดส่วนแบ่งที่จัดสรรทั้งหมด:
+                    {t('totalAllocatedLabel')}:
                   </td>
                   <td className="p-2 text-right text-emerald-700">
                     {format(Number(settlement.totalAllocated))}
@@ -214,7 +225,7 @@ export function SettlementPrintStatement({
                 </tr>
                 <tr className="bg-gray-100 font-bold">
                   <td colSpan={4} className="p-2 text-right text-gray-700">
-                    เงินสำรองสะสมคงเหลือในร้านค้า (Retained Earnings):
+                    {t('retainedEarningsLabel')}:
                   </td>
                   <td className="p-2 text-right text-blue-800">
                     {format(Number(settlement.retainedEarnings))}
@@ -231,27 +242,27 @@ export function SettlementPrintStatement({
               <div className="space-y-12">
                 <div className="h-10"></div>
                 <div className="border-t border-gray-400 pt-1.5">
-                  <p className="font-semibold">ผู้จัดทำรายงาน / ฝ่ายบัญชี</p>
+                  <p className="font-semibold">{t('signPrepared')}</p>
                   <p className="text-[10px] text-gray-400">
-                    วันที่: ____ / ____ / ________
+                    {t('signDatePrefix')}
                   </p>
                 </div>
               </div>
               <div className="space-y-12">
                 <div className="h-10"></div>
                 <div className="border-t border-gray-400 pt-1.5">
-                  <p className="font-semibold">ผู้มีอำนาจอนุมัติ / กรรมการ</p>
+                  <p className="font-semibold">{t('signApproved')}</p>
                   <p className="text-[10px] text-gray-400">
-                    วันที่: ____ / ____ / ________
+                    {t('signDatePrefix')}
                   </p>
                 </div>
               </div>
               <div className="space-y-12">
                 <div className="h-10"></div>
                 <div className="border-t border-gray-400 pt-1.5">
-                  <p className="font-semibold">ตัวแทนหุ้นส่วนผู้รับมอบ</p>
+                  <p className="font-semibold">{t('signPartner')}</p>
                   <p className="text-[10px] text-gray-400">
-                    วันที่: ____ / ____ / ________
+                    {t('signDatePrefix')}
                   </p>
                 </div>
               </div>
@@ -261,11 +272,11 @@ export function SettlementPrintStatement({
 
         <DialogFooter className="print:hidden">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            ปิด
+            {tSettlement('close')}
           </Button>
           <Button onClick={handlePrint}>
             <IconPrinter className="mr-1.5 size-4" />
-            พิมพ์เอกสาร
+            {t('printButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

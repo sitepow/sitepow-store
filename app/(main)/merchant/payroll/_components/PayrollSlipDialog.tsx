@@ -1,6 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 
 import { useUpdatePayrollItemPayout } from '@/actions/hooks/payroll'
 import { PayoutStatus } from '@/generated/prisma/enums'
@@ -14,8 +18,6 @@ import {
   IconUpload,
   IconX,
 } from '@tabler/icons-react'
-import Image from 'next/image'
-import toast from 'react-hot-toast'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -46,6 +48,9 @@ export function PayrollSlipDialog({
   period,
   item,
 }: PayrollSlipDialogProps) {
+  const t = useTranslations('merchant.payroll.settlement')
+  const tStatus = useTranslations('merchant.payroll.status')
+  const tStaff = useTranslations('merchant.payroll.staff')
   const { formatCurrency } = useMerchantCurrency()
   const updateMutation = useUpdatePayrollItemPayout(storeId, period)
 
@@ -75,7 +80,7 @@ export function PayrollSlipDialog({
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('ไฟล์รูปภาพต้องมีขนาดไม่เกิน 5MB')
+        toast.error(t('maxSizeError'))
         return
       }
       const reader = new FileReader()
@@ -102,15 +107,15 @@ export function PayrollSlipDialog({
       if (res.success) {
         toast.success(
           markAsPaid
-            ? `บันทึกการโอนเงินให้ ${item.employeeName} สำเร็จ`
-            : `ยกเลิกสถานะโอนเงินของ ${item.employeeName} แล้ว`,
+            ? t('payoutSuccess', { name: item.employeeName })
+            : t('payoutReverted', { name: item.employeeName }),
         )
         onOpenChange(false)
       } else {
-        toast.error(res.message || 'ไม่สามารถบันทึกข้อมูลได้')
+        toast.error(res.message || t('payoutFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+      toast.error(t('payoutGeneralError'))
     }
   }
 
@@ -121,24 +126,22 @@ export function PayrollSlipDialog({
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <IconReceipt className="size-5 text-primary" />
-            บันทึกการโอนเงินเดือนพนักงาน
+            <IconReceipt className="text-primary size-5" />
+            {t('slipDialogTitle')}
           </DialogTitle>
-          <DialogDescription>
-            บันทึกหลักฐานการโอน วันที่โอน และสถานะจ่ายเงินเดือน
-          </DialogDescription>
+          <DialogDescription>{t('slipDialogDesc')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Employee & Payout Amount Box */}
-          <div className="rounded-xl border border-border/70 bg-muted/20 p-4 space-y-3">
+          <div className="border-border/70 bg-muted/20 space-y-3 rounded-xl border p-4">
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-foreground text-base">
+                <h4 className="text-foreground text-base font-semibold">
                   {item.employeeName}
                 </h4>
-                <p className="text-xs text-muted-foreground">
-                  {item.position || 'พนักงาน'}
+                <p className="text-muted-foreground text-xs">
+                  {item.position || t('defaultPosition')}
                   {item.department ? ` • ${item.department}` : ''}
                 </p>
               </div>
@@ -146,42 +149,49 @@ export function PayrollSlipDialog({
                 variant={isPaid ? 'default' : 'secondary'}
                 className={
                   isPaid
-                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-200'
-                    : 'bg-amber-500/10 text-amber-600 border-amber-200'
+                    ? 'border-emerald-200 bg-emerald-500/10 text-emerald-600'
+                    : 'border-amber-200 bg-amber-500/10 text-amber-600'
                 }
               >
                 {isPaid ? (
                   <span className="flex items-center gap-1">
-                    <IconCheck className="size-3" /> โอนแล้ว
+                    <IconCheck className="size-3" /> {tStatus('paid')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1">
-                    <IconClock className="size-3" /> รอโอน
+                    <IconClock className="size-3" /> {tStatus('pending')}
                   </span>
                 )}
               </Badge>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-background p-3 border border-border/50">
-              <span className="text-xs text-muted-foreground">ยอดเงินเดือนสุทธิ:</span>
-              <span className="text-xl font-bold text-primary">
+            <div className="bg-background border-border/50 flex items-center justify-between rounded-lg border p-3">
+              <span className="text-muted-foreground text-xs">
+                {t('netSalaryLabel')}
+              </span>
+              <span className="text-primary text-xl font-bold">
                 {formatCurrency(item.netSalary)}
               </span>
             </div>
 
             {/* Bank details */}
-            <div className="text-xs space-y-1 text-muted-foreground pt-1 border-t border-border/50">
+            <div className="text-muted-foreground border-border/50 space-y-1 border-t pt-1 text-xs">
               {item.bankName && (
-                <div className="flex items-center gap-1 text-foreground font-medium">
+                <div className="text-foreground flex items-center gap-1 font-medium">
                   <IconBuildingBank className="size-3.5" />
                   {item.bankName}
                 </div>
               )}
               {item.bankAccount && (
-                <div>เลขบัญชี: {item.bankAccount} ({item.bankAccountName || item.employeeName})</div>
+                <div>
+                  {t('accountNumber')} {item.bankAccount} (
+                  {item.bankAccountName || item.employeeName})
+                </div>
               )}
               {item.promptPay && (
-                <div>พร้อมเพย์: {item.promptPay}</div>
+                <div>
+                  {t('promptPay')} {item.promptPay}
+                </div>
               )}
             </div>
           </div>
@@ -189,7 +199,7 @@ export function PayrollSlipDialog({
           {/* Form fields */}
           <div className="space-y-3">
             <div>
-              <Label className="text-xs">วันที่โอนเงิน</Label>
+              <Label className="text-xs">{t('paidDateLabel')}</Label>
               <Input
                 type="date"
                 value={paidDate}
@@ -199,13 +209,13 @@ export function PayrollSlipDialog({
             </div>
 
             <div>
-              <Label className="text-xs">สลิปหลักฐานการโอนเงิน</Label>
+              <Label className="text-xs">{t('uploadSlip')}</Label>
               {slipImage ? (
                 <div className="mt-2 space-y-2">
-                  <div className="relative h-48 w-full overflow-hidden rounded-lg border bg-muted">
+                  <div className="bg-muted relative h-48 w-full overflow-hidden rounded-lg border">
                     <Image
                       src={slipImage}
-                      alt="สลิปโอนเงิน"
+                      alt="Transfer slip"
                       fill
                       className="object-contain"
                     />
@@ -213,21 +223,22 @@ export function PayrollSlipDialog({
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="absolute right-2 top-2 size-7 rounded-full shadow-md"
+                      className="absolute top-2 right-2 size-7 rounded-full shadow-md"
                       onClick={() => setSlipImage('')}
+                      title={t('deleteSlipImage')}
                     >
                       <IconX className="size-4" />
                     </Button>
                   </div>
                 </div>
               ) : (
-                <label className="mt-1 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border/80 bg-muted/10 p-5 text-center hover:bg-muted/30 transition-colors">
-                  <IconUpload className="size-7 text-muted-foreground" />
-                  <span className="mt-2 text-xs font-medium text-foreground">
-                    คลิกเพื่ออัปโหลดรูปภาพสลิป
+                <label className="border-border/80 bg-muted/10 hover:bg-muted/30 mt-1 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-5 text-center transition-colors">
+                  <IconUpload className="text-muted-foreground size-7" />
+                  <span className="text-foreground mt-2 text-xs font-medium">
+                    {t('uploadPrompt')}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    PNG, JPG ไม่เกิน 5MB
+                  <span className="text-muted-foreground text-[11px]">
+                    {t('supportedImageFormats')}
                   </span>
                   <input
                     type="file"
@@ -240,10 +251,10 @@ export function PayrollSlipDialog({
             </div>
 
             <div>
-              <Label className="text-xs">บันทึกการโอน / หมายเหตุ</Label>
+              <Label className="text-xs">{t('paymentNoteLabel')}</Label>
               <Textarea
                 rows={2}
-                placeholder="เช่น โอนผ่าน KBANK เวลา 14:30 น."
+                placeholder={t('paymentNotePlaceholder')}
                 value={paymentNote}
                 onChange={(e) => setPaymentNote(e.target.value)}
                 className="mt-1 text-xs"
@@ -252,26 +263,26 @@ export function PayrollSlipDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0 mt-2">
+        <DialogFooter className="mt-2 gap-2 sm:gap-0">
           {isPaid && (
             <Button
               type="button"
               variant="outline"
-              className="text-rose-500 border-rose-200 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+              className="border-rose-200 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20"
               disabled={updateMutation.isPending}
               onClick={() => handleSave(false)}
             >
-              ยกเลิกสถานะโอน
+              {t('cancelPaid')}
             </Button>
           )}
           <Button
             type="button"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="bg-emerald-600 text-white hover:bg-emerald-700"
             disabled={updateMutation.isPending}
             onClick={() => handleSave(true)}
           >
-            <IconCheck className="size-4 mr-1" />
-            {updateMutation.isPending ? 'กำลังบันทึก...' : 'ยืนยันการโอนเงิน'}
+            <IconCheck className="mr-1 size-4" />
+            {updateMutation.isPending ? t('saving') : t('confirmPaid')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -43,7 +43,8 @@ export default function ProfitSharingPage() {
       : storeOptions?.[0]?.id || ''
 
   const currentStore = storeOptions.find((s) => s.id === resolvedStoreId)
-  const storeName = currentStore?.name || 'ร้านค้าของคุณ'
+  const storeName =
+    currentStore?.name || t('settlement.statement.storeFallback')
 
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
@@ -68,7 +69,7 @@ export default function ProfitSharingPage() {
         />
       ) : !resolvedStoreId ? (
         <div className="text-muted-foreground rounded-xl border border-dashed p-8 text-center">
-          <p>กรุณาเลือกร้านค้าเพื่อดูข้อมูลส่วนแบ่งกำไร</p>
+          <p>{t('noStoreSelected')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -84,7 +85,7 @@ export default function ProfitSharingPage() {
               >
                 <IconCalculator className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.settlement')}</span>
-                <span className="sm:hidden">ตัดรอบ</span>
+                <span className="sm:hidden">{t('tabs.settlementShort')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="partners"
@@ -92,7 +93,7 @@ export default function ProfitSharingPage() {
               >
                 <IconUsers className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.partners')}</span>
-                <span className="sm:hidden">หุ้นส่วน</span>
+                <span className="sm:hidden">{t('tabs.partnersShort')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="history"
@@ -100,7 +101,7 @@ export default function ProfitSharingPage() {
               >
                 <IconHistory className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.history')}</span>
-                <span className="sm:hidden">ประวัติ</span>
+                <span className="sm:hidden">{t('tabs.historyShort')}</span>
               </TabsTrigger>
             </TabsList>
 

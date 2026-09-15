@@ -103,22 +103,22 @@ export function PayoutSlipDialog({
         onSuccess: (res) => {
           if (res.success) {
             toast.success(
-              `บันทึกการโอนเงินให้ ${payout.partnerName} เรียบร้อยแล้ว`,
+              t('settlement.payoutSuccess', { name: payout.partnerName }),
             )
             setOpen(false)
           } else {
-            toast.error(res.message || 'ไม่สามารถบันทึกข้อมูลได้')
+            toast.error(res.message || t('settlement.toastSaveFailed'))
           }
         },
         onError: (err: any) => {
-          toast.error(err?.message || 'ไม่สามารถบันทึกข้อมูลได้')
+          toast.error(err?.message || t('settlement.toastSaveFailed'))
         },
       },
     )
   }
 
   const handleRevertPending = () => {
-    if (window.confirm('ต้องการเปลี่ยนสถานะกลับเป็น "รอโอนเงิน" ใช่หรือไม่?')) {
+    if (window.confirm(t('settlement.revertConfirm'))) {
       updatePayout(
         {
           payoutId: payout.id,
@@ -130,10 +130,10 @@ export function PayoutSlipDialog({
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success('เปลี่ยนสถานะเป็นรอโอนเงินแล้ว')
+              toast.success(t('settlement.revertSuccess'))
               setOpen(false)
             } else {
-              toast.error(res.message || 'ไม่สามารถเปลี่ยนสถานะได้')
+              toast.error(res.message || t('settlement.revertFailed'))
             }
           },
         },
@@ -175,7 +175,7 @@ export function PayoutSlipDialog({
 
             <div className="flex items-baseline justify-between border-t pt-2">
               <span className="text-muted-foreground text-xs">
-                ยอดเงินที่ต้องโอน:
+                {t('settlement.transferAmount')}
               </span>
               <span className="text-primary text-lg font-bold">
                 {format(Number(payout.calculatedAmount))}
@@ -191,18 +191,20 @@ export function PayoutSlipDialog({
                 )}
                 {payout.bankAccount && (
                   <div>
-                    เลขที่บัญชี:{' '}
+                    {t('settlement.accountNumber')}{' '}
                     <span className="text-foreground font-medium">
                       {payout.bankAccount}
                     </span>
                   </div>
                 )}
                 {payout.bankAccountName && (
-                  <div>ชื่อบัญชี: {payout.bankAccountName}</div>
+                  <div>
+                    {t('settlement.accountName')} {payout.bankAccountName}
+                  </div>
                 )}
                 {payout.promptPay && (
                   <div className="text-primary font-medium">
-                    PromptPay: {payout.promptPay}
+                    {t('settlement.promptPay')} {payout.promptPay}
                   </div>
                 )}
               </div>
@@ -235,7 +237,7 @@ export function PayoutSlipDialog({
                   size="icon"
                   className="absolute top-3 right-3 size-7 rounded-full shadow"
                   onClick={() => setSlipImage('')}
-                  title="ลบรูปสลิป"
+                  title={t('settlement.deleteSlip')}
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
@@ -245,7 +247,7 @@ export function PayoutSlipDialog({
               <div className="hover:bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-6 transition-colors">
                 <IconUpload className="text-muted-foreground mb-2 size-8" />
                 <label className="text-primary cursor-pointer text-sm font-medium hover:underline">
-                  <span>คลิกเพื่ออัปโหลดสลิปโอนเงิน</span>
+                  <span>{t('settlement.uploadSlip')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -255,7 +257,7 @@ export function PayoutSlipDialog({
                   />
                 </label>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  รองรับไฟล์รูปภาพ PNG, JPG, WEBP
+                  {t('settlement.supportedImageFormats')}
                 </p>
               </div>
             )}
@@ -266,7 +268,7 @@ export function PayoutSlipDialog({
             <Textarea
               value={paymentNote}
               onChange={(e) => setPaymentNote(e.target.value)}
-              placeholder="เช่น โอนจาก KBank เวลา 14:32 น. หรือ หมายเลขอ้างอิง..."
+              placeholder={t('settlement.paymentNotePlaceholder')}
               rows={2}
               disabled={isPending}
             />
@@ -281,7 +283,7 @@ export function PayoutSlipDialog({
                 onClick={handleRevertPending}
                 disabled={isPending}
               >
-                เปลี่ยนกลับเป็นรอโอน
+                {t('settlement.revertToPending')}
               </Button>
             ) : (
               <div />
@@ -293,14 +295,14 @@ export function PayoutSlipDialog({
                 onClick={() => setOpen(false)}
                 disabled={isPending}
               >
-                ปิด
+                {t('settlement.close')}
               </Button>
               <Button type="button" onClick={handleSave} disabled={isPending}>
                 {isPending
-                  ? 'กำลังบันทึก...'
+                  ? t('settlement.saving')
                   : isPaid
-                    ? 'อัปเดตข้อมูล'
-                    : 'ยืนยันการโอนเงิน'}
+                    ? t('settlement.updateData')
+                    : t('settlement.confirmPayout')}
               </Button>
             </div>
           </DialogFooter>

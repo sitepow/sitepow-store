@@ -44,7 +44,7 @@ export default function PayrollPage() {
       : storeOptions?.[0]?.id || ''
 
   const currentStore = storeOptions.find((s) => s.id === resolvedStoreId)
-  const storeName = currentStore?.name || 'ร้านค้าของคุณ'
+  const storeName = currentStore?.name || t('settlement.payslip.storeFallback')
 
   const handleSelectHistoryPeriod = (_period: string) => {
     setCurrentTab('settlement')
@@ -69,12 +69,12 @@ export default function PayrollPage() {
       !canViewExpenses ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึง"
-          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลเงินเดือนและค่าใช้จ่ายของร้านค้านี้"
+          title={t('noAccessTitle')}
+          description={t('noAccessDescription')}
         />
       ) : !resolvedStoreId ? (
         <div className="text-muted-foreground rounded-xl border border-dashed p-8 text-center">
-          <p>กรุณาเลือกร้านค้าเพื่อดูข้อมูลเงินเดือนและค่าจ้างพนักงาน</p>
+          <p>{t('noStoreSelected')}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -90,7 +90,7 @@ export default function PayrollPage() {
               >
                 <IconCalculator className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.settlement')}</span>
-                <span className="sm:hidden">ตัดรอบ</span>
+                <span className="sm:hidden">{t('tabs.settlementShort')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="staff"
@@ -98,7 +98,7 @@ export default function PayrollPage() {
               >
                 <IconUsers className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.staff')}</span>
-                <span className="sm:hidden">พนักงาน</span>
+                <span className="sm:hidden">{t('tabs.staffShort')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="history"
@@ -106,7 +106,7 @@ export default function PayrollPage() {
               >
                 <IconHistory className="size-4 shrink-0" />
                 <span className="hidden sm:inline">{t('tabs.history')}</span>
-                <span className="sm:hidden">ประวัติ</span>
+                <span className="sm:hidden">{t('tabs.historyShort')}</span>
               </TabsTrigger>
             </TabsList>
 

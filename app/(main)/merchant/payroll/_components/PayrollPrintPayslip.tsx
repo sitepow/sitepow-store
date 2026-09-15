@@ -2,6 +2,8 @@
 
 import React from 'react'
 
+import { useLocale, useTranslations } from 'next-intl'
+
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { MonthlyPayrollItemRecord, MonthlyPayrollRecord } from '@/types/payroll'
 import { IconPrinter, IconReceipt } from '@tabler/icons-react'
@@ -27,139 +29,191 @@ export function PayrollPrintPayslip({
   onOpenChange,
   payroll,
   item,
-  storeName = 'ร้านค้า',
+  storeName,
 }: PayrollPrintPayslipProps) {
+  const t = useTranslations('merchant.payroll.settlement.payslip')
+  const locale = useLocale()
   const { formatCurrency } = useMerchantCurrency()
 
   if (!item) return null
+
+  const displayStoreName = storeName || t('storeFallback')
 
   const handlePrint = () => {
     window.print()
   }
 
-  const additions = item.overtimeAmount + item.bonusAmount + item.commissionAmount
+  const additions =
+    item.overtimeAmount + item.bonusAmount + item.commissionAmount
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl print:m-0 print:max-w-none print:p-0 print:border-none">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl print:m-0 print:max-w-none print:border-none print:p-0">
         <DialogHeader className="print:hidden">
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
-              <IconReceipt className="size-5 text-primary" />
-              ใบเสร็จเงินเดือน (Payslip)
+              <IconReceipt className="text-primary size-5" />
+              {t('title')}
             </DialogTitle>
             <Button size="sm" onClick={handlePrint}>
-              <IconPrinter className="size-4 mr-1" />
-              พิมพ์สลิป
+              <IconPrinter className="mr-1 size-4" />
+              {t('print')}
             </Button>
           </div>
         </DialogHeader>
 
         {/* PRINTABLE SLIP CONTENT */}
-        <div id="printable-payslip" className="p-6 border rounded-xl bg-card text-foreground space-y-5 print:border-none print:p-8">
+        <div
+          id="printable-payslip"
+          className="bg-card text-foreground space-y-5 rounded-xl border p-6 print:border-none print:p-8"
+        >
           {/* Header */}
-          <div className="text-center border-b pb-4 space-y-1">
-            <h2 className="text-xl font-bold tracking-tight">{storeName}</h2>
-            <p className="text-sm font-medium text-muted-foreground">
-              ใบจ่ายเงินเดือนและค่าตอบแทนพนักงาน (Payslip)
+          <div className="space-y-1 border-b pb-4 text-center">
+            <h2 className="text-xl font-bold tracking-tight">
+              {displayStoreName}
+            </h2>
+            <p className="text-muted-foreground text-sm font-medium">
+              {t('subtitle')}
             </p>
-            <p className="text-xs text-primary font-semibold">
-              ประจำงวด: {payroll.periodLabel}
+            <p className="text-primary text-xs font-semibold">
+              {t('period', { period: payroll.periodLabel })}
             </p>
           </div>
 
           {/* Employee Info Box */}
-          <div className="grid grid-cols-2 gap-3 text-xs bg-muted/30 p-3.5 rounded-lg border border-border/50">
+          <div className="bg-muted/30 border-border/50 grid grid-cols-2 gap-3 rounded-lg border p-3.5 text-xs">
             <div>
-              <span className="text-muted-foreground">ชื่อพนักงาน: </span>
-              <span className="font-semibold text-foreground">{item.employeeName}</span>
+              <span className="text-muted-foreground">{t('empName')}: </span>
+              <span className="text-foreground font-semibold">
+                {item.employeeName}
+              </span>
             </div>
             <div>
-              <span className="text-muted-foreground">รหัสพนักงาน: </span>
-              <span className="font-semibold text-foreground">{item.employeeCode || '-'}</span>
+              <span className="text-muted-foreground">{t('empCode')}: </span>
+              <span className="text-foreground font-semibold">
+                {item.employeeCode || '-'}
+              </span>
             </div>
             <div>
-              <span className="text-muted-foreground">ตำแหน่ง: </span>
-              <span className="font-medium text-foreground">{item.position || '-'}</span>
+              <span className="text-muted-foreground">{t('position')}: </span>
+              <span className="text-foreground font-medium">
+                {item.position || '-'}
+              </span>
             </div>
             <div>
-              <span className="text-muted-foreground">แผนก/ฝ่าย: </span>
-              <span className="font-medium text-foreground">{item.department || '-'}</span>
+              <span className="text-muted-foreground">{t('department')}: </span>
+              <span className="text-foreground font-medium">
+                {item.department || '-'}
+              </span>
             </div>
           </div>
 
           {/* Breakdown Table */}
           <div className="space-y-3">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              รายการเงินได้และรายการหัก (Earnings & Deductions)
+            <div className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+              {t('breakdownTitle')}
             </div>
 
-            <div className="rounded-lg border divide-y text-xs">
-              <div className="flex justify-between py-2 px-3 bg-muted/10">
-                <span className="text-foreground">1. ฐานเงินเดือน/ค่าจ้างประจำ</span>
-                <span className="font-medium">{formatCurrency(item.baseSalary)}</span>
+            <div className="divide-y rounded-lg border text-xs">
+              <div className="bg-muted/10 flex justify-between px-3 py-2">
+                <span className="text-foreground">{t('basePay')}</span>
+                <span className="font-medium">
+                  {formatCurrency(item.baseSalary)}
+                </span>
               </div>
               {item.overtimeAmount > 0 && (
-                <div className="flex justify-between py-2 px-3 text-emerald-600">
-                  <span>2. ค่าล่วงเวลา (OT)</span>
-                  <span className="font-medium">+{formatCurrency(item.overtimeAmount)}</span>
+                <div className="flex justify-between px-3 py-2 text-emerald-600">
+                  <span>{t('ot')}</span>
+                  <span className="font-medium">
+                    +{formatCurrency(item.overtimeAmount)}
+                  </span>
                 </div>
               )}
               {item.bonusAmount > 0 && (
-                <div className="flex justify-between py-2 px-3 text-emerald-600">
-                  <span>3. โบนัส / เบี้ยขยัน</span>
-                  <span className="font-medium">+{formatCurrency(item.bonusAmount)}</span>
+                <div className="flex justify-between px-3 py-2 text-emerald-600">
+                  <span>{t('bonus')}</span>
+                  <span className="font-medium">
+                    +{formatCurrency(item.bonusAmount)}
+                  </span>
                 </div>
               )}
               {item.commissionAmount > 0 && (
-                <div className="flex justify-between py-2 px-3 text-emerald-600">
-                  <span>4. คอมมิชชั่น / ค่าผลงาน</span>
-                  <span className="font-medium">+{formatCurrency(item.commissionAmount)}</span>
+                <div className="flex justify-between px-3 py-2 text-emerald-600">
+                  <span>{t('commission')}</span>
+                  <span className="font-medium">
+                    +{formatCurrency(item.commissionAmount)}
+                  </span>
                 </div>
               )}
               {item.deductionAmount > 0 && (
-                <div className="flex justify-between py-2 px-3 text-rose-600">
-                  <span>5. หักขาด ลา มาสาย / ประกันสังคม / ภาษี</span>
-                  <span className="font-medium">-{formatCurrency(item.deductionAmount)}</span>
+                <div className="flex justify-between px-3 py-2 text-rose-600">
+                  <span>{t('deductions')}</span>
+                  <span className="font-medium">
+                    -{formatCurrency(item.deductionAmount)}
+                  </span>
                 </div>
               )}
             </div>
 
             {/* Total Net Box */}
-            <div className="rounded-lg bg-primary/10 border border-primary/20 p-3.5 flex justify-between items-center">
+            <div className="bg-primary/10 border-primary/20 flex items-center justify-between rounded-lg border p-3.5">
               <div>
-                <div className="font-bold text-sm text-foreground">ยอดเงินเดือนสุทธิ (Net Pay)</div>
-                <div className="text-[11px] text-muted-foreground">
-                  (เงินเพิ่มรวม {formatCurrency(additions)} | หักรวม {formatCurrency(item.deductionAmount)})
+                <div className="text-foreground text-sm font-bold">
+                  {t('netTotal')}
+                </div>
+                <div className="text-muted-foreground text-[11px]">
+                  {t('totalSummary', {
+                    additions: formatCurrency(additions),
+                    deductions: formatCurrency(item.deductionAmount),
+                  })}
                 </div>
               </div>
-              <div className="text-xl font-bold text-primary">
+              <div className="text-primary text-xl font-bold">
                 {formatCurrency(item.netSalary)}
               </div>
             </div>
           </div>
 
           {/* Payment & Bank Info */}
-          <div className="rounded-lg border bg-muted/20 p-3 text-xs space-y-1 text-muted-foreground">
-            <div className="font-semibold text-foreground">ช่องทางการรับเงิน:</div>
-            {item.bankName && <div>ธนาคาร: {item.bankName}</div>}
-            {item.bankAccount && <div>เลขบัญชี: {item.bankAccount} ({item.bankAccountName || item.employeeName})</div>}
-            {item.promptPay && <div>พร้อมเพย์: {item.promptPay}</div>}
+          <div className="bg-muted/20 text-muted-foreground space-y-1 rounded-lg border p-3 text-xs">
+            <div className="text-foreground font-semibold">
+              {t('paymentChannels')}
+            </div>
+            {item.bankName && (
+              <div>
+                {t('bankLabel')} {item.bankName}
+              </div>
+            )}
+            {item.bankAccount && (
+              <div>
+                {t('accountLabel')} {item.bankAccount} (
+                {item.bankAccountName || item.employeeName})
+              </div>
+            )}
+            {item.promptPay && (
+              <div>
+                {t('promptPayLabel')} {item.promptPay}
+              </div>
+            )}
             <div className="pt-1 text-[11px]">
-              สถานะ: {item.status === 'PAID' ? 'โอนเงินเรียบร้อยแล้ว' : 'รอดำเนินการโอนเงิน'}
-              {item.paidAt && ` (เมื่อ ${new Date(item.paidAt).toLocaleDateString('th-TH')})`}
+              {t('statusLabel')}{' '}
+              {item.status === 'PAID'
+                ? t('paidStatusSimple')
+                : t('pendingStatusSimple')}
+              {item.paidAt &&
+                ` ${t('paidAtPrefix', { date: new Date(item.paidAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US') })}`}
             </div>
           </div>
 
           {/* Signatures */}
-          <div className="pt-8 grid grid-cols-2 gap-8 text-center text-xs">
+          <div className="grid grid-cols-2 gap-8 pt-8 text-center text-xs">
             <div className="space-y-8">
-              <div className="border-b border-dashed border-muted-foreground/50 w-3/4 mx-auto" />
-              <p className="text-muted-foreground">ลายมือชื่อผู้จ่ายเงิน / ผู้มีอำนาจ</p>
+              <div className="border-muted-foreground/50 mx-auto w-3/4 border-b border-dashed" />
+              <p className="text-muted-foreground">{t('payerSign')}</p>
             </div>
             <div className="space-y-8">
-              <div className="border-b border-dashed border-muted-foreground/50 w-3/4 mx-auto" />
-              <p className="text-muted-foreground">ลายมือชื่อพนักงานผู้รับเงิน</p>
+              <div className="border-muted-foreground/50 mx-auto w-3/4 border-b border-dashed" />
+              <p className="text-muted-foreground">{t('receiverSign')}</p>
             </div>
           </div>
         </div>
@@ -167,4 +221,3 @@ export function PayrollPrintPayslip({
     </Dialog>
   )
 }
-

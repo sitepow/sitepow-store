@@ -2,8 +2,9 @@
 
 import React from 'react'
 
+import { useTranslations } from 'next-intl'
+
 import { useMonthlyPayrollHistory } from '@/actions/hooks/payroll'
-import { StatsCard } from '@/components/StatsCard'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { MonthlyPayrollRecord } from '@/types/payroll'
 import {
@@ -18,6 +19,7 @@ import {
   IconWallet,
 } from '@tabler/icons-react'
 
+import { StatsCard } from '@/components/StatsCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +47,7 @@ export function PayrollHistoryView({
   storeId,
   onSelectPeriod,
 }: PayrollHistoryViewProps) {
+  const t = useTranslations('merchant.payroll.history')
   const { formatCurrency } = useMerchantCurrency()
   const { data: res, isLoading } = useMonthlyPayrollHistory(storeId)
 
@@ -62,22 +65,25 @@ export function PayrollHistoryView({
       {/* 1. Summary Cards with StatsCard */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
-          title="งวดเงินเดือนทั้งหมด"
-          value={`${totalPeriods} งวด`}
-          description={`ปิดรอบแล้ว ${closedPeriods} งวด`}
+          title={t('cardTotalPeriods')}
+          value={t('cardTotalPeriodsUnit', { total: totalPeriods })}
+          description={t('cardClosedDesc', { closed: closedPeriods })}
           icon={IconCalendarEvent}
         />
         <StatsCard
-          title="ยอดจ่ายเงินเดือนสะสมทั้งหมด"
+          title={t('cardTotalCumulativePaid')}
           value={formatCurrency(totalCumulativePaid)}
-          description="ยอดเงินที่โอนจ่ายพนักงานจริงทุกงวด"
+          description={t('cardCumulativeDesc')}
           icon={IconWallet}
           valueClassName="text-primary font-bold"
         />
         <StatsCard
-          title="เชื่อมโยงค่าใช้จ่ายร้านค้า"
-          value={`${historyList.filter((h) => !!h.expenseId).length} / ${totalPeriods} งวด`}
-          description="บันทึกเข้าตาราง Expenses แล้ว"
+          title={t('cardSyncExpense')}
+          value={t('cardSyncExpenseVal', {
+            synced: historyList.filter((h) => !!h.expenseId).length,
+            total: totalPeriods,
+          })}
+          description={t('cardSyncExpenseDesc')}
           icon={IconReceipt}
         />
       </div>
@@ -87,21 +93,19 @@ export function PayrollHistoryView({
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <IconHistory className="text-primary size-5" />
-            ประวัติการตัดรอบและจ่ายเงินเดือนย้อนหลัง
+            {t('title')}
           </CardTitle>
-          <CardDescription>
-            บันทึกประวัติการจ่ายเงินเดือนพนักงานและการเชื่อมโยงค่าใช้จ่ายในแต่ละรอบ
-          </CardDescription>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
 
         <CardContent className="p-0">
           {isLoading ? (
             <div className="text-muted-foreground animate-pulse p-8 text-center text-sm">
-              กำลังโหลดประวัติงวดเงินเดือน...
+              {t('loading')}
             </div>
           ) : historyList.length === 0 ? (
             <div className="text-muted-foreground p-8 text-center text-sm">
-              ยังไม่มีประวัติการตัดรอบเงินเดือนที่บันทึกในระบบ
+              {t('empty')}
             </div>
           ) : (
             <>
@@ -110,22 +114,28 @@ export function PayrollHistoryView({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>งวดประจำเดือน</TableHead>
+                      <TableHead>{t('thColPeriod')}</TableHead>
                       <TableHead className="text-center">
-                        จำนวนพนักงาน
+                        {t('thColStaffCount')}
                       </TableHead>
                       <TableHead className="text-right">
-                        ฐานเงินเดือนรวม
+                        {t('thColBaseSalary')}
                       </TableHead>
-                      <TableHead className="text-right">ยอดสุทธิรวม</TableHead>
                       <TableHead className="text-right">
-                        ยอดที่โอนแล้ว
+                        {t('thColTotalNet')}
                       </TableHead>
-                      <TableHead className="text-center">สถานะรอบ</TableHead>
+                      <TableHead className="text-right">
+                        {t('thColTotalPaid')}
+                      </TableHead>
                       <TableHead className="text-center">
-                        ค่าใช้จ่ายร้านค้า
+                        {t('thColStatus')}
                       </TableHead>
-                      <TableHead className="text-right">การจัดการ</TableHead>
+                      <TableHead className="text-center">
+                        {t('thColExpense')}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t('thColActions')}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -142,7 +152,7 @@ export function PayrollHistoryView({
 
                         <TableCell className="text-center">
                           <Badge variant="outline">
-                            {record.items.length} คน
+                            {t('staffUnit', { count: record.items.length })}
                           </Badge>
                         </TableCell>
 
@@ -162,7 +172,7 @@ export function PayrollHistoryView({
                           {record.isClosed ? (
                             <Badge className="border-emerald-200 bg-emerald-500/10 text-emerald-600">
                               <IconLock className="mr-1 size-3" />
-                              ปิดรอบแล้ว
+                              {t('statusClosed')}
                             </Badge>
                           ) : (
                             <Badge
@@ -170,7 +180,7 @@ export function PayrollHistoryView({
                               className="border-amber-300 text-amber-600"
                             >
                               <IconClock className="mr-1 size-3" />
-                              กำลังดำเนินการ
+                              {t('statusOpen')}
                             </Badge>
                           )}
                         </TableCell>
@@ -179,7 +189,7 @@ export function PayrollHistoryView({
                           {record.expenseId ? (
                             <Badge className="border-blue-200 bg-blue-500/10 text-xs text-blue-600">
                               <IconCheck className="mr-1 size-3" />
-                              บันทึกแล้ว
+                              {t('expenseRecorded')}
                             </Badge>
                           ) : (
                             <span className="text-muted-foreground text-xs">
@@ -195,7 +205,7 @@ export function PayrollHistoryView({
                             className="text-xs"
                             onClick={() => onSelectPeriod(record.period)}
                           >
-                            เปิดดูงวดนี้
+                            {t('viewDetails')}
                             <IconArrowRight className="ml-1 size-3.5" />
                           </Button>
                         </TableCell>
@@ -218,7 +228,10 @@ export function PayrollHistoryView({
                           {record.periodLabel}
                         </div>
                         <div className="text-muted-foreground text-xs">
-                          {record.items.length} พนักงาน • งวด {record.period}
+                          {t('periodDetail', {
+                            count: record.items.length,
+                            period: record.period,
+                          })}
                         </div>
                       </div>
                       <Badge
@@ -228,21 +241,23 @@ export function PayrollHistoryView({
                             : 'border-amber-200 bg-amber-500/10 text-amber-600'
                         }
                       >
-                        {record.isClosed ? 'ปิดรอบแล้ว' : 'กำลังดำเนินการ'}
+                        {record.isClosed ? t('statusClosed') : t('statusOpen')}
                       </Badge>
                     </div>
 
                     <div className="bg-muted/20 grid grid-cols-2 gap-2 rounded-lg p-2.5 text-xs">
                       <div>
                         <span className="text-muted-foreground">
-                          ยอดสุทธิรวม:
+                          {t('netSalaryLabel')}
                         </span>
                         <div className="text-foreground font-bold">
                           {formatCurrency(record.totalNetSalary)}
                         </div>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">จ่ายแล้ว:</span>
+                        <span className="text-muted-foreground">
+                          {t('paidLabel')}
+                        </span>
                         <div className="font-bold text-emerald-600">
                           {formatCurrency(record.totalPaid)}
                         </div>
@@ -254,11 +269,11 @@ export function PayrollHistoryView({
                         {record.expenseId ? (
                           <span className="flex items-center gap-1 font-medium text-blue-600">
                             <IconCheck className="size-3" />{' '}
-                            เชื่อมโยงค่าใช้จ่ายแล้ว
+                            {t('expenseLinked')}
                           </span>
                         ) : (
                           <span className="text-muted-foreground">
-                            ยังไม่ส่งค่าใช้จ่าย
+                            {t('expenseNotRecorded')}
                           </span>
                         )}
                       </div>
@@ -268,7 +283,7 @@ export function PayrollHistoryView({
                         className="h-7 text-xs"
                         onClick={() => onSelectPeriod(record.period)}
                       >
-                        เปิดดูงวดนี้
+                        {t('viewDetails')}
                         <IconArrowRight className="ml-1 size-3" />
                       </Button>
                     </div>

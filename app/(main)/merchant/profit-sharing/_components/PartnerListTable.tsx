@@ -10,7 +10,7 @@ import {
   useProfitPartners,
   useToggleProfitPartnerStatus,
 } from '@/actions/hooks/profit-sharing'
-import { StatsCard } from '@/components/StatsCard'
+import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import {
   PartnerRole,
   ProfitPartnerItem,
@@ -29,6 +29,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 
+import { StatsCard } from '@/components/StatsCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -58,6 +59,7 @@ interface PartnerListTableProps {
 
 export function PartnerListTable({ storeId }: PartnerListTableProps) {
   const t = useTranslations('merchant.profitSharing')
+  const { format } = useMerchantCurrency()
 
   const { data: partners = [], isLoading } = useProfitPartners(storeId)
   const { mutate: deletePartner } = useDeleteProfitPartner()
@@ -79,15 +81,15 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
   }
 
   const handleDelete = (partner: ProfitPartnerItem) => {
-    if (window.confirm(`ต้องการลบ "${partner.name}" ใช่หรือไม่?`)) {
+    if (window.confirm(t('partners.deletePrompt', { name: partner.name }))) {
       deletePartner(
         { id: partner.id, storeId },
         {
           onSuccess: (res) => {
             if (res.success) {
-              toast.success('ลบข้อมูลเรียบร้อยแล้ว')
+              toast.success(t('partners.deleteSuccess'))
             } else {
-              toast.error(res.message || 'ไม่สามารถลบข้อมูลได้')
+              toast.error(res.message || t('partners.deleteFailed'))
             }
           },
         },
@@ -102,7 +104,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
   const handleCopyAccount = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
     setCopiedId(id)
-    toast.success('คัดลอกเลขที่บัญชีแล้ว')
+    toast.success(t('partners.copiedAccount'))
     setTimeout(() => setCopiedId(null), 2000)
   }
 
@@ -144,12 +146,9 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
             <div>
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <IconReceiptTax className="text-primary size-5" />
-                สรุปสัดส่วนการจัดสรรกำไร (Profit Allocation Overview)
+                {t('partners.overviewTitle')}
               </CardTitle>
-              <CardDescription>
-                สัดส่วนที่หุ้นส่วนและระบบได้รับ
-                เทียบกับกำไรสุทธิคงเหลือเก็บเข้ากองทุนสำรองร้านค้า
-              </CardDescription>
+              <CardDescription>{t('partners.overviewDesc')}</CardDescription>
             </div>
             <Button onClick={handleOpenAdd} className="self-start sm:self-auto">
               <IconPlus className="mr-1.5 size-4" />
@@ -161,10 +160,14 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-foreground font-medium">
-                สัดส่วนกำไรสุทธิที่จัดสรรแล้ว ({netProfitPercentTotal}%)
+                {t('partners.allocatedNetProfit', {
+                  percent: netProfitPercentTotal,
+                })}
               </span>
               <span className="text-muted-foreground">
-                เงินสำรองร้านค้าคงเหลือ: {remainingNetProfitPercent}%
+                {t('partners.remainingReserve', {
+                  percent: remainingNetProfitPercent,
+                })}
               </span>
             </div>
             <Progress
@@ -175,21 +178,21 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
 
           <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-3">
             <StatsCard
-              title="% จากกำไรสุทธิ (รวม)"
+              title={t('partners.statsNetProfit')}
               value={`${netProfitPercentTotal}%`}
-              description="สัดส่วนที่จัดสรรจากกำไรสุทธิ"
+              description={t('partners.statsNetProfitDesc')}
               icon={IconPercentage}
             />
             <StatsCard
-              title="% จากยอดขายรวม (รวม)"
+              title={t('partners.statsRevenue')}
               value={`${revenuePercentTotal}%`}
-              description="สัดส่วนที่จัดสรรจากยอดขายทั้งหมด"
+              description={t('partners.statsRevenueDesc')}
               icon={IconReceiptTax}
             />
             <StatsCard
-              title="ยอดคงที่รายเดือน (รวม)"
-              value={`฿${fixedMonthlyTotal.toLocaleString()}`}
-              description="ค่าเดฟและระบบรายเดือน"
+              title={t('partners.statsFixed')}
+              value={format(fixedMonthlyTotal)}
+              description={t('partners.statsFixedDesc')}
               icon={IconCoins}
             />
           </div>
@@ -245,7 +248,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                       <div className="text-base font-bold">
                         {partner.shareType === ShareType.FIXED_MONTHLY ? (
                           <span className="text-blue-600 dark:text-blue-400">
-                            ฿{Number(partner.shareValue).toLocaleString()}
+                            {format(Number(partner.shareValue))}
                           </span>
                         ) : (
                           <span className="text-emerald-600 dark:text-emerald-400">
@@ -296,7 +299,9 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                             ) : (
                               <IconCopy className="size-3" />
                             )}
-                            <span className="text-[10px]">คัดลอก</span>
+                            <span className="text-[10px]">
+                              {t('partners.copy')}
+                            </span>
                           </button>
                         </div>
                       )}
@@ -322,20 +327,17 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2.5">
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="h-8 text-xs"
+                        size="icon-lg"
                         onClick={() => handleOpenEdit(partner)}
                       >
-                        <IconEdit className="mr-1 size-3.5" />
-                        แก้ไข
+                        <IconEdit className="size-3.5" />
                       </Button>
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 h-8 text-xs"
+                        variant="outline"
+                        size="icon-lg"
                         onClick={() => handleDelete(partner)}
                       >
                         <IconTrash className="size-3.5" />
@@ -358,7 +360,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                   <TableHead className="text-right">
                     {t('partners.shareValue')}
                   </TableHead>
-                  <TableHead>ข้อมูลบัญชีโอนเงิน</TableHead>
+                  <TableHead>{t('partners.bankAccountInfo')}</TableHead>
                   <TableHead className="text-center">
                     {t('partners.status')}
                   </TableHead>
@@ -450,7 +452,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                       <TableCell className="text-right text-sm font-bold">
                         {partner.shareType === ShareType.FIXED_MONTHLY ? (
                           <span className="text-blue-600 dark:text-blue-400">
-                            ฿{Number(partner.shareValue).toLocaleString()}
+                            {format(Number(partner.shareValue))}
                           </span>
                         ) : (
                           <span className="text-emerald-600 dark:text-emerald-400">
@@ -480,7 +482,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                                     )
                                   }
                                   className="text-muted-foreground hover:text-foreground transition-colors"
-                                  title="คัดลอกเลขบัญชี"
+                                  title={t('partners.copyAccount')}
                                 >
                                   {copiedId === partner.id ? (
                                     <IconCheck className="size-3 text-emerald-500" />
@@ -503,7 +505,7 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
                           </div>
                         ) : (
                           <span className="text-muted-foreground text-xs italic">
-                            - ไม่ได้ระบุ -
+                            {t('partners.unspecified')}
                           </span>
                         )}
                       </TableCell>
@@ -525,19 +527,17 @@ export function PartnerListTable({ storeId }: PartnerListTableProps) {
 
                       {/* Actions */}
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-2.5">
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
+                            variant="outline"
+                            size="icon-lg"
                             onClick={() => handleOpenEdit(partner)}
                           >
                             <IconEdit className="size-4" />
                           </Button>
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:bg-destructive/10 size-8"
+                            variant="outline"
+                            size="icon-lg"
                             onClick={() => handleDelete(partner)}
                           >
                             <IconTrash className="size-4" />

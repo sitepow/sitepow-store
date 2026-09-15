@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useTranslations } from 'next-intl'
+
 import { useUpsertEmployeeSalaryConfig } from '@/actions/hooks/payroll'
 import { SalaryType } from '@/generated/prisma/enums'
 import { EmployeeSalaryConfigItem } from '@/types/payroll'
@@ -58,6 +60,9 @@ export function StaffSalaryDialog({
   storeId,
   editingStaff,
 }: StaffSalaryDialogProps) {
+  const tStaff = useTranslations('merchant.payroll.staff')
+  const tDialog = useTranslations('merchant.payroll.staff.dialog')
+  const tTypes = useTranslations('merchant.payroll.salaryTypes')
   const upsertMutation = useUpsertEmployeeSalaryConfig()
 
   const [employeeName, setEmployeeName] = useState('')
@@ -113,7 +118,7 @@ export function StaffSalaryDialog({
     e.preventDefault()
 
     if (!employeeName.trim()) {
-      toast.error('กรุณาระบุชื่อ-นามสกุลพนักงาน')
+      toast.error(tStaff('name'))
       return
     }
 
@@ -138,17 +143,13 @@ export function StaffSalaryDialog({
       })
 
       if (res.success) {
-        toast.success(
-          editingStaff
-            ? 'แก้ไขข้อมูลพนักงานเรียบร้อยแล้ว'
-            : 'เพิ่มพนักงานและกำหนดฐานเงินเดือนเรียบร้อยแล้ว',
-        )
+        toast.success(tStaff('saveSuccess'))
         onOpenChange(false)
       } else {
-        toast.error(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+        toast.error(res.message || tStaff('saveFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+      toast.error(tStaff('saveFailed'))
     }
   }
 
@@ -158,17 +159,17 @@ export function StaffSalaryDialog({
         <DialogHeader>
           <DialogHeaderIcon
             icon={editingStaff ? IconCoins : IconUserPlus}
-            title={editingStaff ? 'แก้ไขข้อมูลพนักงาน' : 'เพิ่มพนักงานและฐานเงินเดือน'}
-            description="กำหนดฐานเงินเดือน ตำแหน่ง และบัญชีรับโอนเงินของพนักงาน"
+            title={editingStaff ? tDialog('editTitle') : tDialog('addTitle')}
+            description={tDialog('desc')}
           />
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field className="sm:col-span-2">
-              <FieldLabel>ชื่อ-นามสกุลพนักงาน *</FieldLabel>
+              <FieldLabel>{tDialog('fullName')} *</FieldLabel>
               <Input
-                placeholder="เช่น สมศักดิ์ ขยันยิ่ง"
+                placeholder={tDialog('fullNamePlaceholder')}
                 value={employeeName}
                 onChange={(e) => setEmployeeName(e.target.value)}
                 required
@@ -176,68 +177,68 @@ export function StaffSalaryDialog({
             </Field>
 
             <Field>
-              <FieldLabel>รหัสพนักงาน</FieldLabel>
+              <FieldLabel>{tDialog('empCode')}</FieldLabel>
               <Input
-                placeholder="เช่น EMP-001"
+                placeholder={tDialog('empCodePlaceholder')}
                 value={employeeCode}
                 onChange={(e) => setEmployeeCode(e.target.value)}
               />
             </Field>
 
             <Field>
-              <FieldLabel>แผนก / ฝ่าย</FieldLabel>
+              <FieldLabel>{tDialog('department')}</FieldLabel>
               <Input
-                placeholder="เช่น หน้าร้าน, คลังสินค้า"
+                placeholder={tDialog('departmentPlaceholder')}
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
               />
             </Field>
 
             <Field className="sm:col-span-2">
-              <FieldLabel>ตำแหน่งงาน</FieldLabel>
+              <FieldLabel>{tDialog('position')}</FieldLabel>
               <Input
-                placeholder="เช่น พนักงานขาย, ผู้จัดการสาขา"
+                placeholder={tDialog('positionPlaceholder')}
                 value={position}
                 onChange={(e) => setPosition(e.target.value)}
               />
             </Field>
           </div>
 
-          <div className="rounded-xl border border-border/70 bg-muted/20 p-4 space-y-4">
-            <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <IconCoins className="size-4 text-primary" />
-              การจ้างงานและค่าตอบแทน
+          <div className="border-border/70 bg-muted/20 space-y-4 rounded-xl border p-4">
+            <h4 className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
+              <IconCoins className="text-primary size-4" />
+              {tStaff('salaryType')}
             </h4>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field>
-                <FieldLabel>ประเภทการจ้าง</FieldLabel>
+                <FieldLabel>{tDialog('salaryType')}</FieldLabel>
                 <Select
                   value={salaryType}
                   onValueChange={(val) => setSalaryType(val as SalaryType)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="เลือกประเภท" />
+                    <SelectValue placeholder={tDialog('salaryType')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={SalaryType.MONTHLY}>
-                      เงินเดือนประจำ (Monthly)
+                      {tTypes('MONTHLY')}
                     </SelectItem>
                     <SelectItem value={SalaryType.DAILY}>
-                      รายวัน (Daily)
+                      {tTypes('DAILY')}
                     </SelectItem>
                     <SelectItem value={SalaryType.HOURLY}>
-                      รายชั่วโมง (Hourly)
+                      {tTypes('HOURLY')}
                     </SelectItem>
                     <SelectItem value={SalaryType.COMMISSION}>
-                      คอมมิชชั่นล้วน (Commission)
+                      {tTypes('COMMISSION')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
 
               <Field>
-                <FieldLabel>ฐานเงินเดือน/ค่าจ้าง (บาท) *</FieldLabel>
+                <FieldLabel>{tDialog('baseSalary')} *</FieldLabel>
                 <Input
                   type="number"
                   min="0"
@@ -249,22 +250,26 @@ export function StaffSalaryDialog({
               </Field>
 
               <Field>
-                <FieldLabel>หักภาษี ณ ที่จ่าย (%)</FieldLabel>
+                <FieldLabel>{tDialog('taxPercent')}</FieldLabel>
                 <Input
                   type="number"
                   min="0"
                   max="100"
                   step="1"
-                  placeholder="0 หรือ 3"
+                  placeholder={tDialog('taxPercentPlaceholder')}
                   value={taxPercent}
                   onChange={(e) => setTaxPercent(Number(e.target.value))}
                 />
               </Field>
 
-              <div className="flex items-center justify-between rounded-lg border bg-background p-3">
+              <div className="bg-background flex items-center justify-between rounded-lg border p-3">
                 <div className="space-y-0.5">
-                  <div className="text-xs font-medium">หักประกันสังคม</div>
-                  <div className="text-[11px] text-muted-foreground">คำนวณหัก 5% (สูงสุด 750 บ.)</div>
+                  <div className="text-xs font-medium">
+                    {tStaff('socialSecurity')}
+                  </div>
+                  <div className="text-muted-foreground text-[11px]">
+                    {tDialog('socialSecurityDesc')}
+                  </div>
                 </div>
                 <Switch
                   checked={socialSecurity}
@@ -274,18 +279,18 @@ export function StaffSalaryDialog({
             </div>
           </div>
 
-          <div className="rounded-xl border border-border/70 bg-muted/20 p-4 space-y-4">
-            <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <IconBuildingBank className="size-4 text-primary" />
-              บัญชีธนาคารและพร้อมเพย์
+          <div className="border-border/70 bg-muted/20 space-y-4 rounded-xl border p-4">
+            <h4 className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
+              <IconBuildingBank className="text-primary size-4" />
+              {tStaff('bankInfo')}
             </h4>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field className="sm:col-span-2">
-                <FieldLabel>ธนาคาร</FieldLabel>
+                <FieldLabel>{tDialog('bankName')}</FieldLabel>
                 <Select value={bankName} onValueChange={setBankName}>
                   <SelectTrigger>
-                    <SelectValue placeholder="เลือกธนาคาร" />
+                    <SelectValue placeholder={tDialog('bankName')} />
                   </SelectTrigger>
                   <SelectContent>
                     {THAI_BANKS.map((b) => (
@@ -298,27 +303,27 @@ export function StaffSalaryDialog({
               </Field>
 
               <Field>
-                <FieldLabel>เลขที่บัญชี</FieldLabel>
+                <FieldLabel>{tDialog('bankAccountNumber')}</FieldLabel>
                 <Input
-                  placeholder="เช่น 045-2-88991-0"
+                  placeholder={tDialog('bankAccountPlaceholder')}
                   value={bankAccountNumber}
                   onChange={(e) => setBankAccountNumber(e.target.value)}
                 />
               </Field>
 
               <Field>
-                <FieldLabel>ชื่อบัญชี</FieldLabel>
+                <FieldLabel>{tDialog('bankAccountName')}</FieldLabel>
                 <Input
-                  placeholder="เช่น สมศักดิ์ ขยันยิ่ง"
+                  placeholder={tDialog('bankAccountNamePlaceholder')}
                   value={bankAccountName}
                   onChange={(e) => setBankAccountName(e.target.value)}
                 />
               </Field>
 
               <Field className="sm:col-span-2">
-                <FieldLabel>พร้อมเพย์ (PromptPay)</FieldLabel>
+                <FieldLabel>{tDialog('promptpayNumber')}</FieldLabel>
                 <Input
-                  placeholder="เบอร์โทรศัพท์ 10 หลัก หรือ เลขประจำตัวประชาชน"
+                  placeholder={tDialog('promptpayPlaceholder')}
                   value={promptpayNumber}
                   onChange={(e) => setPromptpayNumber(e.target.value)}
                 />
@@ -327,10 +332,10 @@ export function StaffSalaryDialog({
           </div>
 
           <Field>
-            <FieldLabel>หมายเหตุเพิ่มเติม</FieldLabel>
+            <FieldLabel>{tDialog('note')}</FieldLabel>
             <Textarea
               rows={2}
-              placeholder="เช่น พนักงานทดลองงาน วันที่เริ่มงาน หรือสิทธิประโยชน์อื่นๆ"
+              placeholder={tDialog('notePlaceholder')}
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
@@ -338,25 +343,27 @@ export function StaffSalaryDialog({
 
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
-              <div className="text-sm font-medium">เปิดใช้งานพนักงานนี้</div>
-              <div className="text-xs text-muted-foreground">
-                พนักงานที่เปิดใช้งานจะถูกรวมในรอบตัดเงินเดือนอัตโนมัติ
+              <div className="text-sm font-medium">
+                {tDialog('employmentStatus')}
+              </div>
+              <div className="text-muted-foreground text-xs">
+                {tStaff('status')}
               </div>
             </div>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+          <DialogFooter className="gap-2 pt-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              ยกเลิก
+              {tDialog('cancel')}
             </Button>
             <Button type="submit" disabled={upsertMutation.isPending}>
-              <IconDeviceFloppy className="size-4 mr-1" />
-              {upsertMutation.isPending ? 'กำลังบันทึก...' : 'บันทึกข้อมูล'}
+              <IconDeviceFloppy className="mr-1 size-4" />
+              {upsertMutation.isPending ? tDialog('saving') : tDialog('save')}
             </Button>
           </DialogFooter>
         </form>
@@ -364,4 +371,3 @@ export function StaffSalaryDialog({
     </Dialog>
   )
 }
-

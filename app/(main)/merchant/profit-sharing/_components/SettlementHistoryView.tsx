@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { useMonthlySettlementHistory } from '@/actions/hooks/profit-sharing'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
@@ -49,6 +49,7 @@ export function SettlementHistoryView({
   onSelectPeriod,
 }: SettlementHistoryViewProps) {
   const t = useTranslations('merchant.profitSharing')
+  const locale = useLocale()
   const { data: settlements = [], isLoading } =
     useMonthlySettlementHistory(storeId)
   const { format } = useMerchantCurrency()
@@ -62,6 +63,8 @@ export function SettlementHistoryView({
     setPrintOpen(true)
   }
 
+  const dateLocale = locale === 'th' ? 'th-TH' : 'en-US'
+
   return (
     <div className="space-y-6">
       <Card>
@@ -70,10 +73,7 @@ export function SettlementHistoryView({
             <IconHistory className="text-primary size-5" />
             {t('tabs.history')}
           </CardTitle>
-          <CardDescription>
-            ประวัติรอบบัญชีที่เคยคำนวณและบันทึกไว้ในระบบ
-            สามารถพิมพ์ใบสำคัญจ่ายย้อนหลังได้ตลอดเวลา
-          </CardDescription>
+          <CardDescription>{t('history.cardDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {/* Mobile Card View */}
@@ -92,13 +92,8 @@ export function SettlementHistoryView({
             ) : settlements.length === 0 ? (
               <div className="text-muted-foreground flex flex-col items-center justify-center space-y-2 p-8 text-center">
                 <IconCalendar className="size-8 opacity-40" />
-                <p className="text-sm">
-                  ยังไม่มีประวัติการบันทึกรอบบัญชีในฐานข้อมูล
-                </p>
-                <p className="text-xs">
-                  เมื่อคุณกด &quot;บันทึกยอดรอบนี้ลง DB&quot; หรือ
-                  &quot;ปิดรอบนี้&quot; ในแท็บตัดรอบ ข้อมูลจะปรากฏที่นี่
-                </p>
+                <p className="text-sm">{t('history.empty')}</p>
+                <p className="text-xs">{t('history.emptyDesc')}</p>
               </div>
             ) : (
               settlements.map((record) => {
@@ -110,10 +105,10 @@ export function SettlementHistoryView({
 
                 const startFormatted = new Date(
                   record.startDate,
-                ).toLocaleDateString('th-TH')
+                ).toLocaleDateString(dateLocale)
                 const endFormatted = new Date(
                   record.endDate,
-                ).toLocaleDateString('th-TH')
+                ).toLocaleDateString(dateLocale)
 
                 return (
                   <div key={record.id} className="space-y-3 p-4">
@@ -123,7 +118,7 @@ export function SettlementHistoryView({
                           {record.periodLabel}
                         </div>
                         <div className="text-muted-foreground text-xs">
-                          {startFormatted} ถึง {endFormatted}
+                          {startFormatted} {t('history.to')} {endFormatted}
                         </div>
                       </div>
                       <Badge
@@ -136,13 +131,19 @@ export function SettlementHistoryView({
                       >
                         {allPaid ? (
                           <span className="flex items-center gap-1 text-xs">
-                            <IconCheck className="size-3" /> โอนครบ ({paidCount}
-                            /{totalCount})
+                            <IconCheck className="size-3" />{' '}
+                            {t('history.allPaid', {
+                              paid: paidCount,
+                              total: totalCount,
+                            })}
                           </span>
                         ) : (
                           <span className="flex items-center gap-1 text-xs">
-                            <IconClock className="size-3" /> โอน {paidCount}/
-                            {totalCount}
+                            <IconClock className="size-3" />{' '}
+                            {t('history.partialPaid', {
+                              paid: paidCount,
+                              total: totalCount,
+                            })}
                           </span>
                         )}
                       </Badge>
@@ -152,7 +153,7 @@ export function SettlementHistoryView({
                     <div className="bg-muted/40 grid grid-cols-3 gap-2 rounded-lg p-2.5 text-center text-xs">
                       <div>
                         <span className="text-muted-foreground block text-[11px]">
-                          ยอดขาย
+                          {t('history.revenue')}
                         </span>
                         <span className="text-foreground font-semibold">
                           {format(Number(record.totalRevenue))}
@@ -160,7 +161,7 @@ export function SettlementHistoryView({
                       </div>
                       <div>
                         <span className="text-muted-foreground block text-[11px]">
-                          กำไรสุทธิ
+                          {t('history.netProfit')}
                         </span>
                         <span className="font-semibold text-blue-600 dark:text-blue-400">
                           {format(Number(record.netProfit))}
@@ -168,7 +169,7 @@ export function SettlementHistoryView({
                       </div>
                       <div>
                         <span className="text-muted-foreground block text-[11px]">
-                          จัดสรรแล้ว
+                          {t('history.totalAllocated')}
                         </span>
                         <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                           {format(Number(record.totalAllocated))}
@@ -185,14 +186,14 @@ export function SettlementHistoryView({
                         onClick={() => handlePrint(record)}
                       >
                         <IconPrinter className="mr-1 size-3.5" />
-                        พิมพ์
+                        {t('history.print')}
                       </Button>
                       <Button
                         size="sm"
                         className="text-xs"
                         onClick={() => onSelectPeriod(record.period)}
                       >
-                        ดูรายละเอียด
+                        {t('history.viewDetail')}
                       </Button>
                     </div>
                   </div>
@@ -206,13 +207,25 @@ export function SettlementHistoryView({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>รอบบัญชี / งวด</TableHead>
-                  <TableHead className="text-right">ยอดขายรวม</TableHead>
-                  <TableHead className="text-right">กำไรสุทธิ</TableHead>
-                  <TableHead className="text-right">จัดสรรแล้ว</TableHead>
-                  <TableHead className="text-right">เงินสำรองร้าน</TableHead>
-                  <TableHead className="text-center">สถานะการโอน</TableHead>
-                  <TableHead className="text-right">การจัดการ</TableHead>
+                  <TableHead>{t('history.colPeriod')}</TableHead>
+                  <TableHead className="text-right">
+                    {t('history.colRevenue')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('history.colNetProfit')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('history.colAllocated')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('history.colRetained')}
+                  </TableHead>
+                  <TableHead className="text-center">
+                    {t('history.colStatus')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('history.colActions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -250,11 +263,8 @@ export function SettlementHistoryView({
                     >
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <IconCalendar className="size-8 opacity-40" />
-                        <p>ยังไม่มีประวัติการบันทึกรอบบัญชีในฐานข้อมูล</p>
-                        <p className="text-xs">
-                          เมื่อคุณกด &quot;บันทึกยอดรอบนี้ลง DB&quot; หรือ
-                          &quot;ปิดรอบนี้&quot; ในแท็บตัดรอบ ข้อมูลจะปรากฏที่นี่
-                        </p>
+                        <p>{t('history.empty')}</p>
+                        <p className="text-xs">{t('history.emptyDesc')}</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -268,10 +278,10 @@ export function SettlementHistoryView({
 
                     const startFormatted = new Date(
                       record.startDate,
-                    ).toLocaleDateString('th-TH')
+                    ).toLocaleDateString(dateLocale)
                     const endFormatted = new Date(
                       record.endDate,
-                    ).toLocaleDateString('th-TH')
+                    ).toLocaleDateString(dateLocale)
 
                     return (
                       <TableRow key={record.id}>
@@ -281,7 +291,7 @@ export function SettlementHistoryView({
                             {record.periodLabel}
                           </div>
                           <div className="text-muted-foreground text-xs">
-                            {startFormatted} ถึง {endFormatted}
+                            {startFormatted} {t('history.to')} {endFormatted}
                           </div>
                         </TableCell>
 
@@ -317,13 +327,19 @@ export function SettlementHistoryView({
                           >
                             {allPaid ? (
                               <span className="flex items-center gap-1">
-                                <IconCheck className="size-3" /> โอนครบแล้ว (
-                                {paidCount}/{totalCount})
+                                <IconCheck className="size-3" />{' '}
+                                {t('history.allPaidFull', {
+                                  paid: paidCount,
+                                  total: totalCount,
+                                })}
                               </span>
                             ) : (
                               <span className="flex items-center gap-1">
-                                <IconClock className="size-3" /> โอนแล้ว{' '}
-                                {paidCount}/{totalCount}
+                                <IconClock className="size-3" />{' '}
+                                {t('history.partialPaidFull', {
+                                  paid: paidCount,
+                                  total: totalCount,
+                                })}
                               </span>
                             )}
                           </Badge>
@@ -338,14 +354,13 @@ export function SettlementHistoryView({
                               className="text-xs"
                               onClick={() => onSelectPeriod(record.period)}
                             >
-                              ดูรายละเอียด
+                              {t('history.viewDetail')}
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
+                              variant="outline"
+                              size="icon-lg"
                               onClick={() => handlePrint(record)}
-                              title="พิมพ์ใบสำคัญสรุปยอด"
+                              title={t('history.printTooltip')}
                             >
                               <IconPrinter className="size-4" />
                             </Button>

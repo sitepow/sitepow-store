@@ -109,12 +109,12 @@ export function PartnerDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      toast.error('กรุณาระบุชื่อผู้รับส่วนแบ่งหรือหุ้นส่วน')
+      toast.error(t('partners.dialog.nameRequired'))
       return
     }
 
     if (shareValue <= 0) {
-      toast.error('กรุณาระบุสัดส่วนหรือจำนวนเงินที่มากกว่า 0')
+      toast.error(t('partners.dialog.valueRequired'))
       return
     }
 
@@ -138,16 +138,16 @@ export function PartnerDialog({
           if (res.success) {
             toast.success(
               partner
-                ? 'อัปเดตข้อมูลหุ้นส่วนในฐานข้อมูลเรียบร้อยแล้ว'
-                : 'เพิ่มหุ้นส่วนลงฐานข้อมูลเรียบร้อยแล้ว',
+                ? t('partners.dialog.updateSuccess')
+                : t('partners.dialog.createSuccess'),
             )
             setOpen(false)
           } else {
-            toast.error(res.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+            toast.error(res.message || t('partners.dialog.saveError'))
           }
         },
         onError: (err: any) => {
-          toast.error(err?.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+          toast.error(err?.message || t('partners.dialog.saveError'))
         },
       },
     )
@@ -171,7 +171,7 @@ export function PartnerDialog({
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="เช่น คุณสมชาย (หุ้นส่วน 1) หรือ ค่าพัฒนาระบบ (ทีมเดฟ)"
+              placeholder={t('partners.dialog.namePlaceholder')}
               required
               disabled={isPending}
             />
@@ -239,8 +239,8 @@ export function PartnerDialog({
           <Field>
             <FieldLabel>
               {shareType === ShareType.FIXED_MONTHLY
-                ? 'จำนวนเงินคงที่ต่อเดือน (บาท) *'
-                : 'สัดส่วนเปอร์เซ็นต์ (%) *'}
+                ? t('partners.dialog.fixedMonthlyLabel')
+                : t('partners.dialog.percentLabel')}
             </FieldLabel>
             <div className="relative">
               <Input
@@ -254,22 +254,24 @@ export function PartnerDialog({
                 disabled={isPending}
               />
               <span className="text-muted-foreground absolute top-2.5 right-3 text-sm font-medium">
-                {shareType === ShareType.FIXED_MONTHLY ? '฿ / เดือน' : '%'}
+                {shareType === ShareType.FIXED_MONTHLY
+                  ? t('partners.dialog.fixedMonthlyUnit')
+                  : t('partners.dialog.percentUnit')}
               </span>
             </div>
             <p className="text-muted-foreground mt-1 text-xs">
               {shareType === ShareType.NET_PROFIT_PERCENT &&
-                '💡 คำนวณจาก กำไรสุทธิ = (ยอดขายรวม - ต้นทุนสินค้า - ค่าใช้จ่ายร้าน)'}
+                t('partners.dialog.netProfitHint')}
               {shareType === ShareType.REVENUE_PERCENT &&
-                '💡 คำนวณจาก ยอดขายรวมทั้งหมดของรอบเดือนก่อนหักต้นทุน'}
+                t('partners.dialog.revenueHint')}
               {shareType === ShareType.FIXED_MONTHLY &&
-                '💡 คิดเป็นยอดเงินประจำรายเดือน เช่น ค่าดูแลระบบ หรือ ค่าจ้างเหมา'}
+                t('partners.dialog.fixedHint')}
             </p>
           </Field>
 
           <div className="bg-muted/30 space-y-3 rounded-lg border p-3">
             <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-              ช่องทางการรับเงิน / บัญชีธนาคาร
+              {t('partners.dialog.bankSection')}
             </h4>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -298,7 +300,7 @@ export function PartnerDialog({
                 <Input
                   value={bankAccount}
                   onChange={(e) => setBankAccount(e.target.value)}
-                  placeholder="เช่น 123-4-56789-0"
+                  placeholder={t('partners.dialog.bankAccountPlaceholder')}
                   disabled={isPending}
                 />
               </Field>
@@ -310,7 +312,7 @@ export function PartnerDialog({
                 <Input
                   value={bankAccountName}
                   onChange={(e) => setBankAccountName(e.target.value)}
-                  placeholder="ชื่อบัญชีรับโอน"
+                  placeholder={t('partners.dialog.bankAccountNamePlaceholder')}
                   disabled={isPending}
                 />
               </Field>
@@ -320,7 +322,7 @@ export function PartnerDialog({
                 <Input
                   value={promptPay}
                   onChange={(e) => setPromptPay(e.target.value)}
-                  placeholder="เบอร์โทรศัพท์ หรือ เลขบัตร ปชช."
+                  placeholder={t('partners.dialog.promptPayPlaceholder')}
                   disabled={isPending}
                 />
               </Field>
@@ -332,7 +334,7 @@ export function PartnerDialog({
             <Textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="เงื่อนไขหรือบันทึกเพิ่มเติม..."
+              placeholder={t('partners.dialog.notePlaceholder')}
               rows={2}
               disabled={isPending}
             />
@@ -343,8 +345,8 @@ export function PartnerDialog({
               <p className="text-sm font-medium">{t('partners.status')}</p>
               <p className="text-muted-foreground text-xs">
                 {isActive
-                  ? 'เปิดใช้งานและนำไปคิดในรอบการตัดรอบ'
-                  : 'ระงับการจัดสรรเงินชั่วคราว'}
+                  ? t('partners.dialog.activeDesc')
+                  : t('partners.dialog.inactiveDesc')}
               </p>
             </div>
             <Switch
@@ -361,14 +363,14 @@ export function PartnerDialog({
               onClick={() => setOpen(false)}
               disabled={isPending}
             >
-              ยกเลิก
+              {t('partners.dialog.cancel')}
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending
-                ? 'กำลังบันทึก...'
+                ? t('partners.dialog.saving')
                 : partner
-                  ? 'บันทึกการแก้ไข'
-                  : 'เพิ่มผู้รับส่วนแบ่ง'}
+                  ? t('partners.dialog.saveEdit')
+                  : t('partners.dialog.addSubmit')}
             </Button>
           </DialogFooter>
         </form>

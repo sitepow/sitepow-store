@@ -2,7 +2,8 @@
 
 import React from 'react'
 
-import { StatsCard } from '@/components/StatsCard'
+import { useTranslations } from 'next-intl'
+
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { MonthlyPayrollRecord } from '@/types/payroll'
 import {
@@ -11,6 +12,8 @@ import {
   IconCash,
   IconWallet,
 } from '@tabler/icons-react'
+
+import { StatsCard } from '@/components/StatsCard'
 
 interface PayrollSummaryCardsProps {
   payroll?: MonthlyPayrollRecord
@@ -21,6 +24,7 @@ export function PayrollSummaryCards({
   payroll,
   isLoading = false,
 }: PayrollSummaryCardsProps) {
+  const t = useTranslations('merchant.payroll.summary')
   const { formatCurrency } = useMerchantCurrency()
 
   if (isLoading) {
@@ -49,41 +53,44 @@ export function PayrollSummaryCards({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* 1. Base Salaries */}
       <StatsCard
-        title="ฐานเงินเดือนรวม"
+        title={t('totalBase')}
         value={formatCurrency(base)}
-        description="ยอดเงินเดือน/ค่าจ้างตั้งต้นของพนักงาน"
+        description={t('totalBaseDesc')}
         icon={IconCash}
-        badge={`${payroll?.items?.length ?? 0} คน`}
+        badge={t('badgeStaffCount', { count: payroll?.items?.length ?? 0 })}
       />
 
       {/* 2. Total Additions */}
       <StatsCard
-        title="เงินเพิ่มรวม (OT/โบนัส/คอม)"
+        title={t('totalAdditions')}
         value={formatCurrency(additions)}
-        description="ค่าล่วงเวลาและผลตอบแทนพิเศษ"
+        description={t('totalAdditionsDesc')}
         icon={IconArrowUp}
       />
 
       {/* 3. Total Deductions */}
       <StatsCard
-        title="ยอดหักรวม"
+        title={t('totalDeductions')}
         value={formatCurrency(deductions)}
-        description="ขาด ลา มาสาย หักภาษี ประกันสังคม"
+        description={t('totalDeductionsDesc')}
         icon={IconArrowDown}
       />
 
       {/* 4. Total Net Payroll */}
       <StatsCard
-        title="ยอดจ่ายสุทธิรวม"
+        title={t('totalNet')}
         value={formatCurrency(net)}
-        description={`จ่ายแล้ว ${formatCurrency(paid)} (${net > 0 ? Math.round((paid / net) * 100) : 0}%)`}
+        description={t('paidOfNet', {
+          paid: formatCurrency(paid),
+          percent: net > 0 ? Math.round((paid / net) * 100) : 0,
+        })}
         icon={IconWallet}
         badge={
           payroll?.isClosed
-            ? 'ปิดรอบแล้ว'
+            ? t('badgeClosed')
             : paid >= net && net > 0
-              ? 'จ่ายครบแล้ว'
-              : 'รอดำเนินการ'
+              ? t('badgePaidAll')
+              : t('badgePending')
         }
       />
     </div>

@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useLocale, useTranslations } from 'next-intl'
+
 import {
   useCloseMonthlyPayroll,
   useMonthlyPayroll,
@@ -62,8 +64,11 @@ interface MonthlyPayrollViewProps {
 
 export function MonthlyPayrollView({
   storeId,
-  storeName = 'ร้านค้า',
+  storeName: propStoreName,
 }: MonthlyPayrollViewProps) {
+  const t = useTranslations('merchant.payroll')
+  const storeName = propStoreName || t('settlement.payslip.storeFallback')
+  const locale = useLocale()
   const { formatCurrency } = useMerchantCurrency()
 
   // Generate recent 12 months for period select
@@ -147,18 +152,18 @@ export function MonthlyPayrollView({
       })
 
       if (result.success) {
-        toast.success('บันทึกการคำนวณเงินเดือนเรียบร้อยแล้ว')
+        toast.success(t('settlement.saveSuccess'))
       } else {
-        toast.error(result.message || 'ไม่สามารถบันทึกข้อมูลได้')
+        toast.error(result.message || t('settlement.saveFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+      toast.error(t('settlement.saveFailed'))
     }
   }
 
   const handleSyncToExpense = async () => {
     if (!payroll?.id || payroll.isDraft) {
-      toast.error('กรุณากดบันทึกการคำนวณเงินเดือนก่อนส่งเข้าค่าใช้จ่าย')
+      toast.error(t('settlement.saveChanges'))
       return
     }
 
@@ -170,30 +175,23 @@ export function MonthlyPayrollView({
       })
 
       if (res.success) {
-        toast.success(
-          `บันทึกค่าใช้จ่ายเงินเดือนงวด ${payroll.periodLabel} เข้าสู่ระบบค่าใช้จ่ายร้านค้าเรียบร้อยแล้ว`,
-        )
+        toast.success(t('settlement.syncSuccess'))
       } else {
-        toast.error(res.message || 'ไม่สามารถบันทึกค่าใช้จ่ายได้')
+        toast.error(res.message || t('settlement.saveFailed'))
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย')
+      toast.error(t('settlement.saveFailed'))
     }
   }
 
   const handleToggleClose = async () => {
     if (!payroll?.id || payroll.isDraft) {
-      toast.error('กรุณากดบันทึกการคำนวณเงินเดือนก่อนปิดรอบ')
+      toast.error(t('settlement.saveChanges'))
       return
     }
 
     const willClose = !payroll.isClosed
-    if (
-      willClose &&
-      !confirm(
-        `คุณต้องการปิดรอบเงินเดือนงวด "${payroll.periodLabel}" และบันทึกยอดเงินเดือนเข้าสู่ระบบค่าใช้จ่ายร้านค้าใช่หรือไม่?`,
-      )
-    ) {
+    if (willClose && !confirm(t('settlement.closePayroll'))) {
       return
     }
 
@@ -209,14 +207,21 @@ export function MonthlyPayrollView({
       if (res.success) {
         toast.success(
           willClose
-            ? `ปิดรอบงวด ${payroll.periodLabel} และบันทึกลงค่าใช้จ่ายร้านค้าสำเร็จ`
-            : `เปิดรอบงวด ${payroll.periodLabel} เพื่อแก้ไขแล้ว`,
+            ? t('settlement.closeSuccess')
+            : t('settlement.reopenSuccess'),
         )
       } else {
-        toast.error(res.message || 'ไม่สามารถเปลี่ยนสถานะรอบได้')
+        toast.error(
+          res.message ||
+            (willClose
+              ? t('settlement.closeFailed')
+              : t('settlement.reopenFailed')),
+        )
       }
     } catch {
-      toast.error('เกิดข้อผิดพลาดในการเปลี่ยนสถานะรอบ')
+      toast.error(
+        willClose ? t('settlement.closeFailed') : t('settlement.reopenFailed'),
+      )
     }
   }
 
@@ -239,11 +244,11 @@ export function MonthlyPayrollView({
         <div className="flex flex-wrap items-center gap-3">
           <div className="text-foreground flex items-center gap-1.5 text-sm font-semibold">
             <IconReceiptTax className="text-primary size-5" />
-            เลือกรอบเดือน:
+            {t('settlement.selectPeriod')}:
           </div>
           <Select value={period} onValueChange={(val) => setPeriod(val)}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="เลือกรอบ" />
+              <SelectValue placeholder={t('settlement.selectPeriod')} />
             </SelectTrigger>
             <SelectContent>
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((offset) => {
@@ -252,10 +257,13 @@ export function MonthlyPayrollView({
                 const y = d.getFullYear()
                 const m = String(d.getMonth() + 1).padStart(2, '0')
                 const val = `${y}-${m}`
-                const label = d.toLocaleDateString('th-TH', {
-                  month: 'long',
-                  year: 'numeric',
-                })
+                const label = d.toLocaleDateString(
+                  locale === 'th' ? 'th-TH' : 'en-US',
+                  {
+                    month: 'long',
+                    year: 'numeric',
+                  },
+                )
                 return (
                   <SelectItem key={val} value={val}>
                     {label}
@@ -268,7 +276,7 @@ export function MonthlyPayrollView({
           {isClosed ? (
             <Badge className="border-emerald-200 bg-emerald-500/10 text-emerald-600">
               <IconLock className="mr-1 size-3" />
-              ปิดรอบแล้ว
+              {t('settlement.closed')}
             </Badge>
           ) : (
             <Badge
@@ -276,14 +284,14 @@ export function MonthlyPayrollView({
               className="inline-flex items-center gap-1 border-amber-500/30 bg-amber-500/10 text-amber-600"
             >
               <IconLockOpen className="mr-1 size-3" />
-              กำลังดำเนินการ
+              {t('settlement.open')}
             </Badge>
           )}
 
           {payroll?.expenseId && (
             <Badge className="border-blue-200 bg-blue-500/10 text-blue-600">
               <IconReceipt className="mr-1 size-3" />
-              บันทึกในค่าใช้จ่ายแล้ว (SALARY)
+              {t('settlement.expenseLinked')}
             </Badge>
           )}
         </div>
@@ -298,7 +306,9 @@ export function MonthlyPayrollView({
               onClick={handleSave}
             >
               <IconDeviceFloppy className="mr-1 size-4" />
-              {saveMutation.isPending ? 'กำลังบันทึก...' : 'บันทึกการคำนวณ'}
+              {saveMutation.isPending
+                ? t('settlement.saving')
+                : t('settlement.saveChanges')}
             </Button>
           )}
 
@@ -311,8 +321,8 @@ export function MonthlyPayrollView({
           >
             <IconReceipt className="mr-1 size-4" />
             {syncExpenseMutation.isPending
-              ? 'กำลังส่งข้อมูล...'
-              : 'บันทึกเข้าค่าใช้จ่าย'}
+              ? t('settlement.saving')
+              : t('settlement.syncExpense')}
           </Button>
 
           <Button
@@ -324,12 +334,12 @@ export function MonthlyPayrollView({
             {isClosed ? (
               <>
                 <IconLockOpen className="mr-1 size-4" />
-                เปิดรอบแก้ไข
+                {t('settlement.reopenPayroll')}
               </>
             ) : (
               <>
                 <IconLock className="mr-1 size-4" />
-                ปิดรอบ & บันทึกค่าใช้จ่าย
+                {t('settlement.closePayroll')}
               </>
             )}
           </Button>
@@ -345,12 +355,9 @@ export function MonthlyPayrollView({
           <div>
             <CardTitle className="flex items-center gap-2 text-lg">
               <IconReceipt2 className="text-primary size-5" />
-              รายการคำนวณเงินเดือนพนักงาน ({payroll?.periodLabel || period})
+              {t('settlement.employeeList')} ({payroll?.periodLabel || period})
             </CardTitle>
-            <CardDescription>
-              ปรับยอดค่าล่วงเวลา (OT), โบนัส, คอมมิชชั่น และยอดหักต่างๆ
-              ก่อนปิดรอบ
-            </CardDescription>
+            <CardDescription>{t('description')}</CardDescription>
           </div>
           <Button
             variant="ghost"
@@ -359,19 +366,18 @@ export function MonthlyPayrollView({
             className="text-muted-foreground text-xs"
           >
             <IconRefresh className="mr-1 size-3.5" />
-            รีเฟรชข้อมูล
+            {t('tabs.settlementShort')}
           </Button>
         </CardHeader>
 
         <CardContent className="p-0">
           {isLoading ? (
             <div className="text-muted-foreground animate-pulse p-8 text-center text-sm">
-              กำลังคำนวณข้อมูลงวดเงินเดือน...
+              {t('settlement.saving')}
             </div>
           ) : items.length === 0 ? (
             <div className="text-muted-foreground p-8 text-center text-sm">
-              ยังไม่มีข้อมูลพนักงานที่เปิดใช้งานในระบบ โปรดไปที่แท็บ
-              &quot;รายชื่อ & ฐานเงินเดือน&quot; เพื่อเพิ่มพนักงานก่อน
+              {t('staff.empty')}
             </div>
           ) : (
             <>
@@ -380,23 +386,31 @@ export function MonthlyPayrollView({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>พนักงาน</TableHead>
-                      <TableHead className="text-right">ฐานเงินเดือน</TableHead>
-                      <TableHead className="w-24 text-right">
-                        OT (บาท)
+                      <TableHead>{t('settlement.thColEmployee')}</TableHead>
+                      <TableHead className="text-right">
+                        {t('settlement.thColBaseSalary')}
                       </TableHead>
-                      <TableHead className="w-24 text-right">
-                        โบนัส (บาท)
+                      <TableHead className="w-28 text-right">
+                        {t('settlement.thColOvertime')}
                       </TableHead>
-                      <TableHead className="w-24 text-right">
-                        คอมฯ (บาท)
+                      <TableHead className="w-28 text-right">
+                        {t('settlement.thColBonus')}
                       </TableHead>
-                      <TableHead className="w-24 text-right">
-                        ยอดหัก (บาท)
+                      <TableHead className="w-28 text-right">
+                        {t('settlement.thColCommission')}
                       </TableHead>
-                      <TableHead className="text-right">ยอดสุทธิ</TableHead>
-                      <TableHead className="text-center">สถานะโอน</TableHead>
-                      <TableHead className="text-right">จัดการ</TableHead>
+                      <TableHead className="w-28 text-right">
+                        {t('settlement.thColDeductions')}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t('settlement.thColNet')}
+                      </TableHead>
+                      <TableHead className="text-center">
+                        {t('settlement.thColStatus')}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t('settlement.thColActions')}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -407,7 +421,7 @@ export function MonthlyPayrollView({
                             {item.employeeName}
                           </div>
                           <div className="text-muted-foreground text-xs">
-                            {item.position || 'พนักงาน'}
+                            {item.position || '-'}
                             {item.department ? ` • ${item.department}` : ''}
                           </div>
                         </TableCell>
@@ -508,14 +522,14 @@ export function MonthlyPayrollView({
                             {item.status === 'PAID' ? (
                               <Badge className="border-emerald-200 bg-emerald-500/10 text-emerald-600">
                                 <IconCheck className="mr-1 size-3" />
-                                โอนแล้ว
+                                {t('status.PAID')}
                               </Badge>
                             ) : (
                               <Badge
                                 variant="outline"
                                 className="border-amber-300 text-amber-600"
                               >
-                                รอโอน
+                                {t('status.PENDING')}
                               </Badge>
                             )}
                           </Button>
@@ -525,19 +539,17 @@ export function MonthlyPayrollView({
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                              title="ดูสลิป / แจ้งโอนเงิน"
+                              variant="outline"
+                              size="icon-lg"
+                              title={t('settlement.viewSlip')}
                               onClick={() => openSlipModal(item)}
                             >
                               <IconReceipt className="text-muted-foreground size-4" />
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                              title="พิมพ์สลิปเงินเดือน (Payslip)"
+                              variant="outline"
+                              size="icon-lg"
+                              title={t('settlement.printPayslip')}
                               onClick={() => openPrintModal(item)}
                             >
                               <IconPrinter className="text-muted-foreground size-4" />
@@ -563,7 +575,7 @@ export function MonthlyPayrollView({
                           {item.employeeName}
                         </div>
                         <div className="text-muted-foreground text-xs">
-                          {item.position || 'พนักงาน'}
+                          {item.position || '-'}
                           {item.department ? ` • ${item.department}` : ''}
                         </div>
                       </div>
@@ -574,21 +586,25 @@ export function MonthlyPayrollView({
                             : 'border-amber-200 bg-amber-500/10 text-amber-600'
                         }
                       >
-                        {item.status === 'PAID' ? 'โอนแล้ว' : 'รอโอน'}
+                        {item.status === 'PAID'
+                          ? t('status.PAID')
+                          : t('status.PENDING')}
                       </Badge>
                     </div>
 
                     <div className="bg-muted/20 grid grid-cols-2 gap-2 rounded-lg p-2.5 text-xs">
                       <div>
                         <span className="text-muted-foreground">
-                          ฐานเงินเดือน:
+                          {t('settlement.thColBaseSalary')}:
                         </span>{' '}
                         <span className="font-medium">
                           {formatCurrency(item.baseSalary)}
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">ยอดสุทธิ:</span>{' '}
+                        <span className="text-muted-foreground">
+                          {t('settlement.thColNet')}:
+                        </span>{' '}
                         <span className="text-primary font-bold">
                           {formatCurrency(item.netSalary)}
                         </span>
@@ -599,7 +615,7 @@ export function MonthlyPayrollView({
                       <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
                         <div>
                           <label className="text-muted-foreground text-[11px]">
-                            ค่าล่วงเวลา (OT):
+                            {t('settlement.thColOvertime')}:
                           </label>
                           <Input
                             type="number"
@@ -618,7 +634,7 @@ export function MonthlyPayrollView({
                         </div>
                         <div>
                           <label className="text-muted-foreground text-[11px]">
-                            โบนัส/เบี้ยขยัน:
+                            {t('settlement.thColBonus')}:
                           </label>
                           <Input
                             type="number"
@@ -637,7 +653,7 @@ export function MonthlyPayrollView({
                         </div>
                         <div>
                           <label className="text-muted-foreground text-[11px]">
-                            คอมมิชชั่น:
+                            {t('settlement.thColCommission')}:
                           </label>
                           <Input
                             type="number"
@@ -656,7 +672,7 @@ export function MonthlyPayrollView({
                         </div>
                         <div>
                           <label className="text-[11px] text-rose-500">
-                            ยอดหัก (ขาดลา/ภาษี):
+                            {t('settlement.thColDeductions')}:
                           </label>
                           <Input
                             type="number"
@@ -679,21 +695,17 @@ export function MonthlyPayrollView({
                     <div className="border-border/50 flex items-center gap-2 border-t pt-1">
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="flex-1 text-xs"
+                        size="icon-lg"
                         onClick={() => openSlipModal(item)}
                       >
-                        <IconReceipt className="mr-1 size-3.5" />
-                        {item.status === 'PAID' ? 'ดูสลิปโอน' : 'แจ้งโอนเงิน'}
+                        <IconReceipt className="size-3.5" />
                       </Button>
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="text-xs"
+                        size="icon-lg"
                         onClick={() => openPrintModal(item)}
                       >
-                        <IconPrinter className="mr-1 size-3.5" />
-                        พิมพ์สลิป
+                        <IconPrinter className="size-3.5" />
                       </Button>
                     </div>
                   </div>
