@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
 
 export async function getStoreSlugByDomain(
@@ -11,6 +12,7 @@ export async function getStoreSlugByDomain(
 
   const cacheKey = `domain:slug:${cleanHostname}`
 
+  // 1. อ่านจาก Redis Cache
   try {
     const cachedSlug = await redis.get(cacheKey)
     if (cachedSlug) {
@@ -23,39 +25,47 @@ export async function getStoreSlugByDomain(
     console.error('Redis error in domain-resolver:', err)
   }
 
-  const internalPort = process.env.PORT || '3000'
-  const internalApiBase =
-    process.env.INTERNAL_API_URL || `http://127.0.0.1:${internalPort}`
-  const internalSecret = process.env.INTERNAL_API_SECRET || ''
-
+  // 2. Query ตรงผ่าน Prisma (ไม่ต้อง fetch HTTP ย้อนกลับเข้าตัวเอง)
   try {
-    const resolveRes = await fetch(
-      `${internalApiBase}/api/internal/resolve-domain?domain=${encodeURIComponent(cleanHostname)}`,
-      {
-        headers: {
-          'x-internal-secret': internalSecret,
-        },
-        signal: AbortSignal.timeout(3000),
+    // เช็คจาก StoreDomain หรือฟิลด์ customDomain ใน Store[cite: 1]
+    const storeDomain = await prisma.storeDomain.findFirst({
+      where: {
+        domain: cleanHostname,
+        status: 'ACTIVE',
       },
-    )
+      select: {
+        store: {
+          select: { slug: true },
+        },
+      },
+    })
 
-    if (resolveRes.ok) {
-      const data = (await resolveRes.json()) as { slug?: string }
-      const storeSlug = data.slug
-      if (storeSlug) {
-        await Promise.all([
-          redis.setex(cacheKey, 604800, storeSlug), // 7 days
-          redis.setex(`slug:domain:${storeSlug}`, 604800, cleanHostname),
-        ]).catch(console.error)
-        return storeSlug
-      }
+    let storeSlug = storeDomain?.store?.slug
+
+    // รองรับกรณีเก็บไว้ที่ store.customDomain โดยตรง[cite: 1]
+    if (!storeSlug) {
+      const store = await prisma.store.findFirst({
+        where: {
+          customDomain: cleanHostname,
+        },
+        select: { slug: true },
+      })
+      storeSlug = store?.slug
     }
 
-    // Cache negative lookup for 5 minutes so invalid domains / bots don't hit the internal endpoint repeatedly
+    if (storeSlug) {
+      await Promise.all([
+        redis.setex(cacheKey, 604800, storeSlug), // 7 days
+        redis.setex(`slug:domain:${storeSlug}`, 604800, cleanHostname),
+      ]).catch(console.error)
+      return storeSlug
+    }
+
+    // Domain Not Found - Cache ไว้ 5 นาที
     await redis.setex(cacheKey, 300, '__NOT_FOUND__').catch(console.error)
   } catch (error) {
     console.error(
-      `Failed to resolve domain "${cleanHostname}" via internal API:`,
+      `Failed to resolve domain "${cleanHostname}" via Prisma:`,
       error,
     )
   }
