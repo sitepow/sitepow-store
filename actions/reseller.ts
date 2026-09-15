@@ -220,7 +220,7 @@ export async function createResellerPOSOrder(
 
       const order = await tx.order.create({
         data: {
-          storeId: input.supplierStoreId,
+          storeId: agreement.supplierStoreId,
           orderNumber: `RS-POS-${Date.now()}`,
           baseCurrency: supplierCurrency,
           customerCurrency: customerCurrency,
@@ -238,7 +238,7 @@ export async function createResellerPOSOrder(
       return order
     })
 
-    appEvents.publish<OrderEventPayload>(`order:${input.supplierStoreId}`, {
+    appEvents.publish<OrderEventPayload>(`order:${agreement.supplierStoreId}`, {
       type: 'ORDER_CREATED',
       orderId: result.id,
     })
@@ -372,6 +372,7 @@ export interface AllocateResellerStockInput {
   agreementId: string
   variantId: string
   quantity: number
+  branchId?: string
 }
 
 export async function allocateResellerStock(input: AllocateResellerStockInput) {
@@ -408,7 +409,9 @@ export async function allocateResellerStock(input: AllocateResellerStockInput) {
       const mainStock = await tx.productStock.findFirst({
         where: {
           variantId: input.variantId,
-          branch: { storeId: agreement.supplierStoreId },
+          ...(input.branchId
+            ? { branchId: input.branchId }
+            : { branch: { storeId: agreement.supplierStoreId } }),
         },
       })
 
@@ -780,20 +783,77 @@ export async function getAllResellerAgreements(storeId: string) {
     }
 
     if (!storeId) {
-      return { success: true, data: [] }
+      const agreements = await prisma.resellerAgreement.findMany({
+        where: {
+          status: AgreementStatus.ACTIVE,
+          resellerCustomerId: userId,
+        },
+        include: {
+          supplierStore: {
+            select: { id: true, name: true },
+          },
+          resellerStore: {
+            select: { id: true, name: true },
+          },
+          resellerUser: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+      return { success: true, data: serializeDecimal(agreements) }
     }
 
-    const agreements = await prisma.resellerAgreement.findMany({
-      where: {
-        status: AgreementStatus.ACTIVE,
-        OR: [
-          { supplierStoreId: storeId },
-          {
-            resellerStoreId: storeId,
-            resellerType: ResellerType.INTERNAL_STORE,
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
+    })
+
+    const isStoreOwner = store?.ownerId === userId
+
+    let isSupplierStaff = isStoreOwner
+    if (!isSupplierStaff) {
+      const employeeStore = await prisma.employeeStore.findFirst({
+        where: {
+          storeId,
+          employee: { userId },
+        },
+        include: {
+          branches: {
+            include: {
+              role: true,
+            },
           },
-        ],
-      },
+        },
+      })
+
+      const hasManagerRole = employeeStore?.branches.some(
+        (b) => b.role?.name && b.role.name !== DefaultRole.POS_RESELLER,
+      )
+      if (hasManagerRole) {
+        isSupplierStaff = true
+      }
+    }
+
+    const whereClause: Prisma.ResellerAgreementWhereInput = isSupplierStaff
+      ? {
+          status: AgreementStatus.ACTIVE,
+          OR: [
+            { supplierStoreId: storeId },
+            {
+              resellerStoreId: storeId,
+              resellerType: ResellerType.INTERNAL_STORE,
+            },
+          ],
+        }
+      : {
+          status: AgreementStatus.ACTIVE,
+          resellerCustomerId: userId,
+          OR: [{ supplierStoreId: storeId }, { resellerStoreId: storeId }],
+        }
+
+    const agreements = await prisma.resellerAgreement.findMany({
+      where: whereClause,
       include: {
         supplierStore: {
           select: { id: true, name: true },
@@ -844,23 +904,84 @@ export async function getResellerAgreements(storeId: string) {
     }
 
     if (!storeId) {
-      return { success: true, data: [] }
+      const agreements = await prisma.resellerAgreement.findMany({
+        where: {
+          status: AgreementStatus.ACTIVE,
+          resellerCustomerId: userId,
+        },
+        include: {
+          supplierStore: {
+            select: { id: true, name: true },
+          },
+          resellerStore: {
+            select: { id: true, name: true },
+          },
+          resellerUser: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+      return { success: true, data: serializeDecimal(agreements) }
     }
 
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
+    })
+
+    const isStoreOwner = store?.ownerId === userId
+
+    let isSupplierStaff = isStoreOwner
+    if (!isSupplierStaff) {
+      const employeeStore = await prisma.employeeStore.findFirst({
+        where: {
+          storeId,
+          employee: { userId },
+        },
+        include: {
+          branches: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      })
+
+      const hasManagerRole = employeeStore?.branches.some(
+        (b) => b.role?.name && b.role.name !== DefaultRole.POS_RESELLER,
+      )
+      if (hasManagerRole) {
+        isSupplierStaff = true
+      }
+    }
+
+    const whereClause: Prisma.ResellerAgreementWhereInput = isSupplierStaff
+      ? {
+          status: AgreementStatus.ACTIVE,
+          OR: [
+            {
+              supplierStoreId: storeId,
+              resellerType: ResellerType.EXTERNAL,
+            },
+            {
+              supplierStoreId: storeId,
+              resellerType: ResellerType.INTERNAL_STORE,
+            },
+            {
+              resellerStoreId: storeId,
+              resellerType: ResellerType.INTERNAL_STORE,
+            },
+          ],
+        }
+      : {
+          status: AgreementStatus.ACTIVE,
+          resellerCustomerId: userId,
+          OR: [{ supplierStoreId: storeId }, { resellerStoreId: storeId }],
+        }
+
     const agreements = await prisma.resellerAgreement.findMany({
-      where: {
-        status: AgreementStatus.ACTIVE,
-        OR: [
-          {
-            supplierStoreId: storeId,
-            resellerType: ResellerType.EXTERNAL,
-          },
-          {
-            resellerStoreId: storeId,
-            resellerType: ResellerType.INTERNAL_STORE,
-          },
-        ],
-      },
+      where: whereClause,
       include: {
         supplierStore: {
           select: { id: true, name: true },
@@ -1294,6 +1415,49 @@ export async function upsertResellerCustomPrice(
         messageTH: 'ราคาส่งต้องไม่ติดลบ',
         messageEN: 'Wholesale price cannot be negative',
         message: 'ราคาส่งต้องไม่ติดลบ',
+      }
+    }
+
+    const agreement = await prisma.resellerAgreement.findUnique({
+      where: { id: input.agreementId },
+      include: {
+        supplierStore: { select: { ownerId: true } },
+      },
+    })
+
+    if (!agreement) {
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลสัญญาฝากขาย',
+        messageEN: 'Consignment agreement not found',
+        message: 'ไม่พบข้อมูลสัญญาฝากขาย',
+      }
+    }
+
+    const userId = userSession.id
+    if (agreement.supplierStore.ownerId !== userId) {
+      const employeeStore = await prisma.employeeStore.findFirst({
+        where: {
+          storeId: agreement.supplierStoreId,
+          employee: { userId },
+        },
+        include: {
+          branches: {
+            include: { role: true },
+          },
+        },
+      })
+      const isManager = employeeStore?.branches.some(
+        (b) => b.role?.name && b.role.name !== DefaultRole.POS_RESELLER,
+      )
+      if (!isManager) {
+        return {
+          success: false,
+          messageTH:
+            'เฉพาะร้านค้าผู้จัดจำหน่ายเท่านั้นที่สามารถแก้ไขราคาส่งได้',
+          messageEN: 'Only supplier store can modify wholesale custom prices',
+          message: 'เฉพาะร้านค้าผู้จัดจำหน่ายเท่านั้นที่สามารถแก้ไขราคาส่งได้',
+        }
       }
     }
 

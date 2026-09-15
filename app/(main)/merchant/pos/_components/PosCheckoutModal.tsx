@@ -306,7 +306,7 @@ export function PosCheckoutModal({
     if (isResellerMode && agreementId) {
       const resellerPayload = {
         agreementId,
-        supplierStoreId: data.storeId,
+        supplierStoreId: supplierStoreId || data.storeId,
         branchId: data.branchId,
         customerCurrency: currency,
         items: cartItems.map((item) => ({

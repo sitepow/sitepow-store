@@ -1,8 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
@@ -10,16 +9,18 @@ import {
   useDeleteEmployee,
   useEmployeePermission,
   useEmployees,
+  useResetEmployeePassword,
 } from '@/actions/hooks/employee'
-import { StorePagination } from '@/components/StorePagination'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { extractEmployeeStoreData } from '@/utils/employee'
 import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
+import { StorePagination } from '@/components/StorePagination'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -53,6 +54,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   const canManageEmployee = canUpdateEmployee || canDeleteEmployee
 
   const deleteEmployeeMutation = useDeleteEmployee()
+  const resetPasswordMutation = useResetEmployeePassword()
 
   const { data: { data: employees = [], meta } = {}, isLoading } = useEmployees(
     {
@@ -81,9 +83,11 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   return (
     <div
       className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <div className="rounded-md border">
         <Table>
@@ -193,13 +197,50 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     {canManageEmployee && (
                       <TableCell className="space-x-2 text-right">
                         {canUpdateEmployee && (
-                          <Button
-                            variant="outline"
-                            size="icon-lg"
-                            onClick={() => onEdit(employeeStore.id)}
-                          >
-                            <IconSettings />
-                          </Button>
+                          <>
+                            <Button
+                              variant="outline"
+                              size="icon-lg"
+                              title={t('resetPassword')}
+                              disabled={resetPasswordMutation.isPending}
+                              onClick={() => {
+                                if (confirm(t('resetPasswordConfirm'))) {
+                                  resetPasswordMutation.mutate(
+                                    employeeStore.id,
+                                    {
+                                      onSuccess: (res) => {
+                                        if (res.success) {
+                                          toast.success(
+                                            res.messageTH || res.message,
+                                          )
+                                        } else {
+                                          toast.error(
+                                            res.messageTH || res.message,
+                                          )
+                                        }
+                                      },
+                                      onError: (err) => {
+                                        toast.error(
+                                          err instanceof Error
+                                            ? err.message
+                                            : 'Error',
+                                        )
+                                      },
+                                    },
+                                  )
+                                }
+                              }}
+                            >
+                              <IconKey />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon-lg"
+                              onClick={() => onEdit(employeeStore.id)}
+                            >
+                              <IconSettings />
+                            </Button>
+                          </>
                         )}
                         {canDeleteEmployee && (
                           <DeleteButton

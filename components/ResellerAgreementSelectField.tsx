@@ -62,6 +62,8 @@ export function ResellerAgreementSelectField({
       if (!isValid) {
         handleValueChange(ALL_STORES)
       }
+    } else if (agreements.length === 1 && currentValue === ALL_STORES) {
+      handleValueChange(agreements[0].id)
     }
   }, [selectedStoreId, activeQuery.data?.data, isLoading])
 

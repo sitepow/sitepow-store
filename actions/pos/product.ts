@@ -2,6 +2,7 @@
 
 import {
   AgreementStatus,
+  DefaultRole,
   DiscountType,
   Prisma,
 } from '@/generated/prisma/client'
@@ -99,6 +100,37 @@ export async function getPOSProducts({
   }
 
   try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { ownerId: true },
+    })
+
+    if (store && store.ownerId !== userId) {
+      const employeeStore = await prisma.employeeStore.findFirst({
+        where: {
+          storeId,
+          employee: { userId },
+        },
+        include: {
+          branches: {
+            include: { role: true },
+          },
+        },
+      })
+
+      const isPosReseller = employeeStore?.branches.some(
+        (b) => b.role?.name === DefaultRole.POS_RESELLER,
+      )
+      const hasOtherRole = employeeStore?.branches.some(
+        (b) => b.role?.name && b.role.name !== DefaultRole.POS_RESELLER,
+      )
+
+      // External resellers have no store products of their own; they only sell consignment stock
+      if (isPosReseller && !hasOtherRole) {
+        return { success: true, data: [] }
+      }
+    }
+
     const products = await prisma.product.findMany({
       where: {
         storeId: storeId,
@@ -203,107 +235,148 @@ export type ResellerPOSProductItem = DecimalToNumber<
 export async function getResellerPOSProducts({
   agreementId,
   branchId,
+  storeId,
+  search,
+  categoryId,
 }: {
-  agreementId: string
+  agreementId?: string
   branchId: string
+  storeId?: string
   search?: string
   categoryId?: string
 }) {
-  if (!agreementId || !branchId) {
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+
+  if (!userId || !branchId || (!agreementId && !storeId)) {
     return { success: true, data: [] }
   }
 
   try {
-    const agreement = await prisma.resellerAgreement.findUnique({
-      where: {
-        id: agreementId,
-        status: AgreementStatus.ACTIVE,
-      },
-      include: {
-        customPrices: true,
-        stocks: {
-          include: {
-            variant: {
-              include: {
-                product: {
-                  include: {
-                    images: true,
-                  },
+    const agreementsInclude = {
+      customPrices: true,
+      stocks: {
+        include: {
+          variant: {
+            include: {
+              product: {
+                include: {
+                  images: true,
                 },
               },
             },
           },
         },
       },
-    })
+    }
 
-    if (!agreement || !agreement.stocks.length) {
+    let agreements: any[] = []
+
+    if (agreementId) {
+      const single = await prisma.resellerAgreement.findUnique({
+        where: {
+          id: agreementId,
+          status: AgreementStatus.ACTIVE,
+        },
+        include: agreementsInclude,
+      })
+      if (single) agreements.push(single)
+    } else if (storeId) {
+      agreements = await prisma.resellerAgreement.findMany({
+        where: {
+          status: AgreementStatus.ACTIVE,
+          OR: [
+            { resellerCustomerId: userId, supplierStoreId: storeId },
+            { resellerStoreId: storeId },
+          ],
+        },
+        include: agreementsInclude,
+      })
+    }
+
+    if (!agreements.length) {
       return { success: true, data: [] }
     }
 
     const resellerProductsMap = new Map()
 
-    agreement.stocks.forEach((stock) => {
-      const availableQty = stock.acceptedQuantity - stock.soldQuantity
-      if (availableQty <= 0) {
-        return
-      }
+    for (const agreement of agreements) {
+      agreement.stocks.forEach((stock: any) => {
+        const availableQty = stock.acceptedQuantity - stock.soldQuantity
+        if (availableQty <= 0) {
+          return
+        }
 
-      const variant = stock.variant
-      const product = variant.product
+        const variant = stock.variant
+        const product = variant.product
 
-      const customPrice = agreement.customPrices.find(
-        (cp) => cp.variantId === variant.id,
-      )
+        if (categoryId && product.categoryId !== categoryId) {
+          return
+        }
 
-      const originalPriceNum = Number(variant.price)
-      let calculatedDiscountAmountNum: number | null = null
-      let calculatedDiscountType: DiscountType | null = null
+        if (search) {
+          const query = search.toLowerCase()
+          const matchTitle = product.title?.toLowerCase().includes(query)
+          const matchSku = variant.sku?.toLowerCase().includes(query)
+          const matchVariant = variant.title?.toLowerCase().includes(query)
+          if (!matchTitle && !matchSku && !matchVariant) {
+            return
+          }
+        }
 
-      if (customPrice?.specialPrice) {
-        calculatedDiscountAmountNum =
-          originalPriceNum - Number(customPrice.specialPrice)
-        calculatedDiscountType = DiscountType.FIXED
-      } else if (
-        customPrice?.discountType &&
-        customPrice.discountAmount != null
-      ) {
-        calculatedDiscountAmountNum = Number(customPrice.discountAmount)
-        calculatedDiscountType = customPrice.discountType
-      } else if (
-        agreement.defaultDiscountType &&
-        agreement.defaultDiscountAmount
-      ) {
-        calculatedDiscountAmountNum = Number(agreement.defaultDiscountAmount)
-        calculatedDiscountType = agreement.defaultDiscountType
-      }
+        const customPrice = agreement.customPrices.find(
+          (cp: any) => cp.variantId === variant.id,
+        )
 
-      const formattedVariant = {
-        ...variant,
-        price: originalPriceNum,
-        discountActive: (calculatedDiscountAmountNum ?? 0) > 0,
-        discountType: calculatedDiscountType,
-        discountAmount: calculatedDiscountAmountNum,
-        stocks: [
-          {
-            quantity: availableQty,
-            branchId,
-            branch: { name: 'สต็อกฝากขาย' },
-          },
-        ],
-      }
+        const originalPriceNum = Number(variant.price)
+        let calculatedDiscountAmountNum: number | null = null
+        let calculatedDiscountType: DiscountType | null = null
 
-      if (!resellerProductsMap.has(product.id)) {
-        resellerProductsMap.set(product.id, {
-          ...product,
-          variants: [formattedVariant],
-          isReseller: true,
-          resellerAgreementId: agreement.id,
-        })
-      } else {
-        resellerProductsMap.get(product.id).variants.push(formattedVariant)
-      }
-    })
+        if (customPrice?.specialPrice) {
+          calculatedDiscountAmountNum =
+            originalPriceNum - Number(customPrice.specialPrice)
+          calculatedDiscountType = DiscountType.FIXED
+        } else if (
+          customPrice?.discountType &&
+          customPrice.discountAmount != null
+        ) {
+          calculatedDiscountAmountNum = Number(customPrice.discountAmount)
+          calculatedDiscountType = customPrice.discountType
+        } else if (
+          agreement.defaultDiscountType &&
+          agreement.defaultDiscountAmount
+        ) {
+          calculatedDiscountAmountNum = Number(agreement.defaultDiscountAmount)
+          calculatedDiscountType = agreement.defaultDiscountType
+        }
+
+        const formattedVariant = {
+          ...variant,
+          price: originalPriceNum,
+          discountActive: (calculatedDiscountAmountNum ?? 0) > 0,
+          discountType: calculatedDiscountType,
+          discountAmount: calculatedDiscountAmountNum,
+          stocks: [
+            {
+              quantity: availableQty,
+              branchId,
+              branch: { name: 'สต็อกฝากขาย' },
+            },
+          ],
+        }
+
+        if (!resellerProductsMap.has(product.id)) {
+          resellerProductsMap.set(product.id, {
+            ...product,
+            variants: [formattedVariant],
+            isReseller: true,
+            resellerAgreementId: agreement.id,
+          })
+        } else {
+          resellerProductsMap.get(product.id).variants.push(formattedVariant)
+        }
+      })
+    }
 
     const resellerProducts = Array.from(resellerProductsMap.values())
 

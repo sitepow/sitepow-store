@@ -12,6 +12,7 @@ import {
 } from '@/actions/hooks/reseller'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useResellerSSE } from '@/hooks/use-reseller-sse'
+import { useSession } from '@/hooks/use-session'
 import { useAlertStore } from '@/stores/use-alert-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -63,8 +64,21 @@ export default function ResellerManagementPage() {
   const agreements = response?.data || []
   const selectedAgreement = agreements.find((a) => a.id === selectedAgreementId)
 
+  const { user } = useSession()
+
+  const isExternalReseller = Boolean(
+    selectedAgreement?.resellerCustomerId &&
+    selectedAgreement.resellerCustomerId === user?.id,
+  )
+  const isInternalReseller = Boolean(
+    selectedAgreement?.resellerStoreId &&
+    selectedAgreement.resellerStoreId === selectedStoreId,
+  )
+  const isReseller = isExternalReseller || isInternalReseller
   const isSupplier = Boolean(
-    selectedAgreement && selectedAgreement.supplierStoreId === selectedStoreId,
+    selectedAgreement &&
+    selectedAgreement.supplierStoreId === selectedStoreId &&
+    !isReseller,
   )
 
   const {
@@ -72,6 +86,7 @@ export default function ResellerManagementPage() {
     canCreateReseller,
     canUpdateReseller,
     canUpdateFinance,
+    isPosReseller,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -174,7 +189,7 @@ export default function ResellerManagementPage() {
                   mode="all"
                   disabled={selectedStoreId === ALL_STORES}
                 />
-                {canCreateReseller && (
+                {canCreateReseller && !isPosReseller && (
                   <Button
                     variant="outline"
                     onClick={() => setCreateAgreementOpen(true)}
@@ -271,6 +286,8 @@ export default function ResellerManagementPage() {
             />
           )}
           <ResellerStockTable
+            isSupplier={isSupplier}
+            isReseller={isReseller}
             onAcceptStock={handleOpenAccept}
             onReturnStock={handleOpenReturn}
             onEditPrice={handleOpenEditPrice}

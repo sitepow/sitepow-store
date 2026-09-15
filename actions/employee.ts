@@ -5,6 +5,7 @@ import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
+import bcrypt from 'bcryptjs'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -666,5 +667,142 @@ export async function getEmployeePermission(
   } catch (error) {
     console.error(error)
     return null
+  }
+}
+
+export async function resetEmployeePassword(employeeStoreId: string) {
+  try {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return {
+        success: false,
+        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+        messageEN: 'Please sign in to proceed',
+        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+      }
+    }
+
+    const employeeStore = await prisma.employeeStore.findUnique({
+      where: { id: employeeStoreId },
+      include: {
+        store: { select: { id: true } },
+        employee: {
+          select: { id: true, email: true, userId: true, name: true },
+        },
+      },
+    })
+
+    if (!employeeStore) {
+      return {
+        success: false,
+        messageTH: 'ไม่พบข้อมูลพนักงานในร้านค้านี้',
+        messageEN: 'Employee not found in this store',
+        message: 'ไม่พบข้อมูลพนักงานในร้านค้านี้',
+      }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: employeeStore.store.id,
+      permission: 'canUpdateEmployee',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const targetEmail = employeeStore.employee.email
+    let targetUserId = employeeStore.employee.userId
+
+    const hashedPassword = await bcrypt.hash(DEFAULT_PASSWORD_EMPLOYEE, 10)
+
+    if (!targetUserId) {
+      let user = await prisma.user.findUnique({
+        where: { email: targetEmail },
+        select: { id: true },
+      })
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: targetEmail,
+            name: employeeStore.employee.name,
+            role: 'MERCHANT',
+            password: hashedPassword,
+            emailVerified: true,
+          },
+          select: { id: true },
+        })
+      }
+      targetUserId = user.id
+      await prisma.employee.update({
+        where: { id: employeeStore.employee.id },
+        data: { userId: targetUserId },
+      })
+    }
+
+    const credentialAccount = await prisma.account.findFirst({
+      where: {
+        userId: targetUserId,
+        providerId: 'credential',
+      },
+    })
+
+    if (credentialAccount) {
+      await prisma.account.update({
+        where: { id: credentialAccount.id },
+        data: { password: hashedPassword },
+      })
+    } else {
+      await prisma.account.create({
+        data: {
+          userId: targetUserId,
+          accountId: targetEmail,
+          providerId: 'credential',
+          password: hashedPassword,
+        },
+      })
+    }
+
+    await prisma.user.update({
+      where: { id: targetUserId },
+      data: {
+        password: hashedPassword,
+        emailVerified: true,
+      },
+    })
+
+    await createLog({
+      action: LogAction.MANAGE_EMPLOYEE,
+      actorType: ActorType.MERCHANT,
+      storeId: employeeStore.store.id,
+      entity: 'Employee',
+      entityId: employeeStore.employee.id,
+      details: {
+        email: targetEmail,
+        type: 'reset_password',
+      },
+    })
+
+    return {
+      success: true,
+      messageTH: `รีเซ็ตรหัสผ่านพนักงานสำเร็จ (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
+      messageEN: `Employee password reset successfully (Default password: ${DEFAULT_PASSWORD_EMPLOYEE})`,
+      message: `รีเซ็ตรหัสผ่านพนักงานสำเร็จ (รหัสผ่านเริ่มต้น: ${DEFAULT_PASSWORD_EMPLOYEE})`,
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      success: false,
+      messageTH: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่านพนักงาน',
+      messageEN: 'Error resetting employee password',
+      message: 'เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่านพนักงาน',
+    }
   }
 }

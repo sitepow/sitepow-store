@@ -1042,6 +1042,8 @@
     "noAccessDescription": "You do not have permission to view employee information for this store or branch.",
     "edit": "Edit",
     "delete": "Delete",
+    "resetPassword": "Reset to default password",
+    "resetPasswordConfirm": "Are you sure you want to reset this employee's password to 123456?",
     "columns": {
       "employeeId": "Employee ID",
       "name": "Employee Name",
@@ -1693,7 +1695,8 @@
       "statusAcceptedAll": "Fully Accepted",
       "statusPendingAccept": "Pending ({count})",
       "returnStockTooltip": "Return stock to store owner",
-      "acceptStockTooltip": "Accept stock into inventory"
+      "pullBackStockTooltip": "Pull back consignment stock to warehouse",
+      "acceptStockTooltip": "Accept stock into warehouse"
     },
     "createAgreement": {
       "title": "Create New Reseller Agreement",

@@ -12,14 +12,15 @@ export const posProductKeys = {
       { storeId, branchId, search, categoryId },
     ] as const,
   resellerList: (
-    agreementId: string,
-    branchId: string,
+    agreementId?: string,
+    branchId?: string,
+    storeId?: string,
     search?: string,
     categoryId?: string,
   ) =>
     [
       ...posProductKeys.all,
       'reseller-list',
-      { agreementId, branchId, search, categoryId },
+      { agreementId, branchId, storeId, search, categoryId },
     ] as const,
 }

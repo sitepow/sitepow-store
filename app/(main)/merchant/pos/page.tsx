@@ -42,8 +42,11 @@ export default function MerchantPOSPage() {
   const { selectedBranchId } = useBranchFilter()
   const { selectedAgreementId } = useResellerFilter()
 
-  const { canCreateOrder, isLoading: isPermissionLoading } =
-    useEmployeePermission()
+  const {
+    canCreateOrder,
+    isPosReseller,
+    isLoading: isPermissionLoading,
+  } = useEmployeePermission()
 
   const cartItems = useCartStore((state) => state.items)
   const addItem = useCartStore((state) => state.addItem)
@@ -74,10 +77,12 @@ export default function MerchantPOSPage() {
   } = useResellerPOSProducts({
     agreementId: isAllAgreement ? '' : selectedAgreementId,
     branchId: selectedBranchId,
+    storeId: selectedStoreId,
     search: debouncedSearch,
   })
 
-  const resellerProducts = isAllAgreement ? [] : rawResellerProducts
+  const resellerProducts =
+    !isAllAgreement || isPosReseller ? rawResellerProducts : []
 
   const resellerMap = new Map(
     (resellerProducts as unknown as POSProductItem[]).map((p) => [p.id, p]),
@@ -93,12 +98,14 @@ export default function MerchantPOSPage() {
   ]
 
   const isProductsLoading =
-    isOwnProductsLoading || (!isAllAgreement && isResellerProductsLoading)
+    isOwnProductsLoading ||
+    ((!isAllAgreement || isPosReseller) && isResellerProductsLoading)
 
-  const resellerAgreementId = isAllAgreement
-    ? undefined
-    : selectedAgreementId ||
-      products.find((p) => p.isReseller)?.resellerAgreementId
+  const resellerAgreementId = !isAllAgreement
+    ? selectedAgreementId
+    : isPosReseller && resellerProducts.length > 0
+      ? (resellerProducts[0] as unknown as POSProductItem)?.resellerAgreementId
+      : undefined
 
   const handleAddToCart = (
     product: POSProductItem,

@@ -7,7 +7,6 @@ import {
   useResellerPayoutSummary,
   useResellerStocks,
 } from '@/actions/hooks/reseller'
-import { StatsCard } from '@/components/StatsCard'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -21,6 +20,7 @@ import { CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { ProductImage } from '@/components/ProductImage'
+import { StatsCard } from '@/components/StatsCard'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -38,12 +38,16 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 /* eslint-disable @next/next/no-img-element */
 
 interface ResellerStockTableProps {
+  isSupplier?: boolean
+  isReseller?: boolean
   onAcceptStock?: (stock: any) => void
   onReturnStock?: (stock: any) => void
   onEditPrice?: (stock: any) => void
 }
 
 export function ResellerStockTable({
+  isSupplier = false,
+  isReseller = false,
   onAcceptStock,
   onReturnStock,
   onEditPrice,
@@ -67,7 +71,8 @@ export function ResellerStockTable({
     return <ActionRequiredAlert />
   }
 
-  const canAccept = canViewReseller || canUpdateReseller
+  const canAccept = isReseller && (canViewReseller || canUpdateReseller)
+  const canEditPrice = isSupplier && canUpdateReseller
 
   const hasAnyAction = stocks.some((stock) => {
     const allocated = stock.allocatedQuantity || 0
@@ -75,7 +80,9 @@ export function ResellerStockTable({
     const pendingQuantity = allocated - accepted
     const isAcceptedAll = pendingQuantity <= 0
 
-    return canUpdateInventory || (canAccept && !isAcceptedAll)
+    return (
+      canUpdateInventory || canUpdateReseller || (canAccept && !isAcceptedAll)
+    )
   })
 
   const showActionColumn = hasAnyAction
@@ -224,7 +231,7 @@ export function ResellerStockTable({
                               price: formatCurrency(customPrice),
                             })}
                           </span>
-                          {canUpdateInventory && onEditPrice && (
+                          {canEditPrice && onEditPrice && (
                             <Button
                               variant="ghost"
                               size="icon-lg"
@@ -300,11 +307,15 @@ export function ResellerStockTable({
                       </TableCell>
                       {showActionColumn && (
                         <TableCell className="space-x-1 text-right whitespace-nowrap">
-                          {canUpdateInventory && (
+                          {(canUpdateInventory || canUpdateReseller) && (
                             <Button
                               variant="outline"
                               size="icon-lg"
-                              title={t('table.returnStockTooltip')}
+                              title={
+                                isSupplier
+                                  ? t('table.pullBackStockTooltip')
+                                  : t('table.returnStockTooltip')
+                              }
                               disabled={allocated - sold <= 0}
                               onClick={() => onReturnStock?.(stock)}
                             >

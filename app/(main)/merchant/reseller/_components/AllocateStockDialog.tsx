@@ -1,7 +1,6 @@
 'use client'
 
 /* eslint-disable @next/next/no-img-element */
-
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Controller,
@@ -154,6 +153,7 @@ export function AllocateStockDialog({
         agreementId,
         variantId: values.variantId,
         quantity: Number(values.quantity),
+        branchId: selectedBranchId || undefined,
       },
       {
         onSuccess: (res) => {

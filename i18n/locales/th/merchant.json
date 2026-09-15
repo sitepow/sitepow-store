@@ -1042,6 +1042,8 @@
     "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้",
     "edit": "แก้ไข",
     "delete": "ลบ",
+    "resetPassword": "รีเซ็ตรหัสผ่านเริ่มต้น",
+    "resetPasswordConfirm": "ต้องการรีเซ็ตรหัสผ่านพนักงานคนนี้เป็น 123456 ใช่หรือไม่?",
     "columns": {
       "employeeId": "รหัสพนักงาน",
       "name": "ชื่อพนักงาน",
@@ -1701,6 +1703,7 @@
       "statusAcceptedAll": "รับครบแล้ว",
       "statusPendingAccept": "รอรับ ({count})",
       "returnStockTooltip": "คืนสต็อกกลับให้เจ้าของร้าน",
+      "pullBackStockTooltip": "ดึงสต็อกฝากขายคืนเข้าคลัง",
       "acceptStockTooltip": "กดรับสินค้าเข้าคลัง"
     },
     "createAgreement": {

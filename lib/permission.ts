@@ -611,31 +611,73 @@ export async function findOrCreateEmployee(
     defaultPassword = DEFAULT_PASSWORD_EMPLOYEE,
   } = params
 
+  const hashedPassword = await bcrypt.hash(defaultPassword, 10)
+
   let employee = await db.employee.findUnique({
     where: { email },
     select: { id: true, userId: true },
   })
 
-  if (employee) {
-    return { employee, isNewUser: false }
-  }
-
   let user = await db.user.findUnique({
     where: { email },
-    select: { id: true },
+    select: { id: true, password: true },
   })
 
   if (!user) {
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10)
     user = await db.user.create({
       data: {
         email,
         name,
         role: UserRole.MERCHANT,
         password: hashedPassword,
+        emailVerified: true,
+        accounts: {
+          create: {
+            accountId: email,
+            providerId: 'credential',
+            password: hashedPassword,
+          },
+        },
       },
-      select: { id: true },
+      select: { id: true, password: true },
     })
+  } else {
+    // Ensure credential account exists for better-auth
+    const credentialAccount = await db.account.findFirst({
+      where: {
+        userId: user.id,
+        providerId: 'credential',
+      },
+    })
+
+    if (!credentialAccount) {
+      await db.account.create({
+        data: {
+          userId: user.id,
+          accountId: email,
+          providerId: 'credential',
+          password: hashedPassword,
+        },
+      })
+      await db.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          emailVerified: true,
+        },
+      })
+    }
+  }
+
+  if (employee) {
+    if (!employee.userId) {
+      employee = await db.employee.update({
+        where: { id: employee.id },
+        data: { userId: user.id },
+        select: { id: true, userId: true },
+      })
+    }
+    return { employee, isNewUser: false }
   }
 
   employee = await db.employee.create({
