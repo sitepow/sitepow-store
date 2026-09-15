@@ -45,6 +45,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     },
     {
+      url: `${baseUrl}/pricing/buyout`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: {
+          th: `${baseUrl}/pricing/buyout?lang=th`,
+          en: `${baseUrl}/pricing/buyout?lang=en`,
+        },
+      },
+    },
+    {
       url: `${baseUrl}/download-pos`,
       lastModified: currentDate,
       changeFrequency: 'weekly',

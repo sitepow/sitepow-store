@@ -51,6 +51,8 @@
       "pricing": {
         "title": "ราคา & โซลูชัน",
         "packages": "แพ็กเกจและราคา",
+        "buyout": "ซื้อระบบขาด (Lifetime Buyout)",
+        "buyoutBadge": "แนะนำ",
         "zeroGp": "ขายฟรี 0% GP ตลอดชีพ",
         "zeroGpBadge": "ฟรี",
         "yearlyDiscount": "ส่วนลดรายปีสูงสุด 25%",

@@ -8,7 +8,10 @@
     "title": "Choose the Right Package for Your Store Size & Business Goals",
     "titleStart": "Choose the Right Package for",
     "titleGradient": "Your Store Size & Business Goals",
-    "description": "Transparent, cost-effective, no hidden fees, and 0% GP commission forever. Start your online store immediately."
+    "description": "Transparent, cost-effective, no hidden fees, and 0% GP commission forever. Start your online store immediately.",
+    "buyoutNotice": "Want to own the platform forever (Lifetime Buyout)?",
+    "buyoutNoticeDesc": "One-time payment, zero recurring monthly fees. Includes free installation & 1-year support.",
+    "buyoutNoticeBtn": "View Buyout Plans"
   },
   "tabs": {
     "1month": "1 Month",

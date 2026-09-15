@@ -51,6 +51,8 @@
       "pricing": {
         "title": "Pricing & Solutions",
         "packages": "Plans & Pricing",
+        "buyout": "Lifetime Buyout License",
+        "buyoutBadge": "Hot",
         "zeroGp": "0% GP Commission for Life",
         "zeroGpBadge": "Free",
         "yearlyDiscount": "Annual Discount up to 25%",

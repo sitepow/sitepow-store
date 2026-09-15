@@ -101,6 +101,12 @@ export function Footer() {
       links: [
         { label: t('columns.pricing.packages'), href: '/pricing' },
         {
+          label: t('columns.pricing.buyout'),
+          href: '/pricing/buyout',
+          badge: t('columns.pricing.buyoutBadge'),
+          highlight: true,
+        },
+        {
           label: t('columns.pricing.zeroGp'),
           href: '/pricing',
           badge: t('columns.pricing.zeroGpBadge'),

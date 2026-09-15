@@ -1,5 +1,6 @@
 import auth from './auth.json'
 import blogs from './blogs.json'
+import buyout from './buyout.json'
 import common from './common.json'
 import contact from './contact.json'
 import customer from './customer.json'
@@ -17,6 +18,7 @@ export const en = {
   common,
   home,
   pricing,
+  buyout,
   merchant,
   customer,
   storefront,

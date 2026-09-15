@@ -15,6 +15,7 @@ import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { useGSAP } from '@gsap/react'
+import { IconServer } from '@tabler/icons-react'
 import { ArrowRight } from 'lucide-react'
 
 import { BorderBeam } from '@/components/magicui/border-beam'
@@ -187,6 +188,15 @@ export function PricingSection({
                   </button>
                 )
               })}
+              <Link
+                href="/pricing/buyout"
+                className="text-muted-foreground hover:text-primary border-border/40 hover:border-primary/40 flex cursor-pointer items-center gap-1.5 rounded-xl border border-dashed px-3 py-1.5 text-xs font-semibold transition-all duration-300 sm:px-3.5"
+              >
+                <span>{tHome('buyoutCalloutBtn')}</span>
+                <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                  Hot
+                </span>
+              </Link>
             </div>
           </div>
         </div>
@@ -323,6 +333,38 @@ export function PricingSection({
               </Card>
             )
           })}
+        </div>
+
+        {/* Buyout Callout Banner */}
+        <div className="border-primary/30 bg-card/70 hover:border-primary/50 relative overflow-hidden rounded-3xl border p-5 shadow-sm backdrop-blur-md transition-all sm:p-6">
+          <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                <span className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold">
+                  <IconServer className="size-3" />
+                  Lifetime License
+                </span>
+                <span className="text-foreground text-sm font-bold sm:text-base">
+                  {tHome('buyoutCallout')}
+                </span>
+              </div>
+              <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                {tHome('buyoutCalloutDesc')}
+              </p>
+            </div>
+            <Button
+              asChild
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shrink-0 rounded-xl px-5 text-xs font-semibold shadow-sm sm:text-sm"
+            >
+              <Link
+                href="/pricing/buyout"
+                className="flex items-center gap-1.5"
+              >
+                <span>{tHome('buyoutCalloutBtn')}</span>
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Compare All Features Link */}

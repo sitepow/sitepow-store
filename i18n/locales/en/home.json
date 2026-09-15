@@ -149,7 +149,10 @@
     "badge": "Pricing & Plans",
     "title": "Choose the Perfect Plan for Your Business",
     "description": "Transparent, exceptional value, zero hidden fees, and 0% GP for lifetime.",
-    "compareLink": "View Detailed Feature Comparison Table"
+    "compareLink": "View Detailed Feature Comparison Table",
+    "buyoutCallout": "Interested in a Lifetime Buyout License?",
+    "buyoutCalloutDesc": "One-time payment, zero recurring monthly fees. Includes free installation & 1-year free support.",
+    "buyoutCalloutBtn": "Explore Buyout Plans"
   },
   "faq": {
     "badge": "Frequently Asked Questions",

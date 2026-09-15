@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "title": "Lifetime Buyout License | Sitepow Store: One-Time Payment, Zero Monthly Fees",
+    "description": "Own your e-commerce & POS platform with a one-time buyout license. Free setup and installation service, plus 1-year free technical support and maintenance included."
+  },
+  "hero": {
+    "badge": "Buyout / Lifetime License",
+    "titleStart": "Truly Own Your Store Platform",
+    "titleGradient": "One-Time Payment, Zero Monthly Rent",
+    "description": "Unlock true independence for your business. Pay once and use forever, breaking even in ~2.5 years. Includes free system setup & server installation plus 1 full year of free technical support.",
+    "switchToMonthly": "View Monthly Subscription Plans",
+    "switchToBuyout": "View One-Time Buyout Plans"
+  },
+  "trustBadges": {
+    "freeInstallation": "Free System & Server Installation",
+    "freeSupport": "Free 1-Year Technical Support",
+    "zeroGp": "0% GP Commission, 100% Profit",
+    "dataOwnership": "100% Data & Store Ownership"
+  },
+  "card": {
+    "oneTimePayment": "One-time payment, lifetime access",
+    "originalPrice": "Regular ฿{price}",
+    "saveAmount": "Save ฿{amount}",
+    "popularBadge": "Best Value & Most Popular",
+    "freeInstallBadge": "Free Installation",
+    "freeSupportBadge": "Free 1-Year Support",
+    "ctaButton": "Get This Package",
+    "contactCta": "Contact Sales / Inquire",
+    "includesAll": "Everything included:",
+    "freeValueHighlight": "Free bonuses included immediately:"
+  },
+  "plans": [
+    {
+      "title": "Starter Buyout",
+      "subtitle": "Solid foundation with zero recurring rental fees",
+      "description": "Ideal for small shops needing a counter POS and personal online store. Pay once and keep forever.",
+      "price": "14,900",
+      "originalPrice": "19,900",
+      "features": [
+        "Lifetime platform license",
+        "Zero monthly or annual recurring software fees",
+        "Up to 100 product listings",
+        "Stripe payment gateway (Cards / PromptPay)",
+        "Connect your own custom domain",
+        "Real-time counter POS & inventory deduction",
+        "Automated bank transfer slip verification"
+      ],
+      "freeServices": [
+        "Free! System setup & server configuration (฿5,000 value)",
+        "Free! Technical troubleshooting support for 1 full year (฿6,000 value)",
+        "Free! Lifetime critical security patches"
+      ]
+    },
+    {
+      "title": "Pro Buyout",
+      "subtitle": "Most popular package, fast ROI, unlimited growth",
+      "description": "For growing businesses wanting full-scale e-commerce, unlimited products, AI features, and CRM loyalty.",
+      "price": "29,900",
+      "originalPrice": "39,900",
+      "features": [
+        "Lifetime Pro system license",
+        "Zero monthly fees, break even in ~2.5 years",
+        "Unlimited product listings",
+        "Stripe payment integration + custom domain",
+        "Multi-branch POS & warehouse inventory",
+        "Smart AI product copy generator & assistant",
+        "AI-powered automatic slip verification",
+        "CRM membership, reward points & coupon engine",
+        "Remove Sitepow Store watermark branding"
+      ],
+      "freeServices": [
+        "Free! Turnkey full-setup installation ready to sell (฿8,000 value)",
+        "Free! Expedited priority technical support for 1 year (฿12,000 value)",
+        "Free! 1-on-1 merchant system onboarding training",
+        "Free! Automated periodic data backup system"
+      ]
+    },
+    {
+      "title": "Ultimate Buyout",
+      "subtitle": "Deployed on your Private Cloud with 100% data ownership",
+      "description": "For mid-to-large businesses and brands requiring isolated private servers and complete database sovereignty.",
+      "price": "59,000",
+      "originalPrice": "79,000",
+      "features": [
+        "Lifetime Enterprise system license",
+        "Deployed directly onto client's Private Cloud / VPS",
+        "100% client ownership of database & application deployment",
+        "Unlimited products, unlimited branches, unlimited staff",
+        "Reseller & dropshipping partner management",
+        "Full API & omnichannel marketplace integration",
+        "Ultra-low at-cost AI & slip verification credit rates"
+      ],
+      "freeServices": [
+        "Free! Enterprise cloud architecture & server deployment (฿15,000 value)",
+        "Free! 24/7 VIP Priority Enterprise Support for 1 year (฿24,000 value)",
+        "Free! Staff training workshops across all departments",
+        "Free! Data migration service from your previous platform"
+      ]
+    }
+  ],
+  "benefits": {
+    "badge": "Lifetime Buyout Advantages",
+    "title": "Why Forward-Thinking Businesses Buy Out",
+    "description": "Complete turnkey package: zero recurring fees, free installation, free technical support, and maximal long-term ROI.",
+    "items": [
+      {
+        "title": "Free! Turnkey Setup & Installation",
+        "description": "No IT skills required. Our engineering team installs the system, configures your domain, SSL, and database so you can start selling immediately."
+      },
+      {
+        "title": "Free! 1-Year Technical Support",
+        "description": "Dedicated specialists on standby to troubleshoot technical issues, guide configuration, and assist via fast-track channels."
+      },
+      {
+        "title": "Break Even in 2 to 2.5 Years",
+        "description": "Unlike unending monthly rent, buying out stops recurring platform costs and saves tens of thousands of baht over 3-5 years."
+      },
+      {
+        "title": "100% Store & Data Ownership",
+        "description": "Zero risk of arbitrary account bans. Your order history, customer databases, and product catalogs belong entirely to your business."
+      },
+      {
+        "title": "0% GP Commission Forever",
+        "description": "Keep 100% of your revenue. No hidden transaction percentages or sales cuts. The more you sell, the more profit you keep."
+      },
+      {
+        "title": "Free System & Security Updates",
+        "description": "Ensure your online store remains modern, fast, and protected with enterprise-grade stability and security patches."
+      }
+    ]
+  },
+  "roi": {
+    "badge": "Return on Investment (ROI)",
+    "title": "Monthly Subscription VS Lifetime Buyout",
+    "description": "See the actual cost breakdown over 3 to 5 years and discover how much you save with a one-time purchase.",
+    "headers": [
+      "Comparison Metric",
+      "Monthly Pro Plan",
+      "Pro Buyout (Lifetime)"
+    ],
+    "rows": [
+      {
+        "label": "Year 1 Cost",
+        "monthly": "฿8,910 - ฿11,880",
+        "buyout": "฿29,900 (One-time)",
+        "note": "Buyout includes free setup & 1-yr support"
+      },
+      {
+        "label": "Year 2 Cost",
+        "monthly": "฿8,910 - ฿11,880",
+        "buyout": "฿0 (Zero fee)",
+        "note": "Approaching break-even point"
+      },
+      {
+        "label": "Year 3 Cost",
+        "monthly": "฿8,910 - ฿11,880",
+        "buyout": "฿0 (Zero fee)",
+        "note": "Fully break even; immediate net savings"
+      },
+      {
+        "label": "Total 3-Year Cost",
+        "monthly": "~฿35,640",
+        "buyout": "฿29,900",
+        "note": "Cheaper than monthly subscriptions"
+      },
+      {
+        "label": "Total 5-Year Cost",
+        "monthly": "~฿59,400+",
+        "buyout": "฿29,900",
+        "note": "Save over ฿30,000 - ฿50,000++"
+      },
+      {
+        "label": "Platform Ownership",
+        "monthly": "Temporary rental",
+        "buyout": "100% Lifetime Ownership",
+        "note": "Data & platform belong to you"
+      }
+    ]
+  },
+  "faq": {
+    "badge": "Buyout Frequently Asked Questions",
+    "title": "Questions About Buying the Platform?",
+    "description": "Everything you need to know regarding servers, installation, technical support, and updates.",
+    "items": [
+      {
+        "q": "Do I need to prepare my own server for buyout?",
+        "a": "For Starter and Pro packages, we can host it on Sitepow Store's high-speed cloud infrastructure or deploy onto your private VPS/Cloud if preferred. For Ultimate, we deploy directly to your private AWS/GCP/DigitalOcean cloud with full guidance from our team."
+      },
+      {
+        "q": "What does the free installation service cover?",
+        "a": "It covers database provisioning, custom domain setup (.com, .co.th, etc.), SSL security certificates, Stripe/payment gateway connection, and full system verification before launch."
+      },
+      {
+        "q": "What is covered under the free 1-year technical support?",
+        "a": "It includes bug fixes, technical troubleshooting, configuration assistance, and staff onboarding advice via LINE Official and fast-response email for 12 months."
+      },
+      {
+        "q": "What happens after the 1-year free support expires?",
+        "a": "Your platform continues to run normally for a lifetime with zero interruptions or expiration. If desired, you can opt for an optional yearly maintenance agreement (MA) at special rates or manage it yourself."
+      },
+      {
+        "q": "Will I still receive new feature and security updates?",
+        "a": "Yes, you continue to receive security patches, bug fixes, and core compatibility updates to keep your store fast and modern."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Own Your Store Platform Forever?",
+    "description": "Consult with our specialists to assess your business size, pick the right package, and get free setup plus 1-year free support.",
+    "contactBtn": "Consult With Our Team",
+    "lineBtn": "Contact via LINE Official",
+    "seeMonthlyBtn": "View Monthly Plans"
+  }
+}
