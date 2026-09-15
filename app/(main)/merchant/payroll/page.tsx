@@ -32,7 +32,7 @@ export default function PayrollPage() {
   const { selectedStoreId } = useStoreFilter()
   const { data: storeOptions = [] } = useStoreOptions()
 
-  const { canViewExpenses, isLoading: isPermissionLoading } =
+  const { canViewPayroll, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   const [currentTab, setCurrentTab] = useState<string>('settlement')
@@ -66,7 +66,7 @@ export default function PayrollPage() {
 
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      !canViewExpenses ? (
+      !canViewPayroll ? (
         <ActionRequiredAlert
           icon={<IconLock />}
           title={t('noAccessTitle')}

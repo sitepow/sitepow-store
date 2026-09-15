@@ -179,7 +179,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'ส่วนแบ่งกำไร & หุ้นส่วน',
     tab: 'profit-sharing',
     icon: IconReceiptTax,
-    permissionKey: 'canViewFinance',
+    permissionKey: 'canViewProfitSharing',
   },
   {
     value: 'reseller',
@@ -207,7 +207,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'เงินเดือน & ค่าจ้างพนักงาน',
     tab: 'payroll',
     icon: IconReportMoney,
-    permissionKey: 'canViewExpenses',
+    permissionKey: 'canViewPayroll',
   },
   {
     value: 'reviews',

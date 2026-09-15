@@ -75,7 +75,7 @@ export async function getProfitPartners(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canViewProfitSharing',
   })
   if (!auth.isAuthorized) return []
 
@@ -88,8 +88,16 @@ export async function getProfitPartners(
   if (partners.length === 0) {
     await prisma.profitPartner.createMany({
       data: DEFAULT_PARTNERS.map((p) => ({
-        ...p,
         storeId,
+        name: p.name,
+        role: p.role,
+        shareType: p.shareType,
+        shareValue: new Prisma.Decimal(p.shareValue),
+        bankName: p.bankName,
+        bankAccount: p.bankAccount,
+        bankAccountName: p.bankAccountName,
+        promptPay: p.promptPay,
+        isActive: true,
       })),
     })
 
@@ -126,7 +134,7 @@ export async function upsertProfitPartner(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId: input.storeId,
-    permission: 'canViewFinance',
+    permission: 'canUpdateProfitSharing',
   })
   if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
 
@@ -151,29 +159,32 @@ export async function upsertProfitPartner(
         success: true,
         data: serializeDecimal(updated) as unknown as ProfitPartnerItem,
       }
-    } else {
-      const created = await prisma.profitPartner.create({
-        data: {
-          storeId: input.storeId,
-          name: input.name,
-          role: input.role,
-          shareType: input.shareType,
-          shareValue: new Prisma.Decimal(input.shareValue),
-          bankName: input.bankName,
-          bankAccount: input.bankAccount,
-          bankAccountName: input.bankAccountName,
-          promptPay: input.promptPay,
-          note: input.note,
-          isActive: input.isActive ?? true,
-        },
-      })
-      return {
-        success: true,
-        data: serializeDecimal(created) as unknown as ProfitPartnerItem,
-      }
+    }
+
+    const created = await prisma.profitPartner.create({
+      data: {
+        storeId: input.storeId,
+        name: input.name,
+        role: input.role,
+        shareType: input.shareType,
+        shareValue: new Prisma.Decimal(input.shareValue),
+        bankName: input.bankName,
+        bankAccount: input.bankAccount,
+        bankAccountName: input.bankAccountName,
+        promptPay: input.promptPay,
+        note: input.note,
+        isActive: input.isActive ?? true,
+      },
+    })
+    return {
+      success: true,
+      data: serializeDecimal(created) as unknown as ProfitPartnerItem,
     }
   } catch (err: any) {
-    return { success: false, message: err?.message || 'Failed to save partner' }
+    return {
+      success: false,
+      message: err?.message || 'Failed to save partner',
+    }
   }
 }
 
@@ -187,7 +198,7 @@ export async function deleteProfitPartner(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canDeleteProfitSharing',
   })
   if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
 
@@ -214,7 +225,7 @@ export async function toggleProfitPartnerStatus(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canUpdateProfitSharing',
   })
   if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
 
@@ -251,7 +262,7 @@ export async function getMonthlySettlement(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canViewProfitSharing',
   })
   if (!auth.isAuthorized) return null
 
@@ -281,7 +292,7 @@ export async function getMonthlySettlementHistory(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canViewProfitSharing',
   })
   if (!auth.isAuthorized) return []
 
@@ -342,7 +353,7 @@ export async function saveMonthlySettlement(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId: input.storeId,
-    permission: 'canViewFinance',
+    permission: 'canUpdateProfitSharing',
   })
   if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
 
@@ -497,6 +508,26 @@ export async function updatePayoutStatus(
   if (!user?.id) return { success: false, message: 'Unauthorized' }
 
   try {
+    const existingPayout = await prisma.profitPayout.findUnique({
+      where: { id: payoutId },
+      include: {
+        settlement: {
+          select: { storeId: true },
+        },
+      },
+    })
+
+    if (!existingPayout) {
+      return { success: false, message: 'Payout not found' }
+    }
+
+    const auth = await verifyEmployeePermission({
+      userId: user.id,
+      storeId: existingPayout.settlement.storeId,
+      permission: 'canUpdateProfitSharing',
+    })
+    if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
+
     const updated = await prisma.profitPayout.update({
       where: { id: payoutId },
       data: {
@@ -535,7 +566,7 @@ export async function closeMonthlySettlement(
   const auth = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewFinance',
+    permission: 'canUpdateProfitSharing',
   })
   if (!auth.isAuthorized) return { success: false, message: 'Forbidden' }
 

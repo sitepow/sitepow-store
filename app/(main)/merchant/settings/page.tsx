@@ -62,6 +62,7 @@ function MerchantSettingsContent() {
     canViewPayment,
     canViewReviews,
     canViewStoreSettings,
+    canViewWebhook,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -219,7 +220,7 @@ function MerchantSettingsContent() {
             )}
           </TabsContent>
           <TabsContent value={SettingsTab.WEBHOOK} className="flex-1">
-            {!isPermissionLoading && !canViewStoreSettings ? (
+            {!isPermissionLoading && !canViewWebhook ? (
               <ActionRequiredAlert
                 icon={<IconLock />}
                 title={t('noAccess.title')}

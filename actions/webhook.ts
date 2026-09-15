@@ -46,7 +46,7 @@ export async function getStoreWebhookEndpoints(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canViewStoreSettings',
+      permission: 'canViewWebhook',
     })
 
     if (!authCheck.isAuthorized) return []
@@ -90,7 +90,7 @@ export async function createStoreWebhookEndpoint(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canCreateWebhook',
     })
 
     if (!authCheck.isAuthorized) {
@@ -193,7 +193,7 @@ export async function updateStoreWebhookEndpoint(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existing.storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canUpdateWebhook',
     })
 
     if (!authCheck.isAuthorized) {
@@ -211,13 +211,12 @@ export async function updateStoreWebhookEndpoint(
 
     const parsed = webhookEndpointSchema.safeParse(input)
     if (!parsed.success) {
-      const validationMsg =
-        parsed.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง'
+      const errorMsg = parsed.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง'
       return {
         success: false,
-        messageTH: validationMsg,
-        messageEN: validationMsg,
-        message: validationMsg,
+        messageTH: errorMsg,
+        messageEN: errorMsg,
+        message: errorMsg,
       }
     }
 
@@ -234,9 +233,9 @@ export async function updateStoreWebhookEndpoint(
 
     return {
       success: true,
-      messageTH: 'อัปเดต Webhook Endpoint สำเร็จ',
-      messageEN: 'Webhook endpoint updated successfully',
-      message: 'อัปเดต Webhook Endpoint สำเร็จ',
+      messageTH: 'อัปเดต Webhook สำเร็จ',
+      messageEN: 'Webhook updated successfully',
+      message: 'อัปเดต Webhook สำเร็จ',
       data: updated,
     }
   } catch (error) {
@@ -289,7 +288,7 @@ export async function deleteStoreWebhookEndpoint(endpointId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existing.storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canDeleteWebhook',
     })
 
     if (!authCheck.isAuthorized) {
@@ -312,9 +311,9 @@ export async function deleteStoreWebhookEndpoint(endpointId: string) {
 
     return {
       success: true,
-      messageTH: 'ลบ Webhook Endpoint สำเร็จ',
-      messageEN: 'Webhook endpoint deleted successfully',
-      message: 'ลบ Webhook Endpoint สำเร็จ',
+      messageTH: 'ลบ Webhook สำเร็จ',
+      messageEN: 'Webhook deleted successfully',
+      message: 'ลบ Webhook สำเร็จ',
       storeId: existing.storeId,
     }
   } catch (error) {
@@ -367,7 +366,7 @@ export async function regenerateWebhookSecret(endpointId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existing.storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canUpdateWebhook',
     })
 
     if (!authCheck.isAuthorized) {
@@ -431,7 +430,7 @@ export async function getStoreWebhookLogs(
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existing.storeId,
-      permission: 'canViewStoreSettings',
+      permission: 'canViewWebhook',
     })
 
     if (!authCheck.isAuthorized) return []
@@ -486,7 +485,7 @@ export async function testWebhookEndpoint(endpointId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: existing.storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canUpdateWebhook',
     })
 
     if (!authCheck.isAuthorized) {
@@ -580,7 +579,7 @@ export async function resendWebhookLog(logId: string) {
     const authCheck = await verifyEmployeePermission({
       userId,
       storeId: log.endpoint.storeId,
-      permission: 'canUpdateStoreSettings',
+      permission: 'canUpdateWebhook',
     })
 
     if (!authCheck.isAuthorized) {

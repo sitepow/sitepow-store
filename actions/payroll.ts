@@ -11,6 +11,7 @@ import {
   MonthlyPayrollItemRecord,
   MonthlyPayrollRecord,
 } from '@/types/payroll'
+import { PermissionKey } from '@/types/permission'
 import { serializeDecimal } from '@/utils/decimal'
 
 import { getCurrentUser } from '@/lib/auth-server'
@@ -99,7 +100,10 @@ function getPeriodDates(period: string): {
   return { startDate, endDate, label }
 }
 
-async function checkAccess(storeId: string) {
+async function checkAccess(
+  storeId: string,
+  permission: PermissionKey = 'canViewPayroll',
+) {
   const user = await getCurrentUser()
   if (!user) {
     return { isAuthorized: false, message: 'กรุณาเข้าสู่ระบบ' }
@@ -108,7 +112,7 @@ async function checkAccess(storeId: string) {
   const authCheck = await verifyEmployeePermission({
     userId: user.id,
     storeId,
-    permission: 'canViewExpenses',
+    permission,
   })
 
   if (!authCheck.isAuthorized) {
@@ -116,7 +120,7 @@ async function checkAccess(storeId: string) {
       isAuthorized: false,
       message:
         authCheck.messageTH ||
-        'คุณไม่มีสิทธิ์เข้าถึงข้อมูลเงินเดือนและค่าใช้จ่ายของร้านค้านี้',
+        'คุณไม่มีสิทธิ์เข้าถึงข้อมูลเงินเดือนของร้านค้านี้',
     }
   }
 
@@ -246,7 +250,7 @@ export async function upsertEmployeeSalaryConfig(
   message?: string
 }> {
   try {
-    const auth = await checkAccess(input.storeId)
+    const auth = await checkAccess(input.storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -254,29 +258,32 @@ export async function upsertEmployeeSalaryConfig(
     const dataPayload = {
       storeId: input.storeId,
       employeeName: input.employeeName,
-      employeeCode: input.employeeCode?.trim() || null,
-      department: input.department?.trim() || null,
-      position: input.position?.trim() || null,
-      salaryType: input.salaryType || SalaryType.MONTHLY,
-      baseSalary: new Prisma.Decimal(input.baseSalary || 0),
-      bankName: input.bankName?.trim() || null,
-      bankAccountNumber: input.bankAccountNumber?.trim() || null,
-      bankAccountName: input.bankAccountName?.trim() || null,
-      promptpayNumber: input.promptpayNumber?.trim() || null,
-      socialSecurity: !!input.socialSecurity,
-      taxPercent: new Prisma.Decimal(input.taxPercent || 0),
-      note: input.note?.trim() || null,
+      employeeCode: input.employeeCode,
+      department: input.department,
+      position: input.position,
+      salaryType: input.salaryType,
+      baseSalary: new Prisma.Decimal(input.baseSalary),
+      bankName: input.bankName || null,
+      bankAccountNumber: input.bankAccountNumber || null,
+      bankAccountName: input.bankAccountName || null,
+      promptpayNumber: input.promptpayNumber || null,
+      socialSecurity: input.socialSecurity ?? false,
+      taxPercent:
+        input.taxPercent !== undefined
+          ? new Prisma.Decimal(input.taxPercent)
+          : null,
+      note: input.note || null,
       isActive: input.isActive ?? true,
     }
 
-    let config
+    let record
     if (input.id) {
-      config = await prisma.employeeSalaryConfig.update({
+      record = await prisma.employeeSalaryConfig.update({
         where: { id: input.id, storeId: input.storeId },
         data: dataPayload,
       })
     } else {
-      config = await prisma.employeeSalaryConfig.create({
+      record = await prisma.employeeSalaryConfig.create({
         data: dataPayload,
       })
     }
@@ -284,25 +291,27 @@ export async function upsertEmployeeSalaryConfig(
     return {
       success: true,
       data: {
-        id: config.id,
-        storeId: config.storeId,
-        employeeId: config.employeeId,
-        employeeName: config.employeeName,
-        employeeCode: config.employeeCode,
-        department: config.department,
-        position: config.position,
-        salaryType: config.salaryType,
-        baseSalary: serializeDecimal(config.baseSalary),
-        bankName: config.bankName,
-        bankAccountNumber: config.bankAccountNumber,
-        bankAccountName: config.bankAccountName,
-        promptpayNumber: config.promptpayNumber,
-        socialSecurity: config.socialSecurity,
-        taxPercent: config.taxPercent ? serializeDecimal(config.taxPercent) : 0,
-        isActive: config.isActive,
-        note: config.note,
-        createdAt: config.createdAt.toISOString(),
-        updatedAt: config.updatedAt.toISOString(),
+        id: record.id,
+        storeId: record.storeId,
+        employeeId: record.employeeId,
+        employeeName: record.employeeName,
+        employeeCode: record.employeeCode,
+        department: record.department,
+        position: record.position,
+        salaryType: record.salaryType,
+        baseSalary: serializeDecimal(record.baseSalary),
+        bankName: record.bankName,
+        bankAccountNumber: record.bankAccountNumber,
+        bankAccountName: record.bankAccountName,
+        promptpayNumber: record.promptpayNumber,
+        socialSecurity: record.socialSecurity,
+        taxPercent: record.taxPercent
+          ? serializeDecimal(record.taxPercent)
+          : null,
+        note: record.note,
+        isActive: record.isActive,
+        createdAt: record.createdAt.toISOString(),
+        updatedAt: record.updatedAt.toISOString(),
       },
     }
   } catch (error) {
@@ -316,7 +325,7 @@ export async function deleteEmployeeSalaryConfig(
   storeId: string,
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    const auth = await checkAccess(storeId)
+    const auth = await checkAccess(storeId, 'canDeletePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -341,7 +350,7 @@ export async function toggleEmployeeSalaryConfigStatus(
   message?: string
 }> {
   try {
-    const auth = await checkAccess(storeId)
+    const auth = await checkAccess(storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -372,7 +381,7 @@ export async function syncEmployeesFromStore(
   storeId: string,
 ): Promise<{ success: boolean; count?: number; message?: string }> {
   try {
-    const auth = await checkAccess(storeId)
+    const auth = await checkAccess(storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -645,7 +654,7 @@ export async function saveMonthlyPayroll(
   message?: string
 }> {
   try {
-    const auth = await checkAccess(input.storeId)
+    const auth = await checkAccess(input.storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -781,7 +790,7 @@ export async function updatePayrollItemPayout(
   input: UpdatePayrollItemPayoutInput,
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    const auth = await checkAccess(input.storeId)
+    const auth = await checkAccess(input.storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -836,7 +845,7 @@ export async function syncPayrollToExpense(
   storeId: string,
 ): Promise<{ success: boolean; expenseId?: string; message?: string }> {
   try {
-    const auth = await checkAccess(storeId)
+    const auth = await checkAccess(storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
@@ -901,7 +910,7 @@ export async function closeMonthlyPayroll(
   autoRecordExpense: boolean = true,
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    const auth = await checkAccess(storeId)
+    const auth = await checkAccess(storeId, 'canUpdatePayroll')
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }

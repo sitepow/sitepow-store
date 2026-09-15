@@ -31,7 +31,7 @@ export default function ProfitSharingPage() {
   const { selectedStoreId } = useStoreFilter()
   const { data: storeOptions = [] } = useStoreOptions()
 
-  const { canViewFinance, isLoading: isPermissionLoading } =
+  const { canViewProfitSharing, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
   const [currentTab, setCurrentTab] = useState<string>('settlement')
@@ -61,7 +61,7 @@ export default function ProfitSharingPage() {
 
       {selectedStoreId !== ALL_STORES &&
       !isPermissionLoading &&
-      !canViewFinance ? (
+      !canViewProfitSharing ? (
         <ActionRequiredAlert
           icon={<IconLock />}
           title={t('noAccessTitle')}

@@ -113,6 +113,18 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canCreateReseller',
     'canUpdateReseller',
     'canDeleteReseller',
+    'canViewPayroll',
+    'canCreatePayroll',
+    'canUpdatePayroll',
+    'canDeletePayroll',
+    'canViewProfitSharing',
+    'canCreateProfitSharing',
+    'canUpdateProfitSharing',
+    'canDeleteProfitSharing',
+    'canViewWebhook',
+    'canCreateWebhook',
+    'canUpdateWebhook',
+    'canDeleteWebhook',
   ],
   OWNER_VIEWER: [
     'canViewDomain',
@@ -143,6 +155,9 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewReviews',
     'canViewExpenses',
     'canViewReseller',
+    'canViewPayroll',
+    'canViewProfitSharing',
+    'canViewWebhook',
   ],
   MANAGER: [
     'canViewDomain',
@@ -199,6 +214,15 @@ export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
     'canViewExpenses',
     'canCreateExpenses',
     'canUpdateExpenses',
+    'canViewPayroll',
+    'canCreatePayroll',
+    'canUpdatePayroll',
+    'canViewProfitSharing',
+    'canCreateProfitSharing',
+    'canUpdateProfitSharing',
+    'canViewWebhook',
+    'canCreateWebhook',
+    'canUpdateWebhook',
   ],
   CASHIER: [
     'canViewStore',
@@ -775,6 +799,54 @@ export const PERMISSION_MAPPING: Record<
     domain: PermissionDomain.RESELLER,
     action: PermissionAction.DELETE,
   },
+  canViewPayroll: {
+    domain: PermissionDomain.PAYROLL,
+    action: PermissionAction.READ,
+  },
+  canCreatePayroll: {
+    domain: PermissionDomain.PAYROLL,
+    action: PermissionAction.CREATE,
+  },
+  canUpdatePayroll: {
+    domain: PermissionDomain.PAYROLL,
+    action: PermissionAction.UPDATE,
+  },
+  canDeletePayroll: {
+    domain: PermissionDomain.PAYROLL,
+    action: PermissionAction.DELETE,
+  },
+  canViewProfitSharing: {
+    domain: PermissionDomain.PROFIT_SHARING,
+    action: PermissionAction.READ,
+  },
+  canCreateProfitSharing: {
+    domain: PermissionDomain.PROFIT_SHARING,
+    action: PermissionAction.CREATE,
+  },
+  canUpdateProfitSharing: {
+    domain: PermissionDomain.PROFIT_SHARING,
+    action: PermissionAction.UPDATE,
+  },
+  canDeleteProfitSharing: {
+    domain: PermissionDomain.PROFIT_SHARING,
+    action: PermissionAction.DELETE,
+  },
+  canViewWebhook: {
+    domain: PermissionDomain.WEBHOOK,
+    action: PermissionAction.READ,
+  },
+  canCreateWebhook: {
+    domain: PermissionDomain.WEBHOOK,
+    action: PermissionAction.CREATE,
+  },
+  canUpdateWebhook: {
+    domain: PermissionDomain.WEBHOOK,
+    action: PermissionAction.UPDATE,
+  },
+  canDeleteWebhook: {
+    domain: PermissionDomain.WEBHOOK,
+    action: PermissionAction.DELETE,
+  },
 }
 
 export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
@@ -948,4 +1020,25 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionKey, string> = {
   canCreateReseller: 'มีสิทธิ์ในการเพิ่มตัวแทนจำหน่ายใหม่เข้าสู่ระบบ',
   canUpdateReseller: 'มีสิทธิ์ในการแก้ไขข้อมูลหรือสถานะของตัวแทนจำหน่าย',
   canDeleteReseller: 'มีสิทธิ์ในการลบข้อมูลตัวแทนจำหน่ายออกจากระบบ',
+  canViewPayroll:
+    'มีสิทธิ์ในการเปิดดูข้อมูลเงินเดือน ค่าจ้าง และประวัติการจ่ายเงินพนักงาน',
+  canCreatePayroll:
+    'มีสิทธิ์ในการสร้างรอบจ่ายเงินเดือน หรือเพิ่มโครงสร้างฐานเงินเดือนพนักงาน',
+  canUpdatePayroll:
+    'มีสิทธิ์ในการแก้ไขข้อมูลเงินเดือน ตัดรอบ ปิดรอบ และแนบสลิปการจ่ายเงินพนักงาน',
+  canDeletePayroll: 'มีสิทธิ์ในการลบข้อมูลการตั้งค่าเงินเดือนพนักงานออกจากระบบ',
+  canViewProfitSharing:
+    'มีสิทธิ์ในการเปิดดูข้อมูลหุ้นส่วน รายงานสรุปส่วนแบ่งกำไร และประวัติการจ่ายเงิน',
+  canCreateProfitSharing:
+    'มีสิทธิ์ในการเพิ่มข้อมูลหุ้นส่วน หรือสร้างรอบการแบ่งผลกำไรใหม่',
+  canUpdateProfitSharing:
+    'มีสิทธิ์ในการคำนวณส่วนแบ่งกำไร ปิดรอบจ่าย และแนบหลักฐานการโอนเงินให้หุ้นส่วน',
+  canDeleteProfitSharing: 'มีสิทธิ์ในการลบข้อมูลหุ้นส่วนออกจากระบบ',
+  canViewWebhook:
+    'มีสิทธิ์ในการเปิดดูการตั้งค่า Webhook และประวัติบันทึกการส่งข้อมูล (Webhook Logs)',
+  canCreateWebhook:
+    'มีสิทธิ์ในการเพิ่ม Webhook Endpoint ใหม่สำหรับการเชื่อมต่อภายนอก',
+  canUpdateWebhook:
+    'มีสิทธิ์ในการแก้ไข Webhook Endpoint ทดสอบการส่งข้อมูล ส่งซ้ำ หรือสร้าง Secret Key ใหม่',
+  canDeleteWebhook: 'มีสิทธิ์ในการลบ Webhook Endpoint ออกจากระบบ',
 }
