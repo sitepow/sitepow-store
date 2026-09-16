@@ -1,5 +1,7 @@
 'use client'
 
+import { Suspense } from 'react'
+
 import { useTranslations } from 'next-intl'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -16,7 +18,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { StorePagesForm } from './_components/StorePagesForm'
 
-export default function MerchantStorePagesPage() {
+export const dynamic = 'force-dynamic'
+
+function MerchantStorePagesContent() {
   const t = useTranslations('merchant.storePages')
   const { canViewStoreSettings, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -58,5 +62,13 @@ export default function MerchantStorePagesPage() {
         <StorePagesForm storeId={selectedStoreId as string} />
       )}
     </Sidebar>
+  )
+}
+
+export default function MerchantStorePagesPage() {
+  return (
+    <Suspense fallback={null}>
+      <MerchantStorePagesContent />
+    </Suspense>
   )
 }

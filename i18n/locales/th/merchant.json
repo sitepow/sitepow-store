@@ -3,6 +3,8 @@
     "dashboard": "แดชบอร์ด",
     "analytics": "รายงานวิเคราะห์",
     "pos": "แคชเชียร์",
+    "tables": "โต๊ะอาหาร & QR",
+    "kitchen": "จอครัว (KDS)",
     "orders": "จัดการออเดอร์",
     "store-settings/products": "จัดการสินค้า",
     "store-settings/categories": "หมวดหมู่สินค้า",
@@ -3268,5 +3270,95 @@
       "discordLabel": "Discord Invite URL",
       "youtubeLabel": "YouTube Channel URL"
     }
+  },
+  "tables": {
+    "title": "จัดการโต๊ะอาหาร & QR Code",
+    "description": "สร้างและผังโต๊ะอาหาร ปริ้นป้าย QR Code ตั้งโต๊ะสำหรับให้ลูกค้าสแกนสั่งอาหาร",
+    "selectBranchTitle": "กรุณาเลือกสาขา",
+    "selectBranchDescription": "การจัดการโต๊ะและโซนอาหารต้องดำเนินการในระดับสาขา กรุณาเลือกสาขาด้านบน",
+    "filterAll": "ทั้งหมด ({count})",
+    "filterNoZone": "ไม่มีโซน ({count})",
+    "addZone": "เพิ่มโซน",
+    "addTable": "เพิ่มโต๊ะใหม่",
+    "emptyTitle": "ยังไม่มีโต๊ะอาหารในรายการนี้",
+    "emptyDescription": "กดปุ่ม \"เพิ่มโต๊ะใหม่\" เพื่อเริ่มต้นสร้างโต๊ะและออกป้าย QR Code",
+    "tablePrefix": "โต๊ะ",
+    "zonePrefix": "โซน: {zone}",
+    "noZone": "ไม่มีโซน",
+    "seats": "{count} ที่นั่ง",
+    "orders": "{count} ออเดอร์",
+    "status": {
+      "available": "โต๊ะว่าง",
+      "occupied": "มีลูกค้า",
+      "billRequested": "เรียกเช็คบิล"
+    },
+    "actions": {
+      "print": "พิมพ์ QR",
+      "regenerate": "สร้าง QR Code ใหม่",
+      "edit": "แก้ไขโต๊ะ",
+      "delete": "ลบโต๊ะ"
+    },
+    "dialogs": {
+      "addTableTitle": "เพิ่มโต๊ะอาหารใหม่",
+      "editTableTitle": "แก้ไขโต๊ะอาหาร",
+      "tableNumberLabel": "หมายเลขหรือชื่อโต๊ะ *",
+      "tableNumberPlaceholder": "เช่น A01, T-1, บาร์-3",
+      "seatsLabel": "จำนวนที่นั่ง",
+      "zoneLabel": "โซนที่ตั้ง",
+      "zonePlaceholder": "เลือกโซนที่ตั้ง",
+      "noZoneOption": "ไม่ระบุโซน",
+      "addZoneTitle": "เพิ่มโซนที่นั่งใหม่",
+      "zoneNameLabel": "ชื่อโซน *",
+      "zoneNamePlaceholder": "เช่น ชั้น 1 โซนแอร์, Outdoor, VIP",
+      "cancel": "ยกเลิก",
+      "save": "บันทึก",
+      "saving": "กำลังบันทึก..."
+    },
+    "confirm": {
+      "deleteZone": "ต้องการลบโซน \"{name}\" ใช่หรือไม่? โต๊ะในโซนนี้จะไม่ถูกลบ",
+      "deleteTable": "ต้องการลบโต๊ะ \"{num}\" ใช่หรือไม่?",
+      "regenerateQR": "ต้องการสร้าง QR Code ใหม่สำหรับโต๊ะ \"{num}\" ใช่หรือไม่? QR Code เก่าจะไม่สามารถใช้งานได้อีก"
+    },
+    "validation": {
+      "requireZoneName": "กรุณาระบุชื่อโซน",
+      "selectBranchBeforeZone": "กรุณาเลือกสาขาก่อนสร้างโซน",
+      "requireTableNumber": "กรุณาระบุหมายเลขโต๊ะ",
+      "selectBranchBeforeTable": "กรุณาเลือกสาขาก่อนสร้างโต๊ะ"
+    },
+    "print": {
+      "title": "ป้าย QR Code ตั้งโต๊ะ ({table})",
+      "printButton": "พิมพ์ป้าย (Print)",
+      "scanToOrder": "สแกนสั่งอาหาร / Scan to Order",
+      "noAppNeeded": "ไม่ต้องดาวน์โหลดแอป • สั่งง่ายผ่านมือถือ",
+      "generatingQR": "กำลังสร้าง QR...",
+      "zonePrefix": "โซน {zone}"
+    }
+  },
+  "kitchen": {
+    "title": "จอแสดงผลในครัว (Kitchen Display System - KDS)",
+    "description": "รับออเดอร์จากโต๊ะอาหารแบบ Real-time จัดลำดับคิว และอัปเดตสถานะอาหาร",
+    "selectBranchTitle": "กรุณาเลือกสาขา",
+    "selectBranchDescription": "จอครัวทำงานในระดับสาขา กรุณาเลือกสาขาด้านบน",
+    "noAccessTitle": "ไม่มีสิทธิ์เข้าถึง",
+    "noAccessDescription": "คุณไม่มีสิทธิ์ในการดูรายการออเดอร์ในครัว",
+    "viewTickets": "มุมมองตั๋วออเดอร์ ({count})",
+    "viewAggregated": "มุมมองรวมจาน ({count})",
+    "soundOn": "เสียงเตือน: เปิด",
+    "soundOff": "เสียงเตือน: ปิด",
+    "refresh": "รีเฟรช",
+    "emptyTitle": "ไม่มีออเดอร์ค้างในครัวขณะนี้ 🎉",
+    "emptyDescription": "เมื่อลูกค้าหรือพนักงานสั่งอาหาร รายการจะเด้งขึ้นหน้าจอนี้พร้อมเสียงเตือนทันที",
+    "tablePrefix": "โต๊ะ",
+    "takeaway": "สั่งกลับบ้าน",
+    "minutes": "{count} นาที",
+    "kitchenNote": "โน้ตโต๊ะ: {note}",
+    "variantPrefix": "ขนาด: {variant}",
+    "startCooking": "เริ่มทำ",
+    "finishCooking": "เสร็จแล้ว",
+    "served": "เสิร์ฟแล้ว",
+    "startAll": "เริ่มทำทั้งหมด (Start All)",
+    "readyAll": "เสร็จทั้งหมด (Ready All)",
+    "completeTicket": "เสิร์ฟครบทุกจาน (Complete Ticket)",
+    "fromTables": "จากโต๊ะ: "
   }
 }

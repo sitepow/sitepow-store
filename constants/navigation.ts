@@ -1,9 +1,11 @@
 import { PermissionKey } from '@/types/permission'
 import {
+  IconArmchair,
   IconBox,
   IconBuildingStore,
   IconCashRegister,
   IconChartBar,
+  IconChefHat,
   IconCoin,
   IconCreditCard,
   IconFileDescription,
@@ -127,6 +129,20 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'แคชเชียร์',
     tab: 'pos',
     icon: IconCashRegister,
+    permissionKey: 'canViewOrders',
+  },
+  {
+    value: 'tables',
+    label: 'โต๊ะอาหาร & QR',
+    tab: 'tables',
+    icon: IconArmchair,
+    permissionKey: 'canViewOrders',
+  },
+  {
+    value: 'kitchen',
+    label: 'จอครัว (KDS)',
+    tab: 'kitchen',
+    icon: IconChefHat,
     permissionKey: 'canViewOrders',
   },
   {

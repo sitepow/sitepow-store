@@ -18,7 +18,7 @@ import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
-import { IconCashRegister, IconLock } from '@tabler/icons-react'
+import { IconArmchair, IconCashRegister, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/BranchSelectField'
@@ -26,11 +26,13 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { ResellerAgreementSelectField } from '@/components/ResellerAgreementSelectField'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { DigitalPriceDisplay } from './_components/DigitalPriceDisplay'
 import { PosCart } from './_components/PosCart'
 import { PosProductList } from './_components/PosProductList'
+import { PosTableGrid } from './_components/PosTableGrid'
 import {
   SelectedAddonPayload,
   SelectedOptionPayload,
@@ -55,6 +57,7 @@ export default function MerchantPOSPage() {
   const removeItem = useCartStore((state) => state.removeItem)
 
   const [search, setSearch] = useState('')
+  const [posMode, setPosMode] = useState<'quick' | 'tables'>('quick')
   const debouncedSearch = useDebouncedValue(search, 400)
 
   useEffect(() => {
@@ -242,36 +245,68 @@ export default function MerchantPOSPage() {
           description={t('noAccessDescription')}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-7 xl:col-span-8">
-            {isProductsLoading ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {[...Array(8)].map((_, i) => (
-                  <Skeleton key={i} className="h-44 w-full rounded-xl" />
-                ))}
-              </div>
-            ) : (
-              <PosProductList
-                products={products}
-                cartItems={cartItems}
-                search={search}
-                onSearchChange={setSearch}
-                onAddToCart={handleAddToCart}
-              />
-            )}
+        <div className="space-y-4">
+          {/* POS Mode Switcher */}
+          <div className="flex items-center gap-2 border-b pb-2">
+            <Button
+              size="sm"
+              variant={posMode === 'quick' ? 'default' : 'outline'}
+              onClick={() => setPosMode('quick')}
+              className="gap-1.5"
+            >
+              <IconCashRegister className="size-4" />
+              แคชเชียร์ขายด่วน
+            </Button>
+            <Button
+              size="sm"
+              variant={posMode === 'tables' ? 'default' : 'outline'}
+              onClick={() => setPosMode('tables')}
+              className="gap-1.5"
+            >
+              <IconArmchair className="size-4" />
+              ผังโต๊ะร้านอาหาร
+            </Button>
           </div>
-          <div className="flex flex-col gap-5 lg:col-span-5 xl:col-span-4">
-            <DigitalPriceDisplay value={grandTotal} size="md" />
-            <PosCart
-              cart={cartItems}
+
+          {posMode === 'tables' ? (
+            <PosTableGrid
               storeId={selectedStoreId}
               branchId={selectedBranchId}
-              agreementId={resellerAgreementId}
-              onUpdateQuantity={updateQuantity}
-              onClearCart={clearCart}
-              onRemoveItem={removeItem}
+              onSelectTableForOrder={() => setPosMode('quick')}
             />
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-7 xl:col-span-8">
+                {isProductsLoading ? (
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                    {[...Array(8)].map((_, i) => (
+                      <Skeleton key={i} className="h-44 w-full rounded-xl" />
+                    ))}
+                  </div>
+                ) : (
+                  <PosProductList
+                    products={products}
+                    cartItems={cartItems}
+                    search={search}
+                    onSearchChange={setSearch}
+                    onAddToCart={handleAddToCart}
+                  />
+                )}
+              </div>
+              <div className="flex flex-col gap-5 lg:col-span-5 xl:col-span-4">
+                <DigitalPriceDisplay value={grandTotal} size="md" />
+                <PosCart
+                  cart={cartItems}
+                  storeId={selectedStoreId}
+                  branchId={selectedBranchId}
+                  agreementId={resellerAgreementId}
+                  onUpdateQuantity={updateQuantity}
+                  onClearCart={clearCart}
+                  onRemoveItem={removeItem}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Sidebar>

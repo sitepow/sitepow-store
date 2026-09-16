@@ -3,6 +3,8 @@
     "dashboard": "Dashboard",
     "analytics": "Analytics",
     "pos": "POS Cashier",
+    "tables": "Tables & QR",
+    "kitchen": "Kitchen Display (KDS)",
     "orders": "Orders",
     "store-settings/products": "Products",
     "store-settings/categories": "Categories",
@@ -3260,5 +3262,95 @@
       "discordLabel": "Discord Invite URL",
       "youtubeLabel": "YouTube Channel URL"
     }
+  },
+  "tables": {
+    "title": "Tables & QR Management",
+    "description": "Manage restaurant floor plan, tables, and generate printable QR code stands for digital ordering",
+    "selectBranchTitle": "Please Select a Branch",
+    "selectBranchDescription": "Table and zone management is operated per branch. Please select a branch above.",
+    "filterAll": "All ({count})",
+    "filterNoZone": "No Zone ({count})",
+    "addZone": "Add Zone",
+    "addTable": "Add Table",
+    "emptyTitle": "No tables in this section",
+    "emptyDescription": "Click \"Add Table\" to start creating tables and generating QR code stands",
+    "tablePrefix": "Table",
+    "zonePrefix": "Zone: {zone}",
+    "noZone": "No Zone",
+    "seats": "{count} seats",
+    "orders": "{count} orders",
+    "status": {
+      "available": "Available",
+      "occupied": "Occupied",
+      "billRequested": "Bill Requested"
+    },
+    "actions": {
+      "print": "Print QR",
+      "regenerate": "Regenerate QR Code",
+      "edit": "Edit Table",
+      "delete": "Delete Table"
+    },
+    "dialogs": {
+      "addTableTitle": "Add New Table",
+      "editTableTitle": "Edit Table",
+      "tableNumberLabel": "Table Number / Name *",
+      "tableNumberPlaceholder": "e.g. A01, T-1, Bar-3",
+      "seatsLabel": "Number of Seats",
+      "zoneLabel": "Zone Location",
+      "zonePlaceholder": "Select a zone",
+      "noZoneOption": "No zone",
+      "addZoneTitle": "Add New Zone",
+      "zoneNameLabel": "Zone Name *",
+      "zoneNamePlaceholder": "e.g. Indoor AC, Outdoor, VIP",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "confirm": {
+      "deleteZone": "Are you sure you want to delete zone \"{name}\"? Tables in this zone will not be deleted.",
+      "deleteTable": "Are you sure you want to delete table \"{num}\"?",
+      "regenerateQR": "Are you sure you want to regenerate QR Code for table \"{num}\"? The previous QR code will no longer work."
+    },
+    "validation": {
+      "requireZoneName": "Please enter a zone name",
+      "selectBranchBeforeZone": "Please select a branch before creating a zone",
+      "requireTableNumber": "Please enter a table number",
+      "selectBranchBeforeTable": "Please select a branch before creating a table"
+    },
+    "print": {
+      "title": "Table QR Code Stand ({table})",
+      "printButton": "Print Stand",
+      "scanToOrder": "Scan to Order",
+      "noAppNeeded": "No app download needed • Order easily on mobile",
+      "generatingQR": "Generating QR...",
+      "zonePrefix": "Zone {zone}"
+    }
+  },
+  "kitchen": {
+    "title": "Kitchen Display System (KDS)",
+    "description": "Receive real-time orders from tables, manage preparation queue, and update meal statuses",
+    "selectBranchTitle": "Please Select a Branch",
+    "selectBranchDescription": "Kitchen display operates at branch level. Please select a branch above.",
+    "noAccessTitle": "No Access",
+    "noAccessDescription": "You do not have permission to view kitchen orders.",
+    "viewTickets": "Ticket View ({count})",
+    "viewAggregated": "Dish Aggregation ({count})",
+    "soundOn": "Chime: ON",
+    "soundOff": "Chime: OFF",
+    "refresh": "Refresh",
+    "emptyTitle": "No pending orders in the kitchen 🎉",
+    "emptyDescription": "When customers or staff place orders, tickets will pop up here with a chime sound.",
+    "tablePrefix": "Table",
+    "takeaway": "Takeaway",
+    "minutes": "{count} min",
+    "kitchenNote": "Table Note: {note}",
+    "variantPrefix": "Size: {variant}",
+    "startCooking": "Start",
+    "finishCooking": "Done",
+    "served": "Served",
+    "startAll": "Start All",
+    "readyAll": "Ready All",
+    "completeTicket": "Complete Ticket",
+    "fromTables": "From tables: "
   }
 }

@@ -220,6 +220,8 @@ model Branch {
 
   expenses               Expense[]
   marketplaceConnections MarketplaceConnection[]
+  tableZones             TableZone[]
+  restaurantTables       RestaurantTable[]
 
   translations Json?
 
@@ -802,6 +804,8 @@ model Store {
   monthlySettlements     MonthlySettlement[]
   employeeSalaryConfigs  EmployeeSalaryConfig[]
   monthlyPayrolls        MonthlyPayroll[]
+  tableZones             TableZone[]
+  restaurantTables       RestaurantTable[]
 
   translations Json?
 
@@ -1114,6 +1118,28 @@ model ReviewCategory {
   review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  BILL_REQUESTED
+  RESERVED
+  CLEANING
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum KitchenItemStatus {
+  PENDING
+  COOKING
+  READY
+  SERVED
+  CANCELLED
+}
+
 enum OrderStatus {
   PENDING
   MANUAL_CHECK
@@ -1260,11 +1286,20 @@ model Order {
 
   slipHistories SlipVerificationHistory[]
 
+  orderType      OrderType        @default(DINE_IN)
+  tableId        String?
+  table          RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableSessionId String?
+  tableSession   TableSession?    @relation(fields: [tableSessionId], references: [id], onDelete: SetNull)
+  kitchenNote    String?          @db.Text
+
   @@unique([storeId, orderNumber])
   @@index([storeId])
   @@index([customerId])
   @@index([bankAccountId])
   @@index([employeeId])
+  @@index([tableId])
+  @@index([tableSessionId])
   @@index([storeId, status])
   @@index([storeId, createdAt])
 }
@@ -1278,20 +1313,90 @@ model OrderItem {
   branch   Branch @relation(fields: [branchId], references: [id])
 
   productType   ProductType
-  customerNote  String?     @db.Text
+  customerNote  String?           @db.Text
   productId     String
   title         String
   variantId     String
   variantTitle  String
   image         String?
   quantity      Int
-  price         Decimal     @db.Decimal(10, 2)
-  originalPrice Decimal?    @db.Decimal(10, 2)
-  costPrice     Decimal?    @default(0) @db.Decimal(10, 2)
+  price         Decimal           @db.Decimal(10, 2)
+  originalPrice Decimal?          @db.Decimal(10, 2)
+  costPrice     Decimal?          @default(0) @db.Decimal(10, 2)
+  kitchenStatus KitchenItemStatus @default(PENDING)
 
   @@index([orderId])
   @@index([productId])
   @@index([variantId])
+  @@index([kitchenStatus])
+}
+
+model TableZone {
+  id        String @id @default(uuid())
+  storeId   String
+  branchId  String
+  name      String
+  sortOrder Int    @default(0)
+
+  store  Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  tables RestaurantTable[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId, branchId])
+}
+
+model RestaurantTable {
+  id          String      @id @default(uuid())
+  storeId     String
+  branchId    String
+  zoneId      String?
+  tableNumber String
+  seats       Int         @default(4)
+  status      TableStatus @default(AVAILABLE)
+
+  qrCodeToken String @unique @default(uuid())
+
+  currentSessionId String?
+
+  store  Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  branch Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone   TableZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  sessions TableSession[]
+  orders   Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([branchId, tableNumber])
+  @@index([storeId, branchId])
+  @@index([qrCodeToken])
+}
+
+model TableSession {
+  id          String      @id @default(uuid())
+  tableId     String
+  storeId     String
+  branchId    String
+  sessionCode String      @default(uuid())
+  guestCount  Int         @default(1)
+  status      TableStatus @default(OCCUPIED)
+
+  openedAt DateTime  @default(now())
+  closedAt DateTime?
+
+  table  RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tableId, status])
+  @@index([storeId, branchId])
 }
 
 model Cart {

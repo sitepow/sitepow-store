@@ -304,5 +304,63 @@
     "outOfFive": "out of 5 stars",
     "clearFilter": "Clear Filter",
     "showingResults": "Showing {count} reviews"
+  },
+  "tableOrder": {
+    "tableBadge": "Table {number}",
+    "zoneBadge": "Zone {name}",
+    "tabs": {
+      "menu": "Order Food",
+      "orders": "Orders ({count})"
+    },
+    "searchPlaceholder": "Search menu items...",
+    "allCategories": "All",
+    "callStaff": "Call Staff / Bill",
+    "billRequested": "Bill Requested",
+    "billRequestedDesc": "Staff is coming to your table",
+    "emptyMenu": "No menu items found in this category",
+    "emptyOrders": "No orders placed in this session yet",
+    "emptyOrdersDesc": "Start ordering your delicious meal now!",
+    "viewCart": "View Cart ({count} items)",
+    "total": "Total",
+    "baht": "THB",
+    "selectOptions": "Select",
+    "addToCart": "Add to Order",
+    "updateCart": "Update Order",
+    "dialog": {
+      "variant": "Choose Size / Variant",
+      "quantity": "Quantity",
+      "note": "Special Note to Chef",
+      "notePlaceholder": "e.g. No vegetables, less spicy, no MSG",
+      "cancel": "Close",
+      "confirm": "Add to Order"
+    },
+    "cartDrawer": {
+      "title": "Selected Dishes",
+      "clear": "Clear All",
+      "kitchenNote": "Additional note for this table",
+      "kitchenNotePlaceholder": "e.g. 2 extra plates, extra cutlery",
+      "submit": "Send Order to Kitchen",
+      "submitting": "Sending Order...",
+      "subtotal": "Subtotal",
+      "empty": "No items in cart"
+    },
+    "tracker": {
+      "title": "Order Status Tracker",
+      "orderNumber": "Order #{number}",
+      "time": "At {time}",
+      "pending": "Pending",
+      "cooking": "Cooking",
+      "ready": "Ready to Serve",
+      "served": "Served",
+      "cancelled": "Cancelled"
+    },
+    "toasts": {
+      "addedToCart": "Added {name} to order",
+      "orderSuccess": "Order sent to kitchen successfully!",
+      "orderError": "Failed to send order",
+      "billSuccess": "Staff has been notified for your bill",
+      "billError": "Failed to request bill",
+      "noItems": "Please select items before placing order"
+    }
   }
 }

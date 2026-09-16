@@ -3,7 +3,6 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
-import { setUserLocale } from '@/actions/locale'
 import { ALL_CURRENCIES } from '@/constants/currencies'
 import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
 import { CurrencyCode } from '@/generated/prisma/enums'
@@ -49,13 +48,12 @@ export function QuickSettingsMenu({
   const t = useTranslations('common.settings')
   const { currency: currentCurrency, setCurrency } = useCurrencyStore()
 
-  const switchLocale = async (locale: string) => {
+  const switchLocale = (locale: string) => {
     if (currentLocale === locale) {
       return
     }
 
     document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`
-    await setUserLocale(locale)
     router.refresh()
   }
 

@@ -16,24 +16,15 @@ import {
   REFUND_POLICY_PAGE,
 } from '@/constants/sites/page'
 import { useCurrentStore } from '@/hooks/use-current-store'
+import { useQueryParam } from '@/hooks/use-query-param'
 import { getStoreUrl } from '@/utils/storefront-seo'
 import {
-  IconBrandDiscord,
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandLine,
-  IconBrandTiktok,
-  IconBrandYoutube,
-  IconCopyright,
   IconDeviceFloppy,
   IconExternalLink,
-  IconFileDescription,
   IconFileText,
   IconHelpCircle,
   IconInfoCircle,
   IconLayoutBottombar,
-  IconMessageDots,
-  IconPhone,
   IconReceiptRefund,
   IconRefresh,
   IconShieldLock,
@@ -41,6 +32,7 @@ import {
 } from '@tabler/icons-react'
 
 import BlogEditor from '@/components/BlogEditor'
+import { PageTabHeader } from '@/components/PageTabHeader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,21 +44,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-
-import { cn } from '@/lib/utils'
 
 type PageKey =
   | 'aboutPage'
@@ -130,11 +115,11 @@ interface StorePagesFormProps {
 export function StorePagesForm({ storeId }: StorePagesFormProps) {
   const t = useTranslations('merchant.storePages')
   const locale = useLocale()
-  const { currentStore } = useCurrentStore()
+  const { currentStore, style } = useCurrentStore()
   const { data: storePages, isLoading } = useStorePages(storeId)
   const updateMutation = useUpdateStorePages()
 
-  const [activeTab, setActiveTab] = useState<string>(PAGE_CONFIGS[0].id)
+  const [activeTab, setActiveTab] = useQueryParam('tab', PAGE_CONFIGS[0].id)
   const [contents, setContents] = useState<Record<PageKey, string>>({
     aboutPage: '',
     faqsPage: '',
@@ -343,251 +328,240 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-96 w-full" />
+      <div className="flex flex-col gap-6 xl:flex-row">
+        <div className="flex h-auto w-full shrink-0 flex-col gap-1.5 rounded-xl border p-1.5 xl:sticky xl:top-5 xl:w-64">
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+          <Skeleton className="h-9 w-full rounded-lg" />
+        </div>
+        <Card className="min-w-0 flex-1">
+          <CardHeader>
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-80" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-96 w-full rounded-xl" />
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <Card className="border-border/80 rounded-xl shadow-xs sm:rounded-2xl">
-      <CardHeader className="p-4 pb-3 sm:p-6 sm:pb-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <IconFileDescription className="text-primary size-5 shrink-0" />
-              {t('cardTitle')}
-            </CardTitle>
-            <CardDescription className="mt-1 text-xs sm:text-sm">
-              {t('cardDescription')}
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 p-4 pt-0 sm:space-y-6 sm:p-6 sm:pt-0">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full space-y-4 sm:space-y-6"
-        >
-          <div className="w-full">
-            <TabsList className="bg-muted/70 border-border/80 grid w-full grid-cols-2 gap-1 rounded-xl border p-1 shadow-xs group-data-horizontal/tabs:h-auto sm:grid-cols-3 sm:gap-1.5 sm:rounded-2xl sm:p-1.5 lg:grid-cols-6">
-              {pages.map((page) => {
-                const Icon = page.icon
-                const isActive = activeTab === page.id
-                return (
-                  <TabsTrigger
-                    key={page.id}
-                    value={page.id}
-                    className={cn(
-                      'group flex h-auto cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-all duration-200 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm',
-                      'data-active:bg-background data-active:text-foreground dark:data-active:bg-background dark:data-active:text-foreground data-active:font-bold data-active:shadow-sm',
-                      'text-muted-foreground hover:text-foreground hover:bg-background/40',
-                      'border-0 after:hidden',
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        'size-4 shrink-0 transition-colors',
-                        isActive
-                          ? 'text-primary'
-                          : 'text-muted-foreground group-hover:text-foreground',
-                      )}
-                    />
-                    <span className="truncate">{page.label}</span>
-                  </TabsTrigger>
-                )
-              })}
-              <TabsTrigger
-                value="footer"
-                className={cn(
-                  'group flex h-auto cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-all duration-200 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm',
-                  'data-active:bg-background data-active:text-foreground dark:data-active:bg-background dark:data-active:text-foreground data-active:font-bold data-active:shadow-sm',
-                  'text-muted-foreground hover:text-foreground hover:bg-background/40',
-                  'border-0 after:hidden',
-                )}
-              >
-                <IconLayoutBottombar
-                  className={cn(
-                    'size-4 shrink-0 transition-colors',
-                    activeTab === 'footer'
-                      ? 'text-primary'
-                      : 'text-muted-foreground group-hover:text-foreground',
-                  )}
-                />
-                <span className="truncate">{t('footer.tabLabel')}</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* 5 Markdown Pages */}
+    <div style={style}>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        orientation="vertical"
+        className="flex flex-col gap-6 xl:flex-row"
+      >
+        <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 overflow-x-auto rounded-xl border p-1 xl:sticky xl:top-5 xl:w-64 xl:flex-col">
           {pages.map((page) => {
-            const pageUrl = `${storeBaseUrl}${page.path}`
-            const editorKey = `${page.id}-${resetKeys[page.id] || 0}`
-
+            const Icon = page.icon
             return (
-              <TabsContent
+              <TabsTrigger
                 key={page.id}
                 value={page.id}
-                className="space-y-4 focus-visible:outline-none"
+                className="shrink-0 cursor-pointer gap-2 py-2 xl:shrink"
               >
-                {/* Header Action Bar */}
-                <div className="bg-muted/30 flex flex-col gap-3 rounded-xl border p-3.5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-foreground text-sm font-semibold sm:text-base">
-                        {page.label}
-                      </h3>
-                      <a
-                        href={pageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary inline-flex items-center gap-1 text-xs break-all hover:underline"
-                        title={t('openInNewTab')}
-                      >
-                        <span className="">{page.path}</span>
-                        <IconExternalLink className="size-3.5 shrink-0" />
-                      </a>
-                    </div>
-                    <p className="text-muted-foreground text-xs leading-relaxed">
-                      {page.description}
-                    </p>
-                  </div>
+                <Icon size={16} className="shrink-0" />
+                <span className="truncate">{page.label}</span>
+              </TabsTrigger>
+            )
+          })}
+          <TabsTrigger
+            value="footer"
+            className="shrink-0 cursor-pointer gap-2 py-2 xl:shrink"
+          >
+            <IconLayoutBottombar size={16} className="shrink-0" />
+            <span className="truncate">{t('footer.tabLabel')}</span>
+          </TabsTrigger>
+        </TabsList>
 
-                  <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleAiTrigger(page)}
-                      disabled={
-                        updateMutation.isPending ||
-                        generatingPageId !== null ||
-                        isEstimatingAi
-                      }
-                      className="text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 flex-1 cursor-pointer text-xs font-medium sm:flex-initial"
-                      title={
-                        locale === 'th'
-                          ? 'ให้ AI ช่วยคิดเนื้อหาสำหรับหน้านี้'
-                          : 'Generate content with AI'
-                      }
-                    >
-                      {generatingPageId === page.id ? (
-                        <Spinner className="mr-1.5 size-3.5 shrink-0" />
-                      ) : (
-                        <IconSparkles className="text-primary mr-1 size-3.5 shrink-0" />
-                      )}
-                      {generatingPageId === page.id
-                        ? locale === 'th'
-                          ? 'AI กำลังคิดเนื้อหา...'
-                          : 'Generating...'
-                        : locale === 'th'
-                          ? 'ให้ AI คิดเนื้อหาให้'
-                          : 'AI Generate'}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleResetTemplate(page)}
-                      disabled={
-                        updateMutation.isPending || generatingPageId !== null
-                      }
-                      className="flex-1 text-xs sm:flex-initial"
-                      title={t('loadTemplateTooltip')}
-                    >
-                      <IconRefresh className="mr-1 size-3.5 shrink-0" />
-                      {t('loadTemplate')}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={() => handleSavePage(page)}
-                      disabled={updateMutation.isPending}
-                      className="flex-1 text-xs font-medium sm:flex-initial"
-                    >
-                      {updateMutation.isPending ? (
-                        <Spinner className="mr-1.5 size-3.5 shrink-0" />
-                      ) : (
-                        <IconDeviceFloppy className="mr-1 size-3.5 shrink-0" />
-                      )}
-                      {updateMutation.isPending ? t('saving') : t('save')}
-                    </Button>
-                  </div>
-                </div>
+        {/* 5 Markdown Pages */}
+        {pages.map((page) => {
+          const pageUrl = `${storeBaseUrl}${page.path}`
+          const editorKey = `${page.id}-${resetKeys[page.id] || 0}`
+          const isPending = updateMutation.isPending
 
-                {/* Markdown Editor */}
-                <div className="space-y-2">
+          return (
+            <TabsContent
+              key={page.id}
+              value={page.id}
+              className="min-w-0 flex-1 focus-visible:outline-none"
+            >
+              <Card>
+                <CardHeader>
+                  <PageTabHeader
+                    variant="secondary"
+                    icon={page.icon}
+                    title={
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>{page.label}</span>
+                        <a
+                          href={pageUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary inline-flex items-center gap-1 text-xs font-normal hover:underline"
+                          title={t('openInNewTab')}
+                        >
+                          <span>{page.path}</span>
+                          <IconExternalLink className="size-3.5 shrink-0" />
+                        </a>
+                      </div>
+                    }
+                    description={page.description}
+                    endContent={
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAiTrigger(page)}
+                          disabled={
+                            isPending ||
+                            generatingPageId !== null ||
+                            isEstimatingAi
+                          }
+                          className="text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 cursor-pointer text-xs font-medium"
+                          title={
+                            locale === 'th'
+                              ? 'ให้ AI ช่วยคิดเนื้อหาสำหรับหน้านี้'
+                              : 'Generate content with AI'
+                          }
+                        >
+                          {generatingPageId === page.id ? (
+                            <Spinner className="mr-1.5 size-3.5 shrink-0" />
+                          ) : (
+                            <IconSparkles className="text-primary mr-1.5 size-3.5 shrink-0" />
+                          )}
+                          {generatingPageId === page.id
+                            ? locale === 'th'
+                              ? 'AI กำลังคิดเนื้อหา...'
+                              : 'Generating...'
+                            : locale === 'th'
+                              ? 'ให้ AI คิดเนื้อหาให้'
+                              : 'AI Generate'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleResetTemplate(page)}
+                          disabled={isPending || generatingPageId !== null}
+                          title={t('loadTemplateTooltip')}
+                          className="cursor-pointer text-xs font-medium"
+                        >
+                          <IconRefresh className="mr-1.5 size-3.5 shrink-0" />
+                          {t('loadTemplate')}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => handleSavePage(page)}
+                          disabled={isPending}
+                          className="cursor-pointer text-xs font-medium"
+                        >
+                          {isPending ? (
+                            <Spinner className="mr-1.5 size-3.5 shrink-0" />
+                          ) : (
+                            <IconDeviceFloppy className="mr-1.5 size-3.5 shrink-0" />
+                          )}
+                          {isPending ? t('saving') : t('save')}
+                        </Button>
+                      </div>
+                    }
+                  />
+                </CardHeader>
+                <CardContent>
                   <BlogEditor
                     key={editorKey}
                     value={contents[page.key]}
                     onChange={(val) => handleContentChange(page.key, val)}
                   />
-                </div>
-              </TabsContent>
-            )
-          })}
-
-          {/* Footer Settings Tab */}
-          <TabsContent
-            value="footer"
-            className="space-y-6 focus-visible:outline-none"
-          >
-            <div className="bg-muted/30 flex flex-col gap-3 rounded-xl border p-3.5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-foreground text-sm font-semibold sm:text-base">
-                    {t('footer.title')}
-                  </h3>
-                  <a
-                    href={storeBaseUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary inline-flex items-center gap-1 text-xs break-all hover:underline"
-                    title={t('openInNewTab')}
+                </CardContent>
+                <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t">
+                  <p className="text-muted-foreground text-xs">
+                    {t('markdownHint')}
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => handleSavePage(page)}
+                    disabled={isPending}
+                    className="cursor-pointer font-medium"
                   >
-                    <span>{t('footer.viewStorefront')}</span>
-                    <IconExternalLink className="size-3.5 shrink-0" />
-                  </a>
-                </div>
-                <p className="text-muted-foreground text-xs leading-relaxed">
-                  {t('footer.description')}
-                </p>
-              </div>
+                    {isPending ? (
+                      <Spinner className="mr-1.5 size-4" />
+                    ) : (
+                      <IconDeviceFloppy className="mr-1.5 size-4" />
+                    )}
+                    {isPending ? t('saving') : t('save')}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          )
+        })}
 
-              <div className="flex w-full shrink-0 sm:w-auto">
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleSaveFooter}
-                  disabled={updateMutation.isPending}
-                  className="w-full text-xs font-medium sm:w-auto"
-                >
-                  {updateMutation.isPending ? (
-                    <Spinner className="mr-1.5 size-3.5 shrink-0" />
-                  ) : (
-                    <IconDeviceFloppy className="mr-1 size-3.5 shrink-0" />
-                  )}
-                  {updateMutation.isPending
-                    ? t('saving')
-                    : t('footer.saveButton')}
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:gap-6">
-              {/* Description & Contact */}
-              <div className="bg-card space-y-4 rounded-xl border p-4 sm:p-4.5">
-                <h4 className="text-foreground flex items-center gap-2 text-sm font-semibold">
-                  <IconFileText className="text-primary size-4 shrink-0" />
+        {/* Footer & Social Media Tab */}
+        <TabsContent
+          value="footer"
+          className="min-w-0 flex-1 focus-visible:outline-none"
+        >
+          <Card>
+            <CardHeader>
+              <PageTabHeader
+                variant="secondary"
+                icon={IconLayoutBottombar}
+                title={
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>{t('footer.title')}</span>
+                    <a
+                      href={storeBaseUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary inline-flex items-center gap-1 text-xs font-normal hover:underline"
+                      title={t('openInNewTab')}
+                    >
+                      <span>{t('footer.viewStorefront')}</span>
+                      <IconExternalLink className="size-3.5 shrink-0" />
+                    </a>
+                  </div>
+                }
+                description={t('footer.description')}
+                endContent={
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleSaveFooter}
+                    disabled={updateMutation.isPending}
+                    className="cursor-pointer text-xs font-medium"
+                  >
+                    {updateMutation.isPending ? (
+                      <Spinner className="mr-1.5 size-3.5 shrink-0" />
+                    ) : (
+                      <IconDeviceFloppy className="mr-1.5 size-3.5 shrink-0" />
+                    )}
+                    {updateMutation.isPending
+                      ? t('saving')
+                      : t('footer.saveButton')}
+                  </Button>
+                }
+              />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-foreground text-sm font-semibold sm:text-base">
                   {t('footer.descriptionContactHeading')}
-                </h4>
+                </h3>
 
                 <Field>
-                  <FieldLabel className="text-xs font-medium">
-                    {t('footer.footerTextLabel')}
-                  </FieldLabel>
+                  <FieldLabel>{t('footer.footerTextLabel')}</FieldLabel>
                   <Textarea
                     placeholder={t('footer.footerTextPlaceholder')}
                     value={footerData.footerText}
@@ -599,17 +573,14 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                     }
                     rows={3}
                   />
-                  <FieldDescription className="text-[11px] leading-normal">
+                  <FieldDescription>
                     {t('footer.footerTextHelp')}
                   </FieldDescription>
                 </Field>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconPhone className="text-primary size-3.5 shrink-0" />
-                      {t('footer.phoneLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.phoneLabel')}</FieldLabel>
                     <Input
                       placeholder={t('footer.phonePlaceholder')}
                       value={footerData.phone}
@@ -623,10 +594,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconCopyright className="text-primary size-3.5 shrink-0" />
-                      {t('footer.copyrightLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.copyrightLabel')}</FieldLabel>
                     <Input
                       placeholder={`© ${currentYear} ${currentStore?.name || t('footer.storeNameFallback')}. All rights reserved.`}
                       value={footerData.footerCopyright}
@@ -637,7 +605,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                         }))
                       }
                     />
-                    <FieldDescription className="text-[11px] leading-normal">
+                    <FieldDescription>
                       {t('footer.copyrightHelp', {
                         year: currentYear,
                         storeName:
@@ -648,24 +616,21 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                 </div>
               </div>
 
-              {/* Social Media Links */}
-              <div className="bg-card space-y-4 rounded-xl border p-4 sm:p-4.5">
+              <Separator />
+
+              <div className="space-y-4">
                 <div className="space-y-1">
-                  <h4 className="text-foreground flex items-center gap-2 text-sm font-semibold">
-                    <IconMessageDots className="text-primary size-4 shrink-0" />
+                  <h3 className="text-foreground text-sm font-semibold sm:text-base">
                     {t('footer.socialHeading')}
-                  </h4>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
+                  </h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm">
                     {t('footer.socialDescription')}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandFacebook className="size-4 shrink-0 text-[#1877F2]" />
-                      {t('footer.facebookLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.facebookLabel')}</FieldLabel>
                     <Input
                       placeholder="https://facebook.com/your-store"
                       value={footerData.facebookPage}
@@ -679,10 +644,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandLine className="size-4 shrink-0 text-[#06C755]" />
-                      {t('footer.lineLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.lineLabel')}</FieldLabel>
                     <Input
                       placeholder={t('footer.linePlaceholder')}
                       value={footerData.lineId}
@@ -696,10 +658,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandInstagram className="size-4 shrink-0 text-[#E4405F]" />
-                      {t('footer.instagramLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.instagramLabel')}</FieldLabel>
                     <Input
                       placeholder="https://instagram.com/your-store"
                       value={footerData.instagramPage}
@@ -713,10 +672,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandTiktok className="size-4 shrink-0" />
-                      {t('footer.tiktokLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.tiktokLabel')}</FieldLabel>
                     <Input
                       placeholder="https://tiktok.com/@your-store"
                       value={footerData.tiktokPage}
@@ -730,10 +686,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconMessageDots className="size-4 shrink-0 text-[#00B2FF]" />
-                      {t('footer.messengerLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.messengerLabel')}</FieldLabel>
                     <Input
                       placeholder="https://m.me/your-store"
                       value={footerData.messengerUrl}
@@ -747,10 +700,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandDiscord className="size-4 shrink-0 text-[#5865F2]" />
-                      {t('footer.discordLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.discordLabel')}</FieldLabel>
                     <Input
                       placeholder="https://discord.gg/your-invite"
                       value={footerData.discordUrl}
@@ -764,10 +714,7 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
 
                   <Field className="sm:col-span-2">
-                    <FieldLabel className="flex items-center gap-1.5 text-xs font-medium">
-                      <IconBrandYoutube className="size-4 shrink-0 text-[#FF0000]" />
-                      {t('footer.youtubeLabel')}
-                    </FieldLabel>
+                    <FieldLabel>{t('footer.youtubeLabel')}</FieldLabel>
                     <Input
                       placeholder="https://youtube.com/@your-channel"
                       value={footerData.youtubePage}
@@ -781,92 +728,83 @@ export function StorePagesForm({ storeId }: StorePagesFormProps) {
                   </Field>
                 </div>
               </div>
-
-              {/* Bottom Action Bar */}
-              <div className="flex justify-end pt-2">
-                <Button
-                  type="button"
-                  onClick={handleSaveFooter}
-                  disabled={updateMutation.isPending}
-                  className="w-full font-medium sm:w-auto"
-                >
-                  {updateMutation.isPending ? (
-                    <Spinner className="mr-2 shrink-0" />
-                  ) : (
-                    <IconDeviceFloppy className="mr-2 size-4 shrink-0" />
-                  )}
-                  {updateMutation.isPending
-                    ? t('saving')
-                    : t('footer.saveAllButton')}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <AlertDialog
-          open={!!aiConfirmPage}
-          onOpenChange={() => setAiConfirmPage(null)}
-        >
-          <AlertDialogContent
-            style={
-              {
-                '--primary': currentStore?.primaryColor,
-              } as React.CSSProperties
-            }
-          >
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <IconSparkles className="text-primary size-5" />
-                {locale === 'th'
-                  ? `ให้ AI ช่วยคิดเนื้อหาหน้า "${aiConfirmPage?.label}"`
-                  : `Generate content for "${aiConfirmPage?.label}" with AI`}
-              </AlertDialogTitle>
-              <AlertDialogDescription asChild>
-                <div className="text-muted-foreground space-y-3 pt-2 text-sm">
-                  <p>
-                    {locale === 'th'
-                      ? `ระบบ AI จะนำข้อมูลร้านค้า "${currentStore?.name || ''}" (เช่น คำอธิบายร้านค้า, สินค้า, ข้อมูลติดต่อ) มาวิเคราะห์และสร้างเนื้อหาแบบ Markdown ที่ตรงกับร้านค้าของคุณให้อัตโนมัติ`
-                      : `AI will analyze your store information and generate tailored Markdown content.`}
-                  </p>
-                  <div className="bg-muted/50 space-y-1 rounded-xl border p-3 text-xs">
-                    <div className="text-foreground flex items-center justify-between font-medium">
-                      <span>
-                        {locale === 'th'
-                          ? 'ประมาณการค่าบริการ AI:'
-                          : 'Estimated AI Cost:'}
-                      </span>
-                      <span className="text-primary text-sm font-bold">
-                        {aiEstimatedCost}{' '}
-                        {locale === 'th' ? 'เครดิต' : 'Credits'}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-[11px]">
-                      {locale === 'th'
-                        ? '* หักจากเครดิตคงเหลือของร้านค้าตามจำนวน Token ที่ใช้งานจริง'
-                        : '* Deducted from store credits balance based on actual tokens used'}
-                    </p>
-                  </div>
-                </div>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                {locale === 'th' ? 'ยกเลิก' : 'Cancel'}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleExecuteAi}
-                className="font-semibold"
+            </CardContent>
+            <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
+              <Button
+                type="button"
+                onClick={handleSaveFooter}
+                disabled={updateMutation.isPending}
+                className="cursor-pointer font-medium"
               >
-                <IconSparkles className="mr-1.5 size-4" />
-                {locale === 'th'
-                  ? 'ยืนยันให้ AI สร้างเนื้อหา'
-                  : 'Confirm & Generate'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </CardContent>
-    </Card>
+                {updateMutation.isPending ? (
+                  <Spinner className="mr-1.5 size-4" />
+                ) : (
+                  <IconDeviceFloppy className="mr-1.5 size-4" />
+                )}
+                {updateMutation.isPending
+                  ? t('saving')
+                  : t('footer.saveAllButton')}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <AlertDialog
+        open={!!aiConfirmPage}
+        onOpenChange={() => setAiConfirmPage(null)}
+      >
+        <AlertDialogContent style={style}>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <IconSparkles className="text-primary size-5" />
+              {locale === 'th'
+                ? `ให้ AI ช่วยคิดเนื้อหาหน้า "${aiConfirmPage?.label}"`
+                : `Generate content for "${aiConfirmPage?.label}" with AI`}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="text-muted-foreground space-y-3 pt-2 text-sm">
+                <p>
+                  {locale === 'th'
+                    ? `ระบบ AI จะนำข้อมูลร้านค้า "${currentStore?.name || ''}" (เช่น คำอธิบายร้านค้า, สินค้า, ข้อมูลติดต่อ) มาวิเคราะห์และสร้างเนื้อหาแบบ Markdown ที่ตรงกับร้านค้าของคุณให้อัตโนมัติ`
+                    : `AI will analyze your store information and generate tailored Markdown content.`}
+                </p>
+                <div className="bg-muted/50 space-y-1 rounded-xl border p-3 text-xs">
+                  <div className="text-foreground flex items-center justify-between font-medium">
+                    <span>
+                      {locale === 'th'
+                        ? 'ประมาณการค่าบริการ AI:'
+                        : 'Estimated AI Cost:'}
+                    </span>
+                    <span className="text-primary text-sm font-bold">
+                      {aiEstimatedCost} {locale === 'th' ? 'เครดิต' : 'Credits'}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-[11px]">
+                    {locale === 'th'
+                      ? '* หักจากเครดิตคงเหลือของร้านค้าตามจำนวน Token ที่ใช้งานจริง'
+                      : '* Deducted from store credits balance based on actual tokens used'}
+                  </p>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {locale === 'th' ? 'ยกเลิก' : 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleExecuteAi}
+              className="cursor-pointer font-semibold"
+            >
+              <IconSparkles className="mr-1.5 size-4" />
+              {locale === 'th'
+                ? 'ยืนยันให้ AI สร้างเนื้อหา'
+                : 'Confirm & Generate'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }

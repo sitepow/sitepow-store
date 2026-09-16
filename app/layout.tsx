@@ -13,7 +13,6 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-// กำหนด IBM Plex Sans Thai ให้เป็น --font-sans หลักของทั้งระบบ
 const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
   subsets: ['thai', 'latin'],
@@ -21,7 +20,6 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   display: 'swap',
 })
 
-// ฟอนต์ PG Homeplace น่ารัก/การตลาดสำหรับ Landing Pages
 const pgHomeplace = localFont({
   src: [
     {

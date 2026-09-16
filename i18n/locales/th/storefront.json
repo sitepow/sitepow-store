@@ -303,5 +303,63 @@
     "outOfFive": "จาก 5 ดาว",
     "clearFilter": "ล้างตัวกรอง",
     "showingResults": "แสดง {count} รีวิว"
+  },
+  "tableOrder": {
+    "tableBadge": "โต๊ะ {number}",
+    "zoneBadge": "โซน {name}",
+    "tabs": {
+      "menu": "สั่งอาหาร",
+      "orders": "รายการที่สั่ง ({count})"
+    },
+    "searchPlaceholder": "ค้นหาเมนูอาหาร...",
+    "allCategories": "ทั้งหมด",
+    "callStaff": "เรียกพนักงาน / เช็คบิล",
+    "billRequested": "แจ้งขอเช็คบิลแล้ว",
+    "billRequestedDesc": "พนักงานกำลังมาที่โต๊ะของคุณ",
+    "emptyMenu": "ไม่พบเมนูอาหารในหมวดหมู่นี้",
+    "emptyOrders": "ยังไม่มีรายการอาหารที่สั่งในรอบนี้",
+    "emptyOrdersDesc": "เริ่มสั่งอาหารจานอร่อยของคุณได้เลย!",
+    "viewCart": "ดูรายการที่เลือก ({count} จาน)",
+    "total": "ยอดรวม",
+    "baht": "บาท",
+    "selectOptions": "เลือก",
+    "addToCart": "เพิ่มลงในรายการ",
+    "updateCart": "อัปเดตรายการ",
+    "dialog": {
+      "variant": "ตัวเลือกขนาด / รูปแบบ",
+      "quantity": "จำนวน",
+      "note": "โน้ตพิเศษถึงพ่อครัว",
+      "notePlaceholder": "เช่น ไม่ใส่ผัก, เผ็ดน้อย, ไม่ใส่ชูรส",
+      "cancel": "ปิด",
+      "confirm": "เพิ่มลงรายการ"
+    },
+    "cartDrawer": {
+      "title": "รายการอาหารที่เลือก",
+      "clear": "ล้างทั้งหมด",
+      "kitchenNote": "โน้ตเพิ่มเติมสำหรับโต๊ะนี้",
+      "kitchenNotePlaceholder": "เช่น ขอจานแบ่ง 2 ใบ, ช้อนส้อมเพิ่ม",
+      "submit": "ยืนยันส่งออเดอร์เข้าครัว",
+      "submitting": "กำลังส่งออเดอร์...",
+      "subtotal": "ยอดรวมอาหาร",
+      "empty": "ไม่มีรายการในตะกร้า"
+    },
+    "tracker": {
+      "title": "สถานะอาหารที่สั่ง",
+      "orderNumber": "ออเดอร์ #{number}",
+      "time": "เวลา {time}",
+      "pending": "รอครัวรับ",
+      "cooking": "กำลังปรุง",
+      "ready": "พร้อมเสิร์ฟ",
+      "served": "เสิร์ฟแล้ว",
+      "cancelled": "ยกเลิกแล้ว"
+    },
+    "toasts": {
+      "addedToCart": "เพิ่ม {name} ลงในรายการแล้ว",
+      "orderSuccess": "ส่งออเดอร์เข้าครัวเรียบร้อยแล้ว!",
+      "orderError": "เกิดข้อผิดพลาดในการส่งออเดอร์",
+      "billSuccess": "แจ้งพนักงานขอเช็คบิลเรียบร้อยแล้ว",
+      "billError": "เกิดข้อผิดพลาดในการเรียกเช็คบิล",
+      "noItems": "กรุณาเลือกรายการอาหารก่อนส่ง"
+    }
   }
 }
