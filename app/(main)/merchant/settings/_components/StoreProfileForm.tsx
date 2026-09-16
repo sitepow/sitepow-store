@@ -15,7 +15,6 @@ import {
   useUpdateStoreProfile,
 } from '@/actions/hooks/store-profile'
 import { ALL_CURRENCIES } from '@/constants/currencies'
-import { STORE_FONT_OPTIONS } from '@/constants/fonts'
 import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
 import { CurrencyCode } from '@/generated/prisma/enums'
 import { useCurrentStore } from '@/hooks/use-current-store'
@@ -89,7 +88,6 @@ export function StoreProfileForm() {
       logo: '',
       coverImage: '',
       primaryColor: '',
-      fontFamily: 'default',
       description: '',
       baseCurrency: CurrencyCode.THB,
       allowSearchEngineIndex: true,
@@ -146,7 +144,6 @@ export function StoreProfileForm() {
         taxId: storeProfile.taxId ?? '',
         description: storeProfile.description ?? '',
         primaryColor: storeProfile.primaryColor ?? '',
-        fontFamily: (storeProfile as any).fontFamily ?? 'default',
         baseCurrency: (storeProfile as any).baseCurrency ?? CurrencyCode.THB,
         allowSearchEngineIndex: storeProfile.allowSearchEngineIndex ?? true,
         seoTitle: storeProfile.seoTitle ?? '',
@@ -356,80 +353,37 @@ export function StoreProfileForm() {
               </Field>
             </div>
             <Separator />
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-              <Field>
-                <FieldLabel>{t('primaryColor')}</FieldLabel>
-                <Controller
-                  control={control}
-                  name="primaryColor"
-                  render={({ field }) => (
-                    <Select
-                      value={field.value ?? ''}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t('primaryColorPlaceholder')}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PRIMARY_COLOR_OPTIONS.map((color) => (
-                          <SelectItem key={color.value} value={color.value}>
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="h-4 w-4 rounded-full border border-black/10"
-                                style={{ backgroundColor: color.value }}
-                              />
-                              {color.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldDescription>{t('primaryColorHint')}</FieldDescription>
-              </Field>
-
-              <Field>
-                <FieldLabel>{t('fontFamily')}</FieldLabel>
-                <Controller
-                  control={control}
-                  name="fontFamily"
-                  render={({ field }) => (
-                    <Select
-                      value={field.value ?? 'default'}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('fontFamilyPlaceholder')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STORE_FONT_OPTIONS.map((font) => (
-                          <SelectItem
-                            key={font.value}
-                            value={font.value}
-                            style={{ fontFamily: font.fontFamily }}
-                          >
-                            <div className="flex flex-col gap-0.5 text-left">
-                              <span className="text-sm font-semibold">
-                                {font.label}
-                              </span>
-                              {font.description && (
-                                <span className="text-muted-foreground text-[11px]">
-                                  {font.description}
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <FieldDescription>{t('fontFamilyHint')}</FieldDescription>
-              </Field>
-            </div>
+            <Field>
+              <FieldLabel>{t('primaryColor')}</FieldLabel>
+              <Controller
+                control={control}
+                name="primaryColor"
+                render={({ field }) => (
+                  <Select
+                    value={field.value ?? ''}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('primaryColorPlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRIMARY_COLOR_OPTIONS.map((color) => (
+                        <SelectItem key={color.value} value={color.value}>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-4 w-4 rounded-full border border-black/10"
+                              style={{ backgroundColor: color.value }}
+                            />
+                            {color.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldDescription>{t('primaryColorHint')}</FieldDescription>
+            </Field>
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <Field>
                 <FieldLabel>{t('name')}</FieldLabel>

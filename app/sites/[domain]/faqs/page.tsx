@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = getStoreUrl(store, domain)
   const canonicalUrl = `${url}/faqs`
   const title = `คำถามที่พบบ่อย (FAQs)`
+  const content = store.faqsPage || FAQ_PAGE
   const description =
-    cleanDescription(FAQ_PAGE, 160) ||
+    cleanDescription(content, 160) ||
     store.seoDescription ||
     store.description ||
     `คำถามที่พบบ่อยและข้อมูลช่วยเหลือลูกค้าสำหรับร้าน ${store.name}`
@@ -69,11 +70,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function StoreFaqsPage() {
+export default async function StoreFaqsPage({ params }: Props) {
+  const { domain } = await params
+  const store = await getStore({ domain })
+  const content = store?.faqsPage || FAQ_PAGE
+
   return (
     <StoreLayout>
       <SectionContainer>
-        <MarkdownRenderer content={FAQ_PAGE} />
+        <MarkdownRenderer content={content} />
       </SectionContainer>
     </StoreLayout>
   )

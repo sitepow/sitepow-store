@@ -381,3 +381,15 @@ export const thDictionary: typeof en = {
     ctrl_shortcut: 'Ctrl',
   },
 }
+
+export const blockNoteDictionaries: Record<string, typeof en> = {
+  th: thDictionary,
+  en,
+}
+
+export function getBlockNoteDictionary(locale?: string): typeof en {
+  if (!locale || locale.startsWith('th')) {
+    return thDictionary
+  }
+  return en
+}

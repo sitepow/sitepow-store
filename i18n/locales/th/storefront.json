@@ -277,5 +277,31 @@
   "metadata": {
     "welcome": "ยินดีต้อนรับสู่ร้าน {name}",
     "defaultDescription": "เลือกซื้อสินค้าคุณภาพจาก {name} บนระบบของเรา"
+  },
+  "customerReviews": {
+    "title": "รีวิวจากลูกค้า",
+    "subtitle": "คะแนนความพึงพอใจและความคิดเห็นจริงจากลูกค้าที่สั่งซื้อสินค้ากับทางร้าน",
+    "storeRating": "คะแนนร้านค้า",
+    "overallRating": "คะแนนเฉลี่ยรวม",
+    "totalReviews": "จากทั้งหมด {count} รีวิว",
+    "reviewsCount": "{count} รีวิว",
+    "allFilter": "ทั้งหมด ({count})",
+    "starsFilter": "{star} ดาว ({count})",
+    "withMediaFilter": "มีรูปภาพ/วิดีโอ ({count})",
+    "verifiedPurchase": "สั่งซื้อจริง",
+    "anonymousCustomer": "ลูกค้าไม่ระบุชื่อ",
+    "emptyTitle": "ยังไม่มีรีวิว",
+    "emptyDesc": "ยังไม่มีรายการรีวิวตามเงื่อนไขที่คุณเลือก หรือร้านค้ายังไม่ได้รับรีวิวจากลูกค้า",
+    "viewProduct": "ดูสินค้า",
+    "product": "สินค้า",
+    "variant": "ตัวเลือก",
+    "subRatings": "คะแนนย่อย",
+    "previous": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "page": "หน้า {current} จาก {total}",
+    "filterBy": "กรองรีวิวตามคะแนน",
+    "outOfFive": "จาก 5 ดาว",
+    "clearFilter": "ล้างตัวกรอง",
+    "showingResults": "แสดง {count} รีวิว"
   }
 }

@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = getStoreUrl(store, domain)
   const canonicalUrl = `${url}/privacy-policy`
   const title = `นโยบายความเป็นส่วนตัว`
+  const content = store.privacyPolicyPage || PRIVATE_POLICY_PAGE
   const description =
-    cleanDescription(PRIVATE_POLICY_PAGE, 160) ||
+    cleanDescription(content, 160) ||
     store.seoDescription ||
     store.description ||
     `นโยบายความเป็นส่วนตัวของร้าน ${store.name}`
@@ -69,11 +70,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function StorePrivacyPolicyPage() {
+export default async function StorePrivacyPolicyPage({ params }: Props) {
+  const { domain } = await params
+  const store = await getStore({ domain })
+  const content = store?.privacyPolicyPage || PRIVATE_POLICY_PAGE
+
   return (
     <StoreLayout>
       <SectionContainer>
-        <MarkdownRenderer content={PRIVATE_POLICY_PAGE} />
+        <MarkdownRenderer content={content} />
       </SectionContainer>
     </StoreLayout>
   )

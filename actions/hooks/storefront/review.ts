@@ -4,11 +4,16 @@ import { storefrontReviewKeys } from '@/actions/query-keys/storefront/review'
 import {
   CreateCustomerReviewParams,
   GetCustomerReviewsParams,
+  GetStoreCustomerReviewsParams,
+  GetStoreCustomerReviewsResponse,
+  StoreReviewSummary,
   UpdateCustomerReviewParams,
   createCustomerReview,
   deleteCustomerReview,
   getCustomerReviews,
   getPurchasableProductsForReview,
+  getStoreCustomerReviews,
+  getStoreReviewSummary,
   updateCustomerReview,
 } from '@/actions/storefront/review'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -101,5 +106,34 @@ export function useDeleteReview() {
         })
       }
     },
+  })
+}
+
+export function useStoreReviewSummary(
+  storeId: string,
+  initialData?: StoreReviewSummary,
+) {
+  return useQuery({
+    queryKey: storefrontReviewKeys.storeSummary(storeId),
+    queryFn: () => getStoreReviewSummary(storeId),
+    initialData,
+    enabled: !!storeId,
+  })
+}
+
+export function useStoreCustomerReviews(
+  params: GetStoreCustomerReviewsParams,
+  initialData?: GetStoreCustomerReviewsResponse,
+) {
+  return useQuery({
+    queryKey: storefrontReviewKeys.storeList(params.storeId, {
+      page: params.page,
+      limit: params.limit,
+      rating: params.rating,
+      hasMedia: params.hasMedia,
+    }),
+    queryFn: () => getStoreCustomerReviews(params),
+    initialData,
+    enabled: !!params.storeId,
   })
 }

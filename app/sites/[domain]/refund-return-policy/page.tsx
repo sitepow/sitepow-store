@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = getStoreUrl(store, domain)
   const canonicalUrl = `${url}/refund-return-policy`
   const title = `นโยบายการคืนสินค้าและคืนเงิน`
+  const content = store.refundPolicyPage || REFUND_POLICY_PAGE
   const description =
-    cleanDescription(REFUND_POLICY_PAGE, 160) ||
+    cleanDescription(content, 160) ||
     store.seoDescription ||
     store.description ||
     `นโยบายการคืนสินค้าและการคืนเงินของร้าน ${store.name}`
@@ -69,11 +70,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function StoreRefundReturnPolicyPage() {
+export default async function StoreRefundReturnPolicyPage({ params }: Props) {
+  const { domain } = await params
+  const store = await getStore({ domain })
+  const content = store?.refundPolicyPage || REFUND_POLICY_PAGE
+
   return (
     <StoreLayout>
       <SectionContainer>
-        <MarkdownRenderer content={REFUND_POLICY_PAGE} />
+        <MarkdownRenderer content={content} />
       </SectionContainer>
     </StoreLayout>
   )

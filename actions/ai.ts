@@ -9,6 +9,7 @@ import {
   GEMINI_MODEL,
   PRODUCT_SCHEMA,
   PRODUCT_SCHEMA_PARTS,
+  STORE_PAGE_AI_SCHEMA,
   STORE_SEO_SCHEMA,
 } from '@/constants/ai'
 import { PLAN_DETAILS } from '@/constants/plan'
@@ -25,6 +26,7 @@ import {
   buildBlogPrompt,
   buildCategoryPrompt,
   buildProductPrompt,
+  buildStorePagePrompt,
   buildStoreSeoPrompt,
   calculateAiCost,
   estimateCost,
@@ -1083,6 +1085,185 @@ export async function generateAffiliateProductAi(
       messageTH: 'เกิดข้อผิดพลาดในการประมวลผลด้วย AI โปรดลองใหม่อีกครั้ง',
       messageEN: 'Failed to generate product via AI, please try again',
       message: 'เกิดข้อผิดพลาดในการประมวลผลด้วย AI',
+    }
+  }
+}
+
+export async function estimateStorePageAiCost(
+  pageType:
+    | 'about'
+    | 'faqs'
+    | 'description'
+    | 'privacy-policy'
+    | 'refund-return-policy',
+  storeId: string,
+  currentContent?: string,
+) {
+  try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        email: true,
+        phone: true,
+        lineId: true,
+        facebookPage: true,
+        plan: true,
+        balance: true,
+        categories: { select: { title: true }, take: 5 },
+        branches: { select: { province: true }, take: 1 },
+      },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า', credits: 0 }
+    }
+
+    const prompt = buildStorePagePrompt({
+      pageType,
+      storeName: store.name,
+      storeDescription: store.description,
+      email: store.email,
+      phone: store.phone,
+      lineId: store.lineId,
+      facebookPage: store.facebookPage,
+      categories: store.categories.map((c) => c.title),
+      location: store.branches[0]?.province,
+      currentContent,
+    })
+
+    const costEstimate = await handleUserPrompt(prompt, store.plan)
+    return {
+      success: true,
+      credits: costEstimate.credits,
+      balance: Number(store.balance),
+    }
+  } catch (error) {
+    console.error('estimateStorePageAiCost error:', error)
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการประเมินเครดิต',
+      credits: 0,
+    }
+  }
+}
+
+export async function generateStorePageAi(
+  pageType:
+    | 'about'
+    | 'faqs'
+    | 'description'
+    | 'privacy-policy'
+    | 'refund-return-policy',
+  storeId: string,
+  currentContent?: string,
+  customInstructions?: string,
+) {
+  try {
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        email: true,
+        phone: true,
+        lineId: true,
+        facebookPage: true,
+        plan: true,
+        balance: true,
+        categories: { select: { title: true }, take: 5 },
+        branches: { select: { province: true }, take: 1 },
+      },
+    })
+
+    if (!store) {
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
+    }
+
+    const prompt = buildStorePagePrompt({
+      pageType,
+      storeName: store.name,
+      storeDescription: store.description,
+      email: store.email,
+      phone: store.phone,
+      lineId: store.lineId,
+      facebookPage: store.facebookPage,
+      categories: store.categories.map((c) => c.title),
+      location: store.branches[0]?.province,
+      currentContent,
+      customInstructions,
+    })
+
+    const costEstimate = await handleUserPrompt(prompt, store.plan)
+    if (Number(store.balance) < costEstimate.credits) {
+      return {
+        success: false,
+        message:
+          'เครดิตของคุณไม่เพียงพอสำหรับการสร้างเนื้อหาด้วย AI กรุณาเติมเครดิตก่อนทำรายการครับ',
+      }
+    }
+
+    const model = genAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: STORE_PAGE_AI_SCHEMA,
+      },
+    })
+
+    const result = await model.generateContent(prompt)
+    const responseText = result.response.text()
+
+    const usage = result.response.usageMetadata
+    const inputTokens = usage?.promptTokenCount || 0
+    const outputTokens = usage?.candidatesTokenCount || 0
+
+    const actualCost = calculateAiCost(
+      GEMINI_MODEL,
+      inputTokens,
+      outputTokens,
+      PLAN_DETAILS[store.plan].aiUsageMultiplier,
+    )
+
+    const pageNameMap: Record<string, string> = {
+      about: 'เกี่ยวกับเรา',
+      faqs: 'คำถามที่พบบ่อย',
+      description: 'วิธีการสั่งซื้อ & รายละเอียด',
+      'privacy-policy': 'นโยบายความเป็นส่วนตัว',
+      'refund-return-policy': 'นโยบายการคืนสินค้า & คืนเงิน',
+    }
+
+    await prisma.$transaction([
+      prisma.store.update({
+        where: { id: storeId },
+        data: { balance: { decrement: actualCost } },
+      }),
+      prisma.transaction.create({
+        data: {
+          storeId,
+          amount: actualCost,
+          type: TransactionType.AI_USAGE,
+          description: `AI สร้างเนื้อหาหน้า ${pageNameMap[pageType] || pageType} (Tokens: ${inputTokens}+${outputTokens})`,
+        },
+      }),
+    ])
+
+    const parsed = JSON.parse(responseText) as { content: string }
+
+    return {
+      success: true,
+      messageTH: `สร้างเนื้อหาหน้า "${pageNameMap[pageType] || pageType}" เรียบร้อยแล้ว`,
+      messageEN: 'Store page content generated successfully',
+      data: parsed,
+    }
+  } catch (error) {
+    console.error('generateStorePageAi error:', error)
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการประมวลผลของ AI กรุณาลองใหม่อีกครั้ง',
     }
   }
 }

@@ -161,6 +161,7 @@ export function PosProductList({
         <PosProductOptionDialog
           key={selectedProduct.id}
           product={selectedProduct}
+          cartItems={cartItems}
           onClose={() => setSelectedProduct(null)}
           onConfirm={onAddToCart}
         />

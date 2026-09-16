@@ -411,3 +411,15 @@ export const AFFILIATE_PRODUCT_AI_SCHEMA: Schema = {
   },
   required: ['title', 'slug', 'description', 'price', 'platform', 'isOnSale'],
 }
+
+export const STORE_PAGE_AI_SCHEMA: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    content: {
+      type: SchemaType.STRING,
+      description:
+        'เนื้อหาหน้าเว็บแบบ Markdown ภาษาไทย จัดโครงสร้างหัวข้อ (#, ##, ###), รายการ, ตัวหนา, และข้อมูลอย่างสวยงาม ครบถ้วน',
+    },
+  },
+  required: ['content'],
+}

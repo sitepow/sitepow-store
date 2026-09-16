@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
-import { IBM_Plex_Sans_Thai, IBM_Plex_Sans_Thai_Looped } from 'next/font/google'
+import { IBM_Plex_Sans_Thai } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import '@/app/globals.css'
@@ -13,6 +13,15 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
+// กำหนด IBM Plex Sans Thai ให้เป็น --font-sans หลักของทั้งระบบ
+const ibmPlexSansThai = IBM_Plex_Sans_Thai({
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+// ฟอนต์ PG Homeplace น่ารัก/การตลาดสำหรับ Landing Pages
 const pgHomeplace = localFont({
   src: [
     {
@@ -61,23 +70,9 @@ const pgHomeplace = localFont({
       style: 'normal',
     },
   ],
-  variable: '--font-sans',
+  variable: '--font-landing',
   display: 'swap',
   declarations: [{ prop: 'size-adjust', value: '140%' }],
-})
-
-const ibmPlexSansThai = IBM_Plex_Sans_Thai({
-  weight: ['100', '200', '300', '400', '500', '600', '700'],
-  subsets: ['thai', 'latin'],
-  variable: '--font-ibm-plex-sans-thai',
-  display: 'swap',
-})
-
-const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
-  weight: ['100', '200', '300', '400', '500', '600', '700'],
-  subsets: ['thai', 'latin'],
-  variable: '--font-ibm-plex-sans-thai-loop',
-  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -367,9 +362,8 @@ export default async function RootLayout({
       className={cn(
         'h-full',
         'antialiased',
-        pgHomeplace.variable,
         ibmPlexSansThai.variable,
-        ibmPlexSansThaiLooped.variable,
+        pgHomeplace.variable,
         'font-sans',
       )}
       suppressHydrationWarning
@@ -380,14 +374,20 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-background flex min-h-full flex-col">
+      <body className="bg-background flex min-h-full flex-col font-sans">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster />
+          <Toaster
+            toastOptions={{
+              style: {
+                letterSpacing: '-0.025em',
+              },
+            }}
+          />
           <NextIntlClientProvider locale={locale} messages={messages}>
             <QueryProviders>{children}</QueryProviders>
           </NextIntlClientProvider>

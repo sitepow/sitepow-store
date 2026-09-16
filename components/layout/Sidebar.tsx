@@ -11,7 +11,6 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
-import { getStoreFontFamily } from '@/constants/fonts'
 import { NavigationItem } from '@/constants/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
@@ -108,12 +107,8 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
   const hasBadgesToShow = isMerchant || isPointsEnabled
 
-  const fontFamily = currentStore?.fontFamily ?? store?.fontFamily ?? 'default'
-  const resolvedFont = getStoreFontFamily(fontFamily)
   const storeThemeStyle = {
     '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-    '--font-sans': resolvedFont,
-    fontFamily: resolvedFont,
   } as React.CSSProperties
 
   const tNav = useTranslations('merchant.navigation')

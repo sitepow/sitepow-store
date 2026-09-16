@@ -712,3 +712,226 @@ export async function deleteCustomerReview(reviewId: string) {
     }
   }
 }
+
+export interface StoreReviewSummary {
+  averageRating: number
+  totalReviews: number
+  breakdown: {
+    star: number
+    count: number
+    percentage: number
+  }[]
+  withMediaCount: number
+}
+
+export async function getStoreReviewSummary(
+  storeId: string,
+): Promise<StoreReviewSummary> {
+  if (!storeId) {
+    return {
+      averageRating: 0,
+      totalReviews: 0,
+      breakdown: [5, 4, 3, 2, 1].map((star) => ({
+        star,
+        count: 0,
+        percentage: 0,
+      })),
+      withMediaCount: 0,
+    }
+  }
+
+  try {
+    const [totalReviews, agg, ratingGroups, withMediaCount] = await Promise.all(
+      [
+        prisma.review.count({ where: { storeId } }),
+        prisma.review.aggregate({
+          where: { storeId },
+          _avg: { rating: true },
+        }),
+        prisma.review.groupBy({
+          by: ['rating'],
+          where: { storeId },
+          _count: { _all: true },
+        }),
+        prisma.review.count({
+          where: {
+            storeId,
+            OR: [{ images: { isEmpty: false } }, { video: { not: null } }],
+          },
+        }),
+      ],
+    )
+
+    const countsByStar = new Map<number, number>()
+    for (const group of ratingGroups) {
+      countsByStar.set(group.rating, group._count._all)
+    }
+
+    const breakdown = [5, 4, 3, 2, 1].map((star) => {
+      const count = countsByStar.get(star) || 0
+      const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
+      return {
+        star,
+        count,
+        percentage: Number(percentage.toFixed(1)),
+      }
+    })
+
+    return {
+      averageRating: agg._avg.rating ? Number(agg._avg.rating.toFixed(1)) : 0,
+      totalReviews,
+      breakdown,
+      withMediaCount,
+    }
+  } catch (error) {
+    console.error('getStoreReviewSummary error:', error)
+    return {
+      averageRating: 0,
+      totalReviews: 0,
+      breakdown: [5, 4, 3, 2, 1].map((star) => ({
+        star,
+        count: 0,
+        percentage: 0,
+      })),
+      withMediaCount: 0,
+    }
+  }
+}
+
+const storeCustomerReviewSelect = {
+  id: true,
+  rating: true,
+  comment: true,
+  images: true,
+  video: true,
+  date: true,
+  selectedOptions: true,
+  orderId: true,
+  product: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      images: {
+        select: {
+          url: true,
+          isPrimary: true,
+        },
+        orderBy: { isPrimary: 'desc' },
+        take: 1,
+      },
+    },
+  },
+  variant: {
+    select: {
+      title: true,
+      sku: true,
+    },
+  },
+  customer: {
+    select: {
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    },
+  },
+  categories: {
+    select: {
+      id: true,
+      label: true,
+      rating: true,
+    },
+  },
+} satisfies Prisma.ReviewSelect
+
+export type StoreCustomerReviewItem = DecimalToNumber<
+  Prisma.ReviewGetPayload<{ select: typeof storeCustomerReviewSelect }>
+>
+
+export interface GetStoreCustomerReviewsParams {
+  storeId: string
+  page?: number
+  limit?: number
+  rating?: number
+  hasMedia?: boolean
+}
+
+export interface GetStoreCustomerReviewsResponse {
+  data: StoreCustomerReviewItem[]
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
+
+export async function getStoreCustomerReviews({
+  storeId,
+  page = 1,
+  limit = 10,
+  rating,
+  hasMedia,
+}: GetStoreCustomerReviewsParams): Promise<GetStoreCustomerReviewsResponse> {
+  const emptyResponse: GetStoreCustomerReviewsResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  if (!storeId) {
+    return emptyResponse
+  }
+
+  try {
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(50, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
+
+    const whereClause: Prisma.ReviewWhereInput = {
+      storeId,
+      ...(rating && rating >= 1 && rating <= 5 ? { rating } : {}),
+      ...(hasMedia
+        ? {
+            OR: [{ images: { isEmpty: false } }, { video: { not: null } }],
+          }
+        : {}),
+    }
+
+    const [totalItems, reviews] = await Promise.all([
+      prisma.review.count({ where: whereClause }),
+      prisma.review.findMany({
+        where: whereClause,
+        skip,
+        take: sanitizedLimit,
+        orderBy: { date: 'desc' },
+        select: storeCustomerReviewSelect,
+      }),
+    ])
+
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
+    return {
+      data: serializeDecimal(reviews),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
+    }
+  } catch (error) {
+    console.error('getStoreCustomerReviews error:', error)
+    return emptyResponse
+  }
+}

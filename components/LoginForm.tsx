@@ -5,10 +5,14 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
+import { StoreData } from '@/actions/store'
 import { LOGIN_PROVIDERS } from '@/constants/login'
 import { UserRole } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { LoginFormInputs } from '@/types/login'
 import { useMutation } from '@tanstack/react-query'
 import {
@@ -33,7 +37,19 @@ import { Spinner } from '@/components/ui/spinner'
 
 import { authClient } from '@/lib/auth-client'
 
-export function LoginForm() {
+export interface LoginFormProps {
+  store?: StoreData | null
+  isStore?: boolean
+}
+
+export function LoginForm({
+  store: storeProp,
+  isStore = false,
+}: LoginFormProps = {}) {
+  const storeFromHook = useStoreData((s) => s.store)
+  const store = storeProp ?? storeFromHook
+  const isStoreMode = isStore || !!store
+
   const t = useTranslations('auth.login')
   const searchParams = useSearchParams()
   const role = searchParams.get('role') as UserRole
@@ -42,7 +58,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
 
   const registerParams = new URLSearchParams()
-  if (role) {
+  if (!isStoreMode && role) {
     registerParams.set('role', role)
   }
 
@@ -142,10 +158,42 @@ export function LoginForm() {
   const isCustomer = role === UserRole.CUSTOMER
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10">
+    <div
+      className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10"
+      style={
+        isStoreMode && store?.primaryColor
+          ? ({ '--primary': store.primaryColor } as React.CSSProperties)
+          : undefined
+      }
+    >
       <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-2xl border p-4.5 shadow-xl shadow-black/[0.03] sm:rounded-3xl sm:p-8 md:p-10 dark:shadow-black/20">
         <div className="mb-4 flex justify-center sm:mb-6">
-          <LogoBrand className="text-xl" />
+          {isStoreMode ? (
+            store?.logo ? (
+              <Link
+                href="/"
+                className="block h-14 w-fit max-w-[200px] overflow-hidden"
+              >
+                <Image
+                  src={store.logo}
+                  alt={store.name || 'Store Logo'}
+                  width={200}
+                  height={70}
+                  unoptimized
+                  className="size-full object-contain object-center"
+                />
+              </Link>
+            ) : (
+              <Link
+                href="/"
+                className="text-foreground hover:text-primary text-2xl font-bold tracking-tight transition-colors"
+              >
+                {store?.name || 'Store'}
+              </Link>
+            )
+          ) : (
+            <LogoBrand className="text-xl" />
+          )}
         </div>
         <div className="w-full space-y-4 sm:space-y-6">
           <div className="space-y-1.5 text-center sm:space-y-2">
@@ -153,7 +201,11 @@ export function LoginForm() {
               {t('title')}
             </h1>
             <p className="text-muted-foreground text-xs sm:text-sm">
-              {isCustomer ? t('buyerSubtitle') : t('merchantSubtitle')}
+              {isStoreMode
+                ? t('buyerSubtitle')
+                : isCustomer
+                  ? t('buyerSubtitle')
+                  : t('merchantSubtitle')}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
@@ -221,15 +273,27 @@ export function LoginForm() {
               </div>
               <FieldError>{errors?.password?.message}</FieldError>
             </Field>
-            <RainbowButton
-              type="submit"
-              className="h-10 w-full sm:h-11"
-              size="lg"
-              disabled={isPending}
-            >
-              {isPending && <Spinner className="mr-2" />}
-              {isPending ? t('submitting') : t('submit')}
-            </RainbowButton>
+            {isStoreMode ? (
+              <Button
+                type="submit"
+                className="h-10 w-full font-semibold sm:h-11"
+                size="lg"
+                disabled={isPending}
+              >
+                {isPending && <Spinner className="mr-2" />}
+                {isPending ? t('submitting') : t('submit')}
+              </Button>
+            ) : (
+              <RainbowButton
+                type="submit"
+                className="h-10 w-full sm:h-11"
+                size="lg"
+                disabled={isPending}
+              >
+                {isPending && <Spinner className="mr-2" />}
+                {isPending ? t('submitting') : t('submit')}
+              </RainbowButton>
+            )}
           </form>
           <p className="text-muted-foreground text-center text-xs sm:text-sm">
             {t('noAccount')}{' '}
@@ -242,7 +306,7 @@ export function LoginForm() {
           </p>
         </div>
       </div>
-      {isCustomer && <ProtectedByBrand />}
+      {isCustomer && !isStoreMode && <ProtectedByBrand />}
     </div>
   )
 }

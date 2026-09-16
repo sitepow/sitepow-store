@@ -7,6 +7,7 @@ import {
   generateBlogAi,
   generateCategoryAi,
   generateProductAi,
+  generateStorePageAi,
   generateStoreSeoAi,
   scrapeAffiliateProductUrl,
 } from '@/actions/ai'
@@ -183,6 +184,34 @@ export function useStoreSeoAi() {
       storeId: string
     }) => {
       return await generateStoreSeoAi(storeName, storeDescription, storeId)
+    },
+  })
+}
+
+export function useStorePageAi() {
+  return useMutation({
+    mutationFn: async ({
+      pageType,
+      storeId,
+      currentContent,
+      customInstructions,
+    }: {
+      pageType:
+        | 'about'
+        | 'faqs'
+        | 'description'
+        | 'privacy-policy'
+        | 'refund-return-policy'
+      storeId: string
+      currentContent?: string
+      customInstructions?: string
+    }) => {
+      return await generateStorePageAi(
+        pageType,
+        storeId,
+        currentContent,
+        customInstructions,
+      )
     },
   })
 }

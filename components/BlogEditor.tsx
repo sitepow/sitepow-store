@@ -1,26 +1,48 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
-import { thDictionary } from '@/constants/blocknote'
+import { useLocale } from 'next-intl'
+
+import { getBlockNoteDictionary } from '@/constants/blocknote'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/shadcn'
 import '@blocknote/shadcn/style.css'
 import { useTheme } from '@teispace/next-themes'
 
+import { cn } from '@/lib/utils'
+
 interface BlogEditorProps {
   value?: string
   onChange?: (markdown: string) => void
+  className?: string
+  locale?: string
 }
 
-export default function BlogEditor({ value, onChange }: BlogEditorProps) {
+export default function BlogEditor({
+  value,
+  onChange,
+  className,
+  locale: propLocale,
+}: BlogEditorProps) {
+  const activeLocale = useLocale()
+  const currentLocale = propLocale || activeLocale
   const { resolvedTheme } = useTheme()
 
-  const editor = useCreateBlockNote({
-    dictionary: thDictionary,
-  })
+  const dictionary = useMemo(
+    () => getBlockNoteDictionary(currentLocale),
+    [currentLocale],
+  )
+
+  const editor = useCreateBlockNote(
+    {
+      dictionary,
+    },
+    [currentLocale],
+  )
 
   const lastMarkdownRef = useRef<string>('')
+  const lastEditorRef = useRef(editor)
 
   useEffect(() => {
     const syncValueToEditor = async () => {
@@ -29,8 +51,10 @@ export default function BlogEditor({ value, onChange }: BlogEditorProps) {
       }
 
       const incomingValue = value || ''
+      const isNewEditor = lastEditorRef.current !== editor
 
-      if (incomingValue !== lastMarkdownRef.current) {
+      if (isNewEditor || incomingValue !== lastMarkdownRef.current) {
+        lastEditorRef.current = editor
         lastMarkdownRef.current = incomingValue
 
         const blocks = await editor.tryParseMarkdownToBlocks(incomingValue)
@@ -52,7 +76,12 @@ export default function BlogEditor({ value, onChange }: BlogEditorProps) {
   }
 
   return (
-    <div className="min-h-96 rounded-xl border p-5 font-sans dark:bg-[#1f1f1f] [&_.bn-container]:font-sans">
+    <div
+      className={cn(
+        'min-h-96 w-full overflow-x-auto rounded-xl border p-3 font-sans sm:p-5 dark:bg-[#1f1f1f] [&_.bn-container]:font-sans',
+        className,
+      )}
+    >
       <BlockNoteView
         editor={editor}
         onChange={handleContentChange}

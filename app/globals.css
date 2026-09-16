@@ -1,19 +1,15 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-signature: var(--font-signature);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-sans);
-  --font-ibm-plex: var(--font-ibm-plex-sans-thai);
-  --font-ibm-plex-loop: var(--font-ibm-plex-sans-thai-loop);
+  --font-landing: var(--font-landing);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -51,6 +47,8 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-airy: 0 1.50943px 9.0566px rgba(96, 108, 171, 0.15);
+  --tracking-tight: -0.025em;
+  --letter-spacing-tight: var(--tracking-tight);
   --tracking-tighter: -0.05em;
   --letter-spacing-tighter: var(--tracking-tighter);
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
@@ -148,6 +146,8 @@
 
   html,
   body {
+    font-family: var(--font-sans), sans-serif;
+    letter-spacing: -0.025em; /* tracking-tight ให้กับข้อความทั้งหมด */
     line-height: var(--thai-line-height);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -163,7 +163,15 @@
   h5,
   h6 {
     padding-top: 0.2em;
+    letter-spacing: -0.035em; /* หัวข้อปรับให้กระชับขึ้นเล็กน้อย */
   }
+}
+
+/* บังคับ Toast ทุกตัวให้สืบทอดฟอนต์และระยะตัวอักษร tracking-tight */
+div[role='status'],
+div[role='status'] * {
+  font-family: var(--font-sans), sans-serif !important;
+  letter-spacing: -0.025em !important;
 }
 
 @keyframes gentle-bounce {
@@ -255,6 +263,7 @@ article.prose li {
 .bn-container,
 .bn-container * {
   font-family: var(--font-sans), sans-serif !important;
+  letter-spacing: -0.025em !important;
 }
 
 @keyframes marquee {
@@ -343,17 +352,7 @@ article.prose li {
   animation: rainbow var(--speed, 2s) infinite linear;
 }
 
-.font-default,
-.font-pg_homeplace {
-  font-family: var(--font-sans), sans-serif;
-}
-
-.font-ibm-plex,
-.font-ibm_plex_sans_thai {
-  font-family: var(--font-ibm-plex-sans-thai), sans-serif;
-}
-
-.font-ibm-plex-loop,
-.font-ibm_plex_sans_thai_loop {
-  font-family: var(--font-ibm-plex-sans-thai-loop), sans-serif;
+.font-landing {
+  --font-sans: var(--font-landing);
+  font-family: var(--font-landing), sans-serif;
 }

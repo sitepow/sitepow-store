@@ -79,7 +79,6 @@ const storeDropdownSelect = {
   slug: true,
   logo: true,
   primaryColor: true,
-  fontFamily: true,
   baseCurrency: true,
 } satisfies Prisma.StoreSelect
 
@@ -137,9 +136,24 @@ export type StoreData = Prisma.StoreGetPayload<{
     slug: true
     coverImage: true
     primaryColor: true
-    fontFamily: true
     baseCurrency: true
     translations: true
+    aboutPage: true
+    faqsPage: true
+    descriptionPage: true
+    privacyPolicyPage: true
+    refundPolicyPage: true
+    phone: true
+    lineId: true
+    facebookPage: true
+    instagramPage: true
+    tiktokPage: true
+    youtubePage: true
+    discordUrl: true
+    messengerUrl: true
+    socialLinks: true
+    footerText: true
+    footerCopyright: true
   }
 }>
 
@@ -159,7 +173,6 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         logo: true,
         coverImage: true,
         primaryColor: true,
-        fontFamily: true,
         status: true,
         plan: true,
         email: true,
@@ -173,6 +186,22 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         seoKeywords: true,
         baseCurrency: true,
         translations: true,
+        aboutPage: true,
+        faqsPage: true,
+        descriptionPage: true,
+        privacyPolicyPage: true,
+        refundPolicyPage: true,
+        phone: true,
+        lineId: true,
+        facebookPage: true,
+        instagramPage: true,
+        tiktokPage: true,
+        youtubePage: true,
+        discordUrl: true,
+        messengerUrl: true,
+        socialLinks: true,
+        footerText: true,
+        footerCopyright: true,
       },
     })
   })

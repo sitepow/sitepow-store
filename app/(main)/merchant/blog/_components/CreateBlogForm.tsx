@@ -547,8 +547,8 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     </p>
                   )}
                 </Field>
-                <div className="rounded-xl border p-4 bg-muted/20 space-y-4">
-                  <div className="flex items-center gap-2 font-medium text-sm text-muted-foreground">
+                <div className="bg-muted/20 space-y-4 rounded-xl border p-4">
+                  <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                     <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
                   </div>
                   <Field>
@@ -560,7 +560,9 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel className="text-xs">Blog Content (EN)</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      Blog Content (EN)
+                    </FieldLabel>
                     <Controller
                       control={control}
                       name="translations.en.content"
@@ -568,6 +570,7 @@ export function CreateBlogForm({ blogId, onDataChange }: CreateBlogFormProps) {
                         <BlogEditor
                           value={field.value || ''}
                           onChange={(markdown) => field.onChange(markdown)}
+                          locale="en"
                         />
                       )}
                     />

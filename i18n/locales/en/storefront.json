@@ -278,5 +278,31 @@
   "metadata": {
     "welcome": "Welcome to {name}",
     "defaultDescription": "Shop quality products from {name} on our platform"
+  },
+  "customerReviews": {
+    "title": "Customer Reviews",
+    "subtitle": "Genuine feedback and impressions from customers who purchased from our store",
+    "storeRating": "Store Rating",
+    "overallRating": "Overall Rating",
+    "totalReviews": "From {count} total reviews",
+    "reviewsCount": "{count} reviews",
+    "allFilter": "All ({count})",
+    "starsFilter": "{star} Stars ({count})",
+    "withMediaFilter": "With Photos/Videos ({count})",
+    "verifiedPurchase": "Verified Purchase",
+    "anonymousCustomer": "Anonymous Customer",
+    "emptyTitle": "No Reviews Yet",
+    "emptyDesc": "There are no reviews matching your selected filter, or the store has not received any reviews yet.",
+    "viewProduct": "View Product",
+    "product": "Product",
+    "variant": "Variant",
+    "subRatings": "Sub-ratings",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {current} of {total}",
+    "filterBy": "Filter Reviews by Rating",
+    "outOfFive": "out of 5 stars",
+    "clearFilter": "Clear Filter",
+    "showingResults": "Showing {count} reviews"
   }
 }

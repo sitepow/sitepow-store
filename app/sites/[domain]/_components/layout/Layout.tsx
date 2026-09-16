@@ -2,7 +2,6 @@
 
 import { ComponentProps } from 'react'
 
-import { getStoreFontFamily } from '@/constants/fonts'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
@@ -24,18 +23,11 @@ export function StoreLayout({
   const { user } = useSession()
 
   const isOwner = !!user?.id && !!store?.ownerId && user.id === store.ownerId
-  const fontVar = getStoreFontFamily(store?.fontFamily)
 
   return (
     <div
       className="flex flex-col gap-10"
-      style={
-        {
-          '--primary': store?.primaryColor,
-          '--font-sans': fontVar,
-          fontFamily: fontVar,
-        } as React.CSSProperties
-      }
+      style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       <StoreNavbar />
       <main

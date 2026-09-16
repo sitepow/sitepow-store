@@ -19,6 +19,7 @@
     "loyalty": "ระบบแต้มสะสม",
     "blog": "จัดการบทความ",
     "store-settings": "จัดการร้านค้า",
+    "store-pages": "หน้าเนื้อหาร้านค้า",
     "organization-branches": "จัดการสาขา",
     "billing-subscription": "การสมัครสมาชิก",
     "credits": "จัดการเครดิต",
@@ -1896,9 +1897,6 @@
       "primaryColor": "สีประจำแบรนด์ (Primary Color)",
       "primaryColorPlaceholder": "เลือกสีประจำแบรนด์",
       "primaryColorHint": "เลือกสีหลักสำหรับปุ่มและองค์ประกอบสำคัญในหน้าร้านของคุณ",
-      "fontFamily": "ฟอนต์ประจำร้านค้า (Font Family)",
-      "fontFamilyPlaceholder": "เลือกฟอนต์ของร้านค้า",
-      "fontFamilyHint": "เลือกฟอนต์ตัวอักษรสำหรับหน้าร้านค้าและระบบจัดการร้านของคุณ",
       "name": "ชื่อร้านค้า / ชื่อจดทะเบียนพาณิชย์",
       "namePlaceholder": "ระบุชื่อเต็มของร้านค้า",
       "slug": "Store URL Slug",
@@ -3199,6 +3197,76 @@
       "periodDetail": "{count} พนักงาน • งวด {period}",
       "netSalaryLabel": "ยอดสุทธิรวม:",
       "paidLabel": "จ่ายแล้ว:"
+    }
+  },
+  "storePages": {
+    "title": "หน้าเนื้อหาร้านค้า",
+    "description": "ตั้งค่าและแก้ไขเนื้อหาหน้าเว็บร้านค้า เช่น เกี่ยวกับเรา, คำถามที่พบบ่อย, วิธีการสั่งซื้อ, นโยบายความเป็นส่วนตัว และนโยบายการคืนสินค้า",
+    "noAccessTitle": "ไม่มีสิทธิ์เข้าถึง",
+    "noAccessDescription": "คุณไม่มีสิทธิ์ในการเข้าถึงการตั้งค่าหน้าเนื้อหาร้านค้า",
+    "selectStoreTitle": "กรุณาเลือกร้านค้า",
+    "selectStoreDescription": "กรุณาเลือกร้านค้าที่ต้องการจัดการหน้าเนื้อหาจากเมนูด้านบน",
+    "cardTitle": "แก้ไขเนื้อหาหน้าเว็บร้านค้าและส่วนท้าย (Pages & Footer)",
+    "cardDescription": "เลือกหน้าที่ต้องการแก้ไข ปรับแต่งเนื้อหาด้วย Markdown Editor และตั้งค่าส่วนท้าย (Footer) ได้ทั้งหมด",
+    "openInNewTab": "เปิดดูหน้าร้านจริงในแท็บใหม่",
+    "loadTemplate": "โหลดแม่แบบเริ่มต้น",
+    "loadTemplateTooltip": "คืนค่าเนื้อหาเป็นแม่แบบเริ่มต้นของระบบ",
+    "save": "บันทึกหน้านี้",
+    "saving": "กำลังบันทึก...",
+    "markdownHint": "💡 รองรับการจัดรูปแบบ Markdown เช่น หัวข้อ (# H1, ## H2), รายการ (* รายการ), ตัวหนา (**ข้อความ**), ลิงก์, และตาราง",
+    "toastTemplateLoaded": "โหลดข้อความแม่แบบสำหรับ \"{name}\" เรียบร้อยแล้ว",
+    "toastSaved": "บันทึกเนื้อหาเรียบร้อยแล้ว",
+    "toastError": "เกิดข้อผิดพลาดในการบันทึก",
+    "toastSaveError": "เกิดข้อผิดพลาดในการบันทึกข้อมูล",
+    "pages": {
+      "about": {
+        "label": "เกี่ยวกับเรา",
+        "description": "ข้อมูลแนะนำร้านค้า ความน่าเชื่อถือ และช่องทางการติดต่อ สำหรับแสดงในหน้า /about"
+      },
+      "faqs": {
+        "label": "คำถามที่พบบ่อย (FAQs)",
+        "description": "คำถาม-คำตอบที่ลูกค้ามักสอบถาม เช่น ระยะเวลาจัดส่ง ช่องทางชำระเงิน ในหน้า /faqs"
+      },
+      "description": {
+        "label": "วิธีการสั่งซื้อ & รายละเอียด",
+        "description": "ขั้นตอนการสั่งซื้อสินค้า คำแนะนำ และรายละเอียดบริการสำหรับลูกค้า ในหน้า /description"
+      },
+      "privacyPolicy": {
+        "label": "นโยบายความเป็นส่วนตัว",
+        "description": "นโยบายการคุ้มครองข้อมูลส่วนบุคคล (PDPA) และความปลอดภัยของลูกค้า ในหน้า /privacy-policy"
+      },
+      "refundPolicy": {
+        "label": "นโยบายการคืนสินค้า & คืนเงิน",
+        "description": "เงื่อนไขการรับประกัน การเปลี่ยน หรือขอคืนสินค้าและคืนเงิน ในหน้า /refund-return-policy"
+      }
+    },
+    "footer": {
+      "tabLabel": "ตั้งค่า Footer",
+      "title": "ตั้งค่าส่วนท้ายร้านค้า (Store Footer)",
+      "viewStorefront": "ดูหน้าร้าน",
+      "description": "จัดการข้อความแนะนำ ลิงก์โซเชียลมีเดีย ข้อมูลติดต่อ และข้อความลิขสิทธิ์ที่จะแสดงในส่วนท้ายของทุกหน้า",
+      "saveButton": "บันทึกการตั้งค่า Footer",
+      "saveAllButton": "บันทึกการตั้งค่า Footer ทั้งหมด",
+      "toastSaved": "บันทึกการตั้งค่า Footer เรียบร้อยแล้ว",
+      "descriptionContactHeading": "ข้อความแนะนำร้านค้าและข้อมูลติดต่อ",
+      "footerTextLabel": "คำอธิบายร้านค้าในส่วนท้าย (Footer Description)",
+      "footerTextPlaceholder": "ใส่คำอธิบายเกี่ยวกับร้านค้าสำหรับแสดงใน Footer (หากเว้นว่างไว้จะใช้คำอธิบายหลักของร้านค้า)",
+      "footerTextHelp": "หากเว้นว่างไว้ ระบบจะดึงคำอธิบายร้านค้าหลัก (Store Profile Description) มาแสดงอัตโนมัติ",
+      "phoneLabel": "เบอร์โทรศัพท์ติดต่อ",
+      "phonePlaceholder": "เช่น 081-234-5678",
+      "copyrightLabel": "ข้อความลิขสิทธิ์ (Footer Copyright)",
+      "copyrightHelp": "หากเว้นว่างไว้ ระบบจะแสดง \"© {year} {storeName}. All rights reserved.\"",
+      "storeNameFallback": "ชื่อร้านค้า",
+      "socialHeading": "โซเชียลมีเดียของร้านค้า (Social Media Links)",
+      "socialDescription": "เฉพาะช่องทางที่คุณใส่ลิงก์เท่านั้นที่จะแสดงไอคอนใน Footer (ช่องทางไหนเว้นว่างไว้จะไม่แสดงไอคอน)",
+      "facebookLabel": "Facebook Page / URL",
+      "lineLabel": "LINE ID หรือ ลิงก์ LINE",
+      "linePlaceholder": "เช่น @yourstore หรือ https://line.me/ti/p/~yourid",
+      "instagramLabel": "Instagram URL",
+      "tiktokLabel": "TikTok URL",
+      "messengerLabel": "Messenger URL",
+      "discordLabel": "Discord Invite URL",
+      "youtubeLabel": "YouTube Channel URL"
     }
   }
 }

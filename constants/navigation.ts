@@ -6,6 +6,7 @@ import {
   IconChartBar,
   IconCoin,
   IconCreditCard,
+  IconFileDescription,
   IconHierarchy2,
   IconHistory,
   IconLayoutDashboard,
@@ -246,6 +247,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconBuildingStore,
     hasSeparatorBefore: true,
     groupLabel: 'ตั้งค่าร้านค้าและบัญชี',
+  },
+  {
+    value: 'store-pages',
+    label: 'หน้าเนื้อหาร้านค้า',
+    tab: 'store-pages',
+    icon: IconFileDescription,
+    permissionKey: 'canViewStoreSettings',
   },
   {
     value: 'organization-branches',

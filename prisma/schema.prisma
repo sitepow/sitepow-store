@@ -716,9 +716,17 @@ model Store {
   fontFamily   String? @default("default")
   description  String? @db.Text
 
-  phone        String?
-  lineId       String?
-  facebookPage String?
+  phone           String?
+  lineId          String?
+  facebookPage    String?
+  instagramPage   String?
+  tiktokPage      String?
+  youtubePage     String?
+  discordUrl      String?
+  messengerUrl    String?
+  socialLinks     Json?
+  footerText      String? @db.Text
+  footerCopyright String?
 
   productCount         Int                   @default(0)
   shippingSetting      ShippingSetting?
@@ -751,6 +759,12 @@ model Store {
   seoTitle               String?
   seoDescription         String? @db.Text
   seoKeywords            String?
+
+  aboutPage         String? @db.Text
+  faqsPage          String? @db.Text
+  descriptionPage   String? @db.Text
+  privacyPolicyPage String? @db.Text
+  refundPolicyPage  String? @db.Text
 
   blogs                  Blog[]
   categories             Category[]

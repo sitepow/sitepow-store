@@ -41,18 +41,37 @@ export function StoreFooter() {
     ))
   }
 
+  const socialLinksConfig =
+    (store?.socialLinks as Record<string, string> | null) || {}
+
   const socialLinks = [
     {
       icon: (
         <Image
           src="https://thesvg.org/icons/meta/default.svg"
-          alt="Meta"
+          alt="Facebook"
           width={34}
           height={34}
         />
       ),
-      href: '/',
+      href: store?.facebookPage || socialLinksConfig.facebook || '',
       label: 'Facebook',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/line/default.svg"
+          alt="Line"
+          width={34}
+          height={34}
+        />
+      ),
+      href: store?.lineId
+        ? store.lineId.startsWith('http')
+          ? store.lineId
+          : `https://line.me/R/ti/p/~${store.lineId}`
+        : socialLinksConfig.line || '',
+      label: 'Line',
     },
     {
       icon: (
@@ -63,7 +82,7 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: '/',
+      href: store?.instagramPage || socialLinksConfig.instagram || '',
       label: 'Instagram',
     },
     {
@@ -75,7 +94,7 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: '/',
+      href: store?.tiktokPage || socialLinksConfig.tiktok || '',
       label: 'Tiktok',
     },
     {
@@ -87,20 +106,8 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: '/',
+      href: store?.messengerUrl || socialLinksConfig.messenger || '',
       label: 'Messenger',
-    },
-    {
-      icon: (
-        <Image
-          src="https://thesvg.org/icons/line/default.svg"
-          alt="Line"
-          width={34}
-          height={34}
-        />
-      ),
-      href: '/',
-      label: 'Line',
     },
     {
       icon: (
@@ -111,10 +118,22 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: '/',
+      href: store?.discordUrl || socialLinksConfig.discord || '',
       label: 'Discord',
     },
-  ]
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/youtube/default.svg"
+          alt="YouTube"
+          width={34}
+          height={34}
+        />
+      ),
+      href: store?.youtubePage || socialLinksConfig.youtube || '',
+      label: 'YouTube',
+    },
+  ].filter((s) => Boolean(s.href && s.href.trim() !== ''))
 
   return (
     <footer
@@ -130,24 +149,32 @@ export function StoreFooter() {
               <LogoBrandText />
             )}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              {store?.description ? store?.description : t('storeDescription')}
+              {store?.footerText
+                ? store.footerText
+                : store?.description
+                  ? store.description
+                  : t('storeDescription')}
             </p>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              {t('emailLabel')}: {store?.email || '-'} {t('taxIdLabel')}:{' '}
-              {store?.taxId || '-'}
+              {t('emailLabel')}: {store?.email || '-'}
+              {store?.phone && ` • โทร: ${store.phone}`}
+              {store?.taxId && ` • ${t('taxIdLabel')}: ${store.taxId}`}
             </p>
-            <div className="mt-5 flex flex-wrap items-center gap-5">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {social.icon}
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="mt-5 flex flex-wrap items-center gap-5">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-opacity hover:opacity-80"
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
           {(mainBranch?.address || mainBranch?.subDistrict) && (
             <div>
@@ -185,7 +212,9 @@ export function StoreFooter() {
         </div>
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
           <p className="text-sm">
-            © {currentYear} Sitepow. All rights reserved.
+            {store?.footerCopyright
+              ? store.footerCopyright
+              : `© ${currentYear} ${store?.name || 'Store'}. All rights reserved.`}
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/privacy-policy" className="hover:underline">

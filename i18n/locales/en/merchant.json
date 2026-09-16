@@ -19,6 +19,7 @@
     "loyalty": "Loyalty Points",
     "blog": "Blogs",
     "store-settings": "Store Settings",
+    "store-pages": "Store Pages",
     "organization-branches": "Branches",
     "billing-subscription": "Subscriptions",
     "credits": "Credits",
@@ -1888,9 +1889,6 @@
       "primaryColor": "Brand Primary Color",
       "primaryColorPlaceholder": "Select primary color",
       "primaryColorHint": "Choose main color for buttons and highlights across your storefront",
-      "fontFamily": "Store Font Family",
-      "fontFamilyPlaceholder": "Select store font",
-      "fontFamilyHint": "Choose typography font for your storefront and dashboard",
       "name": "Store Name / Commercial Name",
       "namePlaceholder": "Enter full store name",
       "slug": "Store URL Slug",
@@ -3191,6 +3189,76 @@
       "periodDetail": "{count} staff • Cycle {period}",
       "netSalaryLabel": "Total Net:",
       "paidLabel": "Paid:"
+    }
+  },
+  "storePages": {
+    "title": "Store Pages",
+    "description": "Configure and edit content for store web pages such as About Us, FAQs, How to Order, Privacy Policy, and Refund Policy.",
+    "noAccessTitle": "Access Denied",
+    "noAccessDescription": "You do not have permission to access store pages settings.",
+    "selectStoreTitle": "Please Select a Store",
+    "selectStoreDescription": "Please select a store to manage page contents from the top menu.",
+    "cardTitle": "Edit Store Web Pages & Footer Content",
+    "cardDescription": "Select the page you want to edit, customize content with the Markdown Editor, and configure the store footer.",
+    "openInNewTab": "Open actual store page in a new tab",
+    "loadTemplate": "Load Default Template",
+    "loadTemplateTooltip": "Reset content to system default template",
+    "save": "Save This Page",
+    "saving": "Saving...",
+    "markdownHint": "💡 Supports Markdown formatting such as headings (# H1, ## H2), lists (* item), bold (**text**), links, and tables",
+    "toastTemplateLoaded": "Default template loaded for \"{name}\"",
+    "toastSaved": "Content saved successfully",
+    "toastError": "An error occurred while saving",
+    "toastSaveError": "Failed to save content",
+    "pages": {
+      "about": {
+        "label": "About Us",
+        "description": "Store introduction, trust information, and contact channels to display on the /about page."
+      },
+      "faqs": {
+        "label": "Frequently Asked Questions (FAQs)",
+        "description": "Common questions and answers such as shipping times and payment methods on the /faqs page."
+      },
+      "description": {
+        "label": "How to Order & Details",
+        "description": "Ordering steps, customer instructions, and service details on the /description page."
+      },
+      "privacyPolicy": {
+        "label": "Privacy Policy",
+        "description": "Personal data protection (PDPA) and customer security policy on the /privacy-policy page."
+      },
+      "refundPolicy": {
+        "label": "Refund & Return Policy",
+        "description": "Warranty conditions, replacement, and return/refund guidelines on the /refund-return-policy page."
+      }
+    },
+    "footer": {
+      "tabLabel": "Footer Settings",
+      "title": "Store Footer Settings",
+      "viewStorefront": "View Storefront",
+      "description": "Manage introduction text, social media links, contact details, and copyright notices displayed at the footer of all pages.",
+      "saveButton": "Save Footer Settings",
+      "saveAllButton": "Save All Footer Settings",
+      "toastSaved": "Footer settings saved successfully",
+      "descriptionContactHeading": "Store Description & Contact Information",
+      "footerTextLabel": "Footer Description",
+      "footerTextPlaceholder": "Enter store description to display in the footer (if empty, main store description will be used)",
+      "footerTextHelp": "If left empty, the system will automatically display your primary Store Profile Description.",
+      "phoneLabel": "Contact Phone Number",
+      "phonePlaceholder": "e.g. 081-234-5678",
+      "copyrightLabel": "Footer Copyright",
+      "copyrightHelp": "If left empty, the system displays \"© {year} {storeName}. All rights reserved.\"",
+      "storeNameFallback": "Your Store",
+      "socialHeading": "Store Social Media Links",
+      "socialDescription": "Only channels where you provide a link will show an icon in the footer (blank channels will be hidden).",
+      "facebookLabel": "Facebook Page / URL",
+      "lineLabel": "LINE ID or LINE Link",
+      "linePlaceholder": "e.g. @yourstore or https://line.me/ti/p/~yourid",
+      "instagramLabel": "Instagram URL",
+      "tiktokLabel": "TikTok URL",
+      "messengerLabel": "Messenger URL",
+      "discordLabel": "Discord Invite URL",
+      "youtubeLabel": "YouTube Channel URL"
     }
   }
 }

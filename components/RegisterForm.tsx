@@ -6,11 +6,15 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 import { registerUser } from '@/actions/auth'
+import { StoreData } from '@/actions/store'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { RegisterFormInputs } from '@/types/register'
 import { useMutation } from '@tanstack/react-query'
 import {
@@ -35,18 +39,32 @@ import { Spinner } from '@/components/ui/spinner'
 
 import { authClient } from '@/lib/auth-client'
 
-export function RegisterForm() {
+export interface RegisterFormProps {
+  store?: StoreData | null
+  isStore?: boolean
+}
+
+export function RegisterForm({
+  store: storeProp,
+  isStore = false,
+}: RegisterFormProps = {}) {
+  const storeFromHook = useStoreData((s) => s.store)
+  const store = storeProp ?? storeFromHook
+  const isStoreMode = isStore || !!store
+
   const t = useTranslations('auth.register')
   const searchParams = useSearchParams()
   const roleParam = searchParams.get('role') as UserRole
-  const currentRole = roleParam || UserRole.MERCHANT
+  const currentRole = isStoreMode
+    ? UserRole.CUSTOMER
+    : roleParam || UserRole.MERCHANT
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const loginParams = new URLSearchParams()
-  if (roleParam) {
+  if (!isStoreMode && roleParam) {
     loginParams.set('role', roleParam)
   }
 
@@ -141,18 +159,58 @@ export function RegisterForm() {
     confirmPasswordValue.length > 0 && confirmPasswordValue === passwordValue
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10">
+    <div
+      className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10"
+      style={
+        isStoreMode && store?.primaryColor
+          ? ({ '--primary': store.primaryColor } as React.CSSProperties)
+          : undefined
+      }
+    >
       <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-2xl border p-4.5 shadow-xl shadow-black/[0.03] sm:rounded-3xl sm:p-8 md:p-10 dark:shadow-black/20">
         <div className="mb-4 flex justify-center sm:mb-6">
-          <LogoBrand className="text-xl" />
+          {isStoreMode ? (
+            store?.logo ? (
+              <Link
+                href="/"
+                className="block h-14 w-fit max-w-[200px] overflow-hidden"
+              >
+                <Image
+                  src={store.logo}
+                  alt={store.name || 'Store Logo'}
+                  width={200}
+                  height={70}
+                  unoptimized
+                  className="size-full object-contain object-center"
+                />
+              </Link>
+            ) : (
+              <Link
+                href="/"
+                className="text-foreground hover:text-primary text-2xl font-bold tracking-tight transition-colors"
+              >
+                {store?.name || 'Store'}
+              </Link>
+            )
+          ) : (
+            <LogoBrand className="text-xl" />
+          )}
         </div>
         <div className="w-full space-y-4 sm:space-y-6">
           <div className="space-y-1.5 text-center sm:space-y-2">
             <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-3xl">
-              {isCustomer ? t('buyerTitle') : t('merchantTitle')}
+              {isStoreMode
+                ? t('buyerTitle')
+                : isCustomer
+                  ? t('buyerTitle')
+                  : t('merchantTitle')}
             </h1>
             <p className="text-muted-foreground text-xs sm:text-sm">
-              {isCustomer ? t('buyerSubtitle') : t('merchantSubtitle')}
+              {isStoreMode
+                ? t('buyerSubtitle')
+                : isCustomer
+                  ? t('buyerSubtitle')
+                  : t('merchantSubtitle')}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
@@ -291,15 +349,27 @@ export function RegisterForm() {
               <FieldError>{errors?.confirmPassword?.message}</FieldError>
             </Field>
 
-            <RainbowButton
-              type="submit"
-              className="mt-1 h-10 w-full sm:h-11"
-              size="lg"
-              disabled={isPending}
-            >
-              {isPending && <Spinner className="mr-2" />}
-              {isPending ? t('submitting') : t('submit')}
-            </RainbowButton>
+            {isStoreMode ? (
+              <Button
+                type="submit"
+                className="mt-1 h-10 w-full font-semibold sm:h-11"
+                size="lg"
+                disabled={isPending}
+              >
+                {isPending && <Spinner className="mr-2" />}
+                {isPending ? t('submitting') : t('submit')}
+              </Button>
+            ) : (
+              <RainbowButton
+                type="submit"
+                className="mt-1 h-10 w-full sm:h-11"
+                size="lg"
+                disabled={isPending}
+              >
+                {isPending && <Spinner className="mr-2" />}
+                {isPending ? t('submitting') : t('submit')}
+              </RainbowButton>
+            )}
           </form>
           <p className="text-muted-foreground text-center text-xs sm:text-sm">
             {t('hasAccount')}{' '}
@@ -312,7 +382,9 @@ export function RegisterForm() {
           </p>
         </div>
       </div>
-      {currentRole === UserRole.CUSTOMER && <ProtectedByBrand />}
+      {currentRole === UserRole.CUSTOMER && !isStoreMode && (
+        <ProtectedByBrand />
+      )}
     </div>
   )
 }
