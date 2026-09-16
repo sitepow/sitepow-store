@@ -1,23 +1,35 @@
--- CreateEnum
-CREATE TYPE "TableStatus" AS ENUM ('AVAILABLE', 'OCCUPIED', 'BILL_REQUESTED', 'RESERVED', 'CLEANING');
+-- CreateEnum safely
+DO $$ BEGIN
+    CREATE TYPE "TableStatus" AS ENUM ('AVAILABLE', 'OCCUPIED', 'BILL_REQUESTED', 'RESERVED', 'CLEANING');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
--- CreateEnum
-CREATE TYPE "OrderType" AS ENUM ('DINE_IN', 'TAKEAWAY', 'DELIVERY');
+DO $$ BEGIN
+    CREATE TYPE "OrderType" AS ENUM ('DINE_IN', 'TAKEAWAY', 'DELIVERY');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
--- CreateEnum
-CREATE TYPE "KitchenItemStatus" AS ENUM ('PENDING', 'COOKING', 'READY', 'SERVED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "KitchenItemStatus" AS ENUM ('PENDING', 'COOKING', 'READY', 'SERVED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
--- AlterTable
-ALTER TABLE "Order" ADD COLUMN     "kitchenNote" TEXT,
-ADD COLUMN     "orderType" "OrderType" NOT NULL DEFAULT 'DINE_IN',
-ADD COLUMN     "tableId" TEXT,
-ADD COLUMN     "tableSessionId" TEXT;
+-- AlterTable Order
+ALTER TABLE "Order" 
+ADD COLUMN IF NOT EXISTS "kitchenNote" TEXT,
+ADD COLUMN IF NOT EXISTS "orderType" "OrderType" NOT NULL DEFAULT 'DINE_IN',
+ADD COLUMN IF NOT EXISTS "tableId" TEXT,
+ADD COLUMN IF NOT EXISTS "tableSessionId" TEXT;
 
--- AlterTable
-ALTER TABLE "OrderItem" ADD COLUMN     "kitchenStatus" "KitchenItemStatus" NOT NULL DEFAULT 'PENDING';
+-- AlterTable OrderItem
+ALTER TABLE "OrderItem" 
+ADD COLUMN IF NOT EXISTS "kitchenStatus" "KitchenItemStatus" NOT NULL DEFAULT 'PENDING';
 
--- CreateTable
-CREATE TABLE "TableZone" (
+-- CreateTable TableZone
+CREATE TABLE IF NOT EXISTS "TableZone" (
     "id" TEXT NOT NULL,
     "storeId" TEXT NOT NULL,
     "branchId" TEXT NOT NULL,
@@ -29,8 +41,8 @@ CREATE TABLE "TableZone" (
     CONSTRAINT "TableZone_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "RestaurantTable" (
+-- CreateTable RestaurantTable
+CREATE TABLE IF NOT EXISTS "RestaurantTable" (
     "id" TEXT NOT NULL,
     "storeId" TEXT NOT NULL,
     "branchId" TEXT NOT NULL,
@@ -46,8 +58,8 @@ CREATE TABLE "RestaurantTable" (
     CONSTRAINT "RestaurantTable_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "TableSession" (
+-- CreateTable TableSession
+CREATE TABLE IF NOT EXISTS "TableSession" (
     "id" TEXT NOT NULL,
     "tableId" TEXT NOT NULL,
     "storeId" TEXT NOT NULL,
@@ -63,56 +75,39 @@ CREATE TABLE "TableSession" (
     CONSTRAINT "TableSession_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE INDEX "TableZone_storeId_branchId_idx" ON "TableZone"("storeId", "branchId");
+-- Indexes
+CREATE INDEX IF NOT EXISTS "TableZone_storeId_branchId_idx" ON "TableZone"("storeId", "branchId");
+CREATE UNIQUE INDEX IF NOT EXISTS "RestaurantTable_qrCodeToken_key" ON "RestaurantTable"("qrCodeToken");
+CREATE INDEX IF NOT EXISTS "RestaurantTable_storeId_branchId_idx" ON "RestaurantTable"("storeId", "branchId");
+CREATE INDEX IF NOT EXISTS "RestaurantTable_qrCodeToken_idx" ON "RestaurantTable"("qrCodeToken");
+CREATE UNIQUE INDEX IF NOT EXISTS "RestaurantTable_branchId_tableNumber_key" ON "RestaurantTable"("branchId", "tableNumber");
+CREATE INDEX IF NOT EXISTS "TableSession_tableId_status_idx" ON "TableSession"("tableId", "status");
+CREATE INDEX IF NOT EXISTS "TableSession_storeId_branchId_idx" ON "TableSession"("storeId", "branchId");
+CREATE INDEX IF NOT EXISTS "Order_tableId_idx" ON "Order"("tableId");
+CREATE INDEX IF NOT EXISTS "Order_tableSessionId_idx" ON "Order"("tableSessionId");
+CREATE INDEX IF NOT EXISTS "OrderItem_kitchenStatus_idx" ON "OrderItem"("kitchenStatus");
 
--- CreateIndex
-CREATE UNIQUE INDEX "RestaurantTable_qrCodeToken_key" ON "RestaurantTable"("qrCodeToken");
-
--- CreateIndex
-CREATE INDEX "RestaurantTable_storeId_branchId_idx" ON "RestaurantTable"("storeId", "branchId");
-
--- CreateIndex
-CREATE INDEX "RestaurantTable_qrCodeToken_idx" ON "RestaurantTable"("qrCodeToken");
-
--- CreateIndex
-CREATE UNIQUE INDEX "RestaurantTable_branchId_tableNumber_key" ON "RestaurantTable"("branchId", "tableNumber");
-
--- CreateIndex
-CREATE INDEX "TableSession_tableId_status_idx" ON "TableSession"("tableId", "status");
-
--- CreateIndex
-CREATE INDEX "TableSession_storeId_branchId_idx" ON "TableSession"("storeId", "branchId");
-
--- CreateIndex
-CREATE INDEX "Order_tableId_idx" ON "Order"("tableId");
-
--- CreateIndex
-CREATE INDEX "Order_tableSessionId_idx" ON "Order"("tableSessionId");
-
--- CreateIndex
-CREATE INDEX "OrderItem_kitchenStatus_idx" ON "OrderItem"("kitchenStatus");
-
--- AddForeignKey
+-- Foreign Keys (Drop if exists first to avoid duplicate constraint errors)
+ALTER TABLE "Order" DROP CONSTRAINT IF EXISTS "Order_tableId_fkey";
 ALTER TABLE "Order" ADD CONSTRAINT "Order_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "RestaurantTable"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "Order" DROP CONSTRAINT IF EXISTS "Order_tableSessionId_fkey";
 ALTER TABLE "Order" ADD CONSTRAINT "Order_tableSessionId_fkey" FOREIGN KEY ("tableSessionId") REFERENCES "TableSession"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "TableZone" DROP CONSTRAINT IF EXISTS "TableZone_storeId_fkey";
 ALTER TABLE "TableZone" ADD CONSTRAINT "TableZone_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "TableZone" DROP CONSTRAINT IF EXISTS "TableZone_branchId_fkey";
 ALTER TABLE "TableZone" ADD CONSTRAINT "TableZone_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES "Branch"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "RestaurantTable" DROP CONSTRAINT IF EXISTS "RestaurantTable_storeId_fkey";
 ALTER TABLE "RestaurantTable" ADD CONSTRAINT "RestaurantTable_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "RestaurantTable" DROP CONSTRAINT IF EXISTS "RestaurantTable_branchId_fkey";
 ALTER TABLE "RestaurantTable" ADD CONSTRAINT "RestaurantTable_branchId_fkey" FOREIGN KEY ("branchId") REFERENCES "Branch"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "RestaurantTable" DROP CONSTRAINT IF EXISTS "RestaurantTable_zoneId_fkey";
 ALTER TABLE "RestaurantTable" ADD CONSTRAINT "RestaurantTable_zoneId_fkey" FOREIGN KEY ("zoneId") REFERENCES "TableZone"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
+ALTER TABLE "TableSession" DROP CONSTRAINT IF EXISTS "TableSession_tableId_fkey";
 ALTER TABLE "TableSession" ADD CONSTRAINT "TableSession_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "RestaurantTable"("id") ON DELETE CASCADE ON UPDATE CASCADE;
