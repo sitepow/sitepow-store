@@ -643,12 +643,14 @@ export function CreateProductForm({ productId }: { productId?: string }) {
                     handleAiTrigger(AiGenTask.TITLE, action)
                   }
                 />
-                <div className="rounded-lg border p-3.5 bg-muted/20 space-y-2">
-                  <div className="text-xs font-semibold flex items-center gap-1.5 text-muted-foreground">
+                <div className="bg-muted/20 space-y-2 rounded-lg border p-3.5">
+                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold">
                     <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
                   </div>
                   <Field>
-                    <FieldLabel className="text-xs">Product Title (EN)</FieldLabel>
+                    <FieldLabel className="text-xs">
+                      Product Title (EN)
+                    </FieldLabel>
                     <Input
                       placeholder="Product title in English..."
                       {...register('translations.en.title')}

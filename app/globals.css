@@ -54,6 +54,10 @@
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
 }
 
+@theme {
+  --font-landing: var(--font-landing);
+}
+
 :root {
   --color-1: hsl(0 100% 63%);
   --color-2: hsl(270 100% 63%);

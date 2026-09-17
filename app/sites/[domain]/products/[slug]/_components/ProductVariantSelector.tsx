@@ -204,7 +204,6 @@ export function ProductVariantSelector() {
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="text-sm font-medium wrap-break-word whitespace-pre-line">
-                        {variant.title}
                         {getLocalizedField(variant, 'title', locale) ||
                           variant.title}
                       </span>

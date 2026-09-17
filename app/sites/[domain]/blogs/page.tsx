@@ -71,7 +71,7 @@ export default async function StoreBlogsPage({ params }: Props) {
   return (
     <StoreLayout>
       <SectionContainer>
-        <h1 className="text-foreground text-4xl leading-tight font-bold">
+        <h1 className="text-foreground font-landing text-4xl leading-tight font-bold">
           {t('allBlogs')}
         </h1>
         <BlogsList storeSlug={domain} />

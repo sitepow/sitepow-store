@@ -16,7 +16,7 @@ export function SectionHeader({
   return (
     <div
       className={cn(
-        'text-foreground flex flex-col items-center gap-4',
+        'text-foreground font-landing flex flex-col items-center gap-4',
         className,
       )}
       {...props}
