@@ -18,57 +18,6 @@ import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
-const DEFAULT_EMPLOYEES = [
-  {
-    employeeName: 'สมศักดิ์ ขยันยิ่ง',
-    employeeCode: 'EMP-001',
-    department: 'ฝ่ายขาย & หน้าร้าน',
-    position: 'หัวหน้างานขาย (Sales Supervisor)',
-    salaryType: SalaryType.MONTHLY,
-    baseSalary: new Prisma.Decimal(25000),
-    bankName: 'ธนาคารกสิกรไทย (KBANK)',
-    bankAccountNumber: '045-2-88991-0',
-    bankAccountName: 'สมศักดิ์ ขยันยิ่ง',
-    promptpayNumber: '0811122334',
-    socialSecurity: true,
-    taxPercent: new Prisma.Decimal(3),
-    note: 'พนักงานประจำ ดูแลยอดขายหน้าร้านและบริการลูกค้า',
-    isActive: true,
-  },
-  {
-    employeeName: 'วิภาดา มุ่งมั่น',
-    employeeCode: 'EMP-002',
-    department: 'การตลาดออนไลน์',
-    position: 'เจ้าหน้าที่การตลาด (Marketing Officer)',
-    salaryType: SalaryType.MONTHLY,
-    baseSalary: new Prisma.Decimal(22000),
-    bankName: 'ธนาคารไทยพาณิชย์ (SCB)',
-    bankAccountNumber: '168-4-55672-9',
-    bankAccountName: 'วิภาดา มุ่งมั่น',
-    promptpayNumber: '0899988776',
-    socialSecurity: true,
-    taxPercent: new Prisma.Decimal(3),
-    note: 'พนักงานประจำ จัดการแคมเปญโฆษณาและสื่อโซเชียล',
-    isActive: true,
-  },
-  {
-    employeeName: 'ธนวัฒน์ ว่องไว',
-    employeeCode: 'EMP-003',
-    department: 'คลังสินค้าและจัดส่ง',
-    position: 'เจ้าหน้าที่แพ็คของ & จัดส่ง (Fulfillment)',
-    salaryType: SalaryType.MONTHLY,
-    baseSalary: new Prisma.Decimal(18000),
-    bankName: 'ธนาคารกรุงเทพ (BBL)',
-    bankAccountNumber: '901-0-23456-7',
-    bankAccountName: 'ธนวัฒน์ ว่องไว',
-    promptpayNumber: '0865544332',
-    socialSecurity: true,
-    taxPercent: new Prisma.Decimal(0),
-    note: 'พนักงานประจำ ตรวจเช็คสต็อก แพ็คพัสดุ และส่งสินค้า',
-    isActive: true,
-  },
-]
-
 const MONTH_NAMES_TH = [
   'มกราคม',
   'กุมภาพันธ์',
@@ -131,6 +80,76 @@ async function checkAccess(
 // 1. Employee Salary Configs (การตั้งค่าฐานเงินเดือนพนักงาน)
 // -------------------------------------------------------------
 
+export interface StoreAvailableEmployee {
+  employeeId: string
+  name: string
+  email: string
+  phone?: string | null
+  department?: string | null
+  position?: string | null
+  alreadyConfigured: boolean
+}
+
+export async function getStoreAvailableEmployees(storeId: string): Promise<{
+  success: boolean
+  data?: StoreAvailableEmployee[]
+  message?: string
+}> {
+  try {
+    const auth = await checkAccess(storeId)
+    if (!auth.isAuthorized) {
+      return { success: false, message: auth.message }
+    }
+
+    const [storeEmployees, existingConfigs] = await Promise.all([
+      prisma.employeeStore.findMany({
+        where: { storeId },
+        include: {
+          employee: {
+            include: {
+              user: {
+                select: { phone: true },
+              },
+            },
+          },
+          branches: {
+            include: {
+              branch: true,
+              role: true,
+            },
+          },
+        },
+      }),
+      prisma.employeeSalaryConfig.findMany({
+        where: { storeId },
+        select: { employeeId: true, employeeName: true },
+      }),
+    ])
+
+    const configuredIds = new Set(
+      existingConfigs.map((c) => c.employeeId).filter(Boolean),
+    )
+    const configuredNames = new Set(existingConfigs.map((c) => c.employeeName))
+
+    const list: StoreAvailableEmployee[] = storeEmployees.map((es) => ({
+      employeeId: es.employee.id,
+      name: es.employee.name,
+      email: es.employee.email,
+      phone: es.employee.user?.phone || null,
+      department: es.branches[0]?.branch?.name || null,
+      position: es.branches[0]?.role?.name || null,
+      alreadyConfigured:
+        configuredIds.has(es.employee.id) ||
+        configuredNames.has(es.employee.name),
+    }))
+
+    return { success: true, data: list }
+  } catch (error) {
+    console.error('getStoreAvailableEmployees error:', error)
+    return { success: false, message: 'ไม่สามารถดึงข้อมูลพนักงานของร้านค้าได้' }
+  }
+}
+
 export async function getEmployeeSalaryConfigs(storeId: string): Promise<{
   success: boolean
   data?: EmployeeSalaryConfigItem[]
@@ -141,6 +160,19 @@ export async function getEmployeeSalaryConfigs(storeId: string): Promise<{
     if (!auth.isAuthorized) {
       return { success: false, message: auth.message }
     }
+
+    // Clean up any legacy dummy employees
+    const dummyStaffNames = [
+      'สมศักดิ์ ขยันยิ่ง',
+      'วิภาดา มุ่งมั่น',
+      'ธนวัฒน์ ว่องไว',
+    ]
+    await prisma.employeeSalaryConfig.deleteMany({
+      where: {
+        storeId,
+        employeeName: { in: dummyStaffNames },
+      },
+    })
 
     let configs = await prisma.employeeSalaryConfig.findMany({
       where: { storeId },
@@ -178,20 +210,12 @@ export async function getEmployeeSalaryConfigs(storeId: string): Promise<{
             isActive: true,
           })),
         })
-      } else {
-        // Auto seed default demo employees for ease of onboarding
-        await prisma.employeeSalaryConfig.createMany({
-          data: DEFAULT_EMPLOYEES.map((emp) => ({
-            ...emp,
-            storeId,
-          })),
+
+        configs = await prisma.employeeSalaryConfig.findMany({
+          where: { storeId },
+          orderBy: { createdAt: 'asc' },
         })
       }
-
-      configs = await prisma.employeeSalaryConfig.findMany({
-        where: { storeId },
-        orderBy: { createdAt: 'asc' },
-      })
     }
 
     const items: EmployeeSalaryConfigItem[] = configs.map((c) => ({
@@ -226,6 +250,7 @@ export async function getEmployeeSalaryConfigs(storeId: string): Promise<{
 export interface UpsertEmployeeSalaryConfigInput {
   id?: string
   storeId: string
+  employeeId?: string | null
   employeeName: string
   employeeCode?: string
   department?: string
@@ -257,6 +282,7 @@ export async function upsertEmployeeSalaryConfig(
 
     const dataPayload = {
       storeId: input.storeId,
+      employeeId: input.employeeId || null,
       employeeName: input.employeeName,
       employeeCode: input.employeeCode,
       department: input.department,

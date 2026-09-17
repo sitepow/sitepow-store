@@ -496,12 +496,12 @@ export default function CustomerTableOrderingPage() {
                   <Card key={order.id}>
                     <CardHeader className="border-b pb-3">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="font-mono text-sm">
+                        <CardTitle className="text-sm">
                           {t('tracker.orderNumber', {
                             number: order.orderNumber,
                           })}
                         </CardTitle>
-                        <Badge variant="outline" className="font-mono text-xs">
+                        <Badge variant="outline" className="text-xs">
                           {new Date(order.createdAt).toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit',

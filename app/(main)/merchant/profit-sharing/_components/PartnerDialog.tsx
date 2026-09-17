@@ -5,7 +5,10 @@ import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
-import { useUpsertProfitPartner } from '@/actions/hooks/profit-sharing'
+import {
+  useStorePotentialPartners,
+  useUpsertProfitPartner,
+} from '@/actions/hooks/profit-sharing'
 import {
   PartnerRole,
   ProfitPartnerItem,
@@ -66,7 +69,9 @@ export function PartnerDialog({
 }: PartnerDialogProps) {
   const t = useTranslations('merchant.profitSharing')
   const { mutate: upsertPartner, isPending } = useUpsertProfitPartner()
+  const { data: potentialMembers = [] } = useStorePotentialPartners(storeId)
 
+  const [selectedMemberId, setSelectedMemberId] = useState<string>('custom')
   const [name, setName] = useState('')
   const [role, setRole] = useState<PartnerRole>(PartnerRole.SHAREHOLDER)
   const [shareType, setShareType] = useState<ShareType>(
@@ -82,6 +87,7 @@ export function PartnerDialog({
 
   useEffect(() => {
     if (partner) {
+      setSelectedMemberId('custom')
       setName(partner.name)
       setRole(partner.role)
       setShareType(partner.shareType)
@@ -93,6 +99,7 @@ export function PartnerDialog({
       setNote(partner.note || '')
       setIsActive(partner.isActive)
     } else {
+      setSelectedMemberId('custom')
       setName('')
       setRole(PartnerRole.SHAREHOLDER)
       setShareType(ShareType.NET_PROFIT_PERCENT)
@@ -105,6 +112,34 @@ export function PartnerDialog({
       setIsActive(true)
     }
   }, [partner, open])
+
+  const handleSelectMember = (val: string) => {
+    setSelectedMemberId(val)
+    if (val === 'custom') {
+      return
+    }
+
+    const member = potentialMembers.find((m) => m.id === val)
+    if (!member) return
+
+    setName(member.name)
+    if (member.sourceType === 'OWNER') {
+      setRole(PartnerRole.SHAREHOLDER)
+      setNote(t('partners.dialog.ownerNote'))
+    } else {
+      setRole(PartnerRole.SHAREHOLDER)
+      setNote(
+        member.position
+          ? t('partners.dialog.positionPrefix', { position: member.position })
+          : '',
+      )
+    }
+
+    if (member.bankName) setBankName(member.bankName)
+    if (member.bankAccount) setBankAccount(member.bankAccount)
+    if (member.bankAccountName) setBankAccountName(member.bankAccountName)
+    if (member.promptPay) setPromptPay(member.promptPay)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -166,11 +201,52 @@ export function PartnerDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
+          {!partner && potentialMembers.length > 0 && (
+            <Field>
+              <FieldLabel className="text-foreground font-medium">
+                {t('partners.dialog.selectFromStore')}
+              </FieldLabel>
+              <Select
+                value={selectedMemberId}
+                onValueChange={handleSelectMember}
+                disabled={isPending}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t(
+                      'partners.dialog.selectFromStorePlaceholder',
+                    )}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">
+                    {t('partners.dialog.customMember')}
+                  </SelectItem>
+                  {potentialMembers.map((m) => {
+                    const prefix =
+                      m.sourceType === 'OWNER'
+                        ? t('partners.dialog.ownerPrefix')
+                        : t('partners.dialog.staffPrefix')
+                    return (
+                      <SelectItem key={m.id} value={m.id}>
+                        {prefix} {m.name}
+                        {m.position ? ` (${m.position})` : ''}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+
           <Field>
             <FieldLabel>{t('partners.partnerName')} *</FieldLabel>
             <Input
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value)
+                setSelectedMemberId('custom')
+              }}
               placeholder={t('partners.dialog.namePlaceholder')}
               required
               disabled={isPending}

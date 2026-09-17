@@ -167,7 +167,7 @@ export function PrintTableCardModal({
                 {t('print.scanToOrder')}
               </p>
               <p className="text-xs text-slate-500">{t('print.noAppNeeded')}</p>
-              <p className="pt-1 font-mono text-[10px] text-slate-400 select-all">
+              <p className="pt-1 text-[10px] text-slate-400 select-all">
                 {tableUrl}
               </p>
             </div>

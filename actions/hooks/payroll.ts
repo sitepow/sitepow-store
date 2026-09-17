@@ -7,6 +7,7 @@ import {
   getEmployeeSalaryConfigs,
   getMonthlyPayroll,
   getMonthlyPayrollHistory,
+  getStoreAvailableEmployees,
   saveMonthlyPayroll,
   syncEmployeesFromStore,
   syncPayrollToExpense,
@@ -22,6 +23,14 @@ export function useEmployeeSalaryConfigs(storeId: string) {
   return useQuery({
     queryKey: payrollKeys.configs(storeId),
     queryFn: () => getEmployeeSalaryConfigs(storeId),
+    enabled: !!storeId && storeId !== 'all',
+  })
+}
+
+export function useStoreAvailableEmployees(storeId: string) {
+  return useQuery({
+    queryKey: payrollKeys.availableEmployees(storeId),
+    queryFn: () => getStoreAvailableEmployees(storeId),
     enabled: !!storeId && storeId !== 'all',
   })
 }

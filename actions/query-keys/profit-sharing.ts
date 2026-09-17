@@ -6,4 +6,6 @@ export const profitSharingKeys = {
     [...profitSharingKeys.all, 'settlement', storeId, period] as const,
   history: (storeId: string) =>
     [...profitSharingKeys.all, 'history', storeId] as const,
+  potentialPartners: (storeId: string) =>
+    [...profitSharingKeys.all, 'potential-partners', storeId] as const,
 }

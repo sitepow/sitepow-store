@@ -5,13 +5,17 @@ import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
-import { useUpsertEmployeeSalaryConfig } from '@/actions/hooks/payroll'
+import {
+  useStoreAvailableEmployees,
+  useUpsertEmployeeSalaryConfig,
+} from '@/actions/hooks/payroll'
 import { SalaryType } from '@/generated/prisma/enums'
 import { EmployeeSalaryConfigItem } from '@/types/payroll'
 import {
   IconBuildingBank,
   IconCoins,
   IconDeviceFloppy,
+  IconUser,
   IconUserPlus,
 } from '@tabler/icons-react'
 
@@ -64,7 +68,11 @@ export function StaffSalaryDialog({
   const tDialog = useTranslations('merchant.payroll.staff.dialog')
   const tTypes = useTranslations('merchant.payroll.salaryTypes')
   const upsertMutation = useUpsertEmployeeSalaryConfig()
+  const { data: storeStaffRes } = useStoreAvailableEmployees(storeId)
+  const storeStaffList = storeStaffRes?.data || []
 
+  const [selectedEmpStoreId, setSelectedEmpStoreId] = useState<string>('custom')
+  const [employeeId, setEmployeeId] = useState<string | null>(null)
   const [employeeName, setEmployeeName] = useState('')
   const [employeeCode, setEmployeeCode] = useState('')
   const [department, setDepartment] = useState('')
@@ -82,6 +90,8 @@ export function StaffSalaryDialog({
 
   useEffect(() => {
     if (editingStaff) {
+      setSelectedEmpStoreId(editingStaff.employeeId || 'custom')
+      setEmployeeId(editingStaff.employeeId || null)
       setEmployeeName(editingStaff.employeeName || '')
       setEmployeeCode(editingStaff.employeeCode || '')
       setDepartment(editingStaff.department || '')
@@ -97,6 +107,8 @@ export function StaffSalaryDialog({
       setNote(editingStaff.note || '')
       setIsActive(editingStaff.isActive ?? true)
     } else {
+      setSelectedEmpStoreId('custom')
+      setEmployeeId(null)
       setEmployeeName('')
       setEmployeeCode('')
       setDepartment('')
@@ -114,6 +126,26 @@ export function StaffSalaryDialog({
     }
   }, [editingStaff, open])
 
+  const handleSelectStoreStaff = (val: string) => {
+    setSelectedEmpStoreId(val)
+    if (val === 'custom') {
+      setEmployeeId(null)
+      return
+    }
+
+    const emp = storeStaffList.find((e) => e.employeeId === val)
+    if (!emp) return
+
+    setEmployeeId(emp.employeeId)
+    setEmployeeName(emp.name)
+    setDepartment(emp.department || '')
+    setPosition(emp.position || '')
+    setBankAccountName(emp.name)
+    if (emp.phone) {
+      setPromptpayNumber(emp.phone)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -126,6 +158,7 @@ export function StaffSalaryDialog({
       const res = await upsertMutation.mutateAsync({
         id: editingStaff?.id,
         storeId,
+        employeeId: employeeId || undefined,
         employeeName: employeeName.trim(),
         employeeCode: employeeCode.trim() || undefined,
         department: department.trim() || undefined,
@@ -165,13 +198,49 @@ export function StaffSalaryDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!editingStaff && storeStaffList.length > 0 && (
+            <Field>
+              <FieldLabel className="text-foreground font-medium">
+                {tDialog('selectFromStore')}
+              </FieldLabel>
+              <Select
+                value={selectedEmpStoreId}
+                onValueChange={handleSelectStoreStaff}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={tDialog('selectFromStorePlaceholder')}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="custom">
+                    {tDialog('customStaff')}
+                  </SelectItem>
+                  {storeStaffList.map((emp) => (
+                    <SelectItem key={emp.employeeId} value={emp.employeeId}>
+                      {emp.name}
+                      {emp.position ? ` (${emp.position})` : ''}
+                      {emp.department ? ` • ${emp.department}` : ''}
+                      {emp.alreadyConfigured
+                        ? ` ${tDialog('alreadyConfigured')}`
+                        : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field className="sm:col-span-2">
               <FieldLabel>{tDialog('fullName')} *</FieldLabel>
               <Input
                 placeholder={tDialog('fullNamePlaceholder')}
                 value={employeeName}
-                onChange={(e) => setEmployeeName(e.target.value)}
+                onChange={(e) => {
+                  setEmployeeName(e.target.value)
+                  setSelectedEmpStoreId('custom')
+                }}
                 required
               />
             </Field>

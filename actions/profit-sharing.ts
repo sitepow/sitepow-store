@@ -13,56 +13,123 @@ import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
-const DEFAULT_PARTNERS = [
-  {
-    name: 'คุณณัฐพล (หุ้นส่วนผู้ก่อตั้ง)',
-    role: PartnerRole.SHAREHOLDER,
-    shareType: ShareType.NET_PROFIT_PERCENT,
-    shareValue: new Prisma.Decimal(40),
-    bankName: 'ธนาคารกสิกรไทย (KBANK)',
-    bankAccount: '098-2-34567-8',
-    bankAccountName: 'ณัฐพล วงศ์สวัสดิ์',
-    promptPay: '0812345678',
-    note: 'หุ้นส่วนหลัก รับส่วนแบ่ง 40% ของกำไรสุทธิหลังหักค่าใช้จ่าย',
-    isActive: true,
-  },
-  {
-    name: 'คุณกิตติศักดิ์ (หุ้นส่วนฝ่ายบริหาร)',
-    role: PartnerRole.SHAREHOLDER,
-    shareType: ShareType.NET_PROFIT_PERCENT,
-    shareValue: new Prisma.Decimal(30),
-    bankName: 'ธนาคารไทยพาณิชย์ (SCB)',
-    bankAccount: '405-1-89234-1',
-    bankAccountName: 'กิตติศักดิ์ รัตนชัย',
-    promptPay: '0898765432',
-    note: 'หุ้นส่วนฝ่ายบริหาร รับส่วนแบ่ง 30% ของกำไรสุทธิ',
-    isActive: true,
-  },
-  {
-    name: 'ทีมเดฟ / ค่าพัฒนาระบบซอฟต์แวร์',
-    role: PartnerRole.DEVELOPER,
-    shareType: ShareType.NET_PROFIT_PERCENT,
-    shareValue: new Prisma.Decimal(10),
-    bankName: 'ธนาคารกรุงเทพ (BBL)',
-    bankAccount: '123-4-56789-0',
-    bankAccountName: 'บจก. ดิจิทัล โซลูชั่นส์',
-    promptPay: '0105561234567',
-    note: 'ค่าเดฟพัฒนาระบบและฟีเจอร์ คิด 10% ของกำไรสุทธิประจำเดือน',
-    isActive: true,
-  },
-  {
-    name: 'ค่าเซิร์ฟเวอร์ & คลาวด์แพลตฟอร์ม',
-    role: PartnerRole.SYSTEM,
-    shareType: ShareType.FIXED_MONTHLY,
-    shareValue: new Prisma.Decimal(2500),
-    bankName: 'ธนาคารกสิกรไทย (KBANK)',
-    bankAccount: '789-0-12345-6',
-    bankAccountName: 'คลาวด์ แอนด์ โฮสติ้ง เซอร์วิส',
-    promptPay: '',
-    note: 'ค่าบำรุงรักษา Server, Database, CDN รายเดือนคงที่ 2,500 บาท',
-    isActive: true,
-  },
-]
+export interface StorePotentialPartner {
+  id: string
+  name: string
+  email?: string | null
+  phone?: string | null
+  sourceType: 'OWNER' | 'EMPLOYEE'
+  department?: string | null
+  position?: string | null
+  bankName?: string | null
+  bankAccount?: string | null
+  bankAccountName?: string | null
+  promptPay?: string | null
+}
+
+export async function getStorePotentialPartners(
+  storeId: string,
+): Promise<StorePotentialPartner[]> {
+  if (!storeId || storeId === 'all') return []
+
+  const user = await getCurrentUser()
+  if (!user?.id) return []
+
+  const auth = await verifyEmployeePermission({
+    userId: user.id,
+    storeId,
+    permission: 'canViewProfitSharing',
+  })
+  if (!auth.isAuthorized) return []
+
+  const results: StorePotentialPartner[] = []
+
+  const [store, paymentSetting, employees] = await Promise.all([
+    prisma.store.findUnique({
+      where: { id: storeId },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+    }),
+    prisma.paymentSetting.findUnique({
+      where: { storeId },
+      include: {
+        bankAccounts: {
+          orderBy: { isDefault: 'desc' },
+        },
+      },
+    }),
+    prisma.employeeStore.findMany({
+      where: { storeId },
+      include: {
+        employee: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        branches: {
+          include: {
+            branch: true,
+            role: true,
+          },
+        },
+      },
+    }),
+  ])
+
+  const defaultBank = paymentSetting?.bankAccounts?.[0]
+
+  if (store?.owner) {
+    const ownerName =
+      store.owner.name || store.owner.email?.split('@')[0] || 'เจ้าของร้าน'
+    results.push({
+      id: store.owner.id,
+      name: ownerName,
+      email: store.owner.email,
+      phone: store.owner.phone,
+      sourceType: 'OWNER',
+      position: 'เจ้าของร้าน (Owner)',
+      bankName: defaultBank?.bankName || null,
+      bankAccount: defaultBank?.accountNumber || null,
+      bankAccountName: defaultBank?.accountName || ownerName,
+      promptPay: defaultBank?.promptPayId || store.owner.phone || null,
+    })
+  }
+
+  for (const es of employees) {
+    if (es.employee.userId && es.employee.userId === store?.ownerId) continue
+
+    const branchName = es.branches[0]?.branch?.name
+    const roleName = es.branches[0]?.role?.name
+
+    results.push({
+      id: es.employee.id,
+      name: es.employee.name,
+      email: es.employee.email,
+      phone: es.employee.user?.phone || null,
+      sourceType: 'EMPLOYEE',
+      department: branchName || null,
+      position: roleName || 'พนักงาน',
+      promptPay: es.employee.user?.phone || null,
+    })
+  }
+
+  return results
+}
 
 export async function getProfitPartners(
   storeId: string,
@@ -79,32 +146,77 @@ export async function getProfitPartners(
   })
   if (!auth.isAuthorized) return []
 
+  // Clean up legacy dummy partners if any exist
+  const dummyNames = [
+    'คุณณัฐพล (หุ้นส่วนผู้ก่อตั้ง)',
+    'คุณกิตติศักดิ์ (หุ้นส่วนฝ่ายบริหาร)',
+    'ทีมเดฟ / ค่าพัฒนาระบบซอฟต์แวร์',
+    'ค่าเซิร์ฟเวอร์ & คลาวด์แพลตฟอร์ม',
+  ]
+  await prisma.profitPartner.deleteMany({
+    where: {
+      storeId,
+      name: { in: dummyNames },
+    },
+  })
+
   let partners = await prisma.profitPartner.findMany({
     where: { storeId },
     orderBy: { createdAt: 'asc' },
   })
 
-  // Auto seed default templates for this store if empty
+  // If store has no partners, initialize real store owner with 100% share
   if (partners.length === 0) {
-    await prisma.profitPartner.createMany({
-      data: DEFAULT_PARTNERS.map((p) => ({
-        storeId,
-        name: p.name,
-        role: p.role,
-        shareType: p.shareType,
-        shareValue: new Prisma.Decimal(p.shareValue),
-        bankName: p.bankName,
-        bankAccount: p.bankAccount,
-        bankAccountName: p.bankAccountName,
-        promptPay: p.promptPay,
-        isActive: true,
-      })),
-    })
+    const [store, paymentSetting] = await Promise.all([
+      prisma.store.findUnique({
+        where: { id: storeId },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      }),
+      prisma.paymentSetting.findUnique({
+        where: { storeId },
+        include: {
+          bankAccounts: {
+            orderBy: { isDefault: 'desc' },
+          },
+        },
+      }),
+    ])
 
-    partners = await prisma.profitPartner.findMany({
-      where: { storeId },
-      orderBy: { createdAt: 'asc' },
-    })
+    if (store?.owner) {
+      const defaultBank = paymentSetting?.bankAccounts?.[0]
+      const ownerName =
+        store.owner.name || store.owner.email?.split('@')[0] || 'เจ้าของร้าน'
+
+      await prisma.profitPartner.create({
+        data: {
+          storeId,
+          name: ownerName,
+          role: PartnerRole.SHAREHOLDER,
+          shareType: ShareType.NET_PROFIT_PERCENT,
+          shareValue: new Prisma.Decimal(100),
+          bankName: defaultBank?.bankName || null,
+          bankAccount: defaultBank?.accountNumber || null,
+          bankAccountName: defaultBank?.accountName || ownerName,
+          promptPay: defaultBank?.promptPayId || store.owner.phone || null,
+          note: 'เจ้าของร้านค้า (สัดส่วนกำไร 100%)',
+          isActive: true,
+        },
+      })
+
+      partners = await prisma.profitPartner.findMany({
+        where: { storeId },
+        orderBy: { createdAt: 'asc' },
+      })
+    }
   }
 
   return serializeDecimal(partners) as unknown as ProfitPartnerItem[]

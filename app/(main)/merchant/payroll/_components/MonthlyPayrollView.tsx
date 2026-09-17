@@ -376,8 +376,17 @@ export function MonthlyPayrollView({
               {t('settlement.saving')}
             </div>
           ) : items.length === 0 ? (
-            <div className="text-muted-foreground p-8 text-center text-sm">
-              {t('staff.empty')}
+            <div className="flex flex-col items-center justify-center space-y-3 p-10 text-center">
+              <IconReceiptTax className="text-muted-foreground/40 size-10" />
+              <div className="space-y-1">
+                <p className="text-foreground text-sm font-medium">
+                  ยังไม่มีรายการพนักงานสำหรับคำนวณเงินเดือนในรอบนี้
+                </p>
+                <p className="text-muted-foreground max-w-md text-xs">
+                  กรุณาไปที่แท็บ &quot;รายชื่อ & กำหนดฐานเงินเดือน&quot;
+                  เพื่อซิงค์หรือเพิ่มพนักงานและกำหนดฐานเงินเดือนก่อนเริ่มคำนวณงวดเงินเดือน
+                </p>
+              </div>
             </div>
           ) : (
             <>

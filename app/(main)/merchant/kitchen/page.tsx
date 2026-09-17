@@ -327,7 +327,7 @@ export default function KitchenDisplayPage() {
                                 </Badge>
                               )}
                             </div>
-                            <CardDescription className="font-mono text-xs">
+                            <CardDescription className="text-xs">
                               #{order.orderNumber}
                             </CardDescription>
                           </div>
@@ -340,7 +340,7 @@ export default function KitchenDisplayPage() {
                                   ? 'secondary'
                                   : 'outline'
                             }
-                            className="gap-1 font-mono text-xs"
+                            className="gap-1 text-xs"
                           >
                             <IconClock className="size-3" />
                             {t('minutes', { count: elapsed })}

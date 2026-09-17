@@ -6,6 +6,7 @@ import {
   getMonthlySettlement,
   getMonthlySettlementHistory,
   getProfitPartners,
+  getStorePotentialPartners,
   saveMonthlySettlement,
   toggleProfitPartnerStatus,
   updatePayoutStatus,
@@ -20,6 +21,14 @@ export function useProfitPartners(storeId: string) {
   return useQuery({
     queryKey: profitSharingKeys.partners(storeId),
     queryFn: () => getProfitPartners(storeId),
+    enabled: !!storeId && storeId !== 'all',
+  })
+}
+
+export function useStorePotentialPartners(storeId: string) {
+  return useQuery({
+    queryKey: profitSharingKeys.potentialPartners(storeId),
+    queryFn: () => getStorePotentialPartners(storeId),
     enabled: !!storeId && storeId !== 'all',
   })
 }
