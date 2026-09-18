@@ -1,11 +1,11 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect, useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { ResellerStockItem } from '@/types/reseller'
 import { IconPackage } from '@tabler/icons-react'
 
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
@@ -28,22 +28,9 @@ export interface AcceptStockPayload {
 interface AcceptStockDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  stock: {
-    agreementId: string
-    variantId: string
-    allocatedQuantity: number
-    acceptedQuantity: number
-    variant?: {
-      title?: string
-      product?: { title?: string }
-    }
-  } | null
-  onConfirm: (data: {
-    agreementId: string
-    variantId: string
-    quantity: number
-  }) => Promise<void> | void
+  stock: ResellerStockItem | null
   isLoading?: boolean
+  onConfirm: (payload: AcceptStockPayload) => Promise<void> | void
 }
 
 export function AcceptStockDialog({

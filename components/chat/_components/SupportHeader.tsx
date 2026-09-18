@@ -32,7 +32,7 @@ export function SupportHeader({
             <ArrowLeft className="size-4" />
           </Button>
         )}
-        <span className="truncate">{title}</span>
+        <span className="text-foreground truncate">{title}</span>
       </div>
 
       <div className="flex items-center gap-1">

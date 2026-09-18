@@ -1,12 +1,12 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useTranslations } from 'next-intl'
 
-import { StatsCard } from '@/components/StatsCard'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { formatNumber } from '@/utils/pricing'
 import { IconArrowUpRight, IconUserCheck, IconUsers } from '@tabler/icons-react'
+
+import { StatsCard } from '@/components/StatsCard'
 
 import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
 
@@ -26,10 +26,13 @@ export function CustomerRetentionCard({
   const t = useTranslations('merchant.analytics.customerRetention')
 
   return (
-    <div className="flex flex-col gap-5"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
+    <div
+      className="flex flex-col gap-5"
+      style={
+        {
+          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+        } as React.CSSProperties
+      }
     >
       <AnalyticsCardShell
         title={t('title')}

@@ -10,6 +10,7 @@ import {
   EmployeeSalaryConfigItem,
   MonthlyPayrollItemRecord,
   MonthlyPayrollRecord,
+  StoreAvailableEmployee,
 } from '@/types/payroll'
 import { PermissionKey } from '@/types/permission'
 import { serializeDecimal } from '@/utils/decimal'
@@ -80,15 +81,7 @@ async function checkAccess(
 // 1. Employee Salary Configs (การตั้งค่าฐานเงินเดือนพนักงาน)
 // -------------------------------------------------------------
 
-export interface StoreAvailableEmployee {
-  employeeId: string
-  name: string
-  email: string
-  phone?: string | null
-  department?: string | null
-  position?: string | null
-  alreadyConfigured: boolean
-}
+export type { StoreAvailableEmployee }
 
 export async function getStoreAvailableEmployees(storeId: string): Promise<{
   success: boolean

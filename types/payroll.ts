@@ -82,3 +82,12 @@ export interface MonthlyPayrollRecord {
   updatedAt?: string
 }
 
+export interface StoreAvailableEmployee {
+  employeeId: string
+  name: string
+  email: string
+  phone?: string | null
+  department?: string | null
+  position?: string | null
+  alreadyConfigured: boolean
+}

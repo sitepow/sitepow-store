@@ -1,5 +1,6 @@
 'use client'
-import { useRef } from 'react'
+
+import { useMemo, useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
@@ -15,15 +16,23 @@ export function PricingPackages() {
   const isMounted = useIsMounted()
   const t = useTranslations('pricing')
   const sectionRef = useRef<HTMLDivElement>(null)
-  const plansRef = useRef<HTMLDivElement>(null)
-  const commonRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      if (plansRef.current) {
-        const cards = Array.from(plansRef.current.children)
+      if (!isMounted || !sectionRef.current) {
+        return
+      }
+
+      const plansGrid = sectionRef.current.querySelector(
+        '[data-animate="plans-grid"]',
+      )
+      const commonGrid = sectionRef.current.querySelector(
+        '[data-animate="common-grid"]',
+      )
+
+      if (plansGrid) {
         gsap.fromTo(
-          cards,
+          plansGrid.children,
           { y: 50, scale: 0.95, opacity: 0 },
           {
             y: 0,
@@ -33,7 +42,7 @@ export function PricingPackages() {
             stagger: 0.08,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: plansRef.current,
+              trigger: plansGrid,
               start: 'top 88%',
               toggleActions: 'play none none none',
             },
@@ -41,10 +50,9 @@ export function PricingPackages() {
         )
       }
 
-      if (commonRef.current) {
-        const tiles = Array.from(commonRef.current.children)
+      if (commonGrid) {
         gsap.fromTo(
-          tiles,
+          commonGrid.children,
           { y: 35, opacity: 0 },
           {
             y: 0,
@@ -53,7 +61,7 @@ export function PricingPackages() {
             stagger: 0.05,
             ease: 'power3.out',
             scrollTrigger: {
-              trigger: commonRef.current,
+              trigger: commonGrid,
               start: 'top 90%',
               toggleActions: 'play none none none',
             },
@@ -66,65 +74,59 @@ export function PricingPackages() {
     { scope: sectionRef, dependencies: [isMounted] },
   )
 
-  const translatedPlans = PRICING_PLANS.map((plan, idx) => {
-    let title = plan.title
-    let description = plan.description
-    let buttonText = plan.buttonText
-    let uniqueFeatures = plan.uniqueFeatures
-    try {
-      title = (t.raw(`plans.${idx}.title`) as string) || plan.title
-      description =
-        (t.raw(`plans.${idx}.description`) as string) || plan.description
-      buttonText =
-        (t.raw(`plans.${idx}.buttonText`) as string) || plan.buttonText
-      uniqueFeatures = plan.uniqueFeatures.map((feature, fIdx) => ({
-        ...feature,
-        text:
-          (t.raw(`plans.${idx}.features.${fIdx}`) as string) || feature.text,
-      }))
-    } catch {}
-    return {
-      ...plan,
-      title,
-      description,
-      buttonText,
-      uniqueFeatures,
-    }
-  })
+  const translatedPlans = useMemo(() => {
+    return PRICING_PLANS.map((plan, idx) => {
+      const getRawText = (path: string, fallback: string) => {
+        try {
+          return (t.raw(path) as string) || fallback
+        } catch {
+          return fallback
+        }
+      }
 
-  const translatedCommonFeatures = COMMON_FEATURES.map((feature, index) => {
-    let text = feature.text
-    try {
-      text = (t.raw(`commonFeatures.items.${index}`) as string) || feature.text
-    } catch {}
-    return {
-      ...feature,
-      text,
-    }
-  })
+      return {
+        ...plan,
+        title: getRawText(`plans.${idx}.title`, plan.title),
+        description: getRawText(`plans.${idx}.description`, plan.description),
+        buttonText: getRawText(`plans.${idx}.buttonText`, plan.buttonText),
+        uniqueFeatures: plan.uniqueFeatures.map((feature, fIdx) => ({
+          ...feature,
+          text: getRawText(`plans.${idx}.features.${fIdx}`, feature.text),
+        })),
+      }
+    })
+  }, [t])
+
+  const translatedCommonFeatures = useMemo(() => {
+    return COMMON_FEATURES.map((feature, index) => {
+      let text = feature.text
+      try {
+        text =
+          (t.raw(`commonFeatures.items.${index}`) as string) || feature.text
+      } catch {}
+      return { ...feature, text }
+    })
+  }, [t])
 
   return (
-    <div
+    <section
       ref={sectionRef}
       className="relative mx-auto w-full max-w-7xl space-y-12 px-3.5 sm:space-y-16 sm:px-6 lg:space-y-20 lg:px-8"
     >
-      {/* Background Soft Glow */}
       <div
         aria-hidden="true"
-        className="from-primary/15 pointer-events-none absolute top-24 left-1/2 -z-10 h-80 w-full max-w-4xl -translate-x-1/2 rounded-full bg-gradient-to-r via-orange-500/10 to-transparent blur-3xl"
+        className="from-primary/15 pointer-events-none absolute top-24 left-1/2 -z-10 h-80 w-full max-w-4xl -translate-x-1/2 rounded-full bg-linear-to-r via-orange-500/10 to-transparent blur-3xl"
       />
 
-      {/* Main Pricing Cards Grid */}
       <div
-        ref={plansRef}
+        data-animate="plans-grid"
         className="grid w-full items-stretch gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
       >
-        {translatedPlans.map((plan) => (
-          <PricingCard key={plan.title} {...plan} />
+        {translatedPlans.map((plan, index) => (
+          <PricingCard key={`${plan.title}-${index}`} {...plan} />
         ))}
       </div>
 
-      {/* Common Features Section */}
       <div className="space-y-6 sm:space-y-10">
         <MainSectionHeader
           as="h3"
@@ -137,7 +139,7 @@ export function PricingPackages() {
         />
 
         <div
-          ref={commonRef}
+          data-animate="common-grid"
           className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
         >
           {translatedCommonFeatures.map((feature, index) => (
@@ -158,6 +160,6 @@ export function PricingPackages() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   )
 }

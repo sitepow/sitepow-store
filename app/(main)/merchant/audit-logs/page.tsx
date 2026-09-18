@@ -10,31 +10,17 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDateTime } from '@/utils/date'
-import { IconEye, IconHistory, IconLock } from '@tabler/icons-react'
+import { IconHistory, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StorePagination } from '@/components/StorePagination'
 import { StoreSelectField } from '@/components/StoreSelectField'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 
-import { ActionBadge } from './_components/ActionBadge'
-import { ActorBadge } from './_components/ActorBadge'
 import { AuditLogDetailDialog } from './_components/AuditLogDetailDialog'
 import { AuditLogFilters } from './_components/AuditLogFilters'
+import { AuditLogTable } from './_components/AuditLogTable'
 
 export default function MerchantAuditLogsPage() {
   const t = useTranslations('merchant.auditLogs')
@@ -104,63 +90,13 @@ export default function MerchantAuditLogsPage() {
               setPage(1)
             }}
           />
-          <div className="overflow-hidden rounded-xl border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('columns.timestamp')}</TableHead>
-                  <TableHead>{t('columns.action')}</TableHead>
-                  <TableHead>{t('columns.actorGroup')}</TableHead>
-                  <TableHead>{t('columns.actor')}</TableHead>
-                  <TableHead>{t('columns.targetEntity')}</TableHead>
-                  <TableHead>{t('columns.ipAddress')}</TableHead>
-                  <TableHead>{t('columns.view')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(isLoading || isPermissionLoading) && logs.length === 0 ? (
-                  <TableLoadingRow colSpan={7} />
-                ) : logs.length === 0 ? (
-                  <TableEmptyRow
-                    title={t('empty')}
-                    description={t('emptyDesc')}
-                    colSpan={7}
-                  />
-                ) : (
-                  logs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell>{formatDateTime(log.createdAt)}</TableCell>
-                      <TableCell>
-                        <ActionBadge action={log.action} />
-                      </TableCell>
-                      <TableCell>
-                        <ActorBadge actorType={log.actorType} />
-                      </TableCell>
-                      <TableCell>
-                        {log.employee?.name ?? log.user?.name ?? '-'}
-                      </TableCell>
-                      <TableCell className="space-x-2">
-                        <span>{log.entity}</span>
-                        {log.entityId && (
-                          <Badge variant="outline">{log.entityId}</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>{log.ipAddress ?? '-'}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleOpenDetails(log)}
-                        >
-                          <IconEye />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+
+          <AuditLogTable
+            logs={logs}
+            isLoading={isLoading || isPermissionLoading}
+            onOpenDetails={handleOpenDetails}
+          />
+
           {meta && meta.totalPages > 1 && (
             <StorePagination
               currentPage={meta.currentPage}
@@ -170,6 +106,7 @@ export default function MerchantAuditLogsPage() {
               onPageChange={(newPage) => setPage(newPage)}
             />
           )}
+
           <AuditLogDetailDialog
             isOpen={isDialogOpen}
             onOpenChange={setIsDialogOpen}

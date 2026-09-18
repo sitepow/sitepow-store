@@ -85,7 +85,7 @@ export function DigitalPriceDisplay({
 
       <div className="relative z-10 flex flex-col justify-between gap-1">
         {displayLabel && (
-          <div className="text-muted-foreground flex items-center justify-between font-semibold tracking-wider uppercase">
+          <div className="text-muted-foreground font-landing flex items-center justify-between font-semibold tracking-wider uppercase">
             <span className={sizeStyles.label}>{displayLabel}</span>
           </div>
         )}

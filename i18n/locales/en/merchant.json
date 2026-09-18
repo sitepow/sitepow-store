@@ -3349,7 +3349,7 @@
     "soundOn": "Chime: ON",
     "soundOff": "Chime: OFF",
     "refresh": "Refresh",
-    "emptyTitle": "No pending orders in the kitchen 🎉",
+    "emptyTitle": "No pending orders in the kitchen",
     "emptyDescription": "When customers or staff place orders, tickets will pop up here with a chime sound.",
     "tablePrefix": "Table",
     "takeaway": "Takeaway",

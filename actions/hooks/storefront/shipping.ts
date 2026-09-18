@@ -10,7 +10,7 @@ export function useStorefrontShippingOptions(
 ) {
   return useQuery(
     queryOptions({
-      queryKey: [...storefrontShippingKeys.options(storeSlug), country],
+      queryKey: storefrontShippingKeys.options(storeSlug, country),
       queryFn: () => getStorefrontShippingOptions(storeSlug, country),
       enabled: !!storeSlug,
     }),

@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
 import { useCustomerAffiliateDashboard } from '@/actions/hooks/storefront/affiliate'
-import { UserRole } from '@/generated/prisma/enums'
+import { CurrencyCode, UserRole } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency } from '@/utils/pricing'
@@ -43,7 +43,7 @@ export function ProductAffiliateShare({
 
   const { store } = useStoreData()
   const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
+    (store as { baseCurrency?: CurrencyCode } | null)?.baseCurrency,
   )
 
   const { data, isLoading } = useCustomerAffiliateDashboard(storeSlug)
@@ -114,8 +114,8 @@ export function ProductAffiliateShare({
           url: referralUrl,
         })
         return
-      } catch (err: any) {
-        if (err?.name === 'AbortError') return
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') return
       }
     }
     handleCopy()

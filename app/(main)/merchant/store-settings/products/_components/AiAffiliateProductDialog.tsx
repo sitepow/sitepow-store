@@ -1,71 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-
-import { useTranslations } from 'next-intl'
-
-import { ScrapedAffiliateProductResult } from '@/actions/ai'
-import {
-  useGenerateAffiliateProductAi,
-  useScrapeAffiliateProduct,
-} from '@/actions/hooks/ai'
-import { useBranches } from '@/actions/hooks/branch'
-import { useCategoryOptions } from '@/actions/hooks/category'
-import { useCreateProduct } from '@/actions/hooks/product'
-import {
-  useR2UploadImage,
-  useUploadExternalImagesToR2,
-} from '@/actions/hooks/r2'
-import { ProductType } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import {
-  AFFILIATE_PLATFORM_CONFIG,
-  AffiliatePlatform,
-  parseMarketplaceInput,
-} from '@/types/affiliate-product'
-import {
-  IconArrowLeft,
-  IconCheck,
-  IconExternalLink,
-  IconLoader2,
-  IconPhoto,
-  IconPlayerPlay,
-  IconPlus,
-  IconSparkles,
-  IconStar,
-  IconStarFilled,
-  IconTag,
-  IconTrash,
-  IconUpload,
-  IconVideo,
-  IconWorld,
-} from '@tabler/icons-react'
-import { ImagePlus, Star, X } from 'lucide-react'
+import { IconSparkles } from '@tabler/icons-react'
 
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
 } from '@/components/ui/dialog'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 
-import { cn } from '@/lib/utils'
+import { AiAffiliateDialogFooter } from './AiAffiliateDialogFooter'
+import { AiAffiliateInputStep } from './AiAffiliateInputStep'
+import { AiAffiliatePreviewStep } from './AiAffiliatePreviewStep'
+import { AiAffiliateStepIndicator } from './AiAffiliateStepIndicator'
+import { useAiAffiliateProductForm } from '../_hooks/use-ai-affiliate-product-form'
 
 interface AiAffiliateProductDialogProps {
   open: boolean
@@ -74,728 +22,92 @@ interface AiAffiliateProductDialogProps {
   onSuccess?: () => void
 }
 
-const PLATFORM_OPTIONS: { value: AffiliatePlatform; label: string }[] = [
-  { value: 'SHOPEE', label: 'Shopee' },
-  { value: 'LAZADA', label: 'Lazada' },
-  { value: 'TIKTOK', label: 'TikTok Shop' },
-  { value: 'OTHER', label: 'Other / ร้านค้าทั่วไป' },
-]
-
 export function AiAffiliateProductDialog({
   open,
   onOpenChange,
   storeId,
   onSuccess,
 }: AiAffiliateProductDialogProps) {
-  const t = useTranslations('merchant.products.aiAffiliateDialog')
-  const { currentStore, store } = useCurrentStore()
-
-  const { data: categories = [] } = useCategoryOptions({ storeId })
-  const { data: branchesData } = useBranches({ storeId })
-
-  const branches = branchesData?.data || []
-  const defaultBranchId =
-    branches.find((b) => b.isMain)?.id || branches[0]?.id || ''
-
-  const generateMutation = useGenerateAffiliateProductAi()
-  const scrapeMutation = useScrapeAffiliateProduct()
-  const createProductMutation = useCreateProduct()
-  const uploadImageMutation = useR2UploadImage(`store/${storeId}/products`)
-  const uploadVideoMutation = useR2UploadImage(`store/${storeId}/videos`)
-  const uploadExternalImagesMutation = useUploadExternalImagesToR2()
-
-  const imageFileInputRef = useRef<HTMLInputElement>(null)
-  const videoFileInputRef = useRef<HTMLInputElement>(null)
-
-  // Steps: 'input' | 'preview'
-  const [step, setStep] = useState<'input' | 'preview'>('input')
-
-  // Step 1: Input state
-  const [productUrl, setProductUrl] = useState('')
-  const [rawTitle, setRawTitle] = useState('')
-  const [affiliateUrl, setAffiliateUrl] = useState('')
-  const [selectedCategoryId, setSelectedCategoryId] = useState('')
-  const [platform, setPlatform] = useState<AffiliatePlatform>('SHOPEE')
-  const [notes, setNotes] = useState('')
-  const [liveScraped, setLiveScraped] =
-    useState<ScrapedAffiliateProductResult | null>(null)
-
-  // Loading animation step
-  const [loadingStepIndex, setLoadingStepIndex] = useState(1)
-
-  // Step 2: Generated Preview & Edit state
-  const [title, setTitle] = useState('')
-  const [slug, setSlug] = useState('')
-  const [price, setPrice] = useState<number>(0)
-  const [originalPrice, setOriginalPrice] = useState<number>(0)
-  const [isOnSale, setIsOnSale] = useState(false)
-  const [discountText, setDiscountText] = useState('')
-  const [platformLabel, setPlatformLabel] = useState('')
-  const [images, setImages] = useState<string[]>([])
-  const [primaryImageIndex, setPrimaryImageIndex] = useState(0)
-  const [videoUrl, setVideoUrl] = useState('')
-  const [tags, setTags] = useState('')
-  const [description, setDescription] = useState('')
-  const [specs, setSpecs] = useState<{ key: string; value: string }[]>([])
-  const [destinationUrl, setDestinationUrl] = useState('')
-
-  // Inline new image url state
-  const [newImageUrl, setNewImageUrl] = useState('')
-  const [isAddingImageUrl, setIsAddingImageUrl] = useState(false)
-
-  // Pre-select category if available
-  useEffect(() => {
-    if (categories.length > 0 && !selectedCategoryId) {
-      setSelectedCategoryId(categories[0].id)
-    }
-  }, [categories, selectedCategoryId])
-
-  // Draft auto-save and restore key
-  const DRAFT_KEY = `ai_affiliate_product_draft_${storeId || 'default'}`
-  const isRestoredRef = useRef(false)
-
-  // Restore draft from localStorage
-  useEffect(() => {
-    try {
-      const savedDraft = localStorage.getItem(DRAFT_KEY)
-      if (savedDraft) {
-        const parsed = JSON.parse(savedDraft)
-        if (parsed && typeof parsed === 'object') {
-          if (parsed.step) setStep(parsed.step)
-          if (typeof parsed.productUrl === 'string')
-            setProductUrl(parsed.productUrl)
-          if (typeof parsed.rawTitle === 'string') setRawTitle(parsed.rawTitle)
-          if (typeof parsed.affiliateUrl === 'string')
-            setAffiliateUrl(parsed.affiliateUrl)
-          if (typeof parsed.selectedCategoryId === 'string')
-            setSelectedCategoryId(parsed.selectedCategoryId)
-          if (parsed.platform) setPlatform(parsed.platform)
-          if (typeof parsed.notes === 'string') setNotes(parsed.notes)
-          if (parsed.liveScraped) setLiveScraped(parsed.liveScraped)
-          if (typeof parsed.title === 'string') setTitle(parsed.title)
-          if (typeof parsed.slug === 'string') setSlug(parsed.slug)
-          if (typeof parsed.price === 'number') setPrice(parsed.price)
-          if (typeof parsed.originalPrice === 'number')
-            setOriginalPrice(parsed.originalPrice)
-          if (typeof parsed.isOnSale === 'boolean') setIsOnSale(parsed.isOnSale)
-          if (typeof parsed.discountText === 'string')
-            setDiscountText(parsed.discountText)
-          if (typeof parsed.platformLabel === 'string')
-            setPlatformLabel(parsed.platformLabel)
-          if (Array.isArray(parsed.images)) setImages(parsed.images)
-          if (typeof parsed.primaryImageIndex === 'number')
-            setPrimaryImageIndex(parsed.primaryImageIndex)
-          if (typeof parsed.videoUrl === 'string') setVideoUrl(parsed.videoUrl)
-          if (typeof parsed.tags === 'string') setTags(parsed.tags)
-          if (typeof parsed.description === 'string')
-            setDescription(parsed.description)
-          if (Array.isArray(parsed.specs)) setSpecs(parsed.specs)
-          if (typeof parsed.destinationUrl === 'string')
-            setDestinationUrl(parsed.destinationUrl)
-        }
-      }
-    } catch (e) {
-      console.error(
-        'Failed to restore AI affiliate draft from localStorage:',
-        e,
-      )
-    } finally {
-      isRestoredRef.current = true
-    }
-  }, [DRAFT_KEY])
-
-  // Debounced auto-save draft to localStorage
-  useEffect(() => {
-    if (!isRestoredRef.current) {
-      return
-    }
-
-    const hasData = Boolean(
-      productUrl.trim() ||
-      rawTitle.trim() ||
-      affiliateUrl.trim() ||
-      notes.trim() ||
-      title.trim() ||
-      images.length > 0 ||
-      step === 'preview',
-    )
-
-    if (!hasData) {
-      return
-    }
-
-    const timer = setTimeout(() => {
-      try {
-        const draft = {
-          step,
-          productUrl,
-          rawTitle,
-          affiliateUrl,
-          selectedCategoryId,
-          platform,
-          notes,
-          liveScraped,
-          title,
-          slug,
-          price,
-          originalPrice,
-          isOnSale,
-          discountText,
-          platformLabel,
-          images,
-          primaryImageIndex,
-          videoUrl,
-          tags,
-          description,
-          specs,
-          destinationUrl,
-        }
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
-      } catch (err) {
-        console.error('Failed to auto-save AI affiliate draft:', err)
-      }
-    }, 600)
-
-    return () => clearTimeout(timer)
-  }, [
-    DRAFT_KEY,
+  const {
+    t,
+    currentStore,
+    store,
+    categories,
     step,
+    setStep,
     productUrl,
     rawTitle,
+    setRawTitle,
     affiliateUrl,
+    setAffiliateUrl,
     selectedCategoryId,
+    setSelectedCategoryId,
     platform,
+    setPlatform,
     notes,
+    setNotes,
     liveScraped,
+    loadingStepIndex,
     title,
+    setTitle,
     slug,
+    setSlug,
     price,
+    setPrice,
     originalPrice,
+    setOriginalPrice,
     isOnSale,
+    setIsOnSale,
     discountText,
+    setDiscountText,
     platformLabel,
+    setPlatformLabel,
     images,
     primaryImageIndex,
     videoUrl,
+    setVideoUrl,
     tags,
+    setTags,
     description,
+    setDescription,
     specs,
     destinationUrl,
-  ])
-
-  const hasDraft = Boolean(
-    productUrl.trim() ||
-    rawTitle.trim() ||
-    affiliateUrl.trim() ||
-    notes.trim() ||
-    title.trim() ||
-    images.length > 0 ||
-    step === 'preview',
-  )
-
-  const handleClearDraft = () => {
-    try {
-      localStorage.removeItem(DRAFT_KEY)
-    } catch (e) {
-      console.error(e)
-    }
-    handleFullReset()
-    toast.success('ล้างข้อมูลแบบร่างเรียบร้อยแล้ว')
-  }
-
-  // Progress ticker during generation
-  useEffect(() => {
-    let timer: NodeJS.Timeout
-    if (generateMutation.isPending) {
-      setLoadingStepIndex(1)
-      timer = setTimeout(() => {
-        setLoadingStepIndex(2)
-      }, 2500)
-    }
-    return () => clearTimeout(timer)
-  }, [generateMutation.isPending])
-
-  const handleFullReset = () => {
-    setStep('input')
-    setProductUrl('')
-    setRawTitle('')
-    setAffiliateUrl('')
-    setNotes('')
-    setLiveScraped(null)
-    setTitle('')
-    setSlug('')
-    setPrice(0)
-    setOriginalPrice(0)
-    setIsOnSale(false)
-    setDiscountText('')
-    setPlatform('SHOPEE')
-    setPlatformLabel('')
-    setImages([])
-    setPrimaryImageIndex(0)
-    setVideoUrl('')
-    setTags('')
-    setDescription('')
-    setSpecs([])
-    setDestinationUrl('')
-    setNewImageUrl('')
-    setIsAddingImageUrl(false)
-  }
-
-  const handleFetchLive = async (customUrl?: string) => {
-    const raw = (customUrl || productUrl).trim()
-    if (!raw) {
-      toast.error(t('errNoUrl'))
-      return
-    }
-
-    const parsed = parseMarketplaceInput(raw)
-    const cleanUrl = parsed.url || raw
-
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
-      toast.error(t('errInvalidUrl'))
-      return
-    }
-
-    const toastId = toast.loading(t('fetchingLive'))
-    try {
-      const res = await scrapeMutation.mutateAsync(cleanUrl)
-      if (res && res.success) {
-        setLiveScraped(res)
-        if (res.title) {
-          setRawTitle(res.title)
-        }
-        if (res.platform && res.platform !== 'OTHER') {
-          setPlatform(res.platform)
-        }
-        if (res.price && price === 0) {
-          setPrice(res.price)
-        }
-        if (res.discountText && !discountText) {
-          setDiscountText(res.discountText)
-          setIsOnSale(true)
-        }
-        if (res.images && res.images.length > 0) {
-          setImages(res.images)
-        }
-        if (res.videoUrl) {
-          setVideoUrl(res.videoUrl)
-        }
-        toast.success(t('liveDataFound'), { id: toastId })
-      } else {
-        toast.error(
-          'ไม่สามารถดึงข้อมูลจากเว็บได้ กรุณาระบุชื่อสินค้าด้วยตนเอง',
-          {
-            id: toastId,
-          },
-        )
-      }
-    } catch {
-      toast.error('เกิดข้อผิดพลาดในการเชื่อมต่อกับเว็บสินค้า', { id: toastId })
-    }
-  }
-
-  const handleUseLiveDirectly = () => {
-    if (!liveScraped) return
-
-    const cleanTitle = liveScraped.title || rawTitle || 'สินค้า Affiliate'
-    setTitle(cleanTitle)
-    setSlug(`aff-${platform.toLowerCase()}-${Date.now().toString(36)}`)
-    setPrice(liveScraped.price || 0)
-    setOriginalPrice(liveScraped.price || 0)
-    setIsOnSale(Boolean(liveScraped.discountText))
-    setDiscountText(liveScraped.discountText || '')
-    setPlatform(liveScraped.platform || platform)
-    setPlatformLabel(liveScraped.platform || '')
-
-    const collectedImages = Array.from(
-      new Set(
-        [liveScraped.image, ...(liveScraped.images || [])].filter(
-          (img): img is string => typeof img === 'string' && Boolean(img),
-        ),
-      ),
-    )
-    setImages(collectedImages)
-    setPrimaryImageIndex(0)
-    setVideoUrl(liveScraped.videoUrl || '')
-    setDescription(liveScraped.description || '')
-    setDestinationUrl(
-      affiliateUrl.trim() || liveScraped.finalUrl || productUrl.trim(),
-    )
-
-    setStep('preview')
-  }
-
-  // Handle smart input pasting: auto-detect link, title, price, discount
-  const handleUrlInputChange = (val: string) => {
-    setProductUrl(val)
-    const parsed = parseMarketplaceInput(val)
-
-    if (parsed.url && parsed.url !== val) {
-      // The user pasted a share message containing a URL + text!
-      setProductUrl(parsed.url)
-    }
-
-    if (parsed.title && !rawTitle) {
-      setRawTitle(parsed.title)
-    }
-
-    if (parsed.platform && parsed.platform !== 'OTHER') {
-      setPlatform(parsed.platform)
-    }
-
-    if (parsed.price && price === 0) {
-      setPrice(parsed.price)
-    }
-
-    if (parsed.discountText && !discountText) {
-      setDiscountText(parsed.discountText)
-      setIsOnSale(true)
-    }
-  }
-
-  const handleStartGenerate = async () => {
-    const trimmedInput = productUrl.trim()
-    if (!trimmedInput) {
-      toast.error(t('errNoUrl'))
-      return
-    }
-
-    const parsed = parseMarketplaceInput(trimmedInput)
-    const cleanUrl = parsed.url || trimmedInput
-
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
-      toast.error(t('errInvalidUrl'))
-      return
-    }
-
-    try {
-      const effectiveRawTitle =
-        liveScraped?.title || rawTitle.trim() || parsed.title || undefined
-
-      const res = await generateMutation.mutateAsync({
-        url: cleanUrl,
-        affiliateUrl: affiliateUrl.trim() || undefined,
-        rawTitle: effectiveRawTitle,
-        rawNotes: notes.trim() || undefined,
-        storeId,
-      })
-
-      if (!res.success || !res.data) {
-        toast.error(res.messageTH || res.message || t('generating'))
-        return
-      }
-
-      const d = res.data
-      setTitle(d.title || effectiveRawTitle || '')
-      setSlug(d.slug || '')
-      setPrice(d.price || liveScraped?.price || parsed.price || 0)
-      setOriginalPrice(
-        d.originalPrice || d.price || liveScraped?.price || parsed.price || 0,
-      )
-      setIsOnSale(
-        Boolean(d.isOnSale || liveScraped?.discountText || parsed.discountText),
-      )
-      setDiscountText(
-        d.discountText ||
-          liveScraped?.discountText ||
-          parsed.discountText ||
-          '',
-      )
-      setPlatform(d.platform || liveScraped?.platform || platform)
-      setPlatformLabel(d.platformLabel || '')
-
-      const collectedImages = Array.from(
-        new Set(
-          [
-            d.imageUrl,
-            ...(Array.isArray(d.images) ? d.images : []),
-            ...(liveScraped?.images || []),
-            liveScraped?.image,
-          ].filter(
-            (img): img is string => typeof img === 'string' && Boolean(img),
-          ),
-        ),
-      )
-      setImages(collectedImages)
-      setPrimaryImageIndex(0)
-
-      setVideoUrl(d.videoUrl || liveScraped?.videoUrl || videoUrl || '')
-      setTags(d.tags || '')
-      setDescription(d.description || liveScraped?.description || '')
-      setSpecs(d.metadata || [])
-      setDestinationUrl(d.affiliateUrl || cleanUrl)
-
-      setStep('preview')
-    } catch {
-      toast.error(t('generating'))
-    }
-  }
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    const uploadToast = toast.loading('กำลังอัปโหลดรูปภาพ...')
-    try {
-      const uploadedUrls: string[] = []
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const formData = new FormData()
-        formData.append('file', file)
-        const res = await uploadImageMutation.mutateAsync(formData)
-        if (res?.success && res.url) {
-          uploadedUrls.push(res.url)
-        }
-      }
-
-      if (uploadedUrls.length > 0) {
-        setImages((prev) => [...prev, ...uploadedUrls])
-        toast.success(`อัปโหลดสำเร็จ ${uploadedUrls.length} รูปภาพ`, {
-          id: uploadToast,
-        })
-      } else {
-        toast.error('อัปโหลดรูปภาพไม่สำเร็จ', { id: uploadToast })
-      }
-    } catch {
-      toast.error('เกิดข้อผิดพลาดในการอัปโหลด', { id: uploadToast })
-    } finally {
-      if (imageFileInputRef.current) {
-        imageFileInputRef.current.value = ''
-      }
-    }
-  }
-
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const uploadToast = toast.loading('กำลังอัปโหลดวิดีโอ...')
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      const res = await uploadVideoMutation.mutateAsync(formData)
-      if (res?.success && res.url) {
-        setVideoUrl(res.url)
-        toast.success('อัปโหลดวิดีโอสำเร็จ', { id: uploadToast })
-      } else {
-        toast.error('อัปโหลดวิดีโอไม่สำเร็จ', { id: uploadToast })
-      }
-    } catch {
-      toast.error('เกิดข้อผิดพลาดในการอัปโหลดวิดีโอ', { id: uploadToast })
-    } finally {
-      if (videoFileInputRef.current) {
-        videoFileInputRef.current.value = ''
-      }
-    }
-  }
-
-  const handleAddImageUrl = () => {
-    const trimmed = newImageUrl.trim()
-    if (!trimmed) return
-    if (!images.includes(trimmed)) {
-      setImages((prev) => [...prev, trimmed])
-    }
-    setNewImageUrl('')
-    setIsAddingImageUrl(false)
-  }
-
-  const handleSetPrimary = (targetIndex: number) => {
-    setPrimaryImageIndex(targetIndex)
-  }
-
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index))
-    if (primaryImageIndex === index) {
-      setPrimaryImageIndex(0)
-    } else if (primaryImageIndex > index) {
-      setPrimaryImageIndex((prev) => prev - 1)
-    }
-  }
-
-  const handleAddSpec = () => {
-    setSpecs((prev) => [...prev, { key: '', value: '' }])
-  }
-
-  const handleRemoveSpec = (idx: number) => {
-    setSpecs((prev) => prev.filter((_, i) => i !== idx))
-  }
-
-  const handleUpdateSpec = (
-    idx: number,
-    field: 'key' | 'value',
-    val: string,
-  ) => {
-    setSpecs((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, [field]: val } : item)),
-    )
-  }
-
-  const handleSaveProduct = async () => {
-    if (!title.trim()) {
-      toast.error(t('errTitleRequired'))
-      return
-    }
-
-    if (price < 0) {
-      toast.error(t('errPriceNonNegative'))
-      return
-    }
-
-    if (!selectedCategoryId) {
-      toast.error(t('errCategoryRequired'))
-      return
-    }
-
-    const saveToast = toast.loading(t('btnSaving'))
-    try {
-      const finalDiscountActive = isOnSale && originalPrice > price
-      const discountDiff = Math.max(0, originalPrice - price)
-
-      const affiliateProductLinks = [
-        {
-          id: `aff-${Date.now()}`,
-          platform,
-          url: destinationUrl.trim() || productUrl.trim(),
-          label: platformLabel.trim() || undefined,
-          price: Number(price),
-          originalPrice: Number(originalPrice),
-          isDiscounted: isOnSale,
-          discountText: discountText.trim() || undefined,
-        },
-      ]
-
-      const cleanedSpecs = specs.filter(
-        (s) =>
-          s.key.trim().length > 0 &&
-          s.value.trim().length > 0 &&
-          s.key !== 'videoUrl' &&
-          s.key !== 'description',
-      )
-
-      if (videoUrl.trim()) {
-        cleanedSpecs.push({ key: 'videoUrl', value: videoUrl.trim() })
-      }
-
-      // Generate clean kebab-case slug
-      let cleanSlug = slug
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '')
-
-      if (!cleanSlug) {
-        cleanSlug = `aff-${platform.toLowerCase()}-${Date.now().toString(36)}`
-      }
-
-      // Upload external images to Cloudflare R2 if any
-      let finalUploadedUrls = images
-      const externalImages = images.filter(
-        (url) =>
-          !url.includes('images.sitepow.store') &&
-          (url.startsWith('http://') || url.startsWith('https://')),
-      )
-
-      if (externalImages.length > 0) {
-        toast.loading(
-          `กำลังนำเข้ารูปภาพ ${externalImages.length} ภาพขึ้น Cloudflare R2...`,
-          { id: saveToast },
-        )
-        try {
-          finalUploadedUrls = await uploadExternalImagesMutation.mutateAsync({
-            urls: images,
-            folder: `store/${storeId}/products`,
-          })
-        } catch (uploadErr) {
-          console.warn('Failed to upload external images to R2:', uploadErr)
-        }
-      }
-
-      toast.loading(t('btnSaving'), { id: saveToast })
-
-      // Prepare images with primary tag
-      const productImages = finalUploadedUrls.map((url, i) => ({
-        url,
-        isPrimary: i === primaryImageIndex,
-      }))
-
-      const finalImages = productImages.length > 0 ? productImages : []
-
-      const targetBranchId =
-        defaultBranchId ||
-        branches.find((b) => b.isMain)?.id ||
-        branches[0]?.id ||
-        ''
-
-      const res = await createProductMutation.mutateAsync({
-        storeId,
-        categoryId: selectedCategoryId,
-        title: title.trim(),
-        slug: cleanSlug,
-        tags: tags.trim() || undefined,
-        description: description.trim() || undefined,
-        isPublished: true,
-        productType: ProductType.AFFILIATE_LINK,
-        images: finalImages,
-        metadata: cleanedSpecs.length > 0 ? cleanedSpecs : undefined,
-        affiliateLinks: affiliateProductLinks,
-        variants: [
-          {
-            title: 'Standard',
-            price: Number(price),
-            costPrice: 0,
-            sku: `AFF-${platform.substring(0, 3)}-${Date.now().toString(36).toUpperCase()}`,
-            digitalUrl: destinationUrl.trim() || productUrl.trim(),
-            weight: 0,
-            width: 0,
-            height: 0,
-            length: 0,
-            discount: {
-              active: finalDiscountActive,
-              type: 'FIXED',
-              amount: discountDiff,
-            },
-            rewardPoints: { isActive: false, amount: 0 },
-            isAvailable: true,
-            stocks: [
-              {
-                branchId: targetBranchId,
-                quantity: 999,
-                minStock: 0,
-              },
-            ],
-          },
-        ],
-      })
-
-      if (res.success) {
-        toast.success(res.messageTH || t('successToast'), { id: saveToast })
-        try {
-          localStorage.removeItem(DRAFT_KEY)
-        } catch (e) {
-          console.error(e)
-        }
-        handleFullReset()
-        onOpenChange(false)
-        onSuccess?.()
-      } else {
-        toast.error(res.messageTH || res.message || 'Error', { id: saveToast })
-      }
-    } catch (err: any) {
-      toast.error(err?.message || 'Error creating product', { id: saveToast })
-    }
-  }
-
-  const platformCfg =
-    AFFILIATE_PLATFORM_CONFIG[platform] || AFFILIATE_PLATFORM_CONFIG.OTHER
-
-  const primaryImageSrc = images[primaryImageIndex] || images[0]
+    setDestinationUrl,
+    newImageUrl,
+    setNewImageUrl,
+    isAddingImageUrl,
+    setIsAddingImageUrl,
+    hasDraft,
+    imageFileInputRef,
+    videoFileInputRef,
+    isGenerating,
+    isScraping,
+    isSaving,
+    isUploadingImage,
+    isUploadingVideo,
+    handleUrlInputChange,
+    handleFetchLive,
+    handleUseLiveDirectly,
+    handleGenerate,
+    handleImageUpload,
+    handleVideoUpload,
+    handleAddImageUrl,
+    handleSetPrimary,
+    handleRemoveImage,
+    handleAddSpec,
+    handleRemoveSpec,
+    handleUpdateSpec,
+    handleSaveProduct,
+    handleClearDraft,
+  } = useAiAffiliateProductForm({ storeId, onOpenChange, onSuccess })
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(isOpen) => {
-        onOpenChange(isOpen)
+      onOpenChange={(val) => {
+        if (!val) {
+          onOpenChange(false)
+        }
       }}
     >
       <DialogContent
@@ -814,927 +126,103 @@ export function AiAffiliateProductDialog({
               description={t('description')}
               className="pr-6 sm:pr-0"
             />
-
-            {/* Desktop Step Indicator */}
-            <div className="hidden items-center justify-between pr-8 text-xs font-medium sm:flex">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`rounded-full border px-2.5 py-1 transition-colors ${
-                    step === 'input'
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border bg-background text-muted-foreground'
-                  }`}
-                >
-                  {t('step1')}
-                </span>
-                <span className="text-muted-foreground">→</span>
-                <span
-                  className={`rounded-full border px-2.5 py-1 transition-colors ${
-                    step === 'preview'
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border bg-background text-muted-foreground'
-                  }`}
-                >
-                  {t('step2', {
-                    title: title ? title.slice(0, 16) + '...' : 'Preview',
-                  })}
-                </span>
-              </div>
-              {hasDraft && (
-                <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  บันทึกแบบร่างอัตโนมัติ
-                </span>
-              )}
-            </div>
-
-            {/* Mobile Step Indicator */}
-            <div className="flex flex-col gap-1 sm:hidden">
-              <div className="flex w-full items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium">
-                <span
-                  className={`flex-1 rounded-full border py-1 text-center transition-colors ${
-                    step === 'input'
-                      ? 'border-primary bg-primary/10 text-primary font-semibold'
-                      : 'border-border bg-background text-muted-foreground'
-                  }`}
-                >
-                  1. {t('step1')}
-                </span>
-                <span className="text-muted-foreground">→</span>
-                <span
-                  className={`flex-1 rounded-full border py-1 text-center transition-colors ${
-                    step === 'preview'
-                      ? 'border-primary bg-primary/10 text-primary font-semibold'
-                      : 'border-border bg-background text-muted-foreground'
-                  }`}
-                >
-                  2.{' '}
-                  {t('step2', {
-                    title: title ? title.slice(0, 12) + '...' : 'Preview',
-                  })}
-                </span>
-              </div>
-              {hasDraft && (
-                <div className="text-muted-foreground flex items-center justify-end gap-1 text-[10px]">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  บันทึกแบบร่างอัตโนมัติ
-                </div>
-              )}
-            </div>
+            <AiAffiliateStepIndicator
+              step={step}
+              title={title}
+              hasDraft={hasDraft}
+            />
           </div>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6">
           {step === 'input' ? (
-            <div className="space-y-4">
-              {generateMutation.isPending ? (
-                <Card className="border-primary/30 bg-primary/5 py-8 text-center">
-                  <CardContent className="flex flex-col items-center justify-center space-y-4">
-                    <div className="bg-primary/10 text-primary relative flex h-14 w-14 items-center justify-center rounded-full">
-                      <IconSparkles className="h-7 w-7 animate-pulse" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-foreground text-base font-semibold">
-                        {t('loadingTitle')}
-                      </h4>
-                      <p className="text-muted-foreground text-sm">
-                        {loadingStepIndex === 1
-                          ? t('loadingStep1')
-                          : t('loadingStep2')}
-                      </p>
-                    </div>
-                    <div className="text-primary flex items-center gap-2 text-xs">
-                      <IconLoader2 className="h-4 w-4 animate-spin" />
-                      <span>{t('generating')}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <>
-                  <Field>
-                    <FieldLabel className="flex flex-wrap items-center justify-between gap-1.5">
-                      <span>{t('productUrlLabel')} *</span>
-                      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-                        <Badge
-                          variant="outline"
-                          className="bg-[#EE4D2D]/10 text-[9px] text-[#EE4D2D] sm:text-[10px]"
-                        >
-                          Shopee
-                        </Badge>
-                        <Badge
-                          variant="outline"
-                          className="bg-[#0F146D]/10 text-[9px] text-[#0F146D] sm:text-[10px] dark:text-blue-400"
-                        >
-                          Lazada
-                        </Badge>
-                        <Badge
-                          variant="outline"
-                          className="bg-black/10 text-[9px] text-black sm:text-[10px] dark:bg-white/10 dark:text-white"
-                        >
-                          TikTok Shop
-                        </Badge>
-                      </div>
-                    </FieldLabel>
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                      <Input
-                        type="text"
-                        placeholder={t('productUrlPlaceholder')}
-                        value={productUrl}
-                        onChange={(e) => handleUrlInputChange(e.target.value)}
-                        autoFocus
-                        className="flex-1 text-xs sm:text-sm"
-                      />
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={
-                          !productUrl.trim() || scrapeMutation.isPending
-                        }
-                        onClick={() => handleFetchLive()}
-                        className="h-9 shrink-0 gap-1.5 text-xs sm:h-10 sm:text-sm"
-                      >
-                        {scrapeMutation.isPending ? (
-                          <>
-                            <IconLoader2 className="h-4 w-4 animate-spin" />
-                            <span>{t('fetchingLive')}</span>
-                          </>
-                        ) : (
-                          <>
-                            <IconWorld className="h-4 w-4 text-emerald-500" />
-                            <span>{t('fetchLiveBtn')}</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {t('productUrlHelp')}
-                    </p>
-                  </Field>
-
-                  {/* Live Web Data Card Preview */}
-                  {liveScraped && (
-                    <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 sm:p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                          <IconCheck className="h-4 w-4" />
-                          <span>
-                            {t('liveDataFound')} ({liveScraped.platform})
-                          </span>
-                        </div>
-                        {liveScraped.price ? (
-                          <Badge
-                            variant="secondary"
-                            className="text-xs font-semibold"
-                          >
-                            ฿{liveScraped.price.toLocaleString()}
-                          </Badge>
-                        ) : null}
-                      </div>
-
-                      <div className="flex items-start gap-3 sm:items-center">
-                        {liveScraped.image && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={liveScraped.image}
-                            alt={liveScraped.title || ''}
-                            className="bg-background h-16 w-16 shrink-0 rounded-lg border object-cover"
-                          />
-                        )}
-                        <div className="min-w-0 flex-1 space-y-1">
-                          <p className="line-clamp-2 text-xs leading-tight font-semibold sm:text-sm">
-                            {liveScraped.title}
-                          </p>
-                          <p className="text-muted-foreground line-clamp-2 text-xs">
-                            {liveScraped.description ||
-                              'ตรวจพบข้อมูลสเปกและรายละเอียดสินค้าครบถ้วนจากหน้าเว็บจริง'}
-                          </p>
-                          <div className="text-muted-foreground flex items-center gap-2 pt-0.5 text-[11px]">
-                            <span>
-                              {t('liveImagesCount', {
-                                count: liveScraped.images.length || 1,
-                              })}
-                            </span>
-                            {liveScraped.videoUrl && <span>• มีวิดีโอ</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col-reverse items-stretch justify-end gap-2 border-t border-emerald-500/20 pt-2 sm:flex-row sm:items-center">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleUseLiveDirectly}
-                          className="h-8 w-full gap-1.5 text-xs sm:w-auto"
-                        >
-                          <span>{t('useDirectlyBtn')}</span>
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={handleStartGenerate}
-                          disabled={generateMutation.isPending}
-                          className="h-8 w-full gap-1.5 text-xs sm:w-auto"
-                        >
-                          <IconSparkles className="h-3.5 w-3.5" />
-                          <span>{t('generateBtn')}</span>
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Product Title / Information */}
-                  <Field>
-                    <FieldLabel>{t('rawTitleLabel')}</FieldLabel>
-                    <Input
-                      placeholder={t('rawTitlePlaceholder')}
-                      value={rawTitle}
-                      onChange={(e) => setRawTitle(e.target.value)}
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel>{t('affiliateUrlLabel')}</FieldLabel>
-                    <Input
-                      type="url"
-                      placeholder={t('affiliateUrlPlaceholder')}
-                      value={affiliateUrl}
-                      onChange={(e) => setAffiliateUrl(e.target.value)}
-                    />
-                    <p className="text-muted-foreground text-xs">
-                      {t('affiliateUrlHelp')}
-                    </p>
-                  </Field>
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Field>
-                      <FieldLabel>{t('categoryLabel')} *</FieldLabel>
-                      <Select
-                        value={selectedCategoryId}
-                        onValueChange={setSelectedCategoryId}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('categoryPlaceholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              {cat.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </Field>
-
-                    <Field>
-                      <FieldLabel>{t('fieldPlatform')}</FieldLabel>
-                      <Select
-                        value={platform}
-                        onValueChange={(val) =>
-                          setPlatform(val as AffiliatePlatform)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PLATFORM_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </Field>
-                  </div>
-
-                  <Field>
-                    <FieldLabel>{t('notesLabel')}</FieldLabel>
-                    <Textarea
-                      placeholder={t('notesPlaceholder')}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      rows={2}
-                    />
-                  </Field>
-                </>
-              )}
-            </div>
+            <AiAffiliateInputStep
+              isGenerating={isGenerating}
+              isScraping={isScraping}
+              loadingStepIndex={loadingStepIndex}
+              productUrl={productUrl}
+              rawTitle={rawTitle}
+              affiliateUrl={affiliateUrl}
+              selectedCategoryId={selectedCategoryId}
+              platform={platform}
+              notes={notes}
+              categories={categories}
+              liveScraped={liveScraped}
+              onUrlInputChange={handleUrlInputChange}
+              onRawTitleChange={setRawTitle}
+              onAffiliateUrlChange={setAffiliateUrl}
+              onCategoryChange={setSelectedCategoryId}
+              onPlatformChange={setPlatform}
+              onNotesChange={setNotes}
+              onFetchLive={() => handleFetchLive()}
+              onUseLiveDirectly={handleUseLiveDirectly}
+              onGenerate={handleGenerate}
+            />
           ) : (
-            <div className="space-y-6">
-              {/* Product Visual Card Preview */}
-              <div className="bg-muted/20 flex flex-row items-start gap-3 rounded-xl border p-3 sm:items-center sm:gap-4 sm:p-4">
-                <div className="bg-background relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border sm:h-28 sm:w-28">
-                  {primaryImageSrc ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={primaryImageSrc}
-                      alt={title}
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        ;(e.target as HTMLElement).style.display = 'none'
-                      }}
-                    />
-                  ) : (
-                    <IconPhoto className="text-muted-foreground/50 h-8 w-8" />
-                  )}
-                  {videoUrl && (
-                    <span className="absolute right-1 bottom-1 rounded-full bg-black/70 p-1 text-white">
-                      <IconPlayerPlay className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    </span>
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <span
-                      className={`inline-flex items-center rounded px-2 py-0.5 text-[10px] font-semibold sm:text-xs ${platformCfg.badgeClass}`}
-                    >
-                      {platformCfg.name}
-                    </span>
-                    {isOnSale && (
-                      <Badge
-                        variant="destructive"
-                        className="px-1.5 py-0 text-[10px] sm:text-xs"
-                      >
-                        {discountText || 'ลดราคา'}
-                      </Badge>
-                    )}
-                    {videoUrl && (
-                      <Badge
-                        variant="secondary"
-                        className="gap-1 px-1.5 py-0 text-[10px] sm:text-xs"
-                      >
-                        <IconVideo className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        มีวิดีโอ
-                      </Badge>
-                    )}
-                  </div>
-
-                  <h3 className="text-foreground line-clamp-2 text-sm leading-snug font-medium sm:text-base">
-                    {title || 'ชื่อสินค้า'}
-                  </h3>
-
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-primary text-base font-bold sm:text-lg">
-                      ฿{Number(price).toLocaleString()}
-                    </span>
-                    {isOnSale && originalPrice > price && (
-                      <span className="text-muted-foreground text-xs line-through">
-                        ฿{Number(originalPrice).toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Product Media Gallery & Video Section */}
-              <div className="space-y-4 rounded-xl border p-3 sm:p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h4 className="flex items-center gap-1.5 text-xs font-semibold sm:text-sm">
-                    <IconPhoto className="text-primary h-4 w-4" />
-                    <span>{t('imagesTitle', { count: images.length })}</span>
-                  </h4>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <input
-                      type="file"
-                      ref={imageFileInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => imageFileInputRef.current?.click()}
-                      disabled={uploadImageMutation.isPending}
-                      className="h-7 px-2 text-xs sm:px-3"
-                    >
-                      <IconUpload className="mr-1 h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">
-                        {t('uploadImageBtn')}
-                      </span>
-                      <span className="sm:hidden">อัปโหลด</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsAddingImageUrl(!isAddingImageUrl)}
-                      className="h-7 px-2 text-xs sm:px-3"
-                    >
-                      <IconPlus className="mr-1 h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">
-                        {t('addImageUrlBtn')}
-                      </span>
-                      <span className="sm:hidden">ใส่ลิงก์</span>
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Inline URL adder */}
-                {isAddingImageUrl && (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="url"
-                      placeholder="https://... (URL รูปภาพ)"
-                      value={newImageUrl}
-                      onChange={(e) => setNewImageUrl(e.target.value)}
-                      className="h-8 text-xs"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddImageUrl()
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleAddImageUrl}
-                      className="h-8 shrink-0 text-xs"
-                    >
-                      เพิ่ม
-                    </Button>
-                  </div>
-                )}
-
-                {/* Images grid matching ImageUploadSection */}
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                  {images.map((img, index) => {
-                    const isPrimary = index === primaryImageIndex
-
-                    return (
-                      <div
-                        key={index}
-                        className={cn(
-                          'bg-muted/20 relative flex aspect-square w-full shrink-0 items-center justify-center overflow-hidden border border-dashed p-1.5',
-                          isPrimary ? 'border-primary' : 'border-border',
-                        )}
-                      >
-                        <div className="group relative size-full">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={img}
-                            alt={`product-${index}`}
-                            className="size-full object-cover"
-                            onError={(e) => {
-                              ;(e.target as HTMLElement).style.display = 'none'
-                            }}
-                          />
-                          {isPrimary && (
-                            <div className="pointer-events-none absolute top-1.5 left-1.5 z-10">
-                              <span className="bg-primary flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold text-white shadow">
-                                <Star className="size-3 fill-white" />
-                                {t('primaryBadge')}
-                              </span>
-                            </div>
-                          )}
-                          <div className="dark absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-100 transition-opacity">
-                            {!isPrimary && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon-lg"
-                                className="size-8"
-                                onClick={() => handleSetPrimary(index)}
-                                title={
-                                  t('setPrimaryImage') || 'ตั้งเป็นรูปหลัก'
-                                }
-                              >
-                                <Star className="size-4" />
-                              </Button>
-                            )}
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon-lg"
-                              className="size-8"
-                              onClick={() => handleRemoveImage(index)}
-                              title={t('deleteImage') || 'ลบรูปภาพ'}
-                            >
-                              <X className="size-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                  <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center border border-dashed transition-colors">
-                    <ImagePlus className="size-5" />
-                    <span className="mt-2 text-xs font-medium">
-                      {t('uploadImageBtn')}
-                    </span>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
-                </div>
-
-                {/* Video section */}
-                <div className="space-y-2 border-t pt-3">
-                  <div className="flex items-center justify-between">
-                    <FieldLabel className="flex items-center gap-1.5 text-xs sm:text-sm">
-                      <IconVideo className="text-primary h-4 w-4" />
-                      <span>{t('videoTitle')}</span>
-                    </FieldLabel>
-                    <div>
-                      <input
-                        type="file"
-                        ref={videoFileInputRef}
-                        onChange={handleVideoUpload}
-                        accept="video/*"
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => videoFileInputRef.current?.click()}
-                        disabled={uploadVideoMutation.isPending}
-                        className="h-7 px-2 text-xs sm:px-3"
-                      >
-                        <IconUpload className="mr-1 h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">
-                          {t('uploadVideoBtn')}
-                        </span>
-                        <span className="sm:hidden">อัปโหลดวิดีโอ</span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Input
-                    type="url"
-                    placeholder={t('videoPlaceholder')}
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    className="text-xs"
-                  />
-
-                  {/* Video preview player */}
-                  {videoUrl && (
-                    <div className="mt-2 overflow-hidden rounded-lg border bg-black">
-                      {videoUrl.includes('.mp4') ||
-                      videoUrl.includes('.webm') ||
-                      videoUrl.includes('r2.dev') ||
-                      videoUrl.includes('cloudflare') ? (
-                        <video
-                          src={videoUrl}
-                          controls
-                          className="max-h-56 w-full object-contain"
-                        />
-                      ) : videoUrl.includes('tiktok.com/embed') ? (
-                        <iframe
-                          src={videoUrl}
-                          className="h-56 w-full border-0"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <div className="flex items-center justify-between p-3 text-xs text-white">
-                          <span className="truncate">{videoUrl}</span>
-                          <a
-                            href={videoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary flex items-center gap-1 underline"
-                          >
-                            <span>เปิดดูวิดีโอ</span>
-                            <IconExternalLink className="h-3 w-3" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Editable Form Controls */}
-              <div className="space-y-4">
-                <Field>
-                  <FieldLabel>{t('fieldTitle')} *</FieldLabel>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </Field>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field>
-                    <FieldLabel>{t('fieldSlug')}</FieldLabel>
-                    <Input
-                      value={slug}
-                      onChange={(e) => setSlug(e.target.value)}
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel>{t('categoryLabel')} *</FieldLabel>
-                    <Select
-                      value={selectedCategoryId}
-                      onValueChange={setSelectedCategoryId}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('categoryPlaceholder')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-                  <Field>
-                    <FieldLabel className="text-xs sm:text-sm">
-                      {t('fieldPrice')} *
-                    </FieldLabel>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={price}
-                      onChange={(e) =>
-                        setPrice(parseFloat(e.target.value) || 0)
-                      }
-                      className="text-xs sm:text-sm"
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel className="text-xs sm:text-sm">
-                      {t('fieldOriginalPrice')}
-                    </FieldLabel>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={originalPrice}
-                      onChange={(e) =>
-                        setOriginalPrice(parseFloat(e.target.value) || 0)
-                      }
-                      className="text-xs sm:text-sm"
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel className="text-xs sm:text-sm">
-                      {t('fieldPlatform')}
-                    </FieldLabel>
-                    <Select
-                      value={platform}
-                      onValueChange={(val) =>
-                        setPlatform(val as AffiliatePlatform)
-                      }
-                    >
-                      <SelectTrigger className="text-xs sm:text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PLATFORM_OPTIONS.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel className="text-xs sm:text-sm">
-                      {t('fieldPlatformLabel')}
-                    </FieldLabel>
-                    <Input
-                      placeholder="Shopee Mall, LazMall"
-                      value={platformLabel}
-                      onChange={(e) => setPlatformLabel(e.target.value)}
-                      className="text-xs sm:text-sm"
-                    />
-                  </Field>
-                </div>
-
-                <div className="flex flex-col items-start gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:gap-6">
-                  <div className="flex items-center gap-2.5">
-                    <Switch
-                      checked={isOnSale}
-                      onCheckedChange={setIsOnSale}
-                      id="isOnSaleSwitch"
-                    />
-                    <label
-                      htmlFor="isOnSaleSwitch"
-                      className="cursor-pointer text-xs font-medium sm:text-sm"
-                    >
-                      {t('fieldIsOnSale')}
-                    </label>
-                  </div>
-
-                  {isOnSale && (
-                    <div className="w-full sm:flex-1">
-                      <Input
-                        placeholder={t('fieldDiscountText')}
-                        value={discountText}
-                        onChange={(e) => setDiscountText(e.target.value)}
-                        className="h-8 text-xs"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <Field>
-                  <FieldLabel className="text-xs sm:text-sm">
-                    {t('affiliateUrlLabel')}
-                  </FieldLabel>
-                  <Input
-                    type="url"
-                    value={destinationUrl}
-                    onChange={(e) => setDestinationUrl(e.target.value)}
-                    className="text-xs sm:text-sm"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel className="text-xs sm:text-sm">
-                    {t('fieldTags')}
-                  </FieldLabel>
-                  <Input
-                    value={tags}
-                    onChange={(e) => setTags(e.target.value)}
-                    placeholder="เก้าอี้เพื่อสุขภาพ, ergonomic, WFH"
-                    className="text-xs sm:text-sm"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel className="text-xs sm:text-sm">
-                    {t('fieldDescription')}
-                  </FieldLabel>
-                  <Textarea
-                    rows={6}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="text-xs leading-relaxed"
-                  />
-                </Field>
-
-                {/* Specifications / Metadata */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <FieldLabel className="text-xs sm:text-sm">
-                      {t('fieldSpecs')}
-                    </FieldLabel>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddSpec}
-                      className="h-7 px-2 text-xs sm:px-3"
-                    >
-                      <IconPlus className="mr-1 h-3.5 w-3.5" />
-                      {t('addSpec')}
-                    </Button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {specs.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-1.5 sm:gap-2"
-                      >
-                        <Input
-                          placeholder={t('specKey')}
-                          value={item.key}
-                          onChange={(e) =>
-                            handleUpdateSpec(idx, 'key', e.target.value)
-                          }
-                          className="w-2/5 text-xs sm:w-1/3"
-                        />
-                        <Input
-                          placeholder={t('specValue')}
-                          value={item.value}
-                          onChange={(e) =>
-                            handleUpdateSpec(idx, 'value', e.target.value)
-                          }
-                          className="flex-1 text-xs"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveSpec(idx)}
-                          className="text-destructive h-8 w-8 shrink-0"
-                        >
-                          <IconTrash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AiAffiliatePreviewStep
+              title={title}
+              slug={slug}
+              price={price}
+              originalPrice={originalPrice}
+              platform={platform}
+              platformLabel={platformLabel}
+              isOnSale={isOnSale}
+              discountText={discountText}
+              images={images}
+              primaryImageIndex={primaryImageIndex}
+              videoUrl={videoUrl}
+              tags={tags}
+              description={description}
+              specs={specs}
+              destinationUrl={destinationUrl}
+              newImageUrl={newImageUrl}
+              isAddingImageUrl={isAddingImageUrl}
+              isUploadingImage={isUploadingImage}
+              isUploadingVideo={isUploadingVideo}
+              categories={categories}
+              selectedCategoryId={selectedCategoryId}
+              imageFileInputRef={imageFileInputRef}
+              videoFileInputRef={videoFileInputRef}
+              onTitleChange={setTitle}
+              onSlugChange={setSlug}
+              onPriceChange={setPrice}
+              onOriginalPriceChange={setOriginalPrice}
+              onPlatformChange={setPlatform}
+              onPlatformLabelChange={setPlatformLabel}
+              onIsOnSaleChange={setIsOnSale}
+              onDiscountTextChange={setDiscountText}
+              onCategoryChange={setSelectedCategoryId}
+              onDestinationUrlChange={setDestinationUrl}
+              onTagsChange={setTags}
+              onDescriptionChange={setDescription}
+              onSetPrimary={handleSetPrimary}
+              onRemoveImage={handleRemoveImage}
+              onImageUpload={handleImageUpload}
+              onVideoUpload={handleVideoUpload}
+              onAddImageUrl={handleAddImageUrl}
+              onToggleAddImageUrl={() => setIsAddingImageUrl(!isAddingImageUrl)}
+              onNewImageUrlChange={setNewImageUrl}
+              onVideoUrlChange={setVideoUrl}
+              onAddSpec={handleAddSpec}
+              onRemoveSpec={handleRemoveSpec}
+              onUpdateSpec={handleUpdateSpec}
+            />
           )}
         </div>
 
-        <DialogFooter className="bg-muted/10 border-t p-3 sm:p-6">
-          {step === 'input' ? (
-            <div className="flex w-full flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  disabled={generateMutation.isPending}
-                  onClick={() => onOpenChange(false)}
-                  className="w-full text-xs sm:w-auto sm:text-sm"
-                >
-                  {t('btnBack')}
-                </Button>
-                {hasDraft && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    disabled={generateMutation.isPending}
-                    onClick={handleClearDraft}
-                    className="text-muted-foreground hover:text-destructive w-full gap-1 text-xs sm:w-auto sm:text-sm"
-                  >
-                    <IconTrash className="h-3.5 w-3.5" />
-                    ล้างแบบร่าง
-                  </Button>
-                )}
-              </div>
-              <Button
-                disabled={!productUrl.trim() || generateMutation.isPending}
-                onClick={handleStartGenerate}
-                className="w-full gap-2 text-xs sm:w-auto sm:text-sm"
-              >
-                {generateMutation.isPending ? (
-                  <>
-                    <IconLoader2 className="h-4 w-4 animate-spin" />
-                    <span>{t('generating')}</span>
-                  </>
-                ) : (
-                  <>
-                    <IconSparkles className="h-4 w-4" />
-                    <span>{t('generateBtn')}</span>
-                  </>
-                )}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex w-full flex-col-reverse items-stretch justify-between gap-2 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  disabled={
-                    createProductMutation.isPending ||
-                    uploadExternalImagesMutation.isPending
-                  }
-                  onClick={() => setStep('input')}
-                  className="w-full gap-1.5 text-xs sm:w-auto sm:text-sm"
-                >
-                  <IconArrowLeft className="h-4 w-4" />
-                  {t('btnBack')}
-                </Button>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  disabled={
-                    createProductMutation.isPending ||
-                    uploadExternalImagesMutation.isPending
-                  }
-                  onClick={handleClearDraft}
-                  className="text-muted-foreground hover:text-destructive gap-1 text-xs sm:text-sm"
-                >
-                  <IconTrash className="h-3.5 w-3.5" />
-                  ล้างแบบร่าง
-                </Button>
-              </div>
-              <Button
-                disabled={
-                  createProductMutation.isPending ||
-                  uploadExternalImagesMutation.isPending ||
-                  !title.trim()
-                }
-                onClick={handleSaveProduct}
-                className="w-full gap-2 text-xs sm:w-auto sm:text-sm"
-              >
-                {createProductMutation.isPending ||
-                uploadExternalImagesMutation.isPending ? (
-                  <>
-                    <IconLoader2 className="h-4 w-4 animate-spin" />
-                    <span>{t('btnSaving')}</span>
-                  </>
-                ) : (
-                  <>
-                    <IconCheck className="h-4 w-4" />
-                    <span>{t('btnSave')}</span>
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </DialogFooter>
+        <AiAffiliateDialogFooter
+          step={step}
+          hasDraft={hasDraft}
+          isGenerating={isGenerating}
+          isSaving={isSaving}
+          productUrl={productUrl}
+          title={title}
+          onClose={() => onOpenChange(false)}
+          onClearDraft={handleClearDraft}
+          onGenerate={handleGenerate}
+          onBackToInput={() => setStep('input')}
+          onSaveProduct={handleSaveProduct}
+        />
       </DialogContent>
     </Dialog>
   )

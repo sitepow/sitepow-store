@@ -32,9 +32,15 @@ export function MainHeroHeader({
 
   useGSAP(
     () => {
-      if (!isMounted) return
+      if (!isMounted) {
+        return
+      }
+
       const targets = contentRef.current?.children
-      if (!targets || targets.length === 0) return
+
+      if (!targets || targets.length === 0) {
+        return
+      }
 
       gsap.fromTo(
         targets,
@@ -64,7 +70,7 @@ export function MainHeroHeader({
         numSquares={20}
         maxOpacity={0.3}
         duration={3}
-        className="-z-10 [mask-image:radial-gradient(300px_circle_at_center,white,transparent)] opacity-60 sm:[mask-image:radial-gradient(500px_circle_at_center,white,transparent)] dark:opacity-30"
+        className="-z-10 mask-[radial-gradient(300px_circle_at_center,white,transparent)] opacity-60 sm:mask-[radial-gradient(500px_circle_at_center,white,transparent)] dark:opacity-30"
       />
       <div className="bg-primary/10 pointer-events-none absolute top-1/2 left-1/2 -z-10 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
       <div ref={contentRef} className="space-y-4 sm:space-y-6">
@@ -79,7 +85,7 @@ export function MainHeroHeader({
           </div>
         )}
         <div className="space-y-2.5 sm:space-y-4">
-          <h1 className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
+          <h1 className="text-foreground font-landing text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
             {title}
           </h1>
           {description && (

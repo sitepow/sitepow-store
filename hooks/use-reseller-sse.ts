@@ -13,7 +13,9 @@ export function useResellerSSE(storeId?: string) {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (!storeId) return
+    if (!storeId) {
+      return
+    }
 
     const eventSource = new EventSource(`/api/sse/reseller/${storeId}`)
 

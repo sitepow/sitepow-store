@@ -1,27 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-
+import React from 'react'
 import { useTranslations } from 'next-intl'
+import { IconReceiptTax, IconUserCheck } from '@tabler/icons-react'
 
-import {
-  useStorePotentialPartners,
-  useUpsertProfitPartner,
-} from '@/actions/hooks/profit-sharing'
-import {
-  PartnerRole,
-  ProfitPartnerItem,
-  ShareType,
-} from '@/types/profit-sharing'
-import {
-  IconCoins,
-  IconPercentage,
-  IconReceiptTax,
-  IconUserCheck,
-  IconUsers,
-} from '@tabler/icons-react'
-
+import { ProfitPartnerItem } from '@/types/profit-sharing'
 import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
@@ -42,24 +25,16 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
+import { usePartnerForm } from '../_hooks/use-partner-form'
+import { PartnerBankSection } from './PartnerBankSection'
+import { PartnerShareConfigSection } from './PartnerShareConfigSection'
+
 interface PartnerDialogProps {
   open: boolean
   setOpen: (open: boolean) => void
   storeId: string
   partner?: ProfitPartnerItem | null
 }
-
-const THAI_BANKS = [
-  'ธนาคารกสิกรไทย (KBANK)',
-  'ธนาคารไทยพาณิชย์ (SCB)',
-  'ธนาคารกรุงเทพ (BBL)',
-  'ธนาคารกรุงไทย (KTB)',
-  'ธนาคารกรุงศรีอยุธยา (BAY)',
-  'ธนาคารทหารไทยธนชาต (TTB)',
-  'ธนาคารออมสิน (GSB)',
-  'ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (ธ.ก.ส.)',
-  'อื่นๆ / เงินสด',
-]
 
 export function PartnerDialog({
   open,
@@ -68,125 +43,39 @@ export function PartnerDialog({
   partner,
 }: PartnerDialogProps) {
   const t = useTranslations('merchant.profitSharing')
-  const { mutate: upsertPartner, isPending } = useUpsertProfitPartner()
-  const { data: potentialMembers = [] } = useStorePotentialPartners(storeId)
 
-  const [selectedMemberId, setSelectedMemberId] = useState<string>('custom')
-  const [name, setName] = useState('')
-  const [role, setRole] = useState<PartnerRole>(PartnerRole.SHAREHOLDER)
-  const [shareType, setShareType] = useState<ShareType>(
-    ShareType.NET_PROFIT_PERCENT,
-  )
-  const [shareValue, setShareValue] = useState<number>(10)
-  const [bankName, setBankName] = useState(THAI_BANKS[0])
-  const [bankAccount, setBankAccount] = useState('')
-  const [bankAccountName, setBankAccountName] = useState('')
-  const [promptPay, setPromptPay] = useState('')
-  const [note, setNote] = useState('')
-  const [isActive, setIsActive] = useState(true)
-
-  useEffect(() => {
-    if (partner) {
-      setSelectedMemberId('custom')
-      setName(partner.name)
-      setRole(partner.role)
-      setShareType(partner.shareType)
-      setShareValue(Number(partner.shareValue))
-      setBankName(partner.bankName || THAI_BANKS[0])
-      setBankAccount(partner.bankAccount || '')
-      setBankAccountName(partner.bankAccountName || '')
-      setPromptPay(partner.promptPay || '')
-      setNote(partner.note || '')
-      setIsActive(partner.isActive)
-    } else {
-      setSelectedMemberId('custom')
-      setName('')
-      setRole(PartnerRole.SHAREHOLDER)
-      setShareType(ShareType.NET_PROFIT_PERCENT)
-      setShareValue(10)
-      setBankName(THAI_BANKS[0])
-      setBankAccount('')
-      setBankAccountName('')
-      setPromptPay('')
-      setNote('')
-      setIsActive(true)
-    }
-  }, [partner, open])
-
-  const handleSelectMember = (val: string) => {
-    setSelectedMemberId(val)
-    if (val === 'custom') {
-      return
-    }
-
-    const member = potentialMembers.find((m) => m.id === val)
-    if (!member) return
-
-    setName(member.name)
-    if (member.sourceType === 'OWNER') {
-      setRole(PartnerRole.SHAREHOLDER)
-      setNote(t('partners.dialog.ownerNote'))
-    } else {
-      setRole(PartnerRole.SHAREHOLDER)
-      setNote(
-        member.position
-          ? t('partners.dialog.positionPrefix', { position: member.position })
-          : '',
-      )
-    }
-
-    if (member.bankName) setBankName(member.bankName)
-    if (member.bankAccount) setBankAccount(member.bankAccount)
-    if (member.bankAccountName) setBankAccountName(member.bankAccountName)
-    if (member.promptPay) setPromptPay(member.promptPay)
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) {
-      toast.error(t('partners.dialog.nameRequired'))
-      return
-    }
-
-    if (shareValue <= 0) {
-      toast.error(t('partners.dialog.valueRequired'))
-      return
-    }
-
-    upsertPartner(
-      {
-        id: partner?.id,
-        storeId,
-        name: name.trim(),
-        role,
-        shareType,
-        shareValue,
-        bankName,
-        bankAccount: bankAccount.trim() || null,
-        bankAccountName: bankAccountName.trim() || null,
-        promptPay: promptPay.trim() || null,
-        note: note.trim() || null,
-        isActive,
-      },
-      {
-        onSuccess: (res) => {
-          if (res.success) {
-            toast.success(
-              partner
-                ? t('partners.dialog.updateSuccess')
-                : t('partners.dialog.createSuccess'),
-            )
-            setOpen(false)
-          } else {
-            toast.error(res.message || t('partners.dialog.saveError'))
-          }
-        },
-        onError: (err: any) => {
-          toast.error(err?.message || t('partners.dialog.saveError'))
-        },
-      },
-    )
-  }
+  const {
+    potentialMembers,
+    selectedMemberId,
+    name,
+    setName,
+    role,
+    setRole,
+    shareType,
+    setShareType,
+    shareValue,
+    setShareValue,
+    bankName,
+    setBankName,
+    bankAccount,
+    setBankAccount,
+    bankAccountName,
+    setBankAccountName,
+    promptPay,
+    setPromptPay,
+    note,
+    setNote,
+    isActive,
+    setIsActive,
+    isPending,
+    handleSelectMember,
+    handleSubmit,
+  } = usePartnerForm({
+    storeId,
+    partner,
+    open,
+    setOpen,
+  })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -243,167 +132,34 @@ export function PartnerDialog({
             <FieldLabel>{t('partners.partnerName')} *</FieldLabel>
             <Input
               value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                setSelectedMemberId('custom')
-              }}
+              onChange={(e) => setName(e.target.value)}
               placeholder={t('partners.dialog.namePlaceholder')}
               required
               disabled={isPending}
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field>
-              <FieldLabel>{t('partners.partnerRole')}</FieldLabel>
-              <Select
-                value={role}
-                onValueChange={(val) => setRole(val as PartnerRole)}
-                disabled={isPending}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={PartnerRole.SHAREHOLDER}>
-                    {t('roles.SHAREHOLDER')}
-                  </SelectItem>
-                  <SelectItem value={PartnerRole.DEVELOPER}>
-                    {t('roles.DEVELOPER')}
-                  </SelectItem>
-                  <SelectItem value={PartnerRole.SYSTEM}>
-                    {t('roles.SYSTEM')}
-                  </SelectItem>
-                  <SelectItem value={PartnerRole.MARKETING}>
-                    {t('roles.MARKETING')}
-                  </SelectItem>
-                  <SelectItem value={PartnerRole.INVESTOR}>
-                    {t('roles.INVESTOR')}
-                  </SelectItem>
-                  <SelectItem value={PartnerRole.OTHER}>
-                    {t('roles.OTHER')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+          <PartnerShareConfigSection
+            role={role}
+            setRole={setRole}
+            shareType={shareType}
+            setShareType={setShareType}
+            shareValue={shareValue}
+            setShareValue={setShareValue}
+            isPending={isPending}
+          />
 
-            <Field>
-              <FieldLabel>{t('partners.shareType')}</FieldLabel>
-              <Select
-                value={shareType}
-                onValueChange={(val) => setShareType(val as ShareType)}
-                disabled={isPending}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ShareType.NET_PROFIT_PERCENT}>
-                    {t('shareTypes.NET_PROFIT_PERCENT')}
-                  </SelectItem>
-                  <SelectItem value={ShareType.REVENUE_PERCENT}>
-                    {t('shareTypes.REVENUE_PERCENT')}
-                  </SelectItem>
-                  <SelectItem value={ShareType.FIXED_MONTHLY}>
-                    {t('shareTypes.FIXED_MONTHLY')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-          </div>
-
-          <Field>
-            <FieldLabel>
-              {shareType === ShareType.FIXED_MONTHLY
-                ? t('partners.dialog.fixedMonthlyLabel')
-                : t('partners.dialog.percentLabel')}
-            </FieldLabel>
-            <div className="relative">
-              <Input
-                type="number"
-                step={shareType === ShareType.FIXED_MONTHLY ? '1' : '0.1'}
-                min="0.01"
-                max={shareType === ShareType.FIXED_MONTHLY ? undefined : 100}
-                value={shareValue}
-                onChange={(e) => setShareValue(parseFloat(e.target.value) || 0)}
-                required
-                disabled={isPending}
-              />
-              <span className="text-muted-foreground absolute top-2.5 right-3 text-sm font-medium">
-                {shareType === ShareType.FIXED_MONTHLY
-                  ? t('partners.dialog.fixedMonthlyUnit')
-                  : t('partners.dialog.percentUnit')}
-              </span>
-            </div>
-            <p className="text-muted-foreground mt-1 text-xs">
-              {shareType === ShareType.NET_PROFIT_PERCENT &&
-                t('partners.dialog.netProfitHint')}
-              {shareType === ShareType.REVENUE_PERCENT &&
-                t('partners.dialog.revenueHint')}
-              {shareType === ShareType.FIXED_MONTHLY &&
-                t('partners.dialog.fixedHint')}
-            </p>
-          </Field>
-
-          <div className="bg-muted/30 space-y-3 rounded-lg border p-3">
-            <h4 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-              {t('partners.dialog.bankSection')}
-            </h4>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field>
-                <FieldLabel>{t('partners.bank')}</FieldLabel>
-                <Select
-                  value={bankName}
-                  onValueChange={setBankName}
-                  disabled={isPending}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {THAI_BANKS.map((bank) => (
-                      <SelectItem key={bank} value={bank}>
-                        {bank}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-
-              <Field>
-                <FieldLabel>{t('partners.bankAccount')}</FieldLabel>
-                <Input
-                  value={bankAccount}
-                  onChange={(e) => setBankAccount(e.target.value)}
-                  placeholder={t('partners.dialog.bankAccountPlaceholder')}
-                  disabled={isPending}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field>
-                <FieldLabel>{t('partners.accountName')}</FieldLabel>
-                <Input
-                  value={bankAccountName}
-                  onChange={(e) => setBankAccountName(e.target.value)}
-                  placeholder={t('partners.dialog.bankAccountNamePlaceholder')}
-                  disabled={isPending}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>{t('partners.promptPay')}</FieldLabel>
-                <Input
-                  value={promptPay}
-                  onChange={(e) => setPromptPay(e.target.value)}
-                  placeholder={t('partners.dialog.promptPayPlaceholder')}
-                  disabled={isPending}
-                />
-              </Field>
-            </div>
-          </div>
+          <PartnerBankSection
+            bankName={bankName}
+            setBankName={setBankName}
+            bankAccount={bankAccount}
+            setBankAccount={setBankAccount}
+            bankAccountName={bankAccountName}
+            setBankAccountName={setBankAccountName}
+            promptPay={promptPay}
+            setPromptPay={setPromptPay}
+            isPending={isPending}
+          />
 
           <Field>
             <FieldLabel>{t('partners.note')}</FieldLabel>

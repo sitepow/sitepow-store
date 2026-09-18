@@ -73,7 +73,7 @@ export function CtaSection({
 
       <div className="relative mx-auto w-full max-w-5xl px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
-          <h2 className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-5xl">
+          <h2 className="text-foreground font-landing text-2xl font-extrabold tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-5xl">
             {resolvedTitle}
           </h2>
           <p className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed text-balance sm:text-base md:text-lg">

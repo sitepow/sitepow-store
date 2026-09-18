@@ -10,6 +10,8 @@ import {
 import { useCurrentStore } from '@/hooks/use-current-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+/* eslint-disable @next/next/no-img-element */
+import { ResellerStockItem } from '@/types/reseller'
 import { formatCurrency } from '@/utils/pricing'
 import {
   IconPackageExport,
@@ -35,14 +37,12 @@ import {
 } from '@/components/ui/table'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
-/* eslint-disable @next/next/no-img-element */
-
 interface ResellerStockTableProps {
   isSupplier?: boolean
   isReseller?: boolean
-  onAcceptStock?: (stock: any) => void
-  onReturnStock?: (stock: any) => void
-  onEditPrice?: (stock: any) => void
+  onAcceptStock?: (stock: ResellerStockItem) => void
+  onReturnStock?: (stock: ResellerStockItem) => void
+  onEditPrice?: (stock: ResellerStockItem) => void
 }
 
 export function ResellerStockTable({

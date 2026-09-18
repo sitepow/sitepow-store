@@ -1,14 +1,14 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useTranslations } from 'next-intl'
 
 import { useReturnResellerStock } from '@/actions/hooks/reseller'
+import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
+import { ResellerStockItem } from '@/types/reseller'
 import { IconArrowBackUp } from '@tabler/icons-react'
 import { Loader2 } from 'lucide-react'
 
@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 interface ReturnStockDialogProps {
-  stock: any | null
+  stock: ResellerStockItem | null
   open: boolean
   setOpen: (open: boolean) => void
 }

@@ -107,7 +107,7 @@ export function FeatureHeroSection({
         <div className="bg-card/80 text-primary border-border/80 shadow-primary/5 mx-auto inline-flex size-14 items-center justify-center rounded-2xl border shadow-xl backdrop-blur-md sm:size-20 sm:rounded-3xl">
           {feature.icon}
         </div>
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
+        <h1 className="text-foreground font-landing text-2xl font-extrabold tracking-tight text-balance sm:text-5xl md:text-6xl">
           {feature.title}
         </h1>
         <p className="text-primary text-sm font-semibold sm:text-xl">

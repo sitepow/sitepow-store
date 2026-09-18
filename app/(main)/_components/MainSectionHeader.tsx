@@ -35,7 +35,7 @@ export function MainSectionHeader({
           </AnimatedShinyText>
         </span>
       )}
-      <Heading className="text-foreground max-w-2xl text-xl font-bold tracking-tight text-balance sm:text-3xl md:text-4xl md:leading-tight">
+      <Heading className="text-foreground font-landing max-w-2xl text-xl font-bold tracking-tight text-balance sm:text-3xl md:text-4xl md:leading-tight">
         {title}
       </Heading>
       {description && (

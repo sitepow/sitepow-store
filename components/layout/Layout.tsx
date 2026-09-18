@@ -21,7 +21,7 @@ export function MainLayout({
   const userRole = user?.role
 
   return (
-    <div className="bg-background font-landing flex flex-col gap-10">
+    <div className="bg-background flex flex-col gap-10">
       <Suspense>
         <Navbar />
       </Suspense>

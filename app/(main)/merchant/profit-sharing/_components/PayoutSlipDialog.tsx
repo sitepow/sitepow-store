@@ -110,7 +110,7 @@ export function PayoutSlipDialog({
             toast.error(res.message || t('settlement.toastSaveFailed'))
           }
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(err?.message || t('settlement.toastSaveFailed'))
         },
       },

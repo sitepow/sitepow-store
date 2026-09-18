@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 
-import { ProductType } from '@/generated/prisma/enums'
+import { CurrencyCode, ProductType } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { getLocalizedField } from '@/utils/intl'
@@ -15,12 +15,19 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../store'
 
+interface ProductAffiliateLink {
+  price?: number
+  url?: string
+  platform?: string
+  discountText?: string
+}
+
 export function ProductPriceHeader() {
   const t = useTranslations('storefront.products')
   const locale = useLocale()
   const { store } = useStoreData()
   const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
+    (store as { baseCurrency?: CurrencyCode } | null)?.baseCurrency,
   )
   const {
     product,
@@ -33,14 +40,18 @@ export function ProductPriceHeader() {
   const totalPrice = getTotalPrice()
   const points = getCurrentPoints()
   const isAffiliate = product?.productType === ProductType.AFFILIATE_LINK
-  const rawAffiliateLinks = (product?.details as any)?.affiliateLinks
-  const affiliateLinks = Array.isArray(rawAffiliateLinks)
+  const rawAffiliateLinks = (
+    product?.details as { affiliateLinks?: ProductAffiliateLink[] } | null
+  )?.affiliateLinks
+  const affiliateLinks: ProductAffiliateLink[] = Array.isArray(
+    rawAffiliateLinks,
+  )
     ? rawAffiliateLinks
     : []
 
   const affiliatePrices = affiliateLinks
-    .map((l: any) => l.price)
-    .filter((p: any): p is number => typeof p === 'number' && p > 0)
+    .map((l) => l.price)
+    .filter((p): p is number => typeof p === 'number' && p > 0)
 
   const fallbackMinAffiliatePrice =
     affiliatePrices.length > 0 ? Math.min(...affiliatePrices) : totalPrice
@@ -64,7 +75,6 @@ export function ProductPriceHeader() {
     affiliateLinks[0]?.discountText ||
     (affiliateDiscountPercent > 0 ? `-${affiliateDiscountPercent}%` : null)
 
-  // Normal product discount check
   const normalOrigPrice = Number(selectedVariant?.price ?? 0)
   const hasNormalDiscount =
     !isAffiliate &&
@@ -110,7 +120,6 @@ export function ProductPriceHeader() {
                     )}
               </data>
 
-              {/* Affiliate full price with strikethrough */}
               {isAffiliate &&
                 hasAffiliateDiscount &&
                 affiliateMinOrigPrice > 0 && (
@@ -124,7 +133,6 @@ export function ProductPriceHeader() {
                   </span>
                 )}
 
-              {/* Affiliate discount badge */}
               {isAffiliate && hasAffiliateDiscount && customDiscountText && (
                 <Badge
                   variant="destructive"
@@ -134,7 +142,6 @@ export function ProductPriceHeader() {
                 </Badge>
               )}
 
-              {/* Normal product full price with strikethrough */}
               {!isAffiliate && hasNormalDiscount && (
                 <>
                   <span className="text-muted-foreground text-xl font-normal line-through sm:text-2xl">

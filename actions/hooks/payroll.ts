@@ -15,6 +15,7 @@ import {
   updatePayrollItemPayout,
   upsertEmployeeSalaryConfig,
 } from '@/actions/payroll'
+import { expenseKeys } from '@/actions/query-keys/expenses'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { payrollKeys } from '../query-keys/payroll'
@@ -126,7 +127,7 @@ export function useSaveMonthlyPayroll() {
         queryKey: payrollKeys.history(variables.storeId),
       })
       queryClient.invalidateQueries({
-        queryKey: ['expenses'],
+        queryKey: expenseKeys.all,
       })
     },
   })
@@ -168,7 +169,7 @@ export function useSyncPayrollToExpense() {
         queryKey: payrollKeys.history(variables.storeId),
       })
       queryClient.invalidateQueries({
-        queryKey: ['expenses'],
+        queryKey: expenseKeys.all,
       })
     },
   })
@@ -198,7 +199,7 @@ export function useCloseMonthlyPayroll() {
         queryKey: payrollKeys.history(variables.storeId),
       })
       queryClient.invalidateQueries({
-        queryKey: ['expenses'],
+        queryKey: expenseKeys.all,
       })
     },
   })

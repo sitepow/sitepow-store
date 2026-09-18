@@ -29,6 +29,18 @@ const reviewSelect = {
     select: {
       id: true,
       title: true,
+      images: {
+        select: {
+          url: true,
+        },
+        take: 1,
+      },
+    },
+  },
+  variant: {
+    select: {
+      id: true,
+      title: true,
     },
   },
   customerId: true,

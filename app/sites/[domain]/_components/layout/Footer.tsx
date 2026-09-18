@@ -148,14 +148,14 @@ export function StoreFooter() {
             ) : (
               <LogoBrandText />
             )}
-            <p className="mt-4 text-sm leading-relaxed opacity-60">
+            <p className="font-landing mt-4 text-sm leading-relaxed opacity-60">
               {store?.footerText
                 ? store.footerText
                 : store?.description
                   ? store.description
                   : t('storeDescription')}
             </p>
-            <p className="mt-4 text-sm leading-relaxed opacity-60">
+            <p className="font-landing mt-4 text-sm leading-relaxed opacity-60">
               {t('emailLabel')}: {store?.email || '-'}
               {store?.phone && ` • โทร: ${store.phone}`}
               {store?.taxId && ` • ${t('taxIdLabel')}: ${store.taxId}`}

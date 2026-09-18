@@ -21,10 +21,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+import { AffiliatePayoutItem } from '@/types/affiliate'
+
 interface ApproveAffiliatePayoutDialogProps {
-  payout: any | null
+  payout: AffiliatePayoutItem | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  storeId?: string
 }
 
 export function ApproveAffiliatePayoutDialog({

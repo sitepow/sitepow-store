@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useReviews } from '@/actions/hooks/review'
 import { useDeleteReview } from '@/actions/hooks/storefront/review'
+import { GetReviewItem } from '@/actions/review'
 import { StorePagination } from '@/components/StorePagination'
 import { ReviewFormDialog } from '@/app/sites/[domain]/user/reviews/_components/ReviewFormDialog'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -112,7 +113,7 @@ export function ReviewTable() {
             ) : reviews.length === 0 ? (
               <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
             ) : (
-              reviews.map((item: any) => (
+              (reviews as unknown as GetReviewItem[]).map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{formatDateTime(new Date(item.date))}</TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
@@ -171,12 +172,12 @@ export function ReviewTable() {
                               reviewId: item.id,
                               storeId: selectedStoreId,
                               productId: item.productId,
-                              variantId: item.variantId,
-                              orderId: item.orderId,
+                              variantId: item.variantId || undefined,
+                              orderId: item.orderId || undefined,
                               productTitle: item.product?.title,
-                              productImage: item.product?.image,
+                              productImage: item.product?.images?.[0]?.url,
                               rating: item.rating,
-                              comment: item.comment,
+                              comment: item.comment || undefined,
                               images: item.images,
                             })
                           }

@@ -1,5 +1,6 @@
 'use client'
 
+import { storefrontAddressKeys } from '@/actions/query-keys/storefront/address'
 import {
   AddressDetail,
   createAddress,
@@ -15,14 +16,6 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-
-export const storefrontAddressKeys = {
-  all: ['addresses'] as const,
-  lists: (storeSlug?: string) =>
-    [...storefrontAddressKeys.all, 'list', storeSlug] as const,
-  options: (storeSlug?: string) =>
-    [...storefrontAddressKeys.all, 'options', storeSlug] as const,
-}
 
 export function useAddresses(storeSlug: string) {
   return useQuery(

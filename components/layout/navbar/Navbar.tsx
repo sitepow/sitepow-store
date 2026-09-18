@@ -66,7 +66,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="border-border/40 bg-background/80 supports-[backdrop-filter]:bg-background/60 fixed top-0 left-0 z-50 w-full border-b backdrop-blur-md">
+      <header className="border-border/40 bg-background fixed top-0 left-0 z-50 w-full border-b">
         <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
           <LogoBrand />
           <div className="hidden lg:block">

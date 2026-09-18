@@ -1,4 +1,5 @@
 'use client'
+
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
@@ -9,22 +10,22 @@ import { AnimatedGridPattern } from '@/components/magicui/animated-grid-pattern'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
 
+const LINE_OA_URL = 'https://line.me/ti/p/~@830sdfow'
+const CONSULT_HREF = '/contact?subject=buyout-consultation'
+
 export function BuyoutCta() {
   const t = useTranslations('buyout.cta')
   const tTrust = useTranslations('buyout.trustBadges')
 
+  const trustBadges = [
+    tTrust('freeInstallation'),
+    tTrust('freeSupport'),
+    tTrust('zeroGp'),
+  ]
+
   return (
     <section className="border-border/40 relative w-full overflow-hidden border-t py-16 sm:py-20 md:py-28">
-      <AnimatedGridPattern
-        numSquares={28}
-        maxOpacity={0.3}
-        duration={3}
-        className="-z-10 mask-[radial-gradient(500px_circle_at_center,white,transparent)] opacity-70 sm:mask-[radial-gradient(800px_circle_at_center,white,transparent)] dark:opacity-30"
-      />
-      <div
-        aria-hidden="true"
-        className="from-primary/20 dark:from-primary/15 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-80 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-radial via-orange-500/10 to-transparent blur-[130px] dark:via-orange-500/5"
-      />
+      <CtaBackgroundEffects />
 
       <div className="relative mx-auto w-full max-w-5xl px-4 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
@@ -34,6 +35,7 @@ export function BuyoutCta() {
           <p className="text-muted-foreground mx-auto max-w-2xl text-xs leading-relaxed text-balance sm:text-base md:text-lg">
             {t('description')}
           </p>
+
           <div className="mx-auto flex w-full max-w-md flex-col items-stretch justify-center gap-2.5 pt-2 sm:max-w-none sm:flex-row sm:items-center sm:gap-3.5 sm:pt-3">
             <RainbowButton
               size="lg"
@@ -41,7 +43,7 @@ export function BuyoutCta() {
               className="group shadow-primary/15 h-11 w-full shadow-lg sm:h-12 sm:w-auto sm:px-8"
             >
               <Link
-                href="/contact?subject=buyout-consultation"
+                href={CONSULT_HREF}
                 className="flex items-center justify-center gap-2 text-sm font-bold sm:text-base"
               >
                 <IconHeadset className="size-4.5 sm:size-5" />
@@ -57,7 +59,7 @@ export function BuyoutCta() {
               className="border-border/80 bg-background/60 hover:bg-muted/80 h-11 w-full cursor-pointer px-6 text-xs font-semibold backdrop-blur-md transition-all sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
             >
               <a
-                href="https://line.me/ti/p/~@830sdfow"
+                href={LINE_OA_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400"
@@ -69,32 +71,41 @@ export function BuyoutCta() {
           </div>
 
           <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-3 text-[11px] font-medium sm:text-xs">
-            <span className="flex items-center gap-1.5">
-              <IconCheck
-                className="size-3.5 shrink-0 text-emerald-500"
-                strokeWidth={2.5}
-              />
-              {tTrust('freeInstallation')}
-            </span>
-            <span className="bg-border hidden size-1 rounded-full sm:inline-block" />
-            <span className="flex items-center gap-1.5">
-              <IconCheck
-                className="size-3.5 shrink-0 text-emerald-500"
-                strokeWidth={2.5}
-              />
-              {tTrust('freeSupport')}
-            </span>
-            <span className="bg-border hidden size-1 rounded-full sm:inline-block" />
-            <span className="flex items-center gap-1.5">
-              <IconCheck
-                className="size-3.5 shrink-0 text-emerald-500"
-                strokeWidth={2.5}
-              />
-              {tTrust('zeroGp')}
-            </span>
+            {trustBadges.map((badgeText, idx) => (
+              <span key={idx} className="flex items-center gap-1.5">
+                {idx > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="bg-border mr-3.5 hidden size-1 rounded-full sm:inline-block"
+                  />
+                )}
+                <IconCheck
+                  className="size-3.5 shrink-0 text-emerald-500"
+                  strokeWidth={2.5}
+                />
+                <span>{badgeText}</span>
+              </span>
+            ))}
           </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function CtaBackgroundEffects() {
+  return (
+    <>
+      <AnimatedGridPattern
+        numSquares={28}
+        maxOpacity={0.3}
+        duration={3}
+        className="-z-10 mask-[radial-gradient(500px_circle_at_center,white,transparent)] opacity-70 sm:mask-[radial-gradient(800px_circle_at_center,white,transparent)] dark:opacity-30"
+      />
+      <div
+        aria-hidden="true"
+        className="from-primary/20 dark:from-primary/15 pointer-events-none absolute top-1/2 left-1/2 -z-10 h-80 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-radial via-orange-500/10 to-transparent blur-[130px] dark:via-orange-500/5"
+      />
+    </>
   )
 }

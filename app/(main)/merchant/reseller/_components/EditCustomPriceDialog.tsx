@@ -1,13 +1,13 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
 /* eslint-disable @next/next/no-img-element */
-
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 
 import { useTranslations } from 'next-intl'
 
+import { useCurrentStore } from '@/hooks/use-current-store'
+import { ResellerStockItem } from '@/types/reseller'
 import { formatCurrency } from '@/utils/pricing'
 import { IconCurrencyDollar, IconX } from '@tabler/icons-react'
 
@@ -31,7 +31,7 @@ interface EditCustomPriceFormValues {
 interface EditCustomPriceDialogProps {
   open: boolean
   setOpen: (v: boolean) => void
-  stock: any
+  stock: ResellerStockItem | null
   defaultCommissionRate?: number
   isLoading?: boolean
   onSave?: (variantId: string, customPrice: number) => void
@@ -134,7 +134,9 @@ export function EditCustomPriceDialog({
   }
 
   const onSubmit: SubmitHandler<EditCustomPriceFormValues> = (values) => {
-    onSave?.(stock?.variantId, Number(values.customPrice))
+    if (stock?.variantId) {
+      onSave?.(stock.variantId, Number(values.customPrice))
+    }
     handleClose()
   }
 

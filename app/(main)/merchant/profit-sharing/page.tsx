@@ -8,22 +8,17 @@ import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useStoreOptions } from '@/actions/hooks/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import {
-  IconCalculator,
-  IconHistory,
-  IconLock,
-  IconReceiptTax,
-  IconUsers,
-} from '@tabler/icons-react'
+import { IconLock, IconReceiptTax } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 
 import { MonthlySettlementView } from './_components/MonthlySettlementView'
 import { PartnerListTable } from './_components/PartnerListTable'
+import { ProfitSharingTabList } from './_components/ProfitSharingTabList'
 import { SettlementHistoryView } from './_components/SettlementHistoryView'
 
 export default function ProfitSharingPage() {
@@ -36,7 +31,6 @@ export default function ProfitSharingPage() {
 
   const [currentTab, setCurrentTab] = useState<string>('settlement')
 
-  // Resolve active store ID (if "ALL_STORES", default to first store)
   const resolvedStoreId =
     selectedStoreId !== ALL_STORES
       ? selectedStoreId
@@ -78,34 +72,8 @@ export default function ProfitSharingPage() {
             onValueChange={setCurrentTab}
             className="w-full space-y-6"
           >
-            <TabsList className="grid h-auto w-full max-w-xl grid-cols-3 p-1">
-              <TabsTrigger
-                value="settlement"
-                className="flex items-center justify-center gap-1.5 py-2 text-xs sm:gap-2 sm:text-sm"
-              >
-                <IconCalculator className="size-4 shrink-0" />
-                <span className="hidden sm:inline">{t('tabs.settlement')}</span>
-                <span className="sm:hidden">{t('tabs.settlementShort')}</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="partners"
-                className="flex items-center justify-center gap-1.5 py-2 text-xs sm:gap-2 sm:text-sm"
-              >
-                <IconUsers className="size-4 shrink-0" />
-                <span className="hidden sm:inline">{t('tabs.partners')}</span>
-                <span className="sm:hidden">{t('tabs.partnersShort')}</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="history"
-                className="flex items-center justify-center gap-1.5 py-2 text-xs sm:gap-2 sm:text-sm"
-              >
-                <IconHistory className="size-4 shrink-0" />
-                <span className="hidden sm:inline">{t('tabs.history')}</span>
-                <span className="sm:hidden">{t('tabs.historyShort')}</span>
-              </TabsTrigger>
-            </TabsList>
+            <ProfitSharingTabList />
 
-            {/* Tab 1: Monthly Settlement */}
             <TabsContent value="settlement" className="space-y-6">
               <MonthlySettlementView
                 storeId={resolvedStoreId}
@@ -113,12 +81,10 @@ export default function ProfitSharingPage() {
               />
             </TabsContent>
 
-            {/* Tab 2: Partners & Rules */}
             <TabsContent value="partners" className="space-y-6">
               <PartnerListTable storeId={resolvedStoreId} />
             </TabsContent>
 
-            {/* Tab 3: History */}
             <TabsContent value="history" className="space-y-6">
               <SettlementHistoryView
                 storeId={resolvedStoreId}

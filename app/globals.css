@@ -47,10 +47,6 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-airy: 0 1.50943px 9.0566px rgba(96, 108, 171, 0.15);
-  --tracking-tight: -0.025em;
-  --letter-spacing-tight: var(--tracking-tight);
-  --tracking-tighter: -0.05em;
-  --letter-spacing-tighter: var(--tracking-tighter);
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
 }
 
@@ -135,6 +131,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    @apply tracking-tighter;
   }
   body {
     @apply bg-background text-foreground;
@@ -150,8 +147,6 @@
 
   html,
   body {
-    font-family: var(--font-sans), sans-serif;
-    letter-spacing: -0.025em; /* tracking-tight ให้กับข้อความทั้งหมด */
     line-height: var(--thai-line-height);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -167,15 +162,7 @@
   h5,
   h6 {
     padding-top: 0.2em;
-    letter-spacing: -0.035em; /* หัวข้อปรับให้กระชับขึ้นเล็กน้อย */
   }
-}
-
-/* บังคับ Toast ทุกตัวให้สืบทอดฟอนต์และระยะตัวอักษร tracking-tight */
-div[role='status'],
-div[role='status'] * {
-  font-family: var(--font-sans), sans-serif !important;
-  letter-spacing: -0.025em !important;
 }
 
 @keyframes gentle-bounce {
@@ -264,12 +251,6 @@ article.prose li {
   animation: ken-burns-right 15s ease-in-out infinite alternate;
 }
 
-.bn-container,
-.bn-container * {
-  font-family: var(--font-sans), sans-serif !important;
-  letter-spacing: -0.025em !important;
-}
-
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -356,7 +337,17 @@ article.prose li {
   animation: rainbow var(--speed, 2s) infinite linear;
 }
 
-.font-landing {
-  --font-sans: var(--font-landing);
-  font-family: var(--font-landing), sans-serif;
+@keyframes float-subtle {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+  will-change: transform;
 }
