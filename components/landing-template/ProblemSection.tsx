@@ -42,11 +42,7 @@ export function ProblemSection({
   return (
     <section id="problem" className="relative w-full py-16 md:py-24">
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <MainSectionHeader
-          badge={resolvedBadge}
-          title={resolvedTitle}
-          description={resolvedDescription}
-        />
+        <MainSectionHeader title={resolvedTitle} />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {displayItems.map((prob, idx) => (

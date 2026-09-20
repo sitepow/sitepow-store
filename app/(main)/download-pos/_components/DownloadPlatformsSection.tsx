@@ -109,11 +109,7 @@ export function DownloadPlatformsSection() {
       className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
     >
       <div>
-        <MainSectionHeader
-          badge={t('badge')}
-          title={t('title')}
-          description={t('description')}
-        />
+        <MainSectionHeader title={t('title')} />
       </div>
 
       <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">

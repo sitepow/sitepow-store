@@ -62,12 +62,10 @@ export function PricingPackages() {
       <div className="space-y-6 sm:space-y-10">
         <MainSectionHeader
           as="h3"
-          badge={t('commonFeatures.badge')}
           title={
             (t.raw('commonFeatures.title') as string) ||
             'ฟีเจอร์ที่ทุกแพ็กเกจได้รับเหมือนกัน'
           }
-          description={t('commonFeatures.description')}
         />
 
         <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">

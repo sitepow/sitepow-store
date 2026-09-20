@@ -25,12 +25,10 @@ export function PricingTables() {
       <div>
         <MainSectionHeader
           as="h3"
-          badge={t('badge')}
           title={
             (t.raw('title') as string) ||
             'เปรียบเทียบความสามารถของแต่ละ Package'
           }
-          description={t('description')}
         />
       </div>
 

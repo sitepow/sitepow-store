@@ -20,12 +20,7 @@ export function BuyoutKeyBenefits() {
 
   return (
     <section className="relative mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        as="h2"
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
+      <MainSectionHeader as="h2" title={t('title')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item, idx) => (

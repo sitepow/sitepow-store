@@ -54,7 +54,7 @@ export function HeroSection({ title, description, buttons }: HeroSectionProps) {
       id="hero"
       className="from-primary via-primary/90 relative flex w-full items-center overflow-hidden bg-linear-to-r to-sky-500 py-14 text-white sm:py-16 md:py-20"
     >
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-8 px-4 sm:px-6 md:flex-row md:px-8 lg:px-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-8 px-4 sm:px-6 lg:px-12 xl:flex-row xl:px-8">
         <div className="flex max-w-2xl flex-col items-start space-y-3 text-left sm:space-y-4">
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
             {title.start}{' '}

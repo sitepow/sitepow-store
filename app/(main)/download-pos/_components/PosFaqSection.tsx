@@ -13,11 +13,7 @@ export function PosFaqSection() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
+      <MainSectionHeader title={t('title')} />
       <MainFaqAccordion items={items} idPrefix="pos-faq" />
     </div>
   )

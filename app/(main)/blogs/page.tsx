@@ -102,7 +102,6 @@ export default async function BlogsPage() {
           description={tCta('description', { gp: 0 })}
           registerBtn={tCta('registerBtn')}
           dashboardBtn={tCta('dashboardBtn')}
-          pricingBtn={tCta('pricingBtn')}
         />
       </Suspense>
     </MainLayout>

@@ -37,11 +37,7 @@ export function FaqSection({
       className="border-border/40 relative w-full border-t py-10 sm:py-16 md:py-24"
     >
       <div className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
-        <MainSectionHeader
-          badge={resolvedBadge}
-          title={resolvedTitle}
-          description={resolvedDescription}
-        />
+        <MainSectionHeader title={resolvedTitle} />
         <MainFaqAccordion items={items} idPrefix="landing-faq" />
       </div>
     </section>

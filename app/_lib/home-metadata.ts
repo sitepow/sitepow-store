@@ -6,8 +6,8 @@ export async function generateHomeMetadata(): Promise<Metadata> {
   const isEn = locale === 'en'
 
   const title = isEn
-    ? 'Sitepow Store | All-in-One E-Commerce & POS Platform 0% GP'
-    : 'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP'
+    ? 'Sitepow Store — All-in-One E-Commerce & POS Platform 0% GP'
+    : 'Sitepow Store — ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP'
 
   const description = isEn
     ? 'All-in-one e-commerce management platform, multi-branch inventory, omnichannel POS, automated AI slip verification, reseller system. Start free with 0% GP commission.'

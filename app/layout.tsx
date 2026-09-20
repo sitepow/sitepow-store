@@ -78,8 +78,8 @@ export const metadata: Metadata = {
   applicationName: 'Sitepow Store',
   title: {
     default:
-      'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
-    template: '%s | Sitepow Store',
+      'Sitepow Store — ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
+    template: '%s — Sitepow Store',
   },
   description:
     'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน จัดการสต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน ระบบตัวแทนจำหน่าย ขายฟรี 0% GP สมัครเปิดร้านฟรี',
@@ -180,7 +180,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title:
-      'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
+      'Sitepow Store — ระบบจัดการร้านค้าออนไลน์ ครบวงจร โปรแกรม POS สต็อกสินค้า 0% GP',
     description:
       'Sitepow Store แพลตฟอร์มระบบจัดการร้านค้าออนไลน์ครบวงจร รวมระบบหลังบ้าน จัดการสต็อกสินค้าหลายสาขา โปรแกรม POS หน้าร้าน AI ตรวจสลิปโอนเงิน ระบบตัวแทนจำหน่าย ขายฟรี 0% GP สมัครเปิดร้านฟรี',
     images: ['/images/seo-cover.png'],

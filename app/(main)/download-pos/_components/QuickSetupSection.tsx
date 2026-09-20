@@ -32,11 +32,7 @@ export function QuickSetupSection() {
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8">
       <div>
-        <MainSectionHeader
-          badge={t('badge')}
-          title={t('title')}
-          description={t('description')}
-        />
+        <MainSectionHeader title={t('title')} />
       </div>
 
       <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-3">

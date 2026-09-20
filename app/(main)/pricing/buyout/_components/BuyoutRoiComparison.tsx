@@ -40,12 +40,7 @@ export function BuyoutRoiComparison() {
 
   return (
     <section className="relative mx-auto w-full max-w-5xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8">
-      <MainSectionHeader
-        as="h2"
-        badge={t('badge')}
-        title={t('title')}
-        description={t('description')}
-      />
+      <MainSectionHeader as="h2" title={t('title')} />
 
       <div className="border-border/80 bg-card/80 overflow-hidden rounded-3xl border shadow-lg backdrop-blur-md">
         <div className="overflow-x-auto">

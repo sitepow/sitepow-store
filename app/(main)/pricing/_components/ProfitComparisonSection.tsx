@@ -37,12 +37,7 @@ export function ProfitComparisonSection() {
   return (
     <section className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
       <div>
-        <MainSectionHeader
-          as="h3"
-          badge={t('badge')}
-          title={t('title')}
-          description={t('description')}
-        />
+        <MainSectionHeader as="h3" title={t('title')} />
       </div>
 
       <TableScrollHint />

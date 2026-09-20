@@ -1,11 +1,13 @@
 'use client'
 
 import React from 'react'
+
 import { POSProductItem } from '@/actions/pos/product'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useCurrentStore } from '@/hooks/use-current-store'
 import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { CartItem } from '@/types/sites/cart'
+
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 import {
   SelectedAddonPayload,
@@ -73,8 +75,7 @@ export function PosProductOptionDialog({
   }
 
   const totalPrice = unitPrice * quantity
-  const activeImageUrl =
-    currentVariant?.image || product.images?.[0]?.url
+  const activeImageUrl = currentVariant?.image || product.images?.[0]?.url
 
   return (
     <Dialog open={Boolean(product)} onOpenChange={(open) => !open && onClose()}>

@@ -59,11 +59,7 @@ export function HowItWorksSection({
   return (
     <section id="how-it-works" className="relative w-full py-16 md:py-24">
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <MainSectionHeader
-          badge={resolvedBadge}
-          title={resolvedTitle}
-          description={resolvedDescription}
-        />
+        <MainSectionHeader title={resolvedTitle} />
 
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="space-y-4 lg:col-span-5">

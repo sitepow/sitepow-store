@@ -113,11 +113,7 @@ export function FeaturesBentoSection({
       className="bg-muted/40 border-border/40 relative w-full border-y py-16 md:py-24"
     >
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <MainSectionHeader
-          badge={resolvedBadge}
-          title={resolvedTitle}
-          description={resolvedDescription}
-        />
+        <MainSectionHeader title={resolvedTitle} />
 
         <BentoGrid className="auto-rows-auto sm:auto-rows-80 lg:auto-rows-88">
           <BentoCard

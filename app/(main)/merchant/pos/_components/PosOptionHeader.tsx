@@ -55,9 +55,7 @@ export function PosOptionHeader({
           </DialogHeader>
 
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-            {currentVariant?.sku && (
-              <span>SKU: {currentVariant.sku}</span>
-            )}
+            {currentVariant?.sku && <span>SKU: {currentVariant.sku}</span>}
             {currentVariant?.sku && <span>•</span>}
             <span
               className={cn(
@@ -113,4 +111,3 @@ export function PosOptionHeader({
     </div>
   )
 }
-
