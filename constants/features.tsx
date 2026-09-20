@@ -59,13 +59,13 @@ export interface FeatureItem {
   icon: React.ReactNode
   image?: string
   shortDescription: string
-  fullDescription: string
   highlights: string[]
   metrics: FeatureMetric[]
   workflow: FeatureWorkflowStep[]
   comparison: FeatureComparison
   capabilities: FeatureCapability[]
   faqs: FeatureFaq[]
+  fullDescription?: string
 }
 
 export interface FeatureMeta {

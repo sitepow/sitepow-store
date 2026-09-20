@@ -1,17 +1,12 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import Image from 'next/image'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import {
-  FEATURE_IMAGES,
-  FEATURE_METAS,
-  getLocalizedFeature,
-} from '@/constants/features'
-import { UserRole } from '@/generated/prisma/enums'
-import { IconCheck, IconChevronRight } from '@tabler/icons-react'
+import { FEATURE_METAS, getLocalizedFeature } from '@/constants/features'
+import { IconCheck } from '@tabler/icons-react'
 
+import { EmptyImage } from '@/components/EmptyImage'
+import { CtaSection } from '@/components/landing-template/CtaSection'
 import { MainLayout } from '@/components/layout/Layout'
 
 import { cn } from '@/lib/utils'
@@ -63,11 +58,6 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
     notFound()
   }
 
-  const registerParams = new URLSearchParams()
-  registerParams.set('role', UserRole.MERCHANT)
-  registerParams.set('callbackUrl', '/merchant/dashboard')
-  const registerHref = `/register?${registerParams.toString()}`
-
   const sections = feature.capabilities
 
   return (
@@ -109,16 +99,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
               )}
             >
               <div className="relative aspect-4/3 w-full max-w-md shrink-0 overflow-hidden rounded-2xl bg-neutral-100 shadow-lg dark:bg-neutral-900">
-                <Image
-                  src={
-                    feature.image ||
-                    FEATURE_IMAGES[feature.slug] ||
-                    'https://images.unsplash.com/photo-1556742049-0a67e55722c0?q=80&w=800&auto=format&fit=crop'
-                  }
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                />
+                <EmptyImage className="size-full bg-gray-50 md:size-full" />
 
                 <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 bg-sky-500/30 blur-2xl" />
                 <div
@@ -158,22 +139,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
         })}
       </div>
 
-      <div className="from-primary via-primary/90 relative mt-24 w-full overflow-hidden bg-linear-to-r to-sky-500 py-10 text-white sm:mt-32 sm:py-14">
-        <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center gap-5 px-4 text-center">
-          <p className="text-base font-semibold text-white sm:text-lg md:text-2xl">
-            เริ่มต้นจัดการร้านค้าและยกระดับธุรกิจของคุณด้วยระบบ POS
-            และแพลตฟอร์มที่ดีที่สุดวันนี้
-          </p>
-
-          <Link
-            href={registerHref}
-            className="inline-flex h-10 items-center justify-center rounded-full bg-orange-500 px-8 text-xs font-semibold text-white shadow-md transition-colors hover:bg-orange-600 sm:h-11 sm:text-sm"
-          >
-            <span>ทดลองใช้ฟรี</span>
-            <IconChevronRight size={16} className="ml-1" />
-          </Link>
-        </div>
-      </div>
+      <CtaSection title={t('cta.title')} registerBtn={t('cta.button')} />
     </MainLayout>
   )
 }

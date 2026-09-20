@@ -3,7 +3,7 @@ import { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 
 export type EmptyImageProps = ComponentProps<'div'> & {
-  text: string
+  text?: string
 }
 
 export function EmptyImage({ className, text, ...props }: EmptyImageProps) {

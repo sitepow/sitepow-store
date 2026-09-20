@@ -1,149 +1,51 @@
 {
   "hero": {
-    "badgeText": "All Features & Capabilities",
-    "titleStart": "Every Feature You Need",
-    "titleGradient": "for Modern Commerce",
-    "description": "All-in-one store management: online store (E-Commerce), in-store POS, real-time multi-branch inventory sync, and AI automation to power every stage of your business growth."
+    "badgeText": "Complete Store Platform",
+    "titleStart": "Everything you need",
+    "titleGradient": "for modern commerce",
+    "description": "Consolidate online store, POS cashier, real-time multi-branch inventory, and smart AI automation into a unified platform built to scale your business."
   },
   "categories": {
     "all": "All (12 Features)",
-    "pos": "POS & Storefront",
+    "pos": "Storefront & POS",
     "ai": "AI & Automation",
     "inventory": "Stock & Inventory",
     "sales": "Sales & Finance",
     "marketing": "Marketing & CRM"
   },
-  "viewDetailBtn": "Explore This Feature",
-  "detail": {
-    "backToAll": "All Features",
-    "registerBtn": "Start Selling for Free 0% GP",
-    "pricingBtn": "View Pricing & Packages",
-    "comparison": {
-      "badge": "Before & After Comparison",
-      "title": "A Tangible Difference You Can Feel",
-      "description": "Compare traditional workflows with the Sitepow Store platform"
-    },
-    "workflow": {
-      "badge": "Workflow Process",
-      "title": "Get Started Easily in Just 3 Steps",
-      "description": "No technical knowledge required to start and see results immediately"
-    },
-    "capabilities": {
-      "badge": "Key Capabilities",
-      "title": "Highlights and Capabilities Built for You"
-    },
-    "faq": {
-      "badge": "Frequently Asked Questions",
-      "titlePrefix": "Frequently Asked Questions about",
-      "moreQuestions": "Have more questions about this feature? Contact our team now"
-    },
-    "related": {
-      "title": "Complementary Features That Work Seamlessly",
-      "description": "Explore other powerful tools in the Sitepow Store platform",
-      "learnMore": "Learn More"
-    }
+  "viewDetailBtn": "View Feature Details",
+  "cta": {
+    "title": "Start managing your store and scale your business with the best POS and commerce platform today",
+    "button": "Try for Free"
   },
   "items": {
     "ai": {
       "title": "Smart AI Product Listing & Slip Check",
       "tagline": "Save time with AI purpose-built for modern e-commerce stores",
       "categoryLabel": "AI & Automation",
-      "shortDescription": "Snap a photo and AI auto-generates product names and descriptions, while detecting fake and duplicate slips 100%.",
-      "fullDescription": "Empower your store operations with AI Vision that extracts product attributes from photos, crafts sales-driving descriptions, and verifies bank transfer slips automatically, approving orders 24/7 without manual staff overhead.",
+      "shortDescription": "Upload a photo and let AI write product titles and descriptions instantly, plus 100% automated fake slip and duplicate slip detection.",
       "highlights": [
-        "Generate product titles and descriptions from photos with AI Vision",
-        "100% accurate bank transfer slip verification against fraud",
-        "Automated duplicate slip shield preventing reused payment receipts",
-        "24/7 instant order approval without waiting for chat responses"
+        "Auto-generate product titles and details from photos with AI Vision",
+        "100% accurate bank slip verification protecting against counterfeit slips",
+        "Automated duplicate slip shield preventing fraudulent reuse",
+        "Instant 24/7 order approval without waiting for manual admin review"
       ],
-      "metrics": [
-        {
-          "value": "90%",
-          "label": "Time Saved on Listing",
-          "desc": "Eliminate manual typing of product names and details"
-        },
-        {
-          "value": "100%",
-          "label": "Fake & Duplicate Detection",
-          "desc": "Real-time bank verification protocol"
-        },
-        {
-          "value": "< 1.2s",
-          "label": "Verification Speed",
-          "desc": "Instant order approval and fulfillment around the clock"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Upload Product Photo",
-          "description": "Snap a photo or upload product images. AI analyzes key features, colors, materials, and selling points automatically."
-        },
-        {
-          "step": "02",
-          "title": "AI Writes Description & Categorizes",
-          "description": "AI composes catchy titles and compelling sales copy, suggesting suitable categories and pricing for your review."
-        },
-        {
-          "step": "03",
-          "title": "Automated Slip Check & Order Approval",
-          "description": "When buyers pay, AI scans the slip amount, timestamp, and recipient account to deduct inventory and approve orders instantly."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Traditional Manual Hassles",
-          "points": [
-            "Hours spent manually writing descriptions and typing specifications",
-            "Admins straining to verify payment slips with risks of fake or edited images",
-            "Fraudsters reusing old slips, leading to unrecovered store losses",
-            "Late-night buyers waiting hours for morning admin responses, losing sales"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow AI Suite",
-          "points": [
-            "AI Vision drafts compelling titles and descriptions in seconds",
-            "Automated 100% verification against standard banking QR slips",
-            "Historical transaction logs block reused slips permanently",
-            "24/7 autonomous order approvals and stock deductions while you sleep"
-          ]
-        }
-      },
       "capabilities": [
         {
           "title": "AI Product Auto-fill",
-          "description": "Upload a product photo and AI analyzes attributes, colors, and features to craft persuasive copy immediately.",
-          "badge": "AI Vision"
+          "description": "Simply upload product images and our multimodal AI analyzes attributes, colors, and key features to generate compelling product descriptions and SEO-ready titles in seconds."
         },
         {
           "title": "Automated Slip Verification",
-          "description": "Scan banking QR codes, verifying amounts, timestamps, and recipient account names in split seconds.",
-          "badge": "Fraud Protection"
+          "description": "Instantly scan and verify bank transfer slips in real-time, confirming transaction amounts, timestamps, and recipient accounts to approve orders effortlessly."
         },
         {
           "title": "Duplicate Slip Shield",
-          "description": "Log and cross-reference historical transaction IDs. Reused slips are rejected and alerted immediately.",
-          "badge": "Security"
+          "description": "Detect and block previously used transfer slips by cross-referencing transaction IDs in the cloud, completely eliminating payment fraud."
         },
         {
           "title": "24/7 Order Processing",
-          "description": "Orders placed late at night or on holidays are approved and delivered immediately without missing sales.",
-          "badge": "Automation"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "How does AI payment slip verification work?",
-          "a": "When customers upload a slip, our system utilizes OCR and bank verification protocols to validate amount, time, and recipient accounts in real time."
-        },
-        {
-          "q": "Can the system detect reused slips?",
-          "a": "Yes, 100%. The cloud system logs all previous transaction IDs; any repeated submission is immediately rejected."
-        },
-        {
-          "q": "What languages does the AI copywriter support?",
-          "a": "Both Thai and English, customizable to match your brand tone and voice."
+          "description": "Let your store run on autopilot around the clock. Orders are verified, stock is reserved, and confirmations are sent even while you sleep."
         }
       ]
     },
@@ -151,367 +53,103 @@
       "title": "0% GP Commission: Keep 100% Profits",
       "tagline": "No commission per order. Full net profits stay in your bank account",
       "categoryLabel": "Pricing & Finance",
-      "shortDescription": "Never lose 15-25% to marketplaces. Customers transfer directly to your account with zero hidden fees.",
-      "fullDescription": "Sitepow Store stands firmly on a 0% GP policy. We never take a percentage cut of your hard-earned revenue. Buyers pay directly into your bank account, giving you instant cash flow without waiting for weekly or monthly payout cycles.",
+      "shortDescription": "Zero marketplace commission cuts. Customers transfer directly to your bank account with zero hidden fees.",
       "highlights": [
-        "0% commission on every order across all product categories",
-        "Direct instant transfers to your bank account",
-        "Zero hidden fees and no withdrawal deductions",
-        "Save hundreds of thousands to millions of baht annually"
+        "0% commission on all orders and product categories",
+        "Direct, instant bank transfers straight into your account",
+        "No hidden transaction costs or withdrawal fees",
+        "Save hundreds of thousands in platform fees annually"
       ],
-      "metrics": [
-        {
-          "value": "0%",
-          "label": "GP Commission for Life",
-          "desc": "Keep 100% of your net retail sales"
-        },
-        {
-          "value": "100%",
-          "label": "Direct Payouts",
-          "desc": "PromptPay transfers straight to your bank account"
-        },
-        {
-          "value": "฿120k+",
-          "label": "Average Annual Savings",
-          "desc": "Based on ฿500,000 monthly sales compared to marketplaces"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Link Bank Account or PromptPay",
-          "description": "Enter your bank details. The system generates custom QR codes for direct store payouts immediately."
-        },
-        {
-          "step": "02",
-          "title": "Customers Shop & Scan to Pay",
-          "description": "Shoppers scan via Mobile Banking; funds land straight in your bank account in real time."
-        },
-        {
-          "step": "03",
-          "title": "Keep 100% of Your Profit",
-          "description": "Cash is immediately available for business operations without waiting 7-14 days or paying withdrawal fees."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Selling on Marketplaces",
-          "points": [
-            "High commission cuts and GP fees between 15% - 30% per order",
-            "Revenue withheld for 7-14 day payout cycles",
-            "Multiple transaction and payment processing deductions",
-            "Forced into aggressive price wars with competing sellers"
-          ]
-        },
-        "sitepow": {
-          "title": "Selling on Sitepow Store",
-          "points": [
-            "0% GP on all orders—every baht goes straight to you",
-            "Direct bank deposits for agile operating cash flow",
-            "Transparent pricing with no hidden charges or withdrawal fees",
-            "Build your own sustainable brand and loyal customer base"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Direct Bank Transfer",
-          "description": "Customers pay directly via PromptPay QR codes into your personal or corporate account.",
-          "badge": "Instant Cashflow"
+          "title": "0% Commission on All Orders",
+          "description": "Retain 100% of your retail margin. Unlike conventional marketplaces that deduct 15-30% on every sale, Sitepow Store never takes a cut from your revenue."
         },
         {
-          "title": "Zero Hidden Fees",
-          "description": "No per-item transaction fees or concealed platform surcharges.",
-          "badge": "100% Fair"
+          "title": "Direct Account Transfers",
+          "description": "Funds flow directly from your buyers into your bank account via PromptPay QR in real-time, eliminating multi-week settlement delays and maximizing cash flow."
         },
         {
-          "title": "Transparent Operating Cost",
-          "description": "Pay only a predictable fixed package price, making financial planning straightforward.",
-          "badge": "Predictable Cost"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "Is 0% GP really genuine? Are there hidden fees?",
-          "a": "Yes, 100% genuine. We never take any percentage cut of your sales revenue. All earnings are yours."
-        },
-        {
-          "q": "When do customer payments reach my account?",
-          "a": "Instantly upon customer transfer, as funds go straight from customer bank to yours."
+          "title": "Transparent Pricing",
+          "description": "No surprise withdrawal charges or hidden maintenance fees. What you earn is exactly what you take home, making financial planning crystal clear."
         }
       ]
     },
     "inventory": {
       "title": "Multi-Branch Inventory & Stock Management",
       "tagline": "Real-time automated inventory deductions across all sales channels",
-      "categoryLabel": "Inventory & Stock",
-      "shortDescription": "Oversee stock across all retail branches in one unified system, with instant sync between POS and online.",
-      "fullDescription": "Eliminate overselling and inventory discrepancies with our multi-branch inventory architecture. When a cashier completes a sale on POS, online store stock deducts simultaneously, complete with inter-branch stock transfers and low-stock alerts.",
+      "categoryLabel": "Stock & Inventory",
+      "shortDescription": "Sync inventory between physical POS counters and online stores. Prevent stockouts and overselling with unified real-time stock control.",
       "highlights": [
-        "Real-time automated deductions upon every sale",
-        "Unlimited warehouse branches and storage locations",
-        "Inter-branch stock transfer workflows with audit trails",
-        "Automated low-stock threshold notifications"
+        "Real-time automatic stock deduction across every sales channel",
+        "Multi-branch and multi-warehouse inventory allocation",
+        "Low stock alerts and automated reorder threshold triggers",
+        "Detailed stock adjustment logs and full audit trails"
       ],
-      "metrics": [
-        {
-          "value": "Real-time",
-          "label": "Automated Stock Deduction",
-          "desc": "Simultaneous update across POS counter and web store"
-        },
-        {
-          "value": "0",
-          "label": "Overselling Incidents",
-          "desc": "Stock is reserved immediately when an order is created"
-        },
-        {
-          "value": "Multi",
-          "label": "Warehouses & Branches",
-          "desc": "Seamless inventory tracking and inter-branch transfers"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Define Branches & Stock Quantities",
-          "description": "Set up primary and branch warehouses, input initial quantities, and set low-stock alert thresholds."
-        },
-        {
-          "step": "02",
-          "title": "Sell Across Every Channel",
-          "description": "Whether checking out on POS or buying online, stock deducts automatically from the designated branch."
-        },
-        {
-          "step": "03",
-          "title": "Review Reports & Transfer Items",
-          "description": "Track stock movements, restocks, adjustments, and inter-branch transfers with comprehensive audit logs."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Manual Stock Management",
-          "points": [
-            "Tracking stock in paper notebooks or spreadsheets with daily recount delays",
-            "Disconnected in-store and online stock causing frequent overselling",
-            "Unaware of low stock until customers place orders you cannot fulfill",
-            "Unrecorded inter-branch movements leading to untracked inventory loss"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Inventory Suite",
-          "points": [
-            "Real-time automated stock deductions upon every bill or web purchase",
-            "Unified database connecting physical store POS and online shop",
-            "Low Stock Alerts notify you before popular items run out",
-            "Transparent stock adjustment records and transfer confirmations"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Multi-Branch Inventory",
-          "description": "Segregate inventory across multiple branches and warehouses with granular visibility.",
-          "badge": "Multi-Location"
+          "title": "Real-Time Multi-Branch Sync",
+          "description": "Unified inventory counts updated synchronously across your physical cashiers and online storefronts, preventing overselling and inventory discrepancies."
         },
         {
-          "title": "Real-time Stock Synchronization",
-          "description": "Sales from both in-store registers and online channels deduct from shared inventory in real time.",
-          "badge": "Omnichannel"
+          "title": "Multi-Warehouse & Branch Allocation",
+          "description": "Segment and monitor stock levels across central warehouses and branch stores with intuitive stock transfer tracking and location-based visibility."
         },
         {
-          "title": "Stock Adjustment & History",
-          "description": "Log restocking, inventory damage, loss adjustments, and responsible staff members.",
-          "badge": "Audit Trail"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "If an item is sold in-store, does the online store update immediately?",
-          "a": "Yes, in split seconds. Online customers immediately see updated inventory, completely preventing overselling."
+          "title": "Low Stock Alerts & Reorder Points",
+          "description": "Set custom minimum thresholds for each SKU. Receive immediate notifications when supplies run low so you can restock before missing sales."
         }
       ]
     },
     "pos": {
       "title": "All-in-One In-Store POS Register",
       "tagline": "Turn any device you already own into an intelligent cashier system",
-      "categoryLabel": "Point of Sale (POS)",
-      "shortDescription": "Ring up sales, scan barcodes, and print thermal receipts on PC, Mac, iPad, or Android devices.",
-      "fullDescription": "Engineered for rapid, intuitive counter operations that new staff can learn in 5 minutes. Connects with standard barcode scanners, thermal receipt printers, and cash drawers, with dynamic PromptPay QR generation for seamless mobile checkout.",
+      "categoryLabel": "Storefront & POS",
+      "shortDescription": "Run on iPad, Android tablets, smartphones, or PCs. Fast barcode scanning, instant receipt printing, and seamless in-store checkout.",
       "highlights": [
-        "Cross-device support: Windows, Mac, iPad, Android, and Web Browser",
-        "Connect USB, LAN, and Bluetooth thermal printers (ESC/POS)",
-        "Automated cash drawer kick on receipt printing",
-        "Cashier shift management and accurate end-of-day reconciliation"
+        "Runs on any device: iPads, Android tablets, laptops, or desktops",
+        "Ultra-fast checkout with barcode scanner and receipt printer support",
+        "Automatic calculation of discounts, promotions, and VAT taxes",
+        "Accurate daily sales summaries and cash drawer shift balancing"
       ],
-      "metrics": [
-        {
-          "value": "< 2s",
-          "label": "Checkout Speed",
-          "desc": "Scan barcodes and print thermal receipts rapidly"
-        },
-        {
-          "value": "4 In 1",
-          "label": "Device Compatibility",
-          "desc": "Install on PC, Mac, iPad, Android, or launch on Web"
-        },
-        {
-          "value": "100%",
-          "label": "Real-time Cloud Sync",
-          "desc": "In-store POS checkout instantly syncs with online store"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Sign In & Open Shift",
-          "description": "Launch the app or web register, enter starting cash change float, and start attending customers."
-        },
-        {
-          "step": "02",
-          "title": "Scan Barcodes or Pick Items",
-          "description": "Scan product barcodes to add to cart, apply discounts, or redeem coupons quickly."
-        },
-        {
-          "step": "03",
-          "title": "Accept Payment & Print Receipt",
-          "description": "Accept cash or show PromptPay QR. The thermal printer prints receipt and opens cash drawer automatically."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Traditional POS Hardware",
-          "points": [
-            "Expensive proprietary hardware locked to specific vendors with costly repairs",
-            "Disconnected from online catalog requiring tedious manual end-of-day tallying",
-            "Sluggish checkout interfaces causing long counter queues during rush hours",
-            "Sales reports accessible only on-site at the physical register"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Cloud POS",
-          "points": [
-            "Use existing laptops, tablets, or phones to minimize hardware costs",
-            "Omnichannel inventory sync connects in-store sales and online store instantly",
-            "Fast barcode scanning with automatic receipt printing and drawer triggers",
-            "Owners view live sales summaries and shift logs from anywhere on mobile"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Fast Barcode Checkout",
-          "description": "Compatible with USB/Bluetooth scanners for swift checkout without touching keyboard.",
-          "badge": "High Speed"
+          "title": "Hardware-Free POS System",
+          "description": "Transform any existing tablet, laptop, or smartphone into a modern retail checkout terminal. No expensive proprietary hardware locks required."
         },
         {
-          "title": "Receipt Printing & Auto-cut",
-          "description": "Crisp thermal printing supporting 58mm and 80mm rolls with auto-cutter commands.",
-          "badge": "Thermal Printer"
+          "title": "Quick Barcode & SKU Scanning",
+          "description": "Lightning-fast product search via barcode scanners, camera scanners, or interactive visual grids to keep checkout lines moving smoothly."
         },
         {
-          "title": "Shift & Cash Management",
-          "description": "Record opening cash float, close shifts, and reconcile cash against recorded sales.",
-          "badge": "Cashier Shift"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "Do I need specialized hardware to run the POS?",
-          "a": "No, you can use your existing computer, tablet, iPad, or smartphone, and connect standard market printers."
-        },
-        {
-          "q": "How do I connect receipt printers?",
-          "a": "Supports USB, LAN, Wi-Fi, and Bluetooth using the universal ESC/POS standard."
+          "title": "Shift Balancing & Cash Control",
+          "description": "Comprehensive opening and closing cash drawer registers with detailed staff sales audits, ensuring complete financial accountability."
         }
       ]
     },
     "online-store": {
       "title": "Professional Online Storefront & Website",
       "tagline": "Build a trustworthy store website that sells for you 24 hours a day",
-      "categoryLabel": "Online Storefront",
-      "shortDescription": "Custom branded storefront with intuitive shopping cart, custom domain support, and mobile optimization.",
-      "fullDescription": "Establish your brand presence with a dedicated online storefront. Customize colors, banners, and layout to match your aesthetic. Includes an automated shopping cart calculating shipping fees and discounts, with custom domain support (.com, .net, etc.).",
+      "categoryLabel": "Online Store",
+      "shortDescription": "Launch a branded e-commerce store with mobile-first responsiveness, custom domains, and seamless checkout—no coding required.",
       "highlights": [
-        "High-speed custom storefront optimized for all screen sizes",
-        "Customize brand colors, themes, banners, and home layouts",
-        "Smart shopping cart with automated shipping and discount calculations",
-        "Connect your custom domain (Custom Domain with SSL)"
+        "Modern, high-converting store layouts engineered for sales",
+        "100% mobile-first design optimized for smartphone buyers",
+        "Connect custom domains to establish strong brand credibility",
+        "Frictionless cart, auto-calculated shipping, and checkout flows"
       ],
-      "metrics": [
-        {
-          "value": "1 Min",
-          "label": "Store Launch Time",
-          "desc": "Complete storefront with built-in cart and checkout"
-        },
-        {
-          "value": "100%",
-          "label": "Mobile Responsive",
-          "desc": "Seamless shopping experience across phones, tablets, and PCs"
-        },
-        {
-          "value": "SEO Ready",
-          "label": "Search Engine Optimized",
-          "desc": "Helps prospective customers discover your products on Google"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Set Store Name & Customize Theme",
-          "description": "Pick your store name, upload logos and banners, and choose color palettes matching your brand."
-        },
-        {
-          "step": "02",
-          "title": "Add Products & Organize Categories",
-          "description": "Upload product listings with images, pricing, and variants like sizes and colors."
-        },
-        {
-          "step": "03",
-          "title": "Share Store Link & Receive Orders",
-          "description": "Add store link to Instagram bio, Facebook, or LINE OA for customers to self-checkout 24/7."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Manual Chat Selling",
-          "points": [
-            "Answering every message manually, sending product photos and typing account numbers",
-            "Slow response times during peak hours driving buyers to competitors",
-            "Lacking professional credibility, causing customer payment hesitation",
-            "Custom website development costs tens of thousands of baht with complex upkeep"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Storefront",
-          "points": [
-            "Customers browse, add to cart, fill in addresses, and scan QR to pay independently",
-            "Automated sales round the clock even when staff are away from screens",
-            "Professional store design and clear order tracking instill shopper confidence",
-            "Instantly ready at cost-effective rates with free continuous feature updates"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Custom Branding",
-          "description": "Tailor themes, colors, and banners to reflect your authentic brand identity.",
-          "badge": "Customizable"
+          "title": "Custom Domain & Instant Setup",
+          "description": "Launch a customized, high-converting web storefront in minutes. Connect your own domain (e.g., yourbrand.com) and build lasting brand equity."
         },
         {
-          "title": "Mobile-First Checkout",
-          "description": "Frictionless checkout designed for effortless address entry and slip uploads on mobile.",
-          "badge": "Conversion Focused"
+          "title": "Mobile-First Responsive Design",
+          "description": "Optimized for the 85%+ of online shoppers ordering from smartphones with ultra-fast page speeds, touch gestures, and one-tap checkout."
         },
         {
-          "title": "Custom Domain Connection",
-          "description": "Map your owned domain with free automated SSL encryption certificates.",
-          "badge": "Professional"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "Can I connect my own custom domain?",
-          "a": "Yes! You can connect your existing domain to your Sitepow Storefront easily."
+          "title": "SEO & Social Share Optimization",
+          "description": "Built-in structured metadata and open-graph previews that rank higher on search engines and display beautifully when shared on social media."
         }
       ]
     },
@@ -519,502 +157,155 @@
       "title": "Centralized Multi-Channel Order Management",
       "tagline": "Consolidate orders from every channel into one dashboard without missing a sale",
       "categoryLabel": "Order Management",
-      "shortDescription": "Track order states, verify payments, prepare shipments, and update tracking numbers seamlessly.",
-      "fullDescription": "Unified order hub overseeing order lifecycles from pending payment and slip verification to picking, packing, and completed shipment, complete with advanced filters and batch operations.",
+      "shortDescription": "Unified order processing from online stores and POS counters. Batch status updates, pick lists, and automated delivery tracking.",
       "highlights": [
-        "Consolidate orders from all channels in one dashboard",
-        "Automated order status progression and buyer notifications",
-        "Advanced search and filtering by customer name, phone, or tracking ID",
-        "Batch print pick lists and packing slips simultaneously"
+        "Consolidated live order pipeline across all sales touchpoints",
+        "Automated order status transitions and customer SMS/Email alerts",
+        "One-click batch pick list generation and bulk receipt printing",
+        "Smart search and filtering by customer name, phone, or tracking number"
       ],
-      "metrics": [
-        {
-          "value": "1 Hub",
-          "label": "Consolidated Order Dashboard",
-          "desc": "No need to juggle multiple tabs and chat windows"
-        },
-        {
-          "value": "95%",
-          "label": "Fewer Packing Errors",
-          "desc": "Structured pick lists and order verification checks"
-        },
-        {
-          "value": "Auto",
-          "label": "Automated Tracking Updates",
-          "desc": "Buyers self-check parcel statuses on web portal"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Order Ingestion",
-          "description": "New orders appear in real time with line item details, shipping addresses, and payment proof."
-        },
-        {
-          "step": "02",
-          "title": "Payment Check & Picking",
-          "description": "Batch print pick lists and order labels, transitioning statuses to Preparing."
-        },
-        {
-          "step": "03",
-          "title": "Tracking Assignment & Dispatch",
-          "description": "Enter or scan tracking numbers. Status shifts to Shipped with automated customer alerts."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Fragmented Order Handling",
-          "points": [
-            "Manual notes taken from chats leading to missed orders and fulfillment mistakes",
-            "Messy paper slips causing double fulfillments or unverified payments",
-            "Admins constantly occupied answering customer parcel status questions"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Orders Hub",
-          "points": [
-            "Every order centralized in one clean dashboard with clear status tags",
-            "Structured workflows from payment confirmation to dispatch prevent human errors",
-            "Automated tracking portal lets buyers check parcel status themselves"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Multi-Channel Aggregation",
-          "description": "Consolidate orders across web storefront, counter POS, and manual chat orders in one view.",
-          "badge": "Centralized"
+          "title": "Centralized Order Inbox",
+          "description": "Eliminate scattered tabs. Access every order across your storefront and digital channels in a unified timeline with clear status stages."
         },
         {
-          "title": "Batch Operations",
-          "description": "Batch update statuses, export order manifests, and print packing documents in bulk.",
-          "badge": "Productivity"
-        }
-      ],
-      "faqs": [
+          "title": "Batch Order Processing",
+          "description": "Bulk select hundreds of orders to approve payments, print thermal labels, and trigger fulfillment dispatches in a single click."
+        },
         {
-          "q": "Can I print pick lists for fulfillment staff?",
-          "a": "Yes! You can generate and print combined pick lists for multiple orders at once."
+          "title": "Customer Order Tracking & History",
+          "description": "Provide transparent self-serve order tracking portals for buyers, drastically reducing repetitive customer support inquiries."
         }
       ]
     },
     "analytics": {
       "title": "In-Depth Sales Analytics & Financial Insights",
       "tagline": "Turn store data into actionable decisions through intuitive dashboards",
-      "categoryLabel": "Analytics & Finance",
-      "shortDescription": "Real-time sales tracking, top product rankings, customer retention insights, and net profit analysis.",
-      "fullDescription": "Visualize your business health with comprehensive dashboards detailing revenue trends, top-selling product variants, recurring customer loyalty rates, and true net margin calculations.",
+      "categoryLabel": "Analytics & Insights",
+      "shortDescription": "Track revenue, bestsellers, net profit margins, and peak selling hours to make data-driven inventory and marketing decisions.",
       "highlights": [
-        "Real-time revenue, order volume, and average order value tracking",
-        "Top-performing products and sales velocity breakdown",
-        "Branch-specific sales comparisons and cash flow visibility",
-        "Exportable financial reports ready for accounting"
+        "Daily, weekly, and monthly revenue and net profit summaries",
+        "Rank top revenue drivers and highest-margin product lines",
+        "Identify peak purchasing hours to optimize staffing and campaigns",
+        "Clear visibility into inventory costs and gross margin percentages"
       ],
-      "metrics": [
-        {
-          "value": "Real-time",
-          "label": "Live Revenue Analytics",
-          "desc": "Track daily, weekly, and monthly sales trends"
-        },
-        {
-          "value": "Top 10",
-          "label": "Best-Seller Rankings",
-          "desc": "Identify your highest margin and volume items"
-        },
-        {
-          "value": "100%",
-          "label": "Data Ownership",
-          "desc": "Export complete transaction logs anytime"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Open Analytics Dashboard",
-          "description": "View overall store performance, daily gross revenue, and order trends at a glance."
-        },
-        {
-          "step": "02",
-          "title": "Analyze Product & Branch Performance",
-          "description": "Identify best-selling products and evaluate revenue contributions across each retail branch."
-        },
-        {
-          "step": "03",
-          "title": "Optimize Business Strategy",
-          "description": "Plan inventory replenishment and launch targeted marketing promotions based on real data."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Guesswork Management",
-          "points": [
-            "Manual ledger tallying with no clear view of real daily net profit",
-            "Overstocking slow-moving items and running out of bestsellers",
-            "Lack of customer purchasing frequency data"
-          ]
-        },
-        "sitepow": {
-          "title": "Data-Driven Management",
-          "points": [
-            "Automated visual charts displaying real revenue and profit margins",
-            "Clear visibility into item movement velocity for precise inventory reordering",
-            "Customer retention metrics reveal repeat purchase frequencies"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Real-time Performance Metrics",
-          "description": "Instant updates on sales volume, order counts, and gross margins.",
-          "badge": "Live Insights"
+          "title": "Net Profit Tracking",
+          "description": "Automatically calculate true bottom-line profitability after factoring in product cost of goods sold (COGS) and operational overhead."
         },
         {
-          "title": "Financial Report Exports",
-          "description": "Export structured CSV/Excel reports compatible with standard accounting software.",
-          "badge": "Export Ready"
-        }
-      ],
-      "faqs": [
+          "title": "Product Performance Insights",
+          "description": "Identify fast-moving bestsellers versus dead stock with detailed unit velocity metrics to eliminate holding costs and optimize cash."
+        },
         {
-          "q": "Can I view sales broken down by branch?",
-          "a": "Yes! Filter sales performance and profitability individually by branch location."
+          "title": "Peak Hours & Channel Breakdown",
+          "description": "Pinpoint when sales surge throughout the day and compare physical vs online channel contributions to focus your marketing budget."
         }
       ]
     },
     "payment": {
       "title": "Seamless Payment Processing & Direct Payouts",
       "tagline": "Accept PromptPay QR and credit cards with instant direct payouts and 0% GP",
-      "categoryLabel": "Payments & Finance",
-      "shortDescription": "Direct bank payouts via dynamic PromptPay QR, credit card integrations, and automated slip verification.",
-      "fullDescription": "Empower your store with diverse, secure payment methods. Direct PromptPay QR transfers land instantly in your bank account with zero middleman deductions, alongside optional Stripe integration for international credit and debit cards.",
+      "categoryLabel": "Payment Gateway",
+      "shortDescription": "Accept zero-fee PromptPay QR transfers and integrate Stripe for global Visa/Mastercard payments with maximum security.",
       "highlights": [
-        "Direct PromptPay QR transfer with zero transaction cuts",
-        "Automated bank slip verification eliminating fraudulent receipts",
-        "Optional Stripe gateway for global credit and debit cards",
-        "Cash on Delivery (COD) tracking support"
+        "PromptPay QR code payments with 0% platform commission",
+        "Stripe integration for credit and debit cards worldwide",
+        "Automated slip attachment with intelligent AI verification",
+        "Global PCI-DSS compliance ensuring safe financial transactions"
       ],
-      "metrics": [
-        {
-          "value": "0%",
-          "label": "Commission on Bank Transfers",
-          "desc": "Keep 100% of every PromptPay transfer"
-        },
-        {
-          "value": "Instant",
-          "label": "Direct Payout Arrival",
-          "desc": "Funds reach your account immediately upon buyer transfer"
-        },
-        {
-          "value": "Global",
-          "label": "Card Payment Integration",
-          "desc": "Accept Visa, Mastercard, and mobile wallets via Stripe"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Configure Payment Gateways",
-          "description": "Connect your bank account for PromptPay or activate Stripe for card payments."
-        },
-        {
-          "step": "02",
-          "title": "Buyer Selects Payment Method",
-          "description": "Customers scan exact dynamic PromptPay QR or enter card details securely."
-        },
-        {
-          "step": "03",
-          "title": "Automated Reconciliation",
-          "description": "System verifies the payment automatically and updates order status to Paid instantly."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Traditional Payment Friction",
-          "points": [
-            "Manual checking of bank apps for every transfer notification",
-            "Delayed marketplace payouts holding your operational capital",
-            "High transaction fees reducing profit margins"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Payments",
-          "points": [
-            "Automated slip verification reconciles payments without manual checking",
-            "Direct transfers into your account provide immediate operational liquidity",
-            "0% GP commission ensures you retain maximum revenue"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Dynamic QR PromptPay",
-          "description": "Generate exact QR codes per transaction to prevent amount mismatches.",
-          "badge": "Frictionless"
+          "title": "Dynamic PromptPay QR",
+          "description": "Generate order-specific QR codes with pre-filled exact amounts. Eliminates under- or over-payment errors during mobile banking transfers."
         },
         {
-          "title": "Credit & Debit Card Gateway",
-          "description": "Accept international cards with bank-level encryption standards via Stripe.",
-          "badge": "International"
+          "title": "Credit / Debit Card via Stripe",
+          "description": "Accept Visa, Mastercard, and global debit cards seamlessly through secure Stripe payment infrastructure directly into your merchant account."
         },
         {
-          "title": "Multi-Currency & International Stripe",
-          "description": "Support multi-currency checkouts (THB, USD, EUR, JPY, GBP, SGD) via Stripe, enabling global customers to pay smoothly.",
-          "badge": "Multi-Currency"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "Can customers pay with credit cards?",
-          "a": "Yes, by enabling Stripe integration in settings, your store can accept major international credit and debit cards."
+          "title": "Multi-Currency & International Payments",
+          "description": "Sell to customers across borders with support for international cards and flexible checkout currencies without friction."
         }
       ]
     },
     "crm": {
       "title": "Customer CRM, Reward Points & Loyalty",
       "tagline": "Build long-term customer retention and drive sustainable repeat purchases",
-      "categoryLabel": "Marketing & CRM",
-      "shortDescription": "Membership profiles, automated reward points on purchases, customer segmentation, and VIP loyalty tiers.",
-      "fullDescription": "Turn one-time shoppers into loyal regulars with integrated CRM tools. Customers earn reward points on every completed purchase to redeem as future order discounts, complemented by customer segmentation tags and purchasing history logs.",
+      "categoryLabel": "CRM & Loyalty",
+      "shortDescription": "Reward customers with purchase points, tiered VIP memberships, and personalized birthday perks to maximize lifetime value.",
       "highlights": [
-        "Automated reward points accumulation and redemption at checkout",
-        "Customer profiles with complete historical spend and order records",
-        "Custom tags and VIP tier segmentation for targeted marketing",
-        "Review-for-points incentives boosting organic social proof"
+        "Automated points accrual on every completed purchase",
+        "Unified loyalty balances across physical POS and online store",
+        "Tiered VIP membership structures with custom reward benefits",
+        "Structured customer purchase histories and contact databases"
       ],
-      "metrics": [
-        {
-          "value": "+35%",
-          "label": "Repeat Purchase Rate",
-          "desc": "Boost lifetime customer loyalty through reward points"
-        },
-        {
-          "value": "100%",
-          "label": "Automated Point Accrual",
-          "desc": "Points calculated and awarded on checkout completion"
-        },
-        {
-          "value": "CRM",
-          "label": "Unified Customer Database",
-          "desc": "Consolidate phone numbers, addresses, and purchase habits"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Configure Loyalty Rules",
-          "description": "Set point earning ratios (e.g. 1 point per ฿100 spent) and redemption conversion values."
-        },
-        {
-          "step": "02",
-          "title": "Customers Earn Points",
-          "description": "Points are automatically credited to customer profiles upon order fulfillment."
-        },
-        {
-          "step": "03",
-          "title": "Redeem for Discounts",
-          "description": "Shoppers apply earned points as cash discounts during checkout, driving repeat visits."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "No Customer Retention",
-          "points": [
-            "Customers buy once and disappear with no incentives to return",
-            "No record of customer preferences or lifetime spend",
-            "Marketplaces withhold customer contact details preventing direct re-engagement"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow CRM",
-          "points": [
-            "Reward points give buyers continuous motivation to choose your store again",
-            "Comprehensive customer profiles reveal your most valuable VIP shoppers",
-            "Direct ownership of customer relationships without intermediary barriers"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Automated Reward Points",
-          "description": "Flexible points rules calculate rewards on each successful purchase.",
-          "badge": "Loyalty Engine"
+          "title": "Omnichannel Points",
+          "description": "Unify customer loyalty across online and brick-and-mortar touchpoints. Points accumulate and redeem seamlessly regardless of where they shop."
         },
         {
-          "title": "Customer Segmentation Tags",
-          "description": "Tag customers as Wholesale, VIP, or Regulars for personalized interactions.",
-          "badge": "Segmentation"
-        }
-      ],
-      "faqs": [
+          "title": "Customer Segmentation & VIP Tiers",
+          "description": "Reward top spenders with dynamic membership tiers (e.g., Bronze, Silver, Gold) unlocking exclusive discounts and perks to boost repeat purchase rates."
+        },
         {
-          "q": "Can points be used on both in-store POS and online store?",
-          "a": "Yes! The loyalty system is synchronized across POS registers and online storefronts."
+          "title": "Customer Profiles & Purchase History",
+          "description": "Maintain complete transaction records, lifetime spend metrics, and contact preferences to deliver personalized marketing and VIP service."
         }
       ]
     },
     "promotions": {
       "title": "Coupons, Flash Sales & Sales Promotions",
       "tagline": "Drive urgent purchasing decisions with dynamic coupons and flash sales",
-      "categoryLabel": "Marketing & CRM",
-      "shortDescription": "Discount codes, minimum spend rules, flash sales timers, and Buy-1-Get-1 promotional campaigns.",
-      "fullDescription": "Accelerate sales velocity with flexible promotional tools. Launch time-limited flash sales, generate percentage or fixed amount coupon codes, establish minimum basket sizes, and configure usage limits per shopper.",
+      "categoryLabel": "Promotions & Marketing",
+      "shortDescription": "Create discount vouchers, minimum spend triggers, time-limited flash sales, and free shipping perks to boost average order value.",
       "highlights": [
-        "Custom coupon codes with percentage or flat-rate discounts",
-        "Flash Sale countdown timers creating purchase urgency",
-        "Minimum order spend thresholds and per-user usage limits",
-        "Branch-specific and product-specific promotion rules"
+        "Unlimited discount voucher codes (fixed amount or percentage-off)",
+        "Configurable minimum spend limits and coupon validity windows",
+        "Automated Flash Sale events with live visual countdown timers",
+        "Free delivery coupons triggered by cart volume thresholds"
       ],
-      "metrics": [
-        {
-          "value": "Instant",
-          "label": "Promotion Deployment",
-          "desc": "Launch campaigns with custom start and end times"
-        },
-        {
-          "value": "+28%",
-          "label": "Average Basket Size",
-          "desc": "Encourage larger purchases through minimum spend coupons"
-        },
-        {
-          "value": "100%",
-          "label": "Promotion Control",
-          "desc": "Prevent coupon stacking and limit redemption caps"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Create Coupon or Promotion",
-          "description": "Set discount amounts, minimum spend conditions, and total redemption limits."
-        },
-        {
-          "step": "02",
-          "title": "Promote Across Channels",
-          "description": "Share coupon codes on social channels or display flash sales banners on your storefront."
-        },
-        {
-          "step": "03",
-          "title": "Track Campaign ROI",
-          "description": "Review redemption counts and generated revenue to evaluate promotional effectiveness."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Rigid Promotional Tools",
-          "points": [
-            "Manual discount calculations prone to checkout errors",
-            "Lack of countdown timers to create genuine buyer urgency",
-            "Inability to limit coupon abuse or set granular redemption rules"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Promotions",
-          "points": [
-            "Automated coupon validation applies exact discounts directly in cart",
-            "Dynamic flash sale badges and timers motivate prompt customer decisions",
-            "Granular caps protect store margins from runaway discount redemptions"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Custom Discount Codes",
-          "description": "Issue percentage or fixed baht discounts with custom codes and expiration dates.",
-          "badge": "Coupons"
+          "title": "Custom Coupon Rules",
+          "description": "Design tailored discount structures with flexible constraints: percentage cuts, fixed cash deductions, minimum purchase thresholds, and usage caps."
         },
         {
-          "title": "Flash Sale Timers",
-          "description": "Display eye-catching promotional pricing with automated countdown timers.",
-          "badge": "Urgency"
-        }
-      ],
-      "faqs": [
+          "title": "Flash Sale Countdown",
+          "description": "Drive conversion spikes with scheduled promotional sales featuring dynamic countdown badges that trigger immediate customer purchase intent."
+        },
         {
-          "q": "Can I limit coupons to one use per customer?",
-          "a": "Yes! You can configure maximum usage counts per user or across the entire store."
+          "title": "Free Shipping & Bundle Promotions",
+          "description": "Incentivize larger cart sizes with tiered free shipping milestones and bundled item discounts that increase average order value (AOV)."
         }
       ]
     },
     "import-export": {
       "title": "Bulk Product Import & Catalog Migration",
       "tagline": "Migrate thousands of items from Lazada or Shopee in minutes via CSV/JSON",
-      "categoryLabel": "Inventory & Stock",
-      "shortDescription": "Rapidly bulk import catalogs, images, and prices from CSV or JSON files without manual data entry.",
-      "fullDescription": "Say goodbye to manual product typing. Migrate extensive product catalogs, images, variants, and pricing structures from external platforms or spreadsheets in one click with automated validation.",
+      "categoryLabel": "Data & Migration",
+      "shortDescription": "Bulk import large catalogs from Lazada or Shopee via CSV files without manual entry. Export complete store data at any time.",
       "highlights": [
-        "Bulk product creation and price updates via CSV / Excel / JSON",
-        "Seamless catalog migration from Lazada, Shopee, or other platforms",
-        "Automated image linking and variant generation",
-        "Export store catalog and stock reports in structured formats"
+        "Import hundreds or thousands of products simultaneously",
+        "Compatible with exported catalog files from Lazada and Shopee",
+        "Export products, orders, and customer lists to Excel/CSV anytime",
+        "Bulk update prices and inventory levels via simple re-import"
       ],
-      "metrics": [
-        {
-          "value": "1,000+",
-          "label": "Items Imported in Seconds",
-          "desc": "Bulk catalog ingestion without tedious manual typing"
-        },
-        {
-          "value": "1-Click",
-          "label": "CSV / JSON Migration",
-          "desc": "Compatible with standard marketplace export templates"
-        },
-        {
-          "value": "100%",
-          "label": "Data Integrity",
-          "desc": "Pre-import validation detects errors before saving"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Export File from Existing Store",
-          "description": "Export product data from Shopee, Lazada, or your internal Excel spreadsheets."
-        },
-        {
-          "step": "02",
-          "title": "Upload CSV to Sitepow",
-          "description": "Upload the file to our import tool; the system validates fields and variant structures."
-        },
-        {
-          "step": "03",
-          "title": "Launch Complete Catalog",
-          "description": "Products, photos, and prices go live immediately on both online storefront and in-store POS."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Manual Catalog Re-typing",
-          "points": [
-            "Typing hundreds of items one-by-one, wasting weeks of operational time",
-            "Frequent typos in pricing, barcode numbers, and SKU designations",
-            "Difficulty maintaining price synchronization across multiple channels"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Bulk Tools",
-          "points": [
-            "Import entire catalogs in seconds via standard CSV or JSON files",
-            "Automated formatting checks prevent SKU conflicts and pricing errors",
-            "Batch update prices and stock levels across thousands of items in one upload"
-          ]
-        }
-      },
       "capabilities": [
         {
-          "title": "Bulk CSV Ingestion",
-          "description": "Upload thousands of products with descriptions, variants, and images in one go.",
-          "badge": "Bulk Action"
+          "title": "Bulk Product Upload",
+          "description": "Add thousands of SKUs in minutes. Upload standardized CSV or JSON files with product names, variants, pricing, and image URLs mapped automatically."
         },
         {
-          "title": "Full Catalog Export",
-          "description": "Download your complete product database anytime for backup or accounting purposes.",
-          "badge": "Data Freedom"
-        }
-      ],
-      "faqs": [
+          "title": "Marketplace Migration",
+          "description": "Effortlessly transition off high-commission platforms with built-in import parsers formatted for Shopee and Lazada product exports."
+        },
         {
-          "q": "Can I import product images through the CSV file?",
-          "a": "Yes! Provide image URLs in the CSV and the system automatically links them to your products."
+          "title": "Full Data Ownership",
+          "description": "Own 100% of your business data. Export customers, inventories, and transaction logs at any time in open formats for accounting and CRM use."
         }
       ]
     },
@@ -1022,89 +313,25 @@
       "title": "End-to-End Shipping & Thermal Label Printing",
       "tagline": "Cut packing time in half with automated shipping labels and live courier tracking",
       "categoryLabel": "Logistics & Shipping",
-      "shortDescription": "Print standard thermal shipping labels, calculate weight-based rates, and notify parcel tracking numbers.",
-      "fullDescription": "Streamline warehouse fulfillment with automated logistics tools. Calculate accurate shipping fees based on total weight matrices, batch print adhesive thermal shipping labels, and send automated tracking updates to customers.",
+      "shortDescription": "Print industry-standard thermal shipping labels, configure weight-based courier rates, and send automated tracking alerts to buyers.",
       "highlights": [
-        "Batch print thermal adhesive labels (100x150mm) with clear barcodes",
-        "Dynamic shipping rate matrix based on actual parcel weight",
-        "Automated tracking number notifications sent directly to buyers",
-        "Compatible with major couriers: Flash, Kerry, Thailand Post, J&T"
+        "One-click thermal shipping label printing (100x150mm format)",
+        "Smart shipping calculation by item weight, flat rate, or tiered cart size",
+        "Automatic tracking number dispatches and live tracking links for buyers",
+        "Compatible with top couriers: Flash Express, Kerry, Thailand Post, J&T"
       ],
-      "metrics": [
-        {
-          "value": "Thermal",
-          "label": "Crisp Thermal Label Prints",
-          "desc": "Supports standard 100x150mm shipping sticker rolls"
-        },
-        {
-          "value": "Auto Rate",
-          "label": "Weight-Based Shipping Matrix",
-          "desc": "Prevent shipping losses with accurate weight tiers"
-        },
-        {
-          "value": "Tracking",
-          "label": "Automated Tracking Updates",
-          "desc": "Buyers track parcel progress on store portal"
-        }
-      ],
-      "workflow": [
-        {
-          "step": "01",
-          "title": "Configure Store Shipping Rates",
-          "description": "Establish rates based on total order weight, or offer free delivery promotions on qualifying baskets."
-        },
-        {
-          "step": "02",
-          "title": "Batch Print Shipping Labels",
-          "description": "Select ready-to-ship orders and print crisp thermal labels complete with address and barcode."
-        },
-        {
-          "step": "03",
-          "title": "Assign Tracking & Alert Buyers",
-          "description": "Enter or scan tracking numbers. Status shifts to Shipped with automated customer alerts."
-        }
-      ],
-      "comparison": {
-        "traditional": {
-          "title": "Manual Fulfillment Packing",
-          "points": [
-            "Handwriting recipient addresses on boxes with risks of misdelivery",
-            "Cutting A4 papers and applying transparent tape, wasting supplies",
-            "Flat-rate shipping causing losses when customers order heavy goods",
-            "Answering constant buyer messages inquiring about tracking numbers"
-          ]
-        },
-        "sitepow": {
-          "title": "With Sitepow Logistics",
-          "points": [
-            "Peel-and-stick thermal labels print in seconds with crisp barcodes",
-            "Batch print dozens of labels in a single click, saving hours of packing time",
-            "Accurate weight matrix prevents shipping cost deficits",
-            "Customers track shipments independently on the web portal, reducing chat volume"
-          ]
-        }
-      },
       "capabilities": [
         {
           "title": "Thermal Label Printing",
-          "description": "Standard label sizing (100x150mm) ready to peel and stick directly onto parcel boxes.",
-          "badge": "Label Ready"
+          "description": "Generate standard 100x150mm thermal waybills formatted for instant peel-and-stick application, compatible with all thermal label printers."
         },
         {
           "title": "Smart Shipping Rate Matrix",
-          "description": "Configure tiered weight-based pricing and conditional free shipping rules flexibly.",
-          "badge": "Profit Safe"
+          "description": "Configure flexible shipping rules based on total order weight, piece counts, or flat-rate options with regional surcharges."
         },
         {
-          "title": "Worldwide & Regional Shipping Zones",
-          "description": "Configure tiered shipping rates across nationwide and international zones, calculated accurately by parcel weight.",
-          "badge": "Global Shipping"
-        }
-      ],
-      "faqs": [
-        {
-          "q": "Which thermal printer models are supported for shipping labels?",
-          "a": "Compatible with standard thermal label printers including Xprinter XP-420B, Flash Toy, and USB/Bluetooth label printers."
+          "title": "Automated Tracking Notifications",
+          "description": "Instantly update order status and transmit courier tracking links to buyers via notification when parcels are fulfilled."
         }
       ]
     }
