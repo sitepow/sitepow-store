@@ -1,10 +1,10 @@
 'use client'
-import React, { useRef } from 'react'
+
+import React from 'react'
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
-import { useGSAP } from '@gsap/react'
 import {
   IconBrandAndroid,
   IconBrandApple,
@@ -19,8 +19,6 @@ import {
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
-
-import { gsap } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
@@ -96,54 +94,6 @@ const PLATFORM_CONFIGS: PlatformConfig[] = [
 
 export function DownloadPlatformsSection() {
   const t = useTranslations('downloadPos.platforms')
-  const sectionRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (headerRef.current) {
-        gsap.fromTo(
-          headerRef.current,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (cardsRef.current) {
-        const cards = Array.from(cardsRef.current.children)
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            { y: 50, scale: 0.95, opacity: 0 },
-            {
-              y: 0,
-              scale: 1,
-              opacity: 1,
-              duration: 0.85,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
-            },
-          )
-        })
-      }
-    },
-    { scope: sectionRef },
-  )
 
   const platforms = PLATFORM_CONFIGS.map((p) => ({
     ...p,
@@ -155,21 +105,18 @@ export function DownloadPlatformsSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="platforms"
       className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
     >
-      <div ref={headerRef}>
+      <div>
         <MainSectionHeader
           badge={t('badge')}
           title={t('title')}
           description={t('description')}
         />
       </div>
-      <div
-        ref={cardsRef}
-        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4"
-      >
+
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
         {platforms.map((platform) => (
           <div
             key={platform.id}
@@ -193,6 +140,7 @@ export function DownloadPlatformsSection() {
                 />
               </>
             )}
+
             <div>
               <div className="flex items-start justify-between">
                 <div
@@ -204,6 +152,7 @@ export function DownloadPlatformsSection() {
                   {platform.badge}
                 </span>
               </div>
+
               <div className="pt-2.5 sm:pt-4">
                 <h3 className="text-foreground text-base font-bold sm:text-lg">
                   {platform.name}
@@ -217,7 +166,9 @@ export function DownloadPlatformsSection() {
                   {platform.description}
                 </p>
               </div>
+
               <div className="border-border/60 my-3.5 border-t sm:my-5" />
+
               <ul className="space-y-2 text-xs sm:space-y-2.5">
                 {platform.features.map((feat, idx) => (
                   <li key={idx} className="flex items-start gap-2">
@@ -234,6 +185,7 @@ export function DownloadPlatformsSection() {
                 ))}
               </ul>
             </div>
+
             <div className="space-y-2 pt-4 sm:pt-6">
               <Button
                 disabled
@@ -254,6 +206,7 @@ export function DownloadPlatformsSection() {
           </div>
         ))}
       </div>
+
       <div className="bg-primary/5 border-primary/20 relative flex flex-col items-center justify-between gap-4 overflow-hidden rounded-2xl border p-4 sm:gap-6 sm:rounded-3xl sm:p-8 md:flex-row">
         <div className="space-y-1.5 text-center sm:space-y-2 md:text-left">
           <div className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold">
@@ -267,6 +220,7 @@ export function DownloadPlatformsSection() {
             {t('webBanner.description')}
           </p>
         </div>
+
         <RainbowButton
           size="lg"
           asChild

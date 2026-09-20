@@ -1,78 +1,16 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/pricing'
-import { useIsMounted } from '@/hooks/use-is-mounted'
-
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 import { PricingCard } from './PricingCard'
 
 export function PricingPackages() {
-  const isMounted = useIsMounted()
   const t = useTranslations('pricing')
-  const sectionRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (!isMounted || !sectionRef.current) {
-        return
-      }
-
-      const plansGrid = sectionRef.current.querySelector(
-        '[data-animate="plans-grid"]',
-      )
-      const commonGrid = sectionRef.current.querySelector(
-        '[data-animate="common-grid"]',
-      )
-
-      if (plansGrid) {
-        gsap.fromTo(
-          plansGrid.children,
-          { y: 50, scale: 0.95, opacity: 0 },
-          {
-            y: 0,
-            scale: 1,
-            opacity: 1,
-            duration: 0.85,
-            stagger: 0.08,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: plansGrid,
-              start: 'top 88%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (commonGrid) {
-        gsap.fromTo(
-          commonGrid.children,
-          { y: 35, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.05,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: commonGrid,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      ScrollTrigger.refresh()
-    },
-    { scope: sectionRef, dependencies: [isMounted] },
-  )
 
   const translatedPlans = useMemo(() => {
     return PRICING_PLANS.map((plan, idx) => {
@@ -109,19 +47,13 @@ export function PricingPackages() {
   }, [t])
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative mx-auto w-full max-w-7xl space-y-12 px-3.5 sm:space-y-16 sm:px-6 lg:space-y-20 lg:px-8"
-    >
+    <section className="relative mx-auto w-full max-w-7xl space-y-12 px-3.5 sm:space-y-16 sm:px-6 lg:space-y-20 lg:px-8">
       <div
         aria-hidden="true"
         className="from-primary/15 pointer-events-none absolute top-24 left-1/2 -z-10 h-80 w-full max-w-4xl -translate-x-1/2 rounded-full bg-linear-to-r via-orange-500/10 to-transparent blur-3xl"
       />
 
-      <div
-        data-animate="plans-grid"
-        className="grid w-full items-stretch gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
-      >
+      <div className="grid w-full items-stretch gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {translatedPlans.map((plan, index) => (
           <PricingCard key={`${plan.title}-${index}`} {...plan} />
         ))}
@@ -138,10 +70,7 @@ export function PricingPackages() {
           description={t('commonFeatures.description')}
         />
 
-        <div
-          data-animate="common-grid"
-          className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
-        >
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {translatedCommonFeatures.map((feature, index) => (
             <div
               key={index}

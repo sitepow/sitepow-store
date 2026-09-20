@@ -99,7 +99,7 @@ export function PrivacyContent() {
           </Badge>
         </div>
 
-        <h1 className="font-landing text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           {t('hero.title')}
         </h1>
         <p className="text-muted-foreground max-w-3xl text-base leading-relaxed sm:text-lg">

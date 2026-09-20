@@ -1,13 +1,12 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { PROFIT_COMPARISON } from '@/constants/pricing'
 import { IconSparkles } from '@tabler/icons-react'
 
-import { gsap, useGSAP } from '@/lib/gsap'
 import { cn } from '@/lib/utils'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
@@ -15,57 +14,6 @@ import { TableScrollHint } from '../../_components/TableScrollHint'
 
 export function ProfitComparisonSection() {
   const t = useTranslations('pricing.profitComparison')
-  const sectionRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (!sectionRef.current) {
-        return
-      }
-
-      const header = sectionRef.current.querySelector('[data-animate="header"]')
-      const tableCard = sectionRef.current.querySelector(
-        '[data-animate="table-card"]',
-      )
-
-      if (header) {
-        gsap.fromTo(
-          header,
-          { y: 35, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: header,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (tableCard) {
-        gsap.fromTo(
-          tableCard,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: tableCard,
-              start: 'top 88%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-    },
-    { scope: sectionRef },
-  )
 
   const columns: string[] = useMemo(
     () => (t.raw('columns') as string[]) || PROFIT_COMPARISON.columns,
@@ -87,11 +35,8 @@ export function ProfitComparisonSection() {
   }, [t])
 
   return (
-    <section
-      ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
-    >
-      <div data-animate="header">
+    <section className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+      <div>
         <MainSectionHeader
           as="h3"
           badge={t('badge')}
@@ -102,10 +47,7 @@ export function ProfitComparisonSection() {
 
       <TableScrollHint />
 
-      <div
-        data-animate="table-card"
-        className="border-border/80 bg-card/60 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-xs sm:rounded-3xl"
-      >
+      <div className="border-border/80 bg-card/60 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-xs sm:rounded-3xl">
         <div className="overflow-x-auto">
           <table className="w-full min-w-180 border-collapse text-left">
             <thead>

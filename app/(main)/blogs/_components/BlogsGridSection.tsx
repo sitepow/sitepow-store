@@ -1,13 +1,12 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { type StaticBlogItem, getStaticBlogs } from '@/constants/blogs'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import {
   ArrowRight,
   Calendar,
@@ -19,8 +18,6 @@ import {
 } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
-
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 const formatDate = (dateStr: string, locale: string) =>
   new Date(dateStr).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
@@ -47,16 +44,11 @@ export function BlogsGridSection({
   noBlogsFoundText,
   readMoreText,
 }: BlogsGridSectionProps = {}) {
-  const isMounted = useIsMounted()
   const locale = useLocale()
   const t = useTranslations('blogs')
 
   const [selectedTag, setSelectedTag] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const featuredRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
 
   const texts = {
     allTags: allTagsText ?? t('allTags'),
@@ -92,59 +84,8 @@ export function BlogsGridSection({
   const featuredBlog = isDefaultView ? filteredBlogs[0] : null
   const restBlogs = isDefaultView ? filteredBlogs.slice(1) : filteredBlogs
 
-  useGSAP(
-    () => {
-      if (!isMounted) {
-        return
-      }
-
-      if (featuredRef.current) {
-        gsap.fromTo(
-          featuredRef.current,
-          { y: 35, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: featuredRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (gridRef.current) {
-        gsap.fromTo(
-          gridRef.current.children,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: 'top 92%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      ScrollTrigger.refresh()
-    },
-    { scope: sectionRef, dependencies: [isMounted, filteredBlogs] },
-  )
-
   return (
-    <div
-      ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8"
-    >
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8">
       <BlogFilterBar
         tags={availableTags}
         selectedTag={selectedTag}
@@ -161,7 +102,6 @@ export function BlogsGridSection({
         <div className="space-y-8 sm:space-y-12">
           {featuredBlog && (
             <FeaturedBlogCard
-              ref={featuredRef}
               blog={featuredBlog}
               locale={locale}
               readMoreText={texts.readMore}
@@ -169,10 +109,7 @@ export function BlogsGridSection({
             />
           )}
 
-          <div
-            ref={gridRef}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
-          >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {restBlogs.map((blog) => (
               <BlogCard
                 key={blog.id}
@@ -217,6 +154,7 @@ function BlogFilterBar({
     <div className="border-border/60 bg-card/60 relative flex flex-col items-center justify-between gap-3 rounded-2xl border p-2.5 shadow-sm backdrop-blur-xl sm:flex-row sm:rounded-3xl sm:p-3">
       <div className="no-scrollbar flex w-full max-w-full items-center gap-1.5 overflow-x-auto pb-1 sm:w-auto sm:pb-0">
         <button
+          type="button"
           onClick={() => onSelectTag('all')}
           className={getPillStyle(selectedTag === 'all')}
         >
@@ -225,6 +163,7 @@ function BlogFilterBar({
         {tags.map((tag) => (
           <button
             key={tag}
+            type="button"
             onClick={() => onSelectTag(tag)}
             className={getPillStyle(selectedTag === tag)}
           >
@@ -243,6 +182,7 @@ function BlogFilterBar({
         />
         {searchQuery && (
           <button
+            type="button"
             onClick={() => onSearchChange('')}
             className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer"
           >
@@ -269,20 +209,18 @@ function BlogEmptyState({ message }: { message: string }) {
 }
 
 function FeaturedBlogCard({
-  ref,
   blog,
   locale,
   readMoreText,
   readingTimeText,
 }: {
-  ref?: React.Ref<HTMLDivElement>
   blog: StaticBlogItem
   locale: string
   readMoreText: string
   readingTimeText: (min: number) => string
 }) {
   return (
-    <div ref={ref} className="group relative">
+    <div className="group relative">
       <Link
         href={`/blogs/${blog.slug}`}
         className="absolute inset-0 z-10 cursor-pointer"

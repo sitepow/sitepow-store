@@ -1,17 +1,15 @@
 'use client'
-import { useRef, useState } from 'react'
+
+import { useState } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { FEATURE_IMAGES, getLocalizedFeatures } from '@/constants/features'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconArrowRight, IconCheck } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
-
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 
 const CATEGORIES = [
   { id: 'all', key: 'all' },
@@ -23,81 +21,25 @@ const CATEGORIES = [
 ]
 
 export function FeaturesGridSection() {
-  const isMounted = useIsMounted()
   const t = useTranslations('features')
   const features = getLocalizedFeatures(t)
   const [selectedCat, setSelectedCat] = useState('all')
+
   const filteredFeatures =
     selectedCat === 'all'
       ? features
       : features.filter((f) => f.category === selectedCat)
 
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const tabsRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const hasAnimatedTabs = useRef(false)
-
-  useGSAP(
-    () => {
-      if (!isMounted) return
-
-      if (tabsRef.current && !hasAnimatedTabs.current) {
-        hasAnimatedTabs.current = true
-        gsap.fromTo(
-          tabsRef.current,
-          { y: 25, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: tabsRef.current,
-              start: 'top 92%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (gridRef.current) {
-        const cards = Array.from(gridRef.current.children)
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            { y: 40, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 92%',
-                toggleActions: 'play none none none',
-              },
-            },
-          )
-        })
-      }
-
-      ScrollTrigger.refresh()
-    },
-    { scope: sectionRef, dependencies: [isMounted, selectedCat] },
-  )
-
   return (
-    <div
-      ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
-    >
-      <div ref={tabsRef} className="flex justify-center">
+    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+      <div className="flex justify-center">
         <div className="bg-muted/70 border-border/80 inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 rounded-xl border p-1 shadow-xs sm:gap-1 sm:rounded-2xl sm:p-1.5">
           {CATEGORIES.map((cat) => {
             const isSelected = selectedCat === cat.id
             return (
               <button
                 key={cat.id}
+                type="button"
                 onClick={() => setSelectedCat(cat.id)}
                 className={`cursor-pointer rounded-lg px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:rounded-xl sm:px-3.5 sm:py-1.5 sm:text-sm ${
                   isSelected
@@ -111,17 +53,15 @@ export function FeaturesGridSection() {
           })}
         </div>
       </div>
-      <div
-        ref={gridRef}
-        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3"
-      >
+
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredFeatures.map((feat) => (
           <div
             key={feat.slug}
             className="group border-border/80 bg-card/60 hover:border-border hover:bg-card relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3.5 shadow-xs transition-all duration-300 hover:shadow-md sm:rounded-3xl sm:p-5"
           >
             <div>
-              <div className="border-border/60 bg-muted/40 relative mb-3 aspect-[16/9] w-full overflow-hidden rounded-xl border sm:mb-4">
+              <div className="border-border/60 bg-muted/40 relative mb-3 aspect-video w-full overflow-hidden rounded-xl border sm:mb-4">
                 <Image
                   src={
                     feat.image ||
@@ -133,7 +73,7 @@ export function FeaturesGridSection() {
                   className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div className="from-card/90 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+                <div className="from-card/90 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
                 <div className="absolute top-2.5 left-2.5 flex items-center gap-2">
                   <div className="bg-background/90 text-primary flex size-8 items-center justify-center rounded-lg shadow-xs backdrop-blur-md">
                     {feat.icon}
@@ -154,7 +94,9 @@ export function FeaturesGridSection() {
                   {feat.shortDescription}
                 </p>
               </div>
+
               <div className="border-border/60 my-3.5 border-t sm:my-5" />
+
               <ul className="space-y-1.5 text-xs sm:space-y-2">
                 {feat.highlights.slice(0, 3).map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2">
@@ -171,11 +113,13 @@ export function FeaturesGridSection() {
                 ))}
               </ul>
             </div>
+
             <Link
               href={`/features/${feat.slug}`}
               className="absolute inset-0 z-10 cursor-pointer"
               aria-label={feat.title}
             />
+
             <div className="relative z-20 pt-4 sm:pt-6">
               <Button
                 asChild

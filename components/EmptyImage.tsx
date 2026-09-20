@@ -10,7 +10,7 @@ export function EmptyImage({ className, text, ...props }: EmptyImageProps) {
   return (
     <div
       className={cn(
-        'bg-primary text-primary-foreground font-landing flex size-full items-center justify-center p-2 text-center',
+        'bg-primary text-primary-foreground flex size-full items-center justify-center p-2 text-center',
         className,
       )}
       {...props}

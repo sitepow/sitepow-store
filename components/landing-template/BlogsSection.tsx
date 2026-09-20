@@ -1,20 +1,14 @@
 'use client'
-import { useRef } from 'react'
 
 import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 import { MainSectionHeader } from '@/app/(main)/_components/MainSectionHeader'
-import { getStaticBlogs } from '@/constants/blogs'
-import { useGSAP } from '@gsap/react'
+import { StaticBlogItem, getStaticBlogs } from '@/constants/blogs'
 import { ArrowRight, Calendar, Clock, Tag } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-
-import { gsap } from '@/lib/gsap'
-
-import { StaticBlogItem } from '@/constants/blogs'
 
 export interface BlogsSectionProps {
   badge?: string
@@ -43,72 +37,16 @@ export function BlogsSection({
   const resolvedViewAll = viewAll ?? t('viewAll')
   const resolvedReadMore = readMore ?? t('readMore')
 
-  const sectionRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (headerRef.current) {
-        gsap.fromTo(
-          headerRef.current,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (gridRef.current) {
-        const articles = Array.from(gridRef.current.children)
-        articles.forEach((article) => {
-          gsap.fromTo(
-            article,
-            { y: 50, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.85,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: article,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
-            },
-          )
-        })
-      }
-    },
-    { scope: sectionRef },
-  )
-
   return (
-    <section
-      ref={sectionRef}
-      id="blogs"
-      className="relative w-full py-16 md:py-24"
-    >
+    <section id="blogs" className="relative w-full py-16 md:py-24">
       <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-        <div ref={headerRef}>
-          <MainSectionHeader
-            badge={resolvedBadge}
-            title={resolvedTitle}
-            description={resolvedDescription}
-          />
-        </div>
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
-        >
+        <MainSectionHeader
+          badge={resolvedBadge}
+          title={resolvedTitle}
+          description={resolvedDescription}
+        />
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {blogs.map((blog, idx) => {
             const isFeatured = idx === 0
             const readingMinutes = Math.ceil(blog.content.length / 500) || 3
@@ -116,6 +54,7 @@ export function BlogsSection({
               locale === 'th' ? 'th-TH' : 'en-US',
               { day: 'numeric', month: 'short', year: 'numeric' },
             )
+
             return (
               <article
                 key={blog.id}
@@ -148,6 +87,7 @@ export function BlogsSection({
                     ))}
                   </div>
                 </Link>
+
                 <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
                   <div className="space-y-2.5">
                     <div className="text-muted-foreground flex items-center gap-3 text-[11px]">
@@ -175,6 +115,7 @@ export function BlogsSection({
                       {blog.description}
                     </p>
                   </div>
+
                   <div className="pt-4">
                     <Link
                       href={`/blogs/${blog.slug}`}
@@ -189,6 +130,7 @@ export function BlogsSection({
             )
           })}
         </div>
+
         <div className="flex justify-center pt-2">
           <Button asChild variant="outline" className="rounded-xl px-6">
             <Link href="/blogs" className="inline-flex items-center gap-2">

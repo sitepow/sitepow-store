@@ -7,7 +7,6 @@ import { PRICING_OPTIONS } from '@/constants/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconPackage, IconServer } from '@tabler/icons-react'
 
-import { ScrollTrigger } from '@/lib/gsap'
 import { cn } from '@/lib/utils'
 
 import { MainHeroHeader } from '../../_components/MainHeroHeader'
@@ -26,9 +25,6 @@ export function PricingHeroSection() {
 
   const handleTabChange = (value: string) => {
     setSelectedTab(value)
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh()
-    })
   }
 
   return (

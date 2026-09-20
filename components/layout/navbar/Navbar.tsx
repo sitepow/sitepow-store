@@ -10,7 +10,6 @@ import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { IconLogin } from '@tabler/icons-react'
 import { Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/EmailVerified'
@@ -24,7 +23,6 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { DesktopGuestActions } from './_components/DesktopGuestActions'
 import { DesktopMenuItems } from './_components/DesktopMenuItems'
 import { DesktopUserActions } from './_components/DesktopUserActions'
 import { MobileMenuItems } from './_components/MobileMenuItems'
@@ -66,79 +64,93 @@ export function Navbar() {
 
   return (
     <>
-      <header className="border-border/40 bg-background fixed top-0 left-0 z-50 w-full border-b">
-        <div className="container mx-auto flex items-center justify-between px-6 py-4 md:px-10">
-          <LogoBrand />
-          <div className="hidden lg:block">
+      <header className="fixed top-0 left-0 z-50 w-full border-b border-neutral-200/80 bg-white/95 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/95">
+        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="shrink-0">
+            <LogoBrand />
+          </div>
+
+          <div className="hidden lg:flex lg:items-center lg:justify-center">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="gap-1">
                 <DesktopMenuItems />
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-          {!isAuth && (
-            <div className="hidden items-center gap-2.5 lg:flex">
-              <DesktopGuestActions
-                loginHref={loginHref}
-                registerHref={registerHref}
-              />
-            </div>
-          )}
-          {isAuth && (
-            <div className="hidden items-center gap-4 lg:flex">
+
+          <div className="hidden items-center gap-5 lg:flex">
+            {!isAuth ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href={loginHref}
+                  className="text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white"
+                >
+                  เข้าสู่ระบบ
+                </Link>
+
+                <Button
+                  asChild
+                  className="h-9 rounded-full bg-orange-500 px-5 text-sm font-medium text-white shadow-xs transition-colors hover:bg-orange-600"
+                >
+                  <Link href={registerHref}>ทดลองใช้ฟรี</Link>
+                </Button>
+              </div>
+            ) : (
               <DesktopUserActions
                 navbarItems={navbarItems}
                 userRole={userRole}
               />
-            </div>
-          )}
-          <div className="flex items-center gap-2 lg:hidden">
-            {isAuth && (
-              <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
             )}
-            <div className="flex flex-wrap gap-2">
-              {!isAuth && (
-                <Button size="icon-lg" variant="outline" asChild>
-                  <Link href={loginHref} aria-label="เข้าสู่ระบบ">
-                    <IconLogin className="size-[1.2rem]" />
-                  </Link>
-                </Button>
-              )}
-              <QuickSettingsMenu buttonVariant="outline" />
+          </div>
+
+          <div className="flex items-center gap-2 lg:hidden">
+            <QuickSettingsMenu buttonVariant="outline" />
+
+            {isAuth ? (
+              <UserAvatarDropdown redirectPath="merchant" items={navbarItems} />
+            ) : (
               <Button
-                variant="outline"
-                size="icon-lg"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label="เมนูหลัก"
+                size="sm"
+                asChild
+                className="h-8 rounded-full bg-orange-500 px-3.5 text-xs font-medium text-white hover:bg-orange-600"
               >
-                {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
+                <Link href={registerHref}>ทดลองใช้ฟรี</Link>
               </Button>
-            </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="inline-flex size-9 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 focus:outline-hidden dark:text-neutral-300 dark:hover:bg-neutral-800"
+              aria-label="เมนูหลัก"
+            >
+              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
         </div>
+
         <div
           className={cn(
-            'bg-background text-foreground container mx-auto overflow-y-auto border-t transition-all duration-300 ease-in-out lg:hidden',
+            'overflow-y-auto border-t border-neutral-200/80 bg-white transition-all duration-300 ease-in-out lg:hidden dark:border-neutral-800 dark:bg-neutral-950',
             isMenuOpen
-              ? 'max-h-[calc(100vh-80px)] opacity-100'
+              ? 'max-h-[calc(100vh-4rem)] opacity-100 shadow-xl'
               : 'pointer-events-none max-h-0 opacity-0',
           )}
         >
-          <MobileMenuItems
-            onClose={() => setIsMenuOpen(false)}
-            isAuthenticated={isAuth}
-            loginHref={loginHref}
-            registerHref={registerHref}
-          />
+          <div className="container mx-auto px-4 py-4 sm:px-6">
+            <MobileMenuItems
+              onClose={() => setIsMenuOpen(false)}
+              isAuthenticated={isAuth}
+              loginHref={loginHref}
+              registerHref={registerHref}
+            />
+          </div>
         </div>
+
         {isEmailUnverified && <EmailVerified />}
       </header>
-      <div
-        className={cn(
-          'h-18.25 lg:h-20.25',
-          isEmailUnverified && 'h-35 lg:h-26.25',
-        )}
-      />
+
+      <div className={cn('h-16', isEmailUnverified && 'h-32 lg:h-24')} />
     </>
   )
 }

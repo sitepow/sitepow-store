@@ -1,18 +1,16 @@
 'use client'
-import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
-import { useGSAP } from '@gsap/react'
 import {
-  IconBolt,
+  IconBarcode,
   IconBrandMastercard,
   IconBrandStripe,
-  IconCoins,
-  IconDeviceMobile,
+  IconBuildingBank,
+  IconDevices,
   IconPackage,
+  IconPrinter,
   IconQrcode,
-  IconRobot,
   IconShieldCheck,
   IconTruck,
   IconWorld,
@@ -20,48 +18,68 @@ import {
 
 import { Marquee } from '@/components/magicui/marquee'
 
-import { gsap } from '@/lib/gsap'
-
-const LOGO_ITEMS = [
-  { name: 'PromptPay QR', icon: IconQrcode, note: 'PromptPay QR' },
+const INTEGRATION_ITEMS = [
   {
-    name: 'Stripe Payments',
-    icon: IconBrandStripe,
-    note: 'Credit / Debit Cards',
+    name: 'PromptPay QR',
+    category: 'Instant Payment',
+    icon: IconQrcode,
   },
   {
-    name: 'AI Slip Verification',
-    icon: IconRobot,
-    note: 'AI Slip Verification',
+    name: 'Stripe Payments',
+    category: 'Global Gateway',
+    icon: IconBrandStripe,
   },
   {
     name: 'Visa & Mastercard',
+    category: 'Credit / Debit',
     icon: IconBrandMastercard,
-    note: 'Visa & Mastercard',
   },
-  { name: '0% GP Commission', icon: IconBolt, note: '0% GP Commission' },
-  { name: 'Flash Express', icon: IconTruck, note: 'Flash Express' },
-  { name: 'Kerry Express', icon: IconPackage, note: 'Kerry Express' },
-  { name: 'Thailand Post', icon: IconTruck, note: 'Thailand Post EMS' },
+  {
+    name: 'Thai Bank Transfer',
+    category: 'Direct Transfer',
+    icon: IconBuildingBank,
+  },
+
+  {
+    name: 'Flash Express',
+    category: 'Courier Logistics',
+    icon: IconTruck,
+  },
+  {
+    name: 'Thailand Post EMS',
+    category: 'Postal Service',
+    icon: IconPackage,
+  },
+  {
+    name: 'Kerry Express',
+    category: 'Express Delivery',
+    icon: IconTruck,
+  },
   {
     name: 'Worldwide Shipping',
+    category: 'Global Zones',
     icon: IconWorld,
-    note: 'Worldwide Zone Rates',
+  },
+
+  {
+    name: 'Thermal Printers',
+    category: 'ESC/POS 80mm & 58mm',
+    icon: IconPrinter,
   },
   {
-    name: 'Multi-Currency',
-    icon: IconCoins,
-    note: 'THB, USD, EUR, JPY',
+    name: 'Barcode Scanners',
+    category: 'USB / Bluetooth HID',
+    icon: IconBarcode,
   },
   {
-    name: 'Digital Key Codes',
-    icon: IconDeviceMobile,
-    note: 'Digital Goods & Keys',
+    name: 'Cross-Platform',
+    category: 'PC, Mac, iPad, Android',
+    icon: IconDevices,
   },
   {
-    name: 'SSL Security',
+    name: 'SSL 256-bit',
+    category: 'Bank-Grade Security',
     icon: IconShieldCheck,
-    note: 'SSL Encryption 256-bit',
   },
 ]
 
@@ -71,63 +89,43 @@ export interface LogosSectionProps {
 
 export function LogosSection({ title }: LogosSectionProps = {}) {
   const t = useTranslations('home.logos')
-  const sectionRef = useRef<HTMLElement>(null)
   const resolvedTitle = title ?? t('title')
-
-  useGSAP(
-    () => {
-      if (sectionRef.current) {
-        gsap.from(sectionRef.current, {
-          opacity: 0,
-          y: 20,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-        })
-      }
-    },
-    { scope: sectionRef },
-  )
 
   return (
     <section
-      ref={sectionRef}
       id="logos"
-      className="border-border/40 relative w-full border-b py-12"
+      className="border-border/40 relative w-full border-b py-10 sm:py-12"
     >
       <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
-        <h3 className="text-muted-foreground text-center text-xs font-semibold">
-          {resolvedTitle}
-        </h3>
-        <div className="relative mt-6">
-          <Marquee pauseOnHover className="[--duration:35s] [--gap:1.5rem]">
-            {LOGO_ITEMS.map((item, idx) => (
+        <p className="text-muted-foreground text-center text-xs font-medium tracking-wider uppercase">
+          {resolvedTitle ||
+            'Seamlessly Integrated with Leading Platforms & Hardware'}
+        </p>
+
+        <div className="relative mt-6 overflow-hidden">
+          <Marquee pauseOnHover className="[--duration:40s] [--gap:1rem]">
+            {INTEGRATION_ITEMS.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-card/60 text-card-foreground hover:bg-card flex items-center gap-2.5 rounded-xl border px-4 py-2 shadow-xs transition-colors"
+                className="bg-card/50 hover:bg-card/80 border-border/70 text-foreground flex items-center gap-3 rounded-xl border px-3.5 py-2 shadow-2xs backdrop-blur-xs transition-colors"
               >
-                <div className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg">
+                <div className="bg-primary/10 text-primary flex size-7 shrink-0 items-center justify-center rounded-lg">
                   <item.icon size={16} />
                 </div>
-                <div>
-                  <div className="text-xs leading-none font-semibold">
+                <div className="flex flex-col text-left">
+                  <span className="text-xs leading-tight font-semibold">
                     {item.name}
-                  </div>
-                  <div className="text-muted-foreground text-[10px]">
-                    {item.note}
-                  </div>
+                  </span>
+                  <span className="text-muted-foreground text-[10px] leading-tight">
+                    {item.category}
+                  </span>
                 </div>
               </div>
             ))}
           </Marquee>
-          <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-24 bg-gradient-to-r to-transparent md:w-36" />
-          <div className="from-background pointer-events-none absolute inset-y-0 right-0 h-full w-24 bg-gradient-to-l to-transparent md:w-36" />
-          <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-12 bg-gradient-to-r to-transparent sm:w-24 md:w-36" />
-          <div className="from-background pointer-events-none absolute inset-y-0 right-0 h-full w-12 bg-gradient-to-l to-transparent sm:w-24 md:w-36" />
+
+          <div className="from-background pointer-events-none absolute inset-y-0 left-0 h-full w-16 bg-linear-to-r to-transparent sm:w-28" />
+          <div className="from-background pointer-events-none absolute inset-y-0 right-0 h-full w-16 bg-linear-to-l to-transparent sm:w-28" />
         </div>
       </div>
     </section>

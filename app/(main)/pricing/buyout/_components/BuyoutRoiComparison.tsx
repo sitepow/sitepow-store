@@ -1,52 +1,16 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { MainSectionHeader } from '@/app/(main)/_components/MainSectionHeader'
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconCheck, IconTrendingUp } from '@tabler/icons-react'
 
-import { ScrollTrigger, gsap, useGSAP } from '@/lib/gsap'
 import { cn } from '@/lib/utils'
 
 export function BuyoutRoiComparison() {
-  const isMounted = useIsMounted()
   const t = useTranslations('buyout.roi')
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useGSAP(
-    () => {
-      if (!isMounted || !sectionRef.current) {
-        return
-      }
-
-      const tableCard = sectionRef.current.querySelector(
-        '[data-animate="table-card"]',
-      )
-      if (tableCard) {
-        gsap.fromTo(
-          tableCard,
-          { y: 35, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: tableCard,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      ScrollTrigger.refresh()
-    },
-    { scope: sectionRef, dependencies: [isMounted] },
-  )
 
   const headers = useMemo(
     () => [0, 1, 2].map((idx) => t(`headers.${idx}`)),
@@ -75,10 +39,7 @@ export function BuyoutRoiComparison() {
   }, [t])
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative mx-auto w-full max-w-5xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8"
-    >
+    <section className="relative mx-auto w-full max-w-5xl space-y-8 px-3.5 sm:space-y-12 sm:px-6 lg:px-8">
       <MainSectionHeader
         as="h2"
         badge={t('badge')}
@@ -86,10 +47,7 @@ export function BuyoutRoiComparison() {
         description={t('description')}
       />
 
-      <div
-        data-animate="table-card"
-        className="border-border/80 bg-card/80 overflow-hidden rounded-3xl border shadow-lg backdrop-blur-md"
-      >
+      <div className="border-border/80 bg-card/80 overflow-hidden rounded-3xl border shadow-lg backdrop-blur-md">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead>

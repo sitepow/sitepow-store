@@ -1,5 +1,4 @@
 'use client'
-import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -15,8 +14,6 @@ import {
 import { BorderBeam } from '@/components/magicui/border-beam'
 import { RainbowButton } from '@/components/magicui/rainbow-button'
 import { Button } from '@/components/ui/button'
-
-import { gsap, useGSAP } from '@/lib/gsap'
 
 import { MainSectionHeader } from '../../_components/MainSectionHeader'
 
@@ -83,53 +80,6 @@ const CHANNEL_CONFIGS = [
 
 export function ContactChannelsSection() {
   const t = useTranslations('contact.channels')
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (headerRef.current) {
-        gsap.fromTo(
-          headerRef.current,
-          { y: 35, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none none',
-            },
-          },
-        )
-      }
-
-      if (cardsRef.current) {
-        const cards = Array.from(cardsRef.current.children)
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            { y: 45, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.85,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
-            },
-          )
-        })
-      }
-    },
-    { scope: sectionRef },
-  )
 
   const channels = CHANNEL_CONFIGS.map((ch) => ({
     ...ch,
@@ -141,21 +91,16 @@ export function ContactChannelsSection() {
   }))
 
   return (
-    <div
-      ref={sectionRef}
-      className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
-    >
-      <div ref={headerRef}>
+    <div className="mx-auto w-full max-w-7xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
+      <div>
         <MainSectionHeader
           badge={t('badge')}
           title={t('title')}
           description={t('description')}
         />
       </div>
-      <div
-        ref={cardsRef}
-        className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4"
-      >
+
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
         {channels.map((ch) => (
           <div
             key={ch.id}
@@ -179,6 +124,7 @@ export function ContactChannelsSection() {
                 />
               </>
             )}
+
             <div>
               <div className="flex items-start justify-between">
                 <div
@@ -204,6 +150,7 @@ export function ContactChannelsSection() {
                 </p>
               </div>
             </div>
+
             <div className="pt-3.5 sm:pt-6">
               {ch.onClick ? (
                 ch.isPrimary ? (

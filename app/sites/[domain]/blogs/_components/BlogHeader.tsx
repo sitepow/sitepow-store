@@ -18,7 +18,7 @@ export function BlogHeader({ createdAt, readingTime }: BlogHeaderProps) {
   const t = useTranslations('common.actions')
 
   return (
-    <div className="font-landing flex w-full flex-wrap items-center justify-center gap-5 sm:justify-between">
+    <div className="flex w-full flex-wrap items-center justify-center gap-5 sm:justify-between">
       <Link href="/blogs">
         <Button
           variant="ghost"

@@ -1,13 +1,9 @@
 'use client'
-import { useRef } from 'react'
 
 import { useTranslations } from 'next-intl'
 
 import { MainFaqAccordion } from '@/app/(main)/_components/MainFaqAccordion'
 import { MainSectionHeader } from '@/app/(main)/_components/MainSectionHeader'
-import { useGSAP } from '@gsap/react'
-
-import { gsap } from '@/lib/gsap'
 
 export interface FaqSectionProps {
   badge?: string
@@ -23,38 +19,10 @@ export function FaqSection({
   items: propItems,
 }: FaqSectionProps = {}) {
   const t = useTranslations('home.faq')
-  const sectionRef = useRef<HTMLElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   const resolvedBadge = badge ?? t('badge')
   const resolvedTitle = title ?? t('title')
   const resolvedDescription = description ?? t('description')
-
-  useGSAP(
-    () => {
-      if (contentRef.current) {
-        const elements = Array.from(contentRef.current.children)
-        elements.forEach((el) => {
-          gsap.fromTo(
-            el,
-            { y: 40, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: el,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
-            },
-          )
-        })
-      }
-    },
-    { scope: sectionRef },
-  )
 
   const items =
     propItems ??
@@ -62,16 +30,13 @@ export function FaqSection({
       q: t(`items.${idx}.q`),
       a: t(`items.${idx}.a`),
     }))
+
   return (
     <section
-      ref={sectionRef}
       id="faq"
       className="border-border/40 relative w-full border-t py-10 sm:py-16 md:py-24"
     >
-      <div
-        ref={contentRef}
-        className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8"
-      >
+      <div className="mx-auto w-full max-w-4xl space-y-4 px-3.5 sm:space-y-8 sm:px-6 lg:px-8">
         <MainSectionHeader
           badge={resolvedBadge}
           title={resolvedTitle}

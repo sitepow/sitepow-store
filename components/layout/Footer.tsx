@@ -1,4 +1,5 @@
 'use client'
+
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
@@ -8,11 +9,9 @@ import {
   IconBrandLine,
   IconBrandMessenger,
   IconExternalLink,
-  IconHeadset,
 } from '@tabler/icons-react'
 
 import { LogoBrand } from '@/components/LogoBrand'
-import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
 
 interface FooterLink {
   label: string
@@ -33,22 +32,22 @@ export function Footer() {
 
   const socialLinks = [
     {
-      icon: <IconBrandFacebook className="size-4" />,
+      icon: <IconBrandFacebook className="size-5" />,
       href: 'https://web.facebook.com/profile.php?id=61584675643468',
       label: 'Facebook',
     },
     {
-      icon: <IconBrandMessenger className="size-4" />,
+      icon: <IconBrandMessenger className="size-5" />,
       href: 'https://m.me/61584675643468',
       label: 'Messenger',
     },
     {
-      icon: <IconBrandLine className="size-4" />,
+      icon: <IconBrandLine className="size-5" />,
       href: 'https://line.me/ti/p/~@830sdfow',
       label: 'LINE Official',
     },
     {
-      icon: <IconBrandInstagram className="size-4" />,
+      icon: <IconBrandInstagram className="size-5" />,
       href: 'https://www.instagram.com/sitepow.store',
       label: 'Instagram',
     },
@@ -136,59 +135,53 @@ export function Footer() {
   ]
 
   return (
-    <footer className="border-border/40 bg-background text-foreground border-t transition-colors">
-      <div className="container mx-auto max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
-          <div className="flex flex-col justify-between space-y-6 lg:col-span-4">
+    <footer className="bg-[#282828] text-neutral-300">
+      <div className="container mx-auto max-w-7xl px-6 py-14 sm:px-8 md:py-20 lg:px-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-12">
+          <div className="flex flex-col items-start space-y-6 lg:col-span-4">
             <div className="space-y-4">
-              <LogoBrand />
-              <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+              <LogoBrand className="text-white" />
+              <p className="max-w-xs text-sm leading-relaxed text-neutral-300/90">
                 {t('description')}
               </p>
-
-              <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:gap-3">
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                  <IconHeadset className="text-primary size-4 shrink-0" />
-                  <span>{t('supportHours')}</span>
-                </div>
-              </div>
             </div>
 
-            <div className="pt-2">
-              <p className="text-muted-foreground mb-3 text-xs font-medium">
-                {t('followUs')}
-              </p>
-              <div className="flex flex-wrap items-center gap-2">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="border-border/60 bg-muted/30 text-muted-foreground hover:border-primary/40 hover:bg-muted hover:text-foreground flex size-9 items-center justify-center rounded-xl border transition-all hover:shadow-xs active:scale-95"
-                  >
-                    {social.icon}
-                  </a>
-                ))}
-              </div>
+            <div>
+              <Link
+                href="/contact"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-[#1890ff] px-8 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#1580e6]"
+              >
+                {t('columns.help.contact') || 'ติดต่อเรา'}
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-4 pt-1">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="text-white/80 transition-colors hover:text-white"
+                >
+                  {social.icon}
+                </a>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8 lg:gap-x-8">
+          <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:col-span-8 lg:gap-x-10 xl:grid-cols-4">
             {footerNav.map((col, idx) => (
               <div key={idx} className="flex flex-col space-y-4">
-                <h3 className="text-foreground text-sm font-semibold">
+                <h3 className="text-base font-semibold text-white">
                   {col.title}
                 </h3>
-                <ul className="space-y-3 text-sm">
+                <ul className="space-y-3">
                   {col.links.map((link, linkIdx) => {
                     const isExternal = link.external
-                    const linkClass = `group inline-flex items-center gap-1.5 text-xs sm:text-sm transition-colors ${
-                      link.highlight
-                        ? 'text-primary font-medium hover:underline'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`
+                    const linkClass =
+                      'group inline-flex items-center gap-1.5 text-xs text-neutral-400 transition-colors hover:text-white sm:text-sm'
                     return (
                       <li key={linkIdx} className="leading-snug">
                         {isExternal ? (
@@ -205,7 +198,7 @@ export function Footer() {
                           <Link href={link.href} className={linkClass}>
                             <span>{link.label}</span>
                             {link.badge && (
-                              <span className="border-primary/20 bg-primary/10 text-primary shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] leading-none font-medium">
+                              <span className="shrink-0 rounded bg-neutral-700 px-1.5 py-0.5 text-[10px] leading-none text-neutral-300">
                                 {link.badge}
                               </span>
                             )}
@@ -220,15 +213,12 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-border/40 mt-14 flex flex-col-reverse items-center justify-between gap-4 border-t pt-8 sm:flex-row">
-          <div className="text-muted-foreground text-center text-xs sm:text-left">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-neutral-700/60 pt-8 sm:flex-row">
+          <div className="w-full text-center text-xs text-neutral-400">
             <p>
               © {currentYear} Sitepow Co., Ltd.{' '}
               <span>{t.raw('rights') as string}</span>
             </p>
-          </div>
-          <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-4 text-xs">
-            <QuickSettingsMenu buttonVariant="ghost" />
           </div>
         </div>
       </div>
