@@ -1,18 +1,12 @@
-'use client'
-
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/format'
 
 export function ProductPreviewContent() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const { control } = useFormContext()
   const { selectedStoreSlug } = useStoreFilter()
 
@@ -21,7 +15,7 @@ export function ProductPreviewContent() {
     name: ['title', 'slug', 'tags', 'variants', 'images'],
   })
 
-  const displayTitle = title || t('previewDefaultTitle')
+  const displayTitle = title || 'ชื่อสินค้าจะแสดงตรงนี้'
   const displaySlug = slug || 'url-slug-example'
   const formattedTags = arrayToString(stringToArray(tags))
 
@@ -67,26 +61,14 @@ export function ProductPreviewContent() {
   const minPrice = getMinPrice()
 
   const priceText =
-    minPrice !== null ? ` (฿${minPrice.toLocaleString()}) ` : ' '
-  const description = `${formattedTags ? `${formattedTags} ` : ''}${t(
-    'previewDefaultDescription',
-    {
-      title: title ? `${title} ` : '',
-    },
-  )}`
+    minPrice !== null ? ` เริ่มต้นเพียง ฿${minPrice.toLocaleString()}! ` : ' '
+  const description = `${formattedTags ? `${formattedTags}` : ''}ช้อปเลย! ${title || 'สินค้าคุณภาพ'}${priceText}พร้อมโปรโมชั่นพิเศษและตัวเลือกเสริมมากมาย การันตีของแท้ สั่งซื้อได้ที่นี่...`
 
   return (
-    <div
-      className="text-foreground space-y-6"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <div className="text-foreground space-y-6">
       <div className="dark:bg-foreground/5 rounded-lg border p-4">
         <p className="mb-2 text-xs font-semibold uppercase opacity-60">
-          {t('previewGoogleSearch')}
+          Google Search (ตัวอย่าง)
         </p>
         <div className="space-y-1">
           <p className="text-sm text-emerald-700">
@@ -100,7 +82,7 @@ export function ProductPreviewContent() {
       </div>
       <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
         <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
-          {t('previewSocialShare')}
+          Social Share (ตัวอย่าง)
         </p>
         <Image
           src={previewImageUrl}

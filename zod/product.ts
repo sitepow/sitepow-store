@@ -45,30 +45,17 @@ export const variantSchema = z.object({
   rewardPoints: rewardPointsSchema,
   digitalItems: z.array(digitalItemSchema).default([]),
   isAvailable: z.boolean().default(true),
-  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 const addonSchema = z.object({
   title: z.string().min(1, { message: 'กรุณาระบุชื่อบริการเสริม' }),
   price: z.number().min(0),
   isAvailable: z.boolean().default(true),
-  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 const metadataSchema = z.object({
   key: z.string().min(1),
   value: z.string(),
-})
-
-export const affiliateLinkSchema = z.object({
-  id: z.string().optional(),
-  platform: z.enum(['SHOPEE', 'LAZADA', 'TIKTOK', 'OTHER']).default('OTHER'),
-  url: z.string().min(1, { message: 'กรุณาระบุลิงก์สินค้า' }),
-  label: z.string().optional().or(z.literal('')),
-  price: z.number().min(0, { message: 'ราคาต้องไม่ต่ำกว่า 0' }).default(0),
-  originalPrice: z.number().min(0).optional(),
-  isDiscounted: z.boolean().default(false),
-  discountText: z.string().optional().or(z.literal('')),
 })
 
 export const productFormSchema = z.object({
@@ -97,8 +84,6 @@ export const productFormSchema = z.object({
   metadata: z.array(metadataSchema).default([]),
   tags: z.string().optional().or(z.literal('')),
   productType: z.enum(ProductType).default(ProductType.PHYSICAL),
-  affiliateLinks: z.array(affiliateLinkSchema).default([]),
-  translations: z.record(z.string(), z.any()).optional().nullable(),
 })
 
 export type ProductFormValues = z.input<typeof productFormSchema>

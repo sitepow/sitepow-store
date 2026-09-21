@@ -1,12 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { formatDateTime } from '@/utils/date'
+import { formatCurrency } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import {
@@ -30,22 +25,15 @@ interface RecentSalesChartProps {
   }
 }
 
-export function RecentSalesChart({ data }: RecentSalesChartProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.dashboard.recentSales')
-  const recentSales = data?.recentSales ?? []
+const chartConfig = {
+  amount: {
+    label: 'ยอดขาย',
+    color: '#22c55e',
+  },
+} satisfies ChartConfig
 
-  const chartConfig = useMemo(
-    () =>
-      ({
-        amount: {
-          label: t('sales'),
-          color: '#22c55e',
-        },
-      }) satisfies ChartConfig,
-    [t],
-  )
+export function RecentSalesChart({ data }: RecentSalesChartProps) {
+  const recentSales = data?.recentSales ?? []
 
   const chartData = recentSales.map((sale) => ({
     ...sale,
@@ -54,15 +42,10 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
 
   return (
     <AnalyticsCardShell
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-      title={t('title')}
-      description={t('description')}
+      title="รายการขายล่าสุด"
+      description="5 ออเดอร์ล่าสุดของสาขานี้"
       isEmpty={recentSales.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ขณะนี้ยังไม่มียอดขายล่าสุดในสาขานี้"
     >
       <div className="h-64 w-full">
         <ChartContainer config={chartConfig} className="h-full w-full">
@@ -93,9 +76,7 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
                 <ChartTooltipContent
                   formatter={(value, name, item) => [
                     `+${formatCurrency(typeof value === 'number' ? value : 0)}`,
-                    t('customer', {
-                      name: item.payload.name || t('unnamedCustomer'),
-                    }),
+                    `ลูกค้า: ${item.payload.name || 'ไม่ระบุชื่อ'}`,
                   ]}
                 />
               }
@@ -103,7 +84,7 @@ export function RecentSalesChart({ data }: RecentSalesChartProps) {
             <Area
               type="natural"
               dataKey="amount"
-              name={t('sales')}
+              name="ยอดขาย"
               stroke="#22c55e"
               fill="url(#fillRecentSales)"
               strokeWidth={2}

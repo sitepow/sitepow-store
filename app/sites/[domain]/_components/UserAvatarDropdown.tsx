@@ -2,7 +2,6 @@
 
 import { ComponentProps, Fragment } from 'react'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { USER_ICON } from '@/constants/favicon'
@@ -21,7 +20,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { authClient } from '@/lib/auth-client'
-import { getManageUrl } from '@/lib/manage-url'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarDropdownProps extends ComponentProps<typeof Avatar> {
@@ -35,39 +33,21 @@ export function UserAvatarDropdown({
   redirectPath,
   ...props
 }: UserAvatarDropdownProps) {
-  const tShell = useTranslations('merchant.shell')
-  const tNav = useTranslations('merchant.navigation')
   const { user } = useSession()
 
-  const getItemLabel = (val: string, fallback: string) => {
-    if (redirectPath === 'user') {
-      const buyerKey = `buyer.${val}` as any
-      if (tNav.has(buyerKey)) {
-        return tNav(buyerKey)
-      }
-    }
-    if (tNav.has(val as any)) {
-      return tNav(val as any)
-    }
-    return fallback
-  }
-
   const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/custom-logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
-    } catch (err) {
-      console.error('Logout error:', err)
+    const isCentralDomain =
+      window.location.hostname.endsWith('sitepow.store') ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === 'lvh.me'
+
+    if (!isCentralDomain) {
+      await fetch('/api/auth/custom-logout', { method: 'POST' })
+      window.location.href = '/login'
+      return
     }
 
-    try {
-      await authClient.signOut()
-    } catch (err) {
-      // Ignore
-    }
-
+    await authClient.signOut()
     window.location.href = '/login'
   }
 
@@ -92,7 +72,7 @@ export function UserAvatarDropdown({
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="truncate text-sm leading-none font-medium">
-              {tShell('yourAccount')}
+              บัญชีผู้ใช้งานของคุณ
             </p>
             <p className="text-muted-foreground text-xs leading-none">
               {user?.email}
@@ -102,22 +82,18 @@ export function UserAvatarDropdown({
         <DropdownMenuSeparator />
         {items.map((item) => {
           const Icon = item.icon
-          const targetUrl =
-            redirectPath === 'merchant'
-              ? getManageUrl(`/merchant/${item.value}`)
-              : `/${redirectPath}/${item.value}`
 
           return (
             <Fragment key={item.value}>
               {item.hasSeparatorBefore && <DropdownMenuSeparator />}
               <DropdownMenuItem asChild>
-                <a
-                  href={targetUrl}
+                <Link
+                  href={`/${redirectPath}/${item.value}`}
                   className="flex w-full cursor-pointer items-center"
                 >
                   <Icon className="mr-2 stroke-[1.5]" size={18} />
-                  {getItemLabel(item.value, item.label)}
-                </a>
+                  {item.label}
+                </Link>
               </DropdownMenuItem>
             </Fragment>
           )
@@ -128,8 +104,7 @@ export function UserAvatarDropdown({
           className="cursor-pointer"
           onClick={handleLogout}
         >
-          <IconLogout className="mr-2 stroke-[1.5]" size={18} />{' '}
-          {tShell('logout')}
+          <IconLogout className="mr-2 stroke-[1.5]" size={18} /> ออกจากระบบ
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

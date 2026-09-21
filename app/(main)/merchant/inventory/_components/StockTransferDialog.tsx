@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useBranches } from '@/actions/hooks/branch'
 import { useCreateStockTransfer } from '@/actions/hooks/stock-transfer'
@@ -17,13 +13,14 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageExport } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -51,8 +48,6 @@ export function StockTransferDialog({
   fromBranchId,
   fromBranchName,
 }: StockTransferDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
   const createStockTransferMutation = useCreateStockTransfer()
@@ -110,27 +105,21 @@ export function StockTransferDialog({
           <IconPackageExport />
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconPackageExport}
-            title={t('transfer.title')}
-            description={variantLabel}
-          />
+          <DialogTitle>โอนย้ายสต็อก</DialogTitle>
+          <DialogDescription>{variantLabel}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>{t('transfer.fromBranch')}</FieldLabel>
+            <FieldLabel>สาขาต้นทาง</FieldLabel>
             <Input value={fromBranchName} disabled />
             <FieldError>{errors?.fromBranchId?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel>{t('transfer.toBranch')}</FieldLabel>
+            <FieldLabel>สาขาปลายทาง</FieldLabel>
             <Select
               onValueChange={(v) =>
                 setValue('toBranchId', v, { shouldValidate: true })
@@ -138,7 +127,7 @@ export function StockTransferDialog({
               disabled={createStockTransferMutation.isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t('transfer.selectToBranch')} />
+                <SelectValue placeholder="เลือกสาขาปลายทาง" />
               </SelectTrigger>
               <SelectContent>
                 {branches
@@ -154,7 +143,7 @@ export function StockTransferDialog({
           </Field>
 
           <Field>
-            <FieldLabel>{t('transfer.quantity')}</FieldLabel>
+            <FieldLabel>จำนวนที่ต้องการโอน</FieldLabel>
             <Input
               type="number"
               min={1}
@@ -165,9 +154,9 @@ export function StockTransferDialog({
           </Field>
 
           <Field>
-            <FieldLabel>{t('transfer.note')}</FieldLabel>
+            <FieldLabel>หมายเหตุ</FieldLabel>
             <Textarea
-              placeholder={t('transfer.notePlaceholder')}
+              placeholder="เช่น โอนเพื่อเติมสต็อกสาขาสยาม"
               rows={2}
               {...register('note')}
               disabled={createStockTransferMutation.isPending}
@@ -182,7 +171,7 @@ export function StockTransferDialog({
             onClick={handleClose}
             disabled={createStockTransferMutation.isPending}
           >
-            {t('cancel')}
+            ยกเลิก
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -190,10 +179,10 @@ export function StockTransferDialog({
           >
             {createStockTransferMutation.isPending ? (
               <>
-                <Spinner /> {t('transfer.transferring')}
+                <Spinner /> กำลังโอนย้าย...
               </>
             ) : (
-              t('transfer.confirm')
+              'ยืนยันการโอนย้าย'
             )}
           </Button>
         </DialogFooter>

@@ -1,35 +1,24 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
-import { StoreData } from '@/actions/store'
 import { LOGIN_PROVIDERS } from '@/constants/login'
 import { UserRole } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useLandingImages } from '@/hooks/use-landing-images'
 import { LoginFormInputs } from '@/types/login'
 import { useMutation } from '@tanstack/react-query'
-import {
-  EyeIcon,
-  EyeOffIcon,
-  LockIcon,
-  MailIcon,
-  StoreIcon,
-  UserIcon,
-} from 'lucide-react'
 
 import { ContentDivider } from '@/components/ContentDivider'
 import { ForgotPasswordDialog } from '@/components/ForgotPasswordForm'
 import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
-import { RainbowButton } from '@/components/magicui/rainbow-button'
+import { SectionHeader } from '@/components/SectionHeader'
+import { SupportContact } from '@/components/SupportContact'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -37,28 +26,15 @@ import { Spinner } from '@/components/ui/spinner'
 
 import { authClient } from '@/lib/auth-client'
 
-export interface LoginFormProps {
-  store?: StoreData | null
-  isStore?: boolean
-}
-
-export function LoginForm({
-  store: storeProp,
-  isStore = false,
-}: LoginFormProps = {}) {
-  const storeFromHook = useStoreData((s) => s.store)
-  const store = storeProp ?? storeFromHook
-  const isStoreMode = isStore || !!store
-
-  const t = useTranslations('auth.login')
+export function LoginForm() {
   const searchParams = useSearchParams()
   const role = searchParams.get('role') as UserRole
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
-  const [showPassword, setShowPassword] = useState(false)
+  const { currentImage } = useLandingImages()
 
   const registerParams = new URLSearchParams()
-  if (!isStoreMode && role) {
+  if (role) {
     registerParams.set('role', role)
   }
 
@@ -102,7 +78,7 @@ export function LoginForm({
     },
     onSuccess: (response) => {
       if (response.error) {
-        toast.error(t('invalidCredentials'))
+        toast.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
         return
       }
 
@@ -114,14 +90,10 @@ export function LoginForm({
     try {
       const currentOrigin =
         typeof window !== 'undefined' ? window.location.origin : ''
-      const isAbsoluteCallback =
-        callbackUrl.startsWith('http://') || callbackUrl.startsWith('https://')
       const targetPath = callbackUrl.startsWith('/')
         ? callbackUrl
         : `/${callbackUrl}`
-      const returnTo = isAbsoluteCallback
-        ? callbackUrl
-        : `${currentOrigin}${targetPath}`
+      const returnTo = `${currentOrigin}${targetPath}`
 
       const isCentralDomain =
         window.location.hostname.endsWith('sitepow.store') ||
@@ -147,7 +119,7 @@ export function LoginForm({
       })
     } catch (err) {
       console.error(err)
-      toast.error(t('networkError'))
+      toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
   }
 
@@ -155,158 +127,93 @@ export function LoginForm({
     mutate(data)
   }
 
-  const isCustomer = role === UserRole.CUSTOMER
-
   return (
-    <div
-      className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10"
-      style={
-        isStoreMode && store?.primaryColor
-          ? ({ '--primary': store.primaryColor } as React.CSSProperties)
-          : undefined
-      }
-    >
-      <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-2xl border p-4.5 shadow-xl shadow-black/[0.03] sm:rounded-3xl sm:p-8 md:p-10 dark:shadow-black/20">
-        <div className="mb-4 flex justify-center sm:mb-6">
-          {isStoreMode ? (
-            store?.logo ? (
-              <Link
-                href="/"
-                className="block h-14 w-fit max-w-[200px] overflow-hidden"
-              >
-                <Image
-                  src={store.logo}
-                  alt={store.name || 'Store Logo'}
-                  width={200}
-                  height={70}
-                  unoptimized
-                  className="size-full object-contain object-center"
-                />
-              </Link>
-            ) : (
-              <Link
-                href="/"
-                className="text-foreground hover:text-primary text-2xl font-bold tracking-tight transition-colors"
-              >
-                {store?.name || 'Store'}
-              </Link>
-            )
-          ) : (
-            <LogoBrand className="text-xl" />
-          )}
+    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
+      <div className="border-border bg-background sm:shadow-airy flex w-full overflow-hidden rounded-3xl border">
+        <div
+          style={{
+            backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
+          }}
+          className="relative hidden w-1/2 bg-cover bg-center lg:block"
+        >
+          <div className="absolute bottom-6 left-6 z-10 bg-black/20 p-3 backdrop-blur-md">
+            <LogoBrand className="text-white" />
+          </div>
         </div>
-        <div className="w-full space-y-4 sm:space-y-6">
-          <div className="space-y-1.5 text-center sm:space-y-2">
-            <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-3xl">
-              {t('title')}
-            </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">
-              {isStoreMode
-                ? t('buyerSubtitle')
-                : isCustomer
-                  ? t('buyerSubtitle')
-                  : t('merchantSubtitle')}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-            {LOGIN_PROVIDERS.map((provider, idx) => (
-              <SSOButton
-                key={idx}
-                onClick={() => handleSSO(provider.id)}
-                {...provider}
-              />
-            ))}
-          </div>
-          <ContentDivider name={t('orEmail')} />
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-3 sm:space-y-4"
-          >
-            <Field>
-              <FieldLabel className="text-xs font-medium">
-                {t('emailLabel')}
-              </FieldLabel>
-              <div className="relative">
-                <MailIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+        <div className="flex w-full flex-col items-center justify-center gap-6 p-6 sm:p-10 md:p-12 lg:w-1/2 dark:bg-neutral-800">
+          <SectionHeader
+            className="text-center"
+            title="เข้าสู่ระบบ"
+            description={
+              role !== UserRole.CUSTOMER
+                ? 'จัดการร้านค้าและระบบหลังบ้านของคุณ'
+                : 'เข้าสู่ระบบเพื่อเริ่มสั่งซื้อสินค้า'
+            }
+          />
+          <div className="w-full max-w-sm space-y-6">
+            <div className="flex flex-col gap-3">
+              {LOGIN_PROVIDERS.map((provider, idx) => (
+                <SSOButton
+                  key={idx}
+                  onClick={() => handleSSO(provider.id)}
+                  {...provider}
+                />
+              ))}
+            </div>
+            <ContentDivider name="หรือเข้าสู่ระบบด้วยอีเมล" />
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              <Field>
+                <FieldLabel>อีเมล (E-mail)</FieldLabel>
                 <Input
                   type="email"
-                  placeholder={t('emailPlaceholder')}
-                  className="h-10 rounded-xl pl-10 text-sm sm:h-11"
+                  placeholder="name@example.com"
+                  className="h-11 rounded-xl"
                   {...register('email', {
-                    required: t('emailRequired'),
+                    required: 'กรุณาระบุอีเมลของคุณ',
                   })}
                 />
-              </div>
-              <FieldError>{errors?.email?.message}</FieldError>
-            </Field>
-            <Field>
-              <div className="flex items-center justify-between">
-                <FieldLabel className="text-xs font-medium">
-                  {t('passwordLabel')}
-                </FieldLabel>
-                <ForgotPasswordDialog />
-              </div>
-              <div className="relative">
-                <LockIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                <FieldError>{errors?.email?.message}</FieldError>
+              </Field>
+              <Field>
+                <div className="flex items-center justify-between">
+                  <FieldLabel>รหัสผ่าน</FieldLabel>
+                  <ForgotPasswordDialog />
+                </div>
                 <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={t('passwordPlaceholder')}
-                  className="h-10 rounded-xl pr-10 pl-10 text-sm sm:h-11"
-                  {...register('password', {
-                    required: t('passwordRequired'),
-                  })}
+                  type="password"
+                  placeholder="ระบุรหัสผ่าน"
+                  className="h-11 rounded-xl"
+                  {...register('password', { required: 'กรุณาระบุรหัสผ่าน' })}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 p-1 transition-colors"
-                  aria-label={
-                    showPassword ? t('hidePassword') : t('showPassword')
-                  }
-                >
-                  {showPassword ? (
-                    <EyeOffIcon className="size-4" />
-                  ) : (
-                    <EyeIcon className="size-4" />
-                  )}
-                </button>
-              </div>
-              <FieldError>{errors?.password?.message}</FieldError>
-            </Field>
-            {isStoreMode ? (
+                <FieldError>{errors?.password?.message}</FieldError>
+              </Field>
               <Button
                 type="submit"
-                className="h-10 w-full font-semibold sm:h-11"
+                className="mt-2 h-11 w-full rounded-xl text-base font-medium"
                 size="lg"
                 disabled={isPending}
               >
                 {isPending && <Spinner className="mr-2" />}
-                {isPending ? t('submitting') : t('submit')}
+                เข้าสู่ระบบ
               </Button>
-            ) : (
-              <RainbowButton
-                type="submit"
-                className="h-10 w-full sm:h-11"
-                size="lg"
-                disabled={isPending}
+            </form>
+            <p className="text-muted-foreground text-center text-sm">
+              ยังไม่มีบัญชีผู้ใช้งาน?{' '}
+              <a
+                href={registerHref}
+                className="text-primary font-semibold transition-all hover:underline"
               >
-                {isPending && <Spinner className="mr-2" />}
-                {isPending ? t('submitting') : t('submit')}
-              </RainbowButton>
-            )}
-          </form>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            {t('noAccount')}{' '}
-            <a
-              href={registerHref}
-              className="text-primary font-semibold transition-all hover:underline"
-            >
-              {t('registerFree')}
-            </a>
-          </p>
+                สมัครสมาชิกฟรี
+              </a>
+            </p>
+          </div>
         </div>
       </div>
-      {isCustomer && !isStoreMode && <ProtectedByBrand />}
+      {role !== UserRole.CUSTOMER && <SupportContact />}
+      {role === UserRole.CUSTOMER && <ProtectedByBrand />}
     </div>
   )
 }

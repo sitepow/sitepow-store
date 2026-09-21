@@ -1,9 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useAddStoreDomain,
@@ -14,6 +11,7 @@ import {
 import { DomainStatus } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
+  IconAlertCircle,
   IconCheck,
   IconCopy,
   IconExternalLink,
@@ -35,7 +33,6 @@ import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 
 export function DomainSettingsForm() {
-  const t = useTranslations('merchant.settings.domain')
   const { selectedStoreId, selectedStoreSlug } = useStoreFilter()
 
   const { data: customDomain, isLoading: isDomainLoading } = useStoreDomain(
@@ -74,6 +71,8 @@ export function DomainSettingsForm() {
         onSuccess: (res) => {
           if (res.success) {
             setCustomDomainInput('')
+          } else {
+            alert(res.message)
           }
         },
       },
@@ -85,7 +84,7 @@ export function DomainSettingsForm() {
       return
     }
 
-    verifyDomainMutation.mutate(selectedStoreId, {})
+    verifyDomainMutation.mutate(selectedStoreId)
   }
 
   const defaultSubdomain = selectedStoreSlug
@@ -109,8 +108,8 @@ export function DomainSettingsForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconWorld}
-          title={t('title')}
-          description={t('description')}
+          title="การตั้งค่าโดเมนเนม (Custom Domain)"
+          description="เชื่อมต่อชื่อโดเมนของคุณเองเพื่อสร้างแบรนด์ที่น่าเชื่อถือ หรือใช้งานระบบโดเมนฟรีของ Sitepow"
         />
       </CardHeader>
       {selectedStoreId === ALL_STORES ? (
@@ -121,7 +120,7 @@ export function DomainSettingsForm() {
         <CardContent className="space-y-6">
           <div className="space-y-3">
             <FieldLabel className="text-base font-semibold">
-              {t('defaultSubdomain')}
+              โดเมนเริ่มต้นของระบบ (Free Subdomain)
             </FieldLabel>
             <div className="flex max-w-xl items-center gap-2">
               <Input
@@ -155,29 +154,32 @@ export function DomainSettingsForm() {
                 </Button>
               )}
             </div>
-            <FieldDescription>{t('defaultSubdomainDesc')}</FieldDescription>
+            <FieldDescription>
+              สโตร์ของคุณสามารถเข้าใช้งานได้ทันทีผ่าน Subdomain ฟรีนี้
+            </FieldDescription>
           </div>
           <Separator />
           <div className="space-y-4">
             <div>
               <h3 className="text-base font-semibold">
-                {t('customDomainTitle')}
+                เชื่อมต่อโดเมนของคุณเอง (Custom Domain)
               </h3>
               <p className="text-muted-foreground text-sm">
-                {t('customDomainDesc')}
+                นำชื่อโดเมนที่คุณซื้อจากผู้ให้บริการ เช่น Cloudflare, GoDaddy
+                หรือ Namecheap มาผูกกับหน้าร้านนี้
               </p>
             </div>
             {isDomainLoading ? (
               <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                <Spinner /> {t('loading')}
+                <Spinner /> กำลังโหลดข้อมูลโดเมน...
               </div>
             ) : !customDomain ? (
               <div className="max-w-xl space-y-3">
                 <Field>
-                  <FieldLabel>{t('inputLabel')}</FieldLabel>
+                  <FieldLabel>ชื่อโดเมนเนมของคุณ</FieldLabel>
                   <div className="flex gap-2">
                     <Input
-                      placeholder={t('inputPlaceholder')}
+                      placeholder="เช่น shop.yourbrand.com หรือ yourbrand.com"
                       value={customDomainInput}
                       onChange={(e) => setCustomDomainInput(e.target.value)}
                       disabled={addDomainMutation.isPending}
@@ -187,10 +189,16 @@ export function DomainSettingsForm() {
                       onClick={handleAddDomain}
                       disabled={addDomainMutation.isPending}
                     >
-                      {addDomainMutation.isPending ? <Spinner /> : t('connect')}
+                      {addDomainMutation.isPending ? (
+                        <Spinner />
+                      ) : (
+                        'เชื่อมต่อโดเมน'
+                      )}
                     </Button>
                   </div>
-                  <FieldDescription>{t('inputHint')}</FieldDescription>
+                  <FieldDescription>
+                    ไม่จำเป็นต้องใส่ http:// หรือ https:// ด้านหน้า
+                  </FieldDescription>
                 </Field>
               </div>
             ) : (
@@ -202,7 +210,7 @@ export function DomainSettingsForm() {
                     </span>
                     {customDomain.status === DomainStatus.ACTIVE && (
                       <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25">
-                        {t('statusActive')}
+                        <IconCheck size={12} /> ใช้งานได้
                       </Badge>
                     )}
                     {customDomain.status === DomainStatus.PENDING && (
@@ -210,11 +218,14 @@ export function DomainSettingsForm() {
                         variant="outline"
                         className="border-amber-500/40 bg-amber-500/10 text-amber-600"
                       >
-                        {t('statusPending')}
+                        <IconRefresh size={12} className="animate-spin" />{' '}
+                        รอการยืนยัน DNS
                       </Badge>
                     )}
                     {customDomain.status === DomainStatus.FAILED && (
-                      <Badge variant="destructive">{t('statusFailed')}</Badge>
+                      <Badge variant="destructive">
+                        <IconAlertCircle size={12} /> ตรวจสอบไม่พบ
+                      </Badge>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -229,15 +240,15 @@ export function DomainSettingsForm() {
                       ) : (
                         <IconRefresh size={14} />
                       )}
-                      {t('verify')}
+                      ตรวจสอบสิทธิ์
                     </Button>
                     <DeleteButton
-                      title={t('deleteConfirmTitle')}
-                      description={t('deleteConfirmDesc')}
+                      title="ยืนยันการลบโดเมน?"
+                      description="การลบโดเมนเนมนี้จะทำให้ลูกค้าไม่สามารถเข้าถึงร้านค้าของคุณผ่านชื่อโดเมนนี้ได้อีก"
                       isPending={removeDomainMutation.isPending}
                       onDelete={() => {
                         if (selectedStoreId) {
-                          removeDomainMutation.mutate(selectedStoreId, {})
+                          removeDomainMutation.mutate(selectedStoreId)
                         }
                       }}
                     >
@@ -251,7 +262,7 @@ export function DomainSettingsForm() {
                         ) : (
                           <IconTrash size={14} />
                         )}
-                        {t('delete')}
+                        ลบโดเมน
                       </Button>
                     </DeleteButton>
                   </div>
@@ -261,29 +272,32 @@ export function DomainSettingsForm() {
                     <div className="flex items-start gap-2">
                       <IconInfoCircle className="mt-0.5 size-4 shrink-0 text-blue-500" />
                       <div>
-                        <p className="font-medium">{t('dnsGuideTitle')}</p>
+                        <p className="font-medium">
+                          ขั้นตอนตั้งค่า DNS ผู้ให้บริการโดเมนของคุณ
+                        </p>
                         <p className="text-muted-foreground text-xs">
-                          {t('dnsGuideDesc')}
+                          กรุณาไปที่ระบบจัดการ DNS ของโดเมนคุณ แล้วเพิ่มค่า
+                          CNAME Record ต่อไปนี้:
                         </p>
                       </div>
                     </div>
                     <div className="grid gap-2 text-xs sm:grid-cols-3">
                       <div className="bg-background rounded border p-2">
                         <span className="text-muted-foreground block text-[10px]">
-                          {t('dnsType')}
+                          TYPE
                         </span>
                         CNAME
                       </div>
                       <div className="bg-background rounded border p-2">
                         <span className="text-muted-foreground block text-[10px]">
-                          {t('dnsHost')}
+                          NAME / HOST
                         </span>
                         {getCnameHostName(customDomain.domain)}
                       </div>
                       <div className="bg-background flex items-center justify-between rounded border p-2">
                         <div>
                           <span className="text-muted-foreground block text-[10px]">
-                            {t('dnsTarget')}
+                            VALUE / TARGET
                           </span>
                           {customDomain.cnameTarget}
                         </div>

@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
@@ -20,7 +19,6 @@ import { StorePagination } from '../../_components/Pagination'
 import { ProductCard } from '../../_components/product/ProductCard'
 
 export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
-  const t = useTranslations('storefront.products')
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -52,12 +50,11 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           <Skeleton className="h-4 w-32 rounded" />
         ) : (
           <p className="text-muted-foreground text-sm">
-            {t.rich('showingTotal', {
-              count: meta?.totalItems ?? 0,
-              span: (chunks) => (
-                <span className="text-foreground font-medium">{chunks}</span>
-              ),
-            })}
+            แสดงทั้งหมด{' '}
+            <span className="text-foreground font-medium">
+              {meta?.totalItems ?? 0}
+            </span>{' '}
+            รายการ
           </p>
         )}
 
@@ -67,9 +64,9 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="latest">{t('sortLatest')}</SelectItem>
-              <SelectItem value="price_asc">{t('sortPriceAsc')}</SelectItem>
-              <SelectItem value="price_desc">{t('sortPriceDesc')}</SelectItem>
+              <SelectItem value="latest">เรียงตาม: ล่าสุด</SelectItem>
+              <SelectItem value="price_asc">ราคา: น้อยไปมาก</SelectItem>
+              <SelectItem value="price_desc">ราคา: มากไปน้อย</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -83,8 +80,8 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
         </div>
       ) : products.length === 0 ? (
         <ActionRequiredAlert
-          title={t('sorry')}
-          description={t('noProductsFound')}
+          title="ขออภัย"
+          description="ไม่พบสินค้าที่คุณกำลังมองหา"
         />
       ) : (
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">

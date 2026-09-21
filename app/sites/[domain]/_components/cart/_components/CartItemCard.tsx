@@ -1,10 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
-import { CurrencyCode } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
@@ -22,7 +17,6 @@ interface CartItemCardProps {
   isMaxStock?: boolean
   productClassName?: string
   textClassName?: string
-  baseCurrency?: CurrencyCode
 }
 
 export function CartItemCard({
@@ -32,13 +26,7 @@ export function CartItemCard({
   isMaxStock = false,
   productClassName,
   textClassName,
-  baseCurrency,
 }: CartItemCardProps) {
-  const t = useTranslations('storefront.products')
-  const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    baseCurrency || (store as any)?.baseCurrency,
-  )
   const hasDiscount = item.variant.discountActive
   const originalUnitPrice = item.variant.price
   const isResellerItem = item.isReseller || Boolean(item.agreementId)
@@ -59,7 +47,7 @@ export function CartItemCard({
             </h4>
             {isResellerItem && (
               <Badge className="shrink-0 border-amber-500/20 bg-amber-500/10 px-1.5 py-0 text-[10px] font-normal text-amber-700 hover:bg-amber-500/20 dark:text-amber-400">
-                {t('reseller')}
+                ตัวแทนจำหน่าย
               </Badge>
             )}
           </div>
@@ -113,14 +101,11 @@ export function CartItemCard({
             <div className="flex flex-col">
               {hasDiscount && (
                 <span className="text-muted-foreground text-xs line-through sm:text-sm">
-                  {formatCurrency(
-                    convert(originalUnitPrice * item.quantity),
-                    currentCurrency,
-                  )}
+                  {formatCurrency(originalUnitPrice * item.quantity)}
                 </span>
               )}
               <p className="text-primary text-sm font-bold sm:text-base">
-                {formatCurrency(convert(item.totalPrice), currentCurrency)}
+                {formatCurrency(item.totalPrice)}
               </p>
             </div>
             {onRemove && (

@@ -1,23 +1,13 @@
-import { cn } from '@/lib/utils'
+const Divider = () => {
+  return <div className="bg-border h-[0.5px] w-full" />
+}
 
-export function ContentDivider({
-  name,
-  className,
-}: {
-  name: string
-  className?: string
-}) {
+export function ContentDivider({ name }: { name: string }) {
   return (
-    <div
-      className={cn(
-        'relative my-2 flex w-full items-center justify-center',
-        className,
-      )}
-    >
-      <div className="border-border w-full border-t" />
-      <span className="bg-card text-muted-foreground absolute px-3 text-xs font-medium">
-        {name}
-      </span>
+    <div className="text-foreground flex w-full items-center">
+      <Divider />
+      <p className="w-96 text-center font-bold opacity-50">{name}</p>
+      <Divider />
     </div>
   )
 }

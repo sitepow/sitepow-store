@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { useStorefrontBlogs } from '@/actions/hooks/storefront/blog'
 
 import { SectionContainer } from '@/components/SectionContainer'
@@ -11,7 +9,6 @@ import { SeeMoreButton } from '../SeeMoreButton'
 import { BlogCard } from '../blog/BlogCard'
 
 export function BlogsSection({ storeSlug }: { storeSlug: string }) {
-  const t = useTranslations('storefront.blogs')
   const { data, isLoading } = useStorefrontBlogs({ storeSlug, limit: 5 })
   const blogs = data?.data ?? []
 
@@ -23,7 +20,7 @@ export function BlogsSection({ storeSlug }: { storeSlug: string }) {
 
   return (
     <SectionContainer>
-      <SectionHeader title={t('latestBlogs')} />
+      <SectionHeader title="บทความล่าสุด" />
       <div className="grid w-full grid-flow-row-dense grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {blogs.map((blog, index) => {
           const isFirst = index === 0

@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -15,7 +13,6 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { InventoryTable } from './_components/InventoryTable'
 
 export default function MerchantInventoryPage() {
-  const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const { canViewInventory, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -24,8 +21,8 @@ export default function MerchantInventoryPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconBox}
-        title={t('title')}
-        description={t('description')}
+        title="คลังสินค้า"
+        description="ตรวจสอบและอัปเดตจำนวนสต็อกสินค้าในแต่ละสาขา"
         endContent={<StoreSelectField />}
       />
       {selectedStoreId !== ALL_STORES &&
@@ -33,8 +30,8 @@ export default function MerchantInventoryPage() {
       !canViewInventory ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
         />
       ) : (
         <InventoryTable />

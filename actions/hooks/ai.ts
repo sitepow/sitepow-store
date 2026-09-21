@@ -1,15 +1,10 @@
 import { UseFormReturn } from 'react-hook-form'
 
 import {
-  GenerateAffiliateProductInput,
-  generateAffiliateProductAi,
   generateAnalyticsInsightsAi,
   generateBlogAi,
   generateCategoryAi,
   generateProductAi,
-  generateStorePageAi,
-  generateStoreSeoAi,
-  scrapeAffiliateProductUrl,
 } from '@/actions/ai'
 import { DiscountType } from '@/generated/prisma/enums'
 import { AiGenTask } from '@/types/ai'
@@ -152,66 +147,6 @@ export function useAnalyticsAi(storeId: string) {
   return useMutation({
     mutationFn: async (data: AnalyticsData) => {
       return await generateAnalyticsInsightsAi(data, storeId)
-    },
-  })
-}
-
-export function useGenerateAffiliateProductAi() {
-  return useMutation({
-    mutationFn: async (input: GenerateAffiliateProductInput) => {
-      return await generateAffiliateProductAi(input)
-    },
-  })
-}
-
-export function useScrapeAffiliateProduct() {
-  return useMutation({
-    mutationFn: async (url: string) => {
-      return await scrapeAffiliateProductUrl(url)
-    },
-  })
-}
-
-export function useStoreSeoAi() {
-  return useMutation({
-    mutationFn: async ({
-      storeName,
-      storeDescription,
-      storeId,
-    }: {
-      storeName: string
-      storeDescription?: string
-      storeId: string
-    }) => {
-      return await generateStoreSeoAi(storeName, storeDescription, storeId)
-    },
-  })
-}
-
-export function useStorePageAi() {
-  return useMutation({
-    mutationFn: async ({
-      pageType,
-      storeId,
-      currentContent,
-      customInstructions,
-    }: {
-      pageType:
-        | 'about'
-        | 'faqs'
-        | 'description'
-        | 'privacy-policy'
-        | 'refund-return-policy'
-      storeId: string
-      currentContent?: string
-      customInstructions?: string
-    }) => {
-      return await generateStorePageAi(
-        pageType,
-        storeId,
-        currentContent,
-        customInstructions,
-      )
     },
   })
 }

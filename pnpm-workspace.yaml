@@ -5,7 +5,7 @@ allowBuilds:
   esbuild: true
   prisma: true
   sharp: set this to true or false
-  unrs-resolver: false
+  unrs-resolver: set this to true or false
 
 overrides:
   '@auth/core': '0.41.3'

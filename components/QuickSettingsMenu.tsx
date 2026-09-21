@@ -1,15 +1,10 @@
 'use client'
 
-import { useLocale, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
-import { ALL_CURRENCIES } from '@/constants/currencies'
 import { LANGUAGE_NAMES, SUPPORTED_LNGS } from '@/constants/system'
-import { CurrencyCode } from '@/generated/prisma/enums'
-import { useCurrencyStore } from '@/stores/use-currency-store'
 import {
   IconCheck,
-  IconCoins,
   IconLanguage,
   IconMoon,
   IconSettings,
@@ -43,24 +38,20 @@ export function QuickSettingsMenu({
   buttonVariant = 'outline',
 }: QuickSettingsMenuProps) {
   const { theme, setTheme } = useTheme()
-  const router = useRouter()
-  const currentLocale = useLocale()
-  const t = useTranslations('common.settings')
-  const { currency: currentCurrency, setCurrency } = useCurrencyStore()
+  const pathname = usePathname()
+  // const router = useRouter()
 
-  const switchLocale = (locale: string) => {
-    if (currentLocale === locale) {
-      return
-    }
+  const currentLocale = pathname.split('/')[1]
 
-    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`
-    router.refresh()
-  }
+  //   const switchLocale = (locale: string) => {
+  //     if (currentLocale === locale) {
+  //       return
+  //     }
 
-  const switchCurrency = (currencyCode: CurrencyCode) => {
-    setCurrency(currencyCode)
-    router.refresh()
-  }
+  //     const segments = pathname.split('/')
+  //     segments[1] = locale
+  //     router.push(segments.join('/'))
+  //   }
 
   return (
     <DropdownMenu>
@@ -70,29 +61,29 @@ export function QuickSettingsMenu({
           <span className="sr-only">Quick Settings</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>{t('title')}</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuLabel>ตั้งค่าทั่วไป</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <IconSunMoon className="mr-2 size-4" />
-            <span>{t('theme')}</span>
+            <span>ธีมเว็บไซต์</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={() => setTheme('light')}>
                 <IconSun className="mr-2 size-4" />
-                <span>{t('light')}</span>
+                <span>สว่าง</span>
                 {theme === 'light' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('dark')}>
                 <IconMoon className="mr-2 size-4" />
-                <span>{t('dark')}</span>
+                <span>มืด</span>
                 {theme === 'dark' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('system')}>
                 <IconSunMoon className="mr-2 size-4" />
-                <span>{t('system')}</span>
+                <span>ระบบ</span>
                 {theme === 'system' && <IconCheck className="ml-auto size-4" />}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
@@ -101,39 +92,17 @@ export function QuickSettingsMenu({
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <IconLanguage className="mr-2 size-4" />
-            <span>{t('language')}</span>
+            <span>ภาษา</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               {SUPPORTED_LNGS.map((lng) => (
-                <DropdownMenuItem key={lng} onClick={() => switchLocale(lng)}>
+                <DropdownMenuItem
+                  key={lng}
+                  // onClick={() => switchLocale(lng)}
+                >
                   <span>{LANGUAGE_NAMES[lng] || lng}</span>
                   {currentLocale === lng && (
-                    <IconCheck className="ml-auto size-4" />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <IconCoins className="mr-2 size-4" />
-            <span>{t('currency')}</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
-              {ALL_CURRENCIES.map((curr) => (
-                <DropdownMenuItem
-                  key={curr.code}
-                  onClick={() => switchCurrency(curr.code)}
-                >
-                  <span className="mr-1.5">{curr.flag}</span>
-                  <span className="font-medium">{curr.code}</span>
-                  <span className="text-muted-foreground ml-1.5 text-xs">
-                    ({curr.symbol})
-                  </span>
-                  {currentCurrency === curr.code && (
                     <IconCheck className="ml-auto size-4" />
                   )}
                 </DropdownMenuItem>

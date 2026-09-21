@@ -1,13 +1,10 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useCreateStockAdjustment } from '@/actions/hooks/stock-adjustment'
+import { STOCK_ADJUSTMENT_REASON_OPTIONS } from '@/constants/translate'
 import { StockAdjustmentReason } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
@@ -17,13 +14,14 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageImport } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -51,8 +49,6 @@ export function StockAdjustmentDialog({
   branchId,
   branchName,
 }: StockAdjustmentDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const [open, setOpen] = useState(false)
 
@@ -128,24 +124,20 @@ export function StockAdjustmentDialog({
           <IconPackageImport />
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconPackageImport}
-            title={t('adjustment.title')}
-            description={`${variantLabel} · ${branchName}`}
-          />
+          <DialogTitle>ปรับสต็อกสินค้า</DialogTitle>
+          <DialogDescription>
+            {variantLabel} · {branchName}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>{t('adjustment.branch')}</FieldLabel>
+            <FieldLabel>สาขา</FieldLabel>
             <Input value={branchName} disabled />
           </Field>
           <Field>
-            <FieldLabel>{t('adjustment.type')}</FieldLabel>
+            <FieldLabel>ประเภทการปรับสต็อก</FieldLabel>
             <div className="grid grid-cols-2 gap-2 text-white">
               <Button
                 type="button"
@@ -158,7 +150,7 @@ export function StockAdjustmentDialog({
                 onClick={() => setAdjustmentType('SUBTRACT')}
                 disabled={createStockAdjustmentMutation.isPending}
               >
-                {t('adjustment.subtract')}
+                ตัดออก (- ลดลง)
               </Button>
               <Button
                 type="button"
@@ -171,12 +163,12 @@ export function StockAdjustmentDialog({
                 onClick={() => setAdjustmentType('ADD')}
                 disabled={createStockAdjustmentMutation.isPending}
               >
-                {t('adjustment.add')}
+                เพิ่มเข้า (+ เพิ่มขึ้น)
               </Button>
             </div>
           </Field>
           <Field>
-            <FieldLabel>{t('adjustment.quantity')}</FieldLabel>
+            <FieldLabel>จำนวน</FieldLabel>
             <Input
               type="number"
               min="1"
@@ -187,7 +179,7 @@ export function StockAdjustmentDialog({
             <FieldError>{errors?.quantity?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>{t('adjustment.reason')}</FieldLabel>
+            <FieldLabel>เหตุผล</FieldLabel>
             <Select
               defaultValue={StockAdjustmentReason.CORRECTION}
               onValueChange={(v) =>
@@ -196,12 +188,12 @@ export function StockAdjustmentDialog({
               disabled={createStockAdjustmentMutation.isPending}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t('adjustment.selectReason')} />
+                <SelectValue placeholder="เลือกเหตุผล" />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(StockAdjustmentReason).map((reason) => (
-                  <SelectItem key={reason} value={reason}>
-                    {t(`reasons.${reason}` as any)}
+                {STOCK_ADJUSTMENT_REASON_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -209,9 +201,9 @@ export function StockAdjustmentDialog({
             <FieldError>{errors?.reason?.message}</FieldError>
           </Field>
           <Field>
-            <FieldLabel>{t('adjustment.note')}</FieldLabel>
+            <FieldLabel>หมายเหตุ</FieldLabel>
             <Textarea
-              placeholder={t('adjustment.notePlaceholder')}
+              placeholder="เช่น พบสินค้าแตกหัก 3 ชิ้นระหว่างตรวจนับ"
               rows={2}
               {...register('note')}
               disabled={createStockAdjustmentMutation.isPending}
@@ -225,7 +217,7 @@ export function StockAdjustmentDialog({
             onClick={handleClose}
             disabled={createStockAdjustmentMutation.isPending}
           >
-            {t('cancel')}
+            ยกเลิก
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -233,10 +225,10 @@ export function StockAdjustmentDialog({
           >
             {createStockAdjustmentMutation.isPending ? (
               <>
-                <Spinner /> {t('saving')}
+                <Spinner /> กำลังบันทึก...
               </>
             ) : (
-              t('adjustment.confirm')
+              'ยืนยันการปรับสต็อก'
             )}
           </Button>
         </DialogFooter>

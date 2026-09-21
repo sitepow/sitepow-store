@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -17,7 +16,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
 export function PdpaManagementForm() {
-  const t = useTranslations('customer.settings')
   const router = useRouter()
 
   const { mutate: exportData, isPending: isExporting } = useExportUserData()
@@ -28,22 +26,13 @@ export function PdpaManagementForm() {
     deleteAccount(undefined, {
       onSuccess: async (data) => {
         if (data?.success) {
-          try {
-            await fetch('/api/auth/custom-logout', {
-              method: 'POST',
-              credentials: 'include',
-            })
-          } catch (err) {
-            console.error('Logout error:', err)
-          }
-
-          try {
-            await authClient.signOut()
-          } catch (err) {
-            // Ignore
-          }
-
-          window.location.href = '/'
+          await authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                router.replace('/')
+              },
+            },
+          })
         }
       },
     })
@@ -55,48 +44,51 @@ export function PdpaManagementForm() {
         <PageTabHeader
           variant="secondary"
           icon={IconShieldLock}
-          title={t('pdpaTitle')}
-          description={t('pdpaDesc')}
+          title="การจัดการข้อมูล (PDPA)"
+          description="คุ้มครองความเป็นส่วนตัวและสิทธิ์ของข้อมูลคุณภายใต้พระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล"
         />
       </CardHeader>
       <CardContent className="divide-border divide-y">
         <div className="flex flex-wrap items-center justify-between gap-5 pb-4">
           <div className="pr-4">
             <span className="flex items-center gap-1.5 text-sm font-medium">
-              {t('exportData')}
+              ขอส่งออกข้อมูลทั้งหมด
             </span>
             <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">
-              {t('exportDataDesc')}
+              ดาวน์โหลดข้อมูลส่วนตัวทั้งหมด ประวัติการสั่งซื้อสินค้าทุกร้านค้า
+              และแต้มสะสมที่มีในระบบออกมาเก็บไว้ในรูปแบบไฟล์ข้อมูลมาตรฐาน
+              (JSON/CSV)
             </span>
           </div>
           <DeleteButton
             isPending={isExporting}
             onDelete={() => exportData()}
-            title={t('confirmExportTitle')}
-            description={t('confirmExportDesc')}
+            title="ยืนยันการขอส่งออกข้อมูล?"
+            description="ระบบจะทำการรวบรวมข้อมูลส่วนตัว ประวัติการสั่งซื้อ และแต้มสะสมของคุณเพื่อเตรียมไฟล์ดาวน์โหลด"
           >
             <Button variant="outline" disabled={isExporting}>
-              {isExporting ? t('exporting') : t('requestExport')}
+              {isExporting ? 'กำลังเตรียมไฟล์...' : 'ร้องขอไฟล์ข้อมูล'}
             </Button>
           </DeleteButton>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-5 pt-4">
           <div className="pr-4">
             <span className="text-destructive block text-sm font-medium">
-              {t('deleteAccountTitle')}
+              ขอลบบัญชีและข้อมูลผู้ใช้งาน
             </span>
             <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">
-              {t('deleteAccountDesc')}
+              ลบประวัติการใช้งานและข้อมูลโปรไฟล์ออกจากระบบอย่างถาวรตามกฎหมายสิทธิ์
+              &quot;การถูกลืม&quot; (Right to Erasure)
             </span>
           </div>
           <DeleteButton
             isPending={isDeleting}
             onDelete={handleDelete}
-            title={t('confirmDeleteAccountTitle')}
-            description={t('confirmDeleteAccountDesc')}
+            title="ยืนยันการลบบัญชีถาวร"
+            description="การกระทำนี้ไม่สามารถย้อนกลับได้ บัญชีและข้อมูลโปรไฟล์ของคุณจะถูกลบออกจากระบบทันที และคุณจะออกจากระบบโดยอัตโนมัติ"
           >
             <Button variant="destructive" disabled={isDeleting}>
-              {isDeleting ? t('deleting') : t('deleteAccountBtn')}
+              {isDeleting ? 'กำลังลบ...' : 'ขอลบข้อมูลบัญชี'}
             </Button>
           </DeleteButton>
         </div>

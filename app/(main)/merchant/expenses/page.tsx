@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -21,7 +19,6 @@ import { ExpenseDialog } from './_components/ExpenseDialog'
 import { ExpenseTable } from './_components/ExpenseTable'
 
 export default function ExpensesPage() {
-  const t = useTranslations('merchant.expenses')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewExpenses,
@@ -49,8 +46,8 @@ export default function ExpensesPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconReceipt}
-        title={t('title')}
-        description={t('description')}
+        title="จัดการค่าใช้จ่าย"
+        description="บันทึกและติดตามรายการค่าใช้จ่ายของร้านค้า"
         endContent={
           <div className="flex flex-wrap items-end gap-2.5">
             <StoreSelectField />
@@ -65,7 +62,7 @@ export default function ExpensesPage() {
             {canCreateExpenses && (
               <Button onClick={handleOpenCreate}>
                 <IconPlus className="size-4" />
-                {t('addExpense')}
+                เพิ่มค่าใช้จ่าย
               </Button>
             )}
           </div>
@@ -76,8 +73,8 @@ export default function ExpensesPage() {
       !canViewExpenses ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลค่าใช้จ่ายของสาขาหรือร้านค้านี้"
         />
       ) : (
         <div className="space-y-4">

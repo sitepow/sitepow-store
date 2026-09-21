@@ -1,9 +1,5 @@
 'use server'
 
-import {
-  SERVER_ERROR_MESSAGE_EN,
-  SERVER_ERROR_MESSAGE_TH,
-} from '@/constants/system'
 import { OrderStatus, Prisma } from '@/generated/prisma/client'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
@@ -186,12 +182,7 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
   const userId = userSession?.id
 
   if (!userId) {
-    return {
-      success: false,
-      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      messageEN: 'Please sign in to proceed',
-      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-    }
+    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
   }
 
   try {
@@ -201,12 +192,7 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
     })
 
     if (!customer) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลลูกค้าในระบบ',
-        messageEN: 'Customer not found in the system',
-        message: 'ไม่พบข้อมูลลูกค้าในระบบ',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลลูกค้าในระบบ' }
     }
 
     const {
@@ -225,8 +211,6 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
     if (!productId) {
       return {
         success: false,
-        messageTH: 'ไม่พบรหัสสินค้าที่ถูกต้องในระบบ',
-        messageEN: 'Invalid product ID in the system',
         message: 'ไม่พบรหัสสินค้าที่ถูกต้องในระบบ',
       }
     }
@@ -276,8 +260,6 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
       if (existingReview) {
         return {
           success: false,
-          messageTH: 'คุณได้ทำการรีวิวสินค้านี้ในคำสั่งซื้อนี้ไปแล้ว',
-          messageEN: 'You have already reviewed this product for this order',
           message: 'คุณได้ทำการรีวิวสินค้านี้ในคำสั่งซื้อนี้ไปแล้ว',
         }
       }
@@ -378,20 +360,12 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
       await invalidateStorefrontProductCache(store.slug)
     }
 
-    const successMsgTH =
-      result.awardedPoints > 0
-        ? `รีวิวสำเร็จ! คุณได้รับ ${result.awardedPoints} แต้มสะสม`
-        : 'รีวิวสินค้าสำเร็จแล้ว'
-    const successMsgEN =
-      result.awardedPoints > 0
-        ? `Review submitted successfully! You earned ${result.awardedPoints} points`
-        : 'Product review submitted successfully'
-
     return {
       success: true,
-      messageTH: successMsgTH,
-      messageEN: successMsgEN,
-      message: successMsgTH,
+      message:
+        result.awardedPoints > 0
+          ? `รีวิวสำเร็จ! คุณได้รับ ${result.awardedPoints} แต้มสะสม`
+          : 'รีวิวสินค้าสำเร็จแล้ว',
       data: serializeDecimal(result.newReview),
       pointsDetail: result.breakdown,
     }
@@ -399,9 +373,6 @@ export async function createCustomerReview(params: CreateCustomerReviewParams) {
     console.error(error)
     return {
       success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
     }
   }
 }
@@ -414,12 +385,7 @@ export async function updateCustomerReview(
   const userId = userSession?.id
 
   if (!userId) {
-    return {
-      success: false,
-      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      messageEN: 'Please sign in to proceed',
-      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-    }
+    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
   }
 
   try {
@@ -429,12 +395,7 @@ export async function updateCustomerReview(
     })
 
     if (!existingReview) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลรีวิว',
-        messageEN: 'Review not found',
-        message: 'ไม่พบข้อมูลรีวิว',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลรีวิว' }
     }
 
     let isAuthorized = false
@@ -456,12 +417,7 @@ export async function updateCustomerReview(
     }
 
     if (!isAuthorized) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่มีสิทธิ์แก้ไขรีวิวนี้',
-        messageEN: 'You do not have permission to edit this review',
-        message: 'คุณไม่มีสิทธิ์แก้ไขรีวิวนี้',
-      }
+      return { success: false, message: 'คุณไม่มีสิทธิ์แก้ไขรีวิวนี้' }
     }
 
     if (params.images !== undefined) {
@@ -511,19 +467,12 @@ export async function updateCustomerReview(
 
     return {
       success: true,
-      messageTH: 'อัปเดตการรีวิวสินค้าสำเร็จแล้ว',
-      messageEN: 'Product review updated successfully',
       message: 'อัพเดตการรีวิวสินค้าสำเร็จแล้ว',
       data: serializeDecimal(updatedReview),
     }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
+    return { success: false }
   }
 }
 
@@ -551,7 +500,6 @@ export async function getPurchasableProductsForReview(storeSlug?: string) {
           store: {
             OR: [
               { slug: storeSlug },
-              { customDomain: storeSlug, customDomainStatus: 'ACTIVE' },
               {
                 StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } },
               },
@@ -613,12 +561,7 @@ export async function deleteCustomerReview(reviewId: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return {
-      success: false,
-      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      messageEN: 'Please sign in to proceed',
-      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-    }
+    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
   }
 
   try {
@@ -628,12 +571,7 @@ export async function deleteCustomerReview(reviewId: string) {
     })
 
     if (!review) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลรีวิว',
-        messageEN: 'Review not found',
-        message: 'ไม่พบข้อมูลรีวิว',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลรีวิว' }
     }
 
     const customer = await prisma.customer.findUnique({
@@ -644,9 +582,6 @@ export async function deleteCustomerReview(reviewId: string) {
     if (customer && review.customerId === customer.id) {
       return {
         success: false,
-        messageTH: 'ไม่อนุญาตให้ลบรีวิว คุณสามารถแก้ไขรีวิวได้เท่านั้น',
-        messageEN:
-          'Deleting reviews is not allowed. You can only edit your review.',
         message: 'ไม่อนุญาตให้ลบรีวิว คุณสามารถแก้ไขรีวิวได้เท่านั้น',
       }
     }
@@ -662,12 +597,7 @@ export async function deleteCustomerReview(reviewId: string) {
     }
 
     if (!isAuthorized) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่มีสิทธิ์ลบรีวิวนี้',
-        messageEN: 'You do not have permission to delete this review',
-        message: 'คุณไม่มีสิทธิ์ลบรีวิวนี้',
-      }
+      return { success: false, message: 'คุณไม่มีสิทธิ์ลบรีวิวนี้' }
     }
 
     if (review.images && review.images.length > 0) {
@@ -696,242 +626,9 @@ export async function deleteCustomerReview(reviewId: string) {
       }
     }
 
-    return {
-      success: true,
-      messageTH: 'ลบรีวิวสำเร็จ',
-      messageEN: 'Review deleted successfully',
-      message: 'ลบรีวิวสำเร็จ',
-    }
+    return { success: true, message: 'ลบรีวิวสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
-  }
-}
-
-export interface StoreReviewSummary {
-  averageRating: number
-  totalReviews: number
-  breakdown: {
-    star: number
-    count: number
-    percentage: number
-  }[]
-  withMediaCount: number
-}
-
-export async function getStoreReviewSummary(
-  storeId: string,
-): Promise<StoreReviewSummary> {
-  if (!storeId) {
-    return {
-      averageRating: 0,
-      totalReviews: 0,
-      breakdown: [5, 4, 3, 2, 1].map((star) => ({
-        star,
-        count: 0,
-        percentage: 0,
-      })),
-      withMediaCount: 0,
-    }
-  }
-
-  try {
-    const [totalReviews, agg, ratingGroups, withMediaCount] = await Promise.all(
-      [
-        prisma.review.count({ where: { storeId } }),
-        prisma.review.aggregate({
-          where: { storeId },
-          _avg: { rating: true },
-        }),
-        prisma.review.groupBy({
-          by: ['rating'],
-          where: { storeId },
-          _count: { _all: true },
-        }),
-        prisma.review.count({
-          where: {
-            storeId,
-            OR: [{ images: { isEmpty: false } }, { video: { not: null } }],
-          },
-        }),
-      ],
-    )
-
-    const countsByStar = new Map<number, number>()
-    for (const group of ratingGroups) {
-      countsByStar.set(group.rating, group._count._all)
-    }
-
-    const breakdown = [5, 4, 3, 2, 1].map((star) => {
-      const count = countsByStar.get(star) || 0
-      const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
-      return {
-        star,
-        count,
-        percentage: Number(percentage.toFixed(1)),
-      }
-    })
-
-    return {
-      averageRating: agg._avg.rating ? Number(agg._avg.rating.toFixed(1)) : 0,
-      totalReviews,
-      breakdown,
-      withMediaCount,
-    }
-  } catch (error) {
-    console.error('getStoreReviewSummary error:', error)
-    return {
-      averageRating: 0,
-      totalReviews: 0,
-      breakdown: [5, 4, 3, 2, 1].map((star) => ({
-        star,
-        count: 0,
-        percentage: 0,
-      })),
-      withMediaCount: 0,
-    }
-  }
-}
-
-const storeCustomerReviewSelect = {
-  id: true,
-  rating: true,
-  comment: true,
-  images: true,
-  video: true,
-  date: true,
-  selectedOptions: true,
-  orderId: true,
-  product: {
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      images: {
-        select: {
-          url: true,
-          isPrimary: true,
-        },
-        orderBy: { isPrimary: 'desc' },
-        take: 1,
-      },
-    },
-  },
-  variant: {
-    select: {
-      title: true,
-      sku: true,
-    },
-  },
-  customer: {
-    select: {
-      firstName: true,
-      lastName: true,
-      avatar: true,
-    },
-  },
-  categories: {
-    select: {
-      id: true,
-      label: true,
-      rating: true,
-    },
-  },
-} satisfies Prisma.ReviewSelect
-
-export type StoreCustomerReviewItem = DecimalToNumber<
-  Prisma.ReviewGetPayload<{ select: typeof storeCustomerReviewSelect }>
->
-
-export interface GetStoreCustomerReviewsParams {
-  storeId: string
-  page?: number
-  limit?: number
-  rating?: number
-  hasMedia?: boolean
-}
-
-export interface GetStoreCustomerReviewsResponse {
-  data: StoreCustomerReviewItem[]
-  meta: {
-    currentPage: number
-    limit: number
-    totalItems: number
-    totalPages: number
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-  }
-}
-
-export async function getStoreCustomerReviews({
-  storeId,
-  page = 1,
-  limit = 10,
-  rating,
-  hasMedia,
-}: GetStoreCustomerReviewsParams): Promise<GetStoreCustomerReviewsResponse> {
-  const emptyResponse: GetStoreCustomerReviewsResponse = {
-    data: [],
-    meta: {
-      currentPage: page,
-      limit,
-      totalItems: 0,
-      totalPages: 0,
-      hasNextPage: false,
-      hasPreviousPage: false,
-    },
-  }
-
-  if (!storeId) {
-    return emptyResponse
-  }
-
-  try {
-    const sanitizedPage = Math.max(1, page)
-    const sanitizedLimit = Math.max(1, Math.min(50, limit))
-    const skip = (sanitizedPage - 1) * sanitizedLimit
-
-    const whereClause: Prisma.ReviewWhereInput = {
-      storeId,
-      ...(rating && rating >= 1 && rating <= 5 ? { rating } : {}),
-      ...(hasMedia
-        ? {
-            OR: [{ images: { isEmpty: false } }, { video: { not: null } }],
-          }
-        : {}),
-    }
-
-    const [totalItems, reviews] = await Promise.all([
-      prisma.review.count({ where: whereClause }),
-      prisma.review.findMany({
-        where: whereClause,
-        skip,
-        take: sanitizedLimit,
-        orderBy: { date: 'desc' },
-        select: storeCustomerReviewSelect,
-      }),
-    ])
-
-    const totalPages = Math.ceil(totalItems / sanitizedLimit)
-
-    return {
-      data: serializeDecimal(reviews),
-      meta: {
-        currentPage: sanitizedPage,
-        limit: sanitizedLimit,
-        totalItems,
-        totalPages,
-        hasNextPage: sanitizedPage < totalPages,
-        hasPreviousPage: sanitizedPage > 1,
-      },
-    }
-  } catch (error) {
-    console.error('getStoreCustomerReviews error:', error)
-    return emptyResponse
+    return { success: false }
   }
 }

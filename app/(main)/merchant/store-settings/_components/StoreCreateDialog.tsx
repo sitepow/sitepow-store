@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useCheckout } from '@/actions/hooks/checkout'
 import { useCreateStore } from '@/actions/hooks/store'
@@ -16,16 +12,17 @@ import { CheckoutType } from '@/types/checkout'
 import { formatSlug } from '@/utils/slug'
 import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBuildingStore, IconPlus } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
@@ -35,9 +32,6 @@ import { StoreNameField } from './StoreNameField'
 import { StoreSlugField } from './StoreSlugField'
 
 export function StoreCreateDialog() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores')
-  const tDialog = useTranslations('merchant.stores.dialog')
   const { selectedTab } = usePricingStore()
   const { user } = useSession()
   const [open, setOpen] = useState(false)
@@ -115,31 +109,27 @@ export function StoreCreateDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" disabled={!user?.emailVerified}>
           <IconPlus />
-          {t('createStore')}
+          สร้างร้านค้าใหม่
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconBuildingStore}
-            title={tDialog('title')}
-            description={tDialog('description')}
-          />
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader className="space-y-2">
+          <DialogTitle>เริ่มต้นสร้างร้านค้าใหม่</DialogTitle>
+          <DialogDescription>
+            กรอกข้อมูลพื้นฐานและตั้งค่าระบบของร้านค้าเพื่อเริ่มต้นขายสินค้าออนไลน์
+          </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="text-muted-foreground border-b pb-1 text-sm font-semibold sm:col-span-2">
-              {tDialog('step1')}
+              1. เลือกแพลนการใช้งานของคุณ
             </div>
             <div className="flex flex-col items-center gap-5 sm:col-span-2">
               <MerchantPricingTabs />
               <PlanSelector isPending={createStoreMutation.isPending} />
             </div>
             <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-              {tDialog('step2')}
+              2. ข้อมูลทั่วไปของร้านค้า
             </div>
             <StoreNameField isPending={createStoreMutation.isPending} />
             <StoreSlugField isPending={createStoreMutation.isPending} />
@@ -151,7 +141,7 @@ export function StoreCreateDialog() {
             onClick={handleClose}
             disabled={createStoreMutation.isPending}
           >
-            {tDialog('cancel')}
+            ยกเลิก
           </Button>
           <Button
             disabled={createStoreMutation.isPending}
@@ -159,10 +149,10 @@ export function StoreCreateDialog() {
           >
             {createStoreMutation.isPending ? (
               <>
-                <Spinner /> {tDialog('creating')}
+                <Spinner /> กำลังสร้างร้านค้า...
               </>
             ) : (
-              tDialog('submit')
+              'สร้างร้านค้าของคุณ'
             )}
           </Button>
         </DialogFooter>

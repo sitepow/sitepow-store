@@ -3,11 +3,8 @@
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
 import { UpdateProfileSchema } from '@/zod/profile'
@@ -32,8 +29,6 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.profile.form')
   const { data: profile } = useProfile()
   const updateProfileMutation = useUpdateProfile()
 
@@ -108,36 +103,33 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
     deleteMutation.isPending
 
   return (
-    <Card
-      {...props}
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <Card {...props}>
       <CardHeader>
-        <CardTitle>{t('title')}</CardTitle>
-        <CardDescription>{t('description')}</CardDescription>
+        <CardTitle>ข้อมูลส่วนตัว</CardTitle>
+        <CardDescription>
+          ข้อมูลนี้จะใช้สำหรับระบุตัวตนของคุณในฐานะเจ้าของระบบและใช้รับอีเมลแจ้งเตือนสำคัญ
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5 sm:grid-cols-2">
         <Field>
-          <FieldLabel>{t('firstName')}</FieldLabel>
+          <FieldLabel>ชื่อจริง</FieldLabel>
           <Input {...register('firstName')} />
           <FieldError>{errors.firstName?.message}</FieldError>
         </Field>
         <Field>
-          <FieldLabel>{t('lastName')}</FieldLabel>
+          <FieldLabel>นามสกุล</FieldLabel>
           <Input {...register('lastName')} />
           <FieldError>{errors.lastName?.message}</FieldError>
         </Field>
         <Field>
-          <FieldLabel>{t('email')}</FieldLabel>
+          <FieldLabel>อีเมลหลักของบัญชี (ล็อกอิน)</FieldLabel>
           <Input type="email" value={profile?.email ?? ''} disabled />
-          <FieldDescription>{t('emailDescription')}</FieldDescription>
+          <FieldDescription>
+            อีเมลล็อกอินไม่สามารถเปลี่ยนได้เอง กรุณาติดต่อฝ่ายสนับสนุน
+          </FieldDescription>
         </Field>
         <Field className="col-span-2">
-          <FieldLabel>{t('phone')}</FieldLabel>
+          <FieldLabel>หมายเลขโทรศัพท์ติดต่อ *</FieldLabel>
           <Controller
             name="phone"
             control={control}
@@ -164,7 +156,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
             onClick={resetForm}
             disabled={isPending}
           >
-            {t('reset')}
+            ล้างค่าการตั้งค่า
           </Button>
         )}
 
@@ -174,7 +166,7 @@ export function ProfileForm({ ...props }: ComponentProps<typeof Card>) {
           ) : (
             <IconDeviceFloppy size={14} className="mr-2" />
           )}
-          {isPending ? t('saving') : t('save')}
+          {isPending ? 'กำลังบันทึก...' : 'บันทึกโปรไฟล์ส่วนตัว'}
         </Button>
       </CardFooter>
     </Card>

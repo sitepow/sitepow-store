@@ -20,11 +20,6 @@ const storeProfileSelect = {
   coverImage: true,
   description: true,
   primaryColor: true,
-  baseCurrency: true,
-  allowSearchEngineIndex: true,
-  seoTitle: true,
-  seoDescription: true,
-  seoKeywords: true,
 } satisfies Prisma.StoreSelect
 
 export type GetStoreProfileResult = Prisma.StoreGetPayload<{
@@ -71,22 +66,14 @@ export async function updateStoreProfile(
 ) {
   try {
     if (!storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -98,8 +85,7 @@ export async function updateStoreProfile(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -109,11 +95,7 @@ export async function updateStoreProfile(
         select: { id: true },
       })
       if (existing) {
-        return {
-          success: false,
-          messageTH: 'URL Slug นี้ถูกใช้งานไปแล้ว',
-          messageEN: 'This URL slug is already taken',
-        }
+        return { success: false, message: 'URL Slug นี้ถูกใช้งานไปแล้ว' }
       }
     }
 
@@ -138,11 +120,7 @@ export async function updateStoreProfile(
 
     await invalidateStoreCache(store?.slug)
 
-    return {
-      success: true,
-      messageTH: 'บันทึกข้อมูลร้านค้าสำเร็จ',
-      messageEN: 'Store profile updated successfully',
-    }
+    return { success: true, message: 'บันทึกข้อมูลร้านค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }

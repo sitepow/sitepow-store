@@ -2,11 +2,7 @@
 
 import { ComponentProps } from 'react'
 
-import { useTranslations } from 'next-intl'
-
-import { CurrencyCode } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 
 import { HighlightText } from '@/components/HighlightText'
@@ -26,20 +22,14 @@ interface CartSummaryCustomData {
 
 interface CartSummaryProps extends ComponentProps<'div'> {
   summary?: CartSummaryCustomData
-  baseCurrency?: CurrencyCode
 }
 
 export function CartSummary({
   className,
   summary: customSummary,
-  baseCurrency,
   ...props
 }: CartSummaryProps) {
-  const t = useTranslations('storefront')
   const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    baseCurrency || (store as any)?.baseCurrency,
-  )
   const { getCartSummary } = useCartStore()
   const summary = customSummary ?? getCartSummary()
 
@@ -49,20 +39,13 @@ export function CartSummary({
       {...props}
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
-      <SummaryRow
-        label={t('products.price')}
-        value={formatCurrency(convert(summary.subtotal), currentCurrency)}
-      />
+      <SummaryRow label="ราคาสินค้า" value={formatCurrency(summary.subtotal)} />
       {summary.totalDiscount > 0 && (
         <SummaryRow
-          label={t('cart.discount')}
+          label="ส่วนลด"
           value={
             <HighlightText>
-              -{' '}
-              {formatCurrency(
-                convert(Math.abs(summary.totalDiscount)),
-                currentCurrency,
-              )}
+              - {formatCurrency(Math.abs(summary.totalDiscount))}
             </HighlightText>
           }
         />
@@ -70,12 +53,12 @@ export function CartSummary({
       <Separator className="my-2" />
       {summary.totalPoints > 0 && (
         <p className="text-primary text-right text-xs font-medium">
-          {t('cart.earnPoints', { points: formatNumber(summary.totalPoints) })}
+          คุณจะได้รับ {formatNumber(summary.totalPoints)} แต้ม
         </p>
       )}
       <SummaryRow
-        label={t('cart.actualTotal')}
-        value={formatCurrency(convert(summary.finalPrice), currentCurrency)}
+        label="ยอดที่ต้องจ่ายจริง"
+        value={formatCurrency(summary.finalPrice)}
       />
     </div>
   )

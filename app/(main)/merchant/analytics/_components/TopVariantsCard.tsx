@@ -1,9 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { formatCurrency } from '@/utils/pricing'
 import {
   Area,
   AreaChart,
@@ -25,21 +22,12 @@ interface TopVariantsCardProps {
 }
 
 export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.analytics.topVariants')
-
   return (
     <AnalyticsCardShell
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-      title={t('title')}
-      description={t('description')}
+      title="5 อันดับรูปแบบสินค้าขายดี (Top Variants)"
+      description="เปรียบเทียบปริมาณการขายของแต่ละตัวเลือกสินค้า"
       isEmpty={topVariants.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ไม่มีข้อมูลรูปแบบสินค้า"
     >
       <div className="h-70 w-full pt-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -90,12 +78,10 @@ export function TopVariantsCard({ topVariants }: TopVariantsCardProps) {
                         {data.name}
                       </p>
                       <p className="font-medium text-orange-500">
-                        {t('quantitySold', { quantity: data.quantity })}
+                        จำนวนที่ขายได้: {data.quantity} ชิ้น
                       </p>
                       <p className="text-muted-foreground">
-                        {t('totalSales', {
-                          totalSales: formatCurrency(data.totalSales),
-                        })}
+                        ยอดขายรวม: {formatCurrency(data.totalSales)}
                       </p>
                     </div>
                   )

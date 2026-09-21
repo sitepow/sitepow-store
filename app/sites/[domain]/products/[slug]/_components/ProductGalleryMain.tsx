@@ -16,12 +16,7 @@ export function ProductGalleryMain() {
   }
 
   if (!activeImage) {
-    return (
-      <EmptyImage
-        className="aspect-square w-full md:aspect-4/3"
-        text="ไม่มีรูปภาพ"
-      />
-    )
+    return <EmptyImage className="aspect-square w-full md:aspect-4/3" />
   }
 
   return (

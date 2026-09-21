@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useUpdateStock } from '@/actions/hooks/inventory'
 import { GetInventoryItem } from '@/actions/inventory'
@@ -14,13 +10,14 @@ import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -41,8 +38,6 @@ export function StockEditDialog({
   productTitle = '',
   variantTitle = '',
 }: StockEditDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.inventory')
   const [open, setOpen] = useState(false)
   const updateStockMutation = useUpdateStock()
 
@@ -100,20 +95,17 @@ export function StockEditDialog({
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties} className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconSettings}
-            title={t('editStockDialog.title')}
-            description={`${productTitle ?? ''} ${variantTitle ? `· ${variantTitle}` : ''} ${stock?.branch?.name ? `· ${stock.branch.name}` : ''}`.trim()}
-          />
+          <DialogTitle>แก้ไขสต็อกสินค้า</DialogTitle>
+          <DialogDescription>
+            {productTitle} {variantTitle ? `· ${variantTitle}` : ''}{' '}
+            {stock?.branch?.name ? `· ${stock.branch.name}` : ''}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
           <Field>
-            <FieldLabel>{t('editStockDialog.minStockLabel')}</FieldLabel>
+            <FieldLabel>จำนวนขั้นต่ำ (แจ้งเตือนเมื่อสต็อกต่ำกว่า)</FieldLabel>
             <Input
               type="number"
               min={0}
@@ -129,7 +121,7 @@ export function StockEditDialog({
             onClick={handleClose}
             disabled={updateStockMutation.isPending}
           >
-            {t('cancel')}
+            ยกเลิก
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
@@ -137,10 +129,10 @@ export function StockEditDialog({
           >
             {updateStockMutation.isPending ? (
               <>
-                <Spinner /> {t('saving')}
+                <Spinner /> กำลังบันทึก...
               </>
             ) : (
-              t('save')
+              'บันทึก'
             )}
           </Button>
         </DialogFooter>

@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useCallback, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useNotificationSettings,
@@ -28,8 +24,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { NotificationRow } from './_components/NotificationRow'
 
 export function NotificationSettingsForm() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.notifications')
   const { selectedStoreId } = useStoreFilter()
   const { data: notificationSettings } = useNotificationSettings(
     selectedStoreId as string,
@@ -73,16 +67,12 @@ export function NotificationSettingsForm() {
   }
 
   return (
-    <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <Card>
       <CardHeader>
         <PageTabHeader
           variant="secondary"
-          title={t('title')}
-          description={t('description')}
+          title="ระบบแจ้งเตือนไลน์/อีเมล"
+          description="กำหนดพฤติกรรมการรับส่งข้อมูลสำคัญและตัวแจ้งเตือนแบบเรียลไทม์ของระบบหลังบ้านไปยังพนักงานและผู้บริหาร"
           icon={IconBell}
         />
       </CardHeader>
@@ -93,18 +83,18 @@ export function NotificationSettingsForm() {
             <FormProvider {...methods}>
               <NotificationRow
                 name="notifyLowStock"
-                title={t('lowStockTitle')}
-                description={t('lowStockDesc')}
+                title="ระบบแจ้งเตือนเมื่อสินค้าใกล้หมดคลังวิกฤต"
+                description="ส่งอีเมลรายงานด่วนและแจ้งเตือนพนักงานคลังสินค้าทันทีเมื่อจำนวนสินค้าคงเหลือในสาขาใดๆ มีค่าต่ำกว่า Min Stock ที่ตั้งไว้"
               />
               <NotificationRow
                 name="notifyDailySummary"
-                title={t('dailySummaryTitle')}
-                description={t('dailySummaryDesc')}
+                title="รายงานสรุปยอดขายรายวันอัตโนมัติ"
+                description="ประมวลผลยอดจำหน่ายรวมของทุกร้านค้า แล้วสรุปส่งเป็นรายงานสถิติเข้าอีเมลหลักของผู้ดูแลระบบทุกคืนเวลา 23:59 น."
               />
               <NotificationRow
                 name="notifyBillingAlert"
-                title={t('billingAlertTitle')}
-                description={t('billingAlertDesc')}
+                title="แจ้งเตือนรอบบิลและค่าบริการ"
+                description="รับแจ้งเตือนล่วงหน้าเมื่อใกล้ถึงวันชำระค่าบริการรายเดือน หรือเมื่อโควตา AI Vision และ AI Search ใกล้หมด"
               />
             </FormProvider>
           </CardContent>
@@ -116,7 +106,7 @@ export function NotificationSettingsForm() {
                 variant="outline"
                 onClick={() => resetForm()}
               >
-                {t('reset')}
+                ล้างค่าการตั้งค่า
               </Button>
             )}
 
@@ -128,10 +118,10 @@ export function NotificationSettingsForm() {
               {updateMutation.isPending ? (
                 <>
                   <Spinner />
-                  {t('saving')}
+                  กำลังบันทึก...
                 </>
               ) : (
-                t('save')
+                'บันทึกการตั้งค่า'
               )}
             </Button>
           </CardFooter>

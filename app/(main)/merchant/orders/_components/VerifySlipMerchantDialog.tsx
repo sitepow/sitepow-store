@@ -2,25 +2,23 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { useApproveSlipManual } from '@/actions/hooks/verify-slip'
-import { CurrencyCode } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { SlipVerificationAction } from '@/types/slip'
 import { formatCurrency } from '@/utils/pricing'
 import { formatBankAccount } from '@/utils/slip'
 import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
@@ -31,9 +29,6 @@ interface VerifySlipMerchantDialogProps {
     orderNumber: string
     paymentProof?: string | null
     totalAmount: number
-    totalAmountBase?: number
-    baseCurrency?: CurrencyCode
-    customerCurrency?: CurrencyCode
     bankAccount?: {
       bankName: string
       accountNumber: string
@@ -45,8 +40,6 @@ interface VerifySlipMerchantDialogProps {
 export function VerifySlipMerchantDialog({
   order,
 }: VerifySlipMerchantDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.orders.verifySlip')
   const [isOpen, setIsOpen] = useState(false)
   const { mutate: handleVerifySlip, isPending } = useApproveSlipManual()
 
@@ -67,59 +60,27 @@ export function VerifySlipMerchantDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
-          <IconSearch size={16} /> {t('button')}
+          <IconSearch size={16} /> ตรวจสอบสลิป
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-        className="sm:max-w-lg"
-      >
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconSearch}
-            title={t('title', { orderNumber: order.orderNumber })}
-            description={
-              <span className="block space-y-1">
-                <span className="text-foreground block font-medium">
-                  {t('amountDue')}{' '}
-                  <span className="text-primary font-semibold">
-                    {formatCurrency(
-                      order.totalAmount,
-                      order.customerCurrency || CurrencyCode.THB,
-                    )}
-                  </span>
-                  {order.customerCurrency &&
-                    order.baseCurrency &&
-                    order.customerCurrency !== order.baseCurrency &&
-                    order.totalAmountBase !== undefined && (
-                      <span className="text-muted-foreground ml-1.5 text-xs font-normal">
-                        (~
-                        {formatCurrency(
-                          order.totalAmountBase,
-                          order.baseCurrency,
-                        )}
-                        )
-                      </span>
-                    )}
-                </span>
-                {order.bankAccount && (
-                  <span className="text-foreground block font-medium">
-                    {t('bankInfo', {
-                      bank: order.bankAccount.bankName,
-                      account: formatBankAccount(
-                        order.bankAccount.accountNumber,
-                      ),
-                      name: order.bankAccount.accountName,
-                    })}
-                  </span>
-                )}
+          <DialogTitle>ตรวจสอบสลิปการชำระเงิน #{order.orderNumber}</DialogTitle>
+          <DialogDescription className="space-y-1">
+            <span className="text-foreground block font-medium">
+              ยอดที่ต้องชำระ:{' '}
+              <span className="text-primary">
+                {formatCurrency(order.totalAmount)}
               </span>
-            }
-          />
+            </span>
+            {order.bankAccount && (
+              <span className="text-foreground block font-medium">
+                ธนาคารที่ลูกค้าเลือกโอน: {order.bankAccount.bankName} (เลขบัญชี:{' '}
+                {formatBankAccount(order.bankAccount.accountNumber)}) ชื่อบัญชี:{' '}
+                {order.bankAccount.accountName}
+              </span>
+            )}
+          </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center py-4">
           {order.paymentProof ? (
@@ -133,8 +94,8 @@ export function VerifySlipMerchantDialog({
             </div>
           ) : (
             <ActionRequiredAlert
-              description={t('noSlipDesc')}
-              title={t('noSlipTitle')}
+              description="ยังไม่มีการแนบสลิปสำหรับออเดอร์นี้"
+              title="แจ้งเตือน"
             />
           )}
         </div>
@@ -144,13 +105,13 @@ export function VerifySlipMerchantDialog({
             variant="outline"
             onClick={() => onAction(SlipVerificationAction.REJECT)}
           >
-            {isPending ? <Spinner /> : <IconX />} {t('reject')}
+            {isPending ? <Spinner /> : <IconX />} ปฏิเสธสลิป
           </Button>
           <Button
             type="button"
             onClick={() => onAction(SlipVerificationAction.APPROVE)}
           >
-            {isPending ? <Spinner /> : <IconCheck />} {t('approve')}
+            {isPending ? <Spinner /> : <IconCheck />} สลิปถูกต้อง
           </Button>
         </DialogFooter>
       </DialogContent>

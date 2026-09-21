@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -18,7 +16,6 @@ import { BranchDialog } from './_components/BranchDialog'
 import { BranchesTable } from './_components/BranchesTable'
 
 export default function MerchantStoreSettingsBranchesPage() {
-  const t = useTranslations('merchant.branches')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewBranches,
@@ -43,8 +40,8 @@ export default function MerchantStoreSettingsBranchesPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHierarchy2}
-        title={t('title')}
-        description={t('description')}
+        title="จัดการสาขา"
+        description="จัดการสาขาของร้านค้า กำหนดสาขาหลัก และเพิ่มสาขาย่อย"
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
@@ -64,8 +61,8 @@ export default function MerchantStoreSettingsBranchesPage() {
       ) : !isPermissionLoading && !canViewBranches ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลสาขาของสาขาหรือร้านค้านี้"
         />
       ) : (
         <BranchesTable onEdit={handleEdit} />

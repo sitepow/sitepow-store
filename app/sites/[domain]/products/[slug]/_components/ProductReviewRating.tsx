@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { StorefrontProductDetail } from '@/actions/storefront/product'
 
 import { Progress } from '@/components/ui/progress'
@@ -11,7 +9,6 @@ import { StarRating } from '../../../_components/product/StarRating'
 type ReviewItem = StorefrontProductDetail['reviews'][number]
 
 export function ProductReviewRating({ reviews }: { reviews: ReviewItem[] }) {
-  const t = useTranslations('storefront.products')
   const totalReviews = reviews.length
 
   const averageRating =
@@ -33,7 +30,7 @@ export function ProductReviewRating({ reviews }: { reviews: ReviewItem[] }) {
         <span className="text-5xl font-bold">{averageRating}</span>
         <StarRating rating={Math.round(Number(averageRating))} size={18} />
         <span className="text-muted-foreground text-xs font-medium">
-          {t('allReviews', { count: totalReviews })}
+          {totalReviews} รีวิวทั้งหมด
         </span>
       </div>
       <div className="flex-1 space-y-2.5">

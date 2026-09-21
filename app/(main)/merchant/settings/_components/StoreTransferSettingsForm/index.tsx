@@ -1,10 +1,6 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
-
-import { useTranslations } from 'next-intl'
 
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconMail, IconReplace } from '@tabler/icons-react'
@@ -20,26 +16,19 @@ import { StoreTransferConfirmDialog } from './_components/StoreTransferConfirmDi
 import { StoreTransferHistoryTable } from './_components/StoreTransferHistoryTable'
 
 export function StoreTransferSettingsForm() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.transfer')
   const { selectedStoreId } = useStoreFilter()
   const [email, setEmail] = useState('')
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <div
-      className="space-y-6"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <PageTabHeader
             variant="secondary"
             icon={IconReplace}
-            title={t('title')}
-            description={t('description')}
+            title="โอนย้ายความเป็นเจ้าของร้าน"
+            description="ทำการส่งคำขอไปยังบัญชีผู้ใช้ท่านอื่นเพื่อโอนกรรมสิทธิ์ สิทธิ์ขาดในการตั้งค่า และสิทธิ์ความเป็น Owner ของร้านค้านี้"
           />
         </CardHeader>
 
@@ -47,11 +36,14 @@ export function StoreTransferSettingsForm() {
           <>
             <CardContent className="space-y-5">
               <ActionRequiredAlert
-                title={t('warningTitle')}
-                description={t('warningDesc')}
+                title="คำเตือนและข้อควรระวัง"
+                description="เมื่อผู้รับยืนยันการโอน
+                  บัญชีปัจจุบันของคุณจะถูกลดระดับสิทธิ์ลงทันที
+                  และไม่สามารถเข้าถึงการจัดการงบดุล รายได้
+                  หรือสิทธิ์การตั้งค่าระบบหลักของร้านค้านี้ได้อีกต่อไป"
               />
               <Field>
-                <FieldLabel>{t('email')}</FieldLabel>
+                <FieldLabel>อีเมลของผู้รับโอนสิทธิ์</FieldLabel>
                 <Input
                   type="email"
                   placeholder="example@merchant.com"
@@ -69,7 +61,7 @@ export function StoreTransferSettingsForm() {
                 onClick={() => setConfirmOpen(true)}
               >
                 <IconMail size={14} />
-                {t('submit')}
+                ส่งคำขอโอนร้านค้า
               </Button>
             </CardFooter>
           </>

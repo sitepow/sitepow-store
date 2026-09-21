@@ -3,10 +3,7 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useProductAi } from '@/actions/hooks/ai'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
@@ -32,8 +29,6 @@ export function ProductTitleField({
   isPending: boolean
   onAiTrigger: (action: () => void) => void
 }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const { selectedStoreId } = useStoreFilter()
   const {
     register,
@@ -60,17 +55,11 @@ export function ProductTitleField({
   )
 
   return (
-    <Field
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
-      <FieldLabel>{t('title')}</FieldLabel>
+    <Field>
+      <FieldLabel>ชื่อสินค้า</FieldLabel>
       <div className="flex items-center gap-2">
         <Textarea
-          placeholder={t('titlePlaceholder')}
+          placeholder="เช่น เสื้อยืดลายพิเศษ"
           {...register('title')}
           disabled={isPending}
         />
@@ -80,7 +69,7 @@ export function ProductTitleField({
           size="icon"
           onClick={() => onAiTrigger(() => genTitle())}
           disabled={isGenTitle}
-          title={t('generateTitleTooltip')}
+          title="สร้าง Title จากชื่อสินค้า"
         >
           <IconWand className="size-4" />
         </Button>

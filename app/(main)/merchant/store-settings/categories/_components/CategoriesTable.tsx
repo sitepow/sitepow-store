@@ -2,16 +2,13 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useCategories, useDeleteCategory } from '@/actions/hooks/category'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
 import { ProductImage } from '@/components/ProductImage'
-import { StorePagination } from '@/components/StorePagination'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Button } from '@/components/ui/button'
@@ -29,8 +26,6 @@ interface CategoriesTableProps {
 }
 
 export function CategoriesTable({ onEdit }: CategoriesTableProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.categories')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -44,38 +39,29 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
   const deleteCategoryMutation = useDeleteCategory()
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="overflow-x-auto rounded-md border">
         <Table className="min-w-175 border-separate border-spacing-0">
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 z-25 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                {t('columns.image')}
+                รูปภาพ
               </TableHead>
-              <TableHead>{t('columns.nameAndSlug')}</TableHead>
-              <TableHead>{t('columns.description')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>ชื่อหมวดหมู่/Slug</TableHead>
+              <TableHead>คำอธิบาย</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && categories.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : categories.length === 0 ? (
-              <TableEmptyRow colSpan={4} title={t('empty')} />
+              <TableEmptyRow colSpan={4} title="ไม่พบรายการหมวดหมู่" />
             ) : (
               categories.map((category) => (
                 <TableRow key={category.id} className="hover:bg-muted/50">
                   <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                    <ProductImage src={category.image} alt={category.title} />
+                    <ProductImage src={category.image} />
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
@@ -111,7 +97,15 @@ export function CategoriesTable({ onEdit }: CategoriesTableProps) {
           </TableBody>
         </Table>
       </div>
-      {meta && <StorePagination meta={meta} onPageChange={setPage} />}
-    </div>
+      {meta && meta.totalPages > 1 && (
+        <StorePagination
+          currentPage={meta.currentPage}
+          totalPages={meta.totalPages}
+          hasNextPage={meta.hasNextPage}
+          hasPreviousPage={meta.hasPreviousPage}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
+      )}
+    </>
   )
 }

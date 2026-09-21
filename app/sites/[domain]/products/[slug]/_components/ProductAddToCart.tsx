@@ -1,8 +1,4 @@
-'use client'
-
 import toast from 'react-hot-toast'
-
-import { useLocale, useTranslations } from 'next-intl'
 
 import { ProductType } from '@/generated/prisma/enums'
 import {
@@ -11,7 +7,6 @@ import {
   mapSelectedOptions,
   validateRequiredOptions,
 } from '@/utils/cart'
-import { getLocalizedField } from '@/utils/intl'
 import { formatNumber } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 import { PackageIcon } from 'lucide-react'
@@ -26,8 +21,6 @@ import { useProductPurchaseStore } from '../../store'
 import { QuantitySelector } from './QuantitySelector'
 
 export function ProductAddToCart() {
-  const t = useTranslations('storefront.products')
-  const locale = useLocale()
   const {
     product,
     quantity,
@@ -41,11 +34,6 @@ export function ProductAddToCart() {
   } = useProductPurchaseStore()
 
   const addItem = useCartStore((state) => state.addItem)
-
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
-
   const isPhysical = product?.productType === ProductType.PHYSICAL
   const isDigitalItem = product?.productType === ProductType.DIGITAL_ITEM
   const stock = selectedVariant
@@ -58,7 +46,7 @@ export function ProductAddToCart() {
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
-      toast.error(t('selectVariant'))
+      toast.error('กรุณาเลือกรูปแบบสินค้า')
       return
     }
 
@@ -68,9 +56,7 @@ export function ProductAddToCart() {
     })
 
     if (missingOptions.length > 0) {
-      toast.error(
-        t('selectMissingOption', { options: missingOptions.join(', ') }),
-      )
+      toast.error(`กรุณาเลือก ${missingOptions.join(', ')}`)
       return
     }
 
@@ -103,29 +89,21 @@ export function ProductAddToCart() {
       product.images?.[0]?.url ||
       ''
 
-    addItem(
-      {
-        productId: product.id,
-        productTitle:
-          getLocalizedField(product, 'title', locale) || product.title,
-        branchId: selectedBranchId ?? '',
-        branchName: selectedBranchName ?? '',
-        weight: selectedVariant.weight || 0,
-        image: itemImage,
-        variant: selectedVariant,
-        selectedOptions: mappedOptions,
-        selectedAddons: selectedAddonsData,
-        quantity,
-        unitPrice,
-        rewardPoints,
-        productType: product?.productType ?? ProductType.PHYSICAL,
-      },
-      {
-        consignmentStockOut: t('consignmentStockOut'),
-        branchStockOut: t('branchStockOut'),
-        addedToCart: t('addedToCart'),
-      },
-    )
+    addItem({
+      productId: product.id,
+      productTitle: product.title,
+      branchId: selectedBranchId ?? '',
+      branchName: selectedBranchName ?? '',
+      weight: selectedVariant.weight || 0,
+      image: itemImage,
+      variant: selectedVariant,
+      selectedOptions: mappedOptions,
+      selectedAddons: selectedAddonsData,
+      quantity,
+      unitPrice,
+      rewardPoints,
+      productType: product?.productType ?? ProductType.PHYSICAL,
+    })
   }
 
   if (isLoading) {
@@ -143,7 +121,7 @@ export function ProductAddToCart() {
   return (
     <>
       <div className="flex flex-col gap-2.5 font-bold">
-        <Label className="text-lg font-semibold">{t('quantity')}</Label>
+        <Label className="text-lg font-semibold">จำนวน</Label>
         <div className="flex items-center gap-5">
           <QuantitySelector
             value={quantity}
@@ -152,17 +130,15 @@ export function ProductAddToCart() {
           {(isPhysical || isDigitalItem) && (
             <div className="flex gap-2.5">
               <PackageIcon className="text-primary" />
-              <span>
-                {formatNumber(stock)} {t('pieces')}
-              </span>
+              <span>{formatNumber(stock)} ชิ้น</span>
             </div>
           )}
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-2">
-        <Label className="text-lg font-semibold">{t('additionalInfo')}</Label>
+        <Label className="text-lg font-semibold">ข้อมูลเพิ่มเติม (ถ้ามี)</Label>
         <Textarea
-          placeholder={t('sellerNotePlaceholder')}
+          placeholder="กรอกข้อความถึงผู้ขายที่นี่"
           className="min-h-20"
         />
       </div>
@@ -171,7 +147,7 @@ export function ProductAddToCart() {
         className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >
-        {t('addToCart')}
+        เพิ่มลงตะกร้า
       </Button>
     </>
   )

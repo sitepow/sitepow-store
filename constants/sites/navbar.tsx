@@ -1,83 +1,34 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
-
-export interface StoreNavbarItem {
-  title: string
-  href?: string
-  children?: { title: string; href: string }[]
-}
-
-export function useStoreNavbarItems(): StoreNavbarItem[] {
-  const t = useTranslations('storefront.navbar')
-
-  return [
-    {
-      title: t('aboutStore'),
-      href: '/',
-      children: [
-        {
-          title: t('storeDetail'),
-          href: '/about',
-        },
-        {
-          title: t('faqs'),
-          href: '/faqs',
-        },
-        {
-          title: t('storeRating'),
-          href: '/customer-reviews',
-        },
-        {
-          title: t('howToOrder'),
-          href: '/description',
-        },
-        {
-          title: t('privacyPolicy'),
-          href: '/privacy-policy',
-        },
-        {
-          title: t('returnPolicy'),
-          href: '/refund-return-policy',
-        },
-      ],
-    },
-    { title: t('myOrders'), href: '/user/orders' },
-    { title: t('allBlogs'), href: '/blogs' },
-  ]
-}
-
-export const STORE_NAVBAR_ITEMS: StoreNavbarItem[] = [
+export const STORE_NAVBAR_ITEMS = [
   {
-    title: 'About Store',
+    title: 'เกี่ยวกับร้าน',
     href: '/',
     children: [
       {
-        title: 'Store Details',
+        title: 'รายละเอียดร้าน',
         href: '/about',
       },
       {
-        title: 'FAQs',
+        title: 'คำถามที่พบบ่อย',
         href: '/faqs',
       },
       {
-        title: 'Store Rating',
+        title: 'คะแนนร้านค้า',
         href: '/customer-reviews',
       },
       {
-        title: 'How to Order',
+        title: 'วิธีการสั่งซื้อ',
         href: '/description',
       },
       {
-        title: 'Privacy Policy',
+        title: 'นโยบายความเป็นส่วนตัว',
         href: '/privacy-policy',
       },
       {
-        title: 'Return Policy',
+        title: 'นโยบายการคืนสินค้า',
         href: '/refund-return-policy',
       },
     ],
   },
-  { title: 'My Orders', href: '/user/orders' },
-  { title: 'All Blogs', href: '/blogs' },
+  { title: 'การสั่งซื้อของฉัน', href: '/user/orders' },
+  { title: 'บทความทั้งหมด', href: '/blogs' },
 ]

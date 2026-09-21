@@ -2,9 +2,8 @@ import { useState } from 'react'
 
 export function useCopyToClipboard(resetInterval = 2000) {
   const [copied, setCopied] = useState(false)
-  const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
-  const copy = async (text: string, key?: string) => {
+  const copy = async (text: string) => {
     if (!text) {
       return
     }
@@ -22,28 +21,11 @@ export function useCopyToClipboard(resetInterval = 2000) {
       }
 
       setCopied(true)
-      if (key !== undefined) {
-        setCopiedKey(key)
-      }
-
-      setTimeout(() => {
-        setCopied(false)
-        if (key !== undefined) {
-          setCopiedKey(null)
-        }
-      }, resetInterval)
+      setTimeout(() => setCopied(false), resetInterval)
     } catch {
       setCopied(false)
-      setCopiedKey(null)
     }
   }
 
-  const isCopied = (key?: string) => {
-    if (key !== undefined) {
-      return copiedKey === key
-    }
-    return copied
-  }
-
-  return { copied, copiedKey, copy, isCopied }
+  return { copied, copy }
 }

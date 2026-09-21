@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -16,7 +14,6 @@ import { MerchantInvoiceTable } from './_components/MerchantInvoiceTable'
 import { MerchantSubscriptionTable } from './_components/MerchantSubscriptionTable'
 
 export default function MerchantBillingSubscriptionPage() {
-  const t = useTranslations('merchant.billing')
   const { selectedStoreId } = useStoreFilter()
   const { canViewSubscription, isLoading: isPermissionLoading } =
     useEmployeePermission()
@@ -25,8 +22,8 @@ export default function MerchantBillingSubscriptionPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCreditCard}
-        title={t('title')}
-        description={t('description')}
+        title="การสมัครสมาชิก"
+        description="ตรวจสอบข้อมูลแพลนรายเดือนและประวัติใบเสร็จแยกตามรายร้านค้าของคุณ"
         endContent={<StoreSelectField />}
       />
       {selectedStoreId === ALL_STORES ? (
@@ -34,16 +31,16 @@ export default function MerchantBillingSubscriptionPage() {
       ) : !isPermissionLoading && !canViewSubscription ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
         />
       ) : (
         <MerchantSubscriptionTable />
       )}
       <PageTabHeader
         icon={IconFileInvoice}
-        title={t('invoicesTitle')}
-        description={t('invoicesDesc')}
+        title="ใบแจ้งหนี้และบิล"
+        description="ตรวจสอบประวัติการชำระเงิน ดาวน์โหลดใบแจ้งหนี้ และใบเสร็จรับเงิน"
         endContent={<StoreSelectField />}
       />
       {selectedStoreId === ALL_STORES ? (
@@ -51,8 +48,8 @@ export default function MerchantBillingSubscriptionPage() {
       ) : !isPermissionLoading && !canViewSubscription ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลการสมัครสมาชิกและใบแจ้งหนี้ของสาขาหรือร้านค้านี้"
         />
       ) : (
         <MerchantInvoiceTable />

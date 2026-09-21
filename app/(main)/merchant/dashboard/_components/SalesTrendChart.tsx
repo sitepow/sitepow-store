@@ -1,11 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
-
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { formatCurrency } from '@/utils/pricing'
 import { IconTrendingUp } from '@tabler/icons-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
@@ -27,34 +22,22 @@ interface SalesTrendChartProps {
   }
 }
 
-export function SalesTrendChart({ data }: SalesTrendChartProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.dashboard.salesTrend')
-  const salesTrend = data?.salesTrend ?? []
+const chartConfig = {
+  total: {
+    label: 'ยอดขาย',
+    color: '#10b981',
+  },
+} satisfies ChartConfig
 
-  const chartConfig = useMemo(
-    () =>
-      ({
-        total: {
-          label: t('sales'),
-          color: '#10b981',
-        },
-      }) satisfies ChartConfig,
-    [t],
-  )
+export function SalesTrendChart({ data }: SalesTrendChartProps) {
+  const salesTrend = data?.salesTrend ?? []
 
   return (
     <AnalyticsCardShell
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-      title={t('title')}
-      description={t('description')}
+      title="แนวโน้มยอดขาย"
+      description="ยอดขายสุทธิ 6 เดือนล่าสุด"
       isEmpty={salesTrend.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ไม่มีข้อมูลแนวโน้มยอดขาย"
     >
       <div className="space-y-4">
         <ChartContainer config={chartConfig}>
@@ -90,7 +73,7 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
         </ChartContainer>
         <div className="text-muted-foreground flex items-center gap-2 border-t pt-2 text-xs">
           <IconTrendingUp className="size-4 text-emerald-500" />
-          <span>{t('last6Months')}</span>
+          <span>6 เดือนล่าสุด</span>
         </div>
       </div>
     </AnalyticsCardShell>

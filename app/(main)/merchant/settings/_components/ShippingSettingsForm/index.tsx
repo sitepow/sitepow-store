@@ -9,24 +9,16 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-
 import {
   useStoreShippingSettings,
   useUpdateShippingSettings,
 } from '@/actions/hooks/shipping'
-import {
-  COUNTRY_METADATA,
-  COURIERS_LIST,
-  DEFAULT_INTERNATIONAL_ZONES,
-} from '@/constants/shipping'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { COURIERS_LIST } from '@/constants/shipping'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconDeviceFloppy, IconTruck, IconWorld } from '@tabler/icons-react'
+import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
@@ -43,12 +35,8 @@ import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 import { ShippingZoneTable } from './_components/ShippingZoneTable'
 
 export function ShippingSettingsForm() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.shipping')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
-
-  const { formatCurrency, baseCurrency } = useMerchantCurrency()
 
   const { mutate: updateShipping, isPending: isUpdating } =
     useUpdateShippingSettings()
@@ -96,7 +84,7 @@ export function ShippingSettingsForm() {
 
   const onFormSubmit = (data: ShippingFormValues) => {
     if (!selectedStoreId) {
-      toast.error(t('storeNotFound'))
+      toast.error('ไม่พบข้อมูลร้านค้า')
       return
     }
 
@@ -115,8 +103,8 @@ export function ShippingSettingsForm() {
             <PageTabHeader
               variant="secondary"
               icon={IconTruck}
-              title={t('title')}
-              description={t('description')}
+              title="ระบบขนส่งสินค้า"
+              description="ตั้งค่าบริการบริษัทขนส่ง พร้อมกำหนดอัตราค่าส่งขั้นบันไดและเงื่อนไขพื้นที่ห่างไกลแยกรายบริการอย่างเป็นระบบ"
               endContent={
                 selectedStoreId !== ALL_STORES &&
                 selectedBranchId !== ALL_BRANCHES && <ApplyGlobalRatesDialog />
@@ -142,10 +130,12 @@ export function ShippingSettingsForm() {
                               />
                             )}
                           />
-                          <FieldLabel>{t('freeShipMin')}</FieldLabel>
+                          <FieldLabel>ยอดซื้อรวมขั้นต่ำเพื่อส่งฟรี</FieldLabel>
                         </div>
                         <FieldDescription className="text-muted-foreground mt-1.5 text-xs">
-                          {t('freeShipMinDesc')}
+                          กำหนดเงื่อนไขยอดซื้อขั้นต่ำ
+                          หากลูกค้าซื้อสินค้าถึงจำนวนเงินนี้
+                          จะได้รับสิทธิ์จัดส่งฟรีทันที
                         </FieldDescription>
                         <div className="mt-2 flex items-center">
                           <Input
@@ -158,7 +148,7 @@ export function ShippingSettingsForm() {
                             className="rounded-r-none"
                           />
                           <span className="border-input bg-muted text-muted-foreground flex h-9 items-center rounded-r-md border border-l-0 px-3 text-sm select-none">
-                            {t('currencyBaht')}
+                            บาท
                           </span>
                         </div>
                       </Field>
@@ -169,10 +159,11 @@ export function ShippingSettingsForm() {
                   <div className="space-y-5 py-5">
                     <div>
                       <span className="block text-sm font-semibold">
-                        {t('couriersTitle')}
+                        ตัวเลือกผู้ให้บริการจัดส่งและบริการย่อย (Courier &
+                        Services)
                       </span>
                       <span className="text-muted-foreground mt-0.5 block text-xs leading-relaxed">
-                        {t('couriersDesc')}
+                        เปิด-ปิด และระบุอัตราค่าบริการของแต่ละบริการย่อย
                       </span>
                     </div>
                     <div className="grid gap-4 space-y-6 pt-2 lg:grid-cols-2 2xl:grid-cols-3">
@@ -215,9 +206,7 @@ export function ShippingSettingsForm() {
                                       {service.name}
                                     </span>
                                     <span className="text-muted-foreground block text-xs">
-                                      {t('estimatedDays', {
-                                        days: service.estimatedDays || '',
-                                      })}
+                                      ระยะเวลาโดยประมาณ {service.estimatedDays}
                                     </span>
                                   </div>
                                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
@@ -228,9 +217,7 @@ export function ShippingSettingsForm() {
                                     />
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm font-medium">
-                                        {isEnabled
-                                          ? t('enabled')
-                                          : t('disabled')}
+                                        {isEnabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                                       </span>
                                       <Switch
                                         checked={!!isEnabled}
@@ -251,96 +238,6 @@ export function ShippingSettingsForm() {
                         </div>
                       ))}
                     </div>
-
-                    {/* International & Worldwide Shipping Zones */}
-                    <Separator className="my-6" />
-                    <div className="space-y-4">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                          <IconWorld className="text-primary h-5 w-5" />
-                          <h4 className="text-base font-semibold">
-                            การจัดส่งระหว่างประเทศ (Worldwide & International
-                            Shipping)
-                          </h4>
-                          <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                            Active Ready
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground text-xs">
-                          ระบบคำนวณค่าจัดส่งระหว่างประเทศตามโซนและน้ำหนักสินค้าอัตโนมัติ
-                          (คำนวณและแปลงตามสกุลเงินฐาน {baseCurrency})
-                          รองรับปลายทางทั่วโลก
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                        {DEFAULT_INTERNATIONAL_ZONES.map((zone) => (
-                          <div
-                            key={zone.id}
-                            className="bg-card text-card-foreground flex flex-col justify-between rounded-xl border p-4 shadow-sm transition-all hover:shadow-md"
-                          >
-                            <div className="space-y-3">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="space-y-1">
-                                  <h5 className="text-sm font-semibold">
-                                    {zone.name}
-                                  </h5>
-                                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                                    {zone.countries.map((countryCode) => {
-                                      const meta = COUNTRY_METADATA[countryCode]
-                                      return (
-                                        <span
-                                          key={countryCode}
-                                          className="bg-muted text-foreground inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium"
-                                          title={meta?.nameEN ?? countryCode}
-                                        >
-                                          <span>{meta?.flag}</span>
-                                          <span>{countryCode}</span>
-                                        </span>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="space-y-2 border-t pt-1 text-xs">
-                                {zone.services.map((svc) => (
-                                  <div
-                                    key={svc.id}
-                                    className="bg-muted/40 flex items-center justify-between rounded-lg px-2.5 py-2"
-                                  >
-                                    <div className="space-y-0.5">
-                                      <div className="text-foreground font-medium">
-                                        {svc.name}
-                                      </div>
-                                      <div className="text-muted-foreground text-[11px]">
-                                        {svc.estimatedDays}
-                                      </div>
-                                    </div>
-                                    <div className="text-right">
-                                      <div className="text-foreground font-medium">
-                                        เริ่มต้น{' '}
-                                        {formatCurrency(
-                                          svc.weightRates[0]?.fee ?? 0,
-                                        )}
-                                      </div>
-                                      <div className="text-muted-foreground text-[10px]">
-                                        สูงสุด{' '}
-                                        {formatCurrency(
-                                          svc.weightRates[
-                                            svc.weightRates.length - 1
-                                          ]?.fee ?? 0,
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-wrap justify-end gap-2 border-t">
@@ -350,18 +247,18 @@ export function ShippingSettingsForm() {
                       variant="outline"
                       onClick={() => resetForm()}
                     >
-                      {t('reset')}
+                      ล้างค่าการตั้งค่า
                     </Button>
                   )}
                   <Button type="submit" disabled={isUpdating}>
                     {isUpdating ? (
                       <>
                         <Spinner />
-                        {t('saving')}
+                        กำลังบันทึกเกณฑ์ขนส่งระบบ...
                       </>
                     ) : (
                       <>
-                        <IconDeviceFloppy size={14} /> {t('save')}
+                        <IconDeviceFloppy size={14} /> บันทึกเกณฑ์การส่งสินค้า
                       </>
                     )}
                   </Button>

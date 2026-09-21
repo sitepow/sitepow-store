@@ -19,7 +19,6 @@ export function CategoriesSection({ storeSlug }: { storeSlug: string }) {
           categorySlug={categoryGroup.slug}
           title={categoryGroup.title}
           image={categoryGroup.image}
-          translations={categoryGroup.translations}
           products={categoryGroup.products}
           isLoading={isLoading}
         />

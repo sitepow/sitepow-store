@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { ComponentProps, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useLoyaltySettings,
@@ -39,8 +35,6 @@ export function LoyaltySettingsCard({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.loyalty.settings')
   const { selectedStoreId } = useStoreFilter()
   const { data: settings } = useLoyaltySettings(selectedStoreId)
   const updateLoyaltyMutation = useUpdateLoyaltySettings()
@@ -86,13 +80,10 @@ export function LoyaltySettingsCard({
   }
 
   return (
-    <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className={cn('h-fit', className)} {...props}>
+    <Card className={cn('h-fit', className)} {...props}>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{t('title')}</CardTitle>
+          <CardTitle>เงื่อนไขการคำนวณแต้ม</CardTitle>
           <Switch
             checked={isPointsEnabled}
             onCheckedChange={(v) =>
@@ -101,7 +92,9 @@ export function LoyaltySettingsCard({
             disabled={updateLoyaltyMutation.isPending}
           />
         </div>
-        <CardDescription>{t('description')}</CardDescription>
+        <CardDescription>
+          เปิดใช้ระบบคะแนนสะสมและกำหนดสัดส่วนมูลค่าเงินเป็นคะแนน
+        </CardDescription>
       </CardHeader>
       <CardContent
         className={cn(
@@ -111,7 +104,7 @@ export function LoyaltySettingsCard({
       >
         <div className="space-y-2">
           <Label className="text-xs font-semibold">
-            {t('earningRateLabel')}
+            ยอดซื้อขั้นต่ำต่อการรับ 1 แต้ม
           </Label>
           <div className="flex items-center">
             <Input
@@ -122,7 +115,7 @@ export function LoyaltySettingsCard({
               disabled={updateLoyaltyMutation.isPending}
             />
             <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
-              {t('earningRateUnit')}
+              บาท = 1 แต้ม
             </span>
           </div>
           {errors?.pointEarningRate && (
@@ -133,7 +126,7 @@ export function LoyaltySettingsCard({
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-semibold">
-            {t('redeemRateLabel')}
+            มูลค่าส่วนลดต่อ 1 แต้ม
           </Label>
           <div className="flex items-center">
             <Input
@@ -144,7 +137,7 @@ export function LoyaltySettingsCard({
               disabled={updateLoyaltyMutation.isPending}
             />
             <span className="bg-muted text-muted-foreground rounded-r-md border border-l-0 px-3 py-2 text-xs whitespace-nowrap">
-              {t('redeemRateUnit', { discount: point ?? 0 })}
+              แต้ม = ลด {point} บาท
             </span>
           </div>
           {errors?.pointRedeemRate && (
@@ -163,11 +156,11 @@ export function LoyaltySettingsCard({
         >
           {updateLoyaltyMutation.isPending ? (
             <>
-              <Spinner /> {t('saving')}
+              <Spinner /> กำลังบันทึก...
             </>
           ) : (
             <>
-              <IconDeviceFloppy size={14} /> {t('save')}
+              <IconDeviceFloppy size={14} /> บันทึกการตั้งค่า
             </>
           )}
         </Button>

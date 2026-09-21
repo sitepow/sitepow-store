@@ -1,15 +1,12 @@
 'use client'
 
-import React, { useState }
-from 'react'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useBlogs, useDeleteBlog } from '@/actions/hooks/blog'
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconTag } from '@tabler/icons-react'
 
@@ -29,8 +26,6 @@ import {
 } from '@/components/ui/table'
 
 export function BlogTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.blog')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -49,24 +44,17 @@ export function BlogTable() {
   }
 
   return (
-    <div
-      className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.id')}</TableHead>
-              <TableHead>{t('columns.title')}</TableHead>
-              <TableHead>{t('columns.slug')}</TableHead>
-              <TableHead>{t('columns.tags')}</TableHead>
+              <TableHead>รหัสบทความ</TableHead>
+              <TableHead>ชื่อบทความ</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>แท็ก</TableHead>
               {(canUpdateBlogs || canDeleteBlogs) && (
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -74,7 +62,7 @@ export function BlogTable() {
             {isLoading && blogs.length === 0 ? (
               <TableLoadingRow colSpan={5} />
             ) : blogs.length === 0 ? (
-              <TableEmptyRow colSpan={5} title={t('empty')} />
+              <TableEmptyRow colSpan={5} title="ยังไม่มีบทความ" />
             ) : (
               blogs.map((blog) => (
                 <TableRow key={blog.id}>
@@ -129,6 +117,6 @@ export function BlogTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

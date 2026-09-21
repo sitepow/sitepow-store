@@ -1,12 +1,8 @@
-'use client'
-
 /* eslint-disable @next/next/no-img-element */
+'use client'
 
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 import { ImagePlus, Star, X } from 'lucide-react'
 
@@ -22,8 +18,6 @@ interface ImageUploadSectionProps {
 export function ImageUploadSection({
   showPrimaryControl = true,
 }: ImageUploadSectionProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const { control, setValue, getValues } = useFormContext<ProductFormValues>()
   const { fields, append, remove } = useFieldArray({
     control,
@@ -74,18 +68,13 @@ export function ImageUploadSection({
   }
 
   return (
-    <FieldSet
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <FieldSet className="space-y-4">
       <FieldLegend variant="label" className="text-lg font-bold">
-        {t('mediaTitle', { count: fields.length })}
+        สื่อประกอบ ({fields.length})
       </FieldLegend>
-      <FieldDescription>{t('mediaDescription')}</FieldDescription>
+      <FieldDescription>
+        รองรับรูปภาพและวิดีโอ (ขนาดไฟล์สูงสุด 10 MB)
+      </FieldDescription>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {fields.map((field: any, index) => {
           const rawFile = field.url || field.file
@@ -139,7 +128,7 @@ export function ImageUploadSection({
                       size="icon-lg"
                       className="size-8"
                       onClick={() => handleSetPrimary(index)}
-                      title={t('setMainImage')}
+                      title="ตั้งเป็นรูปหลัก"
                     >
                       <Star className="size-4" />
                     </Button>
@@ -150,7 +139,7 @@ export function ImageUploadSection({
                     size="icon-lg"
                     className="size-8"
                     onClick={() => handleRemoveImage(index)}
-                    title={t('deleteImage')}
+                    title="ลบรูปภาพ"
                   >
                     <X className="size-4" />
                   </Button>
@@ -161,7 +150,7 @@ export function ImageUploadSection({
         })}
         <label className="bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground flex aspect-square cursor-pointer flex-col items-center justify-center border border-dashed">
           <ImagePlus className="size-5" />
-          <span className="mt-2 text-xs font-medium">{t('addMedia')}</span>
+          <span className="mt-2 text-xs font-medium">เพิ่มสื่อ</span>
           <input
             type="file"
             multiple

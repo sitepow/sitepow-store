@@ -12,11 +12,7 @@ export async function updatePassword(input: ChangePasswordFormValues) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const user = await prisma.user.findUnique({
@@ -25,11 +21,7 @@ export async function updatePassword(input: ChangePasswordFormValues) {
     })
 
     if (!user?.password) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลรหัสผ่าน',
-        messageEN: 'Password data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลรหัสผ่าน' }
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -37,11 +29,7 @@ export async function updatePassword(input: ChangePasswordFormValues) {
       user.password,
     )
     if (!isPasswordValid) {
-      return {
-        success: false,
-        messageTH: 'รหัสผ่านปัจจุบันไม่ถูกต้อง',
-        messageEN: 'Current password is incorrect',
-      }
+      return { success: false, message: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' }
     }
 
     const hashedPassword = await bcrypt.hash(input.newPassword, 10)
@@ -53,8 +41,7 @@ export async function updatePassword(input: ChangePasswordFormValues) {
 
     return {
       success: true,
-      messageTH: 'เปลี่ยนรหัสผ่านสำเร็จแล้ว',
-      messageEN: 'Password changed successfully',
+      message: 'เปลี่ยนรหัสผ่านสำเร็จแล้ว',
     }
   } catch (error) {
     console.error(error)

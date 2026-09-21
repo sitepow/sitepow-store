@@ -1,8 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import {
   useCancelPendingPlanChange,
   useStoreSubscriptions,
@@ -35,8 +32,6 @@ import {
 import { ChangePlanDialog } from './ChangePlanDialog'
 
 export function MerchantSubscriptionTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.billing')
   const { user } = useSession()
   const { data: subscriptions = [], isLoading } = useStoreSubscriptions(
     user?.id ?? '',
@@ -44,31 +39,27 @@ export function MerchantSubscriptionTable() {
   const cancelPendingMutation = useCancelPendingPlanChange()
 
   return (
-    <div
-      className="overflow-hidden rounded-xl border"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <div className="overflow-hidden rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('columns.storeId')}</TableHead>
-            <TableHead>{t('columns.storeInfo')}</TableHead>
-            <TableHead>{t('columns.currentPlan')}</TableHead>
-            <TableHead>{t('columns.monthlyFee')}</TableHead>
-            <TableHead className="max-w-75">
-              {t('columns.statusRemaining')}
-            </TableHead>
-            <TableHead>{t('columns.nextBilling')}</TableHead>
-            <TableHead className="text-right">{t('columns.actions')}</TableHead>
+            <TableHead>รหัสร้านค้า</TableHead>
+            <TableHead>ข้อมูลร้านค้า</TableHead>
+            <TableHead>แพลนปัจจุบัน</TableHead>
+            <TableHead>ค่าบริการ / เดือน</TableHead>
+            <TableHead className="max-w-75">สถานะและระยะเวลาคงเหลือ</TableHead>
+            <TableHead>รอบชำระถัดไป</TableHead>
+            <TableHead className="text-right">จัดการ</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableLoadingRow colSpan={6} />
           ) : subscriptions.length === 0 ? (
-            <TableEmptyRow colSpan={7} title={t('emptySubscriptions')} />
+            <TableEmptyRow
+              colSpan={7}
+              title="ไม่พบข้อมูลแพลนบริการของร้านค้า"
+            />
           ) : (
             subscriptions.map((sub) => {
               const plan = PLAN_DETAILS[sub.store.plan]
@@ -89,27 +80,22 @@ export function MerchantSubscriptionTable() {
                       <Badge variant="outline">{sub.store.name}</Badge>
                       <div className="flex items-center gap-1.5">
                         {isPastDue && (
-                          <Badge variant="destructive">
-                            {t('statusPastDue')}
-                          </Badge>
+                          <Badge variant="destructive">เกินกำหนดชำระ</Badge>
                         )}
                         {isCanceled && (
-                          <Badge variant="outline">{t('statusCanceled')}</Badge>
+                          <Badge variant="outline">ยกเลิกแล้ว</Badge>
                         )}
                         {sub.pendingPlan && !isCanceled && (
                           <div className="flex flex-col gap-2">
                             <Badge variant="outline">
-                              {t('pendingDowngrade', {
-                                plan: PLAN_DETAILS[sub.pendingPlan].name,
-                              })}
+                              รอลดแพลนเป็น →{' '}
+                              {PLAN_DETAILS[sub.pendingPlan].name}
                               {sub.pendingPlanCycle &&
                                 ` (${sub.pendingPlanCycle})`}
                             </Badge>
                             <span className="text-muted-foreground text-xs">
-                              {t('effectiveInDays', {
-                                days: daysUntilChange,
-                                date: formatDate(sub.pendingPlanAt!),
-                              })}
+                              มีผลในอีก {daysUntilChange} วัน (วันที่{' '}
+                              {formatDate(sub.pendingPlanAt!)})
                             </span>
                             <Button
                               variant="destructive"
@@ -121,7 +107,7 @@ export function MerchantSubscriptionTable() {
                               disabled={cancelPendingMutation.isPending}
                             >
                               <IconX size={14} className="mr-1" />{' '}
-                              {t('cancelPlanChange')}
+                              ยกเลิกการเปลี่ยนแพลน
                             </Button>
                           </div>
                         )}
@@ -135,7 +121,7 @@ export function MerchantSubscriptionTable() {
                     <span className="font-medium">
                       {formatCurrency(monthlyAverage)}{' '}
                       <span className="text-muted-foreground text-xs">
-                        {t('perMonth')}
+                        / เดือน
                       </span>
                     </span>
                   </TableCell>
@@ -148,10 +134,10 @@ export function MerchantSubscriptionTable() {
                             className="text-destructive"
                           />
                           <span className="text-muted-foreground">
-                            {t('gracePeriodRemaining')}
+                            ระยะเวลาผ่อนผันคงเหลือ
                           </span>
                           <span className="text-destructive font-semibold">
-                            {t('daysUnit', { days: daysRemaining })}
+                            {daysRemaining} วัน
                           </span>
                         </div>
                         <Progress value={progressValue} className="h-1" />
@@ -159,22 +145,23 @@ export function MerchantSubscriptionTable() {
                     ) : sub.pendingPlan && sub.pendingPlanAt ? (
                       <div className="flex flex-col space-y-1">
                         <span className="text-muted-foreground text-sm">
-                          {t('effectiveDate', {
-                            date: formatDate(sub.pendingPlanAt),
-                          })}
+                          มีผลวันที่{' '}
+                          <span className="text-foreground font-medium">
+                            {formatDate(sub.pendingPlanAt)}
+                          </span>
                         </span>
                       </div>
                     ) : isCanceled ? (
                       <span className="text-sm">
-                        {t('usableUntil', { date: formatDate(sub.endDate) })}
+                        ใช้งานได้ถึง {formatDate(sub.endDate)}
                       </span>
                     ) : (
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">
-                          {isCanceled ? t('statusCanceled') : t('statusActive')}
+                          {isCanceled ? 'ยกเลิกแล้ว' : 'ใช้งานปกติ'}
                         </span>
                         <span className="text-muted-foreground text-xs">
-                          {t('remainingDays', { days: daysRemaining })}
+                          คงเหลือ {daysRemaining} วัน
                         </span>
                       </div>
                     )}

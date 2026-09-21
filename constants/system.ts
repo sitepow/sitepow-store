@@ -9,11 +9,8 @@ export const TRANSFER_EXPIRY_DAYS = 1
 export const CHAT_REFETCH_INTERVAL = 15 * SECOND
 export const UNREAD_COUNT_REFETCH_INTERVAL = 10 * SECOND
 export const ORDER_EXPIRY_MINUTES = 30
-export const SERVER_ERROR_MESSAGE_TH =
+export const SERVER_ERROR_MESSAGE =
   'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
-export const SERVER_ERROR_MESSAGE_EN =
-  'Sorry, a temporary system error occurred. Please try again.'
-export const SERVER_ERROR_MESSAGE = SERVER_ERROR_MESSAGE_TH
 export const AI_BOT_ID = '9bc5e6c4-666f-45d1-a41e-ccba7a37fb28'
 export const REDIS_CACHE_TTL_SECONDS = 60 * 60
 export const PERMISSION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7

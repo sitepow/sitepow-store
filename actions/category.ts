@@ -1,19 +1,13 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
-import { PaginatedResponse, PaginationParams } from '@/types/pagination'
+import { ALL_STORES } from '@/stores/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/image'
-import {
-  createPaginationMeta,
-  getEmptyPaginatedResponse,
-  sanitizePagination,
-} from '@/utils/pagination'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { resolveStoreFilter } from '@/lib/store'
 
 import { invalidateStorefrontCategoryCache } from './query-keys/storefront/invalidation/category'
 import { r2DeleteImage } from './r2'
@@ -24,16 +18,30 @@ const categorySelect = {
   slug: true,
   description: true,
   image: true,
-  translations: true,
 } satisfies Prisma.CategorySelect
 
 export type GetCategoriesItem = Prisma.CategoryGetPayload<{
   select: typeof categorySelect
 }>
 
-export type GetCategoriesResponse = PaginatedResponse<GetCategoriesItem>
+export interface GetCategoriesResponse {
+  data: GetCategoriesItem[]
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
 
-interface GetCategoriesParams extends PaginationParams {}
+interface GetCategoriesParams {
+  page?: number
+  limit?: number
+  search?: string
+  storeId?: string
+}
 
 export interface CreateCategoryInput {
   title: string
@@ -41,7 +49,6 @@ export interface CreateCategoryInput {
   storeId: string
   description?: string | null
   image?: string | null
-  translations?: any
 }
 
 export type UpdateCategoryInput = Partial<Omit<CreateCategoryInput, 'storeId'>>
@@ -101,33 +108,61 @@ export async function getCategories({
   search,
   storeId,
 }: GetCategoriesParams = {}): Promise<GetCategoriesResponse> {
+  const emptyResponse: GetCategoriesResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 
   try {
-    const storeAccess = await resolveStoreFilter({
-      userId,
-      storeId,
-      permission: 'canViewCategory',
-    })
+    const whereClause: Prisma.CategoryWhereInput = {}
 
-    if (!storeAccess.isAuthorized) {
-      return getEmptyPaginatedResponse(page, limit)
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId,
+        permission: 'canViewCategory',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { employeeStores: { some: { employee: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
-    const {
-      page: sanitizedPage,
-      limit: sanitizedLimit,
-      skip,
-    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 20 })
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(20, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.CategoryWhereInput = {
-      ...storeAccess.storeFilter,
-      ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
+    if (search) {
+      whereClause.title = { contains: search, mode: 'insensitive' }
     }
 
     const [totalItems, categories] = await Promise.all([
@@ -140,12 +175,21 @@ export async function getCategories({
       }),
     ])
 
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
     return {
       data: categories,
-      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
     }
   } catch {
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 }
 
@@ -161,21 +205,41 @@ export async function getCategoryOptions(filters?: {
       return []
     }
 
-    const storeAccess = await resolveStoreFilter({
-      userId,
-      storeId: filters?.storeId,
-      permission: 'canViewCategory',
-    })
+    const whereClause: Prisma.CategoryWhereInput = {}
 
-    if (!storeAccess.isAuthorized) {
-      return []
+    if (
+      filters?.storeId &&
+      filters.storeId !== ALL_STORES &&
+      filters.storeId !== ''
+    ) {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId: filters.storeId,
+        permission: 'canViewCategory',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return []
+      }
+
+      whereClause.storeId = filters.storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { employeeStores: { some: { employee: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
-    const whereClause: Prisma.CategoryWhereInput = {
-      ...storeAccess.storeFilter,
-      ...(filters?.search
-        ? { title: { contains: filters.search, mode: 'insensitive' } }
-        : {}),
+    if (filters?.search) {
+      whereClause.title = { contains: filters.search, mode: 'insensitive' }
     }
 
     return await prisma.category.findMany({
@@ -194,11 +258,7 @@ export async function createCategory(input: CreateCategoryInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -210,8 +270,7 @@ export async function createCategory(input: CreateCategoryInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -220,11 +279,7 @@ export async function createCategory(input: CreateCategoryInput) {
     })
 
     if (existing) {
-      return {
-        success: false,
-        messageTH: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้',
-        messageEN: 'This slug is already in use in this store',
-      }
+      return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้วในร้านค้านี้' }
     }
 
     const category = await prisma.category.create({ data: input })
@@ -238,12 +293,7 @@ export async function createCategory(input: CreateCategoryInput) {
       details: { title: input.title, slug: input.slug, type: 'created' },
     })
 
-    return {
-      success: true,
-      messageTH: 'สร้างหมวดหมู่สำเร็จแล้ว',
-      messageEN: 'Category created successfully',
-      data: category,
-    }
+    return { success: true, message: 'สร้างหมวดหมู่สำเร็จแล้ว', data: category }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -253,22 +303,14 @@ export async function createCategory(input: CreateCategoryInput) {
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   try {
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Category ID',
-        messageEN: 'Category ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Category ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const targetCategory = await prisma.category.findUnique({
@@ -277,11 +319,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     })
 
     if (!targetCategory) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลหมวดหมู่',
-        messageEN: 'Category data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -293,8 +331,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -326,8 +363,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 
     return {
       success: true,
-      messageTH: 'อัพเดตหมวดหมู่สำเร็จแล้ว',
-      messageEN: 'Category updated successfully',
+      message: 'อัพเดตหมวดหมู่สำเร็จแล้ว',
       data: category,
     }
   } catch (error) {
@@ -339,22 +375,14 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 export async function deleteCategory(id: string) {
   try {
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Category ID',
-        messageEN: 'Category ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Category ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const category = await prisma.category.findUnique({
@@ -368,11 +396,7 @@ export async function deleteCategory(id: string) {
     })
 
     if (!category) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลหมวดหมู่',
-        messageEN: 'Category data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลหมวดหมู่' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -384,8 +408,7 @@ export async function deleteCategory(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -409,11 +432,7 @@ export async function deleteCategory(id: string) {
       await invalidateStorefrontCategoryCache(category.store.slug)
     }
 
-    return {
-      success: true,
-      messageTH: 'ลบหมวดหมู่สำเร็จแล้ว',
-      messageEN: 'Category deleted successfully',
-    }
+    return { success: true, message: 'ลบหมวดหมู่สำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }

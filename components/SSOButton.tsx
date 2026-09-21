@@ -9,27 +9,27 @@ interface SSOButtonProps
   extends
     RegisterProvide,
     LoginProvide,
-    Omit<ComponentPropsWithoutRef<'button'>, 'id'> {}
+    Omit<ComponentPropsWithoutRef<'div'>, 'id'> {}
 
 export function SSOButton({ icon, name, className, ...props }: SSOButtonProps) {
   return (
-    <button
-      type="button"
+    <div
       className={cn(
-        'group border-input bg-background/80 text-foreground hover:bg-muted/80 hover:border-foreground/20 focus-visible:ring-ring/50 relative flex h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border px-4 text-sm font-medium shadow-xs transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
+        'group border-border flex min-w-14 cursor-pointer items-center justify-center rounded-2xl border-2 py-2.5',
+        name && 'w-full px-5',
         className,
       )}
       {...props}
     >
-      <div className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5">
+      <div className="flex size-8 shrink-0 items-center justify-center">
         {icon}
       </div>
 
       {name && (
-        <span className="text-foreground/80 group-hover:text-foreground truncate text-sm font-medium transition-colors">
+        <p className="text-foreground mx-auto text-xl font-bold opacity-70 duration-200 hover:opacity-100">
           {name}
-        </span>
+        </p>
       )}
-    </button>
+    </div>
   )
 }

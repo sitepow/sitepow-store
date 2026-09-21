@@ -1,10 +1,7 @@
 'use client'
 
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { formatNumber } from '@/utils/pricing'
 
 import { RankBadge } from './RankBadge'
@@ -26,27 +23,17 @@ export function RankListItem({
   rank,
   percentage,
   quantityOrCount,
-  unitText,
+  unitText = 'ชิ้น',
   getRankStyle,
   crownColorClass,
   firstGradientClass,
   normalBarClass,
   children,
 }: RankListItemProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('common.order')
-  const unit = unitText ?? t('pieces')
   const isFirst = rank === 0
 
   return (
-    <div
-      className="group border-border/40 bg-card hover:border-border relative rounded-xl border p-3 transition-all duration-200 hover:shadow-sm"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <div className="group border-border/40 bg-card hover:border-border relative rounded-xl border p-3 transition-all duration-200 hover:shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <RankBadge
@@ -61,7 +48,7 @@ export function RankListItem({
             {formatNumber(quantityOrCount)}
           </span>
           <span className="text-muted-foreground ml-1 text-xs font-medium">
-            {unit}
+            {unitText}
           </span>
         </div>
       </div>

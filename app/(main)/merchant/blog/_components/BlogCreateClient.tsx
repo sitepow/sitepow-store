@@ -1,12 +1,8 @@
 'use client'
 
-import React from 'react'
-
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconPlus } from '@tabler/icons-react'
@@ -25,9 +21,6 @@ interface BlogCreateClientProps {
 }
 
 export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.blog')
-  const tCommon = useTranslations('common.actions')
   const { selectedStoreId } = useStoreFilter()
   const isMounted = useIsMounted()
 
@@ -39,31 +32,23 @@ export function BlogCreateClient({ blogId }: BlogCreateClientProps) {
 
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
-      <div
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
+      <PageTabHeader
+        icon={isEditMode ? IconEdit : IconPlus}
+        title={isEditMode ? 'แก้ไขบทความ' : 'เพิ่มบทความใหม่'}
+        description="จัดการเนื้อหาบทความ ภาพปก และการแสดงผลบทความในบล็อก"
+        endContent={
+          <div className="flex flex-wrap items-end gap-3">
+            <Button asChild variant="outline">
+              <Link href="/merchant/blog">
+                <ArrowLeftIcon className="mr-1 size-4" /> ย้อนกลับ
+              </Link>
+            </Button>
+            <StoreSelectField />
+          </div>
         }
-      >
-        <PageTabHeader
-          icon={isEditMode ? IconEdit : IconPlus}
-          title={isEditMode ? t('editBlog') : t('addBlog')}
-          description={t('formDescription')}
-          endContent={
-            <div className="flex flex-wrap items-end gap-3">
-              <Button asChild variant="outline">
-                <Link href="/merchant/blog">
-                  <ArrowLeftIcon className="mr-1 size-4" /> {tCommon('back')}
-                </Link>
-              </Button>
-              <StoreSelectField />
-            </div>
-          }
-        />
-        {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
-        {selectedStoreId !== ALL_STORES && <CreateBlogForm blogId={blogId} />}
-      </div>
+      />
+      {selectedStoreId === ALL_STORES && <ActionRequiredAlert />}
+      {selectedStoreId !== ALL_STORES && <CreateBlogForm blogId={blogId} />}
     </Sidebar>
   )
 }

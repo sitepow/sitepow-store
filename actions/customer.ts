@@ -2,23 +2,19 @@
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { PaginatedResponse, PaginationParams } from '@/types/pagination'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
-import {
-  createPaginationMeta,
-  getEmptyPaginatedResponse,
-  sanitizePagination,
-} from '@/utils/pagination'
 import { CreateCustomerInput } from '@/zod/customer'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { resolveStoreFilter } from '@/lib/store'
 
-export interface GetCustomersParams extends PaginationParams {
-  storeId?: string
+export interface GetCustomersParams {
+  storeId: string
+  page?: number
+  limit?: number
+  search?: string
 }
 
 const customerStoreSelect = {
@@ -44,54 +40,86 @@ export type GetCustomersItem = Prisma.CustomerStoreGetPayload<{
   select: typeof customerStoreSelect
 }>
 
-export type GetCustomersResponse = PaginatedResponse<
-  DecimalToNumber<GetCustomersItem>
->
+export interface GetCustomersResponse {
+  data: DecimalToNumber<GetCustomersItem[]>
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
 
 export async function getCustomers({
   storeId,
   page = 1,
   limit = 10,
   search,
-}: GetCustomersParams = {}): Promise<GetCustomersResponse> {
+}: GetCustomersParams): Promise<GetCustomersResponse> {
+  const emptyResponse: GetCustomersResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 
   try {
-    const storeAccess = await resolveStoreFilter({
-      userId,
-      storeId,
-      permission: 'canViewCustomers',
-    })
+    const whereClause: Prisma.CustomerStoreWhereInput = {}
 
-    if (!storeAccess.isAuthorized) {
-      return getEmptyPaginatedResponse(page, limit)
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId,
+        permission: 'canViewCustomers',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { employeeStores: { some: { employee: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
-    const {
-      page: sanitizedPage,
-      limit: sanitizedLimit,
-      skip,
-    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 20 })
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(20, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
 
-    const whereClause: Prisma.CustomerStoreWhereInput = {
-      ...storeAccess.storeFilter,
-      ...(search
-        ? {
-            customer: {
-              OR: [
-                { firstName: { contains: search, mode: 'insensitive' } },
-                { lastName: { contains: search, mode: 'insensitive' } },
-                { email: { contains: search, mode: 'insensitive' } },
-                { phone: { contains: search, mode: 'insensitive' } },
-              ],
-            },
-          }
-        : {}),
+    if (search) {
+      whereClause.customer = {
+        OR: [
+          { firstName: { contains: search, mode: 'insensitive' } },
+          { lastName: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+        ],
+      }
     }
 
     const [totalItems, customerStores] = await Promise.all([
@@ -105,13 +133,22 @@ export async function getCustomers({
       }),
     ])
 
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
     return {
       data: serializeDecimal(customerStores),
-      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
     }
   } catch (error) {
     console.error(error)
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 }
 
@@ -120,12 +157,7 @@ export async function unblockCustomer(customerId: string, storeId: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Unauthorized',
-        message: 'ไม่มีสิทธิ์เข้าถึง',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -135,12 +167,7 @@ export async function unblockCustomer(customerId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const updatedCustomerStore = await prisma.customerStore.update({
@@ -165,12 +192,7 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       entityId: updatedCustomerStore.id,
     })
 
-    return {
-      success: true,
-      messageTH: 'ปลดล็อกลูกค้าสำเร็จ',
-      messageEN: 'Customer unblocked successfully',
-      message: 'ปลดล็อกลูกค้าสำเร็จ',
-    }
+    return { success: true, message: 'ปลดล็อกลูกค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -182,12 +204,7 @@ export async function blockCustomer(customerId: string, storeId: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Unauthorized',
-        message: 'ไม่มีสิทธิ์เข้าถึง',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -197,12 +214,7 @@ export async function blockCustomer(customerId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const updatedCustomerStore = await prisma.customerStore.update({
@@ -226,12 +238,7 @@ export async function blockCustomer(customerId: string, storeId: string) {
       entityId: updatedCustomerStore.id,
     })
 
-    return {
-      success: true,
-      messageTH: 'บล็อกลูกค้าสำเร็จ',
-      messageEN: 'Customer blocked successfully',
-      message: 'บล็อกลูกค้าสำเร็จ',
-    }
+    return { success: true, message: 'บล็อกลูกค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -254,8 +261,6 @@ export interface POSCustomerSearch {
 export type SearchCustomerResponse = {
   success: boolean
   data?: POSCustomerSearch
-  messageTH?: string
-  messageEN?: string
   message?: string
 }
 
@@ -270,21 +275,11 @@ export async function searchCustomer({
   const userId = userSession?.id
 
   if (!userId) {
-    return {
-      success: false,
-      messageTH: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ',
-      messageEN: 'Access denied, please sign in',
-      message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ',
-    }
+    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบ' }
   }
 
   if (!query || !query.trim()) {
-    return {
-      success: false,
-      messageTH: 'กรุณากรอกข้อมูลสำหรับค้นหา',
-      messageEN: 'Please enter search query',
-      message: 'กรุณากรอกข้อมูลสำหรับค้นหา',
-    }
+    return { success: false, message: 'กรุณากรอกข้อมูลสำหรับค้นหา' }
   }
 
   try {
@@ -295,12 +290,7 @@ export async function searchCustomer({
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const cleanQuery = query.trim()
@@ -333,19 +323,12 @@ export async function searchCustomer({
     })
 
     if (!customerStore) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลสมาชิกในระบบ',
-        messageEN: 'Member not found in the system',
-        message: 'ไม่พบข้อมูลสมาชิกในระบบ',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลสมาชิกในระบบ' }
     }
 
     if (customerStore.isBlocked) {
       return {
         success: false,
-        messageTH: 'สมาชิกรายนี้ถูกระงับการใช้งานในร้านนี้',
-        messageEN: 'This member has been suspended from this store',
         message: 'สมาชิกรายนี้ถูกระงับการใช้งานในร้านนี้',
       }
     }
@@ -357,8 +340,6 @@ export async function searchCustomer({
 
     return {
       success: true,
-      messageTH: 'พบข้อมูลสมาชิก พร้อมใช้แต้มสะสมสำหรับร้านนี้',
-      messageEN: 'Member found, ready to use reward points for this store',
       message: 'พบข้อมูลสมาชิก พร้อมใช้แต้มสะสมสำหรับร้านนี้',
       data: {
         id: customerStore.customer.id,
@@ -378,8 +359,6 @@ export async function searchCustomer({
 export type CreateCustomerResponse = {
   success: boolean
   data?: POSCustomerSearch
-  messageTH?: string
-  messageEN?: string
   message?: string
 }
 
@@ -390,21 +369,11 @@ export async function createCustomer(
   const userId = userSession?.id
 
   if (!userId) {
-    return {
-      success: false,
-      messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-      messageEN: 'Unauthorized',
-      message: 'ไม่มีสิทธิ์เข้าถึง',
-    }
+    return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
   }
 
   if (!input.storeId) {
-    return {
-      success: false,
-      messageTH: 'กรุณาระบุรหัสร้านค้า (storeId)',
-      messageEN: 'Please specify storeId',
-      message: 'กรุณาระบุรหัสร้านค้า (storeId)',
-    }
+    return { success: false, message: 'กรุณาระบุรหัสร้านค้า (storeId)' }
   }
 
   try {
@@ -415,12 +384,7 @@ export async function createCustomer(
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-        message: authCheck.message || 'สิทธิ์การใช้งานไม่เพียงพอ',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const cleanPhone = input.phone.trim()
@@ -468,9 +432,6 @@ export async function createCustomer(
 
     return {
       success: true,
-      messageTH: 'สร้างสมาชิกใหม่สำเร็จ พร้อมใช้สะสมแต้มสำหรับร้านนี้',
-      messageEN:
-        'New member created successfully, ready to use reward points for this store',
       message: 'สร้างสมาชิกใหม่สำเร็จ พร้อมใช้สะสมแต้มสำหรับร้านนี้',
       data: {
         id: customer.id,

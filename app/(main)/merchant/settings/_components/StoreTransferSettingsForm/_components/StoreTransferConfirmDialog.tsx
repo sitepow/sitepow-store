@@ -1,20 +1,16 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
-import { useTranslations } from 'next-intl'
-
 import { useCreateTransferRequest } from '@/actions/hooks/store-transfer'
 import { useSession } from '@/hooks/use-session'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -31,8 +27,6 @@ export function StoreTransferConfirmDialog({
   storeId,
   onClose,
 }: StoreTransferConfirmDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.transfer')
   const { user } = useSession()
   const createMutation = useCreateTransferRequest()
 
@@ -50,18 +44,19 @@ export function StoreTransferConfirmDialog({
         if (!v && !createMutation.isPending) onClose()
       }}
     >
-      <DialogContent
-        style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconAlertTriangle}
-            iconClassName="border-destructive/20 bg-destructive/10 text-destructive"
-            title={t('confirmTitle')}
-            description={t('confirmDesc', { email: toEmail })}
-          />
+          <DialogTitle className="flex items-center gap-2">
+            <IconAlertTriangle size={18} className="text-destructive" />
+            ยืนยันการส่งคำขอโอนร้านค้า
+          </DialogTitle>
         </DialogHeader>
+
+        <p className="text-muted-foreground text-sm">
+          คุณกำลังจะส่งคำขอโอนความเป็นเจ้าของร้านค้าให้กับ{' '}
+          <span className="text-foreground font-medium">{toEmail}</span>{' '}
+          ผู้รับจะต้องยืนยันการรับโอนภายใน 24 ชั่วโมง
+        </p>
 
         <DialogFooter className="flex gap-2 border-t pt-4">
           <Button
@@ -69,7 +64,7 @@ export function StoreTransferConfirmDialog({
             onClick={onClose}
             disabled={createMutation.isPending}
           >
-            {t('cancel')}
+            ยกเลิก
           </Button>
           <Button
             variant="destructive"
@@ -78,10 +73,10 @@ export function StoreTransferConfirmDialog({
           >
             {createMutation.isPending ? (
               <>
-                <Spinner /> {t('sending')}
+                <Spinner /> กำลังส่งคำขอ...
               </>
             ) : (
-              t('confirm')
+              'ยืนยันส่งคำขอ'
             )}
           </Button>
         </DialogFooter>

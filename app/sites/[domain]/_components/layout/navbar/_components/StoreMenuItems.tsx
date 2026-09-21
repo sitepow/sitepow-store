@@ -1,8 +1,6 @@
-'use client'
-
 import Link from 'next/link'
 
-import { useStoreNavbarItems } from '@/constants/sites/navbar'
+import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
 
 import { ListItem } from '@/components/layout/_components/ListItem'
 import {
@@ -16,15 +14,13 @@ import {
 import { cn } from '@/lib/utils'
 
 export function StoreMenuItems() {
-  const items = useStoreNavbarItems()
-
   return (
     <>
-      {items.map((item, idx) => (
+      {STORE_NAVBAR_ITEMS.map((item, idx) => (
         <NavigationMenuItem key={idx}>
           {item.children ? (
             <>
-              <NavigationMenuTrigger className="bg-transparent text-lg font-bold text-white opacity-60 hover:bg-neutral-900 hover:text-white hover:opacity-100 focus:bg-neutral-900 focus:text-white data-open:bg-neutral-900/50 data-open:hover:bg-neutral-900 data-open:focus:bg-neutral-900 data-popup-open:bg-neutral-900/50 data-popup-open:hover:bg-neutral-900">
+              <NavigationMenuTrigger className="text-lg font-bold opacity-60 hover:bg-neutral-900 focus:bg-neutral-900 data-open:bg-neutral-900/50 data-open:hover:bg-neutral-900 data-open:focus:bg-neutral-900 data-popup-open:bg-neutral-900/50 data-popup-open:hover:bg-neutral-900">
                 {item.title}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -40,7 +36,7 @@ export function StoreMenuItems() {
               asChild
               className={cn(
                 navigationMenuTriggerStyle(),
-                'bg-transparent text-lg font-bold text-white opacity-60 hover:bg-transparent hover:text-white hover:opacity-100',
+                'bg-transparent text-lg font-bold text-white opacity-60 hover:bg-transparent',
               )}
             >
               <Link href={item.href!}>{item.title}</Link>

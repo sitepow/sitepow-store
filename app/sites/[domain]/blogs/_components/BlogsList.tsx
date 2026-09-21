@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useStorefrontBlogs } from '@/actions/hooks/storefront/blog'
@@ -11,7 +10,6 @@ import { StorePagination } from '../../_components/Pagination'
 import { BlogCard } from '../../_components/blog/BlogCard'
 
 export function BlogsList({ storeSlug }: { storeSlug: string }) {
-  const t = useTranslations('storefront.blogs')
   const searchParams = useSearchParams()
   const router = useRouter()
   const page = Number(searchParams.get('page') ?? 1)
@@ -23,8 +21,8 @@ export function BlogsList({ storeSlug }: { storeSlug: string }) {
   if (!isLoading && blogs.length === 0) {
     return (
       <ActionRequiredAlert
-        title={t('noBlogsTitle')}
-        description={t('noBlogsDesc')}
+        title="ไม่พบข้อมูลบทความ"
+        description="ยังไม่มีบทความในร้านค้านี้ หรือไม่พบข้อมูลตามเงื่อนไขที่ค้นหา"
       />
     )
   }

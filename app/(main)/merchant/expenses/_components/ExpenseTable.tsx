@@ -1,16 +1,13 @@
-'use client'
-
 /* eslint-disable @next/next/no-img-element */
-import { useTranslations } from 'next-intl'
+'use client'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useDeleteExpense, useExpenses } from '@/actions/hooks/expenses'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
+import { formatCurrency } from '@/utils/pricing'
 import { IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
@@ -42,10 +39,6 @@ export function ExpenseTable({
   selectedCategory,
   onEdit,
 }: ExpenseTableProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.expenses')
-  const tCategories = useTranslations('merchant.expenses.categories')
   const { selectedStoreId } = useStoreFilter()
 
   const {
@@ -75,37 +68,26 @@ export function ExpenseTable({
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title={t('noAccessTitle')}
-        description={t('noAccessDescription')}
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลค่าใช้จ่ายของสาขาหรือร้านค้านี้"
       />
     )
   }
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.date')}</TableHead>
-              <TableHead>{t('columns.title')}</TableHead>
-              <TableHead>{t('columns.category')}</TableHead>
-              <TableHead>{t('columns.branch')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.amount')}
-              </TableHead>
-              <TableHead>{t('columns.receipt')}</TableHead>
+              <TableHead>วันที่บันทึก</TableHead>
+              <TableHead>รายการ</TableHead>
+              <TableHead>หมวดหมู่</TableHead>
+              <TableHead>สาขา</TableHead>
+              <TableHead className="text-right">จำนวนเงิน</TableHead>
+              <TableHead>หลักฐาน / หมายเหตุ</TableHead>
               {canManageExpenses && (
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -113,7 +95,10 @@ export function ExpenseTable({
             {(isLoading || isPermissionLoading) && expenses.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : expenses.length === 0 ? (
-              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ยังไม่มีรายการค่าใช้จ่าย"
+              />
             ) : (
               expenses.map((expense) => (
                 <TableRow key={expense.id}>
@@ -123,19 +108,15 @@ export function ExpenseTable({
                   </TableCell>
                   <TableCell>
                     <Badge>
-                      {tCategories.has(expense.category as any)
-                        ? tCategories(expense.category as any)
-                        : EXPENSE_CATEGORY_TH[expense.category] ||
-                          expense.category}
+                      {EXPENSE_CATEGORY_TH[expense.category] ||
+                        expense.category}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant={expense?.branch?.name ? 'default' : 'outline'}
                     >
-                      {expense?.branch?.name
-                        ? expense.branch.name
-                        : t('allBranches')}
+                      {expense?.branch?.name ? expense.branch.name : 'ทุกสาขา'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -152,12 +133,9 @@ export function ExpenseTable({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <ProductImage
-                            src={expense.receiptImage}
-                            alt={expense.title}
-                          />
+                          <ProductImage src={expense.receiptImage} />
                           <span className="text-primary text-xs">
-                            {t('viewReceiptImage')}
+                            คลิกเพื่อดูรูปหลักฐาน
                           </span>
                         </a>
                       ) : (
@@ -183,8 +161,8 @@ export function ExpenseTable({
                       {canDeleteExpenses && (
                         <DeleteButton
                           isPending={deleteExpenseMutation.isPending}
-                          title={t('deleteConfirmTitle')}
-                          description={t('deleteConfirmDescription')}
+                          title="ยืนยันการลบค่าใช้จ่าย?"
+                          description="คุณต้องการลบรายการค่าใช้จ่ายนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้"
                           onDelete={() =>
                             deleteExpenseMutation.mutate({
                               expenseId: expense.id,
@@ -210,6 +188,6 @@ export function ExpenseTable({
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

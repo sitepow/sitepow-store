@@ -2,8 +2,6 @@
 
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,7 +14,6 @@ import { ProfileAvartar } from './_components/ProfileAvartar'
 import { ProfileForm } from './_components/ProfileForm'
 
 export default function MerchantProfilePage() {
-  const t = useTranslations('merchant.profile')
   const methods = useForm<UpdateProfileSchema>({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
@@ -31,8 +28,8 @@ export default function MerchantProfilePage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
-        title={t('title')}
-        description={t('description')}
+        title="โปรไฟล์ส่วนตัว"
+        description="จัดการข้อมูลผู้ใช้งานหลักของคุณ"
       />
       <FormProvider {...methods}>
         <div className="grid gap-5 xl:grid-cols-12">

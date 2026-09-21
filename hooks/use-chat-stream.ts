@@ -43,7 +43,8 @@ export function useChatStream(conversationId: string) {
         },
       )
 
-      queryClient.invalidateQueries({ queryKey: chatKeys.all })
+      queryClient.invalidateQueries({ queryKey: chatKeys.conversations() })
+      queryClient.invalidateQueries({ queryKey: chatKeys.unreadCount() })
     }
 
     return () => eventSource.close()

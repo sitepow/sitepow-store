@@ -13,6 +13,7 @@ import { useChatStore } from '@/stores/use-chat-store'
 import { MessageCircle, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 import { AlertChat } from './_components/AlertChat'
 import { ChatWindow } from './_components/ChatWindow'
@@ -33,15 +34,14 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
   const selectedConv = conversations.find((c) => c.id === selectedId)
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-3">
-      {isOpen && (
-        <div className="border-border bg-background animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4 flex h-[560px] max-h-[calc(100vh-6rem)] w-[380px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border shadow-2xl duration-200">
+    <div className="fixed right-4 bottom-4 z-50">
+      <Dialog open={isOpen} onOpenChange={(o) => !o && setIsOpen(false)}>
+        <DialogContent className="flex h-[80vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
           <SupportHeader
             title={selectedConv?.merchantName || 'แชท Support'}
             hasBack={!!selectedId}
             onBack={() => setSelectedId(null)}
             onClose={() => setIsOpen(false)}
-            fullScreenUrl="/merchant/chat"
           />
           <div className="flex-1 overflow-hidden">
             {selectedId && selectedConv ? (
@@ -70,18 +70,14 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
               </div>
             )}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
       <Button
         onClick={toggleChat}
         size="icon-lg"
-        className="relative size-14 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
+        className="relative size-14 shadow-lg"
       >
-        {isOpen ? (
-          <X className="size-6" />
-        ) : (
-          <MessageCircle className="size-6" />
-        )}
+        {isOpen ? <X /> : <MessageCircle />}
         {unreadCount > 0 && (
           <CartBadge
             className="border-primary text-primary border bg-white"

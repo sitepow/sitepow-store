@@ -60,9 +60,6 @@ export interface GetDashboardResult {
     name: string
     email: string
     amount: number
-    customerAmount?: number
-    customerCurrency?: string
-    baseCurrency?: string
     createdAt: Date
   }[]
   lowStock: {
@@ -294,7 +291,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.aggregate({
         where: {
@@ -303,7 +300,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.aggregate({
         where: {
@@ -312,7 +309,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.aggregate({
         where: {
@@ -321,7 +318,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.aggregate({
         where: {
@@ -330,7 +327,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.aggregate({
         where: {
@@ -339,7 +336,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        _sum: { totalAmountBase: true },
+        _sum: { totalAmount: true },
       }),
       prisma.order.count({
         where: {
@@ -492,7 +489,7 @@ export async function getDashboard(
           status: { not: OrderStatus.CANCELLED },
           ...orderBranchFilter,
         },
-        select: { totalAmountBase: true, totalAmount: true, createdAt: true },
+        select: { totalAmount: true, createdAt: true },
       }),
       prisma.order.findMany({
         where: {
@@ -505,9 +502,6 @@ export async function getDashboard(
         select: {
           id: true,
           totalAmount: true,
-          totalAmountBase: true,
-          customerCurrency: true,
-          baseCurrency: true,
           customer: {
             select: { firstName: true, lastName: true, email: true },
           },
@@ -536,12 +530,12 @@ export async function getDashboard(
       }),
     ])
 
-    const dSales = Number(salesToday._sum.totalAmountBase ?? 0)
-    const dSalesYesterday = Number(salesYesterday._sum.totalAmountBase ?? 0)
-    const mRevenue = Number(revenueThisMonth._sum.totalAmountBase ?? 0)
-    const mRevenueLastMonth = Number(revenueLastMonth._sum.totalAmountBase ?? 0)
-    const yRevenue = Number(revenueThisYear._sum.totalAmountBase ?? 0)
-    const yRevenueLastYear = Number(revenueLastYear._sum.totalAmountBase ?? 0)
+    const dSales = Number(salesToday._sum.totalAmount ?? 0)
+    const dSalesYesterday = Number(salesYesterday._sum.totalAmount ?? 0)
+    const mRevenue = Number(revenueThisMonth._sum.totalAmount ?? 0)
+    const mRevenueLastMonth = Number(revenueLastMonth._sum.totalAmount ?? 0)
+    const yRevenue = Number(revenueThisYear._sum.totalAmount ?? 0)
+    const yRevenueLastYear = Number(revenueLastYear._sum.totalAmount ?? 0)
     const dCOGS = Number(cogsToday._sum.costPrice ?? 0)
     const dCOGSYesterday = Number(cogsYesterday._sum.costPrice ?? 0)
     const mCOGS = Number(cogsThisMonth._sum.costPrice ?? 0)
@@ -590,9 +584,7 @@ export async function getDashboard(
 
       const key = `${orderThaiYear}-${orderThaiMonth}`
       if (key in trendMap) {
-        trendMap[key] += Number(
-          (order as any).totalAmountBase ?? order.totalAmount,
-        )
+        trendMap[key] += Number(order.totalAmount)
       }
     }
 
@@ -655,10 +647,7 @@ export async function getDashboard(
           id: o.id,
           name: customerName || 'ลูกค้าไม่ทราบชื่อ',
           email: o.customer?.email ?? '-',
-          amount: Number((o as any).totalAmountBase ?? o.totalAmount),
-          customerAmount: Number(o.totalAmount),
-          customerCurrency: (o as any).customerCurrency,
-          baseCurrency: (o as any).baseCurrency,
+          amount: Number(o.totalAmount),
           createdAt: o.createdAt,
         }
       }),

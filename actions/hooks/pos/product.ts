@@ -10,9 +10,8 @@ export interface UsePOSProductsParams {
 }
 
 export interface UseResellerPOSProductsParams {
-  agreementId?: string
+  agreementId: string
   branchId: string
-  storeId?: string
   search?: string
   categoryId?: string
 }
@@ -44,7 +43,6 @@ export function usePOSProducts({
 export function useResellerPOSProducts({
   agreementId,
   branchId,
-  storeId,
   search,
   categoryId,
 }: UseResellerPOSProductsParams) {
@@ -53,7 +51,6 @@ export function useResellerPOSProducts({
       queryKey: posProductKeys.resellerList(
         agreementId,
         branchId,
-        storeId,
         search,
         categoryId,
       ),
@@ -61,7 +58,6 @@ export function useResellerPOSProducts({
         const res = await getResellerPOSProducts({
           agreementId,
           branchId,
-          storeId,
           search,
           categoryId,
         })
@@ -72,7 +68,7 @@ export function useResellerPOSProducts({
 
         return res.data ?? []
       },
-      enabled: Boolean((agreementId || storeId) && branchId),
+      enabled: Boolean(agreementId && branchId),
     }),
   )
 }

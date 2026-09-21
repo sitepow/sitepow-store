@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useCheckStoreAvailability } from '@/actions/hooks/store'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -15,8 +11,6 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 export function StoreNameField({ isPending }: { isPending: boolean }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setError,
@@ -37,21 +31,17 @@ export function StoreNameField({ isPending }: { isPending: boolean }) {
     }
 
     if (!availability?.nameAvailable) {
-      setError('name', { message: t('nameAlreadyTaken') })
+      setError('name', { message: 'ชื่อร้านค้านี้ถูกใช้งานไปแล้ว' })
     } else {
       clearErrors('name')
     }
-  }, [availability, debouncedName, setError, clearErrors, t])
+  }, [availability, debouncedName, setError, clearErrors])
 
   return (
-    <Field
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
-      <FieldLabel>{t('storeNameLabel')}</FieldLabel>
+    <Field>
+      <FieldLabel>ชื่อร้านค้า</FieldLabel>
       <Input
-        placeholder={t('storeNamePlaceholder')}
+        placeholder="เช่น เสื้อผ้าเด็กมินิมอล"
         {...register('name')}
         disabled={isPending}
       />

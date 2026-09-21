@@ -195,11 +195,7 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -211,25 +207,19 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
     if (fromBranchId === toBranchId) {
       return {
         success: false,
-        messageTH: 'สาขาต้นทางและปลายทางต้องไม่เป็นสาขาเดียวกัน',
-        messageEN: 'Source and destination branches must not be the same',
+        message: 'สาขาต้นทางและปลายทางต้องไม่เป็นสาขาเดียวกัน',
       }
     }
 
     if (quantity <= 0) {
-      return {
-        success: false,
-        messageTH: 'จำนวนต้องมากกว่า 0',
-        messageEN: 'Quantity must be greater than 0',
-      }
+      return { success: false, message: 'จำนวนต้องมากกว่า 0' }
     }
 
     const fromStock = await prisma.productStock.findUnique({
@@ -238,18 +228,13 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
     })
 
     if (!fromStock) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลสต็อกสาขาต้นทาง',
-        messageEN: 'Source branch stock data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลสต็อกสาขาต้นทาง' }
     }
 
     if (fromStock.quantity < quantity) {
       return {
         success: false,
-        messageTH: `สต็อกสาขาต้นทางไม่เพียงพอ (มีอยู่ ${fromStock.quantity} ชิ้น)`,
-        messageEN: `Insufficient stock at source branch (available: ${fromStock.quantity})`,
+        message: `สต็อกสาขาต้นทางไม่เพียงพอ (มีอยู่ ${fromStock.quantity} ชิ้น)`,
       }
     }
 
@@ -284,12 +269,7 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
       },
     })
 
-    return {
-      success: true,
-      messageTH: 'โอนย้ายสต็อกสำเร็จแล้ว',
-      messageEN: 'Stock transferred successfully',
-      data: transfer,
-    }
+    return { success: true, message: 'โอนย้ายสต็อกสำเร็จแล้ว', data: transfer }
   } catch (error) {
     console.error(error)
     return { success: false }

@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useStorefrontCategoryOptions } from '@/actions/hooks/storefront/category'
@@ -18,7 +17,6 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
-  const t = useTranslations('storefront.products')
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -49,7 +47,7 @@ export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
       >
         <AccordionItem value="categories" className="border-none">
           <AccordionTrigger className="py-2 text-base font-semibold hover:no-underline">
-            {t('categories')}
+            หมวดหมู่
           </AccordionTrigger>
           <AccordionContent className="space-y-4 py-10 pt-4">
             {isLoading
@@ -82,7 +80,7 @@ export function ProductFilterControl({ storeSlug }: { storeSlug: string }) {
 
       <Separator />
       <Button variant="link" className="text-primary" onClick={clearAll}>
-        {t('clearFilters')}
+        ล้างตัวกรองทั้งหมด
       </Button>
     </aside>
   )

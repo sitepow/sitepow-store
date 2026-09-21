@@ -1,8 +1,5 @@
 'use client'
 
-import React from 'react'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { IconCrown } from '@tabler/icons-react'
 
 interface RankBadgeProps {
@@ -16,7 +13,6 @@ export function RankBadge({
   getRankStyle,
   crownColorClass,
 }: RankBadgeProps) {
-  const { currentStore, store } = useCurrentStore()
   const isFirst = rank === 0
 
   return (
@@ -24,11 +20,6 @@ export function RankBadge({
       className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-105 ${getRankStyle(
         rank,
       )}`}
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
     >
       {isFirst ? (
         <IconCrown

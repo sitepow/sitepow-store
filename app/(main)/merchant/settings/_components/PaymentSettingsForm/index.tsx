@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   usePaymentSetting,
@@ -38,8 +34,6 @@ import { BankAccountDialog } from './_components/BankAccountDialog'
 import { BankAccountTable } from './_components/BankAccountTable'
 
 export function PaymentSettingsForm() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.payment')
   const { selectedStoreId } = useStoreFilter()
   const { data: paymentSetting } = usePaymentSetting(selectedStoreId)
 
@@ -112,19 +106,14 @@ export function PaymentSettingsForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
           <PageTabHeader
             variant="secondary"
             icon={IconCreditCard}
-            title={t('title')}
-            description={t('description')}
+            title="ช่องทางรับชำระเงิน"
+            description="เปิด-ปิดช่องทางการรับเงินสำหรับลูกค้าหน้าร้านค้า พร้อมตั้งค่าบัญชีปลายทางในการรับรายได้"
           />
         </CardHeader>
         {selectedStoreId !== ALL_STORES && (
@@ -134,10 +123,11 @@ export function PaymentSettingsForm() {
                 <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
-                      {t('bankTransfer')}
+                      โอนเงินผ่านบัญชีธนาคาร
                     </span>
                     <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                      {t('bankTransferDesc')}
+                      เปิดใช้งานการชำระเงินด้วยการโอนผ่านบัญชีธนาคาร
+                      พร้อมระบบตรวจสอบสลิปอัตโนมัติหรือตรวจสอบด้วยตนเอง
                     </span>
                   </div>
                   <Controller
@@ -154,7 +144,7 @@ export function PaymentSettingsForm() {
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-5">
                     <span className="text-sm font-medium">
-                      {t('bankAccounts')}
+                      บัญชีธนาคารที่รับเงิน
                     </span>
                     <Button
                       type="button"
@@ -162,8 +152,7 @@ export function PaymentSettingsForm() {
                       size="sm"
                       onClick={handleAdd}
                     >
-                      <IconPlus size={14} className="mr-1" />{' '}
-                      {t('addBankAccount')}
+                      <IconPlus size={14} className="mr-1" /> เพิ่มบัญชีธนาคาร
                     </Button>
                     <BankAccountDialog
                       bankAccountId={selectedBankAccountId}
@@ -180,10 +169,11 @@ export function PaymentSettingsForm() {
               <div className="flex flex-wrap items-center justify-between gap-5 py-5">
                 <div>
                   <span className="block text-sm font-semibold">
-                    {t('stripe')}
+                    เชื่อมบัญชี Stripe
                   </span>
                   <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">
-                    {t('stripeDesc')}
+                    เปิดช่องทางรับชำระเงินออนไลน์ผ่านบัตรเครดิต บัตรเดบิต และ QR
+                    PromptPay ได้อย่างสะดวกรวดเร็ว
                   </span>
                 </div>
                 <Controller
@@ -228,7 +218,7 @@ export function PaymentSettingsForm() {
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="stripeWebhookSecret">
-                        {t('stripeWebhookSecret')}
+                        Stripe Webhook Signing Secret
                       </Label>
                       <div className="flex gap-2">
                         <Controller
@@ -259,22 +249,21 @@ export function PaymentSettingsForm() {
                         </Button>
                       </div>
                       <span className="text-muted-foreground text-xs">
-                        {t('stripeWebhookSecretDesc')}
+                        กรอกรหัส Webhook Secret ที่ได้จากการตั้งค่าใน Stripe
+                        Dashboard ของคุณ
                       </span>
                     </div>
                   </div>
                   <div className="bg-muted/55 space-y-2 rounded-lg border p-4">
                     <span className="block text-xs font-semibold">
-                      {t('stripeGuideTitle')}
+                      คำแนะนำการตั้งค่า Webhook ใน Stripe ของร้านค้า
                     </span>
                     <p className="text-muted-foreground text-xs leading-relaxed">
-                      {t.rich('stripeGuideDesc', {
-                        event: () => (
-                          <code className="bg-background rounded px-1 py-0.5 text-xs">
-                            checkout.session.completed
-                          </code>
-                        ),
-                      })}
+                      โปรดนำ URL ด้านล่างนี้ไปเพิ่มใน Stripe Dashboard ของคุณ
+                      (ที่เมนู Developers &gt; Webhooks) และเลือกรับอีเวนต์{' '}
+                      <code className="bg-background rounded px-1 py-0.5 text-xs">
+                        checkout.session.completed
+                      </code>
                     </p>
                     <div className="flex items-center gap-2 pt-1">
                       <Input
@@ -291,12 +280,11 @@ export function PaymentSettingsForm() {
                       >
                         {copied ? (
                           <>
-                            <IconCheck size={16} className="mr-1" />{' '}
-                            {t('copied')}
+                            <IconCheck size={16} className="mr-1" /> คัดลอกแล้ว
                           </>
                         ) : (
                           <>
-                            <IconCopy size={16} className="mr-1" /> {t('copy')}
+                            <IconCopy size={16} className="mr-1" /> คัดลอก
                           </>
                         )}
                       </Button>
@@ -308,17 +296,17 @@ export function PaymentSettingsForm() {
             <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
               {isDirty && (
                 <Button type="button" variant="outline" onClick={resetForm}>
-                  {t('reset')}
+                  ล้างค่าการตั้งค่า
                 </Button>
               )}
               <Button type="submit" disabled={isSaving}>
                 {isSaving ? (
                   <>
-                    <Spinner /> {t('saving')}
+                    <Spinner /> กำลังบันทึก...
                   </>
                 ) : (
                   <>
-                    <IconDeviceFloppy size={14} /> {t('save')}
+                    <IconDeviceFloppy size={14} /> บันทึกการตั้งค่า
                   </>
                 )}
               </Button>

@@ -1,8 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
-
-import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import {
   useBlockCustomer,
@@ -10,12 +8,10 @@ import {
   useUnblockCustomer,
 } from '@/actions/hooks/customer'
 import { useEmployeePermission } from '@/actions/hooks/employee'
-import { StorePagination } from '@/components/StorePagination'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/date'
-import { formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
@@ -33,9 +29,6 @@ import {
 } from '@/components/ui/table'
 
 export function CustomerTable() {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.customers')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -64,8 +57,8 @@ export function CustomerTable() {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title={t('noAccessTitle')}
-        description={t('noAccessDescription')}
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลลูกค้าของสาขาหรือร้านค้านี้"
       />
     )
   }
@@ -74,34 +67,21 @@ export function CustomerTable() {
   const totalColumns = showManageColumn ? 9 : 8
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.customerId')}</TableHead>
-              <TableHead>{t('columns.name')}</TableHead>
-              <TableHead>{t('columns.email')}</TableHead>
-              <TableHead>{t('columns.phone')}</TableHead>
-              <TableHead>{t('columns.blockStatus')}</TableHead>
-              <TableHead>{t('columns.unblockDate')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.points')}
-              </TableHead>
-              <TableHead className="text-right">
-                {t('columns.totalSpent')}
-              </TableHead>
+              <TableHead>รหัสลูกค้า</TableHead>
+              <TableHead>ชื่อลูกค้า</TableHead>
+              <TableHead>อีเมล</TableHead>
+              <TableHead>เบอร์โทร</TableHead>
+              <TableHead>สถานะบล็อกสลิป</TableHead>
+              <TableHead>กำหนดปลดล็อก</TableHead>
+              <TableHead className="text-right">แต้มสะสม</TableHead>
+              <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
               {showManageColumn && (
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -109,7 +89,10 @@ export function CustomerTable() {
             {(isLoading || isPermissionLoading) && customers.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : customers.length === 0 ? (
-              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ยังไม่มีข้อมูลลูกค้า"
+              />
             ) : (
               customers.map((item) => (
                 <TableRow key={item.customer.id}>
@@ -130,9 +113,7 @@ export function CustomerTable() {
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {item.isBlocked ? (
                       <span className="text-destructive">
-                        {t('blockedReason', {
-                          reason: getBlockMessage(item.blockedUntil),
-                        })}
+                        โดนบล็อก ({getBlockMessage(item.blockedUntil)})
                       </span>
                     ) : (
                       '-'
@@ -155,8 +136,8 @@ export function CustomerTable() {
                         <DeleteButton
                           isPending={unblockMutation.isPending}
                           icon={<IconLockOpen />}
-                          title={t('unblockConfirmTitle')}
-                          description={t('unblockConfirmDescription')}
+                          title="ยืนยันการปลดล็อกลูกค้า?"
+                          description="คุณต้องการปลดล็อกการอัปโหลดสลิปให้กับลูกค้ารายนี้ใช่หรือไม่?"
                           onDelete={() =>
                             unblockMutation.mutate({
                               customerId: item.customer.id,
@@ -168,8 +149,8 @@ export function CustomerTable() {
                         <DeleteButton
                           isPending={blockMutation.isPending}
                           icon={<IconLock />}
-                          title={t('blockConfirmTitle')}
-                          description={t('blockConfirmDescription')}
+                          title="ยืนยันการบล็อกลูกค้า?"
+                          description="คุณต้องการบล็อกการอัปโหลดสลิปของลูกค้ารายนี้ใช่หรือไม่?"
                           onDelete={() =>
                             blockMutation.mutate({
                               customerId: item.customer.id,
@@ -195,6 +176,6 @@ export function CustomerTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

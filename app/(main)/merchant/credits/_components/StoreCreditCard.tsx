@@ -1,11 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { useStoreCredit } from '@/actions/hooks/credit'
 import { AVG_INPUT_TOKENS, AVG_OUTPUT_TOKENS } from '@/constants/ai'
 import { Plan } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CreditUsageType } from '@/types/ai'
@@ -25,8 +22,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PurchaseCreditDialog } from './PurchaseCreditDialog'
 
 export function StoreCreditCard() {
-  const { currentStore } = useCurrentStore()
-  const t = useTranslations('merchant.credits')
   const { selectedStoreId } = useStoreFilter()
   const storeId = selectedStoreId === ALL_STORES ? '' : selectedStoreId
   const { store } = useStoreData()
@@ -49,15 +44,10 @@ export function StoreCreditCard() {
     balance > 0 ? Math.floor(balance / slipCost.credits) : 0
 
   return (
-    <Card
-      className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
       <CardHeader className="pb-2">
         <CardDescription className="text-primary text-xs font-bold">
-          {t('balance')}
+          ยอดเครดิตคงเหลือ
         </CardDescription>
         <CardTitle className="text-foreground flex items-baseline gap-1 pt-1 text-4xl font-extrabold">
           {isLoading ? (
@@ -66,27 +56,22 @@ export function StoreCreditCard() {
             formatNumber(Number(data?.balance ?? 0))
           )}
           <span className="text-muted-foreground text-xs font-normal">
-            {t('creditsUnit')}
+            เครดิต
           </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="text-muted-foreground max-w-96 pb-4 text-[11px] leading-relaxed">
-        {t('cardContent')}
+        ใช้ชำระค่าบริการ AI และตรวจสลิปอัตโนมัติ ช่วยลดงานแมนนวล เพิ่มความแม่นยำ
+        และปิดการขายได้อย่างรวดเร็วตลอด 24 ชั่วโมง
         {!isLoading && balance > 0 && (
           <div className="bg-primary/5 border-primary/10 mt-5 rounded-md border p-2">
             <p className="text-primary font-semibold">
-              {t('estimatedUsageTitle')}
+              เครดิตนี้ใช้งานได้ประมาณ
             </p>
             <p>
-              {t('estimatedAiMessages', {
-                count: formatNumber(estimateAiMessages),
-              })}
+              - ตอบแชท AI ได้อีก ~{formatNumber(estimateAiMessages)} ข้อความ
             </p>
-            <p>
-              {t('estimatedSlipChecks', {
-                count: formatNumber(estimateSlipChecks),
-              })}
-            </p>
+            <p>- ตรวจสลิปได้อีก ~{formatNumber(estimateSlipChecks)} สลิป</p>
           </div>
         )}
       </CardContent>

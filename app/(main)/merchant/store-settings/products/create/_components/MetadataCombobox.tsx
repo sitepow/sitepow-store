@@ -2,10 +2,7 @@
 
 import * as React from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
 import {
@@ -30,8 +27,6 @@ interface Props {
 }
 
 export function MetadataCombobox({ value, onChange }: Props) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const [open, setOpen] = React.useState(false)
 
   const selectedLabel = PRODUCT_METADATA_MASTER.flatMap((g) => g.fields).find(
@@ -50,23 +45,16 @@ export function MetadataCombobox({ value, onChange }: Props) {
           )}
         >
           <span className="line-clamp-1 flex items-center gap-1.5">
-            {selectedLabel || t('selectProperty')}
+            {selectedLabel || 'เลือกคุณสมบัติ...'}
           </span>
           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-        className="w-75 p-0"
-      >
+      <PopoverContent className="w-75 p-0">
         <Command>
-          <CommandInput placeholder={t('searchProperty')} />
+          <CommandInput placeholder="ค้นหาคุณสมบัติ..." />
           <CommandList>
-            <CommandEmpty>{t('noPropertyFound')}</CommandEmpty>
+            <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
             {PRODUCT_METADATA_MASTER.map((group) => (
               <CommandGroup key={group.category} heading={group.category}>
                 {group.fields.map((item) => (

@@ -2,8 +2,6 @@
 
 import React, { ComponentProps } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { IconAlertCircle } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
 
@@ -39,17 +37,14 @@ export interface ActionRequiredAlertProps
 }
 
 export function ActionRequiredAlert({
-  title,
-  description,
+  title = 'โปรดเลือกร้านค้า',
+  description = 'กรุณาเลือกร้านค้าที่ต้องการก่อนเพื่อดำเนินการต่อ',
   icon = <IconAlertCircle className="h-5 w-5" />,
   variant = 'warning',
   action,
   className,
   ...props
 }: ActionRequiredAlertProps) {
-  const t = useTranslations('merchant.shell.actionRequired')
-  const alertTitle = title ?? t('title')
-  const alertDescription = description ?? t('description')
   return (
     <Alert
       className={cn(
@@ -62,11 +57,11 @@ export function ActionRequiredAlert({
       <div className="space-y-1">
         <AlertTitle className="flex flex-wrap items-center gap-2 font-semibold">
           {icon}
-          {alertTitle}
+          {title}
         </AlertTitle>
-        {alertDescription && (
+        {description && (
           <AlertDescription className="mt-1 leading-relaxed">
-            {alertDescription}
+            {description}
           </AlertDescription>
         )}
       </div>

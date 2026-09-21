@@ -1,6 +1,3 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -14,7 +11,6 @@ import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { StoreLogo } from '@/components/StoreLogo'
 
 export function StoreFooter() {
-  const t = useTranslations('storefront.footer')
   const { store } = useStoreData()
   const currentYear = new Date().getFullYear()
 
@@ -32,7 +28,7 @@ export function StoreFooter() {
         <span>{row.day}</span>
         <span>
           {!row.isOpen ? (
-            <span className="text-primary">{t('closedOnlineNormal')}</span>
+            <span className="text-primary">ปิดทำการ (ออนไลน์ปกติ)</span>
           ) : (
             `${row.open} - ${row.close}`
           )}
@@ -41,37 +37,18 @@ export function StoreFooter() {
     ))
   }
 
-  const socialLinksConfig =
-    (store?.socialLinks as Record<string, string> | null) || {}
-
   const socialLinks = [
     {
       icon: (
         <Image
           src="https://thesvg.org/icons/meta/default.svg"
-          alt="Facebook"
+          alt="Meta"
           width={34}
           height={34}
         />
       ),
-      href: store?.facebookPage || socialLinksConfig.facebook || '',
+      href: '/',
       label: 'Facebook',
-    },
-    {
-      icon: (
-        <Image
-          src="https://thesvg.org/icons/line/default.svg"
-          alt="Line"
-          width={34}
-          height={34}
-        />
-      ),
-      href: store?.lineId
-        ? store.lineId.startsWith('http')
-          ? store.lineId
-          : `https://line.me/R/ti/p/~${store.lineId}`
-        : socialLinksConfig.line || '',
-      label: 'Line',
     },
     {
       icon: (
@@ -82,7 +59,7 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: store?.instagramPage || socialLinksConfig.instagram || '',
+      href: '/',
       label: 'Instagram',
     },
     {
@@ -94,7 +71,7 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: store?.tiktokPage || socialLinksConfig.tiktok || '',
+      href: '/',
       label: 'Tiktok',
     },
     {
@@ -106,8 +83,20 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: store?.messengerUrl || socialLinksConfig.messenger || '',
+      href: '/',
       label: 'Messenger',
+    },
+    {
+      icon: (
+        <Image
+          src="https://thesvg.org/icons/line/default.svg"
+          alt="Line"
+          width={34}
+          height={34}
+        />
+      ),
+      href: '/',
+      label: 'Line',
     },
     {
       icon: (
@@ -118,22 +107,10 @@ export function StoreFooter() {
           height={34}
         />
       ),
-      href: store?.discordUrl || socialLinksConfig.discord || '',
+      href: '/',
       label: 'Discord',
     },
-    {
-      icon: (
-        <Image
-          src="https://thesvg.org/icons/youtube/default.svg"
-          alt="YouTube"
-          width={34}
-          height={34}
-        />
-      ),
-      href: store?.youtubePage || socialLinksConfig.youtube || '',
-      label: 'YouTube',
-    },
-  ].filter((s) => Boolean(s.href && s.href.trim() !== ''))
+  ]
 
   return (
     <footer
@@ -149,36 +126,30 @@ export function StoreFooter() {
               <LogoBrandText />
             )}
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              {store?.footerText
-                ? store.footerText
-                : store?.description
-                  ? store.description
-                  : t('storeDescription')}
+              {store?.description
+                ? store?.description
+                : 'เราคัดสรรสินค้าคุณภาพดีในราคาที่จับต้องได้ ช้อปง่าย ได้ของไว และตั้งใจดูแลทุกออเดอร์ให้ส่งถึงมือคุณอย่างปลอดภัย'}
             </p>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
-              {t('emailLabel')}: {store?.email || '-'}
-              {store?.phone && ` • โทร: ${store.phone}`}
-              {store?.taxId && ` • ${t('taxIdLabel')}: ${store.taxId}`}
+              อีเมล: {store?.email || '-'} เลขประจำตัวผู้เสียภาษี:{' '}
+              {store?.taxId || '-'}
             </p>
-            {socialLinks.length > 0 && (
-              <div className="mt-5 flex flex-wrap items-center gap-5">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition-opacity hover:opacity-80"
-                  >
-                    {social.icon}
-                  </a>
-                ))}
-              </div>
-            )}
+            <div className="mt-5 flex flex-wrap items-center gap-5">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
           </div>
           {(mainBranch?.address || mainBranch?.subDistrict) && (
             <div>
-              <h3 className="mb-4 font-bold">{t('mainBranchLocation')}</h3>
+              <h3 className="mb-4 font-bold">ที่ตั้งร้าน (สาขาหลัก)</h3>
               {mainBranch?.mapUrl && (
                 <div className="border-border mb-4 overflow-hidden rounded-lg border">
                   <iframe
@@ -201,7 +172,7 @@ export function StoreFooter() {
           {mainBranch?.openingHours &&
             Array.isArray(mainBranch.openingHours) && (
               <div>
-                <h3 className="mb-4 font-bold">{t('openingHoursStore')}</h3>
+                <h3 className="mb-4 font-bold">เวลาทำการ (หน้าร้าน)</h3>
                 <div className="space-y-1 text-sm opacity-60">
                   {renderOpeningHours(
                     mainBranch.openingHours as OpeningHours[],
@@ -212,16 +183,14 @@ export function StoreFooter() {
         </div>
         <div className="border-border mt-12 flex flex-col items-center justify-between gap-2.5 border-t pt-8 opacity-60 md:flex-row">
           <p className="text-sm">
-            {store?.footerCopyright
-              ? store.footerCopyright
-              : `© ${currentYear} ${store?.name || 'Store'}. All rights reserved.`}
+            © {currentYear} Sitepow. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/privacy-policy" className="hover:underline">
-              {t('privacyPolicy')}
+              นโยบายความเป็นส่วนตัว
             </Link>
             <Link href="/refund-return-policy" className="hover:underline">
-              {t('terms')}
+              ข้อตกลง และเงื่อนไข
             </Link>
           </div>
         </div>

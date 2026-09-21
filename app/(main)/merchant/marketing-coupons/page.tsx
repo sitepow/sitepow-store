@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
@@ -16,7 +14,6 @@ import { CouponListTable } from './_components/CouponListTable'
 import { CouponCreateDialog } from './_components/CreateCouponDialog'
 
 export default function MerchantMarketingCouponsPage() {
-  const t = useTranslations('merchant.marketing')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewCoupons,
@@ -28,8 +25,8 @@ export default function MerchantMarketingCouponsPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconTicket}
-        title={t('title')}
-        description={t('description')}
+        title="คูปองส่วนลด"
+        description="จัดการรหัสโปรโมชัน เงื่อนไขส่วนลดท้ายบิล เพื่อนำไปจัดแคมเปญส่งเสริมการขายบนหน้า Sale Page และระบบฝั่งหน้าร้าน POS"
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
@@ -44,8 +41,8 @@ export default function MerchantMarketingCouponsPage() {
       ) : !isPermissionLoading && !canViewCoupons ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลคูปองส่วนลดของสาขาหรือร้านค้านี้"
         />
       ) : (
         <CouponListTable />

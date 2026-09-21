@@ -43,20 +43,13 @@ export async function verifyEmployeePermission({
     const result = await getEmployeePermissions(userId, storeId, branchId)
 
     if (!result) {
-      return {
-        isAuthorized: false,
-        message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้',
-        messageTH: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้',
-        messageEN: 'You do not have permission to access this store',
-      }
+      return { isAuthorized: false, message: 'คุณไม่มีสิทธิ์เข้าถึงร้านค้านี้' }
     }
 
     if (!result.hasBranchAccess) {
       return {
         isAuthorized: false,
         message: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
-        messageTH: 'คุณไม่มีสิทธิ์จัดการข้อมูลของสาขานี้',
-        messageEN: 'You do not have permission to manage this branch',
       }
     }
 
@@ -71,8 +64,6 @@ export async function verifyEmployeePermission({
         return {
           isAuthorized: false,
           message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageTH: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: 'Insufficient permissions',
         }
       }
     }
@@ -83,8 +74,6 @@ export async function verifyEmployeePermission({
     return {
       isAuthorized: false,
       message: 'เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์',
-      messageTH: 'เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์',
-      messageEN: 'Error checking permissions',
     }
   }
 }
@@ -611,73 +600,31 @@ export async function findOrCreateEmployee(
     defaultPassword = DEFAULT_PASSWORD_EMPLOYEE,
   } = params
 
-  const hashedPassword = await bcrypt.hash(defaultPassword, 10)
-
   let employee = await db.employee.findUnique({
     where: { email },
     select: { id: true, userId: true },
   })
 
+  if (employee) {
+    return { employee, isNewUser: false }
+  }
+
   let user = await db.user.findUnique({
     where: { email },
-    select: { id: true, password: true },
+    select: { id: true },
   })
 
   if (!user) {
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10)
     user = await db.user.create({
       data: {
         email,
         name,
         role: UserRole.MERCHANT,
         password: hashedPassword,
-        emailVerified: true,
-        accounts: {
-          create: {
-            accountId: email,
-            providerId: 'credential',
-            password: hashedPassword,
-          },
-        },
       },
-      select: { id: true, password: true },
+      select: { id: true },
     })
-  } else {
-    // Ensure credential account exists for better-auth
-    const credentialAccount = await db.account.findFirst({
-      where: {
-        userId: user.id,
-        providerId: 'credential',
-      },
-    })
-
-    if (!credentialAccount) {
-      await db.account.create({
-        data: {
-          userId: user.id,
-          accountId: email,
-          providerId: 'credential',
-          password: hashedPassword,
-        },
-      })
-      await db.user.update({
-        where: { id: user.id },
-        data: {
-          password: hashedPassword,
-          emailVerified: true,
-        },
-      })
-    }
-  }
-
-  if (employee) {
-    if (!employee.userId) {
-      employee = await db.employee.update({
-        where: { id: employee.id },
-        data: { userId: user.id },
-        select: { id: true, userId: true },
-      })
-    }
-    return { employee, isNewUser: false }
   }
 
   employee = await db.employee.create({
@@ -693,20 +640,8 @@ export async function findOrCreateEmployee(
 }
 
 export type RequireVerifiedUserResult =
-  | {
-      isAuthorized: true
-      message: null
-      messageTH?: null
-      messageEN?: null
-      userId: string
-    }
-  | {
-      isAuthorized: false
-      message: string
-      messageTH: string
-      messageEN: string
-      userId: string | null
-    }
+  | { isAuthorized: true; message: null; userId: string }
+  | { isAuthorized: false; message: string; userId: string | null }
 
 export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> {
   const userSession = await getCurrentUser()
@@ -716,8 +651,6 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
     return {
       isAuthorized: false,
       message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      messageEN: 'Please sign in to proceed',
       userId: null,
     }
   }
@@ -731,8 +664,6 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
     return {
       isAuthorized: false,
       message: 'ไม่พบข้อมูลผู้ใช้งานในระบบ',
-      messageTH: 'ไม่พบข้อมูลผู้ใช้งานในระบบ',
-      messageEN: 'User not found in system',
       userId: null,
     }
   }
@@ -741,8 +672,6 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
     return {
       isAuthorized: false,
       message: 'กรุณายืนยันอีเมลของคุณก่อนทำรายการ',
-      messageTH: 'กรุณายืนยันอีเมลของคุณก่อนทำรายการ',
-      messageEN: 'Please verify your email before proceeding',
       userId,
     }
   }
@@ -750,8 +679,6 @@ export async function requireVerifiedUser(): Promise<RequireVerifiedUserResult> 
   return {
     isAuthorized: true,
     message: null,
-    messageTH: null,
-    messageEN: null,
     userId,
   }
 }

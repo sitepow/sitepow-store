@@ -2,10 +2,7 @@
 
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { DiscountType } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -20,8 +17,6 @@ import {
 import { Switch } from '@/components/ui/switch'
 
 export function DiscountField({ index }: { index: number }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const { control } = useFormContext<ProductFormValues>()
 
   const discountActive = useWatch({
@@ -30,17 +25,10 @@ export function DiscountField({ index }: { index: number }) {
   })
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="space-y-0.5">
-          <span className="text-sm font-medium">{t('enableDiscount')}</span>
+          <span className="text-sm font-medium">เปิดใช้งานส่วนลด</span>
         </div>
         <Controller
           name={`variants.${index}.discount.active`}
@@ -58,7 +46,7 @@ export function DiscountField({ index }: { index: number }) {
           render={({ field }) => (
             <Field>
               <FieldLabel className="text-muted-foreground text-[10px]">
-                {t('discountType')}
+                ประเภท
               </FieldLabel>
               <Select
                 onValueChange={field.onChange}
@@ -70,11 +58,9 @@ export function DiscountField({ index }: { index: number }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={DiscountType.PERCENTAGE}>
-                    {t('discountPercentage')}
+                    เปอร์เซ็นต์
                   </SelectItem>
-                  <SelectItem value={DiscountType.FIXED}>
-                    {t('discountFixed')}
-                  </SelectItem>
+                  <SelectItem value={DiscountType.FIXED}>จำนวนเงิน</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -86,7 +72,7 @@ export function DiscountField({ index }: { index: number }) {
           render={({ field, fieldState }) => (
             <Field>
               <FieldLabel className="text-muted-foreground text-[10px]">
-                {t('discountValue')}
+                มูลค่าส่วนลด
               </FieldLabel>
               <Input
                 {...field}

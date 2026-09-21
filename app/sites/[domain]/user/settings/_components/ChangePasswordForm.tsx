@@ -2,8 +2,6 @@
 
 import { useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useUpdatePassword } from '@/actions/hooks/storefront/security'
 import {
   ChangePasswordFormValues,
@@ -19,8 +17,6 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 export function ChangePasswordForm() {
-  const t = useTranslations('customer.settings')
-  const tCommon = useTranslations('common')
   const { mutate: updatePassword, isPending } = useUpdatePassword()
 
   const {
@@ -50,14 +46,14 @@ export function ChangePasswordForm() {
           <PageTabHeader
             variant="secondary"
             icon={IconLock}
-            title={t('passwordTitle')}
-            description={t('passwordDesc')}
+            title="เปลี่ยนรหัสผ่าน"
+            description="แนะนำให้ใช้รหัสผ่านที่ปลอดภัย ผสมอักษรและตัวเลข เพื่อปกป้องกระเป๋าเงินรวมถึงแต้มสะสมทั้งหมดของคุณ"
           />
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
             <Field>
-              <FieldLabel>{t('currentPassword')}</FieldLabel>
+              <FieldLabel>รหัสผ่านปัจจุบัน</FieldLabel>
               <Input
                 type="password"
                 {...register('currentPassword')}
@@ -68,22 +64,22 @@ export function ChangePasswordForm() {
               )}
             </Field>
             <Field>
-              <FieldLabel>{t('newPassword')}</FieldLabel>
+              <FieldLabel>รหัสผ่านใหม่</FieldLabel>
               <Input
                 type="password"
                 {...register('newPassword')}
-                placeholder={t('newPasswordPlaceholder')}
+                placeholder="อย่างน้อย 8 ตัวอักษร"
               />
               {errors.newPassword && (
                 <FieldError>{errors.newPassword.message}</FieldError>
               )}
             </Field>
             <Field>
-              <FieldLabel>{t('confirmPassword')}</FieldLabel>
+              <FieldLabel>ยืนยันรหัสผ่านใหม่</FieldLabel>
               <Input
                 type="password"
                 {...register('confirmPassword')}
-                placeholder={t('confirmPasswordPlaceholder')}
+                placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
               />
               {errors.confirmPassword && (
                 <FieldError>{errors.confirmPassword.message}</FieldError>
@@ -99,12 +95,12 @@ export function ChangePasswordForm() {
               onClick={() => reset()}
               disabled={isPending}
             >
-              {t('reset')}
+              ล้างค่าการตั้งค่า
             </Button>
           )}
 
           <Button type="submit" disabled={isPending || !isDirty}>
-            {isPending ? tCommon('actions.saving') : t('updatePassword')}
+            {isPending ? 'กำลังบันทึก...' : 'อัปเดตรหัสผ่าน'}
           </Button>
         </CardFooter>
       </Card>

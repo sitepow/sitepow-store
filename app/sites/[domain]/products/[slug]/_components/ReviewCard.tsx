@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { StorefrontProductDetail } from '@/actions/storefront/product'
 import { getRatingLabel } from '@/utils/review'
 import { CheckCircle2, User2Icon } from 'lucide-react'
@@ -16,11 +14,10 @@ import { ReviewMedia } from './ReviewMedia'
 type ReviewItem = StorefrontProductDetail['reviews'][number]
 
 export function ReviewCard({ review }: { review: ReviewItem }) {
-  const t = useTranslations('storefront.products')
   const customerName =
     [review.customer.firstName, review.customer.lastName]
       .filter(Boolean)
-      .join(' ') || t('anonymousCustomer')
+      .join(' ') || 'ลูกค้าไม่ระบุชื่อ'
 
   const selectedOptions = review.selectedOptions as
     { title: string; name: string }[] | null
@@ -43,7 +40,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                 className="gap-1 border-emerald-200/60 bg-emerald-50 px-2 py-0.5 text-[10px] font-normal text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-400"
               >
                 <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
-                <span>{t('verifiedPurchase')}</span>
+                <span>สั่งซื้อจริง</span>
               </Badge>
             </div>
             <div className="mt-1.5">

@@ -200,22 +200,14 @@ export async function getInventory({
 export async function updateStock(id: string, input: UpdateStockInput) {
   try {
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Stock ID',
-        messageEN: 'Stock ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Stock ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const stockItem = await prisma.productStock.findUnique({
@@ -224,11 +216,7 @@ export async function updateStock(id: string, input: UpdateStockInput) {
     })
 
     if (!stockItem) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลสต็อก',
-        messageEN: 'Stock data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลสต็อก' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -240,8 +228,7 @@ export async function updateStock(id: string, input: UpdateStockInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -270,8 +257,7 @@ export async function updateStock(id: string, input: UpdateStockInput) {
 
     return {
       success: true,
-      messageTH: 'อัปเดตสต็อกสำเร็จ',
-      messageEN: 'Stock updated successfully',
+      message: 'อัปเดตสต็อกสำเร็จ',
       data: serializeDecimal(updatedStock),
     }
   } catch (error) {
@@ -286,11 +272,7 @@ export async function upsertStock(input: UpsertStockInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const { variantId, branchId, quantity, minStock = 0 } = input
@@ -301,11 +283,7 @@ export async function upsertStock(input: UpsertStockInput) {
     })
 
     if (!branch) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลสาขา',
-        messageEN: 'Branch data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลสาขา' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -317,8 +295,7 @@ export async function upsertStock(input: UpsertStockInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -348,8 +325,7 @@ export async function upsertStock(input: UpsertStockInput) {
 
     return {
       success: true,
-      messageTH: 'บันทึกสต็อกสำเร็จ',
-      messageEN: 'Stock saved successfully',
+      message: 'บันทึกสต็อกสำเร็จ',
       data: serializeDecimal(stock),
     }
   } catch (error) {

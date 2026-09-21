@@ -1,9 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
-import { useTranslations } from 'next-intl'
-
 import {
   Area,
   AreaChart,
@@ -26,18 +22,12 @@ interface TopProductPairsCardProps {
 export function TopProductPairsCard({
   topProductPairs,
 }: TopProductPairsCardProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.analytics.topProductPairs')
-
   return (
     <AnalyticsCardShell
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-      title={t('title')}
-      description={t('description')}
+      title="คู่สินค้าที่มักจะถูกซื้อร่วมกัน (Top Product Pairs)"
+      description="วิเคราะห์สินค้าที่ถูกสั่งซื้อพร้อมกันในออเดอร์เดียวกันบ่อยที่สุด"
       isEmpty={topProductPairs.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ไม่มีข้อมูลการซื้อร่วมกัน"
     >
       <div className="h-70 w-full pt-4">
         <ResponsiveContainer width="100%" height="100%">
@@ -88,7 +78,7 @@ export function TopProductPairsCard({
                         {data.pair}
                       </p>
                       <p className="font-medium text-purple-500">
-                        {t('boughtTogether', { count: data.count })}
+                        ซื้อร่วมกัน: {data.count} ออเดอร์
                       </p>
                     </div>
                   )

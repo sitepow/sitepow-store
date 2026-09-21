@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   DEFAULT_SHIPPING_FEE,
@@ -15,20 +11,16 @@ import {
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { ShippingFormValues } from '@/zod/shipping'
-import {
-  IconPlus,
-  IconSettings,
-  IconTrash,
-  IconTruckDelivery,
-} from '@tabler/icons-react'
+import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -45,9 +37,6 @@ export function ServiceConfigDialog({
   serviceName,
   serviceIndex,
 }: ServiceConfigDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.shipping.serviceConfig')
-  const tZones = useTranslations('merchant.settings.shipping.zones')
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<string>(
     ShippingZoneType.SAME_PROVINCE,
@@ -89,19 +78,16 @@ export function ServiceConfigDialog({
           size="sm"
           className="h-8 gap-1"
         >
-          <IconSettings size={14} /> {t('trigger')}
+          <IconSettings size={14} /> ตั้งค่าเรทราคา Matrix
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className="lg:min-w-lg" showCloseButton={false}>
+      <DialogContent className="lg:min-w-lg" showCloseButton={false}>
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconTruckDelivery}
-            title={t('title', { serviceName })}
-            description={t('description')}
-          />
+          <DialogTitle>ตั้งค่าอัตราค่าบริการ: {serviceName}</DialogTitle>
+          <DialogDescription>
+            ตรวจสอบและปรับแต่งขั้นบันไดราคาแยกตามโซนความสัมพันธ์ระยะทาง
+            (กวาดข้อมูลจากระบบอัตโนมัติแล้ว)
+          </DialogDescription>
         </DialogHeader>
         <Tabs
           value={activeTab}
@@ -110,13 +96,13 @@ export function ServiceConfigDialog({
           className="flex flex-col gap-6"
         >
           <TabsList className="flex h-auto w-full shrink-0 items-stretch justify-start gap-1 rounded-xl border p-1">
-            {Object.entries(ZONE_LABELS).map(([zoneKey]) => (
+            {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => (
               <TabsTrigger key={zoneKey} value={zoneKey} className="text-xs">
-                {tZones(`${zoneKey}.title` as any)}
+                {zoneMeta.title}
               </TabsTrigger>
             ))}
           </TabsList>
-          {Object.entries(ZONE_LABELS).map(([zoneKey]) => {
+          {Object.entries(ZONE_LABELS).map(([zoneKey, zoneMeta]) => {
             const targetZone = zoneKey as ShippingZoneType
 
             return (
@@ -128,10 +114,10 @@ export function ServiceConfigDialog({
                 <div className="flex flex-wrap items-center justify-between gap-5">
                   <div>
                     <span className="block text-sm font-semibold">
-                      {tZones(`${targetZone}.title` as any)}
+                      {zoneMeta.title}
                     </span>
                     <span className="text-muted-foreground text-xs">
-                      {tZones(`${targetZone}.description` as any)}
+                      {zoneMeta.description}
                     </span>
                   </div>
                   <Button
@@ -141,10 +127,7 @@ export function ServiceConfigDialog({
                     onClick={() => addWeightRowForZone(targetZone)}
                     className="h-7 gap-1 px-2 text-xs"
                   >
-                    <IconPlus size={14} />{' '}
-                    {t('addWeight', {
-                      zone: tZones(`${targetZone}.title` as any),
-                    })}
+                    <IconPlus size={14} /> เพิ่มช่วงน้ำหนัก ({zoneMeta.title})
                   </Button>
                 </div>
                 <div className="w-0 min-w-full overflow-x-auto">
@@ -166,7 +149,7 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 text-right text-sm"
                             />
                             <span className="text-muted-foreground text-xs select-none">
-                              {t('to')}
+                              ถึง
                             </span>
                             <Input
                               type="number"
@@ -178,13 +161,13 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 text-right text-sm"
                             />
                             <span className="text-muted-foreground w-12 shrink-0 text-xs select-none">
-                              {t('gram')}
+                              กรัม (g)
                             </span>
                           </div>
                           <div className="flex shrink-0 items-center">
                             <Input
                               type="number"
-                              placeholder={t('price')}
+                              placeholder="ราคา"
                               {...register(
                                 `services.${serviceIndex}.weightRates.${globalIndex}.fee` as const,
                                 { valueAsNumber: true },
@@ -192,7 +175,7 @@ export function ServiceConfigDialog({
                               className="h-8 w-24 rounded-r-none text-right text-sm font-medium"
                             />
                             <span className="border-input bg-muted text-muted-foreground flex h-8 items-center rounded-r-md border border-l-0 px-2 text-xs select-none">
-                              {t('baht')}
+                              บาท
                             </span>
                           </div>
                           <Button
@@ -220,10 +203,10 @@ export function ServiceConfigDialog({
             onClick={() => setOpen(false)}
             size="sm"
           >
-            {t('close')}
+            ปิดหน้าต่าง
           </Button>
           <Button type="button" onClick={() => setOpen(false)} size="sm">
-            {t('done')}
+            เสร็จสิ้นการตั้งค่าโซน
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -69,10 +69,7 @@ export function ProductGalleryThumbnail() {
     return (
       <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <EmptyImage
-            className="size-16 text-[10px] md:size-20"
-            text="ไม่มีรูปภาพ"
-          />
+          <EmptyImage hideIcon className="size-16 md:size-20" />
         ))}
       </div>
     )

@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { SettingsTab } from '@/constants/settings'
@@ -12,7 +11,6 @@ import { Alert, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 
 export function StoreSetupAlert() {
-  const t = useTranslations('merchant.shell.storeSetupAlert')
   const { store } = useStoreData()
   const { hasShipping, hasPayment, isConfigured } = useMerchantStoreSetupStore()
 
@@ -22,13 +20,13 @@ export function StoreSetupAlert() {
 
   const missingItems: string[] = []
   if (!hasShipping) {
-    missingItems.push(t('shipping'))
+    missingItems.push('ช่องทางการจัดส่ง')
   }
   if (!hasPayment) {
-    missingItems.push(t('payment'))
+    missingItems.push('ช่องทางการชำระเงิน')
   }
 
-  const missingText = missingItems.join(t('and'))
+  const missingText = missingItems.join(' และ ')
 
   return (
     <Alert
@@ -37,24 +35,25 @@ export function StoreSetupAlert() {
     >
       <AlertCircleIcon className="text-primary size-5" />
       <AlertTitle className="text-primary font-semibold">
-        {t('title')}
+        ตั้งค่าร้านค้าของคุณยังไม่สมบูรณ์
       </AlertTitle>
       <div className="flex flex-wrap items-center justify-between gap-5">
         <div className="text-muted-foreground flex-1 shrink-0 text-sm">
-          {t('description', { missing: missingText })}
+          ร้านค้าของคุณยังไม่ได้ตั้งค่า {missingText}{' '}
+          เพื่อให้ลูกค้าสามารถสั่งซื้อสินค้าได้ โปรดดำเนินการตั้งค่า
         </div>
         <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto">
           {!hasShipping && (
             <Button variant="outline" size="sm" asChild>
               <Link href={`/merchant/settings?tab=${SettingsTab.SHIPPING}`}>
-                {t('setupShipping')}
+                ตั้งค่าการจัดส่ง
               </Link>
             </Button>
           )}
           {!hasPayment && (
             <Button variant="outline" size="sm" asChild>
               <Link href={`/merchant/settings?tab=${SettingsTab.PAYMENT}`}>
-                {t('setupPayment')}
+                ตั้งค่าการชำระเงิน
               </Link>
             </Button>
           )}

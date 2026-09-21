@@ -1,11 +1,7 @@
 'use client'
 
-import React, { useState }
-from 'react'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useCheckout } from '@/actions/hooks/checkout'
 import { CREDIT_TIERS, PACKAGES } from '@/constants/credit'
@@ -18,7 +14,6 @@ import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/credit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCoins, IconPlus } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,6 +21,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -35,8 +31,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 
 export function PurchaseCreditDialog() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.credits.dialog')
   const [open, setOpen] = useState(false)
   const { selectedStoreId } = useStoreFilter()
   const { userId, user } = useSession()
@@ -80,10 +74,7 @@ export function PurchaseCreditDialog() {
     checkout({
       customerEmail: user?.email ?? '',
       amount: data.amount,
-      description: t('checkoutDescription', {
-        credits: formatNumber(getCredits(amount)),
-        rate: ratePerBaht,
-      }),
+      description: `เติมเครดิต AI จำนวน ${formatNumber(getCredits(amount))} เครดิต (${ratePerBaht} เครดิต/บาท)`,
       successUrl: `${window.location.origin}/merchant/credits`,
       cancelUrl: `${window.location.origin}/merchant/credits`,
       metadata: {
@@ -104,20 +95,16 @@ export function PurchaseCreditDialog() {
     >
       <DialogTrigger asChild>
         <Button>
-          <IconPlus size={16} /> {t('trigger')}
+          <IconPlus size={16} /> ซื้อเครดิต
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={{
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties}
-      >
+      <DialogContent>
         <DialogHeader>
-          <DialogHeaderIcon icon={IconCoins} title={t('title')} />
+          <DialogTitle>ซื้อเครดิตสำหรับใช้งาน AI</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
-            <FieldLabel>{t('selectPackage')}</FieldLabel>
+            <FieldLabel>เลือกแพ็กเกจ</FieldLabel>
             <div className="grid grid-cols-3 gap-2">
               {PACKAGES.map((pkg) => {
                 const bonusCredits = getBonusCredits(pkg)
@@ -133,12 +120,10 @@ export function PurchaseCreditDialog() {
                     )}
                     onClick={() => setValue('amount', pkg)}
                   >
-                    <span>{t('bahtUnit', { amount: formatNumber(pkg) })}</span>
+                    <span>{formatNumber(pkg)} บาท</span>
                     {bonusCredits > 0 && (
                       <Badge className="absolute -top-2 -right-2 text-white">
-                        {t('bonusCredits', {
-                          count: formatNumber(bonusCredits),
-                        })}
+                        + {formatNumber(bonusCredits)} เครดิต
                       </Badge>
                     )}
                   </Button>
@@ -147,18 +132,16 @@ export function PurchaseCreditDialog() {
             </div>
           </div>
           <Field>
-            <FieldLabel>{t('customAmountLabel')}</FieldLabel>
+            <FieldLabel>หรือระบุจำนวนเงิน (บาท)</FieldLabel>
             <Input
               type="number"
               {...register('amount', { valueAsNumber: true })}
               min={60}
-              placeholder={t('customAmountPlaceholder')}
+              placeholder="ระบุจำนวนเงิน"
             />
             {amount >= 60 && getBonusCredits(amount) > 0 && (
               <p className="text-primary mt-1 text-sm">
-                {t('bonusEarned', {
-                  count: formatNumber(getBonusCredits(amount)),
-                })}
+                คุณได้รับฟรี +{formatNumber(getBonusCredits(amount))} เครดิต!
               </p>
             )}
             <FieldError>{errors.amount?.message}</FieldError>
@@ -166,30 +149,30 @@ export function PurchaseCreditDialog() {
           <div className="bg-muted/50 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm">
               <IconCoins className="text-primary" size={20} />
-              <span className="font-medium">{t('willReceive')}</span>
+              <span className="font-medium">จะได้รับเครดิต</span>
             </div>
             <span className="text-primary text-xl font-bold">
-              {t('creditsAmount', { count: formatNumber(getCredits(amount)) })}
+              {formatNumber(getCredits(amount))} Credits
             </span>
           </div>
           <Field>
-            <FieldLabel>{t('descriptionLabel')}</FieldLabel>
+            <FieldLabel>หมายเหตุ</FieldLabel>
             <Input
               {...register('description')}
-              placeholder={t('descriptionPlaceholder')}
+              placeholder="เช่น เติมเครดิตเพื่อจ่ายค่า AI"
             />
           </Field>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose}>
-              {t('cancel')}
+              ยกเลิก
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? (
                 <>
-                  <Spinner /> {t('purchasing')}
+                  <Spinner /> กำลังทำรายการ...
                 </>
               ) : (
-                t('submit')
+                'ยืนยันการซื้อ'
               )}
             </Button>
           </DialogFooter>

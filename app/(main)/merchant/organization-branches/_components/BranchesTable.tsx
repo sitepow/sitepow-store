@@ -1,13 +1,9 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useBranches, useDeleteBranch } from '@/actions/hooks/branch'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
@@ -30,8 +26,6 @@ interface BranchesTableProps {
 }
 
 export function BranchesTable({ onEdit }: BranchesTableProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.branches')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -44,29 +38,22 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
   const deleteBranchMutation = useDeleteBranch()
 
   return (
-    <div
-      className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.code')}</TableHead>
-              <TableHead>{t('columns.name')}</TableHead>
-              <TableHead>{t('columns.type')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>รหัสสาขา</TableHead>
+              <TableHead>ชื่อสาขา</TableHead>
+              <TableHead>ประเภท</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && branches.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : branches.length === 0 ? (
-              <TableEmptyRow colSpan={4} title={t('empty')} />
+              <TableEmptyRow colSpan={4} title="ไม่พบรายการสาขา" />
             ) : (
               branches.map((branch) => (
                 <TableRow key={branch.id}>
@@ -76,7 +63,7 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
                   </TableCell>
                   <TableCell>
                     <Badge variant={branch.isMain ? 'default' : 'outline'}>
-                      {branch.isMain ? t('mainBranch') : t('subBranch')}
+                      {branch.isMain ? 'สาขาหลัก' : 'สาขาย่อย'}
                     </Badge>
                   </TableCell>
                   <TableCell className="space-x-2 text-right">
@@ -112,6 +99,6 @@ export function BranchesTable({ onEdit }: BranchesTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

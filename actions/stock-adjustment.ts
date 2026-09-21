@@ -192,11 +192,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -208,17 +204,12 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
     if (quantity === 0) {
-      return {
-        success: false,
-        messageTH: 'จำนวนต้องไม่เป็น 0',
-        messageEN: 'Quantity must not be 0',
-      }
+      return { success: false, message: 'จำนวนต้องไม่เป็น 0' }
     }
 
     const FREE_REASONS: StockAdjustmentReason[] = [
@@ -227,11 +218,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     ]
 
     if (!FREE_REASONS.includes(reason) && quantity > 0) {
-      return {
-        success: false,
-        messageTH: 'ไม่สามารถเพิ่มสต็อกด้วยเหตุผลนี้ได้',
-        messageEN: 'Cannot increase stock with this reason',
-      }
+      return { success: false, message: 'ไม่สามารถเพิ่มสต็อกด้วยเหตุผลนี้ได้' }
     }
 
     const stock = await prisma.productStock.findUnique({
@@ -240,11 +227,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     })
 
     if (!stock) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลสต็อกสาขานี้',
-        messageEN: 'Branch stock data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลสต็อกสาขานี้' }
     }
 
     const newQuantity = stock.quantity + quantity
@@ -252,8 +235,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
     if (newQuantity < 0) {
       return {
         success: false,
-        messageTH: `สต็อกไม่เพียงพอ (มีอยู่ ${stock.quantity} ชิ้น)`,
-        messageEN: `Insufficient stock (available: ${stock.quantity})`,
+        message: `สต็อกไม่เพียงพอ (มีอยู่ ${stock.quantity} ชิ้น)`,
       }
     }
 
@@ -283,12 +265,7 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
       },
     })
 
-    return {
-      success: true,
-      messageTH: 'ปรับสต็อกสำเร็จแล้ว',
-      messageEN: 'Stock adjusted successfully',
-      data: adjustment,
-    }
+    return { success: true, message: 'ปรับสต็อกสำเร็จแล้ว', data: adjustment }
   } catch (error) {
     console.error(error)
     return { success: false }

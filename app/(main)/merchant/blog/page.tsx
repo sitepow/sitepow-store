@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
@@ -17,7 +16,6 @@ import { Button } from '@/components/ui/button'
 import { BlogTable } from './_components/BlogTable'
 
 export default function MerchantBlogsPage() {
-  const t = useTranslations('merchant.blog')
   const { selectedStoreId } = useStoreFilter()
   const {
     canViewBlogs,
@@ -29,16 +27,16 @@ export default function MerchantBlogsPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconNews}
-        title={t('title')}
-        description={t('description')}
+        title="บทความทั้งหมด"
+        description="จัดการบทความ ข่าวสาร และเนื้อหาสำหรับเผยแพร่ในบล็อกของร้านค้าคุณ"
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
             {canCreateBlogs && (
-              <Button asChild>
+              <Button asChild variant="outline">
                 <Link href={'/merchant/blog/create'}>
                   <IconPlus />
-                  {t('addBlog')}
+                  เพิ่มบทความใหม่
                 </Link>
               </Button>
             )}
@@ -50,8 +48,8 @@ export default function MerchantBlogsPage() {
       ) : !isPermissionLoading && !canViewBlogs ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title={t('noAccessTitle')}
-          description={t('noAccessDescription')}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลบทความของสาขาหรือร้านค้านี้"
         />
       ) : (
         <BlogTable />

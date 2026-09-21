@@ -20,44 +20,11 @@ export interface AppliedCoupon {
   discountAmount: number
 }
 
-const getClientLocale = (): 'th' | 'en' => {
-  if (typeof document !== 'undefined') {
-    const htmlLang = document.documentElement.lang
-    if (htmlLang === 'en' || htmlLang === 'th') return htmlLang
-
-    const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)
-    if (cookieMatch && (cookieMatch[1] === 'en' || cookieMatch[1] === 'th')) {
-      return cookieMatch[1]
-    }
-  }
-  return 'th'
-}
-
-const CART_MESSAGES = {
-  th: {
-    consignmentStockOut: 'สต็อกฝากขายหมดแล้ว',
-    branchStockOut: 'สินค้าในสาขานี้หมดแล้ว',
-    addedToCart: 'เพิ่มสินค้าลงในตะกร้าแล้ว',
-  },
-  en: {
-    consignmentStockOut: 'Consignment stock sold out',
-    branchStockOut: 'Out of stock at this branch',
-    addedToCart: 'Added to cart',
-  },
-} as const
-
 interface CartStore {
   items: CartItem[]
   appliedCoupon: AppliedCoupon | null
   usedPoints: number
-  addItem: (
-    item: Omit<CartItem, 'cartItemId' | 'totalPrice'>,
-    messages?: {
-      consignmentStockOut?: string
-      branchStockOut?: string
-      addedToCart?: string
-    },
-  ) => void
+  addItem: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, qty: number) => void
   clearCart: () => void
@@ -72,10 +39,8 @@ export const useCartStore = create<CartStore>()(
       items: [],
       appliedCoupon: null,
       usedPoints: 0,
-      addItem: (newItem, messages) => {
+      addItem: (newItem) => {
         const { items } = get()
-        const locale = getClientLocale()
-        const defaultMessages = CART_MESSAGES[locale]
 
         const getAvailableStock = () => {
           if (
@@ -112,9 +77,8 @@ export const useCartStore = create<CartStore>()(
         ) {
           toast.error(
             newItem.isReseller
-              ? (messages?.consignmentStockOut ??
-                  defaultMessages.consignmentStockOut)
-              : (messages?.branchStockOut ?? defaultMessages.branchStockOut),
+              ? 'สต็อกฝากขายหมดแล้ว'
+              : 'สินค้าในสาขานี้หมดแล้ว',
           )
           return
         }
@@ -157,7 +121,7 @@ export const useCartStore = create<CartStore>()(
           }
           set({ items: [...items, cartItem] })
         }
-        toast.success(messages?.addedToCart ?? defaultMessages.addedToCart)
+        toast.success('เพิ่มสินค้าลงในตะกร้าแล้ว')
       },
       removeItem: (cartItemId) => {
         set((state) => ({

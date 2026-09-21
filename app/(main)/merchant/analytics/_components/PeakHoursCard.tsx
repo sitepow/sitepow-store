@@ -1,11 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
-import { useMemo } from 'react'
-
-import { useTranslations } from 'next-intl'
-
 import { formatNumber } from '@/utils/pricing'
 import { IconTrendingUp } from '@tabler/icons-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
@@ -26,30 +20,20 @@ interface PeakHoursCardProps {
   }>
 }
 
+const chartConfig = {
+  count: {
+    label: 'จำนวนออเดอร์',
+    color: 'hsl(var(--primary))',
+  },
+} satisfies ChartConfig
+
 export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.analytics.peakHours')
-
-  const chartConfig = useMemo(
-    () =>
-      ({
-        count: {
-          label: t('ordersLabel'),
-          color: 'hsl(var(--primary))',
-        },
-      }) satisfies ChartConfig,
-    [t],
-  )
-
   return (
     <AnalyticsCardShell
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-      title={t('title')}
-      description={t('description')}
+      title="5 อันดับ ช่วงเวลาขายดีที่สุด (Peak Hours)"
+      description="ช่วงเวลาที่มีการสร้างออเดอร์สูงสุดโดยรวม"
       isEmpty={topBuyingHours.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ไม่มีข้อมูลช่วงเวลาขายดี"
       className="lg:col-span-2"
     >
       <div className="space-y-4">
@@ -90,11 +74,7 @@ export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
                   <ChartTooltipContent
                     hideLabel
                     formatter={(value) => [
-                      t('orderCountTooltip', {
-                        count: formatNumber(
-                          typeof value === 'number' ? value : 0,
-                        ),
-                      }),
+                      `${formatNumber(typeof value === 'number' ? value : 0)} ออเดอร์`,
                     ]}
                   />
                 }
@@ -102,7 +82,7 @@ export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
               <Area
                 type="natural"
                 dataKey="count"
-                name={t('ordersLabel')}
+                name="จำนวนออเดอร์"
                 stroke="hsl(var(--primary))"
                 fill="url(#fillPeakCount)"
                 strokeWidth={2}
@@ -112,7 +92,7 @@ export function PeakHoursCard({ topBuyingHours }: PeakHoursCardProps) {
         </div>
         <div className="text-muted-foreground flex items-center gap-2 border-t pt-2 text-xs">
           <IconTrendingUp className="size-4 text-emerald-500" />
-          <span>{t('footer')}</span>
+          <span>ช่วงเวลาขายดีเรียงตามความหนาแน่นของออเดอร์</span>
         </div>
       </div>
     </AnalyticsCardShell>

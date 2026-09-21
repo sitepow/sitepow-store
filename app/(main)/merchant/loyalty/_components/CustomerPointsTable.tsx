@@ -2,14 +2,10 @@
 
 import { ComponentProps, useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
-import { StorePagination } from '@/components/StorePagination'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
@@ -39,9 +35,6 @@ export function CustomerPointsTable({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.loyalty')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -58,18 +51,12 @@ export function CustomerPointsTable({
   const isEnabled = settings?.isPointsEnabled ?? false
 
   return (
-    <Card
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-      className={cn('h-fit', className)}
-      {...props}
-    >
+    <Card className={cn('h-fit', className)} {...props}>
       <CardHeader>
-        <CardTitle>{t('table.title')}</CardTitle>
-        <CardDescription>{t('table.description')}</CardDescription>
+        <CardTitle>ฐานข้อมูลสมาชิกและคะแนนคงเหลือ</CardTitle>
+        <CardDescription>
+          รายชื่อลูกค้าที่เป็นสมาชิกของร้านค้านี้ และประวัติคะแนนสะสม
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative">
@@ -78,7 +65,7 @@ export function CustomerPointsTable({
             size={16}
           />
           <Input
-            placeholder={t('table.searchPlaceholder')}
+            placeholder="ค้นหาสมาชิกด้วยชื่อ หรือเบอร์โทรศัพท์..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -92,26 +79,26 @@ export function CustomerPointsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('columns.customer')}</TableHead>
-                <TableHead>{t('columns.phone')}</TableHead>
-                <TableHead className="text-right">
-                  {t('columns.points')}
-                </TableHead>
-                <TableHead className="text-right">
-                  {t('columns.totalSpent')}
-                </TableHead>
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead>ชื่อลูกค้า</TableHead>
+                <TableHead>เบอร์โทรศัพท์</TableHead>
+                <TableHead className="text-right">แต้มปัจจุบัน</TableHead>
+                <TableHead className="text-right">ยอดซื้อสะสม</TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {!isEnabled ? (
-                <TableEmptyRow title={t('table.disabledMessage')} colSpan={5} />
+                <TableEmptyRow
+                  title="ระบบแต้มสะสมของร้านค้านี้ถูกปิดการใช้งานอยู่"
+                  colSpan={5}
+                />
               ) : isLoading && customers.length === 0 ? (
                 <TableLoadingRow colSpan={5} />
               ) : customers.length === 0 ? (
-                <TableEmptyRow title={t('table.empty')} colSpan={5} />
+                <TableEmptyRow
+                  title="ไม่พบข้อมูลสมาชิกในระบบของแบรนด์นี้"
+                  colSpan={5}
+                />
               ) : (
                 customers.map((item) => (
                   <TableRow key={item.id}>

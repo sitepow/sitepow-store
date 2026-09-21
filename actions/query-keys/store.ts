@@ -18,6 +18,7 @@ export const storeKeys = {
     slug?: string
     excludeId?: string
   }) => [...storeKeys.all, 'availability', params] as const,
+  landing: (limit?: number) => [...storeKeys.all, 'landing', limit] as const,
   merchant: () => [...storeKeys.all, 'merchant'] as const,
   setupStatus: (storeId: string) =>
     [...storeKeys.merchant(), 'setup-status', storeId] as const,

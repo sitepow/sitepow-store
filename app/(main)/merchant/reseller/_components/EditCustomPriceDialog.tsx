@@ -1,23 +1,20 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
-/* eslint-disable @next/next/no-img-element */
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { ResellerStockItem } from '@/types/reseller'
 import { formatCurrency } from '@/utils/pricing'
-import { IconCurrencyDollar, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -31,7 +28,7 @@ interface EditCustomPriceFormValues {
 interface EditCustomPriceDialogProps {
   open: boolean
   setOpen: (v: boolean) => void
-  stock: ResellerStockItem | null
+  stock: any
   defaultCommissionRate?: number
   isLoading?: boolean
   onSave?: (variantId: string, customPrice: number) => void
@@ -45,7 +42,6 @@ export function EditCustomPriceDialog({
   isLoading = false,
   onSave,
 }: EditCustomPriceDialogProps) {
-  const t = useTranslations('merchant.reseller.customPrice')
   const methods = useForm<EditCustomPriceFormValues>({
     defaultValues: {
       customPrice: 0,
@@ -134,9 +130,7 @@ export function EditCustomPriceDialog({
   }
 
   const onSubmit: SubmitHandler<EditCustomPriceFormValues> = (values) => {
-    if (stock?.variantId) {
-      onSave?.(stock.variantId, Number(values.customPrice))
-    }
+    onSave?.(stock?.variantId, Number(values.customPrice))
     handleClose()
   }
 
@@ -146,11 +140,10 @@ export function EditCustomPriceDialog({
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogHeaderIcon
-                icon={IconCurrencyDollar}
-                title={t('title')}
-                description={t('description')}
-              />
+              <DialogTitle>ตั้งราคาส่งเฉพาะรายการ</DialogTitle>
+              <DialogDescription>
+                กำหนดราคาต้นทุนส่งฝากขายเฉพาะสินค้านี้สำหรับสัญญาตัวแทน
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="min-w-0 space-y-1.5">
@@ -158,15 +151,13 @@ export function EditCustomPriceDialog({
                   {stock?.variant?.product?.title || '-'}
                 </p>
                 <p className="text-muted-foreground text-xs leading-relaxed break-all whitespace-pre-line">
-                  {t('variantPrefix', {
-                    variant: stock?.variant?.title || '-',
-                  })}
+                  ตัวเลือก: {stock?.variant?.title || '-'}
                 </p>
               </div>
               <div className="bg-muted/50 space-y-1 rounded-lg border p-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {t('normalRetail')}
+                    ราคาขายปลีกปกติ:
                   </span>
                   <span className="font-medium">
                     {formatCurrency(retailPrice)}
@@ -174,7 +165,7 @@ export function EditCustomPriceDialog({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {t('resellerDiscount')}
+                    ส่วนลดตัวแทนที่จะได้รับ:
                   </span>
                   <span className="font-medium">
                     {formatCurrency(Math.max(0, discountAmount))} (
@@ -182,7 +173,7 @@ export function EditCustomPriceDialog({
                   </span>
                 </div>
                 <div className="mt-1 flex justify-between border-t pt-1">
-                  <span className="font-medium">{t('costToClear')}</span>
+                  <span className="font-medium">ทุนโอนเคลียร์ร้านค้า:</span>
                   <span className="font-medium">
                     {formatCurrency(inputCustomPrice)}
                   </span>
@@ -190,18 +181,16 @@ export function EditCustomPriceDialog({
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field className="space-y-2">
-                  <FieldLabel htmlFor="discountPercent">
-                    {t('discountLabel')}
-                  </FieldLabel>
+                  <FieldLabel htmlFor="discountPercent">ส่วนลด (%)</FieldLabel>
                   <Input
                     id="discountPercent"
                     type="number"
                     step="0.1"
-                    placeholder={t('discountPlaceholder')}
+                    placeholder="เช่น 25"
                     {...register('discountPercent', {
                       valueAsNumber: true,
-                      min: { value: 0, message: t('discountMin') },
-                      max: { value: 100, message: t('discountMax') },
+                      min: { value: 0, message: 'ต้องไม่ติดลบ' },
+                      max: { value: 100, message: 'ไม่เกิน 100%' },
                       onChange: (e) =>
                         handlePercentChange(Number(e.target.value)),
                     })}
@@ -211,17 +200,17 @@ export function EditCustomPriceDialog({
                 </Field>
                 <Field className="space-y-2">
                   <FieldLabel htmlFor="customPrice">
-                    {t('priceLabel')}
+                    ราคาส่งฝากขาย (บาท/ชิ้น)
                   </FieldLabel>
                   <Input
                     id="customPrice"
                     type="number"
                     step="0.01"
-                    placeholder={t('pricePlaceholder')}
+                    placeholder="ระบุราคาส่ง"
                     {...register('customPrice', {
                       valueAsNumber: true,
-                      required: t('priceRequired'),
-                      min: { value: 0, message: t('priceMin') },
+                      required: 'กรุณากรอกราคาส่ง',
+                      min: { value: 0, message: 'ราคาส่งต้องไม่ติดลบ' },
                       onChange: (e) =>
                         handleCustomPriceChange(Number(e.target.value)),
                     })}
@@ -240,7 +229,7 @@ export function EditCustomPriceDialog({
                   disabled={isLoading}
                 >
                   <IconX className="size-4" />
-                  {t('reset')}
+                  ล้างข้อมูล
                 </Button>
               ) : (
                 <Button
@@ -249,16 +238,16 @@ export function EditCustomPriceDialog({
                   onClick={handleClose}
                   disabled={isLoading}
                 >
-                  {t('cancel')}
+                  ยกเลิก
                 </Button>
               )}
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Spinner /> {t('submitting')}
+                    <Spinner /> กำลังบันทึก...
                   </>
                 ) : (
-                  t('submit')
+                  'บันทึกราคาส่ง'
                 )}
               </Button>
             </DialogFooter>

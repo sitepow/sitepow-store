@@ -1,5 +1,4 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product'
-import { ProductType } from '@/generated/prisma/enums'
 import {
   CalculatedProduct,
   calculateNetPrice,
@@ -139,10 +138,6 @@ export const useProductPurchaseStore = create<ProductStore>((set, get) => ({
   },
 
   getVariantPrice: (variant) => {
-    const { product } = get()
-    if (product?.productType === ProductType.AFFILIATE_LINK) {
-      return Number(variant.price || 0)
-    }
     return calculateNetPrice({
       price: variant.price,
       discount: {

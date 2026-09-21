@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { PRICING_OPTIONS } from '@/constants/pricing'
 import { RESPONSIVE_DEVICE } from '@/constants/system'
@@ -18,7 +16,6 @@ const TAB_STYLE = {
 }
 
 export function MerchantPricingTabs() {
-  const t = useTranslations('pricing.tabs')
   const isMounted = useIsMounted()
   const isDesktop = useMediaQuery(`(min-width: ${RESPONSIVE_DEVICE.desktop})`)
   const { selectedTab, setSelectedTab } = usePricingStore()
@@ -36,15 +33,11 @@ export function MerchantPricingTabs() {
     >
       <TabsList className={isDesktop ? '' : TAB_STYLE.tabslist_mobile}>
         {PRICING_OPTIONS.map((plan) => {
-          const label = t.raw(plan.value) as string
-
           return (
             <TabsTrigger className="px-5" key={plan.value} value={plan.value}>
-              {label}
+              {plan.label}
               {plan?.discountPercent !== 0 && (
-                <Badge>
-                  {t('discountBadge', { percent: plan.discountPercent ?? 0 })}
-                </Badge>
+                <Badge>ลด {plan.discountPercent}%</Badge>
               )}
             </TabsTrigger>
           )

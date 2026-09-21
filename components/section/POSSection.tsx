@@ -1,0 +1,23 @@
+'use client'
+
+import { POS_FEATURES } from '@/constants/pos'
+
+import { SectionHeader } from '../SectionHeader'
+import { FeatureDisplay } from './_components/FeatureDisplay'
+
+export function POSSection() {
+  return (
+    <FeatureDisplay
+      isLeft={true}
+      imageUrl="/images/landing/landing-pos.jpeg"
+      sectionHeader={
+        <SectionHeader
+          className="max-w-lg text-white"
+          title="บริหารหน้าร้านง่ายๆ ด้วยระบบ POS ในตัว"
+          description="ไม่ว่าคุณจะมีหน้าร้านจริงหรือเป็นจุดรับสินค้า ระบบ POS ของเราเชื่อมต่อกับสต็อกสินค้าออนไลน์ของคุณโดยตรง ตัดสต็อกอัตโนมัติ ลดปัญหาของไม่ตรงยอด"
+        />
+      }
+      featuresList={POS_FEATURES}
+    />
+  )
+}

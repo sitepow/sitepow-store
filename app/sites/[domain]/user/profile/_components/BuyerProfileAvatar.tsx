@@ -4,8 +4,6 @@
 
 import { ComponentProps } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useProfile } from '@/actions/hooks/profile'
 import { USER_ICON } from '@/constants/favicon'
 import { formatDateTime } from '@/utils/date'
@@ -21,7 +19,6 @@ export function BuyerProfileAvatar({
   className,
   ...props
 }: ComponentProps<typeof Card>) {
-  const t = useTranslations('customer.profile')
   const { data: profile, isLoading } = useProfile()
 
   const [firstName, ...rest] = (profile?.name ?? '').split(' ')
@@ -58,7 +55,7 @@ export function BuyerProfileAvatar({
         )}
       </CardContent>
       <CardFooter className="flex justify-between border-t text-xs">
-        <span>{t('memberSince')}</span>
+        <span>เป็นสมาชิกตั้งแต่</span>
         {isLoading ? (
           <Skeleton className="h-3 w-20" />
         ) : (

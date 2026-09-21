@@ -1,6 +1,6 @@
 import { RefObject, useLayoutEffect, useRef } from 'react'
 
-import type { Message } from '@/generated/prisma/browser'
+import { Message } from '@/generated/prisma/client'
 
 export function useChatScroll(
   messages: Message[],

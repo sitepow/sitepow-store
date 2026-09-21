@@ -14,8 +14,7 @@ import {
   CHAT_REFETCH_INTERVAL,
   UNREAD_COUNT_REFETCH_INTERVAL,
 } from '@/constants/system'
-import type { Message } from '@/generated/prisma/browser'
-import { ConversationType } from '@/generated/prisma/enums'
+import { ConversationType, Message } from '@/generated/prisma/client'
 import {
   InfiniteData,
   infiniteQueryOptions,

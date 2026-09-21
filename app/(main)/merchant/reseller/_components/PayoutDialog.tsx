@@ -4,16 +4,12 @@ import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { useCreateResellerPayout } from '@/actions/hooks/reseller'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconReceiptRefund, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +17,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -38,8 +35,6 @@ interface PayoutDialogProps {
 }
 
 export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.reseller.payout')
   const { selectedStoreId } = useStoreFilter()
   const { selectedAgreementId: agreementId } = useResellerFilter()
 
@@ -78,7 +73,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
 
   const onSubmit: SubmitHandler<PayoutFormValues> = async (values) => {
     if (!agreementId) {
-      return toast.error(t('toastNoAgreement'))
+      return toast.error('ไม่พบข้อมูลสัญญาตัวแทน')
     }
 
     let imageUrl = ''
@@ -89,7 +84,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       const res = await uploadMutation.mutateAsync(formData)
 
       if (!res.success) {
-        return toast.error(t('toastUploadError'))
+        return toast.error('อัปโหลดหลักฐานการโอนเงินไม่สำเร็จ')
       }
 
       imageUrl = res.url ?? ''
@@ -105,7 +100,10 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       {
         onSuccess: (res) => {
           if (res.success) {
+            toast.success(res.message || 'บันทึกรายการ Payout สำเร็จ')
             handleClose()
+          } else {
+            toast.error(res.message || 'เกิดข้อผิดพลาดในการบันทึก Payout')
           }
         },
       },
@@ -122,32 +120,32 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
       <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogHeaderIcon icon={IconReceiptRefund} title={t('title')} />
+            <DialogTitle>บันทึกการจ่ายเงินค่าคอมมิชชัน</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>
-              <FieldLabel>{t('amountLabel')}</FieldLabel>
+              <FieldLabel>จำนวนเงินที่เคลียร์ / โอน (บาท)</FieldLabel>
               <Input
                 type="number"
                 step="0.01"
-                placeholder={t('amountPlaceholder')}
+                placeholder="0.00"
                 {...register('amount', {
                   valueAsNumber: true,
-                  min: { value: 0.01, message: t('amountMin') },
+                  min: { value: 0.01, message: 'จำนวนเงินต้องมากกว่า 0' },
                 })}
                 disabled={isPending}
               />
               <FieldError>{errors.amount?.message}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>{t('proofLabel')}</FieldLabel>
+              <FieldLabel>แนบหลักฐานการโอนเงิน (สลิป)</FieldLabel>
               <FileUpload name="paymentProof" />
               <FieldError>{errors.paymentProof?.message as string}</FieldError>
             </Field>
             <Field>
-              <FieldLabel>{t('noteLabel')}</FieldLabel>
+              <FieldLabel>หมายเหตุเพิ่มเติม</FieldLabel>
               <Input
-                placeholder={t('notePlaceholder')}
+                placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับการโอนเงิน..."
                 {...register('note')}
                 disabled={isPending}
               />
@@ -161,7 +159,7 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  {t('reset')}
+                  ล้างข้อมูล
                 </Button>
               ) : (
                 <Button
@@ -170,16 +168,16 @@ export function PayoutDialog({ open, setOpen }: PayoutDialogProps) {
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  {t('cancel')}
+                  ยกเลิก
                 </Button>
               )}
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> {t('submitting')}
+                    <Spinner /> กำลังบันทึก...
                   </>
                 ) : (
-                  t('submit')
+                  'ยืนยันชำระเงิน'
                 )}
               </Button>
             </DialogFooter>

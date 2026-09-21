@@ -14,6 +14,7 @@ import {
   checkStoreAvailability,
   createStore,
   deleteStore,
+  getLandingStores,
   getStoreOptions,
   getStoreSetupStatus,
   getStores,
@@ -110,6 +111,15 @@ export function useDeleteStore() {
       queryClient.invalidateQueries({ queryKey: storeKeys.all })
     },
   })
+}
+
+export function useLandingStores(limit: number = 11) {
+  return useQuery(
+    queryOptions({
+      queryKey: storeKeys.landing(limit),
+      queryFn: async () => await getLandingStores(limit),
+    }),
+  )
 }
 
 export function useMerchantStoreSetup(storeId: string) {

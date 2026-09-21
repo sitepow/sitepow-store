@@ -3,10 +3,7 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useProductAi } from '@/actions/hooks/ai'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
@@ -32,8 +29,6 @@ export function ProductSlugField({
   isPending: boolean
   onAiTrigger: (action: () => void) => void
 }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const { selectedStoreId } = useStoreFilter()
   const {
     register,
@@ -60,13 +55,7 @@ export function ProductSlugField({
   )
 
   return (
-    <Field
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <Field>
       <FieldLabel>URL Slug</FieldLabel>
       <div className="flex items-center gap-2">
         <Input
@@ -80,7 +69,7 @@ export function ProductSlugField({
           size="icon"
           onClick={() => onAiTrigger(() => genSlug())}
           disabled={isGenSlug}
-          title={t('generateSlugTooltip')}
+          title="สร้าง Slug จากชื่อสินค้า"
         >
           <IconWand className="size-4" />
         </Button>

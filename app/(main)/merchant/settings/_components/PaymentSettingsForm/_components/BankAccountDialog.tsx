@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useBankAccount,
@@ -18,10 +14,8 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/slip'
 import { BankAccountFormValues, bankAccountSchema } from '@/zod/payment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBuildingBank } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -34,8 +28,10 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -75,8 +71,6 @@ export function BankAccountDialog({
   open: boolean
   setOpen: (v: boolean) => void
 }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.payment.dialog')
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateBankAccount()
   const updateMutation = useUpdateBankAccount()
@@ -143,28 +137,26 @@ export function BankAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent
-        style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties} className="sm:max-w-lg">
+      <DialogContent className="overflow-hidden sm:max-w-lg">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconBuildingBank}
-            title={bankAccountId ? t('editTitle') : t('addTitle')}
-            description={t('description')}
-          />
+          <DialogTitle>
+            {bankAccountId ? 'แก้ไขบัญชีธนาคาร' : 'เพิ่มบัญชีธนาคาร'}
+          </DialogTitle>
+          <DialogDescription>
+            กรอกข้อมูลบัญชีธนาคารหรือพร้อมเพย์สำหรับรับชำระเงินจากลูกค้า
+          </DialogDescription>
         </DialogHeader>
         {isLoadingAccount && bankAccountId ? (
           <div className="flex justify-center py-8">
-            <Spinner /> {t('loading')}
+            <Spinner /> กำลังโหลดข้อมูล...
           </div>
         ) : (
           <div className="grid min-w-0 gap-4 py-2">
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
-                <span className="text-sm font-medium">{t('defaultLabel')}</span>
+                <span className="text-sm font-medium">ตั้งเป็นบัญชีหลัก</span>
                 <span className="text-muted-foreground block text-xs">
-                  {t('defaultDesc')}
+                  บัญชีนี้จะถูกเลือกเป็นค่าเริ่มต้นในการรับเงิน
                 </span>
               </div>
               <Controller
@@ -179,7 +171,7 @@ export function BankAccountDialog({
               />
             </div>
             <Field className="min-w-0">
-              <FieldLabel>{t('typeLabel')}</FieldLabel>
+              <FieldLabel>ประเภทบัญชี *</FieldLabel>
               <Controller
                 control={control}
                 name="type"
@@ -192,14 +184,14 @@ export function BankAccountDialog({
                     }}
                   >
                     <SelectTrigger className="w-full truncate">
-                      <SelectValue placeholder={t('typePlaceholder')} />
+                      <SelectValue placeholder="เลือกประเภท..." />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={BankAccountType.STANDARD_TRANSFER}>
-                        {t('typeBank')}
+                        โอนผ่านธนาคาร
                       </SelectItem>
                       <SelectItem value={BankAccountType.PROMPTPAY}>
-                        {t('typePromptPay')}
+                        พร้อมเพย์ (PromptPay)
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -207,7 +199,7 @@ export function BankAccountDialog({
               />
             </Field>
             <Field className="min-w-0">
-              <FieldLabel>{t('bankLabel')}</FieldLabel>
+              <FieldLabel>ธนาคาร/ผู้ให้บริการ *</FieldLabel>
               <Controller
                 control={control}
                 name="bankName"
@@ -228,7 +220,7 @@ export function BankAccountDialog({
                             {field.value
                               ? bankOptions.find((b) => b.name === field.value)
                                   ?.name || field.value
-                              : t('bankPlaceholder')}
+                              : 'เลือกธนาคาร...'}
                           </span>
                           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
                         </button>
@@ -238,11 +230,9 @@ export function BankAccountDialog({
                         align="start"
                       >
                         <Command>
-                          <CommandInput
-                            placeholder={t('searchBankPlaceholder')}
-                          />
+                          <CommandInput placeholder="ค้นหาธนาคารหรือผู้ให้บริการ..." />
                           <CommandList>
-                            <CommandEmpty>{t('noBankFound')}</CommandEmpty>
+                            <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
                             <CommandGroup>
                               {bankOptions.map((bank) => (
                                 <CommandItem
@@ -275,7 +265,7 @@ export function BankAccountDialog({
             </Field>
             {accountType === BankAccountType.PROMPTPAY ? (
               <Field className="min-w-0">
-                <FieldLabel>{t('promptPayIdLabel')}</FieldLabel>
+                <FieldLabel>หมายเลขพร้อมเพย์ *</FieldLabel>
                 <Controller
                   control={control}
                   name="promptPayId"
@@ -286,7 +276,7 @@ export function BankAccountDialog({
                         const rawValue = e.target.value.replace(/\D/g, '')
                         field.onChange(rawValue)
                       }}
-                      placeholder={t('promptPayIdPlaceholder')}
+                      placeholder="เบอร์โทรศัพท์ หรือ เลขบัตรประชาชน"
                       inputMode="numeric"
                     />
                   )}
@@ -295,7 +285,7 @@ export function BankAccountDialog({
               </Field>
             ) : (
               <Field className="min-w-0">
-                <FieldLabel>{t('accountNumberLabel')}</FieldLabel>
+                <FieldLabel>เลขบัญชี *</FieldLabel>
                 <Controller
                   control={control}
                   name="accountNumber"
@@ -306,7 +296,7 @@ export function BankAccountDialog({
                         const rawValue = e.target.value.replace(/\D/g, '')
                         field.onChange(rawValue)
                       }}
-                      placeholder={t('accountNumberPlaceholder')}
+                      placeholder="เลขบัญชีธนาคาร"
                       inputMode="numeric"
                     />
                   )}
@@ -315,10 +305,13 @@ export function BankAccountDialog({
               </Field>
             )}
             <Field className="min-w-0">
-              <FieldLabel>{t('accountNameLabel')}</FieldLabel>
+              <FieldLabel>
+                ชื่อบัญชี *สำคัญชื่อต้องตรงและพิมพ์ให้ถูกต้องเท่านั้น
+                ไม่เช่นนั้นตรวจสลิปอัตโนมัติอาจจะไม่ผ่าน
+              </FieldLabel>
               <Input
                 {...register('accountName')}
-                placeholder={t('accountNamePlaceholder')}
+                placeholder="ชื่อ-นามสกุล หรือชื่อบริษัท"
               />
               <FieldError>{errors.accountName?.message}</FieldError>
             </Field>
@@ -331,14 +324,14 @@ export function BankAccountDialog({
             onClick={handleClose}
             disabled={isPending}
           >
-            {t('cancel')}
+            ยกเลิก
           </Button>
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
           >
-            {isPending ? <Spinner /> : t('save')}
+            {isPending ? <Spinner /> : 'บันทึกข้อมูล'}
           </Button>
         </DialogFooter>
       </DialogContent>

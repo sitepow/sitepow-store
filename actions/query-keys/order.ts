@@ -11,5 +11,4 @@ export const orderKeys = {
     search?: string
     status?: OrderStatus
   }) => [...orderKeys.lists(), filters] as const,
-  detail: (id: string) => [...orderKeys.all, 'detail', id] as const,
 }

@@ -1,46 +1,50 @@
-import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { Suspense } from 'react'
 
-import { HeroSection } from '@/components/landing-template/HeroSection'
 import { MainLayout } from '@/components/layout/Layout'
+import { AiVerificationSection } from '@/components/section/AiVerificationSection'
+import { ChatSection } from '@/components/section/ChatSection'
+import { ComparisonSection } from '@/components/section/ComparisonSection'
+import { CustomerLoyaltySection } from '@/components/section/CustomerLoyaltySection'
+import { ExpenseSection } from '@/components/section/ExpenseSection'
+import { FeatureSection } from '@/components/section/FeatureSection'
+import { HeroSection } from '@/components/section/HeroSection'
+import { InfrastructureSection } from '@/components/section/InfrastructureSection'
+import { InventorySection } from '@/components/section/InventorySection'
+import { LogisticsSection } from '@/components/section/LogisticsSection'
+import { POSSection } from '@/components/section/POSSection'
+import { PaymentSection } from '@/components/section/PaymentSection'
+import { PermissionSection } from '@/components/section/PermissionSection'
+import { PricingPhilosophySection } from '@/components/section/PricingPhilosophySection'
+import { ProductTypeSection } from '@/components/section/ProductTypeSection'
+import { ResellerSection } from '@/components/section/ResellerSection'
+import { SecurityTrustSection } from '@/components/section/SecurityTrustSection'
+import { StoreCustomizationSection } from '@/components/section/StoreCustomizationSection'
+import { StoresSection } from '@/components/section/StoresSection'
 
-import { buildFaqJsonLd } from './_lib/home-content'
-import { generateHomeMetadata } from './_lib/home-metadata'
-
-export async function generateMetadata(): Promise<Metadata> {
-  return generateHomeMetadata()
-}
-
-export default async function HomePage() {
-  const [tHero, tFaq] = await Promise.all([
-    getTranslations('home.hero'),
-    getTranslations('home.faq'),
-  ])
-
-  const faqItems = Array.from({ length: 6 }, (_, i) => ({
-    q: tFaq(`items.${i}.q`),
-    a: tFaq(`items.${i}.a`),
-  }))
-
+export default function HomePage() {
   return (
-    <MainLayout>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildFaqJsonLd(faqItems)),
-        }}
-      />
-
-      <HeroSection
-        badge={{ new: tHero('badgeNew'), text: tHero('badgeText', { gp: 0 }) }}
-        title={{ start: tHero('titleStart'), gradient: tHero('titleGradient') }}
-        description={tHero('description')}
-        buttons={{
-          register: tHero('registerBtn'),
-          manageStore: tHero('manageStoreBtn'),
-          downloadPos: tHero('downloadPosBtn'),
-        }}
-      />
+    <MainLayout className="-mt-12.5">
+      <Suspense>
+        <HeroSection />
+      </Suspense>
+      <FeatureSection />
+      <ProductTypeSection />
+      <POSSection />
+      <InventorySection />
+      <PermissionSection />
+      <ExpenseSection />
+      <ResellerSection />
+      <CustomerLoyaltySection />
+      <StoreCustomizationSection />
+      <PaymentSection />
+      <AiVerificationSection />
+      <ChatSection />
+      <LogisticsSection />
+      <InfrastructureSection />
+      <SecurityTrustSection />
+      <ComparisonSection />
+      <PricingPhilosophySection />
+      <StoresSection />
     </MainLayout>
   )
 }

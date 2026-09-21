@@ -2,12 +2,6 @@
 
 import { useMemo } from 'react'
 
-import { useLocale, useTranslations } from 'next-intl'
-
-import { ProductType } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
-import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -21,12 +15,6 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductAddonSelector() {
-  const t = useTranslations('storefront.products')
-  const locale = useLocale()
-  const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
-  )
   const {
     product,
     selectedVariant,
@@ -39,8 +27,8 @@ export function ProductAddonSelector() {
   const hasAddons = product?.addons?.length !== 0
 
   const isOutOfStock = useMemo(() => {
-    if (!product || product.productType === ProductType.AFFILIATE_LINK) {
-      return false
+    if (!product) {
+      return true
     }
 
     const activeVariant = selectedVariant || product.variants[0]
@@ -56,10 +44,6 @@ export function ProductAddonSelector() {
 
     return stock <= 0
   }, [product, selectedVariant, selectedBranchId])
-
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
 
   if (isLoading) {
     return (
@@ -81,7 +65,7 @@ export function ProductAddonSelector() {
     <>
       {product?.addons && product.addons.length > 0 && (
         <div className="space-y-4">
-          <Label className="text-lg font-semibold">{t('addons')}</Label>
+          <Label className="text-lg font-semibold">บริการเสริม</Label>
           <div className="space-y-2">
             {product.addons.map((addon) => {
               const isDisabled = !addon.isAvailable || isOutOfStock
@@ -112,10 +96,10 @@ export function ProductAddonSelector() {
                       isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
                     )}
                   >
-                    {getLocalizedField(addon, 'title', locale) || addon.title}
+                    {addon.title}
                   </span>
                   <span className="text-primary text-sm font-semibold">
-                    + {formatCurrency(convert(addon.price), currentCurrency)}
+                    + {formatCurrency(addon.price)}
                   </span>
                 </Label>
               )

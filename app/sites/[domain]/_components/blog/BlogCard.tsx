@@ -1,11 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-'use client'
-
-import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { StorefrontBlogListItem } from '@/actions/storefront/blog'
-import { getLocalizedField } from '@/utils/intl'
 import { isVideoUrl } from '@/utils/media'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { ArrowRightIcon } from 'lucide-react'
@@ -43,9 +39,6 @@ export function BlogCard({
   blog,
   isFeatured,
 }: BlogCardProps) {
-  const t = useTranslations('storefront.blogs')
-  const locale = useLocale()
-  const localizedTitle = getLocalizedField(blog, 'title', locale) || blog.title
   const isVideo = isVideoUrl(blog.image)
 
   return (
@@ -76,7 +69,7 @@ export function BlogCard({
               )}
             </div>
           ) : (
-            <EmptyImage text={blog.title} />
+            <EmptyImage />
           )}
         </div>
         <div
@@ -91,7 +84,7 @@ export function BlogCard({
               isFeatured && 'lg:text-center lg:text-2xl',
             )}
           >
-            {localizedTitle}
+            {blog.title}
           </h3>
           <div
             className={cn(
@@ -100,7 +93,7 @@ export function BlogCard({
             )}
           >
             <Button variant="link" className="text-primary h-auto p-0">
-              <span className="mr-1">{t('readMoreBtn')}</span>
+              <span className="mr-1">อ่านต่อ</span>
               <ArrowRightIcon className="size-4" />
             </Button>
           </div>

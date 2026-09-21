@@ -1,10 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { getRemainingStock } from '@/utils/cart'
 import { formatCurrency } from '@/utils/pricing'
 import { ShoppingCartIcon } from 'lucide-react'
@@ -26,11 +24,7 @@ import { CartItemCard } from './_components/CartItemCard'
 import { CartSummary } from './_components/CartSummary'
 
 export function CartDrawer() {
-  const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
-  )
 
   const { items, updateQuantity, removeItem, getCartSummary } = useCartStore()
   const summary = getCartSummary()
@@ -50,14 +44,14 @@ export function CartDrawer() {
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center gap-2">
             <ShoppingCartIcon className="size-5" />
-            {t('title')} ({summary.totalQuantity})
+            ตะกร้าสินค้า ({summary.totalQuantity})
           </DrawerTitle>
         </DrawerHeader>
         <ScrollArea className="flex-1 overflow-y-scroll px-4">
           {items.length === 0 ? (
             <div className="text-muted-foreground flex h-[60vh] flex-col items-center justify-center gap-2">
               <ShoppingCartIcon className="h-12 w-12 opacity-20" />
-              <p>{t('empty')}</p>
+              <p>ยังไม่มีสินค้าในตะกร้า</p>
             </div>
           ) : (
             <div className="space-y-4 py-4">
@@ -94,12 +88,7 @@ export function CartDrawer() {
                 size="lg"
                 className="h-12 w-full text-lg shadow-md sm:text-lg"
               >
-                {t('checkoutButton', {
-                  amount: formatCurrency(
-                    convert(summary.finalPrice),
-                    currentCurrency,
-                  ),
-                })}
+                สั่งซื้อสินค้า ({formatCurrency(summary.finalPrice)})
               </Button>
             </Link>
           </DrawerFooter>

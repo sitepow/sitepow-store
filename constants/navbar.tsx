@@ -19,84 +19,84 @@ export const NAVBAR_ITEMS = [
     children: [
       {
         title: 'AI อัจฉริยะช่วยลงของ',
-        href: '/features/ai',
+        href: '/',
         description:
           'เพียงอัปโหลดรูปภาพ AI จะเขียนชื่อและรายละเอียดสินค้าที่โน้มน้าวใจให้ปิดการขายได้ทันที <hilight>โดยไม่ต้องนั่งพิมพ์เองทีละรายการ</hilight>',
         icon: IconSparkles,
       },
       {
         title: 'ขายฟรี 0% GP',
-        href: '/features/zero-gp',
+        href: '/',
         description:
           'รับกำไรเข้ากระเป๋าเต็มเม็ดเต็มหน่วย <hilight>ไม่มีการหักเปอร์เซ็นต์ต่อชิ้นเหมือนการขายผ่าน Marketplace ช่วยให้คุณทำกำไรได้มากกว่าเดิม</hilight>',
         icon: IconPercentage,
       },
       {
         title: 'ระบบจัดการสต็อกอัจฉริยะ',
-        href: '/features/inventory',
+        href: '/',
         description:
           'ดูแลสินค้าทุกสาขาได้แม่นยำในที่เดียว พร้อมระบบตัดสต็อกอัตโนมัติและแจ้งเตือนเมื่อสินค้าใกล้หมด <hilight>เพื่อให้คุณวางแผนสต็อกได้ล่วงหน้า</hilight>',
         icon: IconBox,
       },
       {
         title: 'หน้าร้านออนไลน์มืออาชีพ',
-        href: '/features/online-store',
+        href: '/',
         description:
           'สร้างเว็บไซต์ร้านค้าส่วนตัวที่ดูน่าเชื่อถือ พร้อมระบบตะกร้าสินค้าที่คำนวณราคาและค่าจัดส่งให้ลูกค้าเสร็จสรรพ <hilight>ช่วยให้ปิดการขายได้ง่ายขึ้น</hilight>',
         icon: IconBuildingStore,
       },
       {
         title: 'ระบบจัดการออเดอร์รวมศูนย์',
-        href: '/features/orders',
+        href: '/',
         description:
           'รวมคำสั่งซื้อจากทุกช่องทางมาไว้ที่เดียว จัดการสถานะได้รวดเร็ว <hilight>ช่วยให้คุณจัดเตรียมพัสดุและส่งของได้ทันตามกำหนดโดยไม่พลาดแม้แต่ออเดอร์เดียว</hilight>',
         icon: IconClipboardList,
       },
       {
         title: 'วิเคราะห์ยอดขายเชิงลึก',
-        href: '/features/analytics',
+        href: '/',
         description:
           'สรุปรายได้และสินค้าขายดีผ่าน Dashboard ที่เข้าใจง่าย <hilight>ช่วยให้คุณมองเห็นภาพรวมธุรกิจและวางกลยุทธ์การขายได้อย่างมั่นใจทุกสถานการณ์</hilight>',
         icon: IconChartBar,
       },
       {
         title: 'ระบบรับชำระเงินที่คล่องตัว',
-        href: '/features/payment',
+        href: '/',
         description:
           'ลูกค้าโอนเงินเข้าบัญชีคุณโดยตรง รับเงินหมุนเวียนได้ทันทีไม่ต้องรอรอบจ่าย <hilight>พร้อมระบบเช็คสลิปอัตโนมัติที่ช่วยให้คุณทำงานได้ไวขึ้นหลายเท่า</hilight>',
         icon: IconCreditCard,
       },
       {
         title: 'ระบบสมาชิก & CRM',
-        href: '/features/crm',
+        href: '/',
         description:
           'สร้างฐานลูกค้าประจำด้วยระบบสะสมแต้มและโปรโมชั่นเฉพาะบุคคล <hilight>ช่วยรักษาลูกค้าเก่าให้กลับมาซื้อซ้ำและสร้างยอดขายที่มั่นคงให้ร้านคุณ</hilight>',
         icon: IconUsers,
       },
       {
         title: 'คูปองและโปรโมชั่นเร่งยอด',
-        href: '/features/promotions',
+        href: '/',
         description:
           'สร้างโค้ดส่วนลด จัด Flash Sale หรือโปรโมชั่นซื้อ 1 แถม 1 ได้เองตามต้องการ <hilight>เพื่อกระตุ้นให้ลูกค้าตัดสินใจซื้อสินค้าของคุณได้เร็วยิ่งขึ้น</hilight>',
         icon: IconTicket,
       },
       {
         title: 'จัดการข้อมูลสินค้าแบบด่วน',
-        href: '/features/import-export',
+        href: '/',
         description:
           'ย้ายสินค้าจำนวนมากจาก Lazada หรือ Shopee ได้รวดเร็วผ่านไฟล์ CSV/JSON <hilight>ช่วยให้คุณเปิดร้านใหม่หรืออัปเดตข้อมูลสินค้าได้ในเวลาเพียงไม่กี่นาที</hilight>',
         icon: IconDatabaseImport,
       },
       {
         title: 'ระบบจัดการขนส่งครบวงจร',
-        href: '/features/logistics',
+        href: '/',
         description:
           'จัดการสถานะพัสดุได้อย่างมืออาชีพ รองรับการกรอกเลข Tracking และส่งข้อความแจ้งเตือนสถานะให้ลูกค้าทราบโดยตรง <hilight>ช่วยลดคำถามกวนใจเรื่องสถานะสินค้า</hilight>',
         icon: IconTruckDelivery,
       },
       {
         title: 'ระบบพิมพ์ใบปะหน้าพัสดุ',
-        href: '/features/logistics',
+        href: '/',
         description:
           'พิมพ์ใบปะหน้าพร้อมรายละเอียดออเดอร์ได้ทันที รองรับเครื่องพิมพ์ความร้อน <hilight>ช่วยลดขั้นตอนการเขียนมือและป้องกันความผิดพลาดในการส่งสินค้าให้ลูกค้า</hilight>',
         icon: IconClipboardList,
@@ -106,9 +106,7 @@ export const NAVBAR_ITEMS = [
   { title: 'ราคาและแพ็กเกจ', href: '/pricing' },
   {
     title: 'ดาวน์โหลดโปรแกรม POS',
-    href: '/download-pos',
+    href: '/',
   },
-  { title: 'บทความ', href: '/blogs' },
-  { title: 'คู่มือระบบ', href: '/docs' },
-  { title: 'ติดต่อเรา', href: '/contact' },
+  { title: 'ติดต่อเรา', href: '/' },
 ]

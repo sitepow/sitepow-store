@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import {
@@ -10,8 +9,7 @@ import {
   useProductQuota,
   useProducts,
 } from '@/actions/hooks/product'
-import { StorePagination } from '@/components/StorePagination'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/pricing'
@@ -42,8 +40,6 @@ import {
 } from '@/components/ui/table'
 
 export function ProductsTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products')
   const isMounted = useIsMounted()
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
@@ -72,19 +68,12 @@ export function ProductsTable() {
     : 0
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       {selectedStoreId !== ALL_STORES && (
         <Card className="from-primary/10 via-primary/2 to-background border-primary/20 flex h-fit flex-col justify-between overflow-hidden bg-linear-to-br xl:col-span-1">
           <CardHeader className="pb-2">
             <CardDescription className="text-primary text-xs font-bold">
-              {t('totalInventory')}
+              คลังสินค้าทั้งหมด
             </CardDescription>
             <CardTitle className="text-foreground flex items-baseline gap-1 pt-1 text-4xl font-extrabold">
               {isQuotaLoading ? (
@@ -95,8 +84,8 @@ export function ProductsTable() {
               <span className="text-muted-foreground text-xs font-normal">
                 /{' '}
                 {quota?.maxProducts
-                  ? t('productCount', { count: quota.maxProducts })
-                  : t('unlimitedProducts')}
+                  ? `${quota?.maxProducts} สินค้า`
+                  : 'ไม่จำกัดจำนวนสินค้า'}
               </span>
             </CardTitle>
           </CardHeader>
@@ -105,8 +94,8 @@ export function ProductsTable() {
               <Progress value={progress} className="h-2" />
               <p className="mt-2">
                 {isLimitReached
-                  ? t('quotaReached')
-                  : t('quotaUsed', { percent: progress.toFixed(0) })}
+                  ? 'คุณใช้โควตาสินค้าเต็มแล้ว กรุณาอัปเกรดแพลนเพื่อเพิ่มสินค้า'
+                  : `คุณใช้โควตาไปแล้ว ${progress.toFixed(0)}% ของแพลนปัจจุบัน`}
               </p>
             </CardContent>
           )}
@@ -117,23 +106,21 @@ export function ProductsTable() {
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                {t('columns.image')}
+                รูปภาพสินค้า
               </TableHead>
-              <TableHead>{t('columns.productAndSlug')}</TableHead>
-              <TableHead>{t('columns.store')}</TableHead>
-              <TableHead>{t('columns.category')}</TableHead>
-              <TableHead>{t('columns.startingPrice')}</TableHead>
-              <TableHead>{t('columns.status')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>ชื่อสินค้า/Slug</TableHead>
+              <TableHead>ร้านค้า</TableHead>
+              <TableHead>หมวดหมู่</TableHead>
+              <TableHead>ราคาเริ่มต้น</TableHead>
+              <TableHead>สถานะ</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && products.length === 0 ? (
               <TableLoadingRow colSpan={7} />
             ) : products.length === 0 ? (
-              <TableEmptyRow colSpan={7} title={t('empty')} />
+              <TableEmptyRow colSpan={7} title="ไม่พบรายการสินค้า" />
             ) : (
               products.map((product) => {
                 const basePrice = product.variants?.[0]?.price
@@ -143,10 +130,7 @@ export function ProductsTable() {
                 return (
                   <TableRow key={product.id} className="hover:bg-muted/50">
                     <TableCell className="bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      <ProductImage
-                        src={product.images?.[0]?.url}
-                        alt={product.title}
-                      />
+                      <ProductImage src={product.images?.[0]?.url} />
                     </TableCell>
                     <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                       <div className="flex flex-col">
@@ -169,9 +153,9 @@ export function ProductsTable() {
                     <TableCell>{formatCurrency(basePrice)}</TableCell>
                     <TableCell>
                       {product.isPublished ? (
-                        <Badge>{t('published')}</Badge>
+                        <Badge>แสดงหน้าร้าน</Badge>
                       ) : (
-                        <Badge variant="outline">{t('hidden')}</Badge>
+                        <Badge variant="outline">ซ่อนหน้าร้าน</Badge>
                       )}
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
@@ -208,6 +192,6 @@ export function ProductsTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

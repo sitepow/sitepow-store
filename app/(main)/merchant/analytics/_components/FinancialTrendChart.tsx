@@ -1,11 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
-
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { formatCurrency } from '@/utils/pricing'
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
 import {
@@ -27,33 +22,20 @@ interface FinancialTrendChartProps {
   }>
 }
 
+const chartConfig = {
+  revenue: { label: 'ยอดขาย', color: '#22c55e' },
+  cogs: { label: 'ต้นทุนสินค้า', color: '#f97316' },
+  expense: { label: 'ค่าใช้จ่าย', color: '#ef4444' },
+  netProfit: { label: 'กำไรสุทธิ', color: '#3b82f6' },
+} satisfies ChartConfig
+
 export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.analytics.financialTrend')
-
-  const chartConfig = useMemo(
-    () =>
-      ({
-        revenue: { label: t('revenue'), color: '#22c55e' },
-        cogs: { label: t('cogs'), color: '#f97316' },
-        expense: { label: t('expense'), color: '#ef4444' },
-        netProfit: { label: t('netProfit'), color: '#3b82f6' },
-      }) satisfies ChartConfig,
-    [t],
-  )
-
   return (
     <AnalyticsCardShell
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-      title={t('title')}
-      description={t('description')}
+      title="สรุปผลประกอบการการเงิน"
+      description="แสดงยอดขาย, ต้นทุนสินค้า (COGS), ค่าใช้จ่ายดำเนินงาน และกำไรสุทธิ"
       isEmpty={data.length === 0}
-      emptyMessage={t('emptyMessage')}
+      emptyMessage="ไม่มีข้อมูลผลประกอบการการเงิน"
       className="lg:col-span-2"
     >
       <div className="h-80 w-full">
@@ -104,7 +86,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="revenue"
-              name={t('revenue')}
+              name="ยอดขาย"
               stroke="#22c55e"
               fill="url(#fillRevenue)"
               strokeWidth={2}
@@ -112,7 +94,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="cogs"
-              name={t('cogs')}
+              name="ต้นทุนสินค้า"
               stroke="#f97316"
               fill="url(#fillCogs)"
               strokeWidth={2}
@@ -120,7 +102,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="expense"
-              name={t('expense')}
+              name="ค่าใช้จ่าย"
               stroke="#ef4444"
               fill="url(#fillExpense)"
               strokeWidth={2}
@@ -128,7 +110,7 @@ export function FinancialTrendChart({ data }: FinancialTrendChartProps) {
             <Area
               type="natural"
               dataKey="netProfit"
-              name={t('netProfit')}
+              name="กำไรสุทธิ"
               stroke="#3b82f6"
               fill="url(#fillNetProfit)"
               strokeWidth={2}

@@ -14,7 +14,6 @@ const storefrontCategoryListSelect = {
   slug: true,
   description: true,
   image: true,
-  translations: true,
   _count: {
     select: {
       products: {
@@ -28,7 +27,6 @@ const storefrontCategoryOptionsSelect = {
   id: true,
   title: true,
   slug: true,
-  translations: true,
 } satisfies Prisma.CategorySelect
 
 export type StorefrontCategoryListItem = Prisma.CategoryGetPayload<{

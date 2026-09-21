@@ -80,11 +80,7 @@ export async function deleteUserAccount() {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const user = await prisma.user.findUnique({
@@ -97,11 +93,7 @@ export async function deleteUserAccount() {
     })
 
     if (!user) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const isMerchant = user.role === UserRole.MERCHANT || !!user.employee
@@ -140,12 +132,9 @@ export async function deleteUserAccount() {
 
     return {
       success: true,
-      messageTH: isMerchant
+      message: isMerchant
         ? 'ลบข้อมูลส่วนตัวผู้ซื้อสำเร็จแล้ว'
         : 'ลบบัญชีผู้ใช้งานสำเร็จแล้ว',
-      messageEN: isMerchant
-        ? 'Buyer personal data deleted successfully'
-        : 'User account deleted successfully',
     }
   } catch (error) {
     console.error(error)

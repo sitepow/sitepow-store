@@ -1,10 +1,9 @@
 'use server'
 
-import { DEFAULT_INTERNATIONAL_ZONES, REMOTE_AREAS } from '@/constants/shipping'
+import { REMOTE_AREAS } from '@/constants/shipping'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
-  CountryCode,
   LogAction,
   ShippingZoneType,
 } from '@/generated/prisma/enums'
@@ -99,11 +98,7 @@ export async function updateStoreShippingSettings(
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -115,8 +110,7 @@ export async function updateStoreShippingSettings(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -181,11 +175,7 @@ export async function updateStoreShippingSettings(
       details: { branchId, setting: 'shipping' },
     })
 
-    return {
-      success: true,
-      messageTH: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว',
-      messageEN: 'Shipping settings updated successfully',
-    }
+    return { success: true, message: 'บันทึกข้อมูลการจัดส่งสำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -194,62 +184,11 @@ export async function updateStoreShippingSettings(
 
 export async function calculateMultiBranchShippingFee(params: {
   storeId: string
-  destinationCountry?: CountryCode
   destinationProvince: string
   destinationPostcode: string
   groups: Array<{ branchId: string; province: string; weight: number }>
 }) {
-  const {
-    storeId,
-    destinationCountry = CountryCode.TH,
-    destinationProvince,
-    destinationPostcode,
-    groups,
-  } = params
-
-  if (destinationCountry !== CountryCode.TH) {
-    const rawTotalWeight = groups.reduce((sum, g) => sum + (g.weight || 0), 0)
-    let totalWeight =
-      rawTotalWeight > 100 ? rawTotalWeight / 1000 : rawTotalWeight
-    if (totalWeight <= 0) {
-      totalWeight = 0.5
-    }
-
-    const customZone = await prisma.shippingZone.findFirst({
-      where: {
-        storeId,
-        countries: { has: destinationCountry },
-      },
-      include: { rates: true },
-    })
-
-    if (customZone && customZone.rates.length > 0) {
-      return customZone.rates.map((rate) => {
-        const matches =
-          totalWeight >= Number(rate.minWeight) &&
-          totalWeight <= Number(rate.maxWeight)
-        return {
-          serviceId: rate.id,
-          fee: matches ? Number(rate.fee) : null,
-        }
-      })
-    }
-
-    const defaultPreset =
-      DEFAULT_INTERNATIONAL_ZONES.find((z) =>
-        z.countries.includes(destinationCountry),
-      ) ?? DEFAULT_INTERNATIONAL_ZONES[DEFAULT_INTERNATIONAL_ZONES.length - 1]
-
-    return defaultPreset.services.map((srv) => {
-      const matchedTier = srv.weightRates.find(
-        (wr) => totalWeight >= wr.minWeight && totalWeight <= wr.maxWeight,
-      )
-      return {
-        serviceId: srv.id,
-        fee: matchedTier ? matchedTier.fee : null,
-      }
-    })
-  }
+  const { storeId, destinationProvince, destinationPostcode, groups } = params
 
   const isRemote = REMOTE_AREAS.some(
     (area) => area.postcode === destinationPostcode,

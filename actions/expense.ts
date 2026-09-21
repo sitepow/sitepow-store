@@ -2,28 +2,24 @@
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { PaginatedResponse, PaginationParams } from '@/types/pagination'
 import { buildExpenseDateWithServerTime } from '@/utils/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { getPathR2FromUrl } from '@/utils/image'
-import {
-  createPaginationMeta,
-  getEmptyPaginatedResponse,
-  sanitizePagination,
-} from '@/utils/pagination'
 import { CreateExpenseInput, UpdateExpenseInput } from '@/zod/expense'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { resolveStoreFilter } from '@/lib/store'
 
 import { r2DeleteImage } from './r2'
 
-export interface GetExpensesParams extends PaginationParams {
-  storeId?: string
+export interface GetExpensesParams {
+  storeId: string
   branchId?: string
+  page?: number
+  limit?: number
+  search?: string
   category?: string
   startDate?: string | Date
   endDate?: string | Date
@@ -53,9 +49,17 @@ export type GetExpenseItem = Prisma.ExpenseGetPayload<{
   select: typeof expenseSelect
 }>
 
-export type GetExpensesResponse = PaginatedResponse<
-  DecimalToNumber<GetExpenseItem>
->
+export interface GetExpensesResponse {
+  data: DecimalToNumber<GetExpenseItem[]>
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
 
 export async function getExpenses({
   storeId,
@@ -66,27 +70,54 @@ export async function getExpenses({
   category,
   startDate,
   endDate,
-}: GetExpensesParams = {}): Promise<GetExpensesResponse> {
+}: GetExpensesParams): Promise<GetExpensesResponse> {
+  const emptyResponse: GetExpensesResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
   const userSession = await getCurrentUser()
   const userId = userSession?.id
 
   if (!userId) {
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 
   try {
-    const storeAccess = await resolveStoreFilter({
-      userId,
-      storeId,
-      permission: 'canViewExpenses',
-    })
+    const whereClause: Prisma.ExpenseWhereInput = {}
 
-    if (!storeAccess.isAuthorized) {
-      return getEmptyPaginatedResponse(page, limit)
-    }
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId,
+        permission: 'canViewExpenses',
+      })
 
-    const whereClause: Prisma.ExpenseWhereInput = {
-      ...storeAccess.storeFilter,
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { employeeStores: { some: { employee: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
     }
 
     if (branchId) {
@@ -110,11 +141,9 @@ export async function getExpenses({
       if (endDate) whereClause.expenseDate.lte = new Date(endDate)
     }
 
-    const {
-      page: sanitizedPage,
-      limit: sanitizedLimit,
-      skip,
-    } = sanitizePagination(page, limit, { defaultLimit: 10, maxLimit: 50 })
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(50, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
 
     const [totalItems, expenses] = await Promise.all([
       prisma.expense.count({ where: whereClause }),
@@ -127,13 +156,22 @@ export async function getExpenses({
       }),
     ])
 
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
     return {
       data: serializeDecimal(expenses),
-      meta: createPaginationMeta(totalItems, sanitizedPage, sanitizedLimit),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
     }
   } catch (error) {
     console.error(error)
-    return getEmptyPaginatedResponse(page, limit)
+    return emptyResponse
   }
 }
 
@@ -143,11 +181,7 @@ export async function createExpense(input: CreateExpenseInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Access denied',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -157,11 +191,7 @@ export async function createExpense(input: CreateExpenseInput) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const expense = await prisma.expense.create({
@@ -192,8 +222,7 @@ export async function createExpense(input: CreateExpenseInput) {
 
     return {
       success: true,
-      messageTH: 'บันทึกค่าใช้จ่ายสำเร็จ',
-      messageEN: 'Expense recorded successfully',
+      message: 'บันทึกค่าใช้จ่ายสำเร็จ',
       data: serializeDecimal(expense),
     }
   } catch (error) {
@@ -208,11 +237,7 @@ export async function updateExpense(input: UpdateExpenseInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Access denied',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -222,11 +247,7 @@ export async function updateExpense(input: UpdateExpenseInput) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const existingExpense = await prisma.expense.findUnique({
@@ -237,8 +258,7 @@ export async function updateExpense(input: UpdateExpenseInput) {
     if (!existingExpense) {
       return {
         success: false,
-        messageTH: 'ไม่พบรายการค่าใช้จ่ายที่ต้องการอัปเดต',
-        messageEN: 'Expense item to update not found',
+        message: 'ไม่พบรายการค่าใช้จ่ายที่ต้องการอัปเดต',
       }
     }
 
@@ -282,8 +302,7 @@ export async function updateExpense(input: UpdateExpenseInput) {
 
     return {
       success: true,
-      messageTH: 'อัปเดตค่าใช้จ่ายสำเร็จ',
-      messageEN: 'Expense updated successfully',
+      message: 'อัปเดตค่าใช้จ่ายสำเร็จ',
       data: serializeDecimal(updatedExpense),
     }
   } catch (error) {
@@ -298,11 +317,7 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Access denied',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -312,11 +327,7 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
-      }
+      return { success: false, message: 'สิทธิ์การใช้งานไม่เพียงพอ' }
     }
 
     const expense = await prisma.expense.findUnique({
@@ -328,11 +339,7 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     })
 
     if (!expense) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบรายการค่าใช้จ่าย',
-        messageEN: 'Expense item not found',
-      }
+      return { success: false, message: 'ไม่พบรายการค่าใช้จ่าย' }
     }
 
     if (expense.receiptImage) {
@@ -356,11 +363,7 @@ export async function deleteExpense(expenseId: string, storeId: string) {
       },
     })
 
-    return {
-      success: true,
-      messageTH: 'ลบรายการค่าใช้จ่ายสำเร็จ',
-      messageEN: 'Expense deleted successfully',
-    }
+    return { success: true, message: 'ลบรายการค่าใช้จ่ายสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }

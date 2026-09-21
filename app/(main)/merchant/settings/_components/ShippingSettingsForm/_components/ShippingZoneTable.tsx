@@ -1,9 +1,5 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
-import { useTranslations } from 'next-intl'
-
 import { ZONE_LABELS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { getProvincesForZone, getRegionKey } from '@/utils/shipping'
@@ -22,33 +18,24 @@ export function ShippingZoneTable({
 }: {
   originProvince: string
 }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.shipping')
   const originRegion = getRegionKey(originProvince)
 
   return (
-    <div
-      className="rounded-md border"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-50">{t('zoneTable.zoneType')}</TableHead>
-            <TableHead>{t('zoneTable.provinces')}</TableHead>
+            <TableHead className="w-50">ประเภทโซน</TableHead>
+            <TableHead>จังหวัดในกลุ่ม</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Object.entries(ZONE_LABELS).map(([key]) => (
+          {Object.entries(ZONE_LABELS).map(([key, label]) => (
             <TableRow key={key}>
               <TableCell className="align-top font-medium">
-                <div className="font-semibold">
-                  {t(`zones.${key}.title` as any)}
-                </div>
+                <div className="font-semibold">{label.title}</div>
                 <div className="mt-1 text-xs opacity-60">
-                  {t(`zones.${key}.description` as any)}
+                  {label.description}
                 </div>
               </TableCell>
               <TableCell className="max-w-md min-w-md">

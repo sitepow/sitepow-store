@@ -10,16 +10,11 @@ import { createOrderCore } from '@/lib/order'
 import { CreateOrderInput } from '@/lib/order/types'
 import { requireVerifiedUser } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { dispatchStoreWebhook } from '@/lib/webhook'
 
 const storefrontOrderSelect = {
   id: true,
   orderNumber: true,
   totalAmount: true,
-  baseCurrency: true,
-  customerCurrency: true,
-  exchangeRate: true,
-  totalAmountBase: true,
   status: true,
   paymentMethod: true,
   trackingNumber: true,
@@ -199,15 +194,10 @@ export async function getStorefrontOrders({
 
 export async function createOrder(input: CreateOrderInput) {
   try {
-    const { isAuthorized, messageTH, messageEN, userId } =
-      await requireVerifiedUser()
+    const { isAuthorized, message, userId } = await requireVerifiedUser()
 
     if (!isAuthorized) {
-      return {
-        success: false,
-        messageTH: messageTH || 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: messageEN || 'Please sign in to proceed',
-      }
+      return { success: false, message }
     }
 
     const customer = await prisma.customer.findUnique({
@@ -221,11 +211,7 @@ export async function createOrder(input: CreateOrderInput) {
     })
 
     if (!customer) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลลูกค้า',
-        messageEN: 'Customer data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลลูกค้า' }
     }
 
     const store = await prisma.store.findUnique({
@@ -234,11 +220,7 @@ export async function createOrder(input: CreateOrderInput) {
     })
 
     if (!store) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบร้านค้า',
-        messageEN: 'Store not found',
-      }
+      return { success: false, message: 'ไม่พบร้านค้า' }
     }
 
     const createdOrders = await createOrderCore({
@@ -252,8 +234,6 @@ export async function createOrder(input: CreateOrderInput) {
       couponId: input.couponId,
       usedPoints: input.usedPoints,
       earnedPoints: input.earnedPoints,
-      affiliateCode: input.affiliateCode,
-      customerCurrency: input.customerCurrency,
       items: input.items,
       isPOS: false,
     })
@@ -279,32 +259,11 @@ export async function createOrder(input: CreateOrderInput) {
           price: Number(item.price),
         })),
       }).catch((err) => console.error(err))
-
-      dispatchStoreWebhook(store.id, 'order.created', {
-        orderId: primaryOrder.id,
-        orderNumber: primaryOrder.orderNumber,
-        status: primaryOrder.status,
-        totalAmount: Number(primaryOrder.totalAmount),
-        paymentMethod: primaryOrder.paymentMethod,
-        paidAt: primaryOrder.paidAt,
-        createdAt: primaryOrder.createdAt,
-        customer: {
-          name: customerName,
-        },
-        items: primaryOrder.items.map((item) => ({
-          title: item.title,
-          variantTitle: item.variantTitle,
-          quantity: item.quantity,
-          price: Number(item.price),
-          customerNote: item.customerNote,
-        })),
-      }).catch((err) => console.error('Storefront order webhook error:', err))
     }
 
     return {
       success: true,
-      messageTH: 'สั่งซื้อสินค้าสำเร็จแล้ว',
-      messageEN: 'Order placed successfully',
+      message: 'สั่งซื้อสินค้าสำเร็จแล้ว',
       data: serializeDecimal(createdOrders[0]),
       allOrders: serializeDecimal(createdOrders),
     }
@@ -318,8 +277,7 @@ export async function createOrder(input: CreateOrderInput) {
 
     return {
       success: false,
-      messageTH: errorMessage || 'เกิดข้อผิดพลาดในการสั่งซื้อ',
-      messageEN: errorMessage || 'Failed to place order',
+      message: errorMessage,
     }
   }
 }

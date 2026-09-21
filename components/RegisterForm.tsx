@@ -1,70 +1,46 @@
 /* eslint-disable react-hooks/immutability */
 'use client'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 import { registerUser } from '@/actions/auth'
-import { StoreData } from '@/actions/store'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useLandingImages } from '@/hooks/use-landing-images'
 import { RegisterFormInputs } from '@/types/register'
 import { useMutation } from '@tanstack/react-query'
-import {
-  CheckIcon,
-  EyeIcon,
-  EyeOffIcon,
-  LockIcon,
-  MailIcon,
-  StoreIcon,
-  UserIcon,
-} from 'lucide-react'
 
 import { ContentDivider } from '@/components/ContentDivider'
 import { LogoBrand } from '@/components/LogoBrand'
 import { ProtectedByBrand } from '@/components/ProtectedByBrand'
 import { SSOButton } from '@/components/SSOButton'
-import { RainbowButton } from '@/components/magicui/rainbow-button'
+import { SectionHeader } from '@/components/SectionHeader'
+import { SupportContact } from '@/components/SupportContact'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
 import { authClient } from '@/lib/auth-client'
 
-export interface RegisterFormProps {
-  store?: StoreData | null
-  isStore?: boolean
-}
-
-export function RegisterForm({
-  store: storeProp,
-  isStore = false,
-}: RegisterFormProps = {}) {
-  const storeFromHook = useStoreData((s) => s.store)
-  const store = storeProp ?? storeFromHook
-  const isStoreMode = isStore || !!store
-
-  const t = useTranslations('auth.register')
+export function RegisterForm() {
   const searchParams = useSearchParams()
   const roleParam = searchParams.get('role') as UserRole
-  const currentRole = isStoreMode
-    ? UserRole.CUSTOMER
-    : roleParam || UserRole.MERCHANT
+  const currentRole = roleParam || UserRole.MERCHANT
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const { currentImage } = useLandingImages()
 
   const loginParams = new URLSearchParams()
-  if (!isStoreMode && roleParam) {
+  if (roleParam) {
     loginParams.set('role', roleParam)
   }
 
@@ -87,15 +63,17 @@ export function RegisterForm({
     },
   })
 
-  const passwordValue = watch('password') || ''
-  const confirmPasswordValue = watch('confirmPassword') || ''
+  const passwordValue = watch('password')
 
   const { mutate, isPending } = useMutation({
     mutationFn: registerUser,
     onSuccess: async (res, variables) => {
       if (res && !res.success) {
+        toast.error(res.message || 'การลงทะเบียนล้มเหลว')
         return
       }
+
+      toast.success(res?.message || 'สมัครสมาชิกสำเร็จ!')
 
       const response = await authClient.signIn.email({
         email: variables.email,
@@ -103,7 +81,7 @@ export function RegisterForm({
       })
 
       if (response.error) {
-        toast.error(t('autoLoginFailed'))
+        toast.error('เข้าสู่ระบบอัตโนมัติติดขัด กรุณาเข้าสู่ระบบอีกครั้ง')
         window.location.href = loginHref
         return
       }
@@ -145,7 +123,7 @@ export function RegisterForm({
       })
     } catch (err) {
       console.error(err)
-      toast.error(t('networkError'))
+      toast.error('ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้')
     }
   }
 
@@ -153,238 +131,116 @@ export function RegisterForm({
     mutate({ ...data, userRole: currentRole })
   }
 
-  const isCustomer = currentRole === UserRole.CUSTOMER
-  const isPasswordLongEnough = passwordValue.length >= 6
-  const isPasswordMatching =
-    confirmPasswordValue.length > 0 && confirmPasswordValue === passwordValue
-
   return (
-    <div
-      className="container mx-auto flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-4 p-3.5 sm:gap-6 sm:p-6 lg:p-10"
-      style={
-        isStoreMode && store?.primaryColor
-          ? ({ '--primary': store.primaryColor } as React.CSSProperties)
-          : undefined
-      }
-    >
-      <div className="border-border/80 bg-card text-card-foreground w-full max-w-md overflow-hidden rounded-2xl border p-4.5 shadow-xl shadow-black/[0.03] sm:rounded-3xl sm:p-8 md:p-10 dark:shadow-black/20">
-        <div className="mb-4 flex justify-center sm:mb-6">
-          {isStoreMode ? (
-            store?.logo ? (
-              <Link
-                href="/"
-                className="block h-14 w-fit max-w-[200px] overflow-hidden"
-              >
-                <Image
-                  src={store.logo}
-                  alt={store.name || 'Store Logo'}
-                  width={200}
-                  height={70}
-                  unoptimized
-                  className="size-full object-contain object-center"
-                />
-              </Link>
-            ) : (
-              <Link
-                href="/"
-                className="text-foreground hover:text-primary text-2xl font-bold tracking-tight transition-colors"
-              >
-                {store?.name || 'Store'}
-              </Link>
-            )
-          ) : (
-            <LogoBrand className="text-xl" />
-          )}
+    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
+      <div className="border-border bg-background sm:shadow-airy flex w-full overflow-hidden rounded-3xl border">
+        <div
+          style={{
+            backgroundImage: currentImage ? `url('${currentImage}')` : 'none',
+          }}
+          className="relative hidden w-1/2 bg-cover bg-center lg:block"
+        >
+          <div className="absolute bottom-6 left-6 z-10 bg-black/20 p-3 backdrop-blur-md">
+            <LogoBrand className="text-white" />
+          </div>
         </div>
-        <div className="w-full space-y-4 sm:space-y-6">
-          <div className="space-y-1.5 text-center sm:space-y-2">
-            <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-3xl">
-              {isStoreMode
-                ? t('buyerTitle')
-                : isCustomer
-                  ? t('buyerTitle')
-                  : t('merchantTitle')}
-            </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">
-              {isStoreMode
-                ? t('buyerSubtitle')
-                : isCustomer
-                  ? t('buyerSubtitle')
-                  : t('merchantSubtitle')}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-            {REGISTER_PROVIDERS.map((provider, idx) => (
-              <SSOButton
-                key={idx}
-                onClick={() => handleSSO(provider.id)}
-                {...provider}
-              />
-            ))}
-          </div>
-          <ContentDivider name={t('orEmail')} />
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-3 sm:space-y-3.5"
-          >
-            <Field>
-              <FieldLabel className="text-xs font-medium">
-                {t('emailLabel')}
-              </FieldLabel>
-              <div className="relative">
-                <MailIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+        <div className="flex w-full flex-col items-center justify-center gap-6 p-6 sm:p-10 md:p-12 lg:w-1/2 dark:bg-neutral-800">
+          <SectionHeader
+            className="text-center"
+            title={
+              currentRole !== UserRole.CUSTOMER
+                ? 'สมัครเปิดร้านค้าของคุณ'
+                : 'สมัครสมาชิกสั่งซื้อสินค้า'
+            }
+          />
+          <div className="w-full max-w-sm space-y-6">
+            <div className="flex flex-col gap-3">
+              {REGISTER_PROVIDERS.map((provider, idx) => (
+                <SSOButton
+                  key={idx}
+                  onClick={() => handleSSO(provider.id)}
+                  {...provider}
+                />
+              ))}
+            </div>
+            <ContentDivider name="หรือสมัครด้วยอีเมล" />
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-3"
+            >
+              <Field>
+                <FieldLabel>อีเมล (E-mail)</FieldLabel>
                 <Input
                   type="email"
-                  placeholder={t('emailPlaceholder')}
-                  className="h-10 rounded-xl pl-10 text-sm sm:h-11"
+                  placeholder="name@example.com"
+                  className="h-11 rounded-xl"
                   {...register('email', {
-                    required: t('emailRequired'),
+                    required: 'กรุณาระบุอีเมลของคุณ',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: t('emailInvalid'),
+                      message: 'รูปแบบอีเมลไม่ถูกต้อง',
                     },
                   })}
                 />
-              </div>
-              <p className="text-muted-foreground text-[11px]">
-                {t('emailNotice')}
-              </p>
-              <FieldError>{errors?.email?.message}</FieldError>
-            </Field>
-
-            <Field>
-              <FieldLabel className="text-xs font-medium">
-                {t('passwordLabel')}
-              </FieldLabel>
-              <div className="relative">
-                <LockIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                <FieldDescription className="text-muted-foreground text-xs">
+                  ใช้อีเมลจริงเพื่อรับรหัสยืนยัน OTP
+                </FieldDescription>
+                <FieldError>{errors?.email?.message}</FieldError>
+              </Field>
+              <Field>
+                <FieldLabel>รหัสผ่าน</FieldLabel>
                 <Input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={t('passwordPlaceholder')}
-                  className="h-10 rounded-xl pr-10 pl-10 text-sm sm:h-11"
+                  type="password"
+                  placeholder="อย่างน้อย 6 ตัวอักษร"
+                  className="h-11 rounded-xl"
                   {...register('password', {
-                    required: t('passwordRequired'),
+                    required: 'กรุณากำหนดรหัสผ่าน',
                     minLength: {
                       value: 6,
-                      message: t('passwordMinLength'),
+                      message: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',
                     },
                   })}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 p-1 transition-colors"
-                  aria-label={
-                    showPassword ? t('hidePassword') : t('showPassword')
-                  }
-                >
-                  {showPassword ? (
-                    <EyeOffIcon className="size-4" />
-                  ) : (
-                    <EyeIcon className="size-4" />
-                  )}
-                </button>
-              </div>
-              <div className="flex items-center gap-1.5 text-[11px]">
-                <span
-                  className={`inline-flex items-center gap-1 transition-colors ${
-                    isPasswordLongEnough
-                      ? 'font-medium text-emerald-500'
-                      : 'text-muted-foreground'
-                  }`}
-                >
-                  <CheckIcon className="size-3" /> {t('passwordMinLengthHint')}
-                </span>
-              </div>
-              <FieldError>{errors?.password?.message}</FieldError>
-            </Field>
-
-            <Field>
-              <FieldLabel className="text-xs font-medium">
-                {t('confirmPasswordLabel')}
-              </FieldLabel>
-              <div className="relative">
-                <LockIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+                <FieldError>{errors?.password?.message}</FieldError>
+              </Field>
+              <Field>
+                <FieldLabel>ยืนยันรหัสผ่าน</FieldLabel>
                 <Input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder={t('confirmPasswordPlaceholder')}
-                  className="h-10 rounded-xl pr-10 pl-10 text-sm sm:h-11"
+                  type="password"
+                  placeholder="ระบุรหัสผ่านใหม่อีกครั้ง"
+                  className="h-11 rounded-xl"
                   {...register('confirmPassword', {
-                    required: t('confirmPasswordRequired'),
+                    required: 'กรุณายืนยันรหัสผ่าน',
                     validate: (value) =>
-                      value === passwordValue || t('passwordMismatch'),
+                      value === passwordValue || 'รหัสผ่านทั้งสองช่องไม่ตรงกัน',
                   })}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 p-1 transition-colors"
-                  aria-label={
-                    showConfirmPassword ? t('hidePassword') : t('showPassword')
-                  }
-                >
-                  {showConfirmPassword ? (
-                    <EyeOffIcon className="size-4" />
-                  ) : (
-                    <EyeIcon className="size-4" />
-                  )}
-                </button>
-              </div>
-              {confirmPasswordValue.length > 0 && (
-                <div className="flex items-center gap-1.5 text-[11px]">
-                  <span
-                    className={`inline-flex items-center gap-1 transition-colors ${
-                      isPasswordMatching
-                        ? 'font-medium text-emerald-500'
-                        : 'text-destructive font-medium'
-                    }`}
-                  >
-                    <CheckIcon className="size-3" />
-                    {isPasswordMatching
-                      ? t('passwordMatching')
-                      : t('passwordNotMatching')}
-                  </span>
-                </div>
-              )}
-              <FieldError>{errors?.confirmPassword?.message}</FieldError>
-            </Field>
-
-            {isStoreMode ? (
+                <FieldError>{errors?.confirmPassword?.message}</FieldError>
+              </Field>
               <Button
                 type="submit"
-                className="mt-1 h-10 w-full font-semibold sm:h-11"
+                className="mt-2 h-11 w-full rounded-xl text-base font-medium"
                 size="lg"
                 disabled={isPending}
               >
                 {isPending && <Spinner className="mr-2" />}
-                {isPending ? t('submitting') : t('submit')}
+                สมัครสมาชิก
               </Button>
-            ) : (
-              <RainbowButton
-                type="submit"
-                className="mt-1 h-10 w-full sm:h-11"
-                size="lg"
-                disabled={isPending}
+            </form>
+            <p className="text-muted-foreground text-center text-sm">
+              มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
+              <a
+                href={loginHref}
+                className="text-primary font-semibold transition-all hover:underline"
               >
-                {isPending && <Spinner className="mr-2" />}
-                {isPending ? t('submitting') : t('submit')}
-              </RainbowButton>
-            )}
-          </form>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            {t('hasAccount')}{' '}
-            <a
-              href={loginHref}
-              className="text-primary font-semibold transition-all hover:underline"
-            >
-              {t('loginNow')}
-            </a>
-          </p>
+                เข้าสู่ระบบที่นี่
+              </a>
+            </p>
+          </div>
         </div>
       </div>
-      {currentRole === UserRole.CUSTOMER && !isStoreMode && (
-        <ProtectedByBrand />
-      )}
+      {currentRole !== UserRole.CUSTOMER && <SupportContact />}
+      {currentRole === UserRole.CUSTOMER && <ProtectedByBrand />}
     </div>
   )
 }

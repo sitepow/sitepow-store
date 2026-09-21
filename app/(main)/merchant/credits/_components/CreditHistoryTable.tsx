@@ -1,15 +1,11 @@
 'use client'
 
-import React from 'react'
-
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useTransactions } from '@/actions/hooks/transaction'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { getLabel } from '@/constants/translate'
 import { TransactionType } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { formatNumber } from '@/utils/pricing'
@@ -40,8 +36,6 @@ const INCOME_TYPES = [
 ] as const
 
 export function CreditHistoryTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.credits')
   const { selectedStoreId } = useStoreFilter()
   const router = useRouter()
 
@@ -62,31 +56,22 @@ export function CreditHistoryTable() {
   }
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.id')}</TableHead>
-              <TableHead>{t('columns.details')}</TableHead>
-              <TableHead>{t('columns.date')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.amount')}
-              </TableHead>
+              <TableHead>รหัสธุรกรรม</TableHead>
+              <TableHead>รายละเอียดรายการ</TableHead>
+              <TableHead>วัน-เวลา ทำรายการ</TableHead>
+              <TableHead className="text-right">จำนวนเครดิต</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && transactions.length === 0 ? (
               <TableLoadingRow colSpan={4} />
             ) : transactions.length === 0 ? (
-              <TableEmptyRow colSpan={4} title={t('emptyHistory')} />
+              <TableEmptyRow colSpan={4} title="ยังไม่มีประวัติเครดิต" />
             ) : (
               transactions.map((tx) => {
                 const isIncome = (
@@ -112,11 +97,7 @@ export function CreditHistoryTable() {
                               <IconHistory size={14} />
                             )}
                         </div>
-                        <span>
-                          {t.has(`transactionTypes.${tx.type}`)
-                            ? t(`transactionTypes.${tx.type}`)
-                            : getLabel.transactionType(tx.type)}
-                        </span>
+                        <span>{getLabel.transactionType(tx.type)}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -152,6 +133,6 @@ export function CreditHistoryTable() {
           }}
         />
       )}
-    </div>
+    </>
   )
 }

@@ -2,16 +2,12 @@
 
 import React, { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useInventory } from '@/actions/hooks/inventory'
-import { StorePagination } from '@/components/StorePagination'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
   IconAlertCircle,
   IconAlertTriangle,
@@ -41,9 +37,6 @@ import { StockEditDialog } from './StockEditDialog'
 import { StockTransferDialog } from './StockTransferDialog'
 
 export function InventoryTable() {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.inventory')
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
   const [page, setPage] = useState(1)
@@ -80,8 +73,8 @@ export function InventoryTable() {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title={t('noAccessTitle')}
-        description={t('noAccessDescription')}
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการจัดการข้อมูลคลังสินค้าของสาขาหรือร้านค้านี้"
       />
     )
   }
@@ -90,39 +83,29 @@ export function InventoryTable() {
   const totalColumns = canManageInventory ? 6 : 5
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="overflow-x-auto rounded-md border">
         <Table className="min-w-200">
           <TableHeader>
             <TableRow>
               <TableHead className="bg-background sticky left-0 z-20 w-12" />
               <TableHead className="bg-background sticky left-12 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                {t('columns.image')}
+                รูปภาพ
               </TableHead>
-              <TableHead>{t('columns.product')}</TableHead>
-              <TableHead className="text-center">
-                {t('columns.variantCount')}
-              </TableHead>
-              <TableHead className="text-end">
-                {t('columns.totalStock')}
-              </TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>สินค้า / Slug</TableHead>
+              <TableHead className="text-center">จำนวน Variant</TableHead>
+              <TableHead className="text-end">สต็อกรวม</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {(isLoading || isPermissionLoading) && products.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : products.length === 0 ? (
-              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ไม่พบข้อมูลสต็อกสินค้า"
+              />
             ) : (
               products.map((product) => {
                 const isExpanded = !!expandedProductIds[product.id]
@@ -153,10 +136,7 @@ export function InventoryTable() {
                         </Button>
                       </TableCell>
                       <TableCell className="bg-background hover:bg-muted/50 sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                        <ProductImage
-                          src={product.images?.[0]?.url}
-                          alt={product.title}
-                        />
+                        <ProductImage src={product.images?.[0]?.url} />
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
@@ -167,14 +147,12 @@ export function InventoryTable() {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge>
-                          {t('variantItemCount', { count: variants.length })}
-                        </Badge>
+                        <Badge>{variants.length} รายการ</Badge>
                       </TableCell>
                       <TableCell className="text-end">
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground text-xs">
-                            {t('totalPrefix')}
+                            รวม:
                           </span>
                           <Badge variant="outline">
                             {formatNumber(totalStock)}
@@ -189,7 +167,7 @@ export function InventoryTable() {
                             toggleRow(product.id)
                           }}
                         >
-                          {isExpanded ? t('hideVariants') : t('viewVariants')}
+                          {isExpanded ? 'ซ่อนตัวเลือก' : 'ดูตัวเลือกสินค้า'}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -215,7 +193,6 @@ export function InventoryTable() {
                                   src={
                                     variant.image || product.images?.[0]?.url
                                   }
-                                  alt={variant.title}
                                 />
                               </div>
                             </TableCell>
@@ -225,7 +202,7 @@ export function InventoryTable() {
                                   {variant.title}
                                 </span>
                                 <span className="text-muted-foreground">
-                                  SKU: {variant.sku || '-'} | {t('pricePrefix')}{' '}
+                                  SKU: {variant.sku || '-'} | ราคา:{' '}
                                   {formatCurrency(Number(variant.price))}
                                 </span>
                               </div>
@@ -235,7 +212,7 @@ export function InventoryTable() {
                               <div className="flex flex-col items-end gap-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground text-xs">
-                                    {t('remainingPrefix')}
+                                    คงเหลือ:
                                   </span>
                                   <Badge variant="outline">
                                     {formatNumber(stock.quantity)}
@@ -243,7 +220,7 @@ export function InventoryTable() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-muted-foreground text-xs">
-                                    {t('minPrefix')}
+                                    ขั้นต่ำ:
                                   </span>
                                   <Badge variant="outline">
                                     {formatNumber(stock.minStock)}
@@ -255,18 +232,14 @@ export function InventoryTable() {
                               <div className="flex items-center justify-end gap-2">
                                 {isOut ? (
                                   <Badge variant="destructive">
-                                    <IconAlertCircle size={12} />{' '}
-                                    {t('outOfStock')}
+                                    <IconAlertCircle size={12} /> หมด
                                   </Badge>
                                 ) : isLow ? (
                                   <Badge className="bg-yellow-500 hover:bg-yellow-500">
-                                    <IconAlertTriangle size={12} />{' '}
-                                    {t('lowStock')}
+                                    <IconAlertTriangle size={12} /> ใกล้หมด
                                   </Badge>
                                 ) : (
-                                  <Badge variant="outline">
-                                    {t('inStock')}
-                                  </Badge>
+                                  <Badge variant="outline">ปกติ</Badge>
                                 )}
                                 {canManageInventory && stock.branch && (
                                   <div className="flex items-center space-x-1 pl-2">
@@ -306,6 +279,6 @@ export function InventoryTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

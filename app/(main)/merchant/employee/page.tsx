@@ -2,24 +2,35 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
+import {
+  useResetStoreRolePermissions,
+  useSyncStoreRolesAndPermissions,
+} from '@/actions/hooks/permission'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { DefaultRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconUserCog } from '@tabler/icons-react'
+import {
+  IconClockRecord,
+  IconRefresh,
+  IconShieldLock,
+  IconUserCog,
+  IconX,
+} from '@tabler/icons-react'
 
+import { BranchSelectField } from '@/components/BranchSelectField'
 import { PageTabHeader } from '@/components/PageTabHeader'
+import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { Button } from '@/components/ui/button'
 
-import { EmployeeHeaderActions } from './_components/EmployeeHeaderActions'
+import { EmployeeDialog } from './_components/EmployeeDialog'
 import { EmployeeTable } from './_components/EmployeeTable'
 import { PermissionLegendTable } from './_components/PermissionLegendTable'
 
 export default function EmployeePage() {
-  const t = useTranslations('merchant.employee')
   const { userId } = useSession()
   const { selectedStoreId } = useStoreFilter()
   const { selectedBranchId } = useBranchFilter()
@@ -29,6 +40,9 @@ export default function EmployeePage() {
   >()
   const [open, setOpen] = useState(false)
   const [showPermissions, setShowPermissions] = useState(false)
+
+  const resetPermissionMutation = useResetStoreRolePermissions()
+  const syncStoreRolesMutation = useSyncStoreRolesAndPermissions()
 
   const handleEdit = (id: string) => {
     setSelectedEmployeeId(id)
@@ -44,23 +58,69 @@ export default function EmployeePage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconUserCog}
-        title={t('title')}
-        description={t('description')}
+        title="จัดการพนักงาน"
+        description="จัดการพนักงานและบทบาทการเข้าถึงระบบของร้านค้า"
         endContent={
-          <EmployeeHeaderActions
-            canViewEmployee={canViewEmployee}
-            isOwner={isOwner}
-            isRoleOwner={isRoleOwner}
-            selectedEmployeeId={selectedEmployeeId}
-            dialogOpen={open}
-            setDialogOpen={setOpen}
-            onAddEmployee={handleAdd}
-            showPermissions={showPermissions}
-            onTogglePermissions={() => setShowPermissions((prev) => !prev)}
-            selectedStoreId={selectedStoreId}
-            selectedBranchId={selectedBranchId}
-            userId={userId}
-          />
+          <div className="flex flex-wrap items-end gap-2.5">
+            <StoreSelectField />
+            <BranchSelectField />
+            {canViewEmployee && (
+              <>
+                <EmployeeDialog
+                  employeeId={selectedEmployeeId}
+                  open={open}
+                  setOpen={setOpen}
+                  onAdd={handleAdd}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPermissions((prev) => !prev)}
+                >
+                  {showPermissions ? <IconX /> : <IconShieldLock />}
+                  {showPermissions
+                    ? 'ซ่อนตารางอ้างอิงสิทธิ์'
+                    : 'แสดงตารางอ้างอิงสิทธิ์'}
+                </Button>
+              </>
+            )}
+            {isOwner && (
+              <>
+                <Button
+                  variant="outline"
+                  disabled={isRoleOwner}
+                  onClick={async () => {
+                    await resetPermissionMutation.mutate({
+                      storeId: selectedStoreId,
+                      employeeId: userId!,
+                      roleName: DefaultRole.OWNER,
+                      branchId: selectedBranchId,
+                    })
+                  }}
+                >
+                  <IconClockRecord /> กู้คืนค่าเริ่มต้นสิทธิ์เจ้าของร้าน
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={syncStoreRolesMutation.isPending}
+                  onClick={async () => {
+                    await syncStoreRolesMutation.mutate({
+                      storeId: selectedStoreId,
+                    })
+                  }}
+                >
+                  <IconRefresh
+                    className={
+                      syncStoreRolesMutation.isPending ? 'animate-spin' : ''
+                    }
+                  />
+                  {syncStoreRolesMutation.isPending
+                    ? 'กำลังซิงค์สิทธิ์...'
+                    : 'ซิงค์สิทธิ์ Role ทั้งหมด'}
+                </Button>
+              </>
+            )}
+          </div>
         }
       />
       {showPermissions && canViewEmployee && <PermissionLegendTable />}

@@ -2,12 +2,6 @@
 
 import { useMemo } from 'react'
 
-import { useLocale, useTranslations } from 'next-intl'
-
-import { ProductType } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
-import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { getStockQuantity } from '@/utils/product'
 
@@ -22,12 +16,6 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductOptionGroups() {
-  const t = useTranslations('storefront.products')
-  const locale = useLocale()
-  const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
-  )
   const {
     product,
     selectedVariant,
@@ -40,8 +28,8 @@ export function ProductOptionGroups() {
   const hasOptionGroups = product?.options?.length !== 0
 
   const isOutOfStock = useMemo(() => {
-    if (!product || product.productType === ProductType.AFFILIATE_LINK) {
-      return false
+    if (!product) {
+      return true
     }
 
     const activeVariant = selectedVariant || product.variants[0]
@@ -57,10 +45,6 @@ export function ProductOptionGroups() {
 
     return stock <= 0
   }, [product, selectedVariant, selectedBranchId])
-
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
 
   if (isLoading) {
     return (
@@ -85,12 +69,10 @@ export function ProductOptionGroups() {
       {product?.options?.map((option, idx) => (
         <div key={idx} className="space-y-4">
           <div className="flex items-center gap-2">
-            <Label className="text-lg font-semibold">
-              {getLocalizedField(option, 'title', locale) || option.title}
-            </Label>
+            <Label className="text-lg font-semibold">{option.title}</Label>
             {option.require && (
               <Badge variant="outline" className="border-primary text-primary">
-                * {t('required')}
+                * จำเป็น
               </Badge>
             )}
           </div>
@@ -122,15 +104,11 @@ export function ProductOptionGroups() {
                       disabled={isOutOfStock}
                     />
                     <span className="flex-1 text-sm font-medium">
-                      {getLocalizedField(choice, 'name', locale) || choice.name}
+                      {choice.name}
                     </span>
                     {choice.extraPrice > 0 && (
                       <span className="text-primary text-sm font-semibold">
-                        +
-                        {formatCurrency(
-                          convert(choice.extraPrice),
-                          currentCurrency,
-                        )}
+                        +{formatCurrency(choice.extraPrice)}
                       </span>
                     )}
                   </Label>

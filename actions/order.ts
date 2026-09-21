@@ -12,7 +12,6 @@ import { OrderEventPayload, appEvents } from '@/lib/events'
 import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
-import { dispatchStoreWebhook } from '@/lib/webhook'
 
 interface GetOrdersParams {
   storeId: string
@@ -41,20 +40,6 @@ const orderSelect = {
   codFee: true,
   earnedPoints: true,
   storeId: true,
-  store: {
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      logo: true,
-      phone: true,
-      email: true,
-      taxId: true,
-      description: true,
-      isVatRegistered: true,
-      vatRate: true,
-    },
-  },
   pointRedeemRateSnapshot: true,
   pointEarningRateSnapshot: true,
   shippingAddrSnapshot: true,
@@ -68,9 +53,7 @@ const orderSelect = {
   width: true,
   height: true,
   length: true,
-  baseCurrency: true,
   customerCurrency: true,
-  exchangeRate: true,
   totalAmountBase: true,
   resellerAgreementId: true,
   resellerAgreement: {
@@ -356,24 +339,14 @@ export async function updateOrderStatus(
 ) {
   try {
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Order ID',
-        messageEN: 'Order ID not found',
-        message: 'ไม่พบ Order ID',
-      }
+      return { success: false, message: 'ไม่พบ Order ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     if (status === OrderStatus.CANCELLED) {
@@ -392,12 +365,7 @@ export async function updateOrderStatus(
     })
 
     if (!order) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลออเดอร์',
-        messageEN: 'Order not found',
-        message: 'ไม่พบข้อมูลออเดอร์',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -409,8 +377,6 @@ export async function updateOrderStatus(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -462,54 +428,7 @@ export async function updateOrderStatus(
       orderId: id,
     })
 
-    if (status === OrderStatus.PAID) {
-      prisma.order
-        .findUnique({
-          where: { id },
-          select: {
-            id: true,
-            orderNumber: true,
-            totalAmount: true,
-            items: {
-              select: {
-                title: true,
-                variantTitle: true,
-                price: true,
-                quantity: true,
-                customerNote: true,
-              },
-            },
-          },
-        })
-        .then((orderData) => {
-          if (orderData) {
-            dispatchStoreWebhook(order.storeId, 'order.paid', {
-              orderId: orderData.id,
-              orderNumber: orderData.orderNumber,
-              status: 'PAID',
-              paidAt: new Date().toISOString(),
-              totalAmount: Number(orderData.totalAmount),
-              currency: 'THB',
-              paymentMethod: 'MANUAL_STATUS_UPDATE',
-              items: orderData.items.map((item) => ({
-                title: item.title,
-                variantTitle: item.variantTitle,
-                price: Number(item.price),
-                quantity: item.quantity,
-                customerNote: item.customerNote,
-              })),
-            }).catch((err) => console.error(err))
-          }
-        })
-        .catch((err) => console.error(err))
-    }
-
-    return {
-      success: true,
-      messageTH: 'อัปเดตสถานะออเดอร์สำเร็จ',
-      messageEN: 'Order status updated successfully',
-      message: 'อัปเดตสถานะออเดอร์สำเร็จ',
-    }
+    return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -519,24 +438,14 @@ export async function updateOrderStatus(
 export async function cancelOrder(id: string) {
   try {
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Order ID',
-        messageEN: 'Order ID not found',
-        message: 'ไม่พบ Order ID',
-      }
+      return { success: false, message: 'ไม่พบ Order ID' }
     }
 
     const userSession = await getCurrentUser()
     const currentUserId = userSession?.id
 
     if (!currentUserId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const order = await prisma.order.findUnique({
@@ -571,12 +480,7 @@ export async function cancelOrder(id: string) {
     })
 
     if (!order) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลออเดอร์',
-        messageEN: 'Order not found',
-        message: 'ไม่พบข้อมูลออเดอร์',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลออเดอร์' }
     }
 
     const isOrderCustomer =
@@ -596,8 +500,6 @@ export async function cancelOrder(id: string) {
     ) {
       return {
         success: false,
-        messageTH: 'ออเดอร์ที่ชำระเงินแล้ว ไม่สามารถยกเลิกได้',
-        messageEN: 'Paid orders cannot be cancelled',
         message: 'ออเดอร์ที่ชำระเงินแล้ว ไม่สามารถยกเลิกได้',
       }
     }
@@ -614,8 +516,6 @@ export async function cancelOrder(id: string) {
       if (!authCheck.isAuthorized) {
         return {
           success: false,
-          messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: authCheck.messageEN || 'Insufficient permissions',
           message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
@@ -633,18 +533,7 @@ export async function cancelOrder(id: string) {
       orderId: id,
     })
 
-    dispatchStoreWebhook(order.storeId, 'order.cancelled', {
-      orderId: id,
-      status: 'CANCELLED',
-      cancelledAt: new Date().toISOString(),
-    }).catch((err) => console.error(err))
-
-    return {
-      success: true,
-      messageTH: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ',
-      messageEN: 'Order cancelled and stock restored successfully',
-      message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ',
-    }
+    return { success: true, message: 'ยกเลิกออเดอร์และคืนสต็อกสำเร็จ' }
   } catch (error: unknown) {
     console.error(error)
     let errorMessage
@@ -655,70 +544,7 @@ export async function cancelOrder(id: string) {
 
     return {
       success: false,
-      messageTH: errorMessage || 'เกิดข้อผิดพลาดในการยกเลิกออเดอร์',
-      messageEN: errorMessage || 'An error occurred while cancelling order',
       message: errorMessage,
     }
-  }
-}
-
-export async function getOrderById(id: string): Promise<GetOrdersItem | null> {
-  const userSession = await getCurrentUser()
-  const userId = userSession?.id
-
-  if (!userId) {
-    return null
-  }
-
-  try {
-    const order = await prisma.order.findUnique({
-      where: { id },
-      select: orderSelect,
-    })
-
-    if (!order) {
-      return null
-    }
-
-    const isCustomer = order.customer?.id === userId
-    const isStoreOwner = await prisma.store.findFirst({
-      where: { id: order.storeId, ownerId: userId },
-      select: { id: true },
-    })
-
-    if (isCustomer || isStoreOwner) {
-      return serializeDecimal(order)
-    }
-
-    if (order.resellerAgreementId) {
-      const reseller = await prisma.resellerAgreement.findFirst({
-        where: {
-          id: order.resellerAgreementId,
-          OR: [
-            { resellerCustomerId: userId },
-            { resellerStore: { ownerId: userId } },
-          ],
-        },
-        select: { id: true },
-      })
-      if (reseller) {
-        return serializeDecimal(order)
-      }
-    }
-
-    const authCheck = await verifyEmployeePermission({
-      userId,
-      storeId: order.storeId,
-      permission: 'canViewOrders',
-    })
-
-    if (authCheck.isAuthorized) {
-      return serializeDecimal(order)
-    }
-
-    return null
-  } catch (error) {
-    console.error(error)
-    return null
   }
 }

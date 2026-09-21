@@ -87,22 +87,14 @@ export async function updateLoyaltySettings(
 ) {
   try {
     if (!storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -114,8 +106,7 @@ export async function updateLoyaltySettings(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -136,8 +127,7 @@ export async function updateLoyaltySettings(
 
     return {
       success: true,
-      messageTH: 'ตั้งค่าสำเร็จแล้ว',
-      messageEN: 'Settings saved successfully',
+      message: 'ตั้งค่าสำเร็จแล้ว',
       data: serializeDecimal(data),
     }
   } catch (error) {

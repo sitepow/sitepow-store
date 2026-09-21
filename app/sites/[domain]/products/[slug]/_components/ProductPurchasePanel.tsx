@@ -3,15 +3,10 @@
 import { useEffect } from 'react'
 
 import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
-import { ProductType } from '@/generated/prisma/enums'
-
-import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../store'
 import { ProductAddToCart } from './ProductAddToCart'
 import { ProductAddonSelector } from './ProductAddonSelector'
-import { ProductAffiliateBuyButtons } from './ProductAffiliateBuyButtons'
-import { ProductAffiliateShare } from './ProductAffiliateShare'
 import { ProductOptionGroups } from './ProductOptionGroups'
 import { ProductPriceHeader } from './ProductPriceHeader'
 import { ProductVariantSelector } from './ProductVariantSelector'
@@ -36,27 +31,13 @@ export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
     if (product) setProduct(product)
   }, [product, setProduct])
 
-  const isAffiliateProduct = product?.productType === ProductType.AFFILIATE_LINK
-
   return (
     <>
       <ProductPriceHeader />
-      {isLoading || !product ? (
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-28 w-full rounded-xl" />
-        </div>
-      ) : isAffiliateProduct ? (
-        <ProductAffiliateBuyButtons product={product} />
-      ) : (
-        <>
-          <ProductVariantSelector />
-          <ProductOptionGroups />
-          <ProductAddonSelector />
-          <ProductAddToCart />
-        </>
-      )}
-      <ProductAffiliateShare storeSlug={storeSlug} productSlug={productSlug} />
+      <ProductVariantSelector />
+      <ProductOptionGroups />
+      <ProductAddonSelector />
+      <ProductAddToCart />
     </>
   )
 }

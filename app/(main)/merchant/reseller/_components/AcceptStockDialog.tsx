@@ -2,19 +2,14 @@
 
 import { useEffect, useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { ResellerStockItem } from '@/types/reseller'
-import { IconPackage } from '@tabler/icons-react'
-
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,9 +23,22 @@ export interface AcceptStockPayload {
 interface AcceptStockDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  stock: ResellerStockItem | null
+  stock: {
+    agreementId: string
+    variantId: string
+    allocatedQuantity: number
+    acceptedQuantity: number
+    variant?: {
+      title?: string
+      product?: { title?: string }
+    }
+  } | null
+  onConfirm: (data: {
+    agreementId: string
+    variantId: string
+    quantity: number
+  }) => Promise<void> | void
   isLoading?: boolean
-  onConfirm: (payload: AcceptStockPayload) => Promise<void> | void
 }
 
 export function AcceptStockDialog({
@@ -40,8 +48,6 @@ export function AcceptStockDialog({
   onConfirm,
   isLoading = false,
 }: AcceptStockDialogProps) {
-  const t = useTranslations('merchant.reseller.accept')
-  const tReseller = useTranslations('merchant.reseller')
   const pendingQuantity = stock
     ? stock.allocatedQuantity - stock.acceptedQuantity
     : 0
@@ -79,11 +85,10 @@ export function AcceptStockDialog({
       <DialogContent className="sm:max-w-106.25">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogHeaderIcon
-              icon={IconPackage}
-              title={t('title')}
-              description={t('description')}
-            />
+            <DialogTitle>ยืนยันการรับสินค้าเข้าสต็อก</DialogTitle>
+            <DialogDescription>
+              ตรวจสอบจำนวนสินค้าจริง แล้วระบุจำนวนที่ต้องการรับเข้าสต็อก
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="min-w-0 space-y-1.5">
@@ -91,35 +96,29 @@ export function AcceptStockDialog({
                 {productTitle}
               </p>
               <p className="text-muted-foreground text-xs leading-relaxed wrap-break-word whitespace-pre-line">
-                {t('variantPrefix', { variant: variantTitle })}
+                ตัวเลือก: {variantTitle}
               </p>
             </div>
             <div className="bg-muted/50 space-y-1 rounded-lg border p-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('allocated')}</span>
+                <span className="text-muted-foreground">จำนวนที่ส่งมา:</span>
                 <span className="font-medium">
-                  {tReseller('table.unitPieces', {
-                    count: stock.allocatedQuantity,
-                  })}
+                  {stock.allocatedQuantity} ชิ้น
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('accepted')}</span>
+                <span className="text-muted-foreground">รับเข้าแล้ว:</span>
                 <span className="font-medium">
-                  {tReseller('table.unitPieces', {
-                    count: stock.acceptedQuantity,
-                  })}
+                  {stock.acceptedQuantity} ชิ้น
                 </span>
               </div>
               <div className="mt-1 flex justify-between border-t pt-1">
-                <span className="font-medium">{t('pending')}</span>
-                <span className="font-medium">
-                  {tReseller('table.unitPieces', { count: pendingQuantity })}
-                </span>
+                <span className="font-medium">คงเหลือรอยืนยันรับ:</span>
+                <span className="font-medium">{pendingQuantity} ชิ้น</span>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">{t('quantityLabel')}</Label>
+              <Label htmlFor="quantity">จำนวนที่ตรวจรับถูกต้อง (ชิ้น)</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -127,10 +126,12 @@ export function AcceptStockDialog({
                 max={pendingQuantity}
                 value={quantity || ''}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                placeholder={t('quantityPlaceholder')}
+                placeholder="ระบุจำนวน"
                 required
               />
-              <p className="text-muted-foreground text-[0.8rem]">{t('note')}</p>
+              <p className="text-muted-foreground text-[0.8rem]">
+                * ระบบจะบันทึกวันที่รับสินค้าทันทีเมื่อยืนยันรายการ
+              </p>
             </div>
           </div>
           <DialogFooter>
@@ -140,7 +141,7 @@ export function AcceptStockDialog({
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              {t('cancel')}
+              ยกเลิก
             </Button>
             <Button
               type="submit"
@@ -148,7 +149,7 @@ export function AcceptStockDialog({
                 isLoading || quantity <= 0 || quantity > pendingQuantity
               }
             >
-              {isLoading ? t('submitting') : t('submit')}
+              {isLoading ? 'กำลังบันทึก...' : 'ยืนยันรับสินค้า'}
             </Button>
           </DialogFooter>
         </form>

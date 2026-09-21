@@ -1,26 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useDeleteEmployee,
   useEmployeePermission,
   useEmployees,
-  useResetEmployeePassword,
 } from '@/actions/hooks/employee'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { extractEmployeeStoreData } from '@/utils/employee'
 import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { DeleteButton } from '@/components/DeleteButton'
-import { StorePagination } from '@/components/StorePagination'
 import { TableEmptyRow } from '@/components/TableEmptyRow'
 import { TableLoadingRow } from '@/components/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
@@ -39,8 +34,6 @@ interface EmployeeTableProps {
 }
 
 export function EmployeeTable({ onEdit }: EmployeeTableProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.employee')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -54,7 +47,6 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
   const canManageEmployee = canUpdateEmployee || canDeleteEmployee
 
   const deleteEmployeeMutation = useDeleteEmployee()
-  const resetPasswordMutation = useResetEmployeePassword()
 
   const { data: { data: employees = [], meta } = {}, isLoading } = useEmployees(
     {
@@ -74,35 +66,26 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title={t('noAccessTitle')}
-        description={t('noAccessDescription')}
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลพนักงานของสาขาหรือร้านค้านี้"
       />
     )
   }
 
   return (
-    <div
-      className="space-y-4"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.employeeId')}</TableHead>
-              <TableHead>{t('columns.name')}</TableHead>
-              <TableHead>{t('columns.email')}</TableHead>
-              <TableHead>{t('columns.role')}</TableHead>
-              <TableHead>{t('columns.permissions')}</TableHead>
-              <TableHead>{t('columns.branch')}</TableHead>
+              <TableHead>รหัสพนักงาน</TableHead>
+              <TableHead>ชื่อพนักงาน</TableHead>
+              <TableHead>อีเมล</TableHead>
+              <TableHead>บทบาท</TableHead>
+              <TableHead>สิทธิ์การใช้งาน</TableHead>
+              <TableHead>สาขา</TableHead>
               {canManageEmployee && (
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -110,7 +93,10 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
             {(isLoading || isPermissionLoading) && employees.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : employees.length === 0 ? (
-              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ยังไม่มีพนักงานในร้านนี้"
+              />
             ) : (
               employees.map((employeeStore) => {
                 const {
@@ -134,10 +120,9 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                         ) : (
                           <>
                             {displayedRoles.map((roleName, idx) => {
-                              const roleLabel = t.has(`roles.${roleName}`)
-                                ? t(`roles.${roleName}`)
-                                : DEFAULT_ROLE_TH[roleName as DefaultRole] ||
-                                  roleName
+                              const roleLabel =
+                                DEFAULT_ROLE_TH[roleName as DefaultRole] ||
+                                roleName
 
                               return (
                                 <Badge key={idx} variant="outline">
@@ -158,7 +143,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                       <div className="flex max-w-72 min-w-72 flex-wrap items-center gap-1">
                         {uniquePermissions.length === 0 ? (
                           <span className="text-muted-foreground text-xs">
-                            {t('noPermissions')}
+                            ไม่มีสิทธิ์
                           </span>
                         ) : (
                           <>
@@ -184,7 +169,7 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {employeeStore.branches.length === 0 ? (
-                          <Badge variant="outline">{t('allBranches')}</Badge>
+                          <Badge variant="outline">ทุกสาขา</Badge>
                         ) : (
                           employeeStore.branches.map(({ branch }) => (
                             <Badge key={branch.id} variant="outline">
@@ -197,50 +182,13 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
                     {canManageEmployee && (
                       <TableCell className="space-x-2 text-right">
                         {canUpdateEmployee && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="icon-lg"
-                              title={t('resetPassword')}
-                              disabled={resetPasswordMutation.isPending}
-                              onClick={() => {
-                                if (confirm(t('resetPasswordConfirm'))) {
-                                  resetPasswordMutation.mutate(
-                                    employeeStore.id,
-                                    {
-                                      onSuccess: (res) => {
-                                        if (res.success) {
-                                          toast.success(
-                                            res.messageTH || res.message,
-                                          )
-                                        } else {
-                                          toast.error(
-                                            res.messageTH || res.message,
-                                          )
-                                        }
-                                      },
-                                      onError: (err) => {
-                                        toast.error(
-                                          err instanceof Error
-                                            ? err.message
-                                            : 'Error',
-                                        )
-                                      },
-                                    },
-                                  )
-                                }
-                              }}
-                            >
-                              <IconKey />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="icon-lg"
-                              onClick={() => onEdit(employeeStore.id)}
-                            >
-                              <IconSettings />
-                            </Button>
-                          </>
+                          <Button
+                            variant="outline"
+                            size="icon-lg"
+                            onClick={() => onEdit(employeeStore.id)}
+                          >
+                            <IconSettings />
+                          </Button>
                         )}
                         {canDeleteEmployee && (
                           <DeleteButton
@@ -268,6 +216,6 @@ export function EmployeeTable({ onEdit }: EmployeeTableProps) {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

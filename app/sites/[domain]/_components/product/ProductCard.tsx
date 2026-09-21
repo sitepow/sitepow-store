@@ -1,20 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-'use client'
-
-import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { SectionProductItem } from '@/actions/storefront/sections'
-import { CurrencyCode } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
-import { getLocalizedField } from '@/utils/intl'
 import { isVideoUrl } from '@/utils/media'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateProduct } from '@/utils/product'
 import { IconAlertCircle, IconBuildingStore } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
-import { ExternalLink } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 
@@ -34,13 +26,12 @@ const productCardVariants = cva(
 )
 
 interface ProductCardProps extends VariantProps<typeof productCardVariants> {
-  product: SectionProductItem | any
+  product: SectionProductItem
   className?: string
   onClick?: () => void
   href?: string
   quantity?: number
   isReseller?: boolean
-  baseCurrency?: CurrencyCode
 }
 
 export function ProductCard({
@@ -51,24 +42,13 @@ export function ProductCard({
   href,
   quantity,
   isReseller,
-  baseCurrency,
 }: ProductCardProps) {
-  const t = useTranslations('storefront.products')
-  const locale = useLocale()
-  const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    baseCurrency || (store as any)?.baseCurrency,
-  )
-  const localizedTitle =
-    getLocalizedField(product, 'title', locale) || product.title
-
   const { hasDiscount, net, original, maxDiscountPercent } =
     calculateProduct(product)
 
-  const isAffiliate = product.productType === 'AFFILIATE_LINK'
   const primaryImage = product.images?.[0]
   const isVideo = isVideoUrl(primaryImage?.url)
-  const isOutOfStock = !isAffiliate && quantity !== undefined && quantity <= 0
+  const isOutOfStock = quantity !== undefined && quantity <= 0
 
   const content = (
     <div
@@ -83,7 +63,7 @@ export function ProductCard({
       <div className="relative overflow-hidden rounded-t-xl">
         <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
           {!primaryImage ? (
-            <EmptyImage text={product.title} />
+            <EmptyImage />
           ) : isVideo ? (
             <video
               src={primaryImage.url}
@@ -101,37 +81,31 @@ export function ProductCard({
             />
           )}
         </div>
-        {isAffiliate && (
-          <Badge className="absolute top-2 left-2 flex items-center gap-1 bg-amber-500 text-[10px] font-semibold text-white shadow-sm hover:bg-amber-600">
-            <ExternalLink className="size-3" />
-            {t('affiliateBuy.badge')}
-          </Badge>
-        )}
         {isOutOfStock ? (
           <Badge
             variant="destructive"
             className="absolute top-2 right-2 text-xs"
           >
-            <IconAlertCircle /> {t('outOfStock')}
+            <IconAlertCircle /> ขออภัยสินค้าหมด
           </Badge>
         ) : (
           hasDiscount && (
-            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full border border-white text-center">
-              {t('discountOff')} <br /> -{maxDiscountPercent}%
+            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
+              ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )
         )}
       </div>
       <div className="flex flex-col items-center gap-1 p-1.5">
-        {localizedTitle && (
+        {product.title && (
           <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
-            {localizedTitle}
+            {product.title}
           </h3>
         )}
         {isReseller && (
           <Badge>
             <IconBuildingStore className="size-4" />
-            {t('reseller')}
+            ตัวแทนจำหน่าย
           </Badge>
         )}
         <div className="group-hover:text-primary flex flex-col items-center justify-center">
@@ -139,21 +113,11 @@ export function ProductCard({
             value={hasDiscount ? net?.min : original?.min}
             className="text-primary text-lg font-bold sm:text-xl lg:text-2xl"
           >
-            {hasDiscount && net
-              ? net.min !== net.max
-                ? `${formatCurrency(convert(net.min), currentCurrency)} - ${formatCurrency(convert(net.max), currentCurrency)}`
-                : formatCurrency(convert(net.min), currentCurrency)
-              : original
-                ? original.min !== original.max
-                  ? `${formatCurrency(convert(original.min), currentCurrency)} - ${formatCurrency(convert(original.max), currentCurrency)}`
-                  : formatCurrency(convert(original.min), currentCurrency)
-                : formatCurrency(0, currentCurrency)}
+            {formatCurrency((hasDiscount ? net?.min : original?.min) || 0)}
           </data>
-          {hasDiscount && original && (
+          {hasDiscount && (
             <span className="text-muted-foreground text-sm line-through">
-              {original.min !== original.max
-                ? `${formatCurrency(convert(original.min), currentCurrency)} - ${formatCurrency(convert(original.max), currentCurrency)}`
-                : formatCurrency(convert(original.min), currentCurrency)}
+              {formatCurrency(original?.min || 0)}
             </span>
           )}
         </div>

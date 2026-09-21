@@ -1,35 +1,9 @@
-import auth from './auth.json'
-import blogs from './blogs.json'
-import buyout from './buyout.json'
 import common from './common.json'
-import contact from './contact.json'
-import customer from './customer.json'
-import docs from './docs.json'
-import downloadPos from './downloadPos.json'
-import features from './features.json'
 import home from './home.json'
-import merchant from './merchant.json'
-import pricing from './pricing.json'
-import privacy from './privacy.json'
-import storefront from './storefront.json'
-import terms from './terms.json'
 
-export const th = {
-  common,
-  home,
-  pricing,
-  buyout,
-  merchant,
-  customer,
-  storefront,
-  auth,
-  contact,
-  downloadPos,
-  features,
-  blogs,
-  docs,
-  terms,
-  privacy,
+export const en = {
+  ...common,
+  ...home,
 } as const
 
-export default th
+export default en

@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { useCheckStoreAvailability } from '@/actions/hooks/store'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
@@ -18,8 +14,6 @@ import { Input } from '@/components/ui/input'
 import { SlugPreview } from './SlugPreview'
 
 export function StoreSlugField({ isPending }: { isPending: boolean }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setError,
@@ -40,19 +34,15 @@ export function StoreSlugField({ isPending }: { isPending: boolean }) {
     }
 
     if (!availability?.slugAvailable) {
-      setError('slug', { message: t('slugAlreadyTaken') })
+      setError('slug', { message: 'Slug นี้ถูกใช้งานไปแล้ว' })
     } else {
       clearErrors('slug')
     }
-  }, [availability, debouncedSlug, setError, clearErrors, t])
+  }, [availability, debouncedSlug, setError, clearErrors])
 
   return (
-    <Field
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
-      <FieldLabel>{t('storeSlugLabel')}</FieldLabel>
+    <Field>
+      <FieldLabel>URL หน้าร้าน (Slug)</FieldLabel>
       <div className="flex">
         <span className="bg-muted text-muted-foreground inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
           sitepow.store/

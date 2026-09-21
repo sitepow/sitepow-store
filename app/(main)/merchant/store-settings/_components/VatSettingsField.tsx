@@ -1,10 +1,6 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useFormContext } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { CreateStoreFormValues } from '@/zod/store'
 
@@ -17,8 +13,6 @@ interface VatSettingsFieldProps {
 }
 
 export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setValue,
@@ -29,20 +23,15 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
   const isVatRegistered = watch('isVatRegistered')
 
   return (
-    <div
-      className="contents"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        {t('step4')}
+        4. ข้อมูลระบบภาษี (Tax & VAT)
       </div>
 
       <Field>
-        <FieldLabel>{t('taxIdLabel')}</FieldLabel>
+        <FieldLabel>เลขผู้เสียภาษีร้านค้า (Tax ID)</FieldLabel>
         <Input
-          placeholder={t('taxIdPlaceholder')}
+          placeholder="เลข 13 หลัก (ถ้ามี)"
           maxLength={13}
           {...register('taxId', {
             onChange: (e) => {
@@ -63,13 +52,13 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
             }
             disabled={isPending}
           />
-          <span>{t('vatRegistered')}</span>
+          <span>ร้านค้าจดทะเบียนภาษีมูลค่าเพิ่ม (VAT)</span>
         </label>
       </div>
 
       {isVatRegistered && (
         <Field className="animate-in fade-in duration-200">
-          <FieldLabel>{t('vatRateLabel')}</FieldLabel>
+          <FieldLabel>อัตราภาษีมูลค่าเพิ่ม (%)</FieldLabel>
           <Input
             type="number"
             step="0.01"
@@ -80,6 +69,6 @@ export function VatSettingsField({ isPending }: VatSettingsFieldProps) {
           <FieldError>{errors?.vatRate?.message}</FieldError>
         </Field>
       )}
-    </div>
+    </>
   )
 }

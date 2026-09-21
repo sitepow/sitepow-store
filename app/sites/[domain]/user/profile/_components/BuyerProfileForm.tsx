@@ -3,8 +3,6 @@
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
 import { formatPromptPay } from '@/utils/slip'
 import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
@@ -29,7 +27,6 @@ import {
 import { Input } from '@/components/ui/input'
 
 export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
-  const t = useTranslations('customer.profile')
   const { data: profile } = useProfile()
   const { mutate: updateProfile, isPending } = useUpdateProfile()
 
@@ -73,26 +70,29 @@ export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
   return (
     <Card {...props}>
       <CardHeader>
-        <CardTitle>{t('editPersonal')}</CardTitle>
-        <CardDescription>{t('editPersonalDesc')}</CardDescription>
+        <CardTitle>แก้ไขข้อมูลส่วนบุคคล</CardTitle>
+        <CardDescription>
+          อัปเดตข้อมูลของคุณให้เป็นปัจจุบัน
+          เพื่อประโยชน์ในการติดต่อประสานงานและจัดส่งสินค้า
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5 sm:grid-cols-2">
         <Field>
-          <FieldLabel>{t('firstName')}</FieldLabel>
+          <FieldLabel>ชื่อจริง</FieldLabel>
           <Input {...register('firstName')} />
           <FieldError>{errors.firstName?.message}</FieldError>
         </Field>
         <Field>
-          <FieldLabel>{t('lastName')}</FieldLabel>
+          <FieldLabel>นามสกุล</FieldLabel>
           <Input {...register('lastName')} />
           <FieldError>{errors.lastName?.message}</FieldError>
         </Field>
         <Field className="sm:col-span-2">
-          <FieldLabel>{t('email')}</FieldLabel>
+          <FieldLabel>อีเมลลงทะเบียน (ใช้เข้าสู่ระบบ)</FieldLabel>
           <Input value={profile?.email ?? ''} disabled />
         </Field>
         <Field className="sm:col-span-2">
-          <FieldLabel>{t('phone')}</FieldLabel>
+          <FieldLabel>เบอร์โทรศัพท์ติดต่อหลัก</FieldLabel>
           <Controller
             control={control}
             name="phone"
@@ -103,25 +103,28 @@ export function BuyerProfileForm({ ...props }: ComponentProps<typeof Card>) {
                   const rawValue = e.target.value.replace(/\D/g, '')
                   field.onChange(rawValue)
                 }}
-                placeholder={t('phonePlaceholder')}
+                placeholder="เช่น 0812345678"
                 inputMode="numeric"
               />
             )}
           />
           <FieldError>{errors.phone?.message}</FieldError>
-          <FieldDescription>{t('phoneDesc')}</FieldDescription>
+          <FieldDescription>
+            เบอร์โทรศัพท์นี้ระบบจะใช้เชื่อมโยงกับฐานข้อมูลสมาชิกร้านค้า (Loyalty
+            Points) เพื่อสะสมแต้มให้คุณโดยอัตโนมัติ
+          </FieldDescription>
         </Field>
       </CardContent>
       <CardFooter className="flex flex-wrap justify-end gap-2.5 border-t">
         {isDirty && (
           <Button type="button" variant="outline" onClick={resetForm}>
-            {t('reset')}
+            ล้างค่าการตั้งค่า
           </Button>
         )}
 
         <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
           <IconDeviceFloppy size={14} />
-          {isPending ? t('saving') : t('saveChanges')}
+          {isPending ? 'กำลังบันทึก...' : 'บันทึกข้อมูลโปรไฟล์'}
         </Button>
       </CardFooter>
     </Card>

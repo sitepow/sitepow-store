@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconUser } from '@tabler/icons-react'
 
@@ -12,14 +10,12 @@ import { BuyerProfileAvatar } from './_components/BuyerProfileAvatar'
 import { BuyerProfileForm } from './_components/BuyerProfileForm'
 
 export default function StoreUserProfilePage() {
-  const t = useTranslations('customer.profile')
-
   return (
     <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconUser}
-        title={t('title')}
-        description={t('description')}
+        title="โปรไฟล์ส่วนตัว"
+        description="จัดการข้อมูลบัญชีผู้ซื้อ ชื่อ-นามสกุล และเบอร์โทรศัพท์สำหรับติดต่อและรับสิทธิ์สมาชิก"
       />
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
         <BuyerProfileAvatar className="col-span-1 xl:col-span-4" />

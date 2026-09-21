@@ -64,31 +64,19 @@ export async function updateSecuritySettings(
 ) {
   try {
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ User ID',
-        messageEN: 'User ID not found',
-      }
+      return { success: false, message: 'ไม่พบ User ID' }
     }
 
     const userSession = await getCurrentUser()
     const currentUserId = userSession?.id
 
     if (!currentUserId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     if (currentUserId !== userId) {
       if (!storeId) {
-        return {
-          success: false,
-          messageTH: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: 'Insufficient permissions',
-        }
+        return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
       }
       const authCheck = await verifyEmployeePermission({
         userId: currentUserId,
@@ -98,8 +86,7 @@ export async function updateSecuritySettings(
       if (!authCheck.isAuthorized) {
         return {
           success: false,
-          messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: authCheck.messageEN || 'Insufficient permissions',
+          message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
     }
@@ -110,21 +97,13 @@ export async function updateSecuritySettings(
     })
 
     if (!user) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบบัญชีผู้ใช้',
-        messageEN: 'User account not found',
-      }
+      return { success: false, message: 'ไม่พบบัญชีผู้ใช้' }
     }
 
     if (currentUserId === userId && user.password) {
       const isMatch = await bcrypt.compare(input.currentPassword, user.password)
       if (!isMatch) {
-        return {
-          success: false,
-          messageTH: 'รหัสผ่านปัจจุบันไม่ถูกต้อง',
-          messageEN: 'Current password is incorrect',
-        }
+        return { success: false, message: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' }
       }
     }
 
@@ -143,11 +122,7 @@ export async function updateSecuritySettings(
       details: { setting: 'password_changed' },
     })
 
-    return {
-      success: true,
-      messageTH: 'อัปเดตรหัสผ่านสำเร็จ',
-      messageEN: 'Password updated successfully',
-    }
+    return { success: true, message: 'อัปเดตรหัสผ่านสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -161,31 +136,19 @@ export async function updateTwoFactor(
 ) {
   try {
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ User ID',
-        messageEN: 'User ID not found',
-      }
+      return { success: false, message: 'ไม่พบ User ID' }
     }
 
     const userSession = await getCurrentUser()
     const currentUserId = userSession?.id
 
     if (!currentUserId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     if (currentUserId !== userId) {
       if (!storeId) {
-        return {
-          success: false,
-          messageTH: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: 'Insufficient permissions',
-        }
+        return { success: false, message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอ' }
       }
       const authCheck = await verifyEmployeePermission({
         userId: currentUserId,
@@ -195,8 +158,7 @@ export async function updateTwoFactor(
       if (!authCheck.isAuthorized) {
         return {
           success: false,
-          messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-          messageEN: authCheck.messageEN || 'Insufficient permissions',
+          message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
         }
       }
     }
@@ -214,11 +176,7 @@ export async function updateTwoFactor(
       details: { setting: '2fa', isTwoFactorEnabled },
     })
 
-    return {
-      success: true,
-      messageTH: 'อัปเดตการตั้งค่า 2FA สำเร็จ',
-      messageEN: '2FA settings updated successfully',
-    }
+    return { success: true, message: 'อัปเดตการตั้งค่า 2FA สำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }

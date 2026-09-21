@@ -133,14 +133,13 @@ model Customer {
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  stores            CustomerStore[]
-  reviews           Review[]
-  orders            Order[]
-  carts             Cart[]
-  addresses         Address[]
-  slipHistories     SlipVerificationHistory[]
-  customerCoupon    CustomerCoupon[]
-  affiliateAccounts AffiliateAccount[]
+  stores         CustomerStore[]
+  reviews        Review[]
+  orders         Order[]
+  carts          Cart[]
+  addresses      Address[]
+  slipHistories  SlipVerificationHistory[]
+  customerCoupon CustomerCoupon[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -218,10 +217,7 @@ model Branch {
   transfersIn      StockTransfer[]   @relation("TransferTo")
   stockAdjustments StockAdjustment[]
 
-  expenses               Expense[]
-  marketplaceConnections MarketplaceConnection[]
-  tableZones             TableZone[]
-  restaurantTables       RestaurantTable[]
+  expenses Expense[]
 
   translations Json?
 
@@ -389,9 +385,6 @@ enum PermissionDomain {
   EXPENSE
   RESELLER
   DOMAIN
-  PAYROLL
-  PROFIT_SHARING
-  WEBHOOK
 }
 
 enum PermissionAction {
@@ -587,39 +580,6 @@ model StoreServiceZoneRate {
   @@index([storeCourierServiceId])
 }
 
-model ShippingZone {
-  id      String @id @default(uuid())
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  name      String
-  countries CountryCode[]
-
-  rates ShippingZoneRate[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId])
-}
-
-model ShippingZoneRate {
-  id             String       @id @default(uuid())
-  shippingZoneId String
-  shippingZone   ShippingZone @relation(fields: [shippingZoneId], references: [id], onDelete: Cascade)
-
-  name          String
-  estimatedDays String?
-  minWeight     Decimal @default(0.00) @db.Decimal(10, 3)
-  maxWeight     Decimal @db.Decimal(10, 3)
-  fee           Decimal @db.Decimal(10, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([shippingZoneId])
-}
-
 model PaymentSetting {
   id      String @id @default(uuid())
   storeId String @unique
@@ -715,25 +675,15 @@ model Store {
   logo         String?
   coverImage   String?
   primaryColor String? @default("#f97316")
-  fontFamily   String? @default("default")
   description  String? @db.Text
 
-  phone           String?
-  lineId          String?
-  facebookPage    String?
-  instagramPage   String?
-  tiktokPage      String?
-  youtubePage     String?
-  discordUrl      String?
-  messengerUrl    String?
-  socialLinks     Json?
-  footerText      String? @db.Text
-  footerCopyright String?
+  phone        String?
+  lineId       String?
+  facebookPage String?
 
   productCount         Int                   @default(0)
   shippingSetting      ShippingSetting?
   storeCourierServices StoreCourierService[]
-  shippingZones        ShippingZone[]
 
   taxId           String?
   isVatRegistered Boolean @default(false)
@@ -757,55 +707,33 @@ model Store {
   isInternationalSetup Boolean      @default(false)
   baseCurrency         CurrencyCode @default(THB)
 
-  allowSearchEngineIndex Boolean @default(true)
-  seoTitle               String?
-  seoDescription         String? @db.Text
-  seoKeywords            String?
-
-  aboutPage         String? @db.Text
-  faqsPage          String? @db.Text
-  descriptionPage   String? @db.Text
-  privacyPolicyPage String? @db.Text
-  refundPolicyPage  String? @db.Text
-
-  blogs                  Blog[]
-  categories             Category[]
-  products               Product[]
-  reviews                Review[]
-  orders                 Order[]
-  customers              CustomerStore[]
-  transactions           Transaction[]
-  carts                  Cart[]
-  branches               Branch[]
-  activityLogs           ActivityLog[]
-  coupons                Coupon[]
-  transferRequests       StoreTransferRequest[]
-  stockTransfers         StockTransfer[]
-  stockAdjustments       StockAdjustment[]
-  PaymentSetting         PaymentSetting[]
-  employeeStores         EmployeeStore[]
-  subscriptionInvoices   SubscriptionInvoice[]
-  conversations          Conversation[]
-  StoreDomain            StoreDomain[]
-  role                   Role[]
-  supplierAgreements     ResellerAgreement[]       @relation("SupplierAgreements")
-  resellerAgreements     ResellerAgreement[]       @relation("ResellerAgreements")
-  slipHistories          SlipVerificationHistory[]
-  reviewRewardConfig     ReviewRewardConfig?
-  expenses               Expense[]
-  addresses              Address[]
-  storeThemeConfig       StoreThemeConfig?
-  webhookEndpoints       StoreWebhookEndpoint[]
-  marketplaceConnections MarketplaceConnection[]
-  marketplaceSyncLogs    MarketplaceSyncLog[]
-  affiliateSetting       StoreAffiliateSetting?
-  affiliateAccounts      AffiliateAccount[]
-  profitPartners         ProfitPartner[]
-  monthlySettlements     MonthlySettlement[]
-  employeeSalaryConfigs  EmployeeSalaryConfig[]
-  monthlyPayrolls        MonthlyPayroll[]
-  tableZones             TableZone[]
-  restaurantTables       RestaurantTable[]
+  blogs                Blog[]
+  categories           Category[]
+  products             Product[]
+  reviews              Review[]
+  orders               Order[]
+  customers            CustomerStore[]
+  transactions         Transaction[]
+  carts                Cart[]
+  branches             Branch[]
+  activityLogs         ActivityLog[]
+  coupons              Coupon[]
+  transferRequests     StoreTransferRequest[]
+  stockTransfers       StockTransfer[]
+  stockAdjustments     StockAdjustment[]
+  PaymentSetting       PaymentSetting[]
+  employeeStores       EmployeeStore[]
+  subscriptionInvoices SubscriptionInvoice[]
+  conversations        Conversation[]
+  StoreDomain          StoreDomain[]
+  role                 Role[]
+  supplierAgreements   ResellerAgreement[]       @relation("SupplierAgreements")
+  resellerAgreements   ResellerAgreement[]       @relation("ResellerAgreements")
+  slipHistories        SlipVerificationHistory[]
+  reviewRewardConfig   ReviewRewardConfig?
+  expenses             Expense[]
+  addresses            Address[]
+  storeThemeConfig     StoreThemeConfig[]
 
   translations Json?
 
@@ -939,7 +867,6 @@ enum ProductType {
   DIGITAL_LINK
   DIGITAL_ITEM
   DIGITAL_SERVICE
-  AFFILIATE_LINK
 }
 
 model Product {
@@ -1038,14 +965,13 @@ model ProductVariant {
 
   translations Json?
 
-  reviews             Review[]
-  stocks              ProductStock[]
-  stockTransfers      StockTransfer[]
-  stockAdjustments    StockAdjustment[]
-  digitalItems        DigitalItem[]
-  resellerPrices      ResellerCustomPrice[]
-  resellerStock       ResellerStock[]
-  marketplaceMappings MarketplaceProductMapping[]
+  reviews          Review[]
+  stocks           ProductStock[]
+  stockTransfers   StockTransfer[]
+  stockAdjustments StockAdjustment[]
+  digitalItems     DigitalItem[]
+  resellerPrices   ResellerCustomPrice[]
+  resellerStock    ResellerStock[]
 
   @@index([productId, isAvailable])
 }
@@ -1118,28 +1044,6 @@ model ReviewCategory {
   review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
-enum TableStatus {
-  AVAILABLE
-  OCCUPIED
-  BILL_REQUESTED
-  RESERVED
-  CLEANING
-}
-
-enum OrderType {
-  DINE_IN
-  TAKEAWAY
-  DELIVERY
-}
-
-enum KitchenItemStatus {
-  PENDING
-  COOKING
-  READY
-  SERVED
-  CANCELLED
-}
-
 enum OrderStatus {
   PENDING
   MANUAL_CHECK
@@ -1199,8 +1103,8 @@ model Address {
   receiverName String?
 
   addressLine String
-  subDistrict String?
-  district    String?
+  subDistrict String
+  district    String
   province    String
   postalCode  String
   country     CountryCode @default(TH)
@@ -1217,7 +1121,6 @@ model Address {
   @@index([customerId])
   @@index([storeId])
   @@index([customerId, storeId])
-  @@index([country])
 }
 
 model Order {
@@ -1277,29 +1180,17 @@ model Order {
 
   resellerAgreementId String?
   resellerAgreement   ResellerAgreement? @relation(fields: [resellerAgreementId], references: [id], onDelete: SetNull)
-  affiliateReferral   AffiliateReferral?
 
-  baseCurrency     CurrencyCode @default(THB)
   customerCurrency CurrencyCode @default(THB)
-  exchangeRate     Decimal      @default(1) @db.Decimal(12, 6)
   totalAmountBase  Decimal
 
   slipHistories SlipVerificationHistory[]
-
-  orderType      OrderType        @default(DINE_IN)
-  tableId        String?
-  table          RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
-  tableSessionId String?
-  tableSession   TableSession?    @relation(fields: [tableSessionId], references: [id], onDelete: SetNull)
-  kitchenNote    String?          @db.Text
 
   @@unique([storeId, orderNumber])
   @@index([storeId])
   @@index([customerId])
   @@index([bankAccountId])
   @@index([employeeId])
-  @@index([tableId])
-  @@index([tableSessionId])
   @@index([storeId, status])
   @@index([storeId, createdAt])
 }
@@ -1313,90 +1204,20 @@ model OrderItem {
   branch   Branch @relation(fields: [branchId], references: [id])
 
   productType   ProductType
-  customerNote  String?           @db.Text
+  customerNote  String?     @db.Text
   productId     String
   title         String
   variantId     String
   variantTitle  String
   image         String?
   quantity      Int
-  price         Decimal           @db.Decimal(10, 2)
-  originalPrice Decimal?          @db.Decimal(10, 2)
-  costPrice     Decimal?          @default(0) @db.Decimal(10, 2)
-  kitchenStatus KitchenItemStatus @default(PENDING)
+  price         Decimal     @db.Decimal(10, 2)
+  originalPrice Decimal?    @db.Decimal(10, 2)
+  costPrice     Decimal?    @default(0) @db.Decimal(10, 2)
 
   @@index([orderId])
   @@index([productId])
   @@index([variantId])
-  @@index([kitchenStatus])
-}
-
-model TableZone {
-  id        String @id @default(uuid())
-  storeId   String
-  branchId  String
-  name      String
-  sortOrder Int    @default(0)
-
-  store  Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  tables RestaurantTable[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId, branchId])
-}
-
-model RestaurantTable {
-  id          String      @id @default(uuid())
-  storeId     String
-  branchId    String
-  zoneId      String?
-  tableNumber String
-  seats       Int         @default(4)
-  status      TableStatus @default(AVAILABLE)
-
-  qrCodeToken String @unique @default(uuid())
-
-  currentSessionId String?
-
-  store  Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  branch Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  zone   TableZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-
-  sessions TableSession[]
-  orders   Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([branchId, tableNumber])
-  @@index([storeId, branchId])
-  @@index([qrCodeToken])
-}
-
-model TableSession {
-  id          String      @id @default(uuid())
-  tableId     String
-  storeId     String
-  branchId    String
-  sessionCode String      @default(uuid())
-  guestCount  Int         @default(1)
-  status      TableStatus @default(OCCUPIED)
-
-  openedAt DateTime  @default(now())
-  closedAt DateTime?
-
-  table  RestaurantTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  orders Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([tableId, status])
-  @@index([storeId, branchId])
 }
 
 model Cart {
@@ -1791,8 +1612,6 @@ model Expense {
   expenseDate DateTime @default(now())
   note        String?  @db.Text
 
-  monthlyPayrolls MonthlyPayroll[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1821,433 +1640,4 @@ model StoreThemeConfig {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model StoreWebhookEndpoint {
-  id      String @id @default(uuid())
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  url         String
-  description String?
-  secret      String
-  events      String[]
-  isActive    Boolean  @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  logs StoreWebhookLog[]
-
-  @@index([storeId])
-}
-
-model StoreWebhookLog {
-  id         String               @id @default(uuid())
-  endpointId String
-  endpoint   StoreWebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
-
-  event           String
-  statusCode      Int?
-  requestPayload  Json
-  responseBody    String? @db.Text
-  executionTimeMs Int
-  isSuccess       Boolean @default(false)
-  errorMessage    String? @db.Text
-
-  createdAt DateTime @default(now())
-
-  @@index([endpointId])
-  @@index([createdAt])
-}
-
-enum MarketplacePlatform {
-  SHOPEE
-  LAZADA
-  FACEBOOK
-}
-
-enum MarketplaceConnectionStatus {
-  CONNECTED
-  DISCONNECTED
-  EXPIRED
-  ERROR
-}
-
-enum MarketplaceSyncStatus {
-  SUCCESS
-  FAILED
-  PENDING
-}
-
-model MarketplaceConnection {
-  id       String                      @id @default(uuid())
-  storeId  String
-  store    Store                       @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  platform MarketplacePlatform
-  status   MarketplaceConnectionStatus @default(DISCONNECTED)
-
-  shopId         String?
-  shopName       String?
-  appKey         String?
-  appSecret      String?
-  accessToken    String?   @db.Text
-  refreshToken   String?   @db.Text
-  tokenExpiresAt DateTime?
-
-  isAutoSync  Boolean @default(true)
-  isSimulator Boolean @default(false)
-
-  defaultBranchId String?
-  defaultBranch   Branch? @relation(fields: [defaultBranchId], references: [id], onDelete: SetNull)
-
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  mappings MarketplaceProductMapping[]
-  syncLogs MarketplaceSyncLog[]
-
-  @@unique([storeId, platform, shopId])
-  @@index([storeId])
-  @@index([platform])
-}
-
-model MarketplaceProductMapping {
-  id           String                @id @default(uuid())
-  connectionId String
-  connection   MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
-
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-
-  marketplaceItemId String
-  marketplaceSku    String
-
-  autoSyncStock Boolean @default(true)
-  autoSyncPrice Boolean @default(false)
-
-  lastSyncedStock Int?
-  lastSyncedPrice Decimal?  @db.Decimal(10, 2)
-  lastSyncedAt    DateTime?
-  syncError       String?   @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([connectionId, variantId])
-  @@index([connectionId])
-  @@index([variantId])
-  @@index([marketplaceSku])
-}
-
-model MarketplaceSyncLog {
-  id      String @id @default(uuid())
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  connectionId String
-  connection   MarketplaceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
-
-  platform   MarketplacePlatform
-  action     String
-  status     MarketplaceSyncStatus
-  itemsCount Int                   @default(1)
-
-  payload      Json?
-  response     Json?
-  errorMessage String? @db.Text
-
-  createdAt DateTime @default(now())
-
-  @@index([storeId])
-  @@index([connectionId])
-  @@index([createdAt])
-}
-
-enum AffiliateCommissionStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  PAID
-}
-
-model StoreAffiliateSetting {
-  id      String @id @default(uuid())
-  storeId String @unique
-  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  isEnabled             Boolean @default(false)
-  defaultCommissionRate Decimal @default(5.00) @db.Decimal(5, 2)
-  minWithdrawalAmount   Decimal @default(100.00) @db.Decimal(10, 2)
-  cookieDurationDays    Int     @default(30)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model AffiliateAccount {
-  id         String   @id @default(uuid())
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  storeId    String
-  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-
-  referralCode   String
-  balance        Decimal @default(0) @db.Decimal(10, 2)
-  totalEarned    Decimal @default(0) @db.Decimal(10, 2)
-  totalWithdrawn Decimal @default(0) @db.Decimal(10, 2)
-
-  bankName        String?
-  bankAccountNo   String?
-  bankAccountName String?
-  promptPayNumber String?
-
-  isActive Boolean @default(true)
-
-  referrals AffiliateReferral[]
-  payouts   AffiliatePayout[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([storeId, customerId])
-  @@unique([storeId, referralCode])
-  @@index([storeId])
-  @@index([customerId])
-  @@index([referralCode])
-}
-
-model AffiliateReferral {
-  id                 String           @id @default(uuid())
-  orderId            String           @unique
-  order              Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  affiliateAccountId String
-  affiliateAccount   AffiliateAccount @relation(fields: [affiliateAccountId], references: [id], onDelete: Cascade)
-
-  commissionAmount Decimal                   @db.Decimal(10, 2)
-  commissionRate   Decimal                   @db.Decimal(5, 2)
-  orderAmount      Decimal                   @db.Decimal(10, 2)
-  status           AffiliateCommissionStatus @default(PENDING)
-
-  approvedAt DateTime?
-  paidAt     DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([affiliateAccountId])
-  @@index([status])
-}
-
-model AffiliatePayout {
-  id                 String           @id @default(uuid())
-  affiliateAccountId String
-  affiliateAccount   AffiliateAccount @relation(fields: [affiliateAccountId], references: [id], onDelete: Cascade)
-
-  amount Decimal      @db.Decimal(10, 2)
-  status PayoutStatus @default(PENDING)
-
-  bankName        String?
-  bankAccountNo   String?
-  bankAccountName String?
-  promptPayNumber String?
-
-  paymentProof String?
-  note         String?
-  paidAt       DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([affiliateAccountId])
-  @@index([status])
-}
-
-enum PartnerRole {
-  SHAREHOLDER
-  DEVELOPER
-  SYSTEM
-  MARKETING
-  INVESTOR
-  OTHER
-}
-
-enum ShareType {
-  NET_PROFIT_PERCENT
-  REVENUE_PERCENT
-  FIXED_MONTHLY
-}
-
-model ProfitPartner {
-  id              String         @id @default(uuid())
-  storeId         String
-  store           Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  name            String
-  role            PartnerRole    @default(SHAREHOLDER)
-  shareType       ShareType      @default(NET_PROFIT_PERCENT)
-  shareValue      Decimal        @db.Decimal(10, 2)
-  bankName        String?
-  bankAccount     String?
-  bankAccountName String?
-  promptPay       String?
-  note            String?        @db.Text
-  isActive        Boolean        @default(true)
-  payouts         ProfitPayout[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId])
-}
-
-model MonthlySettlement {
-  id               String         @id @default(uuid())
-  storeId          String
-  store            Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  period           String
-  periodLabel      String
-  startDate        DateTime
-  endDate          DateTime
-  totalRevenue     Decimal        @default(0) @db.Decimal(12, 2)
-  totalCogs        Decimal        @default(0) @db.Decimal(12, 2)
-  totalExpense     Decimal        @default(0) @db.Decimal(12, 2)
-  netProfit        Decimal        @default(0) @db.Decimal(12, 2)
-  totalAllocated   Decimal        @default(0) @db.Decimal(12, 2)
-  retainedEarnings Decimal        @default(0) @db.Decimal(12, 2)
-  isClosed         Boolean        @default(false)
-  payouts          ProfitPayout[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([storeId, period])
-  @@index([storeId])
-}
-
-model ProfitPayout {
-  id               String            @id @default(uuid())
-  settlementId     String
-  settlement       MonthlySettlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
-  partnerId        String
-  partner          ProfitPartner     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
-  partnerName      String
-  role             PartnerRole
-  shareType        ShareType
-  shareValue       Decimal           @db.Decimal(10, 2)
-  calculatedAmount Decimal           @db.Decimal(12, 2)
-  status           PayoutStatus      @default(PENDING)
-  paidAt           DateTime?
-  slipImage        String?
-  paymentNote      String?           @db.Text
-  bankName         String?
-  bankAccount      String?
-  bankAccountName  String?
-  promptPay        String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([settlementId])
-  @@index([partnerId])
-}
-
-enum SalaryType {
-  MONTHLY
-  DAILY
-  HOURLY
-  COMMISSION
-}
-
-model EmployeeSalaryConfig {
-  id                String     @id @default(uuid())
-  storeId           String
-  store             Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  employeeId        String?
-  employeeName      String
-  employeeCode      String?
-  department        String?
-  position          String?
-  salaryType        SalaryType @default(MONTHLY)
-  baseSalary        Decimal    @default(0) @db.Decimal(10, 2)
-  bankName          String?
-  bankAccountNumber String?
-  bankAccountName   String?
-  promptpayNumber   String?
-  socialSecurity    Boolean    @default(false)
-  taxPercent        Decimal?   @default(0) @db.Decimal(5, 2)
-  isActive          Boolean    @default(true)
-  note              String?    @db.Text
-
-  payrollItems MonthlyPayrollItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([storeId])
-}
-
-model MonthlyPayroll {
-  id              String    @id @default(uuid())
-  storeId         String
-  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  period          String
-  periodLabel     String
-  startDate       DateTime
-  endDate         DateTime
-  totalBaseSalary Decimal   @default(0) @db.Decimal(12, 2)
-  totalOvertime   Decimal   @default(0) @db.Decimal(12, 2)
-  totalBonus      Decimal   @default(0) @db.Decimal(12, 2)
-  totalCommission Decimal   @default(0) @db.Decimal(12, 2)
-  totalDeductions Decimal   @default(0) @db.Decimal(12, 2)
-  totalNetSalary  Decimal   @default(0) @db.Decimal(12, 2)
-  totalPaid       Decimal   @default(0) @db.Decimal(12, 2)
-  isClosed        Boolean   @default(false)
-  closedAt        DateTime?
-  expenseId       String?
-  expense         Expense?  @relation(fields: [expenseId], references: [id], onDelete: SetNull)
-  note            String?   @db.Text
-
-  items MonthlyPayrollItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([storeId, period])
-  @@index([storeId])
-  @@index([expenseId])
-}
-
-model MonthlyPayrollItem {
-  id               String                @id @default(uuid())
-  monthlyPayrollId String
-  monthlyPayroll   MonthlyPayroll        @relation(fields: [monthlyPayrollId], references: [id], onDelete: Cascade)
-  employeeConfigId String?
-  employeeConfig   EmployeeSalaryConfig? @relation(fields: [employeeConfigId], references: [id], onDelete: SetNull)
-  employeeName     String
-  employeeCode     String?
-  department       String?
-  position         String?
-  salaryType       SalaryType            @default(MONTHLY)
-  baseSalary       Decimal               @default(0) @db.Decimal(10, 2)
-  overtimeAmount   Decimal               @default(0) @db.Decimal(10, 2)
-  bonusAmount      Decimal               @default(0) @db.Decimal(10, 2)
-  commissionAmount Decimal               @default(0) @db.Decimal(10, 2)
-  deductionAmount  Decimal               @default(0) @db.Decimal(10, 2)
-  netSalary        Decimal               @default(0) @db.Decimal(10, 2)
-  status           PayoutStatus          @default(PENDING)
-  paidAt           DateTime?
-  slipImage        String?
-  paymentNote      String?               @db.Text
-  bankName         String?
-  bankAccount      String?
-  bankAccountName  String?
-  promptPay        String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([monthlyPayrollId])
-  @@index([employeeConfigId])
 }

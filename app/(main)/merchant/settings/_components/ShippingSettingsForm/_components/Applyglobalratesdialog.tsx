@@ -1,27 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-
-import { useTranslations } from 'next-intl'
+import toast from 'react-hot-toast'
 
 import {
   useApplyGlobalRates,
   useGlobalShippingMetadata,
   useGlobalShippingRateMatrixProvinces,
 } from '@/actions/hooks/global-shipping-rate-matrix'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
 import { IconCloudDownload } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
@@ -35,8 +34,6 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 
 export function ApplyGlobalRatesDialog() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.shipping.applyGlobal')
   const [open, setOpen] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState<string>('')
 
@@ -62,6 +59,9 @@ export function ApplyGlobalRatesDialog() {
         onSuccess: () => {
           setOpen(false)
         },
+        onError: (err) => {
+          toast.error(err.message)
+        },
       },
     )
   }
@@ -79,30 +79,25 @@ export function ApplyGlobalRatesDialog() {
       <DialogTrigger asChild>
         <Button type="button" variant="outline">
           <IconCloudDownload />
-          {t('trigger')}
+          นำเรทจัดส่งมาใช้กับร้านนี้
         </Button>
       </DialogTrigger>
 
-      <DialogContent
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-      >
+      <DialogContent>
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconCloudDownload}
-            title={t('title')}
-            description={t('description')}
-          />
+          <DialogTitle>เลือกจังหวัดต้นทางของร้านค้า</DialogTitle>
+          <DialogDescription>
+            ระบบจะดึงเรทค่าจัดส่งจาก Master Data
+            พร้อมทั้งปรับปรุงที่อยู่ต้นทางของร้านค้า (จังหวัด/อำเภอ/ไปรษณีย์)
+            ให้ตรงกับข้อมูลเรทที่เลือกโดยอัตโนมัติ
+          </DialogDescription>
         </DialogHeader>
 
         <Field>
-          <FieldLabel>{t('provinceLabel')}</FieldLabel>
+          <FieldLabel>จังหวัดต้นทาง</FieldLabel>
           <Select value={selectedProvince} onValueChange={setSelectedProvince}>
             <SelectTrigger>
-              <SelectValue placeholder={t('provincePlaceholder')} />
+              <SelectValue placeholder="เลือกจังหวัด..." />
             </SelectTrigger>
             <SelectContent>
               {provinces?.map((matrix) => (
@@ -117,11 +112,10 @@ export function ApplyGlobalRatesDialog() {
           </Select>
           {selectedProvince && (
             <FieldDescription>
-              {t('updatedAt', {
-                date: matrixMeta?.updatedAt
-                  ? formatDateTime(matrixMeta?.updatedAt)
-                  : '-',
-              })}
+              อัพเดตฐานข้อมูลวันที่:{' '}
+              {matrixMeta?.updatedAt
+                ? formatDateTime(matrixMeta?.updatedAt)
+                : '-'}
             </FieldDescription>
           )}
         </Field>
@@ -135,12 +129,12 @@ export function ApplyGlobalRatesDialog() {
             {isApplying ? (
               <>
                 <Spinner />
-                {t('updating')}
+                กำลังอัพเดต...
               </>
             ) : (
               <>
                 <IconCloudDownload size={14} />
-                {t('apply')}
+                นำเรทนี้ไปใช้กับร้านค้า
               </>
             )}
           </Button>

@@ -1,8 +1,6 @@
-import { convertCurrency, getExchangeRate } from '@/constants/currencies'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,
-  CurrencyCode,
   LogAction,
   OrderStatus,
   PaymentMethod,
@@ -37,7 +35,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       logo: true,
       phone: true,
       email: true,
-      baseCurrency: true,
       isPointsEnabled: true,
       pointEarningRate: true,
       pointRedeemRate: true,
@@ -119,10 +116,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       maxDiscount: coupon.maxDiscount ? Number(coupon.maxDiscount) : null,
     }
   }
-
-  const baseCurrency = (store.baseCurrency as CurrencyCode) ?? CurrencyCode.THB
-  const customerCurrency = input.customerCurrency ?? baseCurrency
-  const exchangeRate = getExchangeRate(baseCurrency, customerCurrency)
 
   const variantIds = Array.from(
     new Set(input.items.map((i) => i.variantId).filter(Boolean)),
@@ -298,19 +291,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         ? `${baseOrderNumber}-${orderCounter++}`
         : baseOrderNumber
 
-      const convertedTotal = convertCurrency(
-        groupTotal,
-        baseCurrency,
-        customerCurrency,
-      )
-
       const order = await tx.order.create({
         data: {
           orderNumber: subOrderNumber,
-          baseCurrency,
-          customerCurrency,
-          exchangeRate,
-          totalAmount: convertedTotal,
+          totalAmount: groupTotal,
           totalAmountBase: groupTotal,
           status: defaultStatus,
           paidAt:
@@ -398,19 +382,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
         select: { id: true },
       })
 
-      const convertedDigitalTotal = convertCurrency(
-        digitalTotal,
-        baseCurrency,
-        customerCurrency,
-      )
-
       const order = await tx.order.create({
         data: {
           orderNumber: subOrderNumber,
-          baseCurrency,
-          customerCurrency,
-          exchangeRate,
-          totalAmount: convertedDigitalTotal,
+          totalAmount: digitalTotal,
           totalAmountBase: digitalTotal,
           status: defaultStatus,
           paidAt:
@@ -515,19 +490,10 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
 
         const variant = variantMap.get(serviceItem.variantId)
 
-        const convertedServiceTotal = convertCurrency(
-          serviceTotal,
-          baseCurrency,
-          customerCurrency,
-        )
-
         const order = await tx.order.create({
           data: {
             orderNumber: subOrderNumber,
-            baseCurrency,
-            customerCurrency,
-            exchangeRate,
-            totalAmount: convertedServiceTotal,
+            totalAmount: serviceTotal,
             totalAmountBase: serviceTotal,
             status: defaultStatus,
             paidAt:
@@ -591,53 +557,6 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       })
     }
 
-    if (input.affiliateCode && orders.length > 0) {
-      try {
-        const affiliateSetting = await tx.storeAffiliateSetting.findUnique({
-          where: { storeId: store.id },
-        })
-        if (affiliateSetting?.isEnabled) {
-          const affiliateAccount = await tx.affiliateAccount.findUnique({
-            where: {
-              storeId_referralCode: {
-                storeId: store.id,
-                referralCode: input.affiliateCode,
-              },
-            },
-          })
-
-          if (
-            affiliateAccount &&
-            affiliateAccount.isActive &&
-            affiliateAccount.customerId !== input.customerId
-          ) {
-            const commissionRate = Number(
-              affiliateSetting.defaultCommissionRate,
-            )
-            for (const ord of orders) {
-              const orderTotal = Number(ord.totalAmount)
-              const commissionAmount =
-                Math.round(orderTotal * (commissionRate / 100) * 100) / 100
-              if (commissionAmount > 0) {
-                await tx.affiliateReferral.create({
-                  data: {
-                    orderId: ord.id,
-                    affiliateAccountId: affiliateAccount.id,
-                    commissionAmount,
-                    commissionRate,
-                    orderAmount: orderTotal,
-                    status: 'PENDING',
-                  },
-                })
-              }
-            }
-          }
-        }
-      } catch (affErr) {
-        console.error('Affiliate attribution error:', affErr)
-      }
-    }
-
     return orders
   })
 
@@ -656,6 +575,7 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
       changeAmount: input.changeAmount,
     },
   })
+
   return createdOrders
 }
 
@@ -671,7 +591,6 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       status: true,
       customerId: true,
       totalAmount: true,
-      totalAmountBase: true,
       usedPoints: true,
       earnedPoints: true,
       couponId: true,
@@ -790,9 +709,7 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
         })
       }
 
-      const amountToDeduct = Number(
-        order.totalAmountBase ?? order.totalAmount ?? 0,
-      )
+      const amountToDeduct = Number(order.totalAmount ?? 0)
       if (amountToDeduct > 0) {
         await tx.customerStore.update({
           where: {

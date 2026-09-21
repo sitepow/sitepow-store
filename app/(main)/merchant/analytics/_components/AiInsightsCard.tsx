@@ -1,10 +1,5 @@
 'use client'
 
-import React from 'react'
-
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
 import {
   IconClock,
   IconPackage,
@@ -45,22 +40,12 @@ interface AiInsightsCardProps {
 }
 
 export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.analytics.aiInsights')
-
   return (
-    <Card
-      className="border-purple-200 bg-purple-50/30 dark:bg-purple-950/10"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <Card className="border-purple-200 bg-purple-50/30 dark:bg-purple-950/10">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
           <IconSparkles className="size-5 shrink-0" />
-          {t('title')}
+          บทวิเคราะห์และกลยุทธ์จาก AI (AI Business Insights)
         </CardTitle>
         <CardDescription>{aiInsights.businessSummary}</CardDescription>
       </CardHeader>
@@ -68,13 +53,11 @@ export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="bg-card space-y-1 rounded-lg border p-3">
             <div className="flex items-center gap-2 font-semibold text-blue-600 dark:text-blue-400">
-              <IconClock className="size-4 shrink-0" />{' '}
-              {t('operatingHoursTitle')}
+              <IconClock className="size-4 shrink-0" /> กลยุทธ์เวลาเปิด-ปิดร้าน
             </div>
             <p className="text-xs font-bold">
-              {t('recommendedStartHour', {
-                hour: aiInsights.operatingHoursStrategy.recommendedStartHour,
-              })}
+              เวลาที่ควรเปิด:{' '}
+              {aiInsights.operatingHoursStrategy.recommendedStartHour}
             </p>
             <p className="text-muted-foreground text-xs">
               {aiInsights.operatingHoursStrategy.peakHoursNotice}
@@ -85,8 +68,8 @@ export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
           </div>
           <div className="bg-card space-y-1 rounded-lg border p-3">
             <div className="flex items-center gap-2 font-semibold text-orange-600 dark:text-orange-400">
-              <IconPackage className="size-4 shrink-0" />{' '}
-              {t('productPromoTitle')}
+              <IconPackage className="size-4 shrink-0" /> การดันยอดสินค้า &
+              โปรโมชั่น
             </div>
             <p className="text-muted-foreground text-xs">
               {aiInsights.productAndBundlingStrategy.topProductInsight}
@@ -106,7 +89,7 @@ export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
           </div>
           <div className="bg-card space-y-1 rounded-lg border p-3">
             <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
-              <IconTarget className="size-4 shrink-0" /> {t('retentionTitle')}
+              <IconTarget className="size-4 shrink-0" /> การดึงดูดลูกค้าเดิม
             </div>
             <p className="text-muted-foreground text-xs">
               {aiInsights.retentionAndMarketingStrategy.customerInsight}
@@ -114,7 +97,9 @@ export function AiInsightsCard({ aiInsights }: AiInsightsCardProps) {
           </div>
         </div>
         <div className="border-t pt-3">
-          <p className="mb-2 text-xs font-semibold">{t('actionItemsTitle')}</p>
+          <p className="mb-2 text-xs font-semibold">
+            ข้อแนะนำที่ร้านค้าควรปรับทำทันที (Action Items):
+          </p>
           <ul className="text-muted-foreground list-inside list-disc space-y-1 text-xs">
             {aiInsights.retentionAndMarketingStrategy.actionableSteps.map(
               (step, idx) => (

@@ -1,7 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
 import { BUYER_NAVIGATION } from '@/constants/navigation'
 import { IconMapPin } from '@tabler/icons-react'
 
@@ -12,14 +10,12 @@ import { CustomerAddressCreateDialog } from '../../cart/_components/CustomerAddr
 import { AddressTable } from './_components/AddressTable'
 
 export default function StoreUserAddressesPage() {
-  const t = useTranslations('customer.addresses')
-
   return (
     <Sidebar redirectPath="user" items={BUYER_NAVIGATION}>
       <PageTabHeader
         icon={IconMapPin}
-        title={t('title')}
-        description={t('description')}
+        title="ที่อยู่จัดส่ง"
+        description="บันทึกสมุดที่อยู่รับสินค้า เพื่อความสะดวกและรวดเร็วในการกรอกฟอร์มปลายทางตอนสั่งซื้อผ่านหน้า Sale Page"
         endContent={<CustomerAddressCreateDialog />}
       />
       <AddressTable />

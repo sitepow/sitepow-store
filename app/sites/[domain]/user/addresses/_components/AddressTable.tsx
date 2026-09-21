@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import {
@@ -8,8 +7,6 @@ import {
   useDeleteAddress,
   useSetDefaultAddress,
 } from '@/actions/hooks/storefront/address'
-import { COUNTRY_METADATA } from '@/constants/shipping'
-import { CountryCode } from '@/generated/prisma/enums'
 import { formatPromptPay } from '@/utils/slip'
 import { IconArrowForward, IconBriefcase, IconHome } from '@tabler/icons-react'
 
@@ -28,7 +25,6 @@ import {
 } from '@/components/ui/table'
 
 export function AddressTable() {
-  const t = useTranslations('customer.addresses')
   const params = useParams()
   const domain = params?.domain as string
 
@@ -37,78 +33,41 @@ export function AddressTable() {
     useDeleteAddress()
   const { mutate: setDefault } = useSetDefaultAddress()
 
-  const isOfficeAddress = (name?: string | null) => {
-    if (!name) return false
-    const lower = name.toLowerCase()
-    return (
-      lower.includes('office') ||
-      lower.includes('work') ||
-      (t.has('office' as any) && name.includes(t('office' as any)))
-    )
-  }
-
   return (
     <div className="rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('columns.address')}</TableHead>
-            <TableHead>{t('columns.recipient')}</TableHead>
-            <TableHead>{t('columns.phone')}</TableHead>
-            <TableHead>{t('columns.details')}</TableHead>
-            <TableHead className="text-right">{t('columns.actions')}</TableHead>
+            <TableHead>ที่อยู่</TableHead>
+            <TableHead>ผู้รับสินค้า</TableHead>
+            <TableHead>เบอร์ติดต่อ</TableHead>
+            <TableHead>รายละเอียด</TableHead>
+            <TableHead className="text-right">จัดการ</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading && addresses.length === 0 ? (
             <TableLoadingRow colSpan={5} />
           ) : addresses.length === 0 ? (
-            <TableEmptyRow colSpan={5} title={t('empty')} />
+            <TableEmptyRow colSpan={5} title="คุณยังไม่มีที่อยู่ในระบบ" />
           ) : (
             addresses.map((addr) => (
               <TableRow key={addr.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {isOfficeAddress(addr.name) ? (
+                    {addr.name?.includes('ออฟฟิศ') ? (
                       <IconBriefcase size={16} />
                     ) : (
                       <IconHome size={16} />
                     )}
-                    {addr.country && addr.country !== CountryCode.TH && (
-                      <span title={COUNTRY_METADATA[addr.country]?.nameEN}>
-                        {COUNTRY_METADATA[addr.country]?.flag}
-                      </span>
-                    )}
                     <span>{addr.name}</span>
-                    {addr.isDefault && <Badge>{t('defaultBadge')}</Badge>}
+                    {addr.isDefault && <Badge>ที่อยู่หลัก</Badge>}
                   </div>
                 </TableCell>
                 <TableCell>{addr.receiverName}</TableCell>
-                <TableCell>
-                  {addr.country && addr.country !== CountryCode.TH
-                    ? addr.phone
-                    : formatPromptPay(addr.phone)}
-                </TableCell>
+                <TableCell>{formatPromptPay(addr.phone)}</TableCell>
                 <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
-                  {addr.country && addr.country !== CountryCode.TH
-                    ? [
-                        addr.addressLine,
-                        addr.district,
-                        addr.province,
-                        addr.postalCode,
-                        COUNTRY_METADATA[addr.country]?.nameEN || addr.country,
-                      ]
-                        .filter(Boolean)
-                        .join(', ')
-                    : [
-                        addr.addressLine,
-                        addr.subDistrict,
-                        addr.district,
-                        addr.province,
-                        addr.postalCode,
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
+                  {`${addr.addressLine} ${addr.subDistrict} ${addr.district} ${addr.province} ${addr.postalCode}`}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
@@ -118,13 +77,11 @@ export function AddressTable() {
                         onClick={() => setDefault(addr.id)}
                       >
                         <IconArrowForward />
-                        {t('setDefault')}
+                        ตั้งเป็นที่อยู่หลัก
                       </Button>
                     )}
                     <DeleteButton
                       isPending={isDeletePending}
-                      title={t('confirmDeleteTitle')}
-                      description={t('confirmDeleteDesc')}
                       onDelete={() => deleteAddress(addr.id)}
                     />
                   </div>

@@ -15,7 +15,6 @@ const addressOptionSelect = {
   district: true,
   subDistrict: true,
   postalCode: true,
-  country: true,
   isDefault: true,
   storeId: true,
 } satisfies Prisma.AddressSelect
@@ -30,7 +29,6 @@ const addressDetailSelect = {
   district: true,
   province: true,
   postalCode: true,
-  country: true,
   receiverName: true,
   taxName: true,
   taxId: true,
@@ -88,7 +86,6 @@ async function getStoreIdBySlug(storeSlug?: string) {
     where: {
       OR: [
         { slug: storeSlug },
-        { customDomain: storeSlug, customDomainStatus: 'ACTIVE' },
         { StoreDomain: { some: { domain: storeSlug, status: 'ACTIVE' } } },
       ],
     },
@@ -170,22 +167,14 @@ export async function createAddress(
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const customerId = await getCustomerId(userId)
     const storeId = await getStoreIdBySlug(storeSlug)
 
     if (!customerId || !storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลร้านค้าหรือลูกค้า',
-        messageEN: 'Store or customer data not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้าหรือลูกค้า' }
     }
 
     const countInStore = await prisma.address.count({
@@ -202,12 +191,7 @@ export async function createAddress(
       select: addressDetailSelect,
     })
 
-    return {
-      success: true,
-      messageTH: 'บันทึกที่อยู่สำเร็จแล้ว',
-      messageEN: 'Address saved successfully',
-      data: address,
-    }
+    return { success: true, message: 'บันทึกที่อยู่สำเร็จแล้ว', data: address }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -223,11 +207,7 @@ export async function updateAddress(
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const customerId = await getCustomerId(userId)
@@ -237,11 +217,7 @@ export async function updateAddress(
     })
 
     if (!address || address.customerId !== customerId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลที่อยู่',
-        messageEN: 'Address not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
     }
 
     const updated = await prisma.address.update({
@@ -250,12 +226,7 @@ export async function updateAddress(
       select: addressDetailSelect,
     })
 
-    return {
-      success: true,
-      messageTH: 'อัปเดตที่อยู่สำเร็จแล้ว',
-      messageEN: 'Address updated successfully',
-      data: updated,
-    }
+    return { success: true, message: 'อัปเดตที่อยู่สำเร็จแล้ว', data: updated }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -268,11 +239,7 @@ export async function deleteAddress(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     const customerId = await getCustomerId(userId)
@@ -282,11 +249,7 @@ export async function deleteAddress(id: string) {
     })
 
     if (!address || address.customerId !== customerId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลที่อยู่',
-        messageEN: 'Address not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
     }
 
     await prisma.address.delete({ where: { id } })
@@ -305,11 +268,7 @@ export async function deleteAddress(id: string) {
       }
     }
 
-    return {
-      success: true,
-      messageTH: 'ลบที่อยู่สำเร็จแล้ว',
-      messageEN: 'Address deleted successfully',
-    }
+    return { success: true, message: 'ลบที่อยู่สำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -321,13 +280,7 @@ export async function setDefaultAddress(id: string) {
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
-    if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-      }
-    }
+    if (!userId) return { success: false }
 
     const customerId = await getCustomerId(userId)
 
@@ -337,11 +290,7 @@ export async function setDefaultAddress(id: string) {
     })
 
     if (!targetAddress || targetAddress.customerId !== customerId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลที่อยู่',
-        messageEN: 'Address not found',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลที่อยู่' }
     }
 
     await prisma.$transaction([
@@ -358,11 +307,7 @@ export async function setDefaultAddress(id: string) {
       }),
     ])
 
-    return {
-      success: true,
-      messageTH: 'ตั้งค่าที่อยู่เริ่มต้นสำเร็จแล้ว',
-      messageEN: 'Default address set successfully',
-    }
+    return { success: true, message: 'ตั้งค่าที่อยู่เริ่มต้นสำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }

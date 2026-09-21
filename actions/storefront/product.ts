@@ -14,9 +14,6 @@ const storefrontProductListSelect = {
   title: true,
   slug: true,
   categoryId: true,
-  productType: true,
-  details: true,
-  translations: true,
   images: {
     where: { isPrimary: true },
     select: { url: true },
@@ -29,7 +26,6 @@ const storefrontProductListSelect = {
       discountType: true,
       discountAmount: true,
       discountActive: true,
-      translations: true,
     },
     take: 1,
   },
@@ -41,10 +37,9 @@ const storefrontProductDetailSelect = {
   slug: true,
   productType: true,
   details: true,
-  translations: true,
   tags: { select: { name: true } },
   category: {
-    select: { id: true, title: true, slug: true, translations: true },
+    select: { id: true, title: true, slug: true },
   },
   images: {
     select: { id: true, url: true, isPrimary: true },
@@ -55,7 +50,6 @@ const storefrontProductDetailSelect = {
       title: true,
       price: true,
       image: true,
-      digitalUrl: true,
       isAvailable: true,
       discountActive: true,
       discountType: true,
@@ -66,7 +60,6 @@ const storefrontProductDetailSelect = {
       width: true,
       height: true,
       length: true,
-      translations: true,
       stocks: {
         select: {
           quantity: true,
@@ -88,21 +81,14 @@ const storefrontProductDetailSelect = {
       title: true,
       maxSelect: true,
       require: true,
-      translations: true,
       choices: {
-        select: { id: true, name: true, extraPrice: true, translations: true },
+        select: { id: true, name: true, extraPrice: true },
       },
     },
   },
   addons: {
     where: { isAvailable: true },
-    select: {
-      id: true,
-      title: true,
-      price: true,
-      isAvailable: true,
-      translations: true,
-    },
+    select: { id: true, title: true, price: true, isAvailable: true },
   },
   reviews: {
     select: {
@@ -246,12 +232,10 @@ export async function getStorefrontProductDetail(
     storefrontProductKeys.detail(storeSlug, productSlug),
   )
 
-  const decodedSlug = decodeURIComponent(productSlug)
-
   const product = await withCache(cacheKey, async () => {
     const res = await prisma.product.findFirst({
       where: {
-        OR: [{ slug: productSlug }, { slug: decodedSlug }, { id: productSlug }],
+        slug: productSlug,
         isPublished: true,
         store: { slug: storeSlug, status: StoreStatus.ACTIVE },
       },

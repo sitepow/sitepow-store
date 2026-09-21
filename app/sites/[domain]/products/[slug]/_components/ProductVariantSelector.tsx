@@ -2,14 +2,10 @@
 
 import { useEffect, useMemo } from 'react'
 
-import { useLocale, useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
-import { getLocalizedField } from '@/utils/intl'
 import { formatCurrency } from '@/utils/pricing'
 import { calculateNetPrice, getStockQuantity } from '@/utils/product'
 
@@ -31,12 +27,6 @@ import { cn } from '@/lib/utils'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductVariantSelector() {
-  const t = useTranslations('storefront.products')
-  const locale = useLocale()
-  const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
-  )
   const {
     product,
     selectedVariant,
@@ -50,16 +40,13 @@ export function ProductVariantSelector() {
   const hasVariant = product?.variants?.length !== 0
 
   const allBranches = useMemo(() => {
-    if (product?.productType === ProductType.AFFILIATE_LINK) {
-      return []
-    }
     const branchMap = new Map()
     product?.variants?.forEach((variant) => {
       variant.stocks?.forEach((stock) => {
         if (stock.branchId && !branchMap.has(stock.branchId)) {
           branchMap.set(
             stock.branchId,
-            stock.branch?.name || t('branchPrefix', { name: stock.branchId }),
+            stock.branch?.name || `สาขา ${stock.branchId}`,
           )
         }
       })
@@ -68,10 +55,10 @@ export function ProductVariantSelector() {
       branchId,
       branchName,
     }))
-  }, [product, t])
+  }, [product])
 
   useEffect(() => {
-    if (!isPhysical || product?.productType === ProductType.AFFILIATE_LINK) {
+    if (!isPhysical) {
       return
     }
 
@@ -80,17 +67,7 @@ export function ProductVariantSelector() {
     if (!selectedBranchId && firstBranch) {
       setSelectedBranch(firstBranch.branchId, firstBranch.branchName)
     }
-  }, [
-    allBranches,
-    selectedBranchId,
-    setSelectedBranch,
-    isPhysical,
-    product?.productType,
-  ])
-
-  if (product?.productType === ProductType.AFFILIATE_LINK) {
-    return null
-  }
+  }, [allBranches, selectedBranchId, setSelectedBranch, isPhysical])
 
   return (
     <>
@@ -106,7 +83,7 @@ export function ProductVariantSelector() {
             {isPhysical && (
               <div className="space-y-2">
                 <Label className="text-lg font-semibold">
-                  {t('branchPickup')}
+                  สาขาที่รับสินค้า
                 </Label>
                 <Select
                   value={selectedBranchId || ''}
@@ -116,13 +93,12 @@ export function ProductVariantSelector() {
                     )
                     setSelectedBranch(
                       val,
-                      foundBranch?.branchName ||
-                        t('branchPrefix', { name: val }),
+                      foundBranch?.branchName || `สาขา ${val}`,
                     )
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t('selectBranch')} />
+                    <SelectValue placeholder="กรุณาเลือกสาขา" />
                   </SelectTrigger>
                   <SelectContent>
                     {allBranches.map((branch) => (
@@ -134,7 +110,7 @@ export function ProductVariantSelector() {
                 </Select>
               </div>
             )}
-            <Label className="text-lg font-semibold">{t('options')}</Label>
+            <Label className="text-lg font-semibold">ตัวเลือกสินค้า</Label>
             <RadioGroup
               value={selectedVariant?.id}
               onValueChange={selectVariant}
@@ -196,29 +172,23 @@ export function ProductVariantSelector() {
                           unoptimized
                         />
                       ) : (
-                        <EmptyImage
-                          className="text-[10px]"
-                          text={variant.title}
-                        />
+                        <EmptyImage className="text-[10px]" />
                       )}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="text-sm font-medium wrap-break-word whitespace-pre-line">
-                        {getLocalizedField(variant, 'title', locale) ||
-                          variant.title}
+                        {variant.title}
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {hasDiscount &&
                           variant.discountType === DiscountType.PERCENTAGE && (
                             <Badge className="px-1.5 py-0 text-[10px]">
-                              {t('discountPercent', {
-                                percent: variant.discountAmount ?? 0,
-                              })}
+                              ส่วนลด {variant.discountAmount}%
                             </Badge>
                           )}
                         {hasPoint && (
                           <Badge className="px-1.5 py-0 text-[10px]">
-                            {t('plusPoints', { points: variant.pointsAmount })}
+                            + {variant.pointsAmount} แต้ม
                           </Badge>
                         )}
                       </div>
@@ -226,24 +196,15 @@ export function ProductVariantSelector() {
                         {hasDiscount ? (
                           <div className="flex items-baseline gap-1.5">
                             <span className="text-primary text-sm font-bold">
-                              {formatCurrency(
-                                convert(netPrice),
-                                currentCurrency,
-                              )}
+                              {formatCurrency(netPrice)}
                             </span>
                             <span className="text-muted-foreground text-[10px] line-through">
-                              {formatCurrency(
-                                convert(variant.price),
-                                currentCurrency,
-                              )}
+                              {formatCurrency(variant.price)}
                             </span>
                           </div>
                         ) : (
                           <span className="text-primary text-sm font-semibold">
-                            {formatCurrency(
-                              convert(variant.price),
-                              currentCurrency,
-                            )}
+                            {formatCurrency(variant.price)}
                           </span>
                         )}
                       </div>

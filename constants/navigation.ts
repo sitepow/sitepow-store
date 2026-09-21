@@ -1,24 +1,18 @@
 import { PermissionKey } from '@/types/permission'
 import {
-  IconArmchair,
   IconBox,
   IconBuildingStore,
   IconCashRegister,
   IconChartBar,
-  IconChefHat,
   IconCoin,
   IconCreditCard,
-  IconFileDescription,
   IconHierarchy2,
   IconHistory,
   IconLayoutDashboard,
   IconMapPin,
-  IconMessages,
   IconNews,
   IconPackage,
   IconReceipt,
-  IconReceiptTax,
-  IconReportMoney,
   IconSettings,
   IconShoppingCart,
   IconStar,
@@ -48,14 +42,7 @@ export interface NavigationItem {
   items?: NavigationSubItem[]
 }
 
-export const SUPPORT_NAVIGATION: NavigationItem[] = [
-  {
-    value: 'chat',
-    label: 'กล่องข้อความ Support',
-    tab: 'chat',
-    icon: IconMessages,
-  },
-]
+export const SUPPORT_NAVIGATION: NavigationItem[] = []
 
 export const BUYER_NAVIGATION: NavigationItem[] = [
   {
@@ -71,22 +58,10 @@ export const BUYER_NAVIGATION: NavigationItem[] = [
     icon: IconPackage,
   },
   {
-    value: 'chat',
-    label: 'แชทและข้อความ',
-    tab: 'chat',
-    icon: IconMessages,
-  },
-  {
     value: 'reviews',
     label: 'รีวิวของฉัน',
     tab: 'reviews',
     icon: IconStar,
-  },
-  {
-    value: 'affiliate',
-    label: 'นายหน้าแชร์ลิงก์',
-    tab: 'affiliate',
-    icon: IconCoin,
   },
   {
     value: 'profile',
@@ -131,33 +106,12 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconCashRegister,
     permissionKey: 'canViewOrders',
   },
-  // {
-  //   value: 'tables',
-  //   label: 'โต๊ะอาหาร & QR',
-  //   tab: 'tables',
-  //   icon: IconArmchair,
-  //   permissionKey: 'canViewOrders',
-  // },
-  // {
-  //   value: 'kitchen',
-  //   label: 'จอครัว (KDS)',
-  //   tab: 'kitchen',
-  //   icon: IconChefHat,
-  //   permissionKey: 'canViewOrders',
-  // },
   {
     value: 'orders',
     label: 'จัดการออเดอร์',
     tab: 'orders',
     icon: IconShoppingCart,
     permissionKey: 'canViewOrders',
-  },
-  {
-    value: 'chat',
-    label: 'แชทของร้านค้า',
-    tab: 'chat',
-    icon: IconMessages,
-    permissionKey: 'canViewConversation',
   },
   {
     value: 'store-settings/products',
@@ -191,13 +145,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     groupLabel: 'การจัดการและบุคลากร',
     permissionKey: 'canViewExpenses',
   },
-  // {
-  //   value: 'profit-sharing',
-  //   label: 'ส่วนแบ่งกำไร & หุ้นส่วน',
-  //   tab: 'profit-sharing',
-  //   icon: IconReceiptTax,
-  //   permissionKey: 'canViewProfitSharing',
-  // },
   {
     value: 'reseller',
     label: 'ตัวแทนจำหน่าย',
@@ -219,13 +166,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconUserCog,
     permissionKey: 'canViewEmployee',
   },
-  // {
-  //   value: 'payroll',
-  //   label: 'เงินเดือน & ค่าจ้างพนักงาน',
-  //   tab: 'payroll',
-  //   icon: IconReportMoney,
-  //   permissionKey: 'canViewPayroll',
-  // },
   {
     value: 'reviews',
     label: 'จัดการรีวิว',
@@ -263,13 +203,6 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     icon: IconBuildingStore,
     hasSeparatorBefore: true,
     groupLabel: 'ตั้งค่าร้านค้าและบัญชี',
-  },
-  {
-    value: 'store-pages',
-    label: 'หน้าเนื้อหาร้านค้า',
-    tab: 'store-pages',
-    icon: IconFileDescription,
-    permissionKey: 'canViewStoreSettings',
   },
   {
     value: 'organization-branches',

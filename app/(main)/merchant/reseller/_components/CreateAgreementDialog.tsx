@@ -2,22 +2,20 @@
 
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
+import toast from 'react-hot-toast'
 
 import { useCreateResellerAgreement } from '@/actions/hooks/reseller'
 import { ResellerType } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { IconFileCertificate, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -48,8 +46,6 @@ export function CreateAgreementDialog({
   setOpen,
   onSuccess,
 }: CreateAgreementDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.reseller.createAgreement')
   const { selectedStoreId } = useStoreFilter()
   const createAgreementMutation = useCreateResellerAgreement()
 
@@ -107,8 +103,11 @@ export function CreateAgreementDialog({
       {
         onSuccess: (res) => {
           if (res.success && res.data) {
+            toast.success('สร้างสัญญาตัวแทนจำหน่ายสำเร็จ')
             onSuccess?.(res.data.id)
             handleClose()
+          } else {
+            toast.error(res.message || 'เกิดข้อผิดพลาดในการสร้างสัญญา')
           }
         },
       },
@@ -119,21 +118,14 @@ export function CreateAgreementDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}>
-      <DialogContent
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-        className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md"
-      >
+      <DialogContent className="max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-md">
         <FormProvider {...methods}>
           <DialogHeader>
-            <DialogHeaderIcon icon={IconFileCertificate} title={t('title')} />
+            <DialogTitle>สร้างสัญญาตัวแทนจำหน่ายใหม่</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <Field>
-              <FieldLabel>{t('resellerType')}</FieldLabel>
+              <FieldLabel>ประเภทตัวแทน</FieldLabel>
               <Select
                 value={resellerType}
                 onValueChange={(val: ResellerType) =>
@@ -142,25 +134,25 @@ export function CreateAgreementDialog({
                 disabled={isPending}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('selectType')} />
+                  <SelectValue placeholder="เลือกประเภทตัวแทน" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ResellerType.EXTERNAL}>
-                    {t('typeExternal')}
+                    บุคคลธรรมดา / ตัวแทนภายนอก (Customer)
                   </SelectItem>
                   <SelectItem value={ResellerType.INTERNAL_STORE}>
-                    {t('typeInternal')}
+                    ร้านค้าในระบบ (Store)
                   </SelectItem>
                 </SelectContent>
               </Select>
             </Field>
             {resellerType === ResellerType.EXTERNAL ? (
               <Field>
-                <FieldLabel>{t('customerId')}</FieldLabel>
+                <FieldLabel>รหัสลูกค้า (Customer ID)</FieldLabel>
                 <Input
-                  placeholder={t('customerIdPlaceholder')}
+                  placeholder="ระบุ Customer ID"
                   {...register('resellerCustomerId', {
-                    required: t('customerIdRequired'),
+                    required: 'กรุณาระบุ Customer ID',
                   })}
                   disabled={isPending}
                 />
@@ -168,11 +160,11 @@ export function CreateAgreementDialog({
               </Field>
             ) : (
               <Field>
-                <FieldLabel>{t('storeId')}</FieldLabel>
+                <FieldLabel>รหัสร้านค้าตัวแทน (Store ID)</FieldLabel>
                 <Input
-                  placeholder={t('storeIdPlaceholder')}
+                  placeholder="ระบุ Store ID ของตัวแทน"
                   {...register('resellerStoreId', {
-                    required: t('storeIdRequired'),
+                    required: 'กรุณาระบุ Store ID',
                   })}
                   disabled={isPending}
                 />
@@ -180,15 +172,15 @@ export function CreateAgreementDialog({
               </Field>
             )}
             <Field>
-              <FieldLabel>{t('commissionRate')}</FieldLabel>
+              <FieldLabel>ส่วนลด / คอมมิชชัน (%)</FieldLabel>
               <Input
                 type="number"
                 step="0.01"
-                placeholder={t('commissionRatePlaceholder')}
+                placeholder="10"
                 {...register('commissionRate', {
                   valueAsNumber: true,
-                  min: { value: 0, message: t('commissionNonNegative') },
-                  max: { value: 100, message: t('commissionMax') },
+                  min: { value: 0, message: 'ต้องไม่ติดลบ' },
+                  max: { value: 100, message: 'ต้องไม่เกิน 100%' },
                 })}
                 disabled={isPending}
               />
@@ -203,7 +195,7 @@ export function CreateAgreementDialog({
                   disabled={isPending}
                 >
                   <IconX className="size-4" />
-                  {t('reset')}
+                  ล้างข้อมูล
                 </Button>
               ) : (
                 <Button
@@ -212,16 +204,16 @@ export function CreateAgreementDialog({
                   onClick={handleClose}
                   disabled={isPending}
                 >
-                  {t('cancel')}
+                  ยกเลิก
                 </Button>
               )}
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> {t('submitting')}
+                    <Spinner /> กำลังสร้าง...
                   </>
                 ) : (
-                  t('submit')
+                  'สร้างสัญญา'
                 )}
               </Button>
             </DialogFooter>

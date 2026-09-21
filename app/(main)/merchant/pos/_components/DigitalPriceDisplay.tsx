@@ -1,10 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
-
 import { cn } from '@/lib/utils'
 
 interface DigitalPriceDisplayProps {
@@ -14,29 +9,20 @@ interface DigitalPriceDisplayProps {
   digits?: number
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
-  skipConvert?: boolean
 }
 
 export function DigitalPriceDisplay({
   value,
-  label,
-  currency,
-  digits,
+  label = 'ยอดรวมชำระสุทธิ',
+  currency = '฿',
+  digits = 2,
   className,
   size = 'md',
-  skipConvert = false,
 }: DigitalPriceDisplayProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { currencyInfo, convert } = useMerchantCurrency()
-  const t = useTranslations('merchant.pos')
-  const displayLabel = label ?? t('netPayable')
-  const activeCurrency = currency ?? currencyInfo.symbol
-  const activeDigits = digits ?? (currencyInfo.isZeroDecimal ? 0 : 2)
-  const numericValue = skipConvert ? value : convert(value)
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: activeDigits,
-    maximumFractionDigits: activeDigits,
-  }).format(numericValue)
+  const formattedValue = new Intl.NumberFormat('th-TH', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value)
 
   const sizeStyles = {
     sm: {
@@ -68,15 +54,10 @@ export function DigitalPriceDisplay({
   return (
     <div
       className={cn(
-        'border-border bg-card text-card-foreground relative overflow-hidden rounded-xl border shadow-sm',
+        'border-border bg-card text-card-foreground relative overflow-hidden rounded-xl border font-mono shadow-sm',
         sizeStyles.padding,
         className,
       )}
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
     >
       <div
         aria-hidden="true"
@@ -84,9 +65,9 @@ export function DigitalPriceDisplay({
       />
 
       <div className="relative z-10 flex flex-col justify-between gap-1">
-        {displayLabel && (
+        {label && (
           <div className="text-muted-foreground flex items-center justify-between font-semibold tracking-wider uppercase">
-            <span className={sizeStyles.label}>{displayLabel}</span>
+            <span className={sizeStyles.label}>{label}</span>
           </div>
         )}
 
@@ -107,7 +88,7 @@ export function DigitalPriceDisplay({
               sizeStyles.icon,
             )}
           >
-            {activeCurrency}
+            {currency}
           </span>
         </div>
       </div>

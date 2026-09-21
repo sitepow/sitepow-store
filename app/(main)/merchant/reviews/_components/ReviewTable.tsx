@@ -1,17 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-/* eslint-disable @next/next/no-img-element */
-
 import { useState } from 'react'
-
-import { useTranslations } from 'next-intl'
 
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useReviews } from '@/actions/hooks/review'
 import { useDeleteReview } from '@/actions/hooks/storefront/review'
-import { GetReviewItem } from '@/actions/review'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ReviewFormDialog } from '@/app/sites/[domain]/user/reviews/_components/ReviewFormDialog'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/date'
@@ -37,8 +32,6 @@ import {
 } from '@/components/ui/table'
 
 export function ReviewTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.reviews')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
   const [selectedItem, setSelectedItem] = useState<{
@@ -75,8 +68,8 @@ export function ReviewTable() {
     return (
       <ActionRequiredAlert
         icon={<IconLock />}
-        title={t('noAccessTitle')}
-        description={t('noAccessDescription')}
+        title="ไม่มีสิทธิ์เข้าถึง"
+        description="คุณไม่มีสิทธิ์ในการดูข้อมูลรีวิวของสาขาหรือร้านค้านี้"
       />
     )
   }
@@ -85,25 +78,18 @@ export function ReviewTable() {
   const totalColumns = showManageColumn ? 6 : 5
 
   return (
-    <div
-      className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.date')}</TableHead>
-              <TableHead>{t('columns.product')}</TableHead>
-              <TableHead>{t('columns.customer')}</TableHead>
-              <TableHead>{t('columns.rating')}</TableHead>
-              <TableHead>{t('columns.comment')}</TableHead>
+              <TableHead>วันที่</TableHead>
+              <TableHead>สินค้า</TableHead>
+              <TableHead>ลูกค้า</TableHead>
+              <TableHead>คะแนน</TableHead>
+              <TableHead>ความคิดเห็น</TableHead>
               {showManageColumn && (
-                <TableHead className="text-right">
-                  {t('columns.actions')}
-                </TableHead>
+                <TableHead className="text-right">จัดการ</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -111,16 +97,19 @@ export function ReviewTable() {
             {(isLoading || isPermissionLoading) && reviews.length === 0 ? (
               <TableLoadingRow colSpan={totalColumns} />
             ) : reviews.length === 0 ? (
-              <TableEmptyRow colSpan={totalColumns} title={t('empty')} />
+              <TableEmptyRow
+                colSpan={totalColumns}
+                title="ยังไม่มีข้อมูลรีวิวในร้านค้านี้"
+              />
             ) : (
-              (reviews as unknown as GetReviewItem[]).map((item) => (
+              reviews.map((item: any) => (
                 <TableRow key={item.id}>
                   <TableCell>{formatDateTime(new Date(item.date))}</TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     <div>{item.product?.title || '-'}</div>
                     {item.variant?.title && (
                       <div className="text-muted-foreground text-xs">
-                        {t('variantPrefix', { variant: item.variant.title })}
+                        ตัวเลือก: {item.variant.title}
                       </div>
                     )}
                   </TableCell>
@@ -128,7 +117,7 @@ export function ReviewTable() {
                     <div>
                       {[item.customer?.firstName, item.customer?.lastName]
                         .filter(Boolean)
-                        .join(' ') || t('anonymousCustomer')}
+                        .join(' ') || 'ลูกค้าไม่ระบุชื่อ'}
                     </div>
                     <div className="text-muted-foreground text-xs">
                       {item.customer?.email || '-'}
@@ -172,24 +161,24 @@ export function ReviewTable() {
                               reviewId: item.id,
                               storeId: selectedStoreId,
                               productId: item.productId,
-                              variantId: item.variantId || undefined,
-                              orderId: item.orderId || undefined,
+                              variantId: item.variantId,
+                              orderId: item.orderId,
                               productTitle: item.product?.title,
-                              productImage: item.product?.images?.[0]?.url,
+                              productImage: item.product?.image,
                               rating: item.rating,
-                              comment: item.comment || undefined,
+                              comment: item.comment,
                               images: item.images,
                             })
                           }
                         >
                           <IconEdit className="size-4" />
-                          {t('edit')}
+                          แก้ไข
                         </Button>
                         <DeleteButton
                           isPending={deleteMutation.isPending}
                           icon={<IconTrash className="size-4" />}
-                          title={t('deleteConfirmTitle')}
-                          description={t('deleteConfirmDescription')}
+                          title="ยืนยันการลบรีวิว?"
+                          description="คุณต้องการลบรีวิวสินค้านี้ใช่หรือไม่? หากลบแล้วจะไม่สามารถกู้คืนข้อมูลได้"
                           onDelete={() => deleteMutation.mutate(item.id)}
                         />
                       </div>
@@ -234,6 +223,6 @@ export function ReviewTable() {
           }}
         />
       )}
-    </div>
+    </>
   )
 }

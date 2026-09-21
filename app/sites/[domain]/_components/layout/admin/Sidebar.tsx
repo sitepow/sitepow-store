@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -20,47 +19,46 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
+const SIDEBAR_ITEMS = [
+  {
+    category: 'จัดการร้านค้า',
+    items: [
+      {
+        title: 'แดชบอร์ด',
+        url: '/admin/dashboard',
+        icon: LayoutDashboard,
+      },
+    ],
+  },
+  {
+    category: 'สินค้า',
+    items: [
+      {
+        title: 'เพิ่มสินค้าใหม่',
+        url: '/admin/products/new',
+        icon: PlusCircle,
+      },
+      {
+        title: 'รายการสินค้า',
+        url: '/admin/products',
+        icon: Package,
+      },
+    ],
+  },
+  {
+    category: 'ตั้งค่า',
+    items: [
+      {
+        title: 'ตั้งค่าร้านค้า',
+        url: '/admin/settings',
+        icon: Settings,
+      },
+    ],
+  },
+]
+
 export function StoreAdminAppSidebar() {
   const pathname = usePathname()
-  const t = useTranslations('storefront.adminSidebar')
-
-  const sidebarItems = [
-    {
-      category: t('storeManagement'),
-      items: [
-        {
-          title: t('dashboard'),
-          url: '/admin/dashboard',
-          icon: LayoutDashboard,
-        },
-      ],
-    },
-    {
-      category: t('products'),
-      items: [
-        {
-          title: t('addProduct'),
-          url: '/admin/products/new',
-          icon: PlusCircle,
-        },
-        {
-          title: t('productList'),
-          url: '/admin/products',
-          icon: Package,
-        },
-      ],
-    },
-    {
-      category: t('settings'),
-      items: [
-        {
-          title: t('storeSettings'),
-          url: '/admin/settings',
-          icon: Settings,
-        },
-      ],
-    },
-  ]
 
   return (
     <Sidebar>
@@ -68,7 +66,7 @@ export function StoreAdminAppSidebar() {
         <LogoBrand />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarItems.map((group) => (
+        {SIDEBAR_ITEMS.map((group) => (
           <SidebarGroup key={group.category}>
             <SidebarGroupLabel>{group.category}</SidebarGroupLabel>
             <SidebarGroupContent>

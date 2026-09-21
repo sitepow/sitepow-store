@@ -1,11 +1,6 @@
 'use server'
 
-import {
-  MILLISECONDS_PER_DAY,
-  SERVER_ERROR_MESSAGE_EN,
-  SERVER_ERROR_MESSAGE_TH,
-  TRANSFER_EXPIRY_DAYS,
-} from '@/constants/system'
+import { MILLISECONDS_PER_DAY, TRANSFER_EXPIRY_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
@@ -64,32 +59,17 @@ export async function createTransferRequest(
 ) {
   try {
     if (!storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-        message: 'ไม่พบ Store ID',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
     if (!toEmail) {
-      return {
-        success: false,
-        messageTH: 'กรุณาระบุอีเมลผู้รับ',
-        messageEN: 'Please specify recipient email',
-        message: 'กรุณาระบุอีเมลผู้รับ',
-      }
+      return { success: false, message: 'กรุณาระบุอีเมลผู้รับ' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -101,11 +81,6 @@ export async function createTransferRequest(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH:
-          authCheck.messageTH ||
-          authCheck.message ||
-          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -116,20 +91,10 @@ export async function createTransferRequest(
     })
 
     if (!store) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบร้านค้า',
-        messageEN: 'Store not found',
-        message: 'ไม่พบร้านค้า',
-      }
+      return { success: false, message: 'ไม่พบร้านค้า' }
     }
     if (store.ownerId !== fromOwnerId || store.ownerId !== userId) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่ใช่เจ้าของร้านค้านี้',
-        messageEN: 'You are not the owner of this store',
-        message: 'คุณไม่ใช่เจ้าของร้านค้านี้',
-      }
+      return { success: false, message: 'คุณไม่ใช่เจ้าของร้านค้านี้' }
     }
 
     const toUser = await prisma.user.findUnique({
@@ -138,12 +103,7 @@ export async function createTransferRequest(
     })
 
     if (!toUser) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้ในระบบ',
-        messageEN: 'User account with this email not found',
-        message: 'ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้ในระบบ',
-      }
+      return { success: false, message: 'ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้ในระบบ' }
     }
 
     const pending = await prisma.storeTransferRequest.findFirst({
@@ -154,9 +114,6 @@ export async function createTransferRequest(
     if (pending) {
       return {
         success: false,
-        messageTH: 'มีคำขอโอนที่รอการยืนยันอยู่แล้ว กรุณายกเลิกก่อน',
-        messageEN:
-          'There is already a pending transfer request, please cancel it first',
         message: 'มีคำขอโอนที่รอการยืนยันอยู่แล้ว กรุณายกเลิกก่อน',
       }
     }
@@ -181,20 +138,10 @@ export async function createTransferRequest(
       details: { toEmail, status: 'created' },
     })
 
-    return {
-      success: true,
-      messageTH: 'ส่งคำขอโอนร้านค้าสำเร็จ',
-      messageEN: 'Store transfer request sent successfully',
-      message: 'ส่งคำขอโอนร้านค้าสำเร็จ',
-    }
+    return { success: true, message: 'ส่งคำขอโอนร้านค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
+    return { success: false }
   }
 }
 
@@ -204,24 +151,14 @@ export async function cancelTransferRequest(
 ) {
   try {
     if (!requestId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Request ID',
-        messageEN: 'Request ID not found',
-        message: 'ไม่พบ Request ID',
-      }
+      return { success: false, message: 'ไม่พบ Request ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-        message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const request = await prisma.storeTransferRequest.findUnique({
@@ -230,12 +167,7 @@ export async function cancelTransferRequest(
     })
 
     if (!request) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบคำขอโอนนี้',
-        messageEN: 'Transfer request not found',
-        message: 'ไม่พบคำขอโอนนี้',
-      }
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -247,31 +179,16 @@ export async function cancelTransferRequest(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH:
-          authCheck.messageTH ||
-          authCheck.message ||
-          'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
     if (request.fromOwnerId !== ownerId || request.fromOwnerId !== userId) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่มีสิทธิ์ยกเลิกคำขอนี้',
-        messageEN: 'You do not have permission to cancel this request',
-        message: 'คุณไม่มีสิทธิ์ยกเลิกคำขอนี้',
-      }
+      return { success: false, message: 'คุณไม่มีสิทธิ์ยกเลิกคำขอนี้' }
     }
 
     if (request.status !== TransferStatus.PENDING) {
-      return {
-        success: false,
-        messageTH: 'ไม่สามารถยกเลิกคำขอที่ดำเนินการแล้ว',
-        messageEN: 'Cannot cancel request that has already been processed',
-        message: 'ไม่สามารถยกเลิกคำขอที่ดำเนินการแล้ว',
-      }
+      return { success: false, message: 'ไม่สามารถยกเลิกคำขอที่ดำเนินการแล้ว' }
     }
 
     await prisma.storeTransferRequest.update({
@@ -288,20 +205,10 @@ export async function cancelTransferRequest(
       details: { status: 'cancelled' },
     })
 
-    return {
-      success: true,
-      messageTH: 'ยกเลิกคำขอโอนสำเร็จ',
-      messageEN: 'Store transfer request cancelled successfully',
-      message: 'ยกเลิกคำขอโอนสำเร็จ',
-    }
+    return { success: true, message: 'ยกเลิกคำขอโอนสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
+    return { success: false }
   }
 }
 
@@ -313,8 +220,6 @@ export async function acceptTransferRequest(token: string, userId: string) {
     if (!currentUserId || currentUserId !== userId) {
       return {
         success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
-        messageEN: 'Please sign in with the correct recipient account',
         message: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
       }
     }
@@ -331,40 +236,20 @@ export async function acceptTransferRequest(token: string, userId: string) {
     })
 
     if (!request) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบคำขอโอนนี้',
-        messageEN: 'Transfer request not found',
-        message: 'ไม่พบคำขอโอนนี้',
-      }
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
     }
     if (request.toUserId !== userId) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้',
-        messageEN: 'You are not the designated recipient',
-        message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้',
-      }
+      return { success: false, message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้' }
     }
     if (request.status !== TransferStatus.PENDING) {
-      return {
-        success: false,
-        messageTH: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน',
-        messageEN: 'This request is not pending confirmation',
-        message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน',
-      }
+      return { success: false, message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน' }
     }
     if (new Date() > request.expiresAt) {
       await prisma.storeTransferRequest.update({
         where: { id: request.id },
         data: { status: TransferStatus.EXPIRED },
       })
-      return {
-        success: false,
-        messageTH: 'คำขอโอนนี้หมดอายุแล้ว',
-        messageEN: 'This transfer request has expired',
-        message: 'คำขอโอนนี้หมดอายุแล้ว',
-      }
+      return { success: false, message: 'คำขอโอนนี้หมดอายุแล้ว' }
     }
 
     await prisma.$transaction([
@@ -387,20 +272,10 @@ export async function acceptTransferRequest(token: string, userId: string) {
       details: { status: 'accepted' },
     })
 
-    return {
-      success: true,
-      messageTH: 'รับโอนร้านค้าสำเร็จ',
-      messageEN: 'Store transfer accepted successfully',
-      message: 'รับโอนร้านค้าสำเร็จ',
-    }
+    return { success: true, message: 'รับโอนร้านค้าสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
+    return { success: false }
   }
 }
 
@@ -412,8 +287,6 @@ export async function declineTransferRequest(token: string, userId: string) {
     if (!currentUserId || currentUserId !== userId) {
       return {
         success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
-        messageEN: 'Please sign in with the correct recipient account',
         message: 'กรุณาเข้าสู่ระบบด้วยบัญชีผู้รับโอนที่ถูกต้อง',
       }
     }
@@ -424,28 +297,13 @@ export async function declineTransferRequest(token: string, userId: string) {
     })
 
     if (!request) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบคำขอโอนนี้',
-        messageEN: 'Transfer request not found',
-        message: 'ไม่พบคำขอโอนนี้',
-      }
+      return { success: false, message: 'ไม่พบคำขอโอนนี้' }
     }
     if (request.toUserId !== userId) {
-      return {
-        success: false,
-        messageTH: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้',
-        messageEN: 'You are not the designated recipient',
-        message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้',
-      }
+      return { success: false, message: 'คุณไม่ใช่ผู้รับโอนที่ระบุไว้' }
     }
     if (request.status !== TransferStatus.PENDING) {
-      return {
-        success: false,
-        messageTH: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน',
-        messageEN: 'This request is not pending confirmation',
-        message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน',
-      }
+      return { success: false, message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน' }
     }
 
     await prisma.storeTransferRequest.update({
@@ -462,19 +320,9 @@ export async function declineTransferRequest(token: string, userId: string) {
       details: { status: 'declined' },
     })
 
-    return {
-      success: true,
-      messageTH: 'ปฏิเสธคำขอโอนสำเร็จ',
-      messageEN: 'Store transfer request declined successfully',
-      message: 'ปฏิเสธคำขอโอนสำเร็จ',
-    }
+    return { success: true, message: 'ปฏิเสธคำขอโอนสำเร็จ' }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: SERVER_ERROR_MESSAGE_TH,
-      messageEN: SERVER_ERROR_MESSAGE_EN,
-      message: SERVER_ERROR_MESSAGE_TH,
-    }
+    return { success: false }
   }
 }

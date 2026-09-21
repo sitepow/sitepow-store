@@ -1,10 +1,6 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useFormContext, useWatch } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
@@ -22,8 +18,6 @@ interface PlanSelectorProps {
 }
 
 export function PlanSelector({ isPending }: PlanSelectorProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores.dialog')
   const selectedTab = usePricingStore((state) => state.selectedTab)
   const {
     control,
@@ -37,12 +31,7 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
   })
 
   return (
-    <Field
-      className="space-y-3 sm:col-span-2"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <Field className="space-y-3 sm:col-span-2">
       <RadioGroup
         value={selectedPlan}
         disabled={isPending}
@@ -86,9 +75,8 @@ export function PlanSelector({ isPending }: PlanSelectorProps) {
                     {basePrice > 0 &&
                       selectedTab !== PRICING_VALUE.ONE_MONTH && (
                         <span className="text-[10px] font-medium opacity-60">
-                          {t('averagePerMonth', {
-                            price: formatCurrency(Number(averagePerMonth)),
-                          })}
+                          เฉลี่ย {formatCurrency(Number(averagePerMonth))} /
+                          เดือน
                         </span>
                       )}
                   </div>

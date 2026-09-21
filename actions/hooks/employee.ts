@@ -19,7 +19,6 @@ import {
   getEmployee,
   getEmployeePermission,
   getEmployees,
-  resetEmployeePassword,
   updateEmployee,
 } from '../employee'
 import { employeeKeys } from '../query-keys/employee'
@@ -101,18 +100,6 @@ export function useDeleteEmployee() {
   })
 }
 
-export function useResetEmployeePassword() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (employeeStoreId: string) =>
-      await resetEmployeePassword(employeeStoreId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeKeys.all })
-    },
-  })
-}
-
 export function useEmployeePermission(
   customStoreId?: string,
   customBranchId?: string,
@@ -143,7 +130,6 @@ export function useEmployeePermission(
   const isRoleOwner = roleName === DefaultRole.OWNER
   const isManager = roleName === DefaultRole.MANAGER
   const isCashier = roleName === DefaultRole.CASHIER
-  const isPosReseller = !isOwner && roleName === DefaultRole.POS_RESELLER
 
   const hasBranchAccess = employee?.hasBranchAccess ?? true
   const employeePermissions = employee?.permissions
@@ -188,7 +174,6 @@ export function useEmployeePermission(
       isRoleOwner,
       isManager,
       isCashier,
-      isPosReseller,
       hasBranchAccess,
       hasPermission,
     }

@@ -2,9 +2,6 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 
 import { Checkbox } from '@/components/ui/checkbox'
@@ -12,8 +9,6 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 export function RewardPointsField({ index }: { index: number }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const {
     register,
     setValue,
@@ -25,14 +20,7 @@ export function RewardPointsField({ index }: { index: number }) {
   })
 
   return (
-    <div
-      className="space-y-3"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
+    <div className="space-y-3">
       <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
         <Checkbox
           checked={!!isActive}
@@ -40,12 +28,12 @@ export function RewardPointsField({ index }: { index: number }) {
             setValue(`variants.${index}.rewardPoints.isActive`, !!v)
           }
         />
-        <span>{t('giveRewardPoints')}</span>
+        <span>มอบแต้มสะสมเมื่อซื้อตัวเลือกนี้</span>
       </label>
 
       {isActive && (
         <Field>
-          <FieldLabel>{t('rewardPointsEarned')}</FieldLabel>
+          <FieldLabel>จำนวนแต้มที่ได้รับ</FieldLabel>
           <Input
             type="number"
             placeholder="0"

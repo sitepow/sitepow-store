@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import { useStoreCheckout } from '@/actions/hooks/checkout'
 import { useCancelOrder } from '@/actions/hooks/order'
 import { useStorefrontOrders } from '@/actions/hooks/storefront/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
+import { ORDER_STATUS_TH } from '@/constants/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { formatDateTime } from '@/utils/date'
@@ -40,7 +40,6 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ search }: OrderTableProps) {
-  const t = useTranslations('customer.orders')
   const params = useParams()
   const domain = params?.domain as string
   const { user } = useSession()
@@ -61,22 +60,20 @@ export function OrderTable({ search }: OrderTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.orderNumber')}</TableHead>
-              <TableHead>{t('columns.store')}</TableHead>
-              <TableHead>{t('columns.items')}</TableHead>
-              <TableHead>{t('columns.total')}</TableHead>
-              <TableHead>{t('columns.status')}</TableHead>
-              <TableHead>{t('columns.date')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>หมายเลขคำสั่งซื้อ</TableHead>
+              <TableHead>ร้านค้า / ช่องทาง</TableHead>
+              <TableHead>รายการสินค้า</TableHead>
+              <TableHead>ยอดสุทธิ</TableHead>
+              <TableHead>สถานะ</TableHead>
+              <TableHead>วันที่สั่งซื้อ</TableHead>
+              <TableHead className="text-right">ดูข้อมูล</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && orders.length === 0 ? (
               <TableLoadingRow colSpan={7} />
             ) : orders.length === 0 ? (
-              <TableEmptyRow colSpan={7} title={t('empty')} />
+              <TableEmptyRow colSpan={7} title="ไม่พบประวัติคำสั่งซื้อของคุณ" />
             ) : (
               orders.map((order) => {
                 const isCancelled = order.status === OrderStatus.CANCELLED
@@ -116,7 +113,7 @@ export function OrderTable({ search }: OrderTableProps) {
                             variant="outline"
                             className="px-1.5 py-0 text-[10px] font-normal"
                           >
-                            {t('inStorePos')}
+                            ซื้อที่หน้าร้าน (POS)
                           </Badge>
                         )}
                       </div>
@@ -130,10 +127,7 @@ export function OrderTable({ search }: OrderTableProps) {
                       {getItemsSummary(order.items)}
                     </TableCell>
                     <TableCell className={cn(isCancelled && 'line-through')}>
-                      {formatCurrency(
-                        order.totalAmount,
-                        (order as any).customerCurrency,
-                      )}
+                      {formatCurrency(order.totalAmount)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -150,7 +144,7 @@ export function OrderTable({ search }: OrderTableProps) {
                               : 'outline'
                         }
                       >
-                        {t(`statuses.${order.status}` as any)}
+                        {ORDER_STATUS_TH[order.status]}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDateTime(order.createdAt)}</TableCell>
@@ -167,11 +161,8 @@ export function OrderTable({ search }: OrderTableProps) {
                                   customerEmail: user?.email ?? '',
                                   storeId: order.store.id,
                                   orderId: order.id,
-                                  description: t('stripePaymentDesc', {
-                                    orderNumber: order.orderNumber,
-                                  }),
+                                  description: `ชำระเงินคำสั่งซื้อ #${order.orderNumber}`,
                                   amount: order.totalAmount,
-                                  currency: (order as any).customerCurrency,
                                   successUrl: `${window.location.origin}/user/orders`,
                                   cancelUrl: `${window.location.origin}/user/orders`,
                                 })
@@ -179,8 +170,8 @@ export function OrderTable({ search }: OrderTableProps) {
                             >
                               <IconCreditCard className="mr-1 size-4" />
                               {storeCheckoutMutation.isPending
-                                ? t('connecting')
-                                : t('payWithStripe')}
+                                ? 'กำลังเชื่อมต่อ...'
+                                : 'ชำระเงินผ่าน Stripe'}
                             </Button>
                           ) : (
                             <UploadSlipDialog
@@ -190,7 +181,6 @@ export function OrderTable({ search }: OrderTableProps) {
                               orderNumber={order.orderNumber}
                               customerId={order.customerId!}
                               totalAmount={order.totalAmount}
-                              currency={(order as any).customerCurrency}
                               bankAccounts={
                                 order.bankAccount ? [order.bankAccount] : []
                               }
@@ -209,8 +199,6 @@ export function OrderTable({ search }: OrderTableProps) {
                           <DeleteButton
                             icon={<IconX />}
                             isPending={cancelOrderMutation.isPending}
-                            title={t('cancelOrderTitle')}
-                            description={t('cancelOrderDesc')}
                             onDelete={() =>
                               cancelOrderMutation.mutate(order.id)
                             }

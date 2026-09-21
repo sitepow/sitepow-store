@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import { Plan } from '@/generated/prisma/enums'
 import { CreateStoreFormValues } from '@/zod/store'
@@ -21,8 +17,6 @@ interface PointsSettingsFieldProps {
 }
 
 export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.stores.dialog')
   const {
     register,
     setValue,
@@ -40,14 +34,9 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
   }, [currentPlan, setValue])
 
   return (
-    <div
-      className="contents"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="text-muted-foreground border-b pt-2 pb-1 text-sm font-semibold sm:col-span-2">
-        {t('step5')}
+        5. ระบบสมาชิกและคะแนนสะสม (CRM)
       </div>
 
       <div className="flex flex-col gap-1 py-1 sm:col-span-2">
@@ -66,11 +55,11 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
             disabled={currentPlan !== Plan.ULTIMATE || isPending}
           />
           <span className="flex items-center gap-1.5">
-            {t('enablePoints')}
+            เปิดใช้งานระบบแต้มสะสมสำหรับร้านค้า
             {currentPlan !== Plan.ULTIMATE && (
               <Badge variant="outline">
                 <IconLock />
-                {t('ultimateOnly')}
+                เฉพาะ Ultimate แพลนเท่านั้น
               </Badge>
             )}
           </span>
@@ -81,10 +70,10 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
       {isPointsEnabled && currentPlan === Plan.ULTIMATE && (
         <div className="bg-muted/40 animate-in slide-in-from-top-2 grid gap-5 rounded-lg border p-4 duration-200 sm:col-span-2 sm:grid-cols-2">
           <Field>
-            <FieldLabel>{t('pointEarningRateLabel')}</FieldLabel>
+            <FieldLabel>ยอดซื้อเพื่อรับ 1 แต้ม (บาท)</FieldLabel>
             <Input
               type="number"
-              placeholder={t('pointEarningRatePlaceholder')}
+              placeholder="เช่น ซื้อครบ 100 บาท ได้ 1 แต้ม"
               {...register('pointEarningRate', { valueAsNumber: true })}
               disabled={isPending}
             />
@@ -92,10 +81,10 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
           </Field>
 
           <Field>
-            <FieldLabel>{t('pointRedeemRateLabel')}</FieldLabel>
+            <FieldLabel>มูลค่าส่วนลดต่อ 1 แต้ม (บาท)</FieldLabel>
             <Input
               type="number"
-              placeholder={t('pointRedeemRatePlaceholder')}
+              placeholder="เช่น 1 แต้ม มีค่าเท่ากับ 1 บาท"
               {...register('pointRedeemRate', { valueAsNumber: true })}
               disabled={isPending}
             />
@@ -103,6 +92,6 @@ export function PointsSettingsField({ isPending }: PointsSettingsFieldProps) {
           </Field>
         </div>
       )}
-    </div>
+    </>
   )
 }

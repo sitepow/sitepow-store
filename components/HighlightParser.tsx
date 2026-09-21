@@ -15,10 +15,8 @@ export function HighlightParser({ text, className }: HighlightParserProps) {
   const isMounted = useIsMounted()
 
   if (!isMounted) {
-    const cleanText = text ? text.replace(/<\/?hilight>/g, '') : ''
-    return <span className={className}>{cleanText}</span>
+    return
   }
-
   const parts = text.split(/(<hilight>.*?<\/hilight>)/g)
 
   return (

@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-
 import { handleUserPrompt } from '@/actions/ai'
 import { useCategoryAi } from '@/actions/hooks/ai'
 import {
@@ -15,24 +13,34 @@ import {
 } from '@/actions/hooks/category'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
 import { Plan } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { buildCategoryPrompt } from '@/utils/ai'
 import { getPathR2FromUrl } from '@/utils/image'
 import { formatSlug } from '@/utils/slug'
 import { CreateCategoryFormValues, createCategorySchema } from '@/zod/category'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconCategory, IconPlus, IconWand } from '@tabler/icons-react'
+import { IconPlus, IconWand } from '@tabler/icons-react'
 
-import { AiCreditConfirmDialog } from '@/components/AiCreditConfirmDialog'
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { FileUpload } from '@/components/FileUpload'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -40,13 +48,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 
-const DEFAULT_VALUES = {
-  title: '',
-  slug: '',
-  description: '',
-  image: '',
-  translations: { en: { title: '', description: '' } },
-}
+const DEFAULT_VALUES = { title: '', slug: '', description: '', image: '' }
 
 export function CategoryDialog({
   categoryId,
@@ -59,8 +61,7 @@ export function CategoryDialog({
   setOpen: (v: boolean) => void
   onAdd?: () => void
 }) {
-  const t = useTranslations('merchant.categories')
-  const { currentStore, store } = useCurrentStore()
+  const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
   const createMutation = useCreateCategory()
   const updateMutation = useUpdateCategory()
@@ -99,9 +100,6 @@ export function CategoryDialog({
         ...categoryData,
         description: categoryData.description ?? '',
         image: categoryData.image ?? '',
-        translations: (categoryData as any).translations ?? {
-          en: { title: '', description: '' },
-        },
       })
     } else {
       reset(DEFAULT_VALUES)
@@ -119,7 +117,7 @@ export function CategoryDialog({
 
     if (!currentTitle || currentTitle.trim().length === 0) {
       setError('title', {
-        message: t('dialog.aiTitleRequired'),
+        message: 'กรุณากรอกชื่อหมวดหมู่ก่อนให้ AI ช่วยคิดครับ',
       })
       return
     }
@@ -155,7 +153,7 @@ export function CategoryDialog({
       const res = await uploadMutation.mutateAsync(formData)
 
       if (!res.success) {
-        return toast.error(t('dialog.imageUploadError'))
+        return toast.error('อัพโหลดรูปภาพไม่สำเร็จ')
       }
 
       imageUrl = res.url
@@ -192,37 +190,31 @@ export function CategoryDialog({
         onOpenChange={(v) => (!v ? handleClose() : setOpen(v))}
       >
         <DialogTrigger asChild>
-          <Button onClick={onAdd}>
+          <Button variant="outline" onClick={onAdd}>
             <IconPlus />
-            {t('addCategory')}
+            เพิ่มหมวดหมู่ใหม่
           </Button>
         </DialogTrigger>
-        <DialogContent
-          style={
-            {
-              '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-            } as React.CSSProperties
-          }
-          className="sm:max-w-md"
-        >
+        <DialogContent className="sm:max-w-md">
           <FormProvider {...methods}>
             <DialogHeader>
-              <DialogHeaderIcon
-                icon={IconCategory}
-                title={
-                  categoryId ? t('dialog.editTitle') : t('dialog.createTitle')
-                }
-                description={t('dialog.description')}
-              />
+              <DialogTitle>
+                {categoryId ? 'แก้ไขหมวดหมู่' : 'เพิ่มหมวดหมู่ใหม่'}
+              </DialogTitle>
+              <DialogDescription>
+                กรอกข้อมูลหมวดหมู่สินค้าสำหรับจัดระเบียบสินค้าในร้านค้าของคุณ
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
               <Field>
-                <FieldLabel>{t('dialog.imageLabel')}</FieldLabel>
+                <FieldLabel>
+                  รูปภาพหมวดหมู่ (รองรับรูปภาพและวิดีโอ ขนาดไฟล์สูงสุด 10 MB)
+                </FieldLabel>
                 <FileUpload name="image" />
               </Field>
               <Field>
                 <div className="flex items-center justify-between">
-                  <FieldLabel>{t('dialog.titleLabel')}</FieldLabel>
+                  <FieldLabel>ชื่อหมวดหมู่</FieldLabel>
                   <Button
                     type="button"
                     variant="outline"
@@ -234,61 +226,35 @@ export function CategoryDialog({
                     ) : (
                       <IconWand className="mr-1 size-3.5" />
                     )}
-                    {t('dialog.aiButton')}
+                    ให้ AI ช่วยคิด Slug & คำอธิบาย
                   </Button>
                 </div>
                 <Input
-                  placeholder={t('dialog.titlePlaceholder')}
+                  placeholder="เช่น เสื้อผ้า, รองเท้า, อุปกรณ์อิเล็กทรอนิกส์"
                   {...register('title')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.title?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>{t('dialog.slugLabel')}</FieldLabel>
+                <FieldLabel>URL Slug</FieldLabel>
                 <Input
-                  placeholder={t('dialog.slugPlaceholder')}
+                  placeholder="เช่น clothing, shoes"
                   {...register('slug')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.slug?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>{t('dialog.descriptionLabel')}</FieldLabel>
+                <FieldLabel>คำอธิบาย</FieldLabel>
                 <Textarea
-                  placeholder={t('dialog.descriptionPlaceholder')}
+                  placeholder="อธิบายสั้นๆ เกี่ยวกับหมวดหมู่นี้"
                   rows={3}
                   {...register('description')}
                   disabled={isPending}
                 />
                 <FieldError>{errors?.description?.message}</FieldError>
               </Field>
-              <div className="bg-muted/20 space-y-3 rounded-lg border p-3">
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold">
-                  <span>🌐 คำแปลภาษาอังกฤษ (English Translation)</span>
-                </div>
-                <Field>
-                  <FieldLabel className="text-xs">
-                    Category Title (EN)
-                  </FieldLabel>
-                  <Input
-                    placeholder="e.g. Beverages, Electronics"
-                    {...register('translations.en.title')}
-                    disabled={isPending}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel className="text-xs">
-                    Category Description (EN)
-                  </FieldLabel>
-                  <Textarea
-                    placeholder="Category description in English..."
-                    rows={2}
-                    {...register('translations.en.description')}
-                    disabled={isPending}
-                  />
-                </Field>
-              </div>
             </div>
             <DialogFooter className="gap-2">
               <Button
@@ -296,25 +262,50 @@ export function CategoryDialog({
                 onClick={handleClose}
                 disabled={isPending}
               >
-                {t('dialog.cancel')}
+                ยกเลิก
               </Button>
               <Button onClick={handleSubmit(onSubmit)} disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Spinner /> {t('dialog.saving')}
+                    <Spinner /> กำลังบันทึก...
                   </>
                 ) : (
-                  t('dialog.save')
+                  'บันทึกหมวดหมู่'
                 )}
               </Button>
             </DialogFooter>
           </FormProvider>
         </DialogContent>
       </Dialog>
-      <AiCreditConfirmDialog
-        confirmData={aiConfirm}
-        onOpenChange={() => setAiConfirm(null)}
-      />
+      <AlertDialog open={!!aiConfirm} onOpenChange={() => setAiConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              ยืนยันการใช้ AI คิดข้อมูลหมวดหมู่
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              การดำเนินการนี้จะใช้เครดิตประมาณ{' '}
+              <span className="text-primary font-bold">
+                {aiConfirm?.cost} เครดิต
+              </span>{' '}
+              คุณต้องการดำเนินการต่อหรือไม่?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (aiConfirm) {
+                  aiConfirm.action()
+                  setAiConfirm(null)
+                }
+              }}
+            >
+              ยืนยัน
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

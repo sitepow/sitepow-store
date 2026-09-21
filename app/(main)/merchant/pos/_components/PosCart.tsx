@@ -3,14 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
-import { useMerchantCurrency } from '@/hooks/use-merchant-currency'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { CartItem } from '@/types/sites/cart'
 import {
@@ -18,7 +14,7 @@ import {
   calculateGrandTotal,
   getRemainingStock,
 } from '@/utils/cart'
-import { formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/pricing'
 import { formatPromptPay } from '@/utils/slip'
 import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -59,9 +55,6 @@ export function PosCart({
   onRemoveItem,
   onClearCart,
 }: PosCartProps) {
-  const { currentStore, store } = useCurrentStore()
-  const { formatCurrency, baseCurrency } = useMerchantCurrency()
-  const t = useTranslations('merchant.pos')
   const { selectedStoreSlug } = useStoreFilter()
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
   const { data: loyalty } = useStorefrontLoyalty(selectedStoreSlug)
@@ -190,155 +183,129 @@ export function PosCart({
   }
 
   return (
-    <div
-      className="h-full"
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-        } as React.CSSProperties
-      }
-    >
-      <FormProvider {...methods}>
-        <Card
-          className="flex h-full flex-col"
-          style={
-            {
-              '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-            } as React.CSSProperties
-          }
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between text-lg">
-              <div className="flex items-center gap-2">
-                <IconShoppingCart className="size-5" />
-                <span>{t('cart.title')}</span>
+    <FormProvider {...methods}>
+      <Card className="flex h-full flex-col">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center gap-2">
+              <IconShoppingCart className="size-5" />
+              <span>ตะกร้าสินค้า</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {cart.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearCartAll}
+                >
+                  <IconTrash className="size-3.5" />
+                  ล้างตะกร้า
+                </Button>
+              )}
+              <Button size="icon-sm">{totalItems}</Button>
+            </div>
+          </CardTitle>
+          {!isResellerMode && customerId && (
+            <CustomerCard
+              title="ข้อมูลลูกค้า"
+              content={
+                <>
+                  รหัสลูกค้า: {customerId} <br />
+                  เบอร์โทรศัพท์: {formatPromptPay(customerPhone || '')} <br />
+                  แต้มคงเหลือ: {formatNumber(customerPoints)} แต้ม
+                </>
+              }
+              action={
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleRemoveCustomer}
+                >
+                  <IconX className="size-4" />
+                </Button>
+              }
+            />
+          )}
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <ScrollArea className="h-full px-4">
+            {cart.length === 0 ? (
+              <div className="text-muted-foreground flex h-40 flex-col items-center justify-center gap-2 text-sm">
+                <IconShoppingCart className="size-10 opacity-30" />
+                ยังไม่มีสินค้าในตะกร้า
               </div>
-              <div className="flex items-center gap-2">
-                {cart.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearCartAll}
-                  >
-                    <IconTrash className="size-3.5" />
-                    {t('cart.clearCart')}
-                  </Button>
+            ) : (
+              <div className="flex flex-col gap-2 py-2">
+                {hasMixedProducts && (
+                  <ActionRequiredAlert
+                    title="ไม่สามารถชำระเงินรวมกันได้"
+                    description="พบสินค้าตัวแทนจำหน่ายรวมกับสินค้าหน้าร้าน โปรดลบรายการออกเพื่อชำระเงินทีละประเภท"
+                  />
                 )}
-                <Button size="icon-sm">{totalItems}</Button>
-              </div>
-            </CardTitle>
-            {!isResellerMode && customerId && (
-              <CustomerCard
-                title={t('customerInfo')}
-                content={
-                  <>
-                    {t('customerId', { id: customerId })} <br />
-                    {t('customerPhone', {
-                      phone: formatPromptPay(customerPhone || ''),
-                    })}{' '}
-                    <br />
-                    {t('customerPoints', {
-                      points: formatNumber(customerPoints),
-                    })}
-                  </>
-                }
-                action={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleRemoveCustomer}
-                  >
-                    <IconX className="size-4" />
-                  </Button>
-                }
-              />
-            )}
-          </CardHeader>
-          <CardContent className="flex-1 overflow-hidden p-0">
-            <ScrollArea className="h-full px-4">
-              {cart.length === 0 ? (
-                <div className="text-muted-foreground flex h-40 flex-col items-center justify-center gap-2 text-sm">
-                  <IconShoppingCart className="size-10 opacity-30" />
-                  {t('cart.empty')}
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 py-2">
-                  {hasMixedProducts && (
-                    <ActionRequiredAlert
-                      title={t('cart.mixedProductsTitle')}
-                      description={t('cart.mixedProductsDesc')}
+
+                {cart.map((item) => {
+                  const stock = item.variant.stocks.reduce(
+                    (sum, s) => sum + s.quantity,
+                    0,
+                  )
+                  const isMaxStock =
+                    item.quantity >=
+                    getRemainingStock(cart, {
+                      variantId: item.variant.id,
+                      stock,
+                      excludeCartItemId: item.cartItemId,
+                    })
+
+                  return (
+                    <CartItemCard
+                      textClassName="sm:max-w-1/2 lg:max-w-full"
+                      key={item.cartItemId}
+                      item={item}
+                      onUpdateQuantity={onUpdateQuantity}
+                      onRemove={onRemoveItem}
+                      isMaxStock={isMaxStock}
                     />
-                  )}
-
-                  {cart.map((item) => {
-                    const stock = item.variant.stocks.reduce(
-                      (sum, s) => sum + s.quantity,
-                      0,
-                    )
-                    const isMaxStock =
-                      item.quantity >=
-                      getRemainingStock(cart, {
-                        variantId: item.variant.id,
-                        stock,
-                        excludeCartItemId: item.cartItemId,
-                      })
-
-                    return (
-                      <CartItemCard
-                        textClassName="sm:max-w-1/2 lg:max-w-full"
-                        key={item.cartItemId}
-                        item={item}
-                        onUpdateQuantity={onUpdateQuantity}
-                        onRemove={onRemoveItem}
-                        isMaxStock={isMaxStock}
-                        baseCurrency={baseCurrency}
-                      />
-                    )
-                  })}
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-          <CardFooter className="flex-col gap-3 border-t p-4">
-            {!isResellerMode &&
-              orderItems?.length !== 0 &&
-              !hasMixedProducts && (
-                <PosDiscountDialog subtotal={cartSummary.finalPrice} />
-              )}
-            <div className="w-full">
-              <CartSummary summary={summaryData} baseCurrency={baseCurrency} />
-            </div>
-            <div className="flex w-full gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                disabled={cart.length === 0}
-                onClick={handleClearCartAll}
-              >
-                {t('cart.cancel')}
-              </Button>
-              <Button
-                size="lg"
-                className="flex-2 text-base font-semibold"
-                disabled={cart.length === 0 || hasMixedProducts}
-                onClick={() => setIsCheckoutOpen(true)}
-              >
-                {t('cart.checkoutWithAmount', {
-                  amount: formatCurrency(summaryData.finalPrice),
+                  )
                 })}
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
-        <PosCheckoutModal
-          open={isCheckoutOpen}
-          onOpenChange={setIsCheckoutOpen}
-          totalAmount={summaryData.finalPrice}
-          earnedPoints={isResellerMode ? 0 : cartSummary.totalPoints}
-          agreementId={agreementId}
-          onSuccess={handleClearCartAll}
-        />
-      </FormProvider>
-    </div>
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+        <CardFooter className="flex-col gap-3 border-t p-4">
+          {!isResellerMode && orderItems?.length !== 0 && !hasMixedProducts && (
+            <PosDiscountDialog subtotal={cartSummary.finalPrice} />
+          )}
+          <div className="w-full">
+            <CartSummary summary={summaryData} />
+          </div>
+          <div className="flex w-full gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              disabled={cart.length === 0}
+              onClick={handleClearCartAll}
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              size="lg"
+              className="flex-2 text-base font-semibold"
+              disabled={cart.length === 0 || hasMixedProducts}
+              onClick={() => setIsCheckoutOpen(true)}
+            >
+              ชำระเงิน {formatCurrency(summaryData.finalPrice)}
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+      <PosCheckoutModal
+        open={isCheckoutOpen}
+        onOpenChange={setIsCheckoutOpen}
+        totalAmount={summaryData.finalPrice}
+        earnedPoints={isResellerMode ? 0 : cartSummary.totalPoints}
+        agreementId={agreementId}
+        onSuccess={handleClearCartAll}
+      />
+    </FormProvider>
   )
 }

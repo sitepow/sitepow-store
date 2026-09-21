@@ -58,22 +58,14 @@ export async function updateNotificationSettings(
 ) {
   try {
     if (!storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -85,8 +77,7 @@ export async function updateNotificationSettings(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
@@ -104,11 +95,7 @@ export async function updateNotificationSettings(
       details: { setting: 'notification', updatedFields: Object.keys(input) },
     })
 
-    return {
-      success: true,
-      messageTH: 'บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ',
-      messageEN: 'Notification settings updated successfully',
-    }
+    return { success: true, message: 'บันทึกการตั้งค่าการแจ้งเตือนสำเร็จ' }
   } catch (error) {
     console.error(error)
     return { success: false }

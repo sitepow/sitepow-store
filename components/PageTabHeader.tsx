@@ -22,12 +22,10 @@ const pageTabHeaderVariants = cva(
 )
 
 interface PageTabHeaderProps
-  extends
-    Omit<ComponentProps<'div'>, 'title'>,
-    VariantProps<typeof pageTabHeaderVariants> {
+  extends ComponentProps<'div'>, VariantProps<typeof pageTabHeaderVariants> {
   icon?: ComponentType<{ className?: string; size?: number }>
-  title: ReactNode
-  description?: ReactNode
+  title: string
+  description?: string
   endContent?: ReactNode
 }
 

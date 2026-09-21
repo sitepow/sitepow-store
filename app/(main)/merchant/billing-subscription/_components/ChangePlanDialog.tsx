@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -13,21 +12,21 @@ import {
 } from '@/actions/hooks/subscription'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { UpgradeType } from '@/types/checkout'
 import { formatCurrency } from '@/utils/pricing'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/subscription'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 
@@ -42,9 +41,6 @@ export function ChangePlanDialog({
   storeId,
   currentPlan,
 }: ChangePlanDialogProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.billing.dialog')
-  const tCommon = useTranslations('common.actions')
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const initiateUpgradeMutation = useInitiatePlanUpgrade()
@@ -110,20 +106,12 @@ export function ChangePlanDialog({
           <IconSettings />
         </Button>
       </DialogTrigger>
-      <DialogContent
-        className="sm:max-w-2xl"
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-      >
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconSettings}
-            title={t('title')}
-            description={t('description')}
-          />
+          <DialogTitle>เปลี่ยนแพลนการใช้งาน</DialogTitle>
+          <DialogDescription>
+            เลือกแพลนที่เหมาะสมกับความต้องการของร้านค้าคุณ
+          </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <div className="flex flex-col items-center gap-5">
@@ -137,14 +125,10 @@ export function ChangePlanDialog({
             onClick={handleClose}
             disabled={changePlanMutation.isPending}
           >
-            {tCommon('cancel')}
+            ยกเลิก
           </Button>
           <Button onClick={handleSubmit(onSubmit)}>
-            {upgradeCost > 0
-              ? t('confirmWithExtra', {
-                  extra: formatCurrency(upgradeCost),
-                })
-              : t('confirm')}
+            {`ยืนยันการเปลี่ยนแพลน ${upgradeCost > 0 ? `(ชำระเพิ่ม ${formatCurrency(upgradeCost)})` : ''}`}
           </Button>
         </DialogFooter>
       </DialogContent>

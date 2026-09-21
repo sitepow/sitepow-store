@@ -5,7 +5,6 @@ import {
   getExpenses,
   updateExpense,
 } from '@/actions/expense'
-import { expenseKeys } from '@/actions/query-keys/expenses'
 import { CreateExpenseInput, UpdateExpenseInput } from '@/zod/expense'
 import {
   queryOptions,
@@ -13,6 +12,15 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+
+export const expenseKeys = {
+  all: ['expenses'] as const,
+  lists: () => [...expenseKeys.all, 'list'] as const,
+  list: (filters: GetExpensesParams) =>
+    [...expenseKeys.lists(), filters] as const,
+  details: () => [...expenseKeys.all, 'detail'] as const,
+  detail: (id: string) => [...expenseKeys.details(), id] as const,
+}
 
 export function useExpenses(params: GetExpensesParams) {
   return useQuery(

@@ -1,11 +1,7 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-
-import { useTranslations } from 'next-intl'
 
 import {
   useReviewRewardConfig,
@@ -35,8 +31,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
 export function ReviewRewardSettingsForm() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.settings.reviewReward')
   const { selectedStoreId } = useStoreFilter()
   const storeId = selectedStoreId as string
 
@@ -92,11 +86,7 @@ export function ReviewRewardSettingsForm() {
 
   if (isLoading) {
     return (
-      <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+      <Card>
         <CardContent className="flex items-center justify-center p-12">
           <Spinner />
         </CardContent>
@@ -105,17 +95,13 @@ export function ReviewRewardSettingsForm() {
   }
 
   return (
-    <Card
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <Card>
       <CardHeader>
         <PageTabHeader
           variant="secondary"
           icon={IconStar}
-          title={t('title')}
-          description={t('description')}
+          title="ตั้งค่าคะแนนแจกจากการรีวิว"
+          description="กำหนดกติกาการแจกพ้อยท์/คะแนนสะสมให้แก่ลูกค้าเมื่อทำการเขียนรีวิวสินค้า"
         />
       </CardHeader>
       {selectedStoreId === ALL_STORES ? (
@@ -127,8 +113,12 @@ export function ReviewRewardSettingsForm() {
           <CardContent className="space-y-6">
             <Field className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-xs">
               <div className="space-y-0.5">
-                <FieldLabel className="text-base">{t('enable')}</FieldLabel>
-                <FieldDescription>{t('enableDesc')}</FieldDescription>
+                <FieldLabel className="text-base">
+                  เปิดใช้งานระบบแจกคะแนนรีวิว
+                </FieldLabel>
+                <FieldDescription>
+                  เปิดให้ลูกค้าได้รับคะแนนสะสมเมื่อเขียนรีวิวสินค้าสำเร็จ
+                </FieldDescription>
               </div>
               <Controller
                 control={control}
@@ -145,58 +135,68 @@ export function ReviewRewardSettingsForm() {
             <Separator />
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <Field>
-                <FieldLabel>{t('basePoints')}</FieldLabel>
+                <FieldLabel>คะแนนรีวิวพื้นฐาน (Base Points)</FieldLabel>
                 <Input
                   type="number"
                   placeholder="10"
                   {...register('basePoints', { valueAsNumber: true })}
                   disabled={isFieldsDisabled}
                 />
-                <FieldDescription>{t('basePointsDesc')}</FieldDescription>
+                <FieldDescription>
+                  คะแนนที่ลูกค้าจะได้รับเมื่อเขียนรีวิวข้อความทั่วไป
+                </FieldDescription>
                 <FieldError>{errors?.basePoints?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>{t('photoBonus')}</FieldLabel>
+                <FieldLabel>โบนัสแนบรูปภาพ (Photo Bonus)</FieldLabel>
                 <Input
                   type="number"
                   placeholder="5"
                   {...register('photoBonus', { valueAsNumber: true })}
                   disabled={isFieldsDisabled}
                 />
-                <FieldDescription>{t('photoBonusDesc')}</FieldDescription>
+                <FieldDescription>
+                  คะแนนพิเศษเพิ่มเมื่อมีการอัปโหลดรูปภาพประกอบรีวิว
+                </FieldDescription>
                 <FieldError>{errors?.photoBonus?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>{t('videoBonus')}</FieldLabel>
+                <FieldLabel>โบนัสแนบวิดีโอ (Video Bonus)</FieldLabel>
                 <Input
                   type="number"
                   placeholder="20"
                   {...register('videoBonus', { valueAsNumber: true })}
                   disabled={isFieldsDisabled}
                 />
-                <FieldDescription>{t('videoBonusDesc')}</FieldDescription>
+                <FieldDescription>
+                  คะแนนพิเศษเพิ่มเมื่อมีการอัปโหลดวิดีโอประกอบรีวิว
+                </FieldDescription>
                 <FieldError>{errors?.videoBonus?.message}</FieldError>
               </Field>
               <Field>
-                <FieldLabel>{t('longReviewBonus')}</FieldLabel>
+                <FieldLabel>โบนัสรีวิวยาว (Long Review Bonus)</FieldLabel>
                 <Input
                   type="number"
                   placeholder="10"
                   {...register('longReviewBonus', { valueAsNumber: true })}
                   disabled={isFieldsDisabled}
                 />
-                <FieldDescription>{t('longReviewBonusDesc')}</FieldDescription>
+                <FieldDescription>
+                  คะแนนพิเศษเพิ่มเมื่อความยาวของข้อความรีวิวถึงเกณฑ์ที่กำหนด
+                </FieldDescription>
                 <FieldError>{errors?.longReviewBonus?.message}</FieldError>
               </Field>
               <Field className="lg:col-span-2">
-                <FieldLabel>{t('minCommentLength')}</FieldLabel>
+                <FieldLabel>จำนวนตัวอักษรขั้นต่ำสำหรับโบนัสรีวิวยาว</FieldLabel>
                 <Input
                   type="number"
                   placeholder="50"
                   {...register('minCommentLength', { valueAsNumber: true })}
                   disabled={isFieldsDisabled}
                 />
-                <FieldDescription>{t('minCommentLengthDesc')}</FieldDescription>
+                <FieldDescription>
+                  จำนวนตัวอักษรขั้นต่ำที่ลูกค้าต้องพิมพ์เพื่อที่จะได้รับคะแนนโบนัสรีวิวยาว
+                </FieldDescription>
                 <FieldError>{errors?.minCommentLength?.message}</FieldError>
               </Field>
             </div>
@@ -209,7 +209,7 @@ export function ReviewRewardSettingsForm() {
                 onClick={resetForm}
                 disabled={updateMutation.isPending}
               >
-                {t('reset')}
+                ล้างค่าการตั้งค่า
               </Button>
             )}
             <Button
@@ -219,10 +219,10 @@ export function ReviewRewardSettingsForm() {
             >
               {updateMutation.isPending ? (
                 <>
-                  <Spinner /> {t('saving')}
+                  <Spinner /> กำลังบันทึก...
                 </>
               ) : (
-                t('save')
+                'บันทึกการตั้งค่าคะแนนรีวิว'
               )}
             </Button>
           </CardFooter>

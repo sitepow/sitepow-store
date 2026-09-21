@@ -3,8 +3,6 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useTranslations } from 'next-intl'
-
 import {
   useNotificationSettings,
   useUpdateNotificationSettings,
@@ -22,8 +20,6 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 
 export function NotificationSettingsForm() {
-  const t = useTranslations('customer.settings')
-  const tCommon = useTranslations('common')
   const { data: settings, isLoading } = useNotificationSettings()
   const { mutate: updateSettings, isPending } = useUpdateNotificationSettings()
 
@@ -62,8 +58,8 @@ export function NotificationSettingsForm() {
         <CardHeader>
           <PageTabHeader
             variant="secondary"
-            title={t('notificationTitle')}
-            description={t('notificationDesc')}
+            title="ตั้งค่าการแจ้งเตือน"
+            description="เลือกรูปแบบการรับการแจ้งเตือนที่สำคัญ เพื่อให้คุณไม่พลาดทุกสถานะคำสั่งซื้อและการดำเนินงานภายในร้านค้า"
             icon={IconBell}
           />
         </CardHeader>
@@ -71,10 +67,11 @@ export function NotificationSettingsForm() {
           <div className="flex items-center justify-between pb-4">
             <div className="pr-4">
               <span className="block text-sm font-medium">
-                {t('orderUpdates')}
+                แจ้งเตือนสถานะคำสั่งซื้อ
               </span>
               <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">
-                {t('orderUpdatesDesc')}
+                รับการยืนยันทางอีเมลและการแจ้งเตือนในระบบเมื่อสินค้าถูกจัดส่ง
+                ชำระเงินผ่าน หรืออัปเดตสเตตัสพัสดุ
               </span>
             </div>
             <Switch
@@ -88,10 +85,11 @@ export function NotificationSettingsForm() {
           <div className="flex items-center justify-between pt-4">
             <div className="pr-4">
               <span className="block text-sm font-medium">
-                {t('promotions')}
+                ข่าวสารและโปรโมชั่นพิเศษ
               </span>
               <span className="text-muted-foreground mt-1 block max-w-xl text-xs leading-relaxed">
-                {t('promotionsDesc')}
+                รับข้อมูลรหัสคูปองส่วนลด แคมเปญลดกระหน่ำประจำเดือน
+                และกิจกรรมการตลาดต่างๆ จากระบบ
               </span>
             </div>
             <Switch
@@ -111,11 +109,11 @@ export function NotificationSettingsForm() {
               onClick={() => reset()}
               disabled={isPending}
             >
-              {t('reset')}
+              ล้างค่าการตั้งค่า
             </Button>
           )}
           <Button type="submit" disabled={isPending || !isDirty || isLoading}>
-            {isPending ? tCommon('actions.saving') : t('savePreferences')}
+            {isPending ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า'}
           </Button>
         </CardFooter>
       </Card>

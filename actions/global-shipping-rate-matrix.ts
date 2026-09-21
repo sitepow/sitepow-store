@@ -76,12 +76,7 @@ export async function upsertGlobalShippingRateMatrix(
       details: { provinces: payloads.map((p) => p.fromProvince) },
     })
 
-    return {
-      success: true,
-      messageTH: 'บันทึกข้อมูลเรทจัดส่งกลางสำเร็จแล้ว',
-      messageEN: 'Global shipping rates saved successfully',
-      message: 'บันทึกข้อมูลเรทจัดส่งกลางสำเร็จแล้ว',
-    }
+    return { success: true, message: 'บันทึกข้อมูลเรทจัดส่งกลางสำเร็จแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }
@@ -95,23 +90,14 @@ export async function applyGlobalRatesToStore(
 ) {
   try {
     if (!storeId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-        message: 'ไม่พบ Store ID',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const userSession = await getCurrentUser()
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -123,16 +109,14 @@ export async function applyGlobalRatesToStore(
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
 
     if (!fromProvince) {
       return {
         success: false,
-        messageTH: 'กรุณาระบุจังหวัดต้นทางของร้านค้าก่อนดำเนินการ',
-        messageEN: 'Please specify the store origin province before proceeding',
+        message: 'กรุณาระบุจังหวัดต้นทางของร้านค้าก่อนดำเนินการ',
       }
     }
 
@@ -144,8 +128,7 @@ export async function applyGlobalRatesToStore(
     if (!matrixRow) {
       return {
         success: false,
-        messageTH: `ไม่พบข้อมูลเรทจัดส่งสำหรับจังหวัด ${fromProvince}`,
-        messageEN: `Shipping rate data not found for province ${fromProvince}`,
+        message: `ไม่พบข้อมูลเรทจัดส่งสำหรับจังหวัด ${fromProvince}`,
       }
     }
 
@@ -215,11 +198,7 @@ export async function applyGlobalRatesToStore(
       details: { fromProvince, branchId, type: 'applied_global_rates' },
     })
 
-    return {
-      success: true,
-      messageTH: 'ปรับใช้เรทจัดส่งกลางเรียบร้อยแล้ว',
-      messageEN: 'Global shipping rates applied successfully',
-    }
+    return { success: true, message: 'ปรับใช้เรทจัดส่งกลางเรียบร้อยแล้ว' }
   } catch (error) {
     console.error(error)
     return { success: false }

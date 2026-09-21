@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { useLocale } from 'next-intl'
-
 import { SectionProductItem } from '@/actions/storefront/sections'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useLandingImages } from '@/hooks/use-landing-images'
-import { getLocalizedField } from '@/utils/intl'
 import { isVideoUrl } from '@/utils/media'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -22,7 +19,6 @@ interface CategorySectionProps {
   categorySlug: string
   title: string
   image?: string | null
-  translations?: any
   products: SectionProductItem[]
   isLoading: boolean
 }
@@ -31,13 +27,9 @@ export function CategorySection({
   categorySlug,
   title,
   image,
-  translations,
   products,
   isLoading,
 }: CategorySectionProps) {
-  const locale = useLocale()
-  const displayTitle =
-    getLocalizedField({ title, translations }, 'title', locale) || title
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
   const { emblaRef, emblaApi: api } = useCarousel({
     dragFree: true,
@@ -97,7 +89,7 @@ export function CategorySection({
             <div className="absolute inset-0 z-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
             <div className="relative z-10 flex size-full flex-col justify-end p-5 sm:p-6">
               <h2 className="line-clamp-2 text-xl font-extrabold tracking-tight text-white drop-shadow-md sm:text-2xl md:text-3xl">
-                {displayTitle}
+                {title}
               </h2>
             </div>
           </div>

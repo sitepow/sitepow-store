@@ -1,13 +1,9 @@
 'use client'
 
-import { useCurrentStore } from '@/hooks/use-current-store'
-
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useCoupons, useDeleteCoupon } from '@/actions/hooks/coupon'
-import { StorePagination } from '@/components/StorePagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatShortDate } from '@/utils/date'
 import { IconCalendar, IconHierarchy } from '@tabler/icons-react'
@@ -27,8 +23,6 @@ import {
 } from '@/components/ui/table'
 
 export function CouponListTable() {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.marketing')
   const { selectedStoreId } = useStoreFilter()
   const [page, setPage] = useState(1)
 
@@ -41,27 +35,20 @@ export function CouponListTable() {
   const deleteCouponMutation = useDeleteCoupon()
 
   return (
-    <div
-      className="space-y-4"
-      style={{
-        '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-      } as React.CSSProperties}
-    >
+    <>
       <div className="bg-background overflow-hidden rounded-xl border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('columns.code')}</TableHead>
+              <TableHead>รหัสคูปอง</TableHead>
               <TableHead className="max-w-72 min-w-72">
-                {t('columns.descriptionConditions')}
+                รายละเอียด / เงื่อนไข
               </TableHead>
-              <TableHead>{t('columns.discount')}</TableHead>
-              <TableHead>{t('columns.branch')}</TableHead>
-              <TableHead className="w-48">{t('columns.usage')}</TableHead>
-              <TableHead>{t('columns.validity')}</TableHead>
-              <TableHead className="text-right">
-                {t('columns.actions')}
-              </TableHead>
+              <TableHead>มูลค่าส่วนลด</TableHead>
+              <TableHead>สาขาที่เข้าร่วม</TableHead>
+              <TableHead className="w-48">สถิติการใช้งาน</TableHead>
+              <TableHead>วันหมดอายุ</TableHead>
+              <TableHead className="text-right">จัดการ</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -70,8 +57,8 @@ export function CouponListTable() {
             ) : coupons.length === 0 ? (
               <TableEmptyRow
                 colSpan={7}
-                title={t('emptyTitle')}
-                description={t('emptyDescription')}
+                title="ยังไม่มีโปรโมชันคูปองในขณะนี้"
+                description="เริ่มต้นขับเคลื่อนยอดขายด้วยการคลิกปุ่มสร้างคูปองส่วนลด"
               />
             ) : (
               coupons.map((coupon) => {
@@ -87,7 +74,7 @@ export function CouponListTable() {
                           {coupon.code}
                         </Badge>
                         <span className="text-xs opacity-60">
-                          {isFull ? t('statusFull') : t('statusActive')}
+                          {isFull ? 'สิทธิ์เต็มแล้ว' : 'เปิดใช้งานอยู่'}
                         </span>
                       </div>
                     </TableCell>
@@ -97,11 +84,8 @@ export function CouponListTable() {
                           {coupon.description || '-'}
                         </span>
                         <span className="text-muted-foreground text-xs">
-                          {t('minOrderAmount', {
-                            amount: Number(
-                              coupon.minOrderAmount,
-                            ).toLocaleString(),
-                          })}
+                          เมื่อสั่งซื้อขั้นต่ำ ฿
+                          {Number(coupon.minOrderAmount).toLocaleString()}
                         </span>
                       </div>
                     </TableCell>
@@ -115,11 +99,8 @@ export function CouponListTable() {
                         {coupon.discountType === 'PERCENTAGE' &&
                           coupon.maxDiscount && (
                             <span className="text-xs opacity-60">
-                              {t('maxDiscount', {
-                                amount: Number(
-                                  coupon.maxDiscount,
-                                ).toLocaleString(),
-                              })}
+                              ลดสูงสุด ฿
+                              {Number(coupon.maxDiscount).toLocaleString()}
                             </span>
                           )}
                       </div>
@@ -131,7 +112,7 @@ export function CouponListTable() {
                           size={18}
                         />
                         <span className="text-muted-foreground max-w-45 truncate text-sm">
-                          {coupon.branch?.name ?? t('allBranchesInBrand')}
+                          {coupon.branch?.name ?? 'ทุกสาขาภายในแบรนด์'}
                         </span>
                       </div>
                     </TableCell>
@@ -139,16 +120,14 @@ export function CouponListTable() {
                       <div className="flex flex-col space-y-1.5">
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">
-                            {t('used')}
+                            ใช้ไปแล้ว
                           </span>
                           <span className="font-medium">
                             {coupon.usedCount}{' '}
                             <span className="text-muted-foreground font-normal">
                               {isLimitless
-                                ? t('times')
-                                : t('timesWithLimit', {
-                                    limit: coupon.usageLimit ?? 0,
-                                  })}
+                                ? 'ครั้ง'
+                                : `/ ${coupon.usageLimit} ครั้ง`}
                             </span>
                           </span>
                         </div>
@@ -196,6 +175,6 @@ export function CouponListTable() {
           onPageChange={(newPage) => setPage(newPage)}
         />
       )}
-    </div>
+    </>
   )
 }

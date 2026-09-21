@@ -55,7 +55,6 @@ export interface CreateStoreInput {
   isPointsEnabled?: boolean
   pointEarningRate?: number | string | Prisma.Decimal | null
   pointRedeemRate?: number | string | Prisma.Decimal | null
-  allowSearchEngineIndex?: boolean
 }
 
 export interface UpdateStoreInput extends Partial<
@@ -79,7 +78,6 @@ const storeDropdownSelect = {
   slug: true,
   logo: true,
   primaryColor: true,
-  baseCurrency: true,
 } satisfies Prisma.StoreSelect
 
 const storeSelect = {
@@ -122,6 +120,36 @@ export interface GetStoresResponse {
   }
 }
 
+const storeLandingSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  logo: true,
+  coverImage: true,
+  description: true,
+} satisfies Prisma.StoreSelect
+
+export type StoreLandingItem = Prisma.StoreGetPayload<{
+  select: typeof storeLandingSelect
+}>
+
+export async function getLandingStores(
+  limit = 11,
+): Promise<StoreLandingItem[]> {
+  const cacheKey = queryKeyToRedisKey(storeKeys.landing())
+
+  return (
+    (await withCache(cacheKey, () =>
+      prisma.store.findMany({
+        where: { status: StoreStatus.ACTIVE },
+        select: storeLandingSelect,
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      }),
+    )) ?? []
+  )
+}
+
 export type StoreData = Prisma.StoreGetPayload<{
   select: {
     id: true
@@ -136,24 +164,6 @@ export type StoreData = Prisma.StoreGetPayload<{
     slug: true
     coverImage: true
     primaryColor: true
-    baseCurrency: true
-    translations: true
-    aboutPage: true
-    faqsPage: true
-    descriptionPage: true
-    privacyPolicyPage: true
-    refundPolicyPage: true
-    phone: true
-    lineId: true
-    facebookPage: true
-    instagramPage: true
-    tiktokPage: true
-    youtubePage: true
-    discordUrl: true
-    messengerUrl: true
-    socialLinks: true
-    footerText: true
-    footerCopyright: true
   }
 }>
 
@@ -180,28 +190,6 @@ export const getStore = cache(async ({ domain }: { domain: string }) => {
         slug: true,
         ownerId: true,
         customDomain: true,
-        allowSearchEngineIndex: true,
-        seoTitle: true,
-        seoDescription: true,
-        seoKeywords: true,
-        baseCurrency: true,
-        translations: true,
-        aboutPage: true,
-        faqsPage: true,
-        descriptionPage: true,
-        privacyPolicyPage: true,
-        refundPolicyPage: true,
-        phone: true,
-        lineId: true,
-        facebookPage: true,
-        instagramPage: true,
-        tiktokPage: true,
-        youtubePage: true,
-        discordUrl: true,
-        messengerUrl: true,
-        socialLinks: true,
-        footerText: true,
-        footerCopyright: true,
       },
     })
   })
@@ -440,15 +428,10 @@ export async function getStoreOptions(filters?: {
 
 export async function createStore(input: CreateStoreInput) {
   try {
-    const { isAuthorized, messageTH, messageEN, userId } =
-      await requireVerifiedUser()
+    const { isAuthorized, message, userId } = await requireVerifiedUser()
 
     if (!isAuthorized || !userId) {
-      return {
-        success: false,
-        messageTH: messageTH || 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: messageEN || 'Access denied',
-      }
+      return { success: false, message: message || 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     const validatedInput = createStoreSchema.safeParse({
@@ -459,12 +442,7 @@ export async function createStore(input: CreateStoreInput) {
     if (!validatedInput.success) {
       const errorMessage =
         validatedInput.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง'
-      return {
-        success: false,
-        messageTH: errorMessage,
-        messageEN:
-          validatedInput.error.issues[0]?.message || 'Invalid input data',
-      }
+      return { success: false, message: errorMessage }
     }
 
     const { billingCycle, ...storeData } = input
@@ -505,18 +483,10 @@ export async function createStore(input: CreateStoreInput) {
 
     if (existingStore) {
       if (existingStore.slug.toLowerCase() === slug.toLowerCase()) {
-        return {
-          success: false,
-          messageTH: 'Slug นี้ถูกใช้งานไปแล้ว',
-          messageEN: 'This URL slug is already taken',
-        }
+        return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้ว' }
       }
       if (existingStore.name.toLowerCase() === name.toLowerCase()) {
-        return {
-          success: false,
-          messageTH: 'ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว',
-          messageEN: 'This store name is already taken',
-        }
+        return { success: false, message: 'ชื่อร้านค้า นี้ถูกใช้งานไปแล้ว' }
       }
     }
 
@@ -600,8 +570,6 @@ export async function createStore(input: CreateStoreInput) {
 
     return {
       success: true,
-      messageTH: 'สร้างร้านค้าสำเร็จแล้ว',
-      messageEN: 'Store created successfully',
       message: 'สร้างร้านค้าสำเร็จแล้ว',
       data: store,
       invoice,
@@ -618,21 +586,11 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Unauthorized',
-        message: 'ไม่มีสิทธิ์เข้าถึง',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-        message: 'ไม่พบ Store ID',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -644,8 +602,6 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -657,12 +613,7 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
       })
 
       if (existingStore && existingStore.id !== id) {
-        return {
-          success: false,
-          messageTH: 'Slug นี้ถูกใช้งานไปแล้ว',
-          messageEN: 'This slug is already in use',
-          message: 'Slug นี้ถูกใช้งานไปแล้ว',
-        }
+        return { success: false, message: 'Slug นี้ถูกใช้งานไปแล้ว' }
       }
     }
 
@@ -685,8 +636,6 @@ export async function updateStore(id: string, input: UpdateStoreInput) {
 
     return {
       success: true,
-      messageTH: 'อัปเดตข้อมูลร้านค้าสำเร็จแล้ว',
-      messageEN: 'Store updated successfully',
       message: 'อัปเดตข้อมูลร้านค้าสำเร็จแล้ว',
       data: store,
     }
@@ -702,21 +651,11 @@ export async function deleteStore(id: string) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์เข้าถึง',
-        messageEN: 'Unauthorized',
-        message: 'ไม่มีสิทธิ์เข้าถึง',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }
     }
 
     if (!id) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบ Store ID',
-        messageEN: 'Store ID not found',
-        message: 'ไม่พบ Store ID',
-      }
+      return { success: false, message: 'ไม่พบ Store ID' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -728,8 +667,6 @@ export async function deleteStore(id: string) {
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: authCheck.messageTH || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
-        messageEN: authCheck.messageEN || 'Insufficient permissions',
         message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
       }
     }
@@ -751,8 +688,6 @@ export async function deleteStore(id: string) {
 
     return {
       success: true,
-      messageTH: 'ลบร้านค้าและข้อมูลทั้งหมดสำเร็จเรียบร้อย',
-      messageEN: 'Store and all associated data deleted successfully',
       message: 'ลบร้านค้าและข้อมูลทั้งหมดสำเร็จเรียบร้อย',
     }
   } catch (error) {

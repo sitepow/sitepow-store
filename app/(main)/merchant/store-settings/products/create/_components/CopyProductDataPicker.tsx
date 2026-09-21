@@ -4,19 +4,15 @@ import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useTranslations } from 'next-intl'
-
 import { useProductOptions } from '@/actions/hooks/product'
 import { getProductById } from '@/actions/product'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
-import { useCurrentStore } from '@/hooks/use-current-store'
 import { ProductFormValues } from '@/zod/product'
 import { IconDatabaseImport } from '@tabler/icons-react'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
-import { DialogHeaderIcon } from '@/components/DialogHeaderIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -31,6 +27,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {
@@ -44,8 +41,6 @@ import { cn } from '@/lib/utils'
 type ProductPreview = Awaited<ReturnType<typeof getProductById>>
 
 export function CopyProductDataPicker({ storeId }: { storeId: string }) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('merchant.products.form')
   const [open, setOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const { setValue, getValues } = useFormContext<ProductFormValues>()
@@ -59,7 +54,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
 
   const groupedOptions = options.reduce(
     (acc, item) => {
-      const category = item.category?.title || t('noCategory')
+      const category = item.category?.title || 'ไม่มีหมวดหมู่'
       if (!acc[category]) {
         acc[category] = []
       }
@@ -135,7 +130,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     }
 
     if (selectedFields.includes('addons')) {
-      setValue('addons', previewData.addons as any, {
+      setValue('addons', previewData.addons, {
         shouldDirty: true,
       })
     }
@@ -146,7 +141,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
       })
     }
 
-    toast.success(t('copySuccess'))
+    toast.success('คัดลอกข้อมูลที่เลือกเรียบร้อย')
     setOpen(false)
   }
 
@@ -160,22 +155,13 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <IconDatabaseImport className="size-4" /> {t('copyFromDatabase')}
+          <IconDatabaseImport className="size-4" />{' '}
+          คัดลอกข้อมูลสินค้าในฐานข้อมูล
         </Button>
       </DialogTrigger>
-      <DialogContent
-        style={
-          {
-            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          } as React.CSSProperties
-        }
-        className="flex min-h-96 flex-col"
-      >
+      <DialogContent className="flex min-h-96 flex-col">
         <DialogHeader>
-          <DialogHeaderIcon
-            icon={IconDatabaseImport}
-            title={t('copyProductFrom')}
-          />
+          <DialogTitle>คัดลอกข้อมูลสินค้าจาก</DialogTitle>
         </DialogHeader>
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
@@ -190,23 +176,16 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
               <span className="line-clamp-1 flex items-center gap-1.5">
                 {sourceId
                   ? options.find((p) => p.id === sourceId)?.title
-                  : t('searchTemplatePlaceholder')}
+                  : 'ค้นหาสินค้าต้นแบบ...'}
               </span>
               <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
             </button>
           </PopoverTrigger>
-          <PopoverContent
-            style={
-              {
-                '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-              } as React.CSSProperties
-            }
-            className="max-w-100 p-0"
-          >
+          <PopoverContent className="max-w-100 p-0">
             <Command>
-              <CommandInput placeholder={t('searchProductInputPlaceholder')} />
+              <CommandInput placeholder="พิมพ์ชื่อสินค้าเพื่อค้นหา..." />
               <CommandList>
-                <CommandEmpty>{t('productNotFound')}</CommandEmpty>
+                <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
                 {Object.entries(groupedOptions).map(([category, items]) => (
                   <CommandGroup key={category} heading={category}>
                     {items.map((p) => (
@@ -248,9 +227,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
                       onCheckedChange={() => toggleField(field)}
                     />
                     <span className="text-sm font-medium">
-                      {t('copyFieldLabel', {
-                        field: FIELD_LABELS[field] || field,
-                      })}
+                      [คัดลอก] {FIELD_LABELS[field] || field}
                     </span>
                   </label>
                   {field === 'metadata' &&
@@ -290,7 +267,7 @@ export function CopyProductDataPicker({ storeId }: { storeId: string }) {
           </div>
         )}
         <Button onClick={handleCopy} disabled={selectedFields.length === 0}>
-          {t('confirmCopy')}
+          ยืนยันการคัดลอก
         </Button>
       </DialogContent>
     </Dialog>

@@ -1,10 +1,6 @@
 'use client'
 
-import React, { ReactNode } from 'react'
-
-import { useTranslations } from 'next-intl'
-
-import { useCurrentStore } from '@/hooks/use-current-store'
+import { ReactNode } from 'react'
 
 import {
   Card,
@@ -21,32 +17,18 @@ interface AnalyticsCardShellProps {
   emptyMessage?: string
   children?: ReactNode
   className?: string
-  style?: React.CSSProperties
 }
 
 export function AnalyticsCardShell({
   title,
   description,
   isEmpty = false,
-  emptyMessage,
+  emptyMessage = 'ไม่มีข้อมูล',
   children,
   className,
-  style,
 }: AnalyticsCardShellProps) {
-  const { currentStore, store } = useCurrentStore()
-  const t = useTranslations('common.empty')
-  const resolvedEmptyMessage = emptyMessage ?? t('title')
-
   return (
-    <Card
-      className={`border-border/60 overflow-hidden ${className ?? ''}`}
-      style={
-        {
-          '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-          ...style,
-        } as React.CSSProperties
-      }
-    >
+    <Card className={`border-border/60 overflow-hidden ${className ?? ''}`}>
       <CardHeader>
         <CardTitle className="text-base font-bold">{title}</CardTitle>
         <CardDescription className="text-xs">{description}</CardDescription>
@@ -54,7 +36,7 @@ export function AnalyticsCardShell({
       <CardContent>
         {isEmpty ? (
           <div className="text-muted-foreground py-8 text-center text-sm">
-            {resolvedEmptyMessage}
+            {emptyMessage}
           </div>
         ) : (
           children

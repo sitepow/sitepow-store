@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { ShippingAddressSnapshot } from '@/actions/order'
 import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
@@ -42,7 +40,6 @@ interface OrderDetailViewProps {
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
-  const t = useTranslations('customer.orders')
   const { store } = useStoreData()
   const { copied, copy } = useCopyToClipboard()
   const [open, setOpen] = useState(false)
@@ -66,11 +63,9 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <DialogHeader>
-          <DialogTitle>
-            {t('detailTitle', { orderNumber: order.orderNumber })}
-          </DialogTitle>
+          <DialogTitle>คำสั่งซื้อ #{order.orderNumber}</DialogTitle>
           <DialogDescription>
-            {t('storeName')}: {order.store.name} | {t('orderDate')}:{' '}
+            ร้านค้า: {order.store.name} | วันที่สั่งซื้อ:{' '}
             {formatDateTime(order.createdAt)}
           </DialogDescription>
           <OrderStatusBadges
@@ -82,15 +77,15 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         </DialogHeader>
         <CustomerCard
           icon={<IconMapPin />}
-          title={t('shippingAddress')}
+          title="ที่อยู่จัดส่ง"
           content={
             <>
-              {t('recipient')}:{' '}
+              ชื่อผู้รับ:{' '}
               {shippingAddr?.receiverName || shippingAddr?.name || '-'} <br />
-              {t('phone')}:{' '}
+              เบอร์โทรศัพท์:{' '}
               {shippingAddr?.phone ? formatPromptPay(shippingAddr.phone) : '-'}
               <br />
-              {t('address')}: {formatFullAddress(shippingAddr) || '-'}
+              ที่อยู่: {formatFullAddress(shippingAddr) || '-'}
             </>
           }
         />
@@ -98,11 +93,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         {order.trackingNumber ? (
           <CustomerCard
             icon={<IconCubeSend />}
-            title={t('tracking')}
+            title="เลขพัสดุ (Tracking Number)"
             content={
               <>
-                {t('trackingNo')}: {order.trackingNumber} <br />
-                {t('shippingMethod')}: {order.shippingMethod || '-'}
+                เลขติดตามขนส่ง: {order.trackingNumber} <br />
+                วิธีการจัดส่ง: {order.shippingMethod || '-'}
               </>
             }
             action={
@@ -113,11 +108,11 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               >
                 {copied ? (
                   <>
-                    <IconCheck size={16} /> {t('copied')}
+                    <IconCheck size={16} /> คัดลอกแล้ว
                   </>
                 ) : (
                   <>
-                    <IconCopy size={16} /> {t('copy')}
+                    <IconCopy size={16} /> คัดลอก
                   </>
                 )}
               </Button>
@@ -127,40 +122,39 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           order.status !== OrderStatus.SHIPPED ? (
           <CustomerCard
             icon={<IconCubeSend />}
-            title={t('shippingStatus')}
+            title="สถานะการจัดส่ง"
             content={
               order.status === OrderStatus.PENDING
-                ? t('preparingShipment')
-                : t('processingOrder')
+                ? 'ระบบกำลังเตรียมการจัดส่ง เมื่อร้านค้ากรอกเลขพัสดุแล้วจะแสดงผลที่นี่'
+                : 'ร้านค้ากำลังดำเนินการจัดเตรียมสินค้า เมื่อสินค้าจัดส่งสำเร็จแล้ว ระบบจะจัดส่งเลขติดตามพัสดุ (Tracking Number) ไปยังอีเมลของคุณ'
             }
           />
         ) : null}
         <CustomerCard
           icon={<IconPackage />}
-          title={t('dimensions')}
+          title="ขนาดและน้ำหนักพัสดุ"
           content={
             <>
-              {t('weight')}: {formatNumber(order.totalWeight || 0)} {t('kg')}{' '}
-              <br />
-              {t('size')}: {formatNumber(order.width || 0)} x{' '}
+              น้ำหนัก: {formatNumber(order.totalWeight || 0)} กก. <br />
+              ขนาด (กxยxส): {formatNumber(order.width || 0)} x{' '}
               {formatNumber(order.length || 0)} x{' '}
-              {formatNumber(order.height || 0)} {t('cm')}
+              {formatNumber(order.height || 0)} ซม.
             </>
           }
         />
         {isDirectPayment && (
           <CustomerCard
             icon={<IconCreditCardPay />}
-            title={t('paymentInfo')}
+            title="ข้อมูลการชำระเงิน"
             content={
               <>
-                {t('bank')}: {order.bankAccount?.bankName || '-'} <br />
-                {t('accountNumber')}:{' '}
+                ธนาคาร: {order.bankAccount?.bankName || '-'} <br />
+                เลขที่บัญชี:{' '}
                 {order.bankAccount?.accountNumber
                   ? formatBankAccount(order.bankAccount.accountNumber)
                   : '-'}{' '}
                 <br />
-                {t('accountName')}: {order.bankAccount?.accountName || '-'}
+                ชื่อบัญชี: {order.bankAccount?.accountName || '-'}
               </>
             }
           />
@@ -168,16 +162,17 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
         {order.isTaxInvoiceRequested && (
           <CustomerCard
             icon={<IconReceipt />}
-            title={t('taxInvoice')}
+            title="ข้อมูลใบกำกับภาษี"
             content={
               <>
-                {t('taxCompanyName')}: {order.taxName || '-'}
+                ชื่อ/บริษัท: {order.taxName || '-'}
                 <br />
-                {t('taxId')}: {order.taxId ? formatPromptPay(order.taxId) : '-'}
+                เลขประจำตัวผู้เสียภาษี:{' '}
+                {order.taxId ? formatPromptPay(order.taxId) : '-'}
                 <br />
-                {t('branch')}: {order.taxBranchCode || t('headOffice')}
+                สาขา: {order.taxBranchCode || 'สำนักงานใหญ่'}
                 <br />
-                {t('taxAddress')}: {order.taxAddress || '-'}
+                ที่อยู่จดทะเบียน: {order.taxAddress || '-'}
               </>
             }
           />

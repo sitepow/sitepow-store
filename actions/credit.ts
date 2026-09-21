@@ -38,21 +38,11 @@ export async function purchaseCredit({
     const currentUserId = userId || userSession?.id
 
     if (!currentUserId) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลผู้ใช้งาน',
-        messageEN: 'User not found',
-        message: 'ไม่พบข้อมูลผู้ใช้งาน',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลผู้ใช้งาน' }
     }
 
     if (amount < 60) {
-      return {
-        success: false,
-        messageTH: 'จำนวนเงินขั้นต่ำคือ 60 บาท',
-        messageEN: 'Minimum amount is 60 THB',
-        message: 'จำนวนเงินขั้นต่ำคือ 60 บาท',
-      }
+      return { success: false, message: 'จำนวนเงินขั้นต่ำคือ 60 บาท' }
     }
 
     const store = await prisma.store.findUnique({
@@ -61,12 +51,7 @@ export async function purchaseCredit({
     })
 
     if (!store) {
-      return {
-        success: false,
-        messageTH: 'ไม่พบข้อมูลร้านค้า',
-        messageEN: 'Store not found',
-        message: 'ไม่พบข้อมูลร้านค้า',
-      }
+      return { success: false, message: 'ไม่พบข้อมูลร้านค้า' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -78,8 +63,6 @@ export async function purchaseCredit({
     if (!authCheck.isAuthorized) {
       return {
         success: false,
-        messageTH: 'สิทธิ์การใช้งานของคุณไม่เพียงพอสำหรับการเติมเครดิต',
-        messageEN: 'Insufficient permissions to purchase credits',
         message: 'สิทธิ์การใช้งานของคุณไม่เพียงพอสำหรับการเติมเครดิต',
       }
     }
@@ -115,21 +98,10 @@ export async function purchaseCredit({
       },
     })
 
-    return {
-      success: true,
-      messageTH: 'เติมเครดิตสำเร็จแล้ว',
-      messageEN: 'Credits purchased successfully',
-      message: 'เติมเครดิตสำเร็จแล้ว',
-      data: serializeDecimal(transaction),
-    }
+    return { success: true, data: serializeDecimal(transaction) }
   } catch (error) {
     console.error(error)
-    return {
-      success: false,
-      messageTH: 'เกิดข้อผิดพลาดในการเติมเครดิต',
-      messageEN: 'An error occurred while purchasing credits',
-      message: 'เกิดข้อผิดพลาดในการเติมเครดิต',
-    }
+    return { success: false }
   }
 }
 

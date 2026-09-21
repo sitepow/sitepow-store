@@ -17,11 +17,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
     const userId = userSession?.id
 
     if (!userId) {
-      return {
-        success: false,
-        messageTH: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
-        messageEN: 'Please sign in to proceed',
-      }
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
     }
 
     const authCheck = await verifyEmployeePermission({
@@ -31,11 +27,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
     })
 
     if (!authCheck.isAuthorized) {
-      return {
-        success: false,
-        messageTH: 'ไม่มีสิทธิ์ในการสร้างคำสั่งซื้อ',
-        messageEN: 'You do not have permission to create orders',
-      }
+      return { success: false, message: 'ไม่มีสิทธิ์ในการสร้างคำสั่งซื้อ' }
     }
 
     const employee = await prisma.employee.findUnique({
@@ -56,7 +48,6 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
       usedPoints: input.usedPoints,
       earnedPoints: input.earnedPoints,
       items: input.items,
-      customerCurrency: input.customerCurrency,
       isPOS: true,
     })
 
@@ -91,8 +82,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
 
     return {
       success: true,
-      messageTH: 'ทำรายการขายสำเร็จ',
-      messageEN: 'POS transaction completed successfully',
+      message: 'ทำรายการขายสำเร็จ',
       data: serializeDecimal(orders[0]),
     }
   } catch (error: unknown) {
@@ -105,8 +95,7 @@ export async function createPOSOrder(input: CreateOrderCoreInput) {
 
     return {
       success: false,
-      messageTH: errorMessage || 'เกิดข้อผิดพลาดในการทำรายการ',
-      messageEN: errorMessage || 'Failed to process POS transaction',
+      message: errorMessage,
     }
   }
 }

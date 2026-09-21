@@ -1,9 +1,6 @@
-'use client'
-
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
-import { useStoreNavbarItems } from '@/constants/sites/navbar'
+import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
 import { LockKeyholeIcon, SearchIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -26,25 +23,18 @@ export function StoreMobileMenu({
   loginHref,
   onClose,
 }: StoreMobileMenuProps) {
-  const t = useTranslations('storefront.navbar')
-  const items = useStoreNavbarItems()
-
   return (
     <div className="flex flex-col space-y-6 px-6 py-8 pb-20">
       <ButtonGroup className="w-full">
-        <Input placeholder={t('searchPlaceholder')} className="h-12" />
+        <Input placeholder="ค้นหาสินค้าที่ต้องการ..." className="h-12" />
         <Button variant="outline" className="h-12">
           <SearchIcon size={18} />
         </Button>
       </ButtonGroup>
-      <CategoryDropdown
-        storeSlug={storeSlug}
-        className="w-full justify-between py-6 text-lg font-bold"
-        onItemClick={onClose}
-      />
+      <CategoryDropdown storeSlug={storeSlug} />
       <Separator />
       <div className="flex flex-col space-y-5">
-        {items.map((item, idx) => (
+        {STORE_NAVBAR_ITEMS.map((item, idx) => (
           <div key={idx} className="flex flex-col">
             {item.children ? (
               <div className="space-y-4">
@@ -83,7 +73,7 @@ export function StoreMobileMenu({
               className="w-full gap-3 border-2 py-8 text-lg font-bold"
             >
               <LockKeyholeIcon size={22} />
-              {t('loginRegister')}
+              เข้าสู่ระบบ / สมัครสมาชิก
             </Button>
           </Link>
         </>

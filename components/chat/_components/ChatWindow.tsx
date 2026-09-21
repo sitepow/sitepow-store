@@ -3,8 +3,6 @@
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useLocale, useTranslations } from 'next-intl'
-
 import { useSendMessage, useToggleConversationAi } from '@/actions/hooks/chat'
 import { useChatMessages } from '@/hooks/use-chat-messages'
 import { useChatScroll } from '@/hooks/use-chat-scroll'
@@ -23,31 +21,6 @@ interface ChatWindowProps {
   currentUserId: string
   isAiEnabled?: boolean
   canToggleAi?: boolean
-  showAIToggleBar?: boolean
-  headerContent?: React.ReactNode
-}
-
-function formatDateSeparator(
-  dateStr: Date | string,
-  t: (key: any) => string,
-  locale: string,
-) {
-  const date = new Date(dateStr)
-  const today = new Date()
-  const yesterday = new Date()
-  yesterday.setDate(today.getDate() - 1)
-
-  if (date.toDateString() === today.toDateString()) {
-    return t('today')
-  }
-  if (date.toDateString() === yesterday.toDateString()) {
-    return t('yesterday')
-  }
-  return date.toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
 }
 
 export function ChatWindow({
@@ -55,15 +28,10 @@ export function ChatWindow({
   currentUserId,
   isAiEnabled,
   canToggleAi = false,
-  showAIToggleBar = true,
-  headerContent,
 }: ChatWindowProps) {
-  const t = useTranslations('merchant.chat')
-  const locale = useLocale()
   const containerRef = useRef<HTMLDivElement>(null)
   const { messages } = useChatMessages(conversationId)
-  const { register, handleSubmit, reset, watch, setValue } =
-    useForm<ChatFormValues>()
+  const { register, handleSubmit, reset, watch } = useForm<ChatFormValues>()
 
   useChatScroll(messages, containerRef)
   useChatStream(conversationId)
@@ -74,9 +42,8 @@ export function ChatWindow({
   const hasContent = !!watch('content')?.trim()
 
   return (
-    <div className="bg-background flex h-full flex-col">
-      {headerContent}
-      {canToggleAi && showAIToggleBar && (
+    <div className="flex h-full flex-col">
+      {canToggleAi && (
         <ChatAIToggle
           enabled={isAiEnabled}
           onToggle={(c) => {
@@ -89,42 +56,19 @@ export function ChatWindow({
       )}
       <div
         ref={containerRef}
-        className="bg-muted/20 min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4"
+        className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4"
       >
-        {messages.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <p className="text-muted-foreground text-xs">
-              {t('startConversationHint')}
-            </p>
-          </div>
-        )}
-        <div className="flex flex-col gap-3">
-          {messages.map((msg, index) => {
-            const prevMsg = messages[index - 1]
-            const isNewDay =
-              !prevMsg ||
-              new Date(prevMsg.createdAt).toDateString() !==
-                new Date(msg.createdAt).toDateString()
+        <div className="flex flex-col gap-4">
+          {messages.map((msg) => {
             const isMySender = msg.senderId === currentUserId
-
             return (
-              <div key={msg.id} className="flex flex-col gap-3">
-                {isNewDay && (
-                  <div className="my-2 flex items-center justify-center">
-                    <span className="bg-background border-border/60 text-muted-foreground rounded-full border px-3 py-1 text-[11px] font-medium shadow-2xs select-none">
-                      {formatDateSeparator(msg.createdAt, t, locale)}
-                    </span>
-                  </div>
-                )}
-                <MessageBubble msg={msg} isMySender={isMySender} />
-              </div>
+              <MessageBubble key={msg.id} msg={msg} isMySender={isMySender} />
             )
           })}
         </div>
       </div>
       <ChatInput
         register={register}
-        setValue={setValue}
         onSubmit={handleSubmit((data) => {
           sendMessage(data.content)
           reset()

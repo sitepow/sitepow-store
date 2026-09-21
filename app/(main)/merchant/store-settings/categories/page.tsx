@@ -2,14 +2,12 @@
 
 import { useState } from 'react'
 
-import { useTranslations } from 'next-intl'
-
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconCategory, IconLock } from '@tabler/icons-react'
 
-import { MerchantStoreGuard } from '@/components/MerchantStoreGuard'
+import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import { PageTabHeader } from '@/components/PageTabHeader'
 import { StoreSelectField } from '@/components/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -18,7 +16,7 @@ import { CategoriesTable } from './_components/CategoriesTable'
 import { CategoryDialog } from './_components/CategoryDialog'
 
 export default function MerchantStoreSettingsCategoriesPage() {
-  const t = useTranslations('merchant.categories')
+  const { selectedStoreId } = useStoreFilter()
   const {
     canViewCategory,
     canCreateCategory,
@@ -44,8 +42,8 @@ export default function MerchantStoreSettingsCategoriesPage() {
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconCategory}
-        title={t('title')}
-        description={t('description')}
+        title="หมวดหมู่สินค้า"
+        description="จัดการหมวดหมู่สินค้า เพื่อจัดระเบียบสินค้าในร้านค้าของคุณ"
         endContent={
           <div className="flex flex-wrap items-end gap-5">
             <StoreSelectField />
@@ -60,14 +58,17 @@ export default function MerchantStoreSettingsCategoriesPage() {
           </div>
         }
       />
-      <MerchantStoreGuard
-        isAuthorized={canViewCategory}
-        isPermissionLoading={isPermissionLoading}
-        noAccessTitle={t('noAccessTitle')}
-        noAccessDescription={t('noAccessDescription')}
-      >
+      {selectedStoreId === ALL_STORES ? (
+        <ActionRequiredAlert />
+      ) : !isPermissionLoading && !canViewCategory ? (
+        <ActionRequiredAlert
+          icon={<IconLock />}
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการดูข้อมูลหมวดหมู่สินค้าของสาขาหรือร้านค้านี้"
+        />
+      ) : (
         <CategoriesTable onEdit={handleEdit} />
-      </MerchantStoreGuard>
+      )}
     </Sidebar>
   )
 }

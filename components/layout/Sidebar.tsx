@@ -2,11 +2,9 @@
 
 import { Fragment, PropsWithChildren } from 'react'
 
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { useUnreadCount } from '@/actions/hooks/chat'
 import { useEmployeePermission } from '@/actions/hooks/employee'
 import { useLoyaltySettings } from '@/actions/hooks/loyalty'
 import { useStoreOptions } from '@/actions/hooks/store'
@@ -62,14 +60,6 @@ import { ChatWidget } from '../chat/ChatWidget'
 import { SupportWidget } from '../chat/SupportWidget'
 import { StoreSetupAlert } from './_components/StoreSetupAlert'
 
-const groupLabelMap: Record<string, string> = {
-  สินค้าและคลังสินค้า: 'group_products',
-  การจัดการและบุคลากร: 'group_management',
-  การตลาดและโปรโมชัน: 'group_marketing',
-  ตั้งค่าร้านค้าและบัญชี: 'group_store_settings',
-  บัญชีและการตั้งค่า: 'group_account',
-}
-
 interface SidebarProps extends PropsWithChildren {
   items: NavigationItem[]
   redirectPath: 'merchant' | 'user'
@@ -82,7 +72,6 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
   const { store } = useStoreData()
   const { selectedStoreId } = useStoreFilter()
   const { data: storeOptions } = useStoreOptions()
-  const { data: unreadChatCount = 0 } = useUnreadCount(user?.id || '')
 
   const permissions = useEmployeePermission()
 
@@ -107,54 +96,18 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
 
   const hasBadgesToShow = isMerchant || isPointsEnabled
 
-  const storeThemeStyle = {
-    '--primary': currentStore?.primaryColor ?? store?.primaryColor,
-  } as React.CSSProperties
-
-  const tNav = useTranslations('merchant.navigation')
-  const tShell = useTranslations('merchant.shell')
-
-  const getGroupLabel = (label?: string) => {
-    if (!label) return undefined
-    const key = groupLabelMap[label]
-    if (key && tNav.has(key as any)) {
-      return tNav(key as any)
-    }
-    return label
-  }
-
-  const getItemLabel = (val: string, fallback: string) => {
-    if (redirectPath === 'user') {
-      const buyerKey = `buyer.${val}` as any
-      if (tNav.has(buyerKey)) {
-        return tNav(buyerKey)
-      }
-    }
-    if (tNav.has(val as any)) {
-      return tNav(val as any)
-    }
-    return fallback
-  }
-
-  const checkMenuPermission = (item: {
-    permissionKey?: PermissionKey
-    value?: string
-  }) => {
+  const checkMenuPermission = (item: { permissionKey?: PermissionKey }) => {
     if (!isMerchant) {
       return true
     }
 
     if (!item.permissionKey) return true
 
-    if (item.value === 'chat' && userRole === UserRole.MERCHANT) {
-      return true
-    }
-
     return permissions[item.permissionKey] ?? true
   }
 
   return (
-    <SidebarProvider style={storeThemeStyle}>
+    <SidebarProvider>
       <RootSidebar>
         <SidebarHeader className="mx-auto py-5">
           {logoImage ? (
@@ -183,7 +136,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                       <Separator className="my-2" />
                       {item.groupLabel && (
                         <SidebarGroupLabel className="px-2 text-xs opacity-80">
-                          {getGroupLabel(item.groupLabel)}
+                          {item.groupLabel}
                         </SidebarGroupLabel>
                       )}
                     </>
@@ -205,7 +158,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                           >
                             <item.icon className="size-4" />
                             <span className="flex-1 text-left">
-                              {getItemLabel(item.value, item.label)}
+                              {item.label}
                             </span>
                             {!hasMainPermission ? (
                               <IconLock className="text-muted-foreground ml-auto size-3.5" />
@@ -234,21 +187,11 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                                     >
                                       {hasSubPermission ? (
                                         <Link href={subItem.url}>
-                                          <span>
-                                            {getItemLabel(
-                                              subItem.value,
-                                              subItem.label,
-                                            )}
-                                          </span>
+                                          <span>{subItem.label}</span>
                                         </Link>
                                       ) : (
                                         <div className="flex w-full items-center justify-between">
-                                          <span>
-                                            {getItemLabel(
-                                              subItem.value,
-                                              subItem.label,
-                                            )}
-                                          </span>
+                                          <span>{subItem.label}</span>
                                           <IconLock className="size-3" />
                                         </div>
                                       )}
@@ -272,25 +215,15 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                         )}
                       >
                         {hasMainPermission ? (
-                          <Link
-                            href={mainUrl}
-                            className="flex w-full items-center"
-                          >
+                          <Link href={mainUrl}>
                             <item.icon className="size-4" />
-                            <span className="flex-1">
-                              {getItemLabel(item.value, item.label)}
-                            </span>
-                            {item.value === 'chat' && unreadChatCount > 0 && (
-                              <span className="bg-primary text-primary-foreground ml-auto flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
-                                {unreadChatCount > 99 ? '99+' : unreadChatCount}
-                              </span>
-                            )}
+                            <span>{item.label}</span>
                           </Link>
                         ) : (
                           <div className="flex w-full items-center gap-2">
                             <item.icon className="size-4" />
                             <span className="flex-1 text-left">
-                              {getItemLabel(item.value, item.label)}
+                              {item.label}
                             </span>
                             <IconLock className="size-3.5" />
                           </div>
@@ -307,11 +240,15 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
       </RootSidebar>
       <main
         className="bg-background text-foreground w-full min-w-0 space-y-5 p-3 sm:p-5"
-        style={storeThemeStyle}
+        style={
+          {
+            '--primary': currentStore?.primaryColor ?? store?.primaryColor,
+          } as React.CSSProperties
+        }
       >
         {isEmailUnverified && <EmailVerified />}
         {isMerchant && <StoreSetupAlert />}
-        <div className="bg-background border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5">
+        <div className="bg-background/95 border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <QuickSettingsMenu />
@@ -326,18 +263,18 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                     className="gap-1.5 text-xs"
                   >
                     <IconInfoCircle className="text-muted-foreground size-4" />
-                    <span>{tShell('storeInfo')}</span>
+                    <span>ข้อมูลร้านค้า</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>{tShell('detailsAndStatus')}</DialogTitle>
+                    <DialogTitle>รายละเอียดและสถานะ</DialogTitle>
                   </DialogHeader>
                   <div className="flex flex-col gap-3 py-4">
                     {isMerchant && (
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground text-sm">
-                          {tShell('currentTime')}
+                          เวลาปัจจุบัน:
                         </span>
                         <DateTimeBadge />
                       </div>
@@ -345,31 +282,24 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                     {isMerchant && (
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground text-sm">
-                          {tShell('remainingCredits')}
+                          เครดิตคงเหลือ:
                         </span>
-                        <CreditBadge
-                          unitName={tShell('creditsUnit')}
-                          currencySymbol={tShell('currency')}
-                        />
+                        <CreditBadge />
                       </div>
                     )}
                     {isPointsEnabled && (
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground text-sm">
-                          {tShell('loyaltyPoints')}
+                          แต้มสะสม:
                         </span>
-                        <CreditBadge
-                          unitName={tShell('pointsUnit')}
-                          currencySymbol={tShell('currency')}
-                          rate={pointRate}
-                        />
+                        <CreditBadge unitName="แต้มสะสม" rate={pointRate} />
                       </div>
                     )}
                   </div>
                 </DialogContent>
               </Dialog>
             )}
-            <UserAvatarDropdown redirectPath={redirectPath} items={items} />
+            <UserAvatarDropdown redirectPath="merchant" items={items} />
           </div>
         </div>
         {children}

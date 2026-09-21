@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 
 import {
@@ -11,7 +10,6 @@ import {
 } from '@/actions/hooks/storefront/discount'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStorefrontCurrency } from '@/stores/use-currency-store'
 import { calculateMaxUsablePoints } from '@/utils/cart'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
 import {
@@ -44,11 +42,7 @@ interface DiscountFormProps {
 }
 
 export function DiscountForm({ subtotal }: DiscountFormProps) {
-  const t = useTranslations('storefront.cart')
   const { store } = useStoreData()
-  const { currentCurrency, convert } = useStorefrontCurrency(
-    (store as any)?.baseCurrency,
-  )
 
   const params = useParams()
   const storeSlug = params.domain as string
@@ -102,7 +96,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
             setAppliedCoupon(res.data)
             setCouponCode('')
           } else {
-            setCouponError(res.message ?? t('invalidCoupon'))
+            setCouponError(res.message ?? 'รหัสส่วนลดไม่ถูกต้อง')
           }
         },
       },
@@ -119,7 +113,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2" disabled={!isAuthenticated}>
           <IconTicket />
-          {t('addDiscount')}
+          เพิ่มส่วนลด
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -129,7 +123,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <IconTicket className="text-primary" />
-            {t('applyDiscount')}
+            ใช้ส่วนลด
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -139,11 +133,11 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                 <div className="flex items-center justify-between">
                   <Label className="flex items-center gap-2">
                     <IconWallet className="text-muted-foreground size-4" />
-                    {t('usePoints')}
+                    ใช้แต้มสะสม
                   </Label>
                   <span className="text-primary text-sm font-semibold">
                     {formatNumber(usedPoints)} / {formatNumber(maxUsablePoints)}{' '}
-                    {t('pointsUnit')}
+                    แต้ม
                   </span>
                 </div>
                 <Slider
@@ -163,25 +157,15 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                     className="w-24 text-center font-bold"
                   />
                   <span className="text-muted-foreground text-sm">
-                    {t.rich('redeemWorth', {
-                      amount: formatCurrency(
-                        convert(pointsDiscount),
-                        currentCurrency,
-                      ),
-                      strong: (chunks) => (
-                        <strong className="text-primary">{chunks}</strong>
-                      ),
-                    })}
+                    แลกเป็นส่วนลดได้{' '}
+                    <strong className="text-primary">
+                      {formatCurrency(pointsDiscount)}
+                    </strong>
                   </span>
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {t('pointsRateInfo', {
-                    points: formatNumber(customerPoints),
-                    rate: formatCurrency(
-                      convert(pointRedeemRate),
-                      currentCurrency,
-                    ),
-                  })}
+                  คุณมีแต้มสะสม {formatNumber(customerPoints)} แต้ม (1 แต้ม ={' '}
+                  {formatCurrency(pointRedeemRate)})
                 </p>
               </div>
               <Separator />
@@ -190,7 +174,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <IconDiscount2 className="text-muted-foreground size-4" />
-              {t('couponCode')}
+              รหัสส่วนลด
             </Label>
             {appliedCoupon ? (
               <div className="border-primary/20 bg-primary/5 flex items-center justify-between rounded-md border px-3 py-2">
@@ -199,11 +183,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                 </span>
                 <div className="flex items-center gap-2">
                   <span className="text-primary text-sm font-semibold">
-                    -
-                    {formatCurrency(
-                      convert(appliedCoupon.discountAmount),
-                      currentCurrency,
-                    )}
+                    -{formatCurrency(appliedCoupon.discountAmount)}
                   </span>
                   <Button
                     variant="outline"
@@ -217,7 +197,7 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
             ) : (
               <div className="flex gap-2">
                 <Input
-                  placeholder={t('enterCouponCodePlaceholder')}
+                  placeholder="กรอกรหัสส่วนลด"
                   value={couponCode}
                   className="uppercase"
                   onChange={(e) => setCouponCode(e.target.value)}
@@ -230,8 +210,8 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
                   }
                 >
                   {validateCouponMutation.isPending
-                    ? t('checking')
-                    : t('applyCode')}
+                    ? 'กำลังตรวจสอบ...'
+                    : 'ใช้งาน'}
                 </Button>
               </div>
             )}
@@ -241,25 +221,25 @@ export function DiscountForm({ subtotal }: DiscountFormProps) {
           </div>
           <div className="bg-muted/20 space-y-3 rounded-xl border p-4">
             <SummaryRow
-              label={t('pointsDiscountLabel')}
+              label="ส่วนลดจากแต้มสะสม"
               value={
                 <HighlightText>
-                  - {formatCurrency(convert(pointsDiscount), currentCurrency)}
+                  - {formatCurrency(pointsDiscount)}
                 </HighlightText>
               }
             />
             <SummaryRow
-              label={t('couponDiscount')}
+              label="ส่วนลดจากรหัส"
               value={
                 <HighlightText>
-                  - {formatCurrency(convert(couponDiscount), currentCurrency)}
+                  - {formatCurrency(couponDiscount)}
                 </HighlightText>
               }
             />
             <Separator />
             <SummaryTotal
-              label={t('totalDiscount')}
-              value={formatCurrency(convert(totalDiscount), currentCurrency)}
+              label="รวมส่วนลดทั้งหมด"
+              value={formatCurrency(totalDiscount)}
             />
           </div>
         </div>
