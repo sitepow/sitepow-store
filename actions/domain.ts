@@ -9,9 +9,11 @@ import { invalidateCacheByPattern } from '@/lib/cache'
 import {
   addCloudflareCustomHostname,
   deleteCloudflareCustomHostname,
+  getCloudflareCustomHostname,
 } from '@/lib/cloudflare'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
 
 export interface StoreDomainResult {
   domain: string
@@ -92,16 +94,24 @@ export async function addStoreDomain(storeId: string, domain: string) {
       .toLowerCase()
       .trim()
       .replace(/^https?:\/\//, '')
+      .replace(/\/.*$/, '')
+      .replace(/^www\./, '')
 
     const existingDomain = await prisma.store.findFirst({
       where: {
-        customDomain: cleanDomain,
+        OR: [
+          { customDomain: cleanDomain },
+          { customDomain: `www.${cleanDomain}` },
+        ],
         id: { not: storeId },
       },
     })
 
     if (existingDomain) {
-      return { success: false, message: 'โดเมนนี้ถูกใช้งานในระบบแล้ว' }
+      return {
+        success: false,
+        message: 'โดเมนนี้ถูกใช้งานในระบบแล้ว',
+      }
     }
 
     const cfResult = await addCloudflareCustomHostname(cleanDomain)
@@ -110,20 +120,27 @@ export async function addStoreDomain(storeId: string, domain: string) {
         cfResult.errors?.[0]?.message ||
         'ไม่สามารถลงทะเบียนโดเมนกับ Cloudflare ได้'
       console.error('Cloudflare Error:', cfResult.errors)
-      return { success: false, message: errorMessage }
+      return {
+        success: false,
+        message: errorMessage,
+      }
     }
 
-    await prisma.store.update({
+    const store = await prisma.store.update({
       where: { id: storeId },
       data: {
         customDomain: cleanDomain,
         customDomainStatus: DomainStatus.PENDING,
       },
+      select: { slug: true },
     })
 
-    await invalidateCacheByPattern(`domain:slug:${cleanDomain}`).catch(
-      console.error,
-    )
+    await Promise.all([
+      redis.setex(`domain:slug:${cleanDomain}`, 604800, store.slug),
+      redis.setex(`domain:slug:www.${cleanDomain}`, 604800, store.slug),
+      redis.setex(`slug:domain:${store.slug}`, 604800, cleanDomain),
+      invalidateCacheByPattern(`domain:slug:${cleanDomain}`),
+    ]).catch(console.error)
 
     await createLog({
       action: LogAction.UPDATE_STORE,
@@ -134,10 +151,16 @@ export async function addStoreDomain(storeId: string, domain: string) {
       details: { domain: cleanDomain },
     })
 
-    return { success: true, message: 'เพิ่มโดเมนเรียบร้อยแล้ว' }
+    return {
+      success: true,
+      message: 'เพิ่มโดเมนเรียบร้อยแล้ว',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false }
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการเพิ่มโดเมน',
+    }
   }
 }
 
@@ -146,7 +169,10 @@ export async function removeStoreDomain(storeId: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -165,17 +191,27 @@ export async function removeStoreDomain(storeId: string) {
 
     const store = await prisma.store.findUnique({
       where: { id: storeId },
-      select: { customDomain: true },
+      select: { customDomain: true, slug: true },
     })
 
     if (store?.customDomain) {
-      await deleteCloudflareCustomHostname(store.customDomain).catch((err) =>
+      const cleanCustomDomain = store.customDomain
+        .toLowerCase()
+        .trim()
+        .replace(/^https?:\/\//, '')
+        .replace(/\/.*$/, '')
+        .replace(/^www\./, '')
+
+      await deleteCloudflareCustomHostname(cleanCustomDomain).catch((err) =>
         console.error('Failed to remove Cloudflare hostname:', err),
       )
 
-      await invalidateCacheByPattern(`domain:slug:${store.customDomain}`).catch(
-        console.error,
-      )
+      await Promise.all([
+        redis.del(`domain:slug:${cleanCustomDomain}`),
+        redis.del(`domain:slug:www.${cleanCustomDomain}`),
+        redis.del(`slug:domain:${store.slug}`),
+        invalidateCacheByPattern(`domain:slug:${cleanCustomDomain}`),
+      ]).catch(console.error)
     }
 
     await prisma.store.update({
@@ -192,13 +228,22 @@ export async function removeStoreDomain(storeId: string) {
       storeId,
       entity: 'StoreDomain',
       entityId: storeId,
-      details: { action: 'REMOVE_DOMAIN' },
+      details: {
+        action: 'REMOVE_DOMAIN',
+        previousDomain: store?.customDomain,
+      },
     })
 
-    return { success: true, message: 'ลบโดเมนเรียบร้อยแล้ว' }
+    return {
+      success: true,
+      message: 'ลบโดเมนเรียบร้อยแล้ว',
+    }
   } catch (error) {
     console.error(error)
-    return { success: false, message: 'เกิดข้อผิดพลาดในการลบโดเมน' }
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการลบโดเมน',
+    }
   }
 }
 
@@ -207,7 +252,10 @@ export async function verifyStoreDomain(storeId: string) {
   const userId = userSession?.id
 
   if (!userId) {
-    return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    return {
+      success: false,
+      message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ',
+    }
   }
 
   try {
@@ -217,8 +265,18 @@ export async function verifyStoreDomain(storeId: string) {
     })
 
     if (!store?.customDomain) {
-      return { success: false, message: 'ไม่พบโดเมนที่ต้องการตรวจสอบ' }
+      return {
+        success: false,
+        message: 'ไม่พบโดเมนที่ต้องการตรวจสอบ',
+      }
     }
+
+    const cleanCustomDomain = store.customDomain
+      .toLowerCase()
+      .trim()
+      .replace(/^https?:\/\//, '')
+      .replace(/\/.*$/, '')
+      .replace(/^www\./, '')
 
     const baseDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'sitepow.store'
     const expectedTarget = `${store.slug}.${baseDomain}`.toLowerCase()
@@ -226,19 +284,36 @@ export async function verifyStoreDomain(storeId: string) {
     let isVerified = false
 
     try {
-      const records = await resolveCname(store.customDomain)
-      isVerified = records.some(
-        (record) => record.replace(/\.$/, '').toLowerCase() === expectedTarget,
-      )
-    } catch {
+      const cfHostname = await getCloudflareCustomHostname(cleanCustomDomain)
+      if (cfHostname) {
+        const isHostnameActive = cfHostname.status === 'active'
+        const isSslActive = cfHostname.ssl?.status === 'active'
+        if (isHostnameActive || isSslActive) {
+          isVerified = true
+        }
+      }
+    } catch (err) {
+      console.error('Error verifying domain via Cloudflare:', err)
+    }
+
+    if (!isVerified) {
       try {
-        const response = await fetch(`https://${store.customDomain}`, {
-          method: 'HEAD',
-          redirect: 'manual',
-        })
-        isVerified = response.status < 500
+        const records = await resolveCname(cleanCustomDomain)
+        isVerified = records.some(
+          (record) =>
+            record.replace(/\.$/, '').toLowerCase() === expectedTarget,
+        )
       } catch {
-        isVerified = false
+        try {
+          const response = await fetch(`https://${cleanCustomDomain}`, {
+            method: 'HEAD',
+            redirect: 'manual',
+            signal: AbortSignal.timeout(5000),
+          })
+          isVerified = response.status < 500
+        } catch {
+          isVerified = false
+        }
       }
     }
 
@@ -250,6 +325,15 @@ export async function verifyStoreDomain(storeId: string) {
           : DomainStatus.FAILED,
       },
     })
+
+    if (isVerified) {
+      await Promise.all([
+        redis.setex(`domain:slug:${cleanCustomDomain}`, 604800, store.slug),
+        redis.setex(`domain:slug:www.${cleanCustomDomain}`, 604800, store.slug),
+        redis.setex(`slug:domain:${store.slug}`, 604800, cleanCustomDomain),
+        invalidateCacheByPattern(`domain:slug:${cleanCustomDomain}`),
+      ]).catch(console.error)
+    }
 
     return {
       success: isVerified,

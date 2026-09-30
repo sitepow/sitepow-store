@@ -17,18 +17,50 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Domain missing' }, { status: 400 })
   }
 
+  const cleanDomain = domain
+    .toLowerCase()
+    .trim()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/^www\./, '')
+
   try {
-    const store = await prisma.store.findFirst({
+    const storeDomain = await prisma.storeDomain.findFirst({
       where: {
-        customDomain: domain.toLowerCase(),
-        customDomainStatus: DomainStatus.ACTIVE,
+        OR: [{ domain: cleanDomain }, { domain: `www.${cleanDomain}` }],
+        status: {
+          in: [
+            DomainStatus.ACTIVE,
+            DomainStatus.PENDING,
+            DomainStatus.VERIFIED,
+          ],
+        },
       },
       select: {
-        slug: true,
+        store: {
+          select: { slug: true },
+        },
       },
     })
 
-    if (!store) {
+    let storeSlug = storeDomain?.store?.slug
+
+    if (!storeSlug) {
+      const store = await prisma.store.findFirst({
+        where: {
+          OR: [
+            { customDomain: cleanDomain },
+            { customDomain: `www.${cleanDomain}` },
+          ],
+        },
+        select: {
+          slug: true,
+        },
+      })
+      storeSlug = store?.slug
+    }
+
+    if (!storeSlug) {
       return NextResponse.json(
         { error: 'Store domain not found' },
         { status: 404 },
@@ -36,7 +68,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(
-      { slug: store.slug },
+      { slug: storeSlug },
       {
         headers: {
           'Cache-Control': 's-maxage=300, stale-while-revalidate=59',
