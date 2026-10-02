@@ -6,6 +6,7 @@ import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
+import { invalidateInventoryStock } from '@/lib/cache'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -237,14 +238,27 @@ export async function updateStock(id: string, input: UpdateStockInput) {
       data: input,
       select: {
         id: true,
+        variantId: true,
         quantity: true,
         minStock: true,
         updatedAt: true,
         branch: {
           select: { storeId: true, id: true, name: true, isMain: true },
         },
+        variant: {
+          select: { productId: true },
+        },
       },
     })
+
+    await invalidateInventoryStock(
+      updatedStock.branch.storeId,
+      updatedStock.branch.id,
+      {
+        variantId: updatedStock.variantId,
+        productId: updatedStock.variant?.productId,
+      },
+    )
 
     await createLog({
       action: LogAction.UPDATE_STOCK,
@@ -313,6 +327,12 @@ export async function upsertStock(input: UpsertStockInput) {
         },
       },
     })
+
+    await invalidateInventoryStock(
+      branch.storeId,
+      branchId,
+      { variantId },
+    )
 
     await createLog({
       action: LogAction.UPDATE_STOCK,

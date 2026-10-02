@@ -17,6 +17,7 @@ import {
   getProducts,
   updateProduct,
 } from '../product'
+import { invalidateClientProductQueries } from '../query-keys/invalidation/product'
 import { posProductKeys } from '../query-keys/pos/product'
 import { productKeys } from '../query-keys/product'
 
@@ -44,9 +45,8 @@ export function useCreateProduct() {
 
   return useMutation({
     mutationFn: (input: CreateProductInput) => createProduct(input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.all })
-      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
+    onSuccess: (_, variables) => {
+      invalidateClientProductQueries(queryClient, variables.storeId)
     },
   })
 }
@@ -56,8 +56,9 @@ export function useDeleteProduct() {
 
   return useMutation({
     mutationFn: (id: string) => deleteProduct(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: productKeys.all })
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: posProductKeys.all })
     },
   })
@@ -82,11 +83,11 @@ export function useUpdateProduct() {
     mutationFn: ({ id, data }: { id: string; data: CreateProductInput }) =>
       updateProduct(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: productKeys.all })
-      queryClient.invalidateQueries({
-        queryKey: productKeys.detail(variables.id),
-      })
-      queryClient.invalidateQueries({ queryKey: posProductKeys.all })
+      invalidateClientProductQueries(
+        queryClient,
+        variables.data.storeId,
+        variables.id,
+      )
     },
   })
 }

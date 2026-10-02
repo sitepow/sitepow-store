@@ -15,6 +15,7 @@ import { checkCanCreateProduct } from '@/utils/subscription'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
+import { invalidateProduct } from '@/lib/cache'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -362,9 +363,18 @@ export async function createProduct(input: CreateProductInput) {
 
     if (store) {
       await Promise.all([
-        invalidateStorefrontProductCache(store.slug),
+        invalidateProduct(input.storeId, {
+          productId: product.id,
+          slug: input.slug,
+          storeSlug: store.slug,
+        }),
         invalidateStorefrontCategoryCache(store.slug),
       ])
+    } else {
+      await invalidateProduct(input.storeId, {
+        productId: product.id,
+        slug: input.slug,
+      })
     }
 
     await createLog({
@@ -411,6 +421,7 @@ export async function deleteProduct(id: string) {
       select: {
         id: true,
         title: true,
+        slug: true,
         storeId: true,
         store: { select: { slug: true } },
         images: { select: { url: true } },
@@ -487,7 +498,11 @@ export async function deleteProduct(id: string) {
     ])
 
     await Promise.all([
-      invalidateStorefrontProductCache(product.store.slug),
+      invalidateProduct(product.storeId, {
+        productId: id,
+        slug: product.slug,
+        storeSlug: product.store?.slug,
+      }),
       invalidateStorefrontCategoryCache(product.store.slug),
     ])
 
@@ -802,9 +817,18 @@ export async function updateProduct(id: string, input: CreateProductInput) {
 
       if (store) {
         await Promise.all([
-          invalidateStorefrontProductCache(store.slug),
+          invalidateProduct(existingProduct.storeId, {
+            productId: id,
+            slug: input.slug,
+            storeSlug: store.slug,
+          }),
           invalidateStorefrontCategoryCache(store.slug),
         ])
+      } else {
+        await invalidateProduct(existingProduct.storeId, {
+          productId: id,
+          slug: input.slug,
+        })
       }
     })
 
@@ -919,6 +943,7 @@ export async function toggleProductVisibility(
       where: { id },
       select: {
         storeId: true,
+        slug: true,
         store: { select: { slug: true } },
       },
     })
@@ -945,7 +970,11 @@ export async function toggleProductVisibility(
       data: { isPublished },
     })
 
-    await invalidateStorefrontProductCache(product.store.slug)
+    await invalidateProduct(product.storeId, {
+      productId: id,
+      slug: product.slug,
+      storeSlug: product.store?.slug,
+    })
 
     return {
       success: true,

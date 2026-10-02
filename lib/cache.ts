@@ -2,7 +2,9 @@ import { REDIS_CACHE_TTL_SECONDS } from '@/constants/system'
 
 import { invalidateByPattern as invalidatePatternCore, remember } from './cache/redis-cache'
 
-export * from './cache'
+export * from './cache/keys'
+export * from './cache/redis-cache'
+export * from './cache/invalidate-store'
 
 export async function withCache<T>(
   key: string,

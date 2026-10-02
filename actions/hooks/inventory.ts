@@ -12,6 +12,7 @@ import {
   updateStock,
   upsertStock,
 } from '../inventory'
+import { invalidateClientInventoryQueries } from '../query-keys/invalidation/inventory'
 import { inventoryKeys } from '../query-keys/inventory'
 
 interface UseInventoryParams {
@@ -52,8 +53,16 @@ export function useUpdateStock() {
       id: string
       input: UpdateStockInput
     }) => await updateStock(id, input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.lists() })
+    onSuccess: (result) => {
+      if (result && 'data' in result && result.data?.branch?.storeId) {
+        invalidateClientInventoryQueries(
+          queryClient,
+          result.data.branch.storeId,
+          result.data.branch.id,
+        )
+      } else {
+        queryClient.invalidateQueries({ queryKey: inventoryKeys.lists() })
+      }
     },
   })
 }
@@ -63,8 +72,12 @@ export function useUpsertStock() {
 
   return useMutation({
     mutationFn: async (input: UpsertStockInput) => await upsertStock(input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.lists() })
+    onSuccess: (result, variables) => {
+      invalidateClientInventoryQueries(
+        queryClient,
+        result && 'data' in result ? result.data?.branch?.storeId : undefined,
+        variables.branchId,
+      )
     },
   })
 }

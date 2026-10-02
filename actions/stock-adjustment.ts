@@ -9,6 +9,7 @@ import {
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
+import { invalidateInventoryStock } from '@/lib/cache'
 import { verifyEmployeePermission } from '@/lib/permission'
 import { prisma } from '@/lib/prisma'
 
@@ -249,6 +250,15 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
         select: stockAdjustmentSelect,
       }),
     ])
+
+    await invalidateInventoryStock(
+      storeId,
+      branchId,
+      {
+        variantId,
+        productId: adjustment.variant?.product?.id,
+      },
+    )
 
     await createLog({
       action: LogAction.UPDATE_STOCK,
