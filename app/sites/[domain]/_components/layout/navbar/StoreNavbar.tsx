@@ -62,11 +62,15 @@ export function StoreNavbar() {
   return (
     <>
       <header
+        role="banner"
         className="text-foreground fixed z-50 w-full bg-neutral-900"
         style={{ '--primary': store?.primaryColor } as React.CSSProperties}
       >
         <StoreHeaderBackground coverImage={store?.coverImage} />
-        <nav className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10">
+        <nav
+          aria-label="แถบเมนูหลักของร้านค้า (Main Navigation)"
+          className="container mx-auto flex flex-col gap-5 px-6 py-5 md:px-10"
+        >
           <div className="flex items-center justify-between gap-4">
             {store?.logo ? (
               <StoreLogo image={store?.logo} />
@@ -99,6 +103,9 @@ export function StoreNavbar() {
                 size="icon-lg"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="lg:hidden"
+                aria-label={isMenuOpen ? 'ปิดเมนูนำทาง' : 'เปิดเมนูนำทาง'}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-navigation-menu"
               >
                 {isMenuOpen ? (
                   <X className="size-4" />
@@ -118,6 +125,8 @@ export function StoreNavbar() {
           </div>
         </nav>
         <div
+          id="mobile-navigation-menu"
+          aria-hidden={!isMenuOpen}
           className={cn(
             'bg-background absolute top-18.25 left-0 w-full overflow-y-auto border-t shadow-lg transition-all duration-300 ease-in-out lg:hidden',
             isMenuOpen

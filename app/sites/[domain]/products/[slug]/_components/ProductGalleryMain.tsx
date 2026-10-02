@@ -19,8 +19,13 @@ export function ProductGalleryMain() {
     return <EmptyImage className="aspect-square w-full md:aspect-4/3" />
   }
 
+  const productTitle = product?.title || 'สินค้า'
+
   return (
-    <div className="flex aspect-square h-52 w-full items-center justify-center overflow-hidden bg-gray-50 md:aspect-4/3 md:h-full">
+    <figure
+      aria-label={`ภาพสินค้าหลัก: ${productTitle}`}
+      className="relative flex aspect-square h-52 w-full items-center justify-center overflow-hidden rounded-2xl bg-gray-50 dark:bg-neutral-900 md:aspect-4/3 md:h-full"
+    >
       {isVideoUrl(activeImage.url) ? (
         <video
           key={activeImage.url}
@@ -29,15 +34,21 @@ export function ProductGalleryMain() {
           controls
           autoPlay
           muted
+          aria-label={`วิดีโอแสดงสินค้า: ${productTitle}`}
         />
       ) : (
         <img
           key={activeImage.url}
           src={activeImage.url}
-          alt="Main Product"
+          alt={`${productTitle} - ภาพที่ ${activeImageIndex + 1}`}
+          loading="eager"
+          decoding="async"
           className="size-full object-contain"
         />
       )}
-    </div>
+      <figcaption className="sr-only">
+        {productTitle} ภาพมุมมองที่ {activeImageIndex + 1}
+      </figcaption>
+    </figure>
   )
 }

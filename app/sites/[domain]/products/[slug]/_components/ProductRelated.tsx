@@ -23,39 +23,53 @@ export function ProductRelated() {
   }
 
   return (
-    <div className="w-full space-y-6 overflow-hidden">
+    <section
+      aria-labelledby="related-products-heading"
+      className="w-full space-y-6 overflow-hidden"
+    >
       <div className="flex items-center gap-2">
-        <h3 className="text-foreground text-xl font-bold">สินค้าใกล้เคียง</h3>
+        <h2
+          id="related-products-heading"
+          className="text-foreground text-xl font-bold"
+        >
+          สินค้าใกล้เคียง
+        </h2>
         <Separator className="flex-1" />
       </div>
       <div className="w-full overflow-hidden">
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex items-center gap-2.5">
+          <ul
+            role="list"
+            aria-label="รายการสินค้าใกล้เคียง"
+            className="flex items-center gap-2.5"
+          >
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton
+                  <li
                     key={i}
-                    className="h-75 min-w-37.5 flex-[0_0_150px] rounded-xl sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
-                  />
+                    className="list-none h-75 min-w-37.5 flex-[0_0_150px] rounded-xl sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
+                  >
+                    <Skeleton className="size-full rounded-xl" />
+                  </li>
                 ))
               : products?.map((p) => (
-                  <div
+                  <li
                     key={p.id}
-                    className="h-fit min-w-0 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
+                    className="list-none h-fit min-w-0 flex-[0_0_150px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                   >
                     <ProductCard product={p} />
-                  </div>
+                  </li>
                 ))}
             {!isLoading && (
-              <div className="flex-[0_0_auto] px-2">
+              <li className="list-none flex-[0_0_auto] px-2">
                 <SeeMoreButton
                   href={`/products?category=${product?.category?.slug}`}
                 />
-              </div>
+              </li>
             )}
-          </div>
+          </ul>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

@@ -26,11 +26,27 @@ export default async function StoreBlogDescriptionPage({ params }: Props) {
   return (
     <StoreLayout>
       <SectionContainer>
-        <BlogHeader createdAt={blog.createdAt} readingTime={readingTime} />
-        <div className="mx-auto max-w-3xl py-8 text-start">
-          {blog.content && <MarkdownRenderer content={blog.content} />}
-          <BlogTags tags={blog.tags} />
-        </div>
+        <article
+          itemScope
+          itemType="https://schema.org/BlogPosting"
+          className="mx-auto max-w-4xl"
+        >
+          <header className="space-y-6">
+            <BlogHeader createdAt={blog.createdAt} readingTime={readingTime} />
+            <h1
+              itemProp="headline"
+              className="text-foreground text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-start"
+            >
+              {blog.title}
+            </h1>
+          </header>
+          <div className="mx-auto max-w-3xl py-8 text-start">
+            <div itemProp="articleBody">
+              {blog.content && <MarkdownRenderer content={blog.content} />}
+            </div>
+            <BlogTags tags={blog.tags} />
+          </div>
+        </article>
       </SectionContainer>
     </StoreLayout>
   )

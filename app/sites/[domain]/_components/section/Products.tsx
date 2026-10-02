@@ -30,15 +30,23 @@ export function ProductsSection({ storeSlug }: { storeSlug: string }) {
     <SectionContainer>
       <SectionHeader title="สินค้าใหม่" />
 
-      <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <ul
+        role="list"
+        aria-label="รายการสินค้าใหม่"
+        className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
+      >
         {isLoading
           ? Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-72 w-full rounded-xl" />
+              <li key={i} className="list-none">
+                <Skeleton className="h-72 w-full rounded-xl" />
+              </li>
             ))
           : products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <li key={product.id} className="list-none" itemProp="itemListElement">
+                <ProductCard product={product} />
+              </li>
             ))}
-      </div>
+      </ul>
 
       {!isLoading && <SeeMoreButton href="/products" />}
     </SectionContainer>

@@ -86,6 +86,7 @@ export function ProductGalleryThumbnail() {
         variant="ghost"
         size="icon"
         disabled={!canScrollPrev}
+        aria-label="เลื่อนดูรูปภาพก่อนหน้า"
         className="z-10 size-7 flex-none rounded-full p-0 disabled:opacity-30"
         onClick={scrollPrev}
       >
@@ -103,37 +104,45 @@ export function ProductGalleryThumbnail() {
           isDesktop ? 'h-64 w-24' : 'w-full',
         )}
       >
-        <div className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}>
+        <ul
+          role="list"
+          aria-label="รูปภาพขนาดย่อของสินค้า"
+          className={cn('flex gap-2', isDesktop ? 'flex-col' : 'flex-row')}
+        >
           {images.map((image, index) => (
-            <div
-              key={image.id || index}
-              onClick={() => setActiveImageIndex(index)}
-              className={cn(
-                'border-border relative aspect-square size-16 flex-none cursor-pointer overflow-hidden border border-dashed bg-transparent p-1 transition-all md:size-20',
-                activeImageIndex === index ? 'border-primary' : 'border-muted',
-              )}
-            >
-              {isVideoUrl(image.url) ? (
-                <video
-                  src={image.url}
-                  className="size-full object-cover object-center"
-                  muted
-                />
-              ) : (
-                <img
-                  src={image.url}
-                  alt={`Product ${index}`}
-                  className="size-full object-cover object-center"
-                />
-              )}
-            </div>
+            <li key={image.id || index} role="listitem" className="list-none">
+              <button
+                type="button"
+                aria-label={`เลือกดูรูปภาพที่ ${index + 1}`}
+                onClick={() => setActiveImageIndex(index)}
+                className={cn(
+                  'border-border relative block aspect-square size-16 flex-none cursor-pointer overflow-hidden border border-dashed bg-transparent p-1 transition-all md:size-20',
+                  activeImageIndex === index ? 'border-primary ring-2 ring-primary/30' : 'border-muted',
+                )}
+              >
+                {isVideoUrl(image.url) ? (
+                  <video
+                    src={image.url}
+                    className="size-full object-cover object-center"
+                    muted
+                  />
+                ) : (
+                  <img
+                    src={image.url}
+                    alt={`${product?.title || 'สินค้า'} - ภาพย่อที่ ${index + 1}`}
+                    className="size-full object-cover object-center"
+                  />
+                )}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
       <Button
         variant="ghost"
         size="icon"
         disabled={!canScrollNext}
+        aria-label="เลื่อนดูรูปภาพถัดไป"
         className="z-10 size-7 flex-none rounded-full p-0 disabled:opacity-30"
         onClick={scrollNext}
       >

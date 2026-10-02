@@ -59,7 +59,7 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
         )}
 
         <Select value={sort} onValueChange={updateSort}>
-          <SelectTrigger className="w-45">
+          <SelectTrigger className="w-45" aria-label="ตัวเลือกการเรียงลำดับสินค้า">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -84,11 +84,17 @@ export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {
           description="ไม่พบสินค้าที่คุณกำลังมองหา"
         />
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+        <ul
+          role="list"
+          aria-label="รายการสินค้า"
+          className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5"
+        >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <li key={product.id} className="h-full list-none" itemProp="itemListElement">
+              <ProductCard product={product} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {meta && meta.totalPages > 1 && (

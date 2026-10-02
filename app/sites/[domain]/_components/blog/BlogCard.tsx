@@ -42,9 +42,18 @@ export function BlogCard({
   const isVideo = isVideoUrl(blog.image)
 
   return (
-    <Link href={`/blogs/${blog.slug}`} className="block h-full">
-      <div className={cn(blogCardVariants({ variant }), className)}>
-        <div
+    <Link
+      href={`/blogs/${blog.slug}`}
+      aria-label={`อ่านบทความ: ${blog.title}`}
+      className="block h-full"
+    >
+      <article
+        itemScope
+        itemType="https://schema.org/BlogPosting"
+        className={cn(blogCardVariants({ variant }), className)}
+      >
+        <meta itemProp="mainEntityOfPage" content={`/blogs/${blog.slug}`} />
+        <figure
           className={cn(
             'relative w-full overflow-hidden transition-all duration-300',
             isFeatured ? 'min-h-55 flex-1 lg:min-h-70' : 'h-52 shrink-0',
@@ -59,11 +68,15 @@ export function BlogCard({
                   muted
                   playsInline
                   loop
+                  aria-label={`วิดีโอประกอบบทความ: ${blog.title}`}
                 />
               ) : (
                 <img
+                  itemProp="image"
                   src={blog.image}
                   alt={blog.title}
+                  loading="lazy"
+                  decoding="async"
                   className="size-full object-cover"
                 />
               )}
@@ -71,7 +84,7 @@ export function BlogCard({
           ) : (
             <EmptyImage />
           )}
-        </div>
+        </figure>
         <div
           className={cn(
             'flex shrink-0 flex-col p-4',
@@ -79,6 +92,7 @@ export function BlogCard({
           )}
         >
           <h3
+            itemProp="headline"
             className={cn(
               'group-hover:text-primary mb-2 line-clamp-2 text-lg leading-tight font-medium md:text-xl',
               isFeatured && 'lg:text-center lg:text-2xl',
@@ -92,13 +106,13 @@ export function BlogCard({
               isFeatured && 'lg:justify-center',
             )}
           >
-            <Button variant="link" className="text-primary h-auto p-0">
+            <span className="text-primary inline-flex items-center text-sm font-medium">
               <span className="mr-1">อ่านต่อ</span>
               <ArrowRightIcon className="size-4" />
-            </Button>
+            </span>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   )
 }

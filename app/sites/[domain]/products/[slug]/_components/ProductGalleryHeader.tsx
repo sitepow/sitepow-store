@@ -10,6 +10,7 @@ export function ProductGalleryHeader() {
       <Link href={'/products'}>
         <Button
           variant="ghost"
+          aria-label="ย้อนกลับไปหน้ารวมสินค้า"
           className="text-muted-foreground hover:text-primary -ml-4"
         >
           <ChevronLeft className="mr-2 size-4" />
@@ -17,10 +18,10 @@ export function ProductGalleryHeader() {
         </Button>
       </Link>
       <div className="flex gap-2.5">
-        <Button variant="outline" size="icon-lg">
+        <Button variant="outline" size="icon-lg" aria-label="เพิ่มลงในรายการที่ชอบ">
           <HeartIcon className="size-4" />
         </Button>
-        <Button variant="outline" size="icon-lg">
+        <Button variant="outline" size="icon-lg" aria-label="แชร์สินค้านี้">
           <Share2Icon className="size-4" />
         </Button>
       </div>

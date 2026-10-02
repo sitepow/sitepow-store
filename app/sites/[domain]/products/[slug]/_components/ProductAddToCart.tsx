@@ -129,8 +129,10 @@ export function ProductAddToCart() {
           />
           {(isPhysical || isDigitalItem) && (
             <div className="flex gap-2.5">
-              <PackageIcon className="text-primary" />
-              <span>{formatNumber(stock)} ชิ้น</span>
+              <PackageIcon className="text-primary" aria-hidden="true" />
+              <span aria-label={`มีสินค้าในสต็อก ${formatNumber(stock)} ชิ้น`}>
+                {formatNumber(stock)} ชิ้น
+              </span>
             </div>
           )}
         </div>
@@ -139,11 +141,13 @@ export function ProductAddToCart() {
         <Label className="text-lg font-semibold">ข้อมูลเพิ่มเติม (ถ้ามี)</Label>
         <Textarea
           placeholder="กรอกข้อความถึงผู้ขายที่นี่"
+          aria-label="ข้อความเพิ่มเติมถึงผู้ขาย"
           className="min-h-20"
         />
       </div>
       <Button
         size="lg"
+        aria-label="หยิบสินค้าใส่ตะกร้า"
         className="mt-4 h-14 w-full text-lg shadow-lg"
         onClick={handleAddToCart}
       >

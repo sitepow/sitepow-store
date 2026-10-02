@@ -57,20 +57,22 @@ export function ProductSpecification() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {hasSpecs && (
-        <>
+        <section aria-labelledby="specifications-heading" className="space-y-6">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold">ข้อมูลจำเพาะ</h3>
+            <h2 id="specifications-heading" className="text-xl font-bold">
+              ข้อมูลจำเพาะ
+            </h2>
             <Separator className="flex-1" />
           </div>
-          <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
+          <dl className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-12">
             {Object.entries(details).map(([key, value]) => (
               <div key={key} className="flex flex-col border-b pb-2">
-                <span className="text-sm">
+                <dt className="text-muted-foreground text-sm">
                   {metadataLabelMap[key] ?? key.replace(/_/g, ' ')}
-                </span>
-                <span className="text-primary text-sm">
+                </dt>
+                <dd className="text-primary text-sm font-medium">
                   {Array.isArray(value)
                     ? value
                         .map((v) =>
@@ -80,26 +82,30 @@ export function ProductSpecification() {
                         )
                         .join(', ')
                     : String(value ?? '')}
-                </span>
+                </dd>
               </div>
             ))}
-          </div>
-        </>
+          </dl>
+        </section>
       )}
       {hasTags && (
-        <>
+        <section aria-labelledby="tags-heading" className="space-y-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-bold">แท็กสินค้า</h3>
+            <h3 id="tags-heading" className="text-lg font-bold">
+              แท็กสินค้า
+            </h3>
             <Separator className="flex-1" />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <ul role="list" aria-label="แท็กสินค้า" className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <Badge key={tag.name} variant="outline" className="font-normal">
-                <TagIcon /> {tag.name}
-              </Badge>
+              <li key={tag.name} className="list-none">
+                <Badge variant="outline" className="font-normal">
+                  <TagIcon className="mr-1 size-3" /> {tag.name}
+                </Badge>
+              </li>
             ))}
-          </div>
-        </>
+          </ul>
+        </section>
       )}
     </div>
   )

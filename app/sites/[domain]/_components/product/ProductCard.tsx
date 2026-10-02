@@ -50,17 +50,24 @@ export function ProductCard({
   const isVideo = isVideoUrl(primaryImage?.url)
   const isOutOfStock = quantity !== undefined && quantity <= 0
 
+  const priceValue = (hasDiscount ? net?.min : original?.min) || 0
+  const accessibleLabel = `${product.title} ราคา ${formatCurrency(priceValue)}${
+    isOutOfStock ? ' สินค้าหมด' : hasDiscount ? ` ลดราคา ${maxDiscountPercent}%` : ''
+  }`
+
   const content = (
-    <div
+    <article
+      itemScope
+      itemType="https://schema.org/Product"
       className={cn(
         productCardVariants({ variant }),
         onClick && 'cursor-pointer',
-        isOutOfStock && 'opacity-50',
+        isOutOfStock && 'opacity-60',
         className,
       )}
       onClick={onClick}
     >
-      <div className="relative overflow-hidden rounded-t-xl">
+      <figure className="relative overflow-hidden rounded-t-xl">
         <div className="relative mb-2.5 aspect-square w-full overflow-hidden bg-transparent">
           {!primaryImage ? (
             <EmptyImage />
@@ -72,12 +79,16 @@ export function ProductCard({
               playsInline
               loop
               autoPlay
+              aria-label={`วิดีโอตัวอย่างสินค้า: ${product.title}`}
             />
           ) : (
             <img
+              itemProp="image"
               src={primaryImage.url}
               alt={product.title}
-              className="size-full object-cover"
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           )}
         </div>
@@ -86,19 +97,25 @@ export function ProductCard({
             variant="destructive"
             className="absolute top-2 right-2 text-xs"
           >
-            <IconAlertCircle /> ขออภัยสินค้าหมด
+            <IconAlertCircle className="mr-1 size-3.5" /> ขออภัยสินค้าหมด
           </Badge>
         ) : (
           hasDiscount && (
-            <Badge className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center">
+            <Badge
+              aria-label={`ลดราคา ${maxDiscountPercent}%`}
+              className="bg-primary absolute top-0 right-0 size-12 rounded-full text-center"
+            >
               ลด <br /> -{maxDiscountPercent}%
             </Badge>
           )
         )}
-      </div>
+      </figure>
       <div className="flex flex-col items-center gap-1 p-1.5">
         {product.title && (
-          <h3 className="group-hover:text-primary line-clamp-2 px-1 font-medium">
+          <h3
+            itemProp="name"
+            className="group-hover:text-primary line-clamp-2 px-1 font-medium"
+          >
             {product.title}
           </h3>
         )}
@@ -108,26 +125,52 @@ export function ProductCard({
             ตัวแทนจำหน่าย
           </Badge>
         )}
-        <div className="group-hover:text-primary flex flex-col items-center justify-center">
+        <div
+          itemProp="offers"
+          itemScope
+          itemType="https://schema.org/Offer"
+          className="group-hover:text-primary flex flex-col items-center justify-center"
+        >
+          <meta itemProp="priceCurrency" content="THB" />
+          <link
+            itemProp="availability"
+            href={
+              isOutOfStock
+                ? 'https://schema.org/OutOfStock'
+                : 'https://schema.org/InStock'
+            }
+          />
           <data
-            value={hasDiscount ? net?.min : original?.min}
+            itemProp="price"
+            value={priceValue}
             className="text-primary text-lg font-bold sm:text-xl lg:text-2xl"
           >
-            {formatCurrency((hasDiscount ? net?.min : original?.min) || 0)}
+            {formatCurrency(priceValue)}
           </data>
           {hasDiscount && (
-            <span className="text-muted-foreground text-sm line-through">
+            <span
+              aria-label={`ราคาปกติ ${formatCurrency(original?.min || 0)}`}
+              className="text-muted-foreground text-sm line-through"
+            >
               {formatCurrency(original?.min || 0)}
             </span>
           )}
         </div>
       </div>
-    </div>
+    </article>
   )
 
   if (onClick) {
     return content
   }
 
-  return <Link href={href || `/products/${product.slug}`}>{content}</Link>
+  return (
+    <Link
+      href={href || `/products/${product.slug}`}
+      aria-label={accessibleLabel}
+      className="block h-full"
+    >
+      {content}
+    </Link>
+  )
 }

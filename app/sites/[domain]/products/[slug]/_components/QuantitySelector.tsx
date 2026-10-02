@@ -45,6 +45,7 @@ export function QuantitySelector({
           type="button"
           variant="ghost"
           size="icon"
+          aria-label="ลดจำนวนสินค้า"
           className="hover:bg-muted size-9 rounded-none"
           onClick={handleDecrement}
           disabled={value <= min}
@@ -55,6 +56,9 @@ export function QuantitySelector({
       <InputGroupInput
         type="number"
         value={value}
+        aria-label="ระบุจำนวนสินค้า"
+        min={min}
+        max={max}
         onChange={handleInputChange}
         className="h-9 [appearance:textfield] border-none text-center focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
@@ -63,6 +67,7 @@ export function QuantitySelector({
           type="button"
           variant="ghost"
           size="icon"
+          aria-label="เพิ่มจำนวนสินค้า"
           className="hover:bg-muted size-9 rounded-none"
           onClick={handleIncrement}
           disabled={value >= max}

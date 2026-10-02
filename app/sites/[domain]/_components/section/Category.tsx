@@ -99,6 +99,7 @@ export function CategorySection({
             <Button
               variant="outline"
               size="icon"
+              aria-label="ดูสินค้าก่อนหน้า"
               onClick={() => api?.scrollPrev()}
               className="border-border/50 bg-background/80 absolute -left-3 z-20 hidden size-9 rounded-full shadow-md backdrop-blur-md transition-all group-hover/carousel:flex hover:scale-105"
             >
@@ -109,33 +110,40 @@ export function CategorySection({
             ref={emblaRef}
             className="w-full min-w-0 cursor-grab overflow-hidden p-1 active:cursor-grabbing"
           >
-            <div className="flex items-stretch gap-2.5">
+            <ul
+              role="list"
+              aria-label={`สินค้าในหมวดหมู่ ${title}`}
+              className="flex items-stretch gap-2.5"
+            >
               {isLoading
                 ? Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton
+                    <li
                       key={i}
-                      className="h-72 min-w-0 flex-[0_0_160px] rounded-xl sm:flex-[0_0_200px]"
-                    />
+                      className="list-none h-72 min-w-0 flex-[0_0_160px] rounded-xl sm:flex-[0_0_200px]"
+                    >
+                      <Skeleton className="size-full rounded-xl" />
+                    </li>
                   ))
                 : products.map((product) => (
-                    <div
+                    <li
                       key={product.id}
-                      className="flex-[0_0_160px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
+                      className="list-none flex-[0_0_160px] sm:flex-[0_0_200px] lg:flex-[0_0_220px]"
                     >
                       <ProductCard product={product} className="h-full" />
-                    </div>
+                    </li>
                   ))}
               {!isLoading && (
-                <div className="flex flex-[0_0_140px] items-center justify-center sm:flex-[0_0_180px]">
+                <li className="list-none flex flex-[0_0_140px] items-center justify-center sm:flex-[0_0_180px]">
                   <SeeMoreButton href={`/products?category=${categorySlug}`} />
-                </div>
+                </li>
               )}
-            </div>
+            </ul>
           </div>
           {canScrollNext && (
             <Button
               variant="outline"
               size="icon"
+              aria-label="ดูสินค้าถัดไป"
               onClick={() => api?.scrollNext()}
               className="border-border/50 bg-background/80 absolute -right-3 z-20 hidden size-9 rounded-full shadow-md backdrop-blur-md transition-all group-hover/carousel:flex hover:scale-105"
             >

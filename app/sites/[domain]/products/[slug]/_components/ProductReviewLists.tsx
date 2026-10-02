@@ -14,17 +14,21 @@ export function ProductReviewLists() {
   }
 
   return (
-    <div className="mt-20 space-y-8">
+    <section aria-labelledby="reviews-heading" className="mt-20 space-y-8">
       <div className="flex items-center gap-2">
-        <h3 className="text-xl font-bold">รีวิวจากลูกค้า</h3>
+        <h2 id="reviews-heading" className="text-xl font-bold">
+          รีวิวจากลูกค้า
+        </h2>
         <Separator className="flex-1" />
       </div>
       <ProductReviewRating reviews={reviews} />
-      <div className="space-y-10 pt-4">
+      <ul role="list" aria-label="รายการรีวิวจากลูกค้า" className="space-y-10 pt-4">
         {reviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
+          <li key={review.id} className="list-none">
+            <ReviewCard review={review} />
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   )
 }

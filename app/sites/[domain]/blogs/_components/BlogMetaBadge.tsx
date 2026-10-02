@@ -39,7 +39,12 @@ export function BlogMetaBadge({
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
       )}
       <div className="relative z-10 flex flex-wrap items-center justify-center gap-2.5">
-        <div className="flex items-center gap-2">
+        <address
+          itemProp="author"
+          itemScope
+          itemType="https://schema.org/Person"
+          className="not-italic flex items-center gap-2"
+        >
           <Avatar className="size-8 border border-white/20">
             <AvatarImage src={authorAvatar} alt={authorName} />
             <AvatarFallback className={cn(hasBg && 'bg-black/40 text-white')}>
@@ -47,6 +52,7 @@ export function BlogMetaBadge({
             </AvatarFallback>
           </Avatar>
           <span
+            itemProp="name"
             className={cn(
               'font-medium',
               hasBg ? 'text-white' : 'text-foreground',
@@ -54,13 +60,18 @@ export function BlogMetaBadge({
           >
             {authorName}
           </span>
+        </address>
+        <div className="flex items-center gap-1.5">
+          <CalendarIcon size={16} aria-hidden="true" />
+          <time
+            itemProp="datePublished"
+            dateTime={new Date(createdAt).toISOString()}
+          >
+            {formatDateTime(createdAt)}
+          </time>
         </div>
         <div className="flex items-center gap-1.5">
-          <CalendarIcon size={16} />
-          <span>{formatDateTime(createdAt)}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Clock size={16} />
+          <Clock size={16} aria-hidden="true" />
           <span>อ่าน {readingTime} นาที</span>
         </div>
       </div>

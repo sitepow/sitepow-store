@@ -114,6 +114,7 @@ export function StoreFooter() {
 
   return (
     <footer
+      role="contentinfo"
       className="bg-background border-border text-foreground border-t"
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
@@ -141,6 +142,7 @@ export function StoreFooter() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`ติดตามเราผ่านทาง ${social.label}`}
                 >
                   {social.icon}
                 </a>
@@ -156,17 +158,18 @@ export function StoreFooter() {
                     src={mainBranch.mapUrl}
                     width="100%"
                     height="200"
+                    title={`แผนที่สาขาหลัก ${store?.name || ''}`}
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                   />
                 </div>
               )}
-              <p className="text-sm leading-relaxed opacity-60">
+              <address className="not-italic text-sm leading-relaxed opacity-60">
                 {mainBranch?.address} {mainBranch?.subDistrict}{' '}
                 {mainBranch?.district} <br />
                 {mainBranch?.province} {mainBranch?.postcode}
-              </p>
+              </address>
             </div>
           )}
           {mainBranch?.openingHours &&
@@ -185,14 +188,14 @@ export function StoreFooter() {
           <p className="text-sm">
             © {currentYear} Sitepow. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm">
+          <nav aria-label="นโยบายและข้อกำหนด" className="flex gap-6 text-sm">
             <Link href="/privacy-policy" className="hover:underline">
               นโยบายความเป็นส่วนตัว
             </Link>
             <Link href="/refund-return-policy" className="hover:underline">
               ข้อตกลง และเงื่อนไข
             </Link>
-          </div>
+          </nav>
         </div>
       </div>
       {store?.plan === Plan.FREE && <ProtectedByBrand />}

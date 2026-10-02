@@ -29,11 +29,17 @@ export function BlogsList({ storeSlug }: { storeSlug: string }) {
 
   return (
     <>
-      <div className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul
+        role="list"
+        aria-label="รายการบทความ"
+        className="grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {blogs.map((blog) => (
-          <BlogCard key={blog.id} blog={blog} />
+          <li key={blog.id} className="list-none">
+            <BlogCard blog={blog} />
+          </li>
         ))}
-      </div>
+      </ul>
       {meta && meta.totalPages > 1 && (
         <StorePagination
           currentPage={meta.currentPage}

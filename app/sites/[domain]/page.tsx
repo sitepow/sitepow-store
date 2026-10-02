@@ -21,6 +21,9 @@ export default async function StoreHomePage({ params }: Props) {
 
   return (
     <StoreLayout>
+      <h1 className="sr-only">
+        {store?.name ? `${store.name} - ร้านค้าออนไลน์คุณภาพ` : 'ร้านค้าออนไลน์'}
+      </h1>
       {store && <TenantStoreJsonLd store={store} baseUrl={baseUrl} />}
       <BlogsSection storeSlug={domain} />
       <CategoriesSection storeSlug={domain} />

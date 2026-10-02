@@ -112,21 +112,39 @@ export default async function StoreProductDescriptionPage({ params }: Props) {
         />
       )}
       <SectionContainer>
-        <div className="text-foreground grid w-full items-start gap-x-10 gap-y-5 text-start xl:grid-cols-12">
-          <div className="flex flex-col gap-5 xl:col-span-7">
-            <ProductGallery />
+        <article
+          itemScope
+          itemType="https://schema.org/Product"
+          className="text-foreground w-full"
+        >
+          <meta itemProp="name" content={product?.title || ''} />
+          <meta itemProp="description" content={description} />
+          {product?.images?.[0]?.url && (
+            <link itemProp="image" href={product.images[0].url} />
+          )}
+
+          <div className="grid w-full items-start gap-x-10 gap-y-5 text-start xl:grid-cols-12">
+            <div className="flex flex-col gap-5 xl:col-span-7">
+              <ProductGallery />
+            </div>
+            <section
+              aria-labelledby="product-purchase-section"
+              className="flex flex-col gap-5 xl:sticky xl:top-40 xl:col-span-5 xl:col-start-8 xl:row-start-1 xl:row-end-3"
+            >
+              <h2 id="product-purchase-section" className="sr-only">
+                สั่งซื้อสินค้าและเลือกตัวเลือก
+              </h2>
+              <ProductPurchasePanel storeSlug={domain} productSlug={slug} />
+            </section>
+            <div className="xl:col-span-7">
+              <ProductSpecification />
+              <ProductReviewLists />
+            </div>
           </div>
-          <div className="flex flex-col gap-5 xl:sticky xl:top-40 xl:col-span-5 xl:col-start-8 xl:row-start-1 xl:row-end-3">
-            <ProductPurchasePanel storeSlug={domain} productSlug={slug} />
+          <div className="mt-16 flex w-full">
+            <ProductRelated />
           </div>
-          <div className="xl:col-span-7">
-            <ProductSpecification />
-            <ProductReviewLists />
-          </div>
-        </div>
-        <div className="flex w-full">
-          <ProductRelated />
-        </div>
+        </article>
       </SectionContainer>
     </StoreLayout>
   )

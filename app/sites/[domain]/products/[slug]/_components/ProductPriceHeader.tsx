@@ -13,24 +13,40 @@ export function ProductPriceHeader() {
   const points = getCurrentPoints()
 
   return (
-    <>
+    <header className="flex flex-col gap-4">
       {isLoading ? (
         <Skeleton className="h-10 w-3/4 rounded-lg" />
       ) : (
-        <h1 className="text-start text-xl leading-tight font-bold sm:text-2xl lg:text-3xl">
+        <h1
+          itemProp="name"
+          className="text-start text-xl leading-tight font-bold sm:text-2xl lg:text-3xl"
+        >
           {product?.title}
         </h1>
       )}
 
-      <div className="flex flex-col gap-2.5">
+      <div
+        itemProp="offers"
+        itemScope
+        itemType="https://schema.org/Offer"
+        className="flex flex-col gap-2.5"
+      >
+        <meta itemProp="priceCurrency" content="THB" />
+        <link
+          itemProp="availability"
+          href="https://schema.org/InStock"
+        />
         {isLoading ? (
           <Skeleton className="h-12 w-36 rounded-lg" />
         ) : (
           <>
-            <Label className="text-lg font-semibold">ราคาสินค้า</Label>
+            <Label className="text-muted-foreground text-sm font-semibold">
+              ราคาสินค้า
+            </Label>
             <div className="flex items-end gap-2">
               <data
-                value={totalPrice}
+                itemProp="price"
+                value={totalPrice || 0}
                 className="text-primary text-4xl font-bold sm:text-5xl"
               >
                 {formatCurrency(totalPrice || 0)}
@@ -38,7 +54,7 @@ export function ProductPriceHeader() {
             </div>
 
             {points > 0 && (
-              <p>
+              <p className="text-muted-foreground text-sm">
                 คุณจะได้รับ{' '}
                 <span className="text-primary text-lg font-bold">
                   {formatNumber(points)}
@@ -51,6 +67,6 @@ export function ProductPriceHeader() {
       </div>
 
       <Separator />
-    </>
+    </header>
   )
 }
