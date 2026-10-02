@@ -7,6 +7,12 @@ RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 COPY . .
 
+ARG BETTER_AUTH_SECRET=build-default-secret-key-32-chars-long
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV BETTER_AUTH_URL=https://sitepow.store
+ENV DATABASE_URL="postgresql://postgres:postgres@localhost:5432/dummy?schema=public"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN pnpm exec prisma generate && \
     pnpm build
 

@@ -5,6 +5,8 @@ import { StoreStatus } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { getTenantBaseUrl } from '@/lib/tenant-seo'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ domain: string }> },

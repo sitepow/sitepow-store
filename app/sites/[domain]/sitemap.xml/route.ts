@@ -5,6 +5,8 @@ import { StoreStatus } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { getTenantBaseUrl } from '@/lib/tenant-seo'
 
+export const dynamic = 'force-dynamic'
+
 interface SitemapItem {
   loc: string
   lastmod?: string
