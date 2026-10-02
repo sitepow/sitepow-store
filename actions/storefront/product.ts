@@ -47,6 +47,7 @@ const storefrontProductDetailSelect = {
   variants: {
     select: {
       id: true,
+      sku: true,
       title: true,
       price: true,
       image: true,

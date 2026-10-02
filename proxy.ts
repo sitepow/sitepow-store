@@ -179,6 +179,42 @@ export default async function middleware(req: NextRequest) {
 
   const isRootDomain = ROOT_DOMAINS.includes(hostname)
   if (isRootDomain) {
+    if (url.pathname.startsWith('/sites/')) {
+      const segments = url.pathname.split('/').filter(Boolean)
+      const targetSlug = segments[1]
+      const remainingSegments = segments.slice(2)
+      const remainingPath =
+        remainingSegments.length > 0 ? `/${remainingSegments.join('/')}` : ''
+
+      if (targetSlug) {
+        let customDomain = ''
+        try {
+          customDomain = (await redis.get(`slug:domain:${targetSlug}`)) || ''
+        } catch (err) {
+          console.error(err)
+        }
+
+        if (customDomain) {
+          return NextResponse.redirect(
+            new URL(`${remainingPath}${url.search}`, `https://${customDomain}`),
+            { status: 301 },
+          )
+        }
+
+        const host =
+          req.headers.get('x-forwarded-host') || req.headers.get('host') || ''
+        const port = host.includes(':') ? host.split(':')[1] : '3000'
+        const tenantOrigin = isProd
+          ? `https://${targetSlug}.sitepow.store`
+          : `http://${targetSlug}.lvh.me:${port}`
+
+        return NextResponse.redirect(
+          new URL(`${remainingPath}${url.search}`, tenantOrigin),
+          { status: 301 },
+        )
+      }
+    }
+
     const langParam = url.searchParams.get('lang')
     const requestHeaders = new Headers(req.headers)
 
@@ -227,7 +263,7 @@ export default async function middleware(req: NextRequest) {
     if (customDomain) {
       return NextResponse.redirect(
         new URL(`${url.pathname}${url.search}`, `https://${customDomain}`),
-        { status: 307 },
+        { status: 301 },
       )
     }
   } else {

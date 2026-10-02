@@ -5,6 +5,8 @@ import { getStore } from '@/actions/store'
 import { BASE_FAVICON } from '@/constants/favicon'
 import { StoreStatus } from '@/generated/prisma/enums'
 
+import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant-seo'
+
 import { AlertLayout } from '@/components/layout/AlertLayout'
 
 import { StoreInitializer } from './_components/layout/StoreInitializer'
@@ -22,39 +24,62 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound()
   }
 
-  const storeDomain = store.customDomain || domain
-  const url = storeDomain.includes('.')
-    ? `https://${storeDomain}`
-    : `https://${storeDomain}.sitepow.store`
-
+  const baseUrl = await getTenantBaseUrl(domain)
   const storeName = store.name
+  const storeDescription =
+    cleanDescription(store.description) ||
+    `เลือกซื้อสินค้าคุณภาพจาก ${storeName} บนระบบร้านค้าออนไลน์ สั่งซื้อง่าย จัดส่งรวดเร็ว ปลอดภัย`
+  const storeImage =
+    store.coverImage || store.logo || '/images/default-store-banner.jpg'
+  const isStoreActive = store.status === StoreStatus.ACTIVE
 
   return {
+    metadataBase: new URL(baseUrl),
     title: {
-      default: `ยินดีต้อนรับสู่ร้าน ${storeName}`,
+      default: `${storeName} - ร้านค้าออนไลน์คุณภาพ`,
       template: `%s | ${storeName}`,
     },
-    description:
-      store.description || `เลือกซื้อสินค้าคุณภาพจาก ${storeName} บนระบบของเรา`,
+    description: storeDescription,
     icons: {
       icon: store.logo || BASE_FAVICON,
       shortcut: BASE_FAVICON,
-      apple: BASE_FAVICON,
+      apple: store.logo || BASE_FAVICON,
     },
     alternates: {
-      canonical: url,
+      canonical: baseUrl,
     },
-    // robots: {
-    //   index: store.status === StoreStatus.ACTIVE,
-    //   follow: store.status === StoreStatus.ACTIVE,
-    // },
+    openGraph: {
+      type: 'website',
+      locale: 'th_TH',
+      url: baseUrl,
+      siteName: storeName,
+      title: `${storeName} | ร้านค้าออนไลน์`,
+      description: storeDescription,
+      images: [
+        {
+          url: storeImage,
+          width: 1200,
+          height: 630,
+          alt: storeName,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${storeName} | ร้านค้าออนไลน์`,
+      description: storeDescription,
+      images: [storeImage],
+    },
     robots: {
-      index: false,
-      follow: false,
-      nocache: true,
+      index: isStoreActive,
+      follow: isStoreActive,
+      nocache: !isStoreActive,
       googleBot: {
-        index: false,
-        follow: false,
+        index: isStoreActive,
+        follow: isStoreActive,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
     },
   }
