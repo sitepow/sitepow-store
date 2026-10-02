@@ -2,7 +2,7 @@ import { ComponentProps, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface SectionHeaderProps extends Omit<ComponentProps<'div'>, 'title'> {
+interface SectionHeaderProps extends Omit<ComponentProps<'header'>, 'title'> {
   title: ReactNode
   description?: ReactNode
 }
@@ -14,9 +14,9 @@ export function SectionHeader({
   ...props
 }: SectionHeaderProps) {
   return (
-    <div
+    <header
       className={cn(
-        'text-foreground flex flex-col items-center gap-4',
+        'text-foreground flex flex-col items-center gap-4 text-center',
         className,
       )}
       {...props}
@@ -30,6 +30,6 @@ export function SectionHeader({
           {description}
         </p>
       )}
-    </div>
+    </header>
   )
 }

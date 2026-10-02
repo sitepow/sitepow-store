@@ -13,7 +13,7 @@ export function InventorySection() {
       sectionHeader={
         <SectionHeader
           className="max-w-lg text-white"
-          title="บริหารสต็อกและโอนย้ายสินค้าระหว่างสาขาอย่างสมบูรณ์แบบ"
+          title="ระบบสต็อกสินค้าหลายสาขาและจัดการคลัง"
           description="จัดการคลังสินค้าแบบ Multi-Branch เช็กสต็อกรายสาขา โอนย้ายสินค้า และบันทึกการปรับสต็อกเมื่อชำรุดหรือหมดอายุได้อย่างมีประสิทธิภาพ"
         />
       }

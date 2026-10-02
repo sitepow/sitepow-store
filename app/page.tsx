@@ -22,7 +22,7 @@ import { ResellerSection } from '@/components/section/ResellerSection'
 import { SecurityTrustSection } from '@/components/section/SecurityTrustSection'
 import { StoreCustomizationSection } from '@/components/section/StoreCustomizationSection'
 import { StoresSection } from '@/components/section/StoresSection'
-import { StructuredData } from '@/components/seo/StructuredData'
+import { JsonLd } from '@/components/seo/JsonLd'
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
@@ -63,8 +63,8 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <MainLayout className="-mt-12.5">
-      <StructuredData />
+    <MainLayout className="-mt-12.5" id="main-content">
+      <JsonLd />
       <Suspense>
         <HeroSection />
       </Suspense>
