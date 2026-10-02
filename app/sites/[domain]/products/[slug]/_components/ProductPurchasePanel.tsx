@@ -33,7 +33,7 @@ export function ProductPurchasePanel({ storeSlug, productSlug }: Props) {
 
   return (
     <>
-      <ProductPriceHeader />
+      <ProductPriceHeader storeSlug={storeSlug} productSlug={productSlug} />
       <ProductVariantSelector />
       <ProductOptionGroups />
       <ProductAddonSelector />

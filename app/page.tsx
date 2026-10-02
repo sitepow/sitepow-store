@@ -29,6 +29,8 @@ const BASE_URL =
     ? 'https://sitepow.store'
     : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title:
     'Sitepow Store | ระบบร้านค้าออนไลน์ ครบวงจร จัดการสต็อก POS และตรวจสลิปอัตโนมัติ',

@@ -229,24 +229,8 @@ export async function getStorefrontProductDetail(
   storeSlug: string,
   productSlug: string,
 ): Promise<StorefrontProductDetail | null> {
-  const cacheKey = queryKeyToRedisKey(
-    storefrontProductKeys.detail(storeSlug, productSlug),
-  )
-
-  const product = await withCache(cacheKey, async () => {
-    const res = await prisma.product.findFirst({
-      where: {
-        slug: productSlug,
-        isPublished: true,
-        store: { slug: storeSlug, status: StoreStatus.ACTIVE },
-      },
-      select: storefrontProductDetailSelect,
-    })
-
-    return res ? serializeDecimal(res) : null
-  })
-
-  return product
+  const { getProductBySlug } = await import('@/lib/data/product')
+  return await getProductBySlug(storeSlug, productSlug)
 }
 
 export async function getRelatedProducts(

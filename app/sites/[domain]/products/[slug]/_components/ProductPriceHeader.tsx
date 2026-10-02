@@ -1,4 +1,6 @@
+import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { calculateNetPrice } from '@/utils/product'
 
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -6,11 +8,44 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../store'
 
-export function ProductPriceHeader() {
-  const { product, getCurrentPoints, getTotalPrice, isLoading } =
-    useProductPurchaseStore()
-  const totalPrice = getTotalPrice()
-  const points = getCurrentPoints()
+interface Props {
+  storeSlug?: string
+  productSlug?: string
+}
+
+export function ProductPriceHeader({ storeSlug, productSlug }: Props) {
+  const { data: queryProduct } = useStorefrontProductDetail(
+    storeSlug ?? '',
+    productSlug ?? '',
+  )
+  const {
+    product: storeProduct,
+    getCurrentPoints,
+    getTotalPrice,
+    isLoading: isStoreLoading,
+  } = useProductPurchaseStore()
+
+  const product = storeProduct || queryProduct
+  const isLoading = !product && isStoreLoading
+
+  let totalPrice = 0
+  let points = 0
+
+  if (storeProduct) {
+    totalPrice = getTotalPrice()
+    points = getCurrentPoints()
+  } else if (product?.variants?.[0]) {
+    const primaryVariant = product.variants[0]
+    totalPrice = calculateNetPrice({
+      price: primaryVariant.price,
+      discount: {
+        active: primaryVariant.discountActive ?? false,
+        type: primaryVariant.discountType ?? '',
+        amount: primaryVariant.discountAmount ?? 0,
+      },
+    })
+    points = primaryVariant.pointsActive ? primaryVariant.pointsAmount : 0
+  }
 
   return (
     <header className="flex flex-col gap-4">
@@ -32,10 +67,7 @@ export function ProductPriceHeader() {
         className="flex flex-col gap-2.5"
       >
         <meta itemProp="priceCurrency" content="THB" />
-        <link
-          itemProp="availability"
-          href="https://schema.org/InStock"
-        />
+        <link itemProp="availability" href="https://schema.org/InStock" />
         {isLoading ? (
           <Skeleton className="h-12 w-36 rounded-lg" />
         ) : (

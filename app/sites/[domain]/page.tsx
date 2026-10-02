@@ -1,5 +1,9 @@
-import { getStore } from '@/actions/store'
+import { storefrontProductKeys } from '@/actions/query-keys/storefront/product'
+import { getStorefrontProducts } from '@/actions/storefront/product'
+import { getStoreByDomain } from '@/lib/data/store'
+import { getQueryClient } from '@/lib/get-query-client'
 import { getTenantBaseUrl } from '@/lib/tenant-seo'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
 import { TenantStoreJsonLd } from '@/components/seo/TenantStoreJsonLd'
 
@@ -8,27 +12,50 @@ import { BlogsSection } from './_components/section/Blogs'
 import { CategoriesSection } from './_components/section/Categories'
 import { ProductsSection } from './_components/section/Products'
 
+export const revalidate = 60
+
 type Props = {
   params: Promise<{ domain: string }>
 }
 
 export default async function StoreHomePage({ params }: Props) {
   const { domain } = await params
+
   const [store, baseUrl] = await Promise.all([
-    getStore({ domain }),
+    getStoreByDomain(domain),
     getTenantBaseUrl(domain),
   ])
 
+  const queryClient = getQueryClient()
+  await queryClient.prefetchQuery({
+    queryKey: storefrontProductKeys.list({
+      storeSlug: domain,
+      page: 1,
+      limit: 8,
+      search: '',
+      categorySlug: '',
+    }),
+    queryFn: () =>
+      getStorefrontProducts({
+        storeSlug: domain,
+        page: 1,
+        limit: 8,
+      }),
+  })
+
   return (
-    <StoreLayout>
-      <h1 className="sr-only">
-        {store?.name ? `${store.name} - ร้านค้าออนไลน์คุณภาพ` : 'ร้านค้าออนไลน์'}
-      </h1>
-      {store && <TenantStoreJsonLd store={store} baseUrl={baseUrl} />}
-      <BlogsSection storeSlug={domain} />
-      <CategoriesSection storeSlug={domain} />
-      <ProductsSection storeSlug={domain} />
-    </StoreLayout>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <StoreLayout>
+        <h1 className="sr-only">
+          {store?.name
+            ? `${store.name} - ร้านค้าออนไลน์คุณภาพ`
+            : 'ร้านค้าออนไลน์'}
+        </h1>
+        {store && <TenantStoreJsonLd store={store} baseUrl={baseUrl} />}
+        <BlogsSection storeSlug={domain} />
+        <CategoriesSection storeSlug={domain} />
+        <ProductsSection storeSlug={domain} />
+      </StoreLayout>
+    </HydrationBoundary>
   )
 }
-

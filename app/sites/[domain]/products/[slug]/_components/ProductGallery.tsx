@@ -4,7 +4,12 @@ import { ProductGalleryHeader } from './ProductGalleryHeader'
 import { ProductGalleryMain } from './ProductGalleryMain'
 import { ProductGalleryThumbnail } from './ProductGalleryThumbnail'
 
-export function ProductGallery() {
+interface Props {
+  storeSlug?: string
+  productSlug?: string
+}
+
+export function ProductGallery({ storeSlug, productSlug }: Props) {
   return (
     <div className="space-y-5">
       <ProductGalleryHeader />
@@ -13,7 +18,7 @@ export function ProductGallery() {
           <ProductGalleryThumbnail />
         </div>
         <div className="order-1 flex-1 md:order-2">
-          <ProductGalleryMain />
+          <ProductGalleryMain storeSlug={storeSlug} productSlug={productSlug} />
         </div>
       </div>
     </div>

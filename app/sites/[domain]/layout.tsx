@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getStore } from '@/actions/store'
+import { getStoreByDomain } from '@/lib/data/store'
 import { BASE_FAVICON } from '@/constants/favicon'
 import { StoreStatus } from '@/generated/prisma/enums'
 
@@ -18,7 +18,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { domain } = await params
-  const store = await getStore({ domain })
+  const store = await getStoreByDomain(domain)
 
   if (!store) {
     notFound()
@@ -87,7 +87,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function StoreLayout({ children, params }: Props) {
   const { domain } = await params
-  const store = await getStore({ domain })
+  const store = await getStoreByDomain(domain)
 
   if (!store) {
     return (

@@ -1,5 +1,6 @@
 'use client'
 
+import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { TagIcon } from 'lucide-react'
 
@@ -8,6 +9,11 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { useProductPurchaseStore } from '../../store'
+
+interface Props {
+  storeSlug?: string
+  productSlug?: string
+}
 
 const metadataLabelMap = PRODUCT_METADATA_MASTER.reduce<Record<string, string>>(
   (acc, category) => {
@@ -19,9 +25,16 @@ const metadataLabelMap = PRODUCT_METADATA_MASTER.reduce<Record<string, string>>(
   {},
 )
 
-export function ProductSpecification() {
-  const product = useProductPurchaseStore((s) => s.product)
-  const isLoading = useProductPurchaseStore((s) => s.isLoading)
+export function ProductSpecification({ storeSlug, productSlug }: Props) {
+  const { data: queryProduct } = useStorefrontProductDetail(
+    storeSlug ?? '',
+    productSlug ?? '',
+  )
+  const storeProduct = useProductPurchaseStore((s) => s.product)
+  const isStoreLoading = useProductPurchaseStore((s) => s.isLoading)
+
+  const product = storeProduct || queryProduct
+  const isLoading = !product && isStoreLoading
 
   if (isLoading) {
     return (
@@ -96,7 +109,11 @@ export function ProductSpecification() {
             </h3>
             <Separator className="flex-1" />
           </div>
-          <ul role="list" aria-label="แท็กสินค้า" className="flex flex-wrap gap-2">
+          <ul
+            role="list"
+            aria-label="แท็กสินค้า"
+            className="flex flex-wrap gap-2"
+          >
             {tags.map((tag) => (
               <li key={tag.name} className="list-none">
                 <Badge variant="outline" className="font-normal">

@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
 import { isVideoUrl } from '@/utils/media'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -6,8 +7,24 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyImage } from '../../../_components/EmptyImage'
 import { useProductPurchaseStore } from '../../store'
 
-export function ProductGalleryMain() {
-  const { product, isLoading, activeImageIndex } = useProductPurchaseStore()
+interface Props {
+  storeSlug?: string
+  productSlug?: string
+}
+
+export function ProductGalleryMain({ storeSlug, productSlug }: Props) {
+  const { data: queryProduct } = useStorefrontProductDetail(
+    storeSlug ?? '',
+    productSlug ?? '',
+  )
+  const {
+    product: storeProduct,
+    isLoading: isStoreLoading,
+    activeImageIndex,
+  } = useProductPurchaseStore()
+
+  const product = storeProduct || queryProduct
+  const isLoading = !product && isStoreLoading
 
   const activeImage = product?.images?.[activeImageIndex]
 
