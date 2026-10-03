@@ -15,6 +15,7 @@ import {
   createStore,
   deleteStore,
   getLandingStores,
+  StoreLandingItem,
   getStoreOptions,
   getStoreSetupStatus,
   getStores,
@@ -113,11 +114,16 @@ export function useDeleteStore() {
   })
 }
 
-export function useLandingStores(limit: number = 11) {
+export function useLandingStores(
+  limit: number = 11,
+  initialData?: StoreLandingItem[],
+) {
   return useQuery(
     queryOptions({
       queryKey: storeKeys.landing(limit),
       queryFn: async () => await getLandingStores(limit),
+      initialData,
+      staleTime: 60 * 1000,
     }),
   )
 }

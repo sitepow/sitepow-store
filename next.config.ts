@@ -4,8 +4,16 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const nextConfig: NextConfig = {
   output: 'standalone',
   compress: true,
-  poweredByHeader: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   experimental: {
+    optimizePackageImports: [
+      '@tabler/icons-react',
+      'lucide-react',
+      'radix-ui',
+      '@tanstack/react-query',
+    ],
     serverActions: {
       bodySizeLimit: '100mb',
       allowedOrigins: [

@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useLandingStores } from '@/actions/hooks/store'
+import { StoreLandingItem } from '@/actions/store'
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
@@ -18,10 +19,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { ActionRequiredAlert } from '../ActionRequiredAlert'
 
-export function StoresSection() {
+interface StoresSectionProps {
+  initialStores?: StoreLandingItem[]
+}
+
+export function StoresSection({ initialStores }: StoresSectionProps = {}) {
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
 
-  const { data: stores = [], isLoading } = useLandingStores()
+  const { data: stores = initialStores ?? [], isLoading } =
+    useLandingStores(11, initialStores)
   const { isAuthenticated } = useSession()
 
   const registerParams = new URLSearchParams()

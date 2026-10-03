@@ -1,11 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata, Viewport } from 'next'
-import {
-  Dancing_Script,
-  IBM_Plex_Sans_Thai_Looped,
-  Inter,
-} from 'next/font/google'
+import { IBM_Plex_Sans_Thai_Looped } from 'next/font/google'
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -14,22 +10,10 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
 const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
-  display: 'swap',
-})
-
-const dancingScript = Dancing_Script({
-  subsets: ['latin'],
-  variable: '--font-signature',
   display: 'swap',
 })
 
@@ -113,8 +97,6 @@ export default async function RootLayout({
         'h-full',
         'antialiased',
         ibmPlexSansThaiLooped.variable,
-        dancingScript.variable,
-        inter.variable,
         'font-sans',
       )}
       suppressHydrationWarning

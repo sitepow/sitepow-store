@@ -43,7 +43,12 @@ export function DesktopMenuItems() {
                 'font-bold opacity-60 hover:bg-transparent 2xl:text-lg',
               )}
             >
-              <Link href={item.href!}>{item.title}</Link>
+              <Link
+                href={item.href!}
+                className="inline-flex h-9 items-center justify-center px-4 py-2"
+              >
+                {item.title}
+              </Link>
             </NavigationMenuLink>
           )}
         </NavigationMenuItem>

@@ -1,7 +1,6 @@
 'use client'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 
 import Image from 'next/image'
 
@@ -19,6 +18,7 @@ interface FeatureDisplayProps {
   sectionHeader: ReactNode
   featuresList: any[]
   isLeft?: boolean
+  defaultActive?: boolean
 }
 
 export function FeatureDisplay({
@@ -26,10 +26,38 @@ export function FeatureDisplay({
   imageUrl,
   sectionHeader,
   featuresList,
+  defaultActive = false,
 }: FeatureDisplayProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
-    Autoplay({ delay: 3 * SECOND, stopOnInteraction: true, playOnInit: false }),
-  ])
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isActive, setIsActive] = useState(defaultActive)
+
+  useEffect(() => {
+    if (isActive) return
+    if (!containerRef.current || typeof IntersectionObserver === 'undefined') {
+      setIsActive(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsActive(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px' },
+    )
+
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [isActive])
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: false, active: isActive },
+    [
+      Autoplay({ delay: 3 * SECOND, stopOnInteraction: true, playOnInit: false }),
+    ],
+  )
 
   useEffect(() => {
     if (!emblaApi) return
@@ -63,7 +91,7 @@ export function FeatureDisplay({
   }, [emblaApi])
 
   return (
-    <SectionContainer className="gap-0">
+    <SectionContainer ref={containerRef} className="gap-0">
       <div className="relative overflow-hidden rounded-t-3xl bg-slate-900 p-8 text-white md:p-12">
         <div className="absolute inset-0">
           <Image
@@ -71,8 +99,8 @@ export function FeatureDisplay({
             alt=""
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover opacity-20"
-            width={800}
-            height={800}
+            fill
+            sizes="(max-width: 1024px) 100vw, 800px"
             loading="lazy"
           />
         </div>

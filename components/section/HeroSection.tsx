@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { AVATARS_SEED } from '@/constants/avartar'
+import { SECOND } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { useSession } from '@/hooks/use-session'
@@ -16,7 +17,10 @@ import { Button } from '../ui/button'
 
 export function HeroSection() {
   const { isAuthenticated } = useSession()
-  const { currentImage } = useLandingImages({ imageFolder: 'hero-section' })
+  const { currentImage } = useLandingImages({
+    imageFolder: 'hero-section',
+    intervalTime: 15 * SECOND,
+  })
 
   const registerParams = new URLSearchParams()
   registerParams.set('role', UserRole.MERCHANT)
@@ -99,7 +103,7 @@ export function HeroSection() {
                   transform: 'translateX(-50%)',
                   willChange: 'transform',
                 }}
-                className="rounded-full"
+                className="hidden sm:block rounded-full"
               />
             ))}
             <svg

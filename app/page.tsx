@@ -1,5 +1,6 @@
-
 import type { Metadata } from 'next'
+
+import { getLandingStores, StoreLandingItem } from '@/actions/store'
 
 import { MainLayout } from '@/components/layout/Layout'
 import { AiVerificationSection } from '@/components/section/AiVerificationSection'
@@ -62,7 +63,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  let initialStores: StoreLandingItem[] = []
+  try {
+    initialStores = await getLandingStores(11)
+  } catch {
+    // fallback gracefully
+  }
+
   return (
     <MainLayout className="-mt-12.5" id="main-content">
       <JsonLd />
@@ -84,7 +92,7 @@ export default function HomePage() {
       <SecurityTrustSection />
       <ComparisonSection />
       <PricingPhilosophySection />
-      <StoresSection />
+      <StoresSection initialStores={initialStores} />
     </MainLayout>
   )
 }

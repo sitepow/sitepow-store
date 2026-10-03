@@ -82,8 +82,8 @@ export function Navbar() {
             src={FALLBACK_IMAGE}
             alt=""
             aria-hidden="true"
-            width={800}
-            height={800}
+            fill
+            sizes="100vw"
             className="size-full object-cover opacity-40"
           />
         </div>

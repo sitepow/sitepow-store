@@ -11,6 +11,7 @@ export function FeatureSection() {
 
   return (
     <FeatureDisplay
+      defaultActive
       imageUrl="/images/landing/landing-orders-managers.jpeg"
       sectionHeader={
         <SectionHeader

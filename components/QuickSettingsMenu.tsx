@@ -59,10 +59,9 @@ export function QuickSettingsMenu({
         <Button
           variant={buttonVariant}
           size="icon-lg"
-          aria-label="ตั้งค่าทั่วไปและเปลี่ยนธีม"
         >
           <IconSettings className="size-[1.2rem]" aria-hidden="true" />
-          <span className="sr-only">Quick Settings</span>
+          <span className="sr-only">ตั้งค่าทั่วไปและเปลี่ยนธีม Quick Settings</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
