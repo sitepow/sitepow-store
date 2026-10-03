@@ -14,7 +14,7 @@ export default async function StoreProductPage({ params }: Props) {
   return (
     <StoreLayout>
       <SectionContainer>
-        <header className="mb-8 flex items-center justify-center text-center">
+        <header className="mb-8 flex flex-col items-center justify-center text-center">
           <h1 className="text-2xl font-bold text-foreground tracking-tight sm:text-3xl lg:text-4xl">
             สินค้าทั้งหมด
           </h1>
