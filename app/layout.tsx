@@ -1,8 +1,6 @@
 import { Toaster } from 'react-hot-toast'
 
-import type { Metadata } from 'next'
-// import { NextIntlClientProvider } from 'next-intl'
-// import { getMessages } from 'next-intl/server'
+import type { Metadata, Viewport } from 'next'
 import {
   Dancing_Script,
   IBM_Plex_Sans_Thai_Looped,
@@ -16,21 +14,36 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
 
 const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
+  display: 'swap',
 })
 
 const dancingScript = Dancing_Script({
   subsets: ['latin'],
   variable: '--font-signature',
+  display: 'swap',
 })
 
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://sitepow.store'
+    : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
 export const metadata: Metadata = {
-  title: 'Sitepow Store: ทุกเรื่องการค้าออนไลน์ จัดการให้ง่ายแค่ปลายนิ้ว',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร',
+    template: '%s | Sitepow Store',
+  },
   description:
     'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว เริ่มต้นเปิดร้านค้าออนไลน์ให้ง่ายในทุกขั้นตอน',
   keywords: [
@@ -40,29 +53,69 @@ export const metadata: Metadata = {
     'ระบบหลังบ้านร้านค้า',
     'ขายของออนไลน์',
     'โปรแกรมสต็อกสินค้า',
+    'POS',
+    'ตรวจสลิปอัตโนมัติ',
   ],
+  authors: [{ name: 'Sitepow Store' }],
+  creator: 'Sitepow Store',
+  publisher: 'Sitepow Store',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'th_TH',
+    url: BASE_URL,
+    siteName: 'Sitepow Store',
+    title: 'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร',
+    description:
+      'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sitepow Store | ระบบจัดการร้านค้าออนไลน์ ครบวงจร',
+    description:
+      'Sitepow ช่วยจัดการร้านค้าออนไลน์ครบวงจร ช่วยคุณจัดการสินค้า สต็อก และออเดอร์ได้ในที่เดียว',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default async function RootLayout({
   children,
-  // params,
 }: Readonly<{
   children: React.ReactNode
-  // params: Promise<{ lng: string }>
 }>) {
-  // const { lng } = await params
-  // const messages = await getMessages({ locale: lng })
-
   return (
     <html
-      // lang={lng}
+      lang="th"
       className={cn(
         'h-full',
         'antialiased',
         ibmPlexSansThaiLooped.variable,
         dancingScript.variable,
-        'font-sans',
         inter.variable,
+        'font-sans',
       )}
       suppressHydrationWarning
     >
@@ -74,9 +127,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster />
-          {/* <NextIntlClientProvider locale={lng} messages={messages}> */}
           <QueryProviders>{children}</QueryProviders>
-          {/* </NextIntlClientProvider> */}
         </ThemeProvider>
       </body>
     </html>

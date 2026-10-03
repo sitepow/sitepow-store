@@ -1,5 +1,7 @@
+'use client'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 import Image from 'next/image'
 
@@ -26,8 +28,34 @@ export function FeatureDisplay({
   featuresList,
 }: FeatureDisplayProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
-    Autoplay({ delay: 3 * SECOND, stopOnInteraction: true }),
+    Autoplay({ delay: 3 * SECOND, stopOnInteraction: true, playOnInit: false }),
   ])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    const autoplay = emblaApi.plugins()?.autoplay
+    if (!autoplay) return
+
+    const node = emblaApi.rootNode()
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      autoplay.play()
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          autoplay.play()
+        } else {
+          autoplay.stop()
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [emblaApi])
 
   return (
     <SectionContainer className="gap-0">
@@ -35,10 +63,12 @@ export function FeatureDisplay({
         <div className="absolute inset-0">
           <Image
             src={imageUrl}
-            alt="feature-landing-background"
+            alt=""
+            aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover opacity-20"
             width={800}
             height={800}
+            loading="lazy"
           />
         </div>
         <div className="relative z-10 grid min-w-0 gap-10 lg:grid-cols-2">

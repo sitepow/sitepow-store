@@ -87,8 +87,9 @@ export function ChatWidget({ conversationType, storeId }: ChatWidgetProps) {
         onClick={toggleChat}
         size="icon-lg"
         className="relative size-14 shadow-lg"
+        aria-label={isOpen ? 'ปิดหน้าต่างแชทช่วยเหลือ' : 'เปิดหน้าต่างแชทช่วยเหลือ'}
       >
-        {isOpen ? <X /> : <MessageCircle />}
+        {isOpen ? <X aria-hidden="true" /> : <MessageCircle aria-hidden="true" />}
         {unreadCount > 0 && (
           <CartBadge
             className="border-primary text-primary border bg-white"

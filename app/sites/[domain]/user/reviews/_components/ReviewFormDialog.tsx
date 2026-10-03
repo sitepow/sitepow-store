@@ -292,13 +292,20 @@ export function ReviewFormDialog({
                             <button
                               key={star}
                               type="button"
+                              aria-label={`ให้คะแนน ${star} ดาว`}
                               className="p-1 focus:outline-none"
                               onClick={() => field.onChange(star)}
                             >
                               {isFilled ? (
-                                <IconStarFilled className="size-8 text-amber-400" />
+                                <IconStarFilled
+                                  aria-hidden="true"
+                                  className="size-8 text-amber-400"
+                                />
                               ) : (
-                                <IconStar className="size-8 text-gray-300" />
+                                <IconStar
+                                  aria-hidden="true"
+                                  className="size-8 text-gray-300"
+                                />
                               )}
                             </button>
                           )

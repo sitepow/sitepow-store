@@ -2,15 +2,24 @@
 
 import { ComponentProps, Suspense } from 'react'
 
+import dynamic from 'next/dynamic'
+
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 
 import { cn } from '@/lib/utils'
 
-import { ChatWidget } from '../chat/ChatWidget'
-import { SupportWidget } from '../chat/SupportWidget'
 import { Footer } from './Footer'
 import { Navbar } from './navbar/Navbar'
+
+const ChatWidget = dynamic(
+  () => import('../chat/ChatWidget').then((mod) => mod.ChatWidget),
+  { ssr: false },
+)
+const SupportWidget = dynamic(
+  () => import('../chat/SupportWidget').then((mod) => mod.SupportWidget),
+  { ssr: false },
+)
 
 export function MainLayout({
   children,
@@ -22,9 +31,7 @@ export function MainLayout({
 
   return (
     <div className="bg-background flex flex-col gap-10">
-      <Suspense>
-        <Navbar />
-      </Suspense>
+      <Navbar />
 
       <main className={cn(className)} {...props}>
         {children}

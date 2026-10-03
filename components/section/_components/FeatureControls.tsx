@@ -8,16 +8,20 @@ interface FeatureControlsProps {
 export const FeatureControls = ({ onPrev, onNext }: FeatureControlsProps) => (
   <div className="mt-6 flex gap-2">
     <button
+      type="button"
       onClick={onPrev}
+      aria-label="สไลด์ก่อนหน้า"
       className="rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
     >
-      <ChevronLeft />
+      <ChevronLeft aria-hidden="true" />
     </button>
     <button
+      type="button"
       onClick={onNext}
+      aria-label="สไลด์ถัดไป"
       className="rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
     >
-      <ChevronRight />
+      <ChevronRight aria-hidden="true" />
     </button>
   </div>
 )

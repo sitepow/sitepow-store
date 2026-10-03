@@ -28,9 +28,16 @@ export function ModeToggle({ buttonVariant = 'outline' }: ModeToggleProps) {
           variant={buttonVariant}
           size="icon-lg"
           className="text-foreground"
+          aria-label="เปลี่ยนโหมดธีมสว่างหรือมืด"
         >
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+          <Sun
+            aria-hidden="true"
+            className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+          />
+          <Moon
+            aria-hidden="true"
+            className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+          />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>

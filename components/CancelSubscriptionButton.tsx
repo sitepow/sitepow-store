@@ -25,8 +25,13 @@ export function CancelSubscriptionButton({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="icon-lg" disabled={isPending}>
-          <IconX />
+        <Button
+          variant="outline"
+          size="icon-lg"
+          disabled={isPending}
+          aria-label="ยกเลิกแพลนการสมัครสมาชิก"
+        >
+          <IconX aria-hidden="true" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

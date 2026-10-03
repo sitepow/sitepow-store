@@ -3,6 +3,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  compress: true,
+  poweredByHeader: false,
   experimental: {
     serverActions: {
       bodySizeLimit: '100mb',
@@ -16,7 +18,21 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ['lvh.me', '*.lvh.me'],
   images: {
-    remotePatterns: [new URL('https://images.sitepow.store/**')],
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.sitepow.store',
+      },
+      {
+        protocol: 'https',
+        hostname: 'thesvg.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+      },
+    ],
   },
 }
 

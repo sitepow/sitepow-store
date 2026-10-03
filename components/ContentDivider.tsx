@@ -6,7 +6,7 @@ export function ContentDivider({ name }: { name: string }) {
   return (
     <div className="text-foreground flex w-full items-center">
       <Divider />
-      <p className="w-96 text-center font-bold opacity-50">{name}</p>
+      <p className="text-muted-foreground w-96 text-center text-xs font-semibold">{name}</p>
       <Divider />
     </div>
   )

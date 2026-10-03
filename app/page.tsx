@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 
 import type { Metadata } from 'next'
 
@@ -67,9 +66,7 @@ export default function HomePage() {
   return (
     <MainLayout className="-mt-12.5" id="main-content">
       <JsonLd />
-      <Suspense>
-        <HeroSection />
-      </Suspense>
+      <HeroSection />
       <FeatureSection />
       <ProductTypeSection />
       <POSSection />

@@ -132,7 +132,10 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl">
+    <main
+      id="main-content"
+      className="text-foreground container mx-auto flex min-h-[calc(100vh-80px)] flex-col justify-center gap-6 p-4 sm:p-10 lg:max-w-7xl"
+    >
       <div className="border-border bg-background sm:shadow-airy flex w-full overflow-hidden rounded-3xl border">
         <div
           style={{
@@ -241,6 +244,6 @@ export function RegisterForm() {
       </div>
       {currentRole !== UserRole.CUSTOMER && <SupportContact />}
       {currentRole === UserRole.CUSTOMER && <ProtectedByBrand />}
-    </div>
+    </main>
   )
 }

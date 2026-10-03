@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
 import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
@@ -34,7 +34,6 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { isAuthenticated, user, userRole } = useSession()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   const navbarItems = (
     [UserRole.SUPPORT, UserRole.CUSTOMER] as UserRole[]
@@ -42,16 +41,28 @@ export function Navbar() {
     ? SUPPORT_NAVIGATION
     : MERCHANT_NAVIGATION
 
-  const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
-
-  const authParams = new URLSearchParams()
-  authParams.set('role', UserRole.MERCHANT)
-  if (currentUrl && currentUrl !== '/') {
-    authParams.set('callbackUrl', currentUrl)
+  const initialAuthParams = new URLSearchParams()
+  initialAuthParams.set('role', UserRole.MERCHANT)
+  if (pathname && pathname !== '/') {
+    initialAuthParams.set('callbackUrl', pathname)
   }
 
-  const loginHref = `/login?${authParams.toString()}`
-  const registerHref = `/register?${authParams.toString()}`
+  const [loginHref, setLoginHref] = useState(`/login?${initialAuthParams.toString()}`)
+  const [registerHref, setRegisterHref] = useState(`/register?${initialAuthParams.toString()}`)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const search = window.location.search
+      const fullUrl = `${pathname}${search}`
+      if (fullUrl && fullUrl !== '/') {
+        const params = new URLSearchParams()
+        params.set('role', UserRole.MERCHANT)
+        params.set('callbackUrl', fullUrl)
+        setLoginHref(`/login?${params.toString()}`)
+        setRegisterHref(`/register?${params.toString()}`)
+      }
+    }
+  }, [pathname])
 
   const isEmailUnverified = isAuthenticated && !user?.emailVerified
 
@@ -69,7 +80,8 @@ export function Navbar() {
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <Image
             src={FALLBACK_IMAGE}
-            alt="footer-background"
+            alt=""
+            aria-hidden="true"
             width={800}
             height={800}
             className="size-full object-cover opacity-40"
@@ -118,6 +130,8 @@ export function Navbar() {
                 size="icon-lg"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-foreground hover:bg-transparent"
+                aria-label={isMenuOpen ? 'ปิดเมนูนำทาง' : 'เปิดเมนูนำทาง'}
+                aria-expanded={isMenuOpen}
               >
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </Button>

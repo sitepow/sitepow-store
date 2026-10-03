@@ -56,8 +56,12 @@ export function QuickSettingsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={buttonVariant} size="icon-lg">
-          <IconSettings className="size-[1.2rem]" />
+        <Button
+          variant={buttonVariant}
+          size="icon-lg"
+          aria-label="ตั้งค่าทั่วไปและเปลี่ยนธีม"
+        >
+          <IconSettings className="size-[1.2rem]" aria-hidden="true" />
           <span className="sr-only">Quick Settings</span>
         </Button>
       </DropdownMenuTrigger>

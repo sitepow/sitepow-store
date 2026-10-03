@@ -53,7 +53,10 @@ export function UserAvatarDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="focus:outline-none">
+      <DropdownMenuTrigger
+        className="focus:outline-none"
+        aria-label="เมนูผู้ใช้งาน"
+      >
         <Avatar
           size="lg"
           className={cn(

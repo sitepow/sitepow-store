@@ -27,10 +27,14 @@ export function HeroSection() {
   return (
     <section className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">
       <div className="absolute inset-0 z-0">
-        <div
-          key={currentImage}
-          className="animate-in fade-in absolute inset-0 size-full bg-cover bg-center opacity-40 duration-1000"
-          style={{ backgroundImage: `url('${currentImage}')` }}
+        <Image
+          src={currentImage || '/images/hero-section/section-1.jpeg'}
+          alt="Sitepow Store ระบบจัดการร้านค้าออนไลน์"
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="size-full object-cover object-center opacity-40"
         />
       </div>
       <div className="z-10 space-y-5">
@@ -81,6 +85,10 @@ export function HeroSection() {
                 height={size}
                 unoptimized
                 alt=""
+                role="presentation"
+                aria-hidden="true"
+                loading="lazy"
+                fetchPriority="low"
                 style={{
                   position: 'absolute',
                   left,
@@ -89,6 +97,7 @@ export function HeroSection() {
                   height: size,
                   animation: `gentle-bounce ${dur}s ease-in-out ${delay}s infinite`,
                   transform: 'translateX(-50%)',
+                  willChange: 'transform',
                 }}
                 className="rounded-full"
               />
@@ -99,6 +108,7 @@ export function HeroSection() {
                 animation: 'gentle-bounce 2.5s ease-in-out infinite',
                 width: '150vw',
                 transform: 'translateX(-50%)',
+                willChange: 'transform',
               }}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 1440 320"

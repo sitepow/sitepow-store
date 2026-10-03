@@ -48,9 +48,10 @@ export function CheckoutSection({
         {!isActive && isCompleted && !isDisabled && (
           <button
             onClick={onEdit}
+            aria-label={`แก้ไข ${title}`}
             className="flex items-center gap-1 text-xs font-medium hover:underline"
           >
-            <PencilIcon className="size-3" /> แก้ไข
+            <PencilIcon className="size-3" aria-hidden="true" /> แก้ไข
           </button>
         )}
       </div>

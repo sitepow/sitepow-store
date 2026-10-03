@@ -65,10 +65,14 @@ export function StoresSection() {
               <Image
                 key={currentImage}
                 className="animate-ken-burns fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
-                src={currentImage ?? ''}
+                src={
+                  currentImage ||
+                  '/images/shelf/premium_photo-1679003074247-9c70a2822cb6.avif'
+                }
                 width={800}
                 height={800}
-                alt="store-preview-image"
+                loading="lazy"
+                alt={store.name || 'ตัวอย่างร้านค้า Sitepow'}
               />
             </div>
             <CardContent className="flex flex-1 flex-col pb-5">

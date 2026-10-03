@@ -41,7 +41,12 @@ export function DeleteButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {children ?? (
-          <Button variant="outline" size="icon-lg" disabled={isPending}>
+          <Button
+            variant="outline"
+            size="icon-lg"
+            disabled={isPending}
+            aria-label={title || 'ลบข้อมูล'}
+          >
             {icon}
           </Button>
         )}

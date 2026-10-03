@@ -7,7 +7,7 @@ import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMediaQuery } from '@/hooks/use-media-query'
 
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const TAB_STYLE = {
   tabslist_mobile:
@@ -43,6 +43,16 @@ export function MerchantPricingTabs() {
           )
         })}
       </TabsList>
+      {PRICING_OPTIONS.map((plan) => (
+        <TabsContent
+          key={plan.value}
+          value={plan.value}
+          className="sr-only"
+          tabIndex={-1}
+        >
+          <span className="sr-only">{plan.label}</span>
+        </TabsContent>
+      ))}
     </Tabs>
   )
 }
