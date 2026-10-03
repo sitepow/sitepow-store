@@ -1,5 +1,6 @@
 'use client'
 
+
 import { PRODUCT_TYPE_FEATURES } from '@/constants/product-types'
 
 import { SectionHeader } from '../SectionHeader'

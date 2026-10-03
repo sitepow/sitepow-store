@@ -63,46 +63,47 @@ export function StoresSection({ initialStores }: StoresSectionProps = {}) {
 
       <div className="grid w-full gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {stores.map((store) => (
-          <Card
-            key={store.id}
-            className="group from-background relative flex h-full flex-col overflow-hidden bg-linear-to-t p-0 transition-all"
-          >
-            <div className="bg-muted relative h-48 w-full overflow-hidden">
-              <Image
-                key={currentImage}
-                className="animate-ken-burns fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
-                src={
-                  currentImage ||
-                  '/images/shelf/premium_photo-1679003074247-9c70a2822cb6.avif'
-                }
-                width={800}
-                height={800}
-                loading="lazy"
-                alt={store.name || 'ตัวอย่างร้านค้า Sitepow'}
-              />
-            </div>
-            <CardContent className="flex flex-1 flex-col pb-5">
-              <h3 className="mb-5 line-clamp-2 text-lg font-bold sm:text-xl">
-                {store.name}
-              </h3>
-              <ActionRequiredAlert
-                title="ปิดการค้นหา"
-                description="เนื่องจากเป็นร้านค้าตัวอย่าง เราจึงปิดการทำงานของ Search Engine
-                  เพื่อป้องกันไม่ให้ข้อมูลสินค้าในร้านตัวอย่างไปปรากฏในการค้นหาจริงของลูกค้า"
-              />
-              <div className="mt-6 flex items-end justify-end">
-                <Button variant="outline" asChild>
-                  <Link
-                    href={`https://${store.slug}.sitepow.store`}
-                    target="_blank"
-                  >
-                    เยี่ยมชมเว็บไซต์
-                    <IconArrowUpRight className="size-4" />
-                  </Link>
-                </Button>
+          <article key={store.id} className="h-full">
+            <Card className="group from-background relative flex h-full flex-col overflow-hidden bg-linear-to-t p-0 transition-all">
+              <div className="bg-muted relative h-48 w-full overflow-hidden">
+                <Image
+                  key={currentImage}
+                  className="animate-ken-burns fade-in relative size-full bg-cover bg-center object-cover object-center duration-1000"
+                  src={
+                    currentImage ||
+                    '/images/shelf/premium_photo-1679003074247-9c70a2822cb6.avif'
+                  }
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  alt={store.name || 'ตัวอย่างร้านค้า Sitepow'}
+                />
               </div>
-            </CardContent>
-          </Card>
+              <CardContent className="flex flex-1 flex-col pb-5">
+                <h3 className="mb-5 line-clamp-2 text-lg font-bold sm:text-xl">
+                  {store.name}
+                </h3>
+                <ActionRequiredAlert
+                  title="ปิดการค้นหา"
+                  description="เนื่องจากเป็นร้านค้าตัวอย่าง เราจึงปิดการทำงานของ Search Engine
+                    เพื่อป้องกันไม่ให้ข้อมูลสินค้าในร้านตัวอย่างไปปรากฏในการค้นหาจริงของลูกค้า"
+                />
+                <div className="mt-6 flex items-end justify-end">
+                  <Button variant="outline" asChild>
+                    <Link
+                      href={`https://${store.slug}.sitepow.store`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`เยี่ยมชมเว็บไซต์ร้านค้า ${store.name}`}
+                    >
+                      เยี่ยมชมเว็บไซต์
+                      <IconArrowUpRight className="size-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </article>
         ))}
         {isLoading &&
           Array.from({

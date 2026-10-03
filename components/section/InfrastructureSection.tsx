@@ -1,5 +1,6 @@
 'use client'
 
+
 import { INFRASTRUCTURE_FEATURES } from '@/constants/infrastructure'
 
 import { SectionHeader } from '../SectionHeader'

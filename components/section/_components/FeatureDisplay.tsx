@@ -54,9 +54,15 @@ export function FeatureDisplay({
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: false, active: isActive },
-    [
-      Autoplay({ delay: 3 * SECOND, stopOnInteraction: true, playOnInit: false }),
-    ],
+    isActive
+      ? [
+          Autoplay({
+            delay: 3 * SECOND,
+            stopOnInteraction: true,
+            playOnInit: false,
+          }),
+        ]
+      : [],
   )
 
   useEffect(() => {

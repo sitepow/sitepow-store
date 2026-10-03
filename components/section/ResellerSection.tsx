@@ -1,5 +1,6 @@
 'use client'
 
+
 import { RESELLER_FEATURES } from '@/constants/reseller'
 
 import { SectionHeader } from '../SectionHeader'

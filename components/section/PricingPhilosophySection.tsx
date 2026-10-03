@@ -1,5 +1,6 @@
 'use client'
 
+
 import { PHILOSOPHY_FEATURES } from '@/constants/pricing-philosophy'
 
 import { SectionHeader } from '../SectionHeader'

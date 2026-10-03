@@ -1,5 +1,6 @@
 'use client'
 
+
 import { POS_FEATURES } from '@/constants/pos'
 
 import { SectionHeader } from '../SectionHeader'

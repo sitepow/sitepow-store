@@ -20,16 +20,19 @@ export function PricingPackages() {
         <SectionHeader title="ฟีเจอร์ที่ทุกแพ็กเกจได้รับเหมือนกัน" />
         <Card className="mt-5 w-full">
           <CardContent>
-            <div className="grid w-full grid-cols-1 gap-4 text-start sm:grid-cols-2 lg:grid-cols-3">
+            <ul
+              role="list"
+              className="grid w-full grid-cols-1 gap-4 text-start sm:grid-cols-2 lg:grid-cols-3"
+            >
               {COMMON_FEATURES.map((feature, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
+                <li key={index} className="flex items-center gap-2 text-sm">
                   <div className="text-primary shrink-0" aria-hidden="true">
                     {feature.icon}
                   </div>
                   <span>{feature.text}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </CardContent>
         </Card>
       </SectionContainer>

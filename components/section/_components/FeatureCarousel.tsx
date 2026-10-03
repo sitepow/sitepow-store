@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react'
-
-import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMediaQuery } from '@/hooks/use-media-query'
 
 import { FeatureCard } from './FeatureCard'
 
 export const FeatureCarousel = ({ features, emblaRef }: any) => {
-  const isMounted = useIsMounted()
   const isDesktop = useMediaQuery('(min-width: 1536px)')
 
-  const shouldShowGrid = isMounted && isDesktop
+  const shouldShowGrid = isDesktop
 
   const groupedFeatures = useMemo(() => {
     return shouldShowGrid

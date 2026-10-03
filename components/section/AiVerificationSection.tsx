@@ -1,5 +1,6 @@
 'use client'
 
+
 import { AI_VERIFICATION_FEATURES } from '@/constants/aiVerification'
 
 import { SectionHeader } from '../SectionHeader'

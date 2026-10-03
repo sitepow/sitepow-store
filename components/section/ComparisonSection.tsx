@@ -7,6 +7,7 @@ import { CloseCircleIcon } from '@/components/icon/CloseCircle'
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -33,10 +34,15 @@ export function ComparisonSection() {
         description="ลองเช็คให้ชัดว่ากำไรเหลือเท่าไหร่หลังหักค่าธรรมเนียม และมาดูเหตุการณ์จริงที่คุณอาจต้องเจอเมื่อขายผ่านแพลตฟอร์ม"
       />
       <Table className="border text-start">
+        <TableCaption className="sr-only">
+          ตารางเปรียบเทียบค่าธรรมเนียมและคุณสมบัติระหว่างแพลตฟอร์มออนไลน์ทั่วไปกับ Sitepow Store
+        </TableCaption>
         <TableHeader>
           <TableRow>
             {PROFIT_COMPARISON.columns.map((col) => (
-              <TableHead key={col}>{col}</TableHead>
+              <TableHead key={col} scope="col">
+                {col}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -47,15 +53,19 @@ export function ComparisonSection() {
                 <TableCell
                   colSpan={PROFIT_COMPARISON.columns.length}
                   className="bg-primary font-semibold text-white"
+                  role="rowheader"
                 >
                   {category.name}
                 </TableCell>
               </TableRow>
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="text-foreground font-medium">
+                  <TableHead
+                    scope="row"
+                    className="text-foreground font-medium"
+                  >
                     {feature.label}
-                  </TableCell>
+                  </TableHead>
                   {feature.values.map((val, i) => (
                     <TableCell key={i}>
                       <div className="flex items-center gap-2">

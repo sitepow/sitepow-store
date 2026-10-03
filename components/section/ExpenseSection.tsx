@@ -1,5 +1,6 @@
 'use client'
 
+
 import { EXPENSE_FEATURES } from '@/constants/expenses'
 
 import { SectionHeader } from '../SectionHeader'

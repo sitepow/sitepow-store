@@ -91,21 +91,26 @@ export function Footer() {
               สร้างสรรค์ประสบการณ์ดิจิทัลที่ดีที่สุดสำหรับคุณ
               เชื่อมต่อทุกความเป็นไปได้ด้วยเทคโนโลยีที่ทันสมัย
             </p>
-            <p className="mt-4 text-sm leading-relaxed opacity-60">
+            <address className="not-italic mt-4 text-sm leading-relaxed opacity-60">
               อีเมล: {'-'} เลขประจำตัวผู้เสียภาษี: {'-'}
-            </p>
+            </address>
             <div className="mt-5 flex flex-wrap items-center gap-5">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                >
-                  {social.icon}
-                </a>
-              ))}
+              <nav aria-label="ช่องทางโซเชียลมีเดีย">
+                <ul className="flex flex-wrap items-center gap-5">
+                  {socialLinks.map((social) => (
+                    <li key={social.label}>
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={social.label}
+                      >
+                        {social.icon}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -115,16 +120,23 @@ export function Footer() {
               © {currentYear} Sitepow. All rights reserved.
             </p>
           </div>
-          <div className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8">
-            <div className="flex flex-wrap justify-center gap-5 text-sm sm:gap-6">
-              <Link href="/" className="hover:underline">
-                นโยบายความเป็นส่วนตัว
-              </Link>
-              <Link href="/" className="hover:underline">
-                ข้อตกลง และเงื่อนไข
-              </Link>
-            </div>
-          </div>
+          <nav
+            aria-label="ข้อกำหนดและนโยบายความเป็นส่วนตัว"
+            className="order-1 flex flex-col items-center gap-6 md:order-2 md:flex-row md:gap-8"
+          >
+            <ul className="flex flex-wrap justify-center gap-5 text-sm sm:gap-6">
+              <li>
+                <Link href="/" className="hover:underline">
+                  นโยบายความเป็นส่วนตัว
+                </Link>
+              </li>
+              <li>
+                <Link href="/" className="hover:underline">
+                  ข้อตกลง และเงื่อนไข
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </footer>

@@ -1,5 +1,6 @@
 'use client'
 
+
 import { SECURITY_FEATURES } from '@/constants/security-trust'
 
 import { SectionHeader } from '../SectionHeader'

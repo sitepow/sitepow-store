@@ -1,5 +1,6 @@
 'use client'
 
+
 import { LOGISTICS_FEATURES } from '@/constants/logistics'
 
 import { SectionHeader } from '../SectionHeader'

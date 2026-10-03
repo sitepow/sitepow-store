@@ -1,7 +1,3 @@
-'use client'
-
-import { useIsMounted } from '@/hooks/use-is-mounted'
-
 import { cn } from '@/lib/utils'
 
 import { PointerHighlight } from './ui/pointer-highlight'
@@ -12,11 +8,7 @@ interface HighlightParserProps {
 }
 
 export function HighlightParser({ text, className }: HighlightParserProps) {
-  const isMounted = useIsMounted()
-
-  if (!isMounted) {
-    return
-  }
+  if (!text) return null
   const parts = text.split(/(<hilight>.*?<\/hilight>)/g)
 
   return (
@@ -27,10 +19,17 @@ export function HighlightParser({ text, className }: HighlightParserProps) {
           return (
             <PointerHighlight
               key={index}
-              rectangleClassName="bg-neutral-700 border-neutral-600"
+              rectangleClassName="bg-neutral-700/70 border-neutral-600"
               pointerClassName="text-yellow-500"
             >
-              <span className={cn('relative z-10', className)}>{content}</span>
+              <mark
+                className={cn(
+                  'relative z-10 bg-transparent text-inherit font-inherit',
+                  className,
+                )}
+              >
+                {content}
+              </mark>
             </PointerHighlight>
           )
         }

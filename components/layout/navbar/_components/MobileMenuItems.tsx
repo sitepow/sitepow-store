@@ -20,36 +20,45 @@ export function MobileMenuItems({
   registerHref,
 }: MobileMenuItemsProps) {
   return (
-    <div className="flex flex-col space-y-4 px-6 py-8">
-      {NAVBAR_ITEMS.map((item, idx) => (
-        <div key={idx} className="flex flex-col">
-          {item.children ? (
-            <div className="space-y-4">
-              <p className="text-sm font-bold opacity-40">{item.title}</p>
-              <div className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4">
-                {item.children.map((child) => (
-                  <Link
-                    key={child.title}
-                    href={child.href}
-                    onClick={onClose}
-                    className="active:text-primary text-lg font-semibold opacity-80"
-                  >
-                    {child.title}
-                  </Link>
-                ))}
+    <nav
+      aria-label="เมนูหลักสำหรับมือถือ"
+      className="flex flex-col space-y-4 px-6 py-8"
+    >
+      <ul className="flex flex-col space-y-4" role="list">
+        {NAVBAR_ITEMS.map((item, idx) => (
+          <li key={idx} className="flex flex-col">
+            {item.children ? (
+              <div className="space-y-4">
+                <p className="text-sm font-bold opacity-40">{item.title}</p>
+                <ul
+                  role="list"
+                  className="border-border ml-2 flex flex-col space-y-4 border-l-2 pl-4"
+                >
+                  {item.children.map((child) => (
+                    <li key={child.title}>
+                      <Link
+                        href={child.href}
+                        onClick={onClose}
+                        className="active:text-primary text-lg font-semibold opacity-80"
+                      >
+                        {child.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
-          ) : (
-            <Link
-              href={item.href!}
-              onClick={onClose}
-              className="text-foreground text-xl font-bold"
-            >
-              {item.title}
-            </Link>
-          )}
-        </div>
-      ))}
+            ) : (
+              <Link
+                href={item.href!}
+                onClick={onClose}
+                className="text-foreground text-xl font-bold"
+              >
+                {item.title}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
       {!isAuthenticated && (
         <>
           <div className="pt-4">
@@ -73,6 +82,6 @@ export function MobileMenuItems({
           </div>
         </>
       )}
-    </div>
+    </nav>
   )
 }

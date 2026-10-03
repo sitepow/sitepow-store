@@ -1,5 +1,6 @@
 'use client'
 
+
 import { INVENTORY_FEATURES } from '@/constants/inventory'
 
 import { SectionHeader } from '../SectionHeader'

@@ -19,7 +19,7 @@ export function HeroSection() {
   const { isAuthenticated } = useSession()
   const { currentImage } = useLandingImages({
     imageFolder: 'hero-section',
-    intervalTime: 15 * SECOND,
+    intervalTime: 60 * SECOND,
   })
 
   const registerParams = new URLSearchParams()
@@ -29,7 +29,10 @@ export function HeroSection() {
   const registerHref = `/register?${registerParams.toString()}`
 
   return (
-    <section className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10">
+    <section
+      aria-label="แนะนำ Sitepow Store"
+      className="relative flex h-screen flex-col items-center justify-center gap-5 overflow-hidden bg-neutral-900 px-5 pt-37.5 pb-96 text-center text-white sm:px-10"
+    >
       <div className="absolute inset-0 z-0">
         <Image
           src={currentImage || '/images/hero-section/section-1.jpeg'}
@@ -37,6 +40,7 @@ export function HeroSection() {
           fill
           priority
           fetchPriority="high"
+          quality={65}
           sizes="100vw"
           className="size-full object-cover object-center opacity-40"
         />
@@ -54,17 +58,19 @@ export function HeroSection() {
         />
         <div className="dark flex flex-wrap justify-center gap-2.5 px-10 text-white">
           <Button variant="outline" size="lg" asChild>
-            <Link href="/pricing">ดูราคาและแพ็กเกจ</Link>
+            <Link href="/pricing" prefetch={false}>
+              ดูราคาและแพ็กเกจ
+            </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
-            <Link href="/">
+            <Link href="/" prefetch={false}>
               <IconDownload />
               ดาวน์โหลดโปรแกรม POS (เร็วๆนี้)
             </Link>
           </Button>
           {!isAuthenticated && (
             <Button size="lg" asChild>
-              <Link href={registerHref}>
+              <Link href={registerHref} prefetch={false}>
                 สมัครเปิดร้านฟรี
                 <ArrowRight />
               </Link>
@@ -72,7 +78,7 @@ export function HeroSection() {
           )}
           {isAuthenticated && (
             <Button size="lg" asChild>
-              <Link href="/merchant/dashboard">
+              <Link href="/merchant/dashboard" prefetch={false}>
                 จัดการร้านค้าของคุณ
                 <ArrowRight />
               </Link>

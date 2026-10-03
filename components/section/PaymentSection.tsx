@@ -1,5 +1,6 @@
 'use client'
 
+
 import { PAYMENTS_FEATURES } from '@/constants/payment'
 
 import { SectionHeader } from '../SectionHeader'

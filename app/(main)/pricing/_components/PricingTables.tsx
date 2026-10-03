@@ -9,6 +9,7 @@ import { CloseCircleIcon } from '@/components/icon/CloseCircle'
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -20,11 +21,16 @@ export function PricingTables() {
     <SectionContainer>
       <SectionHeader title="เปรียบเทียบ ความสามารถของแต่ละ Package" />
       <Table className="border">
+        <TableCaption className="sr-only">
+          เปรียบเทียบความสามารถของแต่ละแพ็กเกจ Sitepow Store
+        </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>เลือก Package ที่เหมาะกับคุณ</TableHead>
+            <TableHead scope="col">เลือก Package ที่เหมาะกับคุณ</TableHead>
             {PRICING_TABLES.tiers.map((tier) => (
-              <TableHead key={tier}>{tier}</TableHead>
+              <TableHead key={tier} scope="col">
+                {tier}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -35,15 +41,19 @@ export function PricingTables() {
                 <TableCell
                   colSpan={PRICING_TABLES.tiers.length + 1}
                   className="bg-primary text-start font-semibold text-white"
+                  role="rowheader"
                 >
                   {category.name}
                 </TableCell>
               </TableRow>
               {category.features.map((feature, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="text-foreground text-start">
+                  <TableHead
+                    scope="row"
+                    className="text-foreground text-start"
+                  >
                     {feature.label}
-                  </TableCell>
+                  </TableHead>
                   {feature.access.map((hasAccess, i) => (
                     <TableCell key={i} className="text-center">
                       {hasAccess ? <CheckCircleIcon /> : <CloseCircleIcon />}

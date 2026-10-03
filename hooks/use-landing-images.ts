@@ -53,7 +53,7 @@ export function useLandingImages({
   }, [imageFolder, initialImages.length])
 
   useEffect(() => {
-    if (images.length === 0) {
+    if (images.length <= 1) {
       return
     }
 
@@ -62,7 +62,7 @@ export function useLandingImages({
     }, intervalTime)
 
     return () => clearInterval(interval)
-  }, [images, intervalTime])
+  }, [images.length, intervalTime])
 
   return {
     currentImage: images[currentIdx] || initialImages[0] || '',

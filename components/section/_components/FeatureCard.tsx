@@ -32,9 +32,9 @@ export function FeatureCard({
           <h3 className="text-xl font-bold sm:text-2xl">{title}</h3>
         </CardHeader>
         <CardContent className="-mt-5">
-          <div className="text-lg leading-relaxed opacity-60">
+          <p className="text-lg leading-relaxed opacity-60">
             <HighlightParser text={description} />
-          </div>
+          </p>
           {image && (
             <div className="border-border relative mt-6 overflow-hidden rounded-xl border-2 border-dashed">
               <div className="flex h-48 w-full items-center justify-center" />

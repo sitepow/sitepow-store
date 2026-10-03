@@ -1,5 +1,6 @@
 'use client'
 
+
 import { CUSTOMER_LOYALTY_FEATURES } from '@/constants/customerLoyalty'
 
 import { SectionHeader } from '../SectionHeader'
