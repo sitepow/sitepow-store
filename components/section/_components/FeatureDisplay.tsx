@@ -44,10 +44,15 @@ export function FeatureDisplay({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          autoplay.play()
-        } else {
-          autoplay.stop()
+        try {
+          if (!autoplay || emblaApi.scrollSnapList().length <= 1) return
+          if (entry.isIntersecting) {
+            autoplay.play()
+          } else {
+            autoplay.stop()
+          }
+        } catch {
+          // Autoplay safely ignored if carousel has only 1 snap or is uninitialized
         }
       },
       { threshold: 0.1 },
