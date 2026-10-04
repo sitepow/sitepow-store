@@ -43,9 +43,9 @@ import {
 } from '@tabler/icons-react'
 import { ChevronLeftIcon } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { HighlightText } from '@/components/HighlightText'
-import { SectionContainer } from '@/components/SectionContainer'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { HighlightText } from '@/components/shared/HighlightText'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { RadioGroup } from '@/components/ui/radio-group'

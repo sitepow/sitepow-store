@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
+import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 
 interface DesktopGuestActionsProps {

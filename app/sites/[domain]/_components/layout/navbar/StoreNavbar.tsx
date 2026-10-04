@@ -11,10 +11,10 @@ import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
-import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrandText } from '@/components/LogoBrandText'
-import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
-import { StoreLogo } from '@/components/StoreLogo'
+import { EmailVerified } from '@/components/auth/EmailVerified'
+import { LogoBrandText } from '@/components/brand/LogoBrandText'
+import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
+import { StoreLogo } from '@/components/brand/StoreLogo'
 import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,

@@ -20,8 +20,8 @@ import { POSCheckoutInput, posCheckoutSchema } from '@/zod/sales/pos-checkout'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { CustomerCard } from '@/components/CustomerCard'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { CustomerCard } from '@/components/customer/CustomerCard'
 import { Button } from '@/components/ui/button'
 import {
   Card,

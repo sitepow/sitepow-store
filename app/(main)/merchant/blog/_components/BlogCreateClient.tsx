@@ -8,9 +8,9 @@ import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconPlus } from '@tabler/icons-react'
 import { ArrowLeftIcon } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
+import { StoreSelectField } from '@/components/form/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 

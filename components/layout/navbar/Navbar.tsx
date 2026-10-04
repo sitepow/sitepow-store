@@ -14,9 +14,9 @@ import { useSession } from '@/hooks/use-session'
 import { IconLogin } from '@tabler/icons-react'
 import { Menu, X } from 'lucide-react'
 
-import { EmailVerified } from '@/components/EmailVerified'
-import { LogoBrand } from '@/components/LogoBrand'
-import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
+import { EmailVerified } from '@/components/auth/EmailVerified'
+import { LogoBrand } from '@/components/brand/LogoBrand'
+import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,

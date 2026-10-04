@@ -11,7 +11,7 @@ import { AddressSchema, addressSchema } from '@/zod/shared/address'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 
-import { CreateInput } from '@/components/AddressAutoField'
+import { CreateInput } from '@/components/form/AddressAutoField'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

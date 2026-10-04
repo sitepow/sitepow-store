@@ -16,8 +16,8 @@ import { formatDate } from '@/utils/formatting/date'
 import { formatCurrency } from '@/utils/formatting/number'
 import { IconArrowRight, IconDownload } from '@tabler/icons-react'
 
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

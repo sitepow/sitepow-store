@@ -17,10 +17,10 @@ import {
 } from '@tabler/icons-react'
 import { CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { ProductImage } from '@/components/ProductImage'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { ProductImage } from '@/components/brand/ProductImage'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

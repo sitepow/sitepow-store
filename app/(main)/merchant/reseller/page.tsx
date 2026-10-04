@@ -22,10 +22,10 @@ import {
 } from '@tabler/icons-react'
 import { XIcon } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { PageTabHeader } from '@/components/PageTabHeader'
-import { ResellerAgreementSelectField } from '@/components/ResellerAgreementSelectField'
-import { StoreSelectField } from '@/components/StoreSelectField'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
+import { ResellerAgreementSelectField } from '@/components/form/ResellerAgreementSelectField'
+import { StoreSelectField } from '@/components/form/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 

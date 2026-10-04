@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useStorefrontBlogs } from '@/actions/storefront/blog/hooks'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 
 import { StorePagination } from '../../_components/Pagination'
 import { BlogCard } from '../../_components/blog/BlogCard'

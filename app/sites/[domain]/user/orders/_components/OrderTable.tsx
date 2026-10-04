@@ -15,9 +15,9 @@ import { formatDateTime } from '@/utils/formatting/date'
 import { formatCurrency } from '@/utils/formatting/number'
 import { IconCreditCard, IconX } from '@tabler/icons-react'
 
-import { DeleteButton } from '@/components/DeleteButton'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

@@ -21,8 +21,8 @@ import { createEmployeeSchema } from '@/zod/store/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconKey, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { MultiSelect } from '@/components/MultiSelect'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { MultiSelect } from '@/components/form/MultiSelect'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

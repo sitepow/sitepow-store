@@ -15,8 +15,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBell } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'

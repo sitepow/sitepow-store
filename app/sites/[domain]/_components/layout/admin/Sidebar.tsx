@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 import { LayoutDashboard, Package, PlusCircle, Settings } from 'lucide-react'
 
-import { LogoBrand } from '@/components/LogoBrand'
+import { LogoBrand } from '@/components/brand/LogoBrand'
 import {
   Sidebar,
   SidebarContent,

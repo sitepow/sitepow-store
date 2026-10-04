@@ -7,10 +7,10 @@ import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
-import { DeleteButton } from '@/components/DeleteButton'
-import { ProductImage } from '@/components/ProductImage'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { ProductImage } from '@/components/brand/ProductImage'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
   Table,

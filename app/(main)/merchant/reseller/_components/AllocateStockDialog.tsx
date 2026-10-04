@@ -18,8 +18,8 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 
-import { BranchSelectField } from '@/components/BranchSelectField'
-import { ProductImage } from '@/components/ProductImage'
+import { BranchSelectField } from '@/components/form/BranchSelectField'
+import { ProductImage } from '@/components/brand/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

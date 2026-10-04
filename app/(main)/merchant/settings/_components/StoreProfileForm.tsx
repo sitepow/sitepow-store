@@ -17,9 +17,9 @@ import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store/store-pr
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBuildingStore } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreLogo } from '@/components/StoreLogo'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
+import { StoreLogo } from '@/components/brand/StoreLogo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import {

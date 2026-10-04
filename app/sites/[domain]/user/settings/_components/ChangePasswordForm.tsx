@@ -10,7 +10,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconLock } from '@tabler/icons-react'
 
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'

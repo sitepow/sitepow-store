@@ -22,7 +22,7 @@ import {
   IconReceipt,
 } from '@tabler/icons-react'
 
-import { CustomerCard } from '@/components/CustomerCard'
+import { CustomerCard } from '@/components/customer/CustomerCard'
 import { OrderItemsSummary } from '@/components/order/ItemsSummary'
 import { OrderStatusBadges } from '@/components/order/StatusBadges'
 import { Button } from '@/components/ui/button'

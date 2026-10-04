@@ -20,9 +20,9 @@ import {
   IconX,
 } from '@tabler/icons-react'
 
-import { BranchSelectField } from '@/components/BranchSelectField'
-import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
+import { BranchSelectField } from '@/components/form/BranchSelectField'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
+import { StoreSelectField } from '@/components/form/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 

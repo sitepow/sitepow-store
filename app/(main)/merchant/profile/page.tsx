@@ -7,7 +7,7 @@ import { UpdateProfileSchema, updateProfileSchema } from '@/zod/account/profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconUser } from '@tabler/icons-react'
 
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Sidebar } from '@/components/layout/Sidebar'
 
 import { ProfileAvartar } from './_components/ProfileAvartar'

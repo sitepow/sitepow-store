@@ -4,7 +4,7 @@ import { CartItem } from '@/types/sites/cart'
 import { formatCurrency } from '@/utils/formatting/number'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 
-import { ProductImage } from '@/components/ProductImage'
+import { ProductImage } from '@/components/brand/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 

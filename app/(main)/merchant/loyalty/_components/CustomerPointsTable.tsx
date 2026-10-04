@@ -9,8 +9,8 @@ import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
   Card,

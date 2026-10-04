@@ -8,8 +8,8 @@ import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/Su
 import { calculateOrderSummary } from '@/utils/order/order-calculation'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 
-import { HighlightText } from '../HighlightText'
-import { ProductImage } from '../ProductImage'
+import { HighlightText } from '@/components/shared/HighlightText'
+import { ProductImage } from '@/components/brand/ProductImage'
 
 export interface OrderItemsSummaryProps {
   order: GetOrdersItem | GetStorefrontOrderItemSerialized

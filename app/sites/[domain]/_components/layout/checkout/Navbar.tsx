@@ -4,8 +4,8 @@ import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { LockKeyholeIcon } from 'lucide-react'
 
-import { LogoBrandText } from '@/components/LogoBrandText'
-import { StoreLogo } from '@/components/StoreLogo'
+import { LogoBrandText } from '@/components/brand/LogoBrandText'
+import { StoreLogo } from '@/components/brand/StoreLogo'
 import { Button } from '@/components/ui/button'
 
 export function StoreNavbarCheckout() {

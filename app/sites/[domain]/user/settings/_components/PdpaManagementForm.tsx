@@ -8,8 +8,8 @@ import {
 } from '@/actions/storefront/pdpa/hooks'
 import { IconShieldLock } from '@tabler/icons-react'
 
-import { DeleteButton } from '@/components/DeleteButton'
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 

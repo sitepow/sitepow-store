@@ -17,10 +17,10 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { DeleteButton } from '@/components/DeleteButton'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
   Table,

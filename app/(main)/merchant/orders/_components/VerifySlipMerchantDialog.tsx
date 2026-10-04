@@ -10,7 +10,7 @@ import { formatCurrency } from '@/utils/formatting/number'
 import { formatBankAccount } from '@/utils/formatting/promptpay-phone'
 import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

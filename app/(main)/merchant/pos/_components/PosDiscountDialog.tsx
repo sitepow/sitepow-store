@@ -28,8 +28,8 @@ import {
   IconX,
 } from '@tabler/icons-react'
 
-import { CustomerCard } from '@/components/CustomerCard'
-import { HighlightText } from '@/components/HighlightText'
+import { CustomerCard } from '@/components/customer/CustomerCard'
+import { HighlightText } from '@/components/shared/HighlightText'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

@@ -18,7 +18,7 @@ import { ChangePlanFormValues, changePlanSchema } from '@/zod/billing/change-pla
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 
-import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
+import { MerchantPricingTabs } from '@/components/billing/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

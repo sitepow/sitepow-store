@@ -1,7 +1,7 @@
 import { HOW_TO_ORDER_PAGE } from '@/constants/storefront/page'
 
-import { MarkdownRenderer } from '@/components/MarkdownRenderer'
-import { SectionContainer } from '@/components/SectionContainer'
+import { MarkdownRenderer } from '@/components/editor/MarkdownRenderer'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 
 import { StoreLayout } from '../_components/layout/Layout'
 

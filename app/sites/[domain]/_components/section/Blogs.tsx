@@ -2,8 +2,8 @@
 
 import { useStorefrontBlogs } from '@/actions/storefront/blog/hooks'
 
-import { SectionContainer } from '@/components/SectionContainer'
-import { SectionHeader } from '@/components/SectionHeader'
+import { SectionContainer } from '@/components/layout/SectionContainer'
+import { SectionHeader } from '@/components/layout/SectionHeader'
 
 import { SeeMoreButton } from '../SeeMoreButton'
 import { BlogCard } from '../blog/BlogCard'

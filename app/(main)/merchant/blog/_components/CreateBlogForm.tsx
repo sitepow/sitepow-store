@@ -21,7 +21,7 @@ import { BlogFormValues, blogFormSchema } from '@/zod/catalog/blog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconTrash, IconUpload, IconWand, IconX } from '@tabler/icons-react'
 
-import BlogEditor from '@/components/BlogEditor'
+import BlogEditor from '@/components/editor/BlogEditor'
 import {
   AlertDialog,
   AlertDialogAction,

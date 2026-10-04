@@ -6,9 +6,9 @@ import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { OpeningHours } from '@/types/branch'
 
-import { LogoBrandText } from '@/components/LogoBrandText'
-import { ProtectedByBrand } from '@/components/ProtectedByBrand'
-import { StoreLogo } from '@/components/StoreLogo'
+import { LogoBrandText } from '@/components/brand/LogoBrandText'
+import { ProtectedByBrand } from '@/components/brand/ProtectedByBrand'
+import { StoreLogo } from '@/components/brand/StoreLogo'
 
 export function StoreFooter() {
   const { store } = useStoreData()

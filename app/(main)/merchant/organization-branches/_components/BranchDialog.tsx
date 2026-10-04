@@ -15,7 +15,7 @@ import { CreateBranchFormValues, createBranchSchema } from '@/zod/store/branch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 
-import { CreateInput } from '@/components/AddressAutoField'
+import { CreateInput } from '@/components/form/AddressAutoField'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

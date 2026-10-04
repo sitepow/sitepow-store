@@ -3,7 +3,7 @@
 import { BUYER_NAVIGATION } from '@/constants/store/navigation'
 import { IconPackage } from '@tabler/icons-react'
 
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Sidebar } from '@/components/layout/Sidebar'
 
 import { OrderTable } from './_components/OrderTable'

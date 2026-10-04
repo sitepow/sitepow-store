@@ -14,7 +14,7 @@ import { CreateStoreFormValues, createStoreSchema } from '@/zod/store/create-sto
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 
-import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
+import { MerchantPricingTabs } from '@/components/billing/MerchantPricingTabs'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

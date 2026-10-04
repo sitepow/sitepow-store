@@ -16,9 +16,9 @@ import {
   IconReceipt,
 } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import {
   Table,
   TableBody,

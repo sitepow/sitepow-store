@@ -20,8 +20,8 @@ import { ShippingFormValues, shippingFormSchema } from '@/zod/store/shipping-set
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'

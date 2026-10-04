@@ -4,7 +4,7 @@ import { Message as PrismaMessage } from '@/generated/prisma/client'
 import { UserRole } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 
-import { MarkdownRenderer } from '@/components/MarkdownRenderer'
+import { MarkdownRenderer } from '@/components/editor/MarkdownRenderer'
 
 import { cn } from '@/lib/utils'
 

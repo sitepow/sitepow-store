@@ -12,7 +12,7 @@ import { getQueryClient } from '@/lib/query/get-query-client'
 import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant/seo'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
-import { SectionContainer } from '@/components/SectionContainer'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 import { TenantProductJsonLd } from '@/components/seo/TenantProductJsonLd'
 
 import { StoreLayout } from '../../_components/layout/Layout'

@@ -12,8 +12,8 @@ import { calculateMonthlyAverage, getSubscriptionStatusInfo } from '@/utils/bill
 import { IconAlertTriangle, IconX } from '@tabler/icons-react'
 import { differenceInDays } from 'date-fns'
 
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'

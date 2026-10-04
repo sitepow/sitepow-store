@@ -21,9 +21,9 @@ import {
   IconWorld,
 } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { DeleteButton } from '@/components/DeleteButton'
-import { PageTabHeader } from '@/components/PageTabHeader'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

@@ -2,9 +2,9 @@
 
 import { useStorefrontProducts } from '@/actions/storefront/product/hooks'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { SectionContainer } from '@/components/SectionContainer'
-import { SectionHeader } from '@/components/SectionHeader'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { SectionContainer } from '@/components/layout/SectionContainer'
+import { SectionHeader } from '@/components/layout/SectionHeader'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { SeeMoreButton } from '../SeeMoreButton'

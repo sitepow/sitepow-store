@@ -20,10 +20,10 @@ import {
   IconWorld,
 } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { BranchSelectField } from '@/components/BranchSelectField'
-import { PageTabHeader } from '@/components/PageTabHeader'
-import { StoreSelectField } from '@/components/StoreSelectField'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { BranchSelectField } from '@/components/form/BranchSelectField'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
+import { StoreSelectField } from '@/components/form/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 

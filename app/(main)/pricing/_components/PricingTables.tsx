@@ -2,8 +2,8 @@ import React from 'react'
 
 import { PRICING_TABLES } from '@/constants/billing/pricing'
 
-import { SectionContainer } from '@/components/SectionContainer'
-import { SectionHeader } from '@/components/SectionHeader'
+import { SectionContainer } from '@/components/layout/SectionContainer'
+import { SectionHeader } from '@/components/layout/SectionHeader'
 import { CheckCircleIcon } from '@/components/icon/CheckCircle'
 import { CloseCircleIcon } from '@/components/icon/CloseCircle'
 import {

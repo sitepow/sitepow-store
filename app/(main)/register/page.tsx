@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
-import { RegisterForm } from '@/components/RegisterForm'
+import { RegisterForm } from '@/components/auth/RegisterForm'
 
 import { getCurrentUser } from '@/lib/auth/server'
 

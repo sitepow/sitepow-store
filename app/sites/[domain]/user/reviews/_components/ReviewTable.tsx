@@ -10,8 +10,8 @@ import { usePurchasableProducts } from '@/actions/storefront/review/hooks'
 import { formatDateTime } from '@/utils/formatting/date'
 import { IconMessagePlus, IconStarFilled } from '@tabler/icons-react'
 
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Button } from '@/components/ui/button'
 import {
   Table,

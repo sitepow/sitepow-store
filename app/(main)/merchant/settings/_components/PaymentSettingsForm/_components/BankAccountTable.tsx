@@ -9,8 +9,8 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconEdit } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
-import { DeleteButton } from '@/components/DeleteButton'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { DeleteButton } from '@/components/shared/DeleteButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {

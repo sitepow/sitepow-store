@@ -16,7 +16,7 @@ import { ProductFormValues } from '@/zod/catalog/product'
 import { IconTrash } from '@tabler/icons-react'
 import { ImagePlus, PlusCircle, X } from 'lucide-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {

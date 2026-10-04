@@ -12,7 +12,7 @@ import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart/cart-cal
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { calculateNetPrice } from '@/utils/product/product-calculation'
 
-import { ProductImage } from '@/components/ProductImage'
+import { ProductImage } from '@/components/brand/ProductImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'

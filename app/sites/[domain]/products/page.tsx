@@ -1,4 +1,4 @@
-import { SectionContainer } from '@/components/SectionContainer'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 
 import { StoreLayout } from '../_components/layout/Layout'
 import { ProductFilterControl } from './_components/ProductFilterControl'

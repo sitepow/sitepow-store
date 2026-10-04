@@ -2,9 +2,9 @@ import { Suspense } from 'react'
 
 import type { Metadata } from 'next'
 
-import { MerchantPricingTabs } from '@/components/MerchantPricingTabs'
+import { MerchantPricingTabs } from '@/components/billing/MerchantPricingTabs'
 import { MainLayout } from '@/components/layout/Layout'
-import { PricingSection } from '@/components/section/PricingSection'
+import { PricingSection } from '@/components/landing/sections/PricingSection'
 
 import { PricingPackages } from './_components/PricingPackages'
 import { PricingTables } from './_components/PricingTables'

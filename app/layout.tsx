@@ -6,7 +6,7 @@ import { IBM_Plex_Sans_Thai_Looped } from 'next/font/google'
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
 
-import { ThemeProvider } from '@/components/ThemeProvider'
+import { ThemeProvider } from '@/components/shared/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 

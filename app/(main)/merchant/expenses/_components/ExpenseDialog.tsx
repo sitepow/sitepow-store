@@ -20,7 +20,7 @@ import { ExpenseFormValues, createExpenseSchema } from '@/zod/finance/expense'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconX } from '@tabler/icons-react'
 
-import { FileUpload } from '@/components/FileUpload'
+import { FileUpload } from '@/components/form/FileUpload'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {

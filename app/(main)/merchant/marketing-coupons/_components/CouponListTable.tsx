@@ -8,9 +8,9 @@ import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatShortDate } from '@/utils/formatting/date'
 import { IconCalendar, IconHierarchy } from '@tabler/icons-react'
 
-import { DeleteButton } from '@/components/DeleteButton'
-import { TableEmptyRow } from '@/components/TableEmptyRow'
-import { TableLoadingRow } from '@/components/TableLoadingRow'
+import { DeleteButton } from '@/components/shared/DeleteButton'
+import { TableEmptyRow } from '@/components/table/TableEmptyRow'
+import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import {

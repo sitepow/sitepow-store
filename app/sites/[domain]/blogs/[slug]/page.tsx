@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation'
 
 import { getStorefrontBlogDetail } from '@/actions/storefront/blog/actions'
 
-import { MarkdownRenderer } from '@/components/MarkdownRenderer'
-import { SectionContainer } from '@/components/SectionContainer'
+import { MarkdownRenderer } from '@/components/editor/MarkdownRenderer'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 
 import { StoreLayout } from '../../_components/layout/Layout'
 import { BlogHeader } from '../_components/BlogHeader'

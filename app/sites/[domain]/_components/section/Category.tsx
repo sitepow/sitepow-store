@@ -8,7 +8,7 @@ import { useLandingImages } from '@/hooks/use-landing-images'
 import { isVideoUrl } from '@/utils/media/video'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { SectionContainer } from '@/components/SectionContainer'
+import { SectionContainer } from '@/components/layout/SectionContainer'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 

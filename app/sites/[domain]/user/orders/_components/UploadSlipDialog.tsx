@@ -24,7 +24,7 @@ import {
 import generatePayload from 'promptpay-qr'
 import QRCode from 'qrcode'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

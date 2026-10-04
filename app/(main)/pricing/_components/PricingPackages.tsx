@@ -1,7 +1,7 @@
 import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/billing/pricing'
 
-import { SectionContainer } from '@/components/SectionContainer'
-import { SectionHeader } from '@/components/SectionHeader'
+import { SectionContainer } from '@/components/layout/SectionContainer'
+import { SectionHeader } from '@/components/layout/SectionHeader'
 import { Card, CardContent } from '@/components/ui/card'
 
 import { PricingCard } from './PricingCard'

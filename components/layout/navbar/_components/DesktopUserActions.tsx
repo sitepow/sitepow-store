@@ -5,8 +5,8 @@ import { NavigationItem } from '@/constants/store/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { IconLock } from '@tabler/icons-react'
 
-// import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { QuickSettingsMenu } from '@/components/QuickSettingsMenu'
+// import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher'
+import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
 import { Button } from '@/components/ui/button'
 
 interface DesktopUserActionsProps {

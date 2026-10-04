@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import { LoginForm } from '@/components/LoginForm'
+import { LoginForm } from '@/components/auth/LoginForm'
 
 import { getCurrentUser } from '@/lib/auth/server'
 

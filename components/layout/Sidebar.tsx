@@ -49,15 +49,15 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { CreditBadge } from '../CreditBadge'
-import { DateTimeBadge } from '../DateTimeBadge'
-import { EmailVerified } from '../EmailVerified'
-import { LogoBrand } from '../LogoBrand'
-import { LogoBrandText } from '../LogoBrandText'
-import { QuickSettingsMenu } from '../QuickSettingsMenu'
-import { StoreLogo } from '../StoreLogo'
-import { ChatWidget } from '../chat/ChatWidget'
-import { SupportWidget } from '../chat/SupportWidget'
+import { CreditBadge } from '@/components/shared/CreditBadge'
+import { DateTimeBadge } from '@/components/shared/DateTimeBadge'
+import { EmailVerified } from '@/components/auth/EmailVerified'
+import { LogoBrand } from '@/components/brand/LogoBrand'
+import { LogoBrandText } from '@/components/brand/LogoBrandText'
+import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
+import { StoreLogo } from '@/components/brand/StoreLogo'
+import { ChatWidget } from '@/components/chat/ChatWidget'
+import { SupportWidget } from '@/components/chat/SupportWidget'
 import { StoreSetupAlert } from './_components/StoreSetupAlert'
 
 interface SidebarProps extends PropsWithChildren {

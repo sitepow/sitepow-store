@@ -19,7 +19,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 
-import { HighlightText } from '@/components/HighlightText'
+import { HighlightText } from '@/components/shared/HighlightText'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

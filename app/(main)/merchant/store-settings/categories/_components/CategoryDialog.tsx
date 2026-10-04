@@ -22,7 +22,7 @@ import { CreateCategoryFormValues, createCategorySchema } from '@/zod/catalog/ca
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconWand } from '@tabler/icons-react'
 
-import { FileUpload } from '@/components/FileUpload'
+import { FileUpload } from '@/components/form/FileUpload'
 import {
   AlertDialog,
   AlertDialogAction,

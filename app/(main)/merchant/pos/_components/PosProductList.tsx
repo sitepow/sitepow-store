@@ -10,7 +10,7 @@ import { CartItem } from '@/types/sites/cart'
 import { getRemainingStock } from '@/utils/cart/cart-calculation'
 import { IconSearch } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 

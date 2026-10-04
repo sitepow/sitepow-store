@@ -10,7 +10,7 @@ import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconX } from '@tabler/icons-react'
 
-import { FileUpload } from '@/components/FileUpload'
+import { FileUpload } from '@/components/form/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
