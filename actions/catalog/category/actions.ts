@@ -1,7 +1,7 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/media/image'
 
 import { createLog } from '@/lib/activity/log'

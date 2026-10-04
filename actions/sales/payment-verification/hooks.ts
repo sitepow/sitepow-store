@@ -1,4 +1,4 @@
-import { SlipVerificationAction } from '@/types/slip'
+import { SlipVerificationAction } from '@/types/sales'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { orderKeys } from '@/actions/sales/order/query-keys'

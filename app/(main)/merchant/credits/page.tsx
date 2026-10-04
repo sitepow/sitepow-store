@@ -2,7 +2,7 @@
 
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconLock, IconWallet } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useReturnResellerStock } from '@/actions/reseller/reseller/hooks'
-import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/merchant/use-branch-filter'
 import { Loader2 } from 'lucide-react'
 
 import { BranchSelectField } from '@/components/form/BranchSelectField'

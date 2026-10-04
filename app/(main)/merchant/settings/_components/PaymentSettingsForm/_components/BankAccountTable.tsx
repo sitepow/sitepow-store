@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { useDeleteBankAccount } from '@/actions/store/payment/hooks'
 import { PaymentSettingPayload } from '@/actions/store/payment/actions'
 import { BankAccountType } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconEdit } from '@tabler/icons-react'
 

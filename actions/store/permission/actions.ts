@@ -5,7 +5,7 @@ import {
   ROLE_PERMISSION_PRESETS,
 } from '@/constants/store/permission'
 import { DefaultRole } from '@/generated/prisma/enums'
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey } from '@/types/store'
 
 import {
   TransactionClient,

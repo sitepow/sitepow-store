@@ -8,7 +8,7 @@ import { useReviews } from '@/actions/catalog/review/hooks'
 import { useDeleteReview } from '@/actions/storefront/review/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { ReviewFormDialog } from '@/app/sites/[domain]/user/reviews/_components/ReviewFormDialog'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 import {
   IconEdit,

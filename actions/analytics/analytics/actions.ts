@@ -2,8 +2,8 @@
 
 import { DAY } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
-import { ALL_BRANCHES } from '@/stores/use-branch-filter'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_BRANCHES } from '@/stores/merchant/use-branch-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import {
   formatDayMonth,
   formatMonthYear,

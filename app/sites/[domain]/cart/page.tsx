@@ -28,7 +28,7 @@ import {
 } from '@/generated/prisma/enums'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { calculateGrandTotal, getRemainingStock } from '@/utils/cart/cart-calculation'
 import { formatCurrency } from '@/utils/formatting/number'
 import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
@@ -60,7 +60,7 @@ import { CheckoutSection } from './_components/CheckoutSection'
 import { CustomerAddressCreateDialog } from './_components/CustomerAddressCreateDialog'
 import { DiscountForm } from './_components/DiscountForm'
 import { RadioCard } from './_components/RadioCard'
-import { useCartStore } from './store'
+import { useCartStore } from '@/stores/cart/use-cart-store'
 
 type CheckoutStep = 'address' | 'shipping' | 'payment' | 'review'
 

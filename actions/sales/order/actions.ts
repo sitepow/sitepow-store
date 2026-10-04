@@ -2,7 +2,7 @@
 
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
 import { earnCustomerPoints } from '@/utils/points/customer-points'
 

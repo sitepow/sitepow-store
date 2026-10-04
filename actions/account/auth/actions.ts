@@ -1,7 +1,7 @@
 'use server'
 
 import { UserRole } from '@/generated/prisma/enums'
-import { RegisterFormInputs } from '@/types/register'
+import { RegisterFormInputs } from '@/types/auth'
 import { isPast } from '@/utils/formatting/date'
 import { generateOtp } from '@/utils/auth/otp'
 import bcrypt from 'bcryptjs'

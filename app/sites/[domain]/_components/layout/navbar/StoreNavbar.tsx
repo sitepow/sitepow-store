@@ -8,7 +8,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { BUYER_NAVIGATION } from '@/constants/store/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/auth/EmailVerified'

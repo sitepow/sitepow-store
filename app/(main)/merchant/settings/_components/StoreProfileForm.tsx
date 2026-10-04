@@ -11,7 +11,7 @@ import {
   useUpdateStoreProfile,
 } from '@/actions/store/profile/hooks'
 import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { getPathR2FromUrl } from '@/utils/media/image'
 import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'

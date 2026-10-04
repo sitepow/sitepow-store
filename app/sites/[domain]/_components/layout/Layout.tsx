@@ -4,7 +4,7 @@ import { ComponentProps } from 'react'
 
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { SupportWidget } from '@/components/chat/SupportWidget'

@@ -11,7 +11,7 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/client'
-import { CheckoutType, UpgradeType } from '@/types/checkout'
+import { CheckoutType, UpgradeType } from '@/types/billing'
 import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
 import { calculatePlanPrice, calculateProration } from '@/utils/billing/subscription-pricing'
 import { addMonths, differenceInMonths } from 'date-fns'

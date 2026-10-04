@@ -5,7 +5,7 @@ import { useCancelTransferRequest } from '@/actions/store/ownership-transfer/hoo
 import { TRANSFER_STATUS_TH } from '@/constants/i18n/translate'
 import { TransferStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 
 import { DeleteButton } from '@/components/shared/DeleteButton'

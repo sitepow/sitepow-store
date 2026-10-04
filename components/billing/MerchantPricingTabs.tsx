@@ -1,6 +1,6 @@
 'use client'
 
-import { usePricingStore } from '@/app/(main)/pricing/store'
+import { usePricingStore } from '@/stores/billing/use-pricing-store'
 import { PRICING_OPTIONS } from '@/constants/billing/pricing'
 import { RESPONSIVE_DEVICE } from '@/constants/system'
 import { useIsMounted } from '@/hooks/use-is-mounted'

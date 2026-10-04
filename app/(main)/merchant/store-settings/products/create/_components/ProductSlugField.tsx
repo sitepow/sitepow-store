@@ -5,7 +5,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useProductAi } from '@/actions/ai/ai/hooks'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { AiGenTask } from '@/types/ai'
 import { ProductFormValues } from '@/zod/catalog/product'
 import { IconWand } from '@tabler/icons-react'

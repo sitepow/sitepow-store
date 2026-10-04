@@ -1,5 +1,5 @@
 import { getAnalyticsOverview } from '@/actions/analytics/analytics/actions'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { useQuery } from '@tanstack/react-query'
 
 import { analyticsKeys } from '@/actions/analytics/analytics/query-keys'

@@ -2,7 +2,7 @@
 
 import { Message as PrismaMessage } from '@/generated/prisma/client'
 import { UserRole } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 
 import { MarkdownRenderer } from '@/components/editor/MarkdownRenderer'
 

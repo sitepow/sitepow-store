@@ -3,7 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { arrayToString, stringToArray } from '@/utils/formatting/text'
 
 export function ProductPreviewContent() {

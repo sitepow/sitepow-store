@@ -5,14 +5,14 @@ import Image from 'next/image'
 import { PRICING_VALUE } from '@/constants/billing/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
-import { PricingPlanProps } from '@/types/pricing'
+import { PricingPlanProps } from '@/types/billing'
 import { formatCurrency } from '@/utils/formatting/number'
 import { calculatePlanPrice } from '@/utils/billing/subscription-pricing'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
-import { usePricingStore } from '../store'
+import { usePricingStore } from '@/stores/billing/use-pricing-store'
 
 export function PricingCard({
   title,

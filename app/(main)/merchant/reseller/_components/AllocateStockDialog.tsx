@@ -12,9 +12,9 @@ import toast from 'react-hot-toast'
 
 import { usePOSProducts } from '@/actions/sales/pos-product/hooks'
 import { useAllocateResellerStock } from '@/actions/reseller/reseller/hooks'
-import { useBranchFilter } from '@/stores/use-branch-filter'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 

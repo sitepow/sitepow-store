@@ -4,3 +4,4 @@ export interface StorePageProps {
     domain: string
   }>
 }
+

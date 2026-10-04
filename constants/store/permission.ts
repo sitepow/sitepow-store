@@ -1,5 +1,5 @@
 import { PermissionAction, PermissionDomain } from '@/generated/prisma/enums'
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey } from '@/types/store'
 
 export const ROLE_PERMISSION_PRESETS: Record<string, string[]> = {
   OWNER: [

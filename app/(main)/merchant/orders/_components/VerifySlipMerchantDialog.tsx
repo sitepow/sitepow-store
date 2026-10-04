@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 import { useApproveSlipManual } from '@/actions/sales/payment-verification/hooks'
-import { SlipVerificationAction } from '@/types/slip'
+import { SlipVerificationAction } from '@/types/sales'
 import { formatCurrency } from '@/utils/formatting/number'
 import { formatBankAccount } from '@/utils/formatting/promptpay-phone'
 import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'

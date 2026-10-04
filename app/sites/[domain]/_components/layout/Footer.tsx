@@ -3,8 +3,8 @@ import Link from 'next/link'
 
 import { useBranches } from '@/actions/store/branch/hooks'
 import { Plan } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { OpeningHours } from '@/types/branch'
+import { useStoreData } from '@/stores/storefront/use-store-data'
+import { OpeningHours } from '@/types/store'
 
 import { LogoBrandText } from '@/components/brand/LogoBrandText'
 import { ProtectedByBrand } from '@/components/brand/ProtectedByBrand'

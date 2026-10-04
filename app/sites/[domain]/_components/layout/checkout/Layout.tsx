@@ -3,7 +3,7 @@
 import { ComponentProps } from 'react'
 
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 
 import { EmailVerified } from '@/components/auth/EmailVerified'
 import { SectionContainer } from '@/components/layout/SectionContainer'

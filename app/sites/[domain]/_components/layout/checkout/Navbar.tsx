@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { LockKeyholeIcon } from 'lucide-react'
 
 import { LogoBrandText } from '@/components/brand/LogoBrandText'

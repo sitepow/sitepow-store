@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useBranches, useDeleteBranch } from '@/actions/store/branch/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/shared/DeleteButton'

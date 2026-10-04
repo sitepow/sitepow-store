@@ -8,7 +8,7 @@ import {
   useUpsertPaymentSetting,
 } from '@/actions/store/payment/hooks'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/store/payment-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {

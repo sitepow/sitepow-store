@@ -1,7 +1,7 @@
 import { useBranchOptions } from '@/actions/store/branch/hooks'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
 import {

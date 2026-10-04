@@ -2,7 +2,7 @@ import {
   PERMISSION_MAPPING,
   ROLE_PERMISSION_PRESETS,
 } from '@/constants/store/permission'
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey } from '@/types/store'
 
 export interface EmployeePermissionItem {
   id: string

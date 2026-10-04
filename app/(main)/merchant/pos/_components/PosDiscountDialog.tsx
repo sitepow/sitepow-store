@@ -11,7 +11,7 @@ import {
 } from '@/actions/storefront/discount/hooks'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { calculateMaxUsablePoints } from '@/utils/cart/cart-calculation'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { formatPhoneInput, formatPromptPay } from '@/utils/formatting/promptpay-phone'

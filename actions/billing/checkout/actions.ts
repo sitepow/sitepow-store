@@ -4,7 +4,7 @@ import {
   CheckoutParams,
   CreateStoreCheckoutParams,
   PaymentMethod,
-} from '@/types/checkout'
+} from '@/types/billing'
 
 import { prisma } from '@/lib/db/prisma'
 import { getStripeInstance, stripe } from '@/lib/integrations/stripe'

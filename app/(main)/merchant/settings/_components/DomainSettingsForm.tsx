@@ -9,7 +9,7 @@ import {
   useVerifyStoreDomain,
 } from '@/actions/store/domain/hooks'
 import { DomainStatus } from '@/generated/prisma/enums'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   IconAlertCircle,
   IconCheck,

@@ -2,7 +2,7 @@
 
 import { ComponentProps } from 'react'
 
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 
 import { HighlightText } from '@/components/shared/HighlightText'
@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 
-import { useCartStore } from '../../../cart/store'
+import { useCartStore } from '@/stores/cart/use-cart-store'
 import { SummaryRow } from './SummaryRow'
 
 interface CartSummaryCustomData {

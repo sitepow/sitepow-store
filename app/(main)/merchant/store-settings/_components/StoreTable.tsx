@@ -9,7 +9,7 @@ import { useDeleteStore, useStores } from '@/actions/store/management/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { PLAN_DETAILS } from '@/constants/billing/plan'
 import { StoreStatus } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 import { getSubscriptionStatusInfo } from '@/utils/billing/subscription-pricing'
 import {

@@ -1,4 +1,4 @@
-import { PricingOption, PricingPlanProps, PricingTables } from '@/types/pricing'
+import { PricingOption, PricingPlanProps, PricingTables } from '@/types/billing'
 import {
   IconBolt,
   IconBoxSeam,

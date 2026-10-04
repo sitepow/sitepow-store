@@ -2,7 +2,7 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { usePricingStore } from '@/app/(main)/pricing/store'
+import { usePricingStore } from '@/stores/billing/use-pricing-store'
 import { RadioCard } from '@/app/sites/[domain]/cart/_components/RadioCard'
 import { PLAN_DETAILS } from '@/constants/billing/plan'
 import { PRICING_VALUE } from '@/constants/billing/pricing'

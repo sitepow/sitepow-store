@@ -1,8 +1,3 @@
-export enum CreditUsageType {
-  AI = 'AI',
-  SLIP = 'SLIP',
-}
-
 export enum AiGenTask {
   ALL = 'ALL',
   TITLE = 'TITLE',

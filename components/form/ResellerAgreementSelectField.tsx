@@ -7,8 +7,8 @@ import {
   useResellerAgreements,
 } from '@/actions/reseller/reseller/hooks'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconFileText } from '@tabler/icons-react'
 
 import { Field, FieldLabel } from '@/components/ui/field'

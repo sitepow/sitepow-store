@@ -10,7 +10,7 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
-import { CheckoutParams, CheckoutType } from '@/types/checkout'
+import { CheckoutParams, CheckoutType } from '@/types/billing'
 import { addMonths } from 'date-fns'
 import Stripe from 'stripe'
 

@@ -8,7 +8,7 @@ import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 import { IconEye, IconHistory, IconLock } from '@tabler/icons-react'
 

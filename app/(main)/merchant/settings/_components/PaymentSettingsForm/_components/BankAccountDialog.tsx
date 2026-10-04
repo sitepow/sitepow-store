@@ -10,7 +10,7 @@ import {
 } from '@/actions/store/payment/hooks'
 import { OTHER_PAYMENT_METHODS, THAI_BANKS } from '@/constants/payment/bank'
 import { BankAccountType } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { BankAccountFormValues, bankAccountSchema } from '@/zod/store/payment-settings'
 import { zodResolver } from '@hookform/resolvers/zod'

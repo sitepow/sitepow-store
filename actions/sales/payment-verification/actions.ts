@@ -11,7 +11,7 @@ import {
   OrderStatus,
   TransactionType,
 } from '@/generated/prisma/enums'
-import { SlipVerificationAction } from '@/types/slip'
+import { SlipVerificationAction } from '@/types/sales'
 import { fromNow, getBlockMessage, isPast } from '@/utils/formatting/date'
 import { getPathR2FromUrl } from '@/utils/media/image'
 import axios from 'axios'

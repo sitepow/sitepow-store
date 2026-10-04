@@ -9,8 +9,8 @@ import {
   useUpdateBranch,
 } from '@/actions/store/branch/hooks'
 import { THAI_DAYS } from '@/constants/system'
-import { useStoreFilter } from '@/stores/use-store-filter'
-import { OpeningHours } from '@/types/branch'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
+import { OpeningHours } from '@/types/store'
 import { CreateBranchFormValues, createBranchSchema } from '@/zod/store/branch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'

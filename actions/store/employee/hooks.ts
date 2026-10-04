@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
 
 import { DefaultRole } from '@/generated/prisma/enums'
-import { useBranchFilter } from '@/stores/use-branch-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
+import { useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
+import { PermissionKey } from '@/types/store'
 import {
   queryOptions,
   useMutation,

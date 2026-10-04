@@ -6,8 +6,8 @@ import toast from 'react-hot-toast'
 
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
 import { useCreateResellerPayout } from '@/actions/reseller/reseller/hooks'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconX } from '@tabler/icons-react'
 
 import { FileUpload } from '@/components/form/FileUpload'

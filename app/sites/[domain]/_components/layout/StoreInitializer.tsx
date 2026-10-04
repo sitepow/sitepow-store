@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 
 import { StoreData } from '@/actions/store/management/actions'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 
 export function StoreInitializer({ store }: { store: StoreData }) {
   const initialized = useRef(false)

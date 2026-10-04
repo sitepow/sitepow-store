@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { useCreateStockAdjustment } from '@/actions/inventory/stock-adjustment/hooks'
 import { STOCK_ADJUSTMENT_REASON_OPTIONS } from '@/constants/i18n/translate'
 import { StockAdjustmentReason } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   CreateStockAdjustmentFormValues,
   createStockAdjustmentSchema,

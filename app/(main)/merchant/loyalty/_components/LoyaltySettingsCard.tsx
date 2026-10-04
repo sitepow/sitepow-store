@@ -7,7 +7,7 @@ import {
   useLoyaltySettings,
   useUpdateLoyaltySettings,
 } from '@/actions/store/loyalty/hooks'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   UpdateLoyaltySettingsFormValues,
   updateLoyaltySettingsSchema,

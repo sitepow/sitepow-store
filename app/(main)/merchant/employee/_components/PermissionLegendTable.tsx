@@ -6,7 +6,7 @@ import {
   PERMISSION_DESCRIPTIONS,
   PERMISSION_MAPPING,
 } from '@/constants/store/permission'
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey } from '@/types/store'
 import { IconKey } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'

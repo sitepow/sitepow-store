@@ -9,7 +9,7 @@ import {
 } from '@/actions/sales/customer/hooks'
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime, getBlockMessage } from '@/utils/formatting/date'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { formatPromptPay } from '@/utils/formatting/promptpay-phone'

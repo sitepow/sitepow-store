@@ -11,7 +11,7 @@ import {
 
 import { useBranches } from '@/actions/store/branch/hooks'
 import { ProductType } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { ProductFormValues } from '@/zod/catalog/product'
 import { IconTrash } from '@tabler/icons-react'
 import { ImagePlus, PlusCircle, X } from 'lucide-react'

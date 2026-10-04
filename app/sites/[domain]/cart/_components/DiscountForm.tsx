@@ -9,7 +9,7 @@ import {
   useValidateCoupon,
 } from '@/actions/storefront/discount/hooks'
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { calculateMaxUsablePoints } from '@/utils/cart/cart-calculation'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
@@ -35,7 +35,7 @@ import { Slider } from '@/components/ui/slider'
 
 import { SummaryRow } from '../../_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '../../_components/cart/_components/SummaryTotal'
-import { useCartStore } from '../store'
+import { useCartStore } from '@/stores/cart/use-cart-store'
 
 interface DiscountFormProps {
   subtotal: number

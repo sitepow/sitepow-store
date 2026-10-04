@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from 'react'
 
-import { LoginProvide } from '@/types/login'
-import { RegisterProvide } from '@/types/register'
+import { LoginProvide } from '@/types/auth'
+import { RegisterProvide } from '@/types/auth'
 
 import { cn } from '@/lib/utils'
 

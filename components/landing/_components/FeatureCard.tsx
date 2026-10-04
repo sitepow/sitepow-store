@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-import { FeatureCard as FeatureCardType } from '@/types/payment'
+import { FeatureCard as FeatureCardType } from '@/types/landing'
 
 import { HighlightParser } from '@/components/landing/HighlightParser'
 import { PageTabHeaderIcon } from '@/components/layout/PageTabHeaderIcon'

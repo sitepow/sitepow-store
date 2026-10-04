@@ -10,9 +10,9 @@ import {
 } from '@/actions/reseller/reseller/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useResellerSSE } from '@/hooks/use-reseller-sse'
-import { useAlertStore } from '@/stores/use-alert-store'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { useAlertStore } from '@/stores/ui/use-alert-store'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   IconBuildingStore,
   IconFilePlus,

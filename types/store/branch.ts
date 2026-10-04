@@ -4,3 +4,4 @@ export type OpeningHours = {
   close: string
   isOpen: boolean
 }
+

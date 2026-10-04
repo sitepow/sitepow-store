@@ -18,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
+import { useIsMounted } from '@/hooks/use-is-mounted'
 
 interface StoresSectionProps {
   initialStores?: StoreLandingItem[]
@@ -25,6 +26,7 @@ interface StoresSectionProps {
 
 export function StoresSection({ initialStores }: StoresSectionProps = {}) {
   const { currentImage } = useLandingImages({ imageFolder: 'shelf' })
+  const isMounted = useIsMounted()
 
   const { data: stores = initialStores ?? [], isLoading } =
     useLandingStores(11, initialStores)
@@ -35,6 +37,10 @@ export function StoresSection({ initialStores }: StoresSectionProps = {}) {
   registerParams.set('callbackUrl', '/merchant/store-settings')
 
   const registerHref = `/register?${registerParams.toString()}`
+
+  if (!isMounted) {
+    return null
+  }
 
   if (isLoading && stores?.length === 0) {
     return (

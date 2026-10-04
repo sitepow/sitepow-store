@@ -36,3 +36,4 @@ export interface PricingTables {
   tiers: string[]
   categories: PricingCategory[]
 }
+

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 import { useCreateResellerAgreement } from '@/actions/reseller/reseller/hooks'
 import { ResellerType } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconX } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

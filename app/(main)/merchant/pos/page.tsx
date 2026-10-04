@@ -9,12 +9,12 @@ import {
   useResellerPOSProducts,
 } from '@/actions/sales/pos-product/hooks'
 import { POSProductItem } from '@/actions/sales/pos-product/actions'
-import { useCartStore } from '@/app/sites/[domain]/cart/store'
+import { useCartStore } from '@/stores/cart/use-cart-store'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
-import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_BRANCHES, useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart/cart-calculation'
 import { IconCashRegister, IconLock } from '@tabler/icons-react'
 

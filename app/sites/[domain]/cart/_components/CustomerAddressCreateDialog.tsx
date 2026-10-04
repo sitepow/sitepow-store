@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { useCreateAddress } from '@/actions/storefront/address/hooks'
 import { AddressType } from '@/generated/prisma/enums'
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { formatPhoneInput } from '@/utils/formatting/promptpay-phone'
 import { AddressSchema, addressSchema } from '@/zod/shared/address'
 import { zodResolver } from '@hookform/resolvers/zod'

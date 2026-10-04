@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconMail, IconReplace } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'

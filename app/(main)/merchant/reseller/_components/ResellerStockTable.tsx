@@ -7,8 +7,8 @@ import {
   useResellerStocks,
 } from '@/actions/reseller/reseller/hooks'
 import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
-import { useResellerFilter } from '@/stores/use-reseller-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { useResellerFilter } from '@/stores/merchant/use-reseller-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatCurrency } from '@/utils/formatting/number'
 import {
   IconPackageExport,

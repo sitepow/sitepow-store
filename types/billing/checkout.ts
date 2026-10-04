@@ -41,3 +41,4 @@ export interface CreateStoreCheckoutParams {
   cancelUrl: string
   metadata?: Record<string, string>
 }
+

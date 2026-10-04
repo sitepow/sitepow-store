@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation'
 import { LOGIN_PROVIDERS } from '@/constants/auth/providers'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
-import { LoginFormInputs } from '@/types/login'
+import { LoginFormInputs } from '@/types/auth'
 import { useMutation } from '@tanstack/react-query'
 
 import { ContentDivider } from '@/components/shared/ContentDivider'

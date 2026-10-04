@@ -2,7 +2,7 @@
 
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 
 import { createLog } from '@/lib/activity/log'
 import { getCurrentUser } from '@/lib/auth/server'

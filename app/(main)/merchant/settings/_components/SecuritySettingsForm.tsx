@@ -9,7 +9,7 @@ import {
   useUpdateTwoFactor,
 } from '@/actions/account/security/hooks'
 import { useSession } from '@/hooks/use-session'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   ChangePasswordFormValues,
   TwoFactorFormValues,

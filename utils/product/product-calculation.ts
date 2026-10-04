@@ -1,6 +1,6 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
-import { ProductWithRelations } from '@/types/product'
+import { ProductWithRelations } from '@/types/catalog'
 import { ProductFormValues } from '@/zod/catalog/product'
 
 export interface CalculatedProduct {

@@ -8,8 +8,8 @@ import {
   useGlobalShippingMetadata,
   useGlobalShippingRateMatrixProvinces,
 } from '@/actions/store/global-shipping-rate-matrix/hooks'
-import { useBranchFilter } from '@/stores/use-branch-filter'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 import { IconCloudDownload } from '@tabler/icons-react'
 

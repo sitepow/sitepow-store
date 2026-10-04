@@ -1,5 +1,5 @@
-import { LoginProvide } from '@/types/login'
-import { RegisterProvide } from '@/types/register'
+import { LoginProvide } from '@/types/auth'
+import { RegisterProvide } from '@/types/auth'
 
 import { GoogleIcon } from '@/components/icon/Google'
 import { LineIcon } from '@/components/icon/Line'

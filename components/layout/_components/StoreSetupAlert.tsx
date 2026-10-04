@@ -3,8 +3,8 @@
 import Link from 'next/link'
 
 import { SettingsTab } from '@/constants/store/settings'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
+import { useStoreData } from '@/stores/storefront/use-store-data'
+import { useMerchantStoreSetupStore } from '@/stores/merchant/use-merchant-setup'
 import { AlertCircleIcon } from 'lucide-react'
 
 import { Alert, AlertTitle } from '@/components/ui/alert'

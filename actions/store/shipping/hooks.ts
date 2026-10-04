@@ -1,5 +1,5 @@
-import { ALL_BRANCHES } from '@/stores/use-branch-filter'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_BRANCHES } from '@/stores/merchant/use-branch-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { ShippingFormValues } from '@/zod/store/shipping-settings'
 import {
   queryOptions,

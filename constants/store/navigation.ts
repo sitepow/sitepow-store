@@ -1,4 +1,4 @@
-import { PermissionKey } from '@/types/permission'
+import { PermissionKey } from '@/types/store'
 import {
   IconBox,
   IconBuildingStore,

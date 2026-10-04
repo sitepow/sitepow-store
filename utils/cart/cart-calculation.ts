@@ -1,6 +1,6 @@
 import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 import { DiscountType } from '@/generated/prisma/enums'
-import { CartItem, CartSummary, SelectedOption } from '@/types/sites/cart'
+import { CartItem, CartSummary, SelectedOption } from '@/types/cart'
 import { calculateNetPrice } from '@/utils/product/product-calculation'
 
 type CartOption = NonNullable<StorefrontProductDetail['options']>[number]

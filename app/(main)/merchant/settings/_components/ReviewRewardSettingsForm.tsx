@@ -7,7 +7,7 @@ import {
   useReviewRewardConfig,
   useUpdateReviewRewardConfig,
 } from '@/actions/store/review-reward/hooks'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   ReviewRewardConfigFormValues,
   reviewRewardConfigSchema,

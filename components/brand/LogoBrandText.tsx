@@ -4,7 +4,7 @@ import { ComponentProps } from 'react'
 
 import Link from 'next/link'
 
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 
 import { cn } from '@/lib/utils'
 

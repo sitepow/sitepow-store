@@ -7,8 +7,8 @@ import { useAnalyticsOverview } from '@/actions/analytics/analytics/hooks'
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
-import { useBranchFilter } from '@/stores/use-branch-filter'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { useBranchFilter } from '@/stores/merchant/use-branch-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
   IconArrowUpRight,

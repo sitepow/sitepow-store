@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 
 import { useBranches } from '@/actions/store/branch/hooks'
 import { useCreateStockTransfer } from '@/actions/inventory/stock-transfer/hooks'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   CreateStockTransferFormValues,
   createStockTransferSchema,

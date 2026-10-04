@@ -4,7 +4,7 @@
 import { KeyboardEvent } from 'react'
 import { UseFormRegister } from 'react-hook-form'
 
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { IconSend2 } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

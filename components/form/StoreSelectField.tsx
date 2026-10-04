@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 
 import { useMerchantStoreSetup, useStoreOptions } from '@/actions/store/management/hooks'
 import { useIsMounted } from '@/hooks/use-is-mounted'
-import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { useMerchantStoreSetupStore } from '@/stores/merchant/use-merchant-setup'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { IconFilter } from '@tabler/icons-react'
 
 import {

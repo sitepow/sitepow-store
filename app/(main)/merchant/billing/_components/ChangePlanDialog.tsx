@@ -10,9 +10,9 @@ import {
   useInitiatePlanUpgrade,
   useUpgradeCost,
 } from '@/actions/billing/subscription/hooks'
-import { usePricingStore } from '@/app/(main)/pricing/store'
+import { usePricingStore } from '@/stores/billing/use-pricing-store'
 import { Plan } from '@/generated/prisma/enums'
-import { UpgradeType } from '@/types/checkout'
+import { UpgradeType } from '@/types/billing'
 import { formatCurrency } from '@/utils/formatting/number'
 import { ChangePlanFormValues, changePlanSchema } from '@/zod/billing/change-plan'
 import { zodResolver } from '@hookform/resolvers/zod'

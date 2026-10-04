@@ -7,7 +7,7 @@ import {
   useNotificationSettings,
   useUpdateNotificationSettings,
 } from '@/actions/account/notification-settings/hooks'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   NotificationSettingsFormValues,
   notificationSettingsSchema,

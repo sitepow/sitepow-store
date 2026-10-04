@@ -1,6 +1,6 @@
 import { LANDING_STORES_STALE_TIME } from '@/constants/system'
 import { Plan, StoreStatus } from '@/generated/prisma/enums'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import {
   queryOptions,
   useMutation,

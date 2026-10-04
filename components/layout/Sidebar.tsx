@@ -12,9 +12,9 @@ import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/shared/User
 import { NavigationItem } from '@/constants/store/navigation'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
-import { useStoreData } from '@/stores/sites/use-store-data'
-import { useStoreFilter } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
+import { useStoreData } from '@/stores/storefront/use-store-data'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
+import { PermissionKey } from '@/types/store'
 import { IconChevronRight, IconInfoCircle, IconLock } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

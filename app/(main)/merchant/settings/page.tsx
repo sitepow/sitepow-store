@@ -6,7 +6,7 @@ import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { SettingsTab } from '@/constants/store/settings'
 import { useQueryParam } from '@/hooks/use-query-param'
-import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
+import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import {
   IconBell,
   IconBuildingStore,

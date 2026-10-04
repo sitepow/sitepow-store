@@ -3,7 +3,7 @@
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { useCategoryOptions } from '@/actions/catalog/category/hooks'
-import { useStoreFilter } from '@/stores/use-store-filter'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { ProductFormValues } from '@/zod/catalog/product'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'

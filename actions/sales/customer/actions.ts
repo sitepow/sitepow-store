@@ -1,7 +1,7 @@
 'use server'
 
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
 import { CreateCustomerInput } from '@/zod/sales/customer'
 

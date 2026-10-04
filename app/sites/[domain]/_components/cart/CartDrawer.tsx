@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { useStoreData } from '@/stores/sites/use-store-data'
+import { useStoreData } from '@/stores/storefront/use-store-data'
 import { getRemainingStock } from '@/utils/cart/cart-calculation'
 import { formatCurrency } from '@/utils/formatting/number'
 import { ShoppingCartIcon } from 'lucide-react'
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
-import { useCartStore } from '../../cart/store'
+import { useCartStore } from '@/stores/cart/use-cart-store'
 import { CartBadge } from './CartBadge'
 import { CartItemCard } from './_components/CartItemCard'
 import { CartSummary } from './_components/CartSummary'

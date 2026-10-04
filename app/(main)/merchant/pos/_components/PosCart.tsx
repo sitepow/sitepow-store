@@ -7,8 +7,8 @@ import { useStorefrontLoyalty } from '@/actions/storefront/discount/hooks'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
-import { useStoreFilter } from '@/stores/use-store-filter'
-import { CartItem } from '@/types/sites/cart'
+import { useStoreFilter } from '@/stores/merchant/use-store-filter'
+import { CartItem } from '@/types/cart'
 import {
   calculateCartSummary,
   calculateGrandTotal,

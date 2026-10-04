@@ -9,7 +9,7 @@ import {
 } from '@/actions/chat/chat/hooks'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { useSession } from '@/hooks/use-session'
-import { useChatStore } from '@/stores/use-chat-store'
+import { useChatStore } from '@/stores/ui/use-chat-store'
 import { MessageCircle, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

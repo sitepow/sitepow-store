@@ -15,7 +15,7 @@ import {
   StoreStatus,
   SubStatus,
 } from '@/generated/prisma/enums'
-import { ALL_STORES } from '@/stores/use-store-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
 import { queryKeyToRedisKey } from '@/utils/cache/query-key'
 import { formatDate } from '@/utils/formatting/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'

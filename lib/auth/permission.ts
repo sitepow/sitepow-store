@@ -9,9 +9,9 @@ import {
 } from '@/constants/system'
 import { EmployeeStore } from '@/generated/prisma/client'
 import { DefaultRole, UserRole } from '@/generated/prisma/enums'
-import { ALL_BRANCHES } from '@/stores/use-branch-filter'
-import { ALL_STORES } from '@/stores/use-store-filter'
-import { PermissionKey } from '@/types/permission'
+import { ALL_BRANCHES } from '@/stores/merchant/use-branch-filter'
+import { ALL_STORES } from '@/stores/merchant/use-store-filter'
+import { PermissionKey } from '@/types/store'
 import { queryKeyToRedisKey } from '@/utils/cache/query-key'
 import bcrypt from 'bcryptjs'
 
