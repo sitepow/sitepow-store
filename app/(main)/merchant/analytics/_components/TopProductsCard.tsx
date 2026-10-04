@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts'
 
-import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from './shared/AnalyticsCardShell'
 
 interface TopProductsCardProps {
   topProducts: Array<{

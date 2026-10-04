@@ -513,8 +513,8 @@ export async function initiatePlanUpgrade(
         customerEmail: userSession?.email ?? '',
         amount: Number(amountToPay),
         description: `ชำระส่วนต่างสำหรับ Upgrade ไปยังแพลน ${PLAN_DETAILS[newPlan].name}`,
-        successUrl: `${process.env.APP_URL}/merchant/billing-subscription`,
-        cancelUrl: `${process.env.APP_URL}/merchant/billing-subscription`,
+        successUrl: `${process.env.APP_URL}/merchant/billing`,
+        cancelUrl: `${process.env.APP_URL}/merchant/billing`,
         metadata: {
           type: CheckoutType.UPGRADE,
           storeId,

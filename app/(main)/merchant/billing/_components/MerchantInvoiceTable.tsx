@@ -49,8 +49,8 @@ export function MerchantInvoiceTable() {
       customerEmail: user?.email ?? '',
       amount: Number(inv.amount),
       description: inv.description!,
-      successUrl: `${window.location.origin}/merchant/billing-subscription`,
-      cancelUrl: `${window.location.origin}/merchant/billing-subscription`,
+      successUrl: `${window.location.origin}/merchant/billing`,
+      cancelUrl: `${window.location.origin}/merchant/billing`,
       metadata: {
         type: CheckoutType.SUBSCRIPTION,
         relatedId: inv.id,

@@ -27,7 +27,7 @@ import { StoreSelectField } from '@/components/form/StoreSelectField'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-import { DomainSettingsForm } from './DomainSettingsForm'
+import { DomainSettingsForm } from './_components/DomainSettingsForm'
 import { NotificationSettingsForm } from './_components/NotificationSettingsForm'
 import { PaymentSettingsForm } from './_components/PaymentSettingsForm'
 import { ReviewRewardSettingsForm } from './_components/ReviewRewardSettingsForm'

@@ -74,7 +74,7 @@ function StoreRowActions({
           size="icon-lg"
           onClick={() => {
             setSelectedStoreId(storeId)
-            router.push('/merchant/organization-branches')
+            router.push('/merchant/branches')
           }}
         >
           <IconHierarchy2 />
@@ -86,7 +86,7 @@ function StoreRowActions({
           size="icon-lg"
           onClick={() => {
             setSelectedStoreId(storeId)
-            router.push('/merchant/billing-subscription')
+            router.push('/merchant/billing')
           }}
         >
           <IconCreditCard />

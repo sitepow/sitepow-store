@@ -16,7 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { AnalyticsCardShell } from '../../analytics/_components/_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from '../../analytics/_components/shared/AnalyticsCardShell'
 
 interface LowStockCardProps {
   data?: {

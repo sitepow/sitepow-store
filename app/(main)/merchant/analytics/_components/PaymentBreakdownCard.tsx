@@ -4,7 +4,7 @@ import { PAYMENT_METHOD_TH } from '@/constants/i18n/translate'
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
-import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from './shared/AnalyticsCardShell'
 
 const PIE_COLORS = [
   '#3b82f6',

@@ -30,7 +30,7 @@ import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
-import { ApplyGlobalRatesDialog } from './_components/Applyglobalratesdialog'
+import { ApplyGlobalRatesDialog } from './_components/ApplyGlobalRatesDialog'
 import { ServiceConfigDialog } from './_components/ServiceConfigDialog'
 import { ShippingZoneTable } from './_components/ShippingZoneTable'
 

@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { cn } from '@/lib/utils'
 
-export function ProfileAvartar({
+export function ProfileAvatar({
   className,
   ...props
 }: ComponentProps<typeof Card>) {

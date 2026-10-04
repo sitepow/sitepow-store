@@ -11,7 +11,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-import { AnalyticsCardShell } from '../../analytics/_components/_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from '../../analytics/_components/shared/AnalyticsCardShell'
 
 interface SalesTrendChartProps {
   data?: {

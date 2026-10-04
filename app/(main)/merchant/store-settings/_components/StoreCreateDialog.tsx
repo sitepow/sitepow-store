@@ -79,8 +79,8 @@ export function StoreCreateDialog() {
               customerEmail: user?.email ?? '',
               amount: Number(data.invoice.amount),
               description: data.invoice.description!,
-              successUrl: `${window.location.origin}/merchant/billing-subscription`,
-              cancelUrl: `${window.location.origin}/merchant/billing-subscription`,
+              successUrl: `${window.location.origin}/merchant/billing`,
+              cancelUrl: `${window.location.origin}/merchant/billing`,
               metadata: {
                 type: CheckoutType.SUBSCRIPTION,
                 relatedId: data.invoice.id,

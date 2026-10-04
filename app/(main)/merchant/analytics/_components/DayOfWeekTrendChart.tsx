@@ -10,7 +10,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from './shared/AnalyticsCardShell'
 
 interface DayOfWeekTrendChartProps {
   dayOfWeekTrend: Array<{

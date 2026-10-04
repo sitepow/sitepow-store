@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import Link from 'next/link'
 
-import { BranchDialog } from '@/app/(main)/merchant/organization-branches/_components/BranchDialog'
+import { BranchDialog } from '@/app/(main)/merchant/branches/_components/BranchDialog'
 import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

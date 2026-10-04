@@ -174,7 +174,7 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     permissionKey: 'canViewReviews',
   },
   {
-    value: 'marketing-coupons',
+    value: 'coupons',
     label: 'คูปองส่วนลด',
     tab: 'coupons',
     icon: IconTicket,
@@ -205,14 +205,14 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     groupLabel: 'ตั้งค่าร้านค้าและบัญชี',
   },
   {
-    value: 'organization-branches',
+    value: 'branches',
     label: 'จัดการสาขา',
     tab: 'branches',
     icon: IconHierarchy2,
     permissionKey: 'canViewBranches',
   },
   {
-    value: 'billing-subscription',
+    value: 'billing',
     label: 'การสมัครสมาชิก',
     tab: 'billing',
     icon: IconCreditCard,

@@ -10,7 +10,7 @@ import { IconUser } from '@tabler/icons-react'
 import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Sidebar } from '@/components/layout/Sidebar'
 
-import { ProfileAvartar } from './_components/ProfileAvartar'
+import { ProfileAvatar } from './_components/ProfileAvatar'
 import { ProfileForm } from './_components/ProfileForm'
 
 export default function MerchantProfilePage() {
@@ -33,7 +33,7 @@ export default function MerchantProfilePage() {
       />
       <FormProvider {...methods}>
         <div className="grid gap-5 xl:grid-cols-12">
-          <ProfileAvartar className="col-span-1 xl:col-span-4" />
+          <ProfileAvatar className="col-span-1 xl:col-span-4" />
           <ProfileForm className="col-span-1 xl:col-span-8" />
         </div>
       </FormProvider>

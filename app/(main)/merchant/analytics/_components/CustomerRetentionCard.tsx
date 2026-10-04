@@ -4,7 +4,7 @@ import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
 import { formatNumber } from '@/utils/formatting/number'
 import { IconArrowUpRight, IconUserCheck, IconUsers } from '@tabler/icons-react'
 
-import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from './shared/AnalyticsCardShell'
 
 interface CustomerRetentionCardProps {
   retention?: {

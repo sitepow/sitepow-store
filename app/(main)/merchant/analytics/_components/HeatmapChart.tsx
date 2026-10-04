@@ -2,7 +2,7 @@
 
 import { DAYS, HOURS } from '@/constants/system'
 
-import { AnalyticsCardShell } from './_components/AnalyticsCardShell'
+import { AnalyticsCardShell } from './shared/AnalyticsCardShell'
 
 interface HeatmapChartProps {
   heatmap: Array<{
