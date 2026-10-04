@@ -1,3 +1,7 @@
+import {
+  DOMAIN_CACHE_TTL_SECONDS,
+  DOMAIN_NOT_FOUND_CACHE_TTL_SECONDS,
+} from '@/constants/system'
 import { DomainStatus } from '@/generated/prisma/enums'
 
 import { prisma } from '@/lib/prisma'
@@ -75,14 +79,24 @@ export async function getStoreSlugByDomain(
 
     if (storeSlug) {
       await Promise.all([
-        redis.setex(cacheKey, 604800, storeSlug), // 7 days
-        redis.setex(`domain:slug:www.${cleanHostname}`, 604800, storeSlug),
-        redis.setex(`slug:domain:${storeSlug}`, 604800, cleanHostname),
+        redis.setex(cacheKey, DOMAIN_CACHE_TTL_SECONDS, storeSlug), // 7 days
+        redis.setex(
+          `domain:slug:www.${cleanHostname}`,
+          DOMAIN_CACHE_TTL_SECONDS,
+          storeSlug,
+        ),
+        redis.setex(
+          `slug:domain:${storeSlug}`,
+          DOMAIN_CACHE_TTL_SECONDS,
+          cleanHostname,
+        ),
       ]).catch(console.error)
       return storeSlug
     }
 
-    await redis.setex(cacheKey, 60, '__NOT_FOUND__').catch(console.error)
+    await redis
+      .setex(cacheKey, DOMAIN_NOT_FOUND_CACHE_TTL_SECONDS, '__NOT_FOUND__')
+      .catch(console.error)
   } catch (error) {
     console.error(
       `Failed to resolve domain "${cleanHostname}" via Prisma:`,

@@ -1,3 +1,4 @@
+import { DB_CONNECTION_TIMEOUT, DB_IDLE_TIMEOUT } from '@/constants/system'
 import { PrismaPg } from '@prisma/adapter-pg'
 import 'dotenv/config'
 import pg from 'pg'
@@ -10,8 +11,8 @@ const prismaClientSingleton = () => {
   const pool = new pg.Pool({
     connectionString,
     max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: DB_IDLE_TIMEOUT,
+    connectionTimeoutMillis: DB_CONNECTION_TIMEOUT,
   })
   const adapter = new PrismaPg(pool)
 

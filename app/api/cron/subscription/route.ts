@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { PLAN_DETAILS } from '@/constants/plan'
+import { DAY, OVERDUE_INVOICE_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { InvoiceStatus, Plan, SubStatus } from '@/generated/prisma/enums'
 import { formatDate } from '@/utils/date'
@@ -18,13 +19,14 @@ export async function GET(request: Request) {
   const now = new Date()
 
   try {
-    const sevenDaysAgo = new Date(now)
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    const overdueThreshold = new Date(
+      now.getTime() - OVERDUE_INVOICE_DAYS * DAY,
+    )
 
     const overdueInvoices = await prisma.subscriptionInvoice.findMany({
       where: {
         status: InvoiceStatus.UNPAID,
-        createdAt: { lt: sevenDaysAgo },
+        createdAt: { lt: overdueThreshold },
       },
     })
 

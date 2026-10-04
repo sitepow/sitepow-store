@@ -1,6 +1,6 @@
 'use server'
 
-import { MILLISECONDS_PER_DAY, TRANSFER_EXPIRY_DAYS } from '@/constants/system'
+import { DAY, TRANSFER_EXPIRY_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
 
@@ -124,9 +124,7 @@ export async function createTransferRequest(
         fromOwnerId,
         toEmail,
         toUserId: toUser.id,
-        expiresAt: new Date(
-          Date.now() + TRANSFER_EXPIRY_DAYS * MILLISECONDS_PER_DAY,
-        ),
+        expiresAt: new Date(Date.now() + TRANSFER_EXPIRY_DAYS * DAY),
       },
     })
 

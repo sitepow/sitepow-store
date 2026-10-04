@@ -1,21 +1,45 @@
 export const SECOND = 1000
-export const OTP_MIN_RANGE = 100_000
-export const OTP_MAX_RANGE = 1_000_000
-export const OTP_EXPIRY_MINUTES = 5
-export const MILLISECONDS_PER_MINUTE = 60000
-export const MILLISECONDS_PER_DAY = 24 * 60 * MILLISECONDS_PER_MINUTE
+export const MINUTE = 60 * SECOND
+export const HOUR = 60 * MINUTE
+export const DAY = 24 * HOUR
+export const WEEK = 7 * DAY
+export const YEAR = 365 * DAY
+
+const toSeconds = (ms: number) => ms / SECOND
+
 export const SUBSCRIPTION_DAYS = 30
 export const TRANSFER_EXPIRY_DAYS = 1
+export const OVERDUE_INVOICE_DAYS = 7
+export const FAKE_SLIP_BLOCK_DAYS = 7
+export const OTP_EXPIRY_MINUTES = 5
+export const ORDER_EXPIRY_MINUTES = 30
+export const OTP_RESEND_COOLDOWN_SECONDS = 60
+
 export const CHAT_REFETCH_INTERVAL = 15 * SECOND
 export const UNREAD_COUNT_REFETCH_INTERVAL = 10 * SECOND
-export const ORDER_EXPIRY_MINUTES = 30
+export const SSE_KEEP_ALIVE_INTERVAL = 15 * SECOND
+export const LANDING_STORES_STALE_TIME = MINUTE
+export const COPY_RESET_INTERVAL = 2 * SECOND
+export const DOMAIN_VERIFY_TIMEOUT = 5 * SECOND
+export const DB_IDLE_TIMEOUT = 30 * SECOND
+export const DB_CONNECTION_TIMEOUT = 10 * SECOND
+
+export const REDIS_CACHE_TTL_SECONDS = toSeconds(HOUR)
+export const PERMISSION_CACHE_TTL_SECONDS = toSeconds(WEEK)
+export const LATEST_MESSAGES_CACHE_TTL_SECONDS = toSeconds(5 * MINUTE)
+export const DOMAIN_CACHE_TTL_SECONDS = toSeconds(WEEK)
+export const DOMAIN_NOT_FOUND_CACHE_TTL_SECONDS = toSeconds(MINUTE)
+export const TENANT_ORIGIN_CACHE_TTL_SECONDS = toSeconds(DAY)
+export const AUTH_TICKET_TTL_SECONDS = toSeconds(MINUTE)
+export const SESSION_COOKIE_MAX_AGE_SECONDS = toSeconds(WEEK)
+export const LOCALE_COOKIE_MAX_AGE_SECONDS = toSeconds(YEAR)
+export const R2_UPLOAD_URL_EXPIRY_SECONDS = toSeconds(5 * MINUTE)
+
+export const OTP_MIN_RANGE = 100_000
+export const OTP_MAX_RANGE = 1_000_000
 export const SERVER_ERROR_MESSAGE =
   'ขออภัย ระบบขัดข้องชั่วคราว โปรดลองใหม่อีกครั้ง'
 export const AI_BOT_ID = '9bc5e6c4-666f-45d1-a41e-ccba7a37fb28'
-export const REDIS_CACHE_TTL_SECONDS = 60 * 60
-export const PERMISSION_CACHE_TTL_SECONDS = 60 * 60 * 24 * 7
-export const LATEST_MESSAGES_CACHE_TTL_SECONDS = 300
-export const OTP_RESEND_COOLDOWN_SECONDS = 60
 export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'www',
   'api',

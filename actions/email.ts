@@ -1,7 +1,7 @@
 'use server'
 
 import {
-  MILLISECONDS_PER_MINUTE,
+  MINUTE,
   OTP_EXPIRY_MINUTES,
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
@@ -98,7 +98,7 @@ export async function resendOtp() {
 
     if (user.otpExpires) {
       const cooldownInMs = OTP_RESEND_COOLDOWN_SECONDS * SECOND
-      const expiryDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+      const expiryDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
 
       const lastSentTime = user.otpExpires.getTime() - expiryDurationInMs
       const timePassed = Date.now() - lastSentTime
@@ -113,7 +113,7 @@ export async function resendOtp() {
     }
 
     const newOtp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-    const otpDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+    const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
     const otpExpires = new Date(Date.now() + otpDurationInMs)
 
     await prisma.user.update({

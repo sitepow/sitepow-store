@@ -1,5 +1,6 @@
 'use server'
 
+import { R2_UPLOAD_URL_EXPIRY_SECONDS } from '@/constants/system'
 import {
   DeleteObjectCommand,
   PutObjectCommand,
@@ -36,7 +37,9 @@ export async function getR2PresignedUrl(
     })
 
     // @ts-ignore
-    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 })
+    const uploadUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: R2_UPLOAD_URL_EXPIRY_SECONDS,
+    })
 
     return {
       success: true,

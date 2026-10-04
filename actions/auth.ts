@@ -1,7 +1,7 @@
 'use server'
 
 import {
-  MILLISECONDS_PER_MINUTE,
+  MINUTE,
   OTP_EXPIRY_MINUTES,
   OTP_MAX_RANGE,
   OTP_MIN_RANGE,
@@ -84,7 +84,7 @@ export async function registerUser(values: RegisterFormInputs) {
 
     const hashedPassword = await bcrypt.hash(password, 12)
     const otp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-    const otpDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+    const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
     const otpExpires = new Date(Date.now() + otpDurationInMs)
 
     const user = await prisma.user.create({
@@ -155,7 +155,7 @@ export async function requestForgotPasswordOtp(input: RequestOtpInput) {
 
     if (!isOtpValid) {
       const newOtp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-      const otpDurationInMs = OTP_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE
+      const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
       const otpExpires = new Date(Date.now() + otpDurationInMs)
 
       await prisma.user.update({

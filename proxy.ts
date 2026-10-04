@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { LOCALE_COOKIE_MAX_AGE_SECONDS } from '@/constants/system'
+
 import { getStoreSlugByDomain } from '@/lib/domain-resolver'
 import { redis } from '@/lib/redis'
 
@@ -227,7 +229,7 @@ export default async function middleware(req: NextRequest) {
       })
       response.cookies.set('NEXT_LOCALE', langParam, {
         path: '/',
-        maxAge: 60 * 60 * 24 * 365,
+        maxAge: LOCALE_COOKIE_MAX_AGE_SECONDS,
         sameSite: 'lax',
       })
       return response

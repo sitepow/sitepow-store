@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import {
-  MILLISECONDS_PER_MINUTE,
-  ORDER_EXPIRY_MINUTES,
-  SECOND,
-} from '@/constants/system'
+import { HOUR, MINUTE, ORDER_EXPIRY_MINUTES, SECOND } from '@/constants/system'
 
 export function useOrderCountdown(
   createdAt: string | Date,
@@ -18,8 +14,7 @@ export function useOrderCountdown(
   useEffect(() => {
     const calculateTimeLeft = () => {
       const createdTime = new Date(createdAt).getTime()
-      const expirationTime =
-        createdTime + durationMinutes * MILLISECONDS_PER_MINUTE
+      const expirationTime = createdTime + durationMinutes * MINUTE
       const now = new Date().getTime()
       const difference = expirationTime - now
 
@@ -29,12 +24,8 @@ export function useOrderCountdown(
         return
       }
 
-      const minutes = Math.floor(
-        (difference % (60 * MILLISECONDS_PER_MINUTE)) / MILLISECONDS_PER_MINUTE,
-      )
-      const seconds = Math.floor(
-        (difference % MILLISECONDS_PER_MINUTE) / SECOND,
-      )
+      const minutes = Math.floor((difference % HOUR) / MINUTE)
+      const seconds = Math.floor((difference % MINUTE) / SECOND)
 
       setTimeLeft(
         `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { SESSION_COOKIE_MAX_AGE_SECONDS } from '@/constants/system'
+
 import { redis } from '@/lib/redis'
 
 export async function GET(req: NextRequest) {
@@ -29,7 +31,7 @@ export async function GET(req: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: SESSION_COOKIE_MAX_AGE_SECONDS,
   })
 
   return response

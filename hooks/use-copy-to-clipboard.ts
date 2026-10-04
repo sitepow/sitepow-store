@@ -1,6 +1,8 @@
 import { useState } from 'react'
 
-export function useCopyToClipboard(resetInterval = 2000) {
+import { COPY_RESET_INTERVAL } from '@/constants/system'
+
+export function useCopyToClipboard(resetInterval = COPY_RESET_INTERVAL) {
   const [copied, setCopied] = useState(false)
 
   const copy = async (text: string) => {

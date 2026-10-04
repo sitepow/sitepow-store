@@ -1,3 +1,5 @@
+import { DAY, HOUR, MINUTE } from '@/constants/system'
+
 export const THAILAND_TZ = 'Asia/Bangkok'
 const THAILAND_UTC_OFFSET_HOURS = 7
 
@@ -56,10 +58,6 @@ export const getBlockMessage = (blockedUntil: Date | string | null): string => {
   if (diffMs <= 0) {
     return 'บัญชีของคุณพ้นกำหนดระงับแล้ว กรุณาลองใหม่อีกครั้ง'
   }
-
-  const MINUTE = 60 * 1000
-  const HOUR = 60 * MINUTE
-  const DAY = 24 * HOUR
 
   const diffDays = Math.floor(diffMs / DAY)
   const diffHours = Math.floor((diffMs % DAY) / HOUR)

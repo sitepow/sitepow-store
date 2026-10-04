@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import {
-  MILLISECONDS_PER_MINUTE,
-  ORDER_EXPIRY_MINUTES,
-} from '@/constants/system'
+import { MINUTE, ORDER_EXPIRY_MINUTES } from '@/constants/system'
 import { ActorType, OrderStatus } from '@/generated/prisma/enums'
 
 import { cancelOrderCore } from '@/lib/order'
@@ -19,7 +16,7 @@ export async function GET(request: Request) {
 
   try {
     const expirationThreshold = new Date(
-      now.getTime() - ORDER_EXPIRY_MINUTES * MILLISECONDS_PER_MINUTE,
+      now.getTime() - ORDER_EXPIRY_MINUTES * MINUTE,
     )
 
     const expiredOrders = await prisma.order.findMany({

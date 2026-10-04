@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { AUTH_TICKET_TTL_SECONDS } from '@/constants/system'
 import crypto from 'crypto'
 
 import { redis } from '@/lib/redis'
@@ -46,7 +47,12 @@ export async function GET(req: NextRequest) {
   }
 
   const ticket = crypto.randomBytes(32).toString('hex')
-  await redis.set(`auth:ticket:${ticket}`, fullCookieValue, 'EX', 60)
+  await redis.set(
+    `auth:ticket:${ticket}`,
+    fullCookieValue,
+    'EX',
+    AUTH_TICKET_TTL_SECONDS,
+  )
 
   const claimUrl = new URL(
     `https://${targetUrl.hostname}/api/auth/claim-ticket`,

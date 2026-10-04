@@ -1,3 +1,4 @@
+import { TENANT_ORIGIN_CACHE_TTL_SECONDS } from '@/constants/system'
 import { DomainStatus } from '@/generated/prisma/enums'
 
 import { prisma } from '@/lib/prisma'
@@ -46,10 +47,7 @@ export async function getTenantBaseUrl(
         StoreDomain: {
           where: {
             status: {
-              in: [
-                DomainStatus.ACTIVE,
-                DomainStatus.VERIFIED,
-              ],
+              in: [DomainStatus.ACTIVE, DomainStatus.VERIFIED],
             },
           },
           orderBy: [{ isPrimary: 'desc' }, { updatedAt: 'desc' }],
@@ -79,7 +77,9 @@ export async function getTenantBaseUrl(
           : `http://${clean}.lvh.me:3000`
     }
 
-    await redis.setex(cacheKey, 86400, origin).catch(console.error)
+    await redis
+      .setex(cacheKey, TENANT_ORIGIN_CACHE_TTL_SECONDS, origin)
+      .catch(console.error)
     return origin
   } catch (err) {
     console.error('Failed to get tenant base URL:', err)
@@ -89,7 +89,10 @@ export async function getTenantBaseUrl(
   }
 }
 
-export function cleanDescription(text?: string | null, maxLength = 160): string {
+export function cleanDescription(
+  text?: string | null,
+  maxLength = 160,
+): string {
   if (!text) return ''
   const clean = text
     .replace(/<[^>]*>?/gm, ' ')

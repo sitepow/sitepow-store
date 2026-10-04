@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server'
 
+import { SSE_KEEP_ALIVE_INTERVAL } from '@/constants/system'
+
 import { getCurrentUser } from '@/lib/auth-server'
 import { ResellerEventPayload, appEvents } from '@/lib/events'
 
@@ -29,7 +31,7 @@ export async function GET(
             clearInterval(keepAliveInterval)
           }
         }
-      }, 15000)
+      }, SSE_KEEP_ALIVE_INTERVAL)
 
       const unsubscribe = appEvents.subscribe<ResellerEventPayload>(
         `reseller:${storeId}`,

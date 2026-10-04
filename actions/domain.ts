@@ -1,5 +1,9 @@
 'use server'
 
+import {
+  DOMAIN_CACHE_TTL_SECONDS,
+  DOMAIN_VERIFY_TIMEOUT,
+} from '@/constants/system'
 import { ActorType, DomainStatus, LogAction } from '@/generated/prisma/client'
 import { resolveCname } from 'node:dns/promises'
 
@@ -136,9 +140,21 @@ export async function addStoreDomain(storeId: string, domain: string) {
     })
 
     await Promise.all([
-      redis.setex(`domain:slug:${cleanDomain}`, 604800, store.slug),
-      redis.setex(`domain:slug:www.${cleanDomain}`, 604800, store.slug),
-      redis.setex(`slug:domain:${store.slug}`, 604800, cleanDomain),
+      redis.setex(
+        `domain:slug:${cleanDomain}`,
+        DOMAIN_CACHE_TTL_SECONDS,
+        store.slug,
+      ),
+      redis.setex(
+        `domain:slug:www.${cleanDomain}`,
+        DOMAIN_CACHE_TTL_SECONDS,
+        store.slug,
+      ),
+      redis.setex(
+        `slug:domain:${store.slug}`,
+        DOMAIN_CACHE_TTL_SECONDS,
+        cleanDomain,
+      ),
       invalidateCacheByPattern(`domain:slug:${cleanDomain}`),
     ]).catch(console.error)
 
@@ -308,7 +324,7 @@ export async function verifyStoreDomain(storeId: string) {
           const response = await fetch(`https://${cleanCustomDomain}`, {
             method: 'HEAD',
             redirect: 'manual',
-            signal: AbortSignal.timeout(5000),
+            signal: AbortSignal.timeout(DOMAIN_VERIFY_TIMEOUT),
           })
           isVerified = response.status < 500
         } catch {
@@ -328,9 +344,21 @@ export async function verifyStoreDomain(storeId: string) {
 
     if (isVerified) {
       await Promise.all([
-        redis.setex(`domain:slug:${cleanCustomDomain}`, 604800, store.slug),
-        redis.setex(`domain:slug:www.${cleanCustomDomain}`, 604800, store.slug),
-        redis.setex(`slug:domain:${store.slug}`, 604800, cleanCustomDomain),
+        redis.setex(
+          `domain:slug:${cleanCustomDomain}`,
+          DOMAIN_CACHE_TTL_SECONDS,
+          store.slug,
+        ),
+        redis.setex(
+          `domain:slug:www.${cleanCustomDomain}`,
+          DOMAIN_CACHE_TTL_SECONDS,
+          store.slug,
+        ),
+        redis.setex(
+          `slug:domain:${store.slug}`,
+          DOMAIN_CACHE_TTL_SECONDS,
+          cleanCustomDomain,
+        ),
         invalidateCacheByPattern(`domain:slug:${cleanCustomDomain}`),
       ]).catch(console.error)
     }

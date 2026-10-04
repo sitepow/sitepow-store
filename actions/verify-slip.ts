@@ -3,6 +3,7 @@
 import { SLIP_CREDIT_COST } from '@/constants/ai'
 import { mapBankCodeToSlip2Go } from '@/constants/bank'
 import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/slip'
+import { DAY, FAKE_SLIP_BLOCK_DAYS } from '@/constants/system'
 import {
   ActorType,
   BankAccountType,
@@ -227,8 +228,7 @@ export async function verifySlip(
           },
         })
       } else if (updatedCustomerStore.fakeSlipCount >= 3) {
-        const blockDate = new Date()
-        blockDate.setDate(blockDate.getDate() + 7)
+        const blockDate = new Date(Date.now() + FAKE_SLIP_BLOCK_DAYS * DAY)
         await tx.customerStore.update({
           where: {
             customerId_storeId: {

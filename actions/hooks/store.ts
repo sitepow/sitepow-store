@@ -1,3 +1,4 @@
+import { LANDING_STORES_STALE_TIME } from '@/constants/system'
 import { Plan, StoreStatus } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/use-store-filter'
 import {
@@ -10,12 +11,12 @@ import {
 import { storeKeys } from '../query-keys/store'
 import {
   CreateStoreInput,
+  StoreLandingItem,
   UpdateStoreInput,
   checkStoreAvailability,
   createStore,
   deleteStore,
   getLandingStores,
-  StoreLandingItem,
   getStoreOptions,
   getStoreSetupStatus,
   getStores,
@@ -123,7 +124,7 @@ export function useLandingStores(
       queryKey: storeKeys.landing(limit),
       queryFn: async () => await getLandingStores(limit),
       initialData,
-      staleTime: 60 * 1000,
+      staleTime: LANDING_STORES_STALE_TIME,
     }),
   )
 }

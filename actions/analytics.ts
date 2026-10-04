@@ -1,5 +1,6 @@
 'use server'
 
+import { DAY } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
@@ -205,7 +206,7 @@ export async function getAnalyticsOverview(
   ])
 
   const diffInDays = Math.ceil(
-    (endRange.getTime() - startRange.getTime()) / (1000 * 60 * 60 * 24),
+    (endRange.getTime() - startRange.getTime()) / DAY,
   )
   const isDailyMode = diffInDays <= 31
 
