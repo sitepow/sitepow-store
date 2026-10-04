@@ -34,7 +34,6 @@ export const DOMAIN_NOT_FOUND_CACHE_TTL_SECONDS = toSeconds(MINUTE)
 export const TENANT_ORIGIN_CACHE_TTL_SECONDS = toSeconds(DAY)
 export const AUTH_TICKET_TTL_SECONDS = toSeconds(MINUTE)
 export const SESSION_COOKIE_MAX_AGE_SECONDS = toSeconds(WEEK)
-export const LOCALE_COOKIE_MAX_AGE_SECONDS = toSeconds(YEAR)
 export const R2_UPLOAD_URL_EXPIRY_SECONDS = toSeconds(5 * MINUTE)
 
 export const OTP_MIN_RANGE = 100_000
@@ -155,11 +154,6 @@ export const RESERVED_STORE_SUBDOMAIN_SLUG = [
   'sandbox',
   'invite',
 ]
-export const SUPPORTED_LNGS = ['th', 'en']
-export const LANGUAGE_NAMES: Record<string, string> = {
-  th: 'ภาษาไทย',
-  en: 'English',
-}
 export const FIELD_LABELS: Record<string, string> = {
   basic: 'ข้อมูลพื้นฐาน (ชื่อ, slug, หมวดหมู่)',
   metadata: 'Metadata (ข้อมูลทางเทคนิค)',

@@ -13,8 +13,8 @@ import { LockKeyholeIcon, Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/auth/EmailVerified'
 import { LogoBrandText } from '@/components/brand/LogoBrandText'
-import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
 import { StoreLogo } from '@/components/brand/StoreLogo'
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,
@@ -95,8 +95,7 @@ export function StoreNavbar() {
                   items={BUYER_NAVIGATION}
                 />
               )}
-              <QuickSettingsMenu buttonVariant="secondary" />
-              {/* <ModeToggle buttonVariant="secondary" /> */}
+              <ThemeSwitcher buttonVariant="secondary" />
               <CartDrawer />
               <Button
                 variant="secondary"

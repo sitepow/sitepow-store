@@ -54,8 +54,8 @@ import { DateTimeBadge } from '@/components/shared/DateTimeBadge'
 import { EmailVerified } from '@/components/auth/EmailVerified'
 import { LogoBrand } from '@/components/brand/LogoBrand'
 import { LogoBrandText } from '@/components/brand/LogoBrandText'
-import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
 import { StoreLogo } from '@/components/brand/StoreLogo'
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { SupportWidget } from '@/components/chat/SupportWidget'
 import { StoreSetupAlert } from './_components/StoreSetupAlert'
@@ -251,7 +251,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
         <div className="bg-background/95 border-border sticky top-0 z-20 flex items-center justify-between border-b py-2.5 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <SidebarTrigger />
-            <QuickSettingsMenu />
+            <ThemeSwitcher />
           </div>
           <div className="flex items-center gap-2">
             {hasBadgesToShow && (

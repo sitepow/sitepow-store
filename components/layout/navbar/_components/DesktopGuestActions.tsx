@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 
 interface DesktopGuestActionsProps {
@@ -22,7 +22,7 @@ export function DesktopGuestActions({
       <Link href={registerHref}>
         <Button className="font-bold">สมัครเปิดร้าน</Button>
       </Link>
-      <QuickSettingsMenu buttonVariant="secondary" />
+      <ThemeSwitcher buttonVariant="secondary" />
     </>
   )
 }

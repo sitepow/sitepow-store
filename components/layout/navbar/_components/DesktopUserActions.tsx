@@ -5,8 +5,7 @@ import { NavigationItem } from '@/constants/store/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { IconLock } from '@tabler/icons-react'
 
-// import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher'
-import { QuickSettingsMenu } from '@/components/shared/QuickSettingsMenu'
+import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 
 interface DesktopUserActionsProps {
@@ -33,9 +32,7 @@ export function DesktopUserActions({
           </Link>
         </Button>
       )}
-      <QuickSettingsMenu buttonVariant="secondary" />
-      {/* <ModeToggle buttonVariant="secondary" /> */}
-      {/* <LanguageSwitcher buttonVariant="secondary" /> */}
+      <ThemeSwitcher buttonVariant="secondary" />
     </>
   )
 }

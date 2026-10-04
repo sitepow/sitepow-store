@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { LOCALE_COOKIE_MAX_AGE_SECONDS } from '@/constants/system'
-
 import { getStoreSlugByDomain } from '@/lib/tenant/domain-resolver'
 import { redis } from '@/lib/redis/client'
 
@@ -215,34 +213,6 @@ export default async function middleware(req: NextRequest) {
           { status: 301 },
         )
       }
-    }
-
-    const langParam = url.searchParams.get('lang')
-    const requestHeaders = new Headers(req.headers)
-
-    if (langParam && (langParam === 'th' || langParam === 'en')) {
-      requestHeaders.set('x-next-intl-locale', langParam)
-      const response = NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      })
-      response.cookies.set('NEXT_LOCALE', langParam, {
-        path: '/',
-        maxAge: LOCALE_COOKIE_MAX_AGE_SECONDS,
-        sameSite: 'lax',
-      })
-      return response
-    }
-
-    const cookieLocale = req.cookies.get('NEXT_LOCALE')?.value
-    if (cookieLocale && (cookieLocale === 'th' || cookieLocale === 'en')) {
-      requestHeaders.set('x-next-intl-locale', cookieLocale)
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      })
     }
 
     return NextResponse.next()
