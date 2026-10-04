@@ -38,12 +38,6 @@ export const metadata: Metadata = {
     'เปิดร้านค้าออนไลน์สำเร็จรูปกับ Sitepow Store บริหารสต็อกสินค้าหลายสาขา ระบบ POS คิดเงินหน้าร้าน ตรวจเช็คสลิปโอนเงินอัตโนมัติด้วย AI คำนวณค่าส่งอัจฉริยะ 0% ค่าคอมมิชชั่น',
   alternates: {
     canonical: BASE_URL,
-    languages: {
-      th: `${BASE_URL}?lang=th`,
-      en: `${BASE_URL}?lang=en`,
-      'zh-Hans': `${BASE_URL}?lang=cn`,
-      'x-default': BASE_URL,
-    },
   },
   openGraph: {
     title:

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
 
 import { LoginForm } from '@/components/auth/LoginForm'
 
 import { getCurrentUser } from '@/lib/auth/server'
+import { redirectWithCallback } from '@/lib/utils/redirect'
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
@@ -16,12 +16,6 @@ export const metadata: Metadata = {
     'เข้าสู่ระบบ Sitepow Store เพื่อบริหารจัดการร้านค้า สต็อกสินค้า คิดเงินหน้าร้าน POS และรายงานยอดขาย',
   alternates: {
     canonical: `${BASE_URL}/login`,
-    languages: {
-      th: `${BASE_URL}/login?lang=th`,
-      en: `${BASE_URL}/login?lang=en`,
-      'zh-Hans': `${BASE_URL}/login?lang=cn`,
-      'x-default': `${BASE_URL}/login`,
-    },
   },
   openGraph: {
     title: 'เข้าสู่ระบบ | Sitepow Store จัดการร้านค้าออนไลน์',
@@ -46,26 +40,7 @@ export default async function TenantLoginPage({
   const resolvedParams = await searchParams
 
   if (userSession) {
-    const callbackUrl = resolvedParams?.callbackUrl
-    if (callbackUrl) {
-      try {
-        if (callbackUrl.startsWith('/')) {
-          redirect(callbackUrl)
-        }
-        const parsed = new URL(callbackUrl)
-        const hostname = parsed.hostname
-        if (
-          hostname.endsWith('sitepow.store') ||
-          hostname.endsWith('lvh.me') ||
-          hostname === 'localhost'
-        ) {
-          redirect(callbackUrl)
-        }
-      } catch {
-        // invalid URL fallback to '/'
-      }
-    }
-    redirect('/')
+    redirectWithCallback(resolvedParams?.callbackUrl)
   }
 
   return <LoginForm />

@@ -20,12 +20,6 @@ export const metadata: Metadata = {
     'เปรียบเทียบแพ็กเกจราคา Sitepow Store ระบบร้านค้าออนไลน์ ครบทุกฟีเจอร์ POS, จัดการสต็อกสินค้าหลายสาขา, ตรวจสลิป AI เริ่มต้นใช้งานฟรี',
   alternates: {
     canonical: `${BASE_URL}/pricing`,
-    languages: {
-      th: `${BASE_URL}/pricing?lang=th`,
-      en: `${BASE_URL}/pricing?lang=en`,
-      'zh-Hans': `${BASE_URL}/pricing?lang=cn`,
-      'x-default': `${BASE_URL}/pricing`,
-    },
   },
   openGraph: {
     title: 'ราคาและแพ็กเกจ | Sitepow Store - คุ้มค่า ไม่มีค่าคอมมิชชั่น 0%',

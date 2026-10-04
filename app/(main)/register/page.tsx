@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
 
 import { RegisterForm } from '@/components/auth/RegisterForm'
 
 import { getCurrentUser } from '@/lib/auth/server'
+import { redirectWithCallback } from '@/lib/utils/redirect'
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'
@@ -16,12 +16,6 @@ export const metadata: Metadata = {
     'สมัครสมาชิกเปิดร้านค้าออนไลน์ฟรีกับ Sitepow Store ระบบร้านค้าออนไลน์ จัดการสต็อก POS หลายสาขา ตรวจสลิป AI เริ่มต้นใช้งานได้ทันที',
   alternates: {
     canonical: `${BASE_URL}/register`,
-    languages: {
-      th: `${BASE_URL}/register?lang=th`,
-      en: `${BASE_URL}/register?lang=en`,
-      'zh-Hans': `${BASE_URL}/register?lang=cn`,
-      'x-default': `${BASE_URL}/register`,
-    },
   },
   openGraph: {
     title: 'สมัครสมาชิกเปิดร้านค้าออนไลน์ฟรี | Sitepow Store',
@@ -46,26 +40,7 @@ export default async function TenantRegisterPage({
   const resolvedParams = await searchParams
 
   if (userSession) {
-    const callbackUrl = resolvedParams?.callbackUrl
-    if (callbackUrl) {
-      try {
-        if (callbackUrl.startsWith('/')) {
-          redirect(callbackUrl)
-        }
-        const parsed = new URL(callbackUrl)
-        const hostname = parsed.hostname
-        if (
-          hostname.endsWith('sitepow.store') ||
-          hostname.endsWith('lvh.me') ||
-          hostname === 'localhost'
-        ) {
-          redirect(callbackUrl)
-        }
-      } catch {
-        // invalid URL fallback to '/'
-      }
-    }
-    redirect('/')
+    redirectWithCallback(resolvedParams?.callbackUrl)
   }
 
   return <RegisterForm />
