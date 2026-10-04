@@ -1,5 +1,6 @@
 import { ProductType } from '@/generated/prisma/enums'
 import crypto from 'crypto'
+import { format } from 'date-fns'
 
 import { CreateOrderItemInput } from '@/lib/order/types'
 
@@ -72,7 +73,7 @@ export function calculateOrderSummary(order: OrderCalculationsInput) {
 
 export function generateOrderNumber() {
   const date = new Date()
-  const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`
+  const datePart = format(date, 'yyyyMMdd')
   const randomPart = crypto.randomInt(1000, 9999)
   return `SP${datePart}${randomPart}`
 }

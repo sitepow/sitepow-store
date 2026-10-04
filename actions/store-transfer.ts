@@ -3,6 +3,7 @@
 import { DAY, TRANSFER_EXPIRY_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, TransferStatus } from '@/generated/prisma/enums'
+import { fromNow, isPast } from '@/utils/date'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -124,7 +125,7 @@ export async function createTransferRequest(
         fromOwnerId,
         toEmail,
         toUserId: toUser.id,
-        expiresAt: new Date(Date.now() + TRANSFER_EXPIRY_DAYS * DAY),
+        expiresAt: fromNow(TRANSFER_EXPIRY_DAYS * DAY),
       },
     })
 
@@ -242,7 +243,7 @@ export async function acceptTransferRequest(token: string, userId: string) {
     if (request.status !== TransferStatus.PENDING) {
       return { success: false, message: 'คำขอนี้ไม่อยู่ในสถานะรอการยืนยัน' }
     }
-    if (new Date() > request.expiresAt) {
+    if (isPast(request.expiresAt)) {
       await prisma.storeTransferRequest.update({
         where: { id: request.id },
         data: { status: TransferStatus.EXPIRED },

@@ -2,6 +2,7 @@
 
 import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
+import { getRecentMonths, getUtcYearMonthDay, toMonthKey } from '@/utils/date'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
@@ -70,7 +71,8 @@ export async function getStorefrontDashboard(
     }
 
     const now = new Date()
-    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+    const { year: utcYear, month: utcMonth } = getUtcYearMonthDay(now)
+    const sixMonthsAgo = new Date(Date.UTC(utcYear, utcMonth - 5, 1))
 
     const [customerStore, totalOrders, pendingOrders, coupons, ordersTrendRaw] =
       await Promise.all([
@@ -127,11 +129,9 @@ export async function getStorefrontDashboard(
       { name: string; total: number; earned: number; used: number }
     >()
 
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-      const key = `${d.getFullYear()}-${d.getMonth()}`
+    for (const { key, month } of getRecentMonths(6, utcYear, utcMonth)) {
       monthlyDataMap.set(key, {
-        name: THAI_MONTHS[d.getMonth()],
+        name: THAI_MONTHS[month],
         total: 0,
         earned: 0,
         used: 0,
@@ -139,7 +139,10 @@ export async function getStorefrontDashboard(
     }
 
     for (const order of ordersTrendRaw) {
-      const key = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth()}`
+      const key = toMonthKey(
+        order.createdAt.getUTCFullYear(),
+        order.createdAt.getUTCMonth(),
+      )
       const entry = monthlyDataMap.get(key)
       if (entry) {
         entry.total += Number(order.totalAmount)

@@ -12,7 +12,7 @@ import {
   TransactionType,
 } from '@/generated/prisma/enums'
 import { SlipVerificationAction } from '@/types/slip'
-import { getBlockMessage } from '@/utils/date'
+import { fromNow, getBlockMessage, isPast } from '@/utils/date'
 import { getPathR2FromUrl } from '@/utils/image'
 import axios from 'axios'
 
@@ -96,7 +96,7 @@ export async function verifySlip(
   }
 
   if (customerStore.isBlocked) {
-    if (customerStore.blockedUntil && new Date() > customerStore.blockedUntil) {
+    if (customerStore.blockedUntil && isPast(customerStore.blockedUntil)) {
       await prisma.customerStore.update({
         where: {
           customerId_storeId: {
@@ -228,7 +228,7 @@ export async function verifySlip(
           },
         })
       } else if (updatedCustomerStore.fakeSlipCount >= 3) {
-        const blockDate = new Date(Date.now() + FAKE_SLIP_BLOCK_DAYS * DAY)
+        const blockDate = fromNow(FAKE_SLIP_BLOCK_DAYS * DAY)
         await tx.customerStore.update({
           where: {
             customerId_storeId: {

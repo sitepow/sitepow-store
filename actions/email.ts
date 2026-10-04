@@ -3,13 +3,11 @@
 import {
   MINUTE,
   OTP_EXPIRY_MINUTES,
-  OTP_MAX_RANGE,
-  OTP_MIN_RANGE,
   OTP_RESEND_COOLDOWN_SECONDS,
   SECOND,
 } from '@/constants/system'
 import OtpEmail from '@/emails/OtpEmail'
-import crypto from 'crypto'
+import { generateOtp } from '@/utils/otp'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
@@ -112,9 +110,7 @@ export async function resendOtp() {
       }
     }
 
-    const newOtp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-    const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
-    const otpExpires = new Date(Date.now() + otpDurationInMs)
+    const { otp: newOtp, otpExpires } = generateOtp()
 
     await prisma.user.update({
       where: { id: userId },

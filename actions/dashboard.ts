@@ -4,7 +4,14 @@ import { THAI_MONTHS } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { getThaiBoundary } from '@/utils/date'
+import {
+  getRecentMonths,
+  getUtcDayRange,
+  getUtcMonthRange,
+  getUtcYearMonthDay,
+  getUtcYearRange,
+  toMonthKey,
+} from '@/utils/date'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -174,88 +181,36 @@ export async function getDashboard(
     const stockBranchFilter = validBranchId ? { branchId: validBranchId } : {}
 
     const now = new Date()
-    const thaiFormatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Bangkok',
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    })
+    const {
+      year: utcYear,
+      month: utcMonth,
+      day: utcDay,
+    } = getUtcYearMonthDay(now)
 
-    const parts = thaiFormatter.formatToParts(now)
-    const thaiYear = Number(parts.find((p) => p.type === 'year')?.value)
-    const thaiMonth = Number(parts.find((p) => p.type === 'month')?.value) - 1
-    const thaiDay = Number(parts.find((p) => p.type === 'day')?.value)
-
-    const startOfToday = getThaiBoundary(
-      thaiYear,
-      thaiMonth,
-      thaiDay,
-      0,
-      0,
-      0,
-      0,
+    const { start: startOfToday, end: endOfToday } = getUtcDayRange(
+      utcYear,
+      utcMonth,
+      utcDay,
     )
-    const endOfToday = getThaiBoundary(
-      thaiYear,
-      thaiMonth,
-      thaiDay,
-      23,
-      59,
-      59,
-      999,
+    const { start: startOfYesterday, end: endOfYesterday } = getUtcDayRange(
+      utcYear,
+      utcMonth,
+      utcDay - 1,
     )
-    const startOfYesterday = getThaiBoundary(
-      thaiYear,
-      thaiMonth,
-      thaiDay - 1,
-      0,
-      0,
-      0,
-      0,
+    const { start: startOfThisMonth, end: endOfThisMonth } = getUtcMonthRange(
+      utcYear,
+      utcMonth,
     )
-    const endOfYesterday = getThaiBoundary(
-      thaiYear,
-      thaiMonth,
-      thaiDay - 1,
-      23,
-      59,
-      59,
-      999,
+    const { start: startOfLastMonth, end: endOfLastMonth } = getUtcMonthRange(
+      utcYear,
+      utcMonth - 1,
     )
-    const startOfThisMonth = getThaiBoundary(thaiYear, thaiMonth, 1, 0, 0, 0, 0)
-    const endOfThisMonth = getThaiBoundary(
-      thaiYear,
-      thaiMonth + 1,
-      0,
-      23,
-      59,
-      59,
-      999,
+    const { start: startOfThisYear, end: endOfThisYear } =
+      getUtcYearRange(utcYear)
+    const { start: startOfLastYear, end: endOfLastYear } = getUtcYearRange(
+      utcYear - 1,
     )
-    const startOfLastMonth = getThaiBoundary(
-      thaiYear,
-      thaiMonth - 1,
-      1,
-      0,
-      0,
-      0,
-      0,
-    )
-    const endOfLastMonth = getThaiBoundary(
-      thaiYear,
-      thaiMonth,
-      0,
-      23,
-      59,
-      59,
-      999,
-    )
-
-    const startOfThisYear = getThaiBoundary(thaiYear, 0, 1, 0, 0, 0, 0)
-    const endOfThisYear = getThaiBoundary(thaiYear, 11, 31, 23, 59, 59, 999)
-    const startOfLastYear = getThaiBoundary(thaiYear - 1, 0, 1, 0, 0, 0, 0)
-    const endOfLastYear = getThaiBoundary(thaiYear - 1, 11, 31, 23, 59, 59, 999)
-    const sixMonthsAgo = getThaiBoundary(thaiYear, thaiMonth - 5, 1, 0, 0, 0, 0)
+    const sixMonthsAgo = new Date(Date.UTC(utcYear, utcMonth - 5, 1))
 
     const [
       salesToday,
@@ -561,28 +516,13 @@ export async function getDashboard(
     const yNetProfit = yGrossProfit - yExpense
     const yNetProfitLastYear = yGrossProfitLastYear - yExpenseLastYear
     const trendMap: Record<string, number> = {}
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(Date.UTC(thaiYear, thaiMonth - i, 1))
-      trendMap[`${d.getUTCFullYear()}-${d.getUTCMonth()}`] = 0
+    for (const { key } of getRecentMonths(6, utcYear, utcMonth)) {
+      trendMap[key] = 0
     }
 
     for (const order of salesTrendRaw) {
-      const orderDate = new Date(order.createdAt)
-      const orderThaiYear = Number(
-        new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Bangkok',
-          year: 'numeric',
-        }).format(orderDate),
-      )
-      const orderThaiMonth =
-        Number(
-          new Intl.DateTimeFormat('en-US', {
-            timeZone: 'Asia/Bangkok',
-            month: 'numeric',
-          }).format(orderDate),
-        ) - 1
-
-      const key = `${orderThaiYear}-${orderThaiMonth}`
+      const { year, month } = getUtcYearMonthDay(new Date(order.createdAt))
+      const key = toMonthKey(year, month)
       if (key in trendMap) {
         trendMap[key] += Number(order.totalAmount)
       }

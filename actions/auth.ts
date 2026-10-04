@@ -1,15 +1,10 @@
 'use server'
 
-import {
-  MINUTE,
-  OTP_EXPIRY_MINUTES,
-  OTP_MAX_RANGE,
-  OTP_MIN_RANGE,
-} from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { RegisterFormInputs } from '@/types/register'
+import { isPast } from '@/utils/date'
+import { generateOtp } from '@/utils/otp'
 import bcrypt from 'bcryptjs'
-import crypto from 'crypto'
 
 import { prisma } from '@/lib/prisma'
 
@@ -83,9 +78,7 @@ export async function registerUser(values: RegisterFormInputs) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12)
-    const otp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-    const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
-    const otpExpires = new Date(Date.now() + otpDurationInMs)
+    const { otp, otpExpires } = generateOtp()
 
     const user = await prisma.user.create({
       data: {
@@ -147,16 +140,12 @@ export async function requestForgotPasswordOtp(input: RequestOtpInput) {
       return { success: false, message: 'ไม่พบผู้ใช้งานด้วยอีเมลนี้ในระบบ' }
     }
 
-    const now = new Date()
     let otpToSend = user.otp
 
-    const isOtpValid =
-      user.otp && user.otpExpires && new Date(user.otpExpires) > now
+    const isOtpValid = user.otp && user.otpExpires && !isPast(user.otpExpires)
 
     if (!isOtpValid) {
-      const newOtp = crypto.randomInt(OTP_MIN_RANGE, OTP_MAX_RANGE).toString()
-      const otpDurationInMs = OTP_EXPIRY_MINUTES * MINUTE
-      const otpExpires = new Date(Date.now() + otpDurationInMs)
+      const { otp: newOtp, otpExpires } = generateOtp()
 
       await prisma.user.update({
         where: { id: user.id },
@@ -212,7 +201,7 @@ export async function resetPasswordWithOtp(input: ResetPasswordWithOtpInput) {
       return { success: false, message: 'รหัส OTP ไม่ถูกต้อง' }
     }
 
-    if (new Date() > new Date(user.otpExpires)) {
+    if (isPast(user.otpExpires)) {
       return { success: false, message: 'รหัส OTP หมดอายุแล้ว กรุณาขอรหัสใหม่' }
     }
 

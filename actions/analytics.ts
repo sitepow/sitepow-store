@@ -4,7 +4,14 @@ import { DAY } from '@/constants/system'
 import { OrderStatus } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { ALL_STORES } from '@/stores/use-store-filter'
-import { THAILAND_TZ, getThaiDateParts } from '@/utils/date'
+import {
+  formatDayMonth,
+  formatMonthYear,
+  getThaiDateParts,
+  getThaiEndOfDay,
+  getThaiStartOfDay,
+  getThaiStartOfMonth,
+} from '@/utils/date'
 
 import { getCurrentUser } from '@/lib/auth-server'
 import { verifyEmployeePermission } from '@/lib/permission'
@@ -131,19 +138,15 @@ export async function getAnalyticsOverview(
   let endRange: Date
 
   if (startDate) {
-    startRange = new Date(startDate)
-    startRange.setHours(0, 0, 0, 0)
+    startRange = getThaiStartOfDay(startDate)
   } else {
-    const now = new Date()
-    startRange = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+    startRange = getThaiStartOfMonth(new Date())
   }
 
   if (endDate) {
-    endRange = new Date(endDate)
-    endRange.setHours(23, 59, 59, 999)
+    endRange = getThaiEndOfDay(endDate)
   } else {
-    endRange = new Date()
-    endRange.setHours(23, 59, 59, 999)
+    endRange = getThaiEndOfDay(new Date())
   }
 
   const dateRangeFilter = {
@@ -220,24 +223,14 @@ export async function getAnalyticsOverview(
 
     if (isDailyMode) {
       const key = `${year}-${month}-${day}`
-      const label = new Intl.DateTimeFormat('th-TH', {
-        timeZone: THAILAND_TZ,
-        day: 'numeric',
-        month: 'short',
-      }).format(date)
-      return { key, label }
+      return { key, label: formatDayMonth(date) }
     } else {
       const key = `${year}-${month}`
-      const label = new Intl.DateTimeFormat('th-TH', {
-        timeZone: THAILAND_TZ,
-        month: 'short',
-        year: '2-digit',
-      }).format(date)
-      return { key, label }
+      return { key, label: formatMonthYear(date) }
     }
   }
 
-  const cursor = new Date(startRange)
+  let cursor = isDailyMode ? startRange : getThaiStartOfMonth(startRange)
   while (cursor <= endRange) {
     const { key, label } = getPeriodInfo(cursor)
     if (!periodMap[key]) {
@@ -254,11 +247,9 @@ export async function getAnalyticsOverview(
       }
     }
 
-    if (isDailyMode) {
-      cursor.setDate(cursor.getDate() + 1)
-    } else {
-      cursor.setMonth(cursor.getMonth() + 1)
-    }
+    cursor = isDailyMode
+      ? new Date(cursor.getTime() + DAY)
+      : getThaiStartOfMonth(cursor, 1)
   }
 
   orders.forEach((o) => {

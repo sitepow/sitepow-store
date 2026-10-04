@@ -14,7 +14,7 @@ import {
 import { CheckoutType, UpgradeType } from '@/types/checkout'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { calculatePlanPrice, calculateProration } from '@/utils/pricing'
-import { differenceInMonths } from 'date-fns'
+import { addMonths, differenceInMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -227,8 +227,7 @@ export async function changePlan(
       : calculatePlanPrice(PLAN_DETAILS[newPlan].price.toString(), billingCycle)
 
     const months = parseInt(billingCycle) || 1
-    const nextEndDate = new Date()
-    nextEndDate.setMonth(nextEndDate.getMonth() + months)
+    const nextEndDate = addMonths(new Date(), months)
 
     const unpaidInvoice = await prisma.subscriptionInvoice.findFirst({
       where: { storeId, status: InvoiceStatus.UNPAID },

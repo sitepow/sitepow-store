@@ -4,7 +4,7 @@ import { PLAN_DETAILS } from '@/constants/plan'
 import { DAY, OVERDUE_INVOICE_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { InvoiceStatus, Plan, SubStatus } from '@/generated/prisma/enums'
-import { formatDate } from '@/utils/date'
+import { ago, formatDate } from '@/utils/date'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { addMonths } from 'date-fns'
 
@@ -19,9 +19,7 @@ export async function GET(request: Request) {
   const now = new Date()
 
   try {
-    const overdueThreshold = new Date(
-      now.getTime() - OVERDUE_INVOICE_DAYS * DAY,
-    )
+    const overdueThreshold = ago(OVERDUE_INVOICE_DAYS * DAY)
 
     const overdueInvoices = await prisma.subscriptionInvoice.findMany({
       where: {

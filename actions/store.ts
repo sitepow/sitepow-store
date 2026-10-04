@@ -21,6 +21,7 @@ import { formatDate } from '@/utils/date'
 import { DecimalToNumber, serializeDecimal } from '@/utils/decimal'
 import { calculatePlanPrice } from '@/utils/pricing'
 import { createStoreSchema } from '@/zod/store'
+import { addMonths } from 'date-fns'
 
 import { createLog } from '@/lib/activity-log'
 import { getCurrentUser } from '@/lib/auth-server'
@@ -457,8 +458,7 @@ export async function createStore(input: CreateStoreInput) {
             : 1
 
     const startDate = new Date()
-    const endDate = new Date()
-    endDate.setMonth(endDate.getMonth() + months)
+    const endDate = addMonths(startDate, months)
 
     const selectedPlan = input.plan ?? Plan.STARTER
     const isFreePlan = selectedPlan === Plan.FREE
