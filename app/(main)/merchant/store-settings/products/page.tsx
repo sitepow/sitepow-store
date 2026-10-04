@@ -3,7 +3,7 @@
 import Link from 'next/link'
 
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconBox, IconLock, IconPlus } from '@tabler/icons-react'
 

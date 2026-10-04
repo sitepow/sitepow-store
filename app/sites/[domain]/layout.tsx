@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { getStoreByDomain } from '@/lib/tenant/store'
-import { BASE_FAVICON } from '@/constants/favicon'
+import { BASE_FAVICON } from '@/constants/shared/assets'
 import { StoreStatus } from '@/generated/prisma/enums'
 
 import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant/seo'

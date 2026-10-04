@@ -1,7 +1,7 @@
 'use client'
 
 
-import { CUSTOMER_LOYALTY_FEATURES } from '@/constants/customerLoyalty'
+import { CUSTOMER_LOYALTY_FEATURES } from '@/constants/landing/sections/customer-loyalty'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

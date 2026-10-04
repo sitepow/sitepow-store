@@ -8,7 +8,7 @@ import {
   useAllResellerAgreements,
   useUpsertResellerCustomPrice,
 } from '@/actions/reseller/reseller/hooks'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useResellerSSE } from '@/hooks/use-reseller-sse'
 import { useAlertStore } from '@/stores/use-alert-store'
 import { useResellerFilter } from '@/stores/use-reseller-filter'

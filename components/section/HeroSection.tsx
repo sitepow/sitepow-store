@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { AVATARS_SEED } from '@/constants/avartar'
+import { AVATARS_SEED } from '@/constants/landing/avatars'
 import { MINUTE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'

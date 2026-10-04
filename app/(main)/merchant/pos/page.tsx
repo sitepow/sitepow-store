@@ -10,7 +10,7 @@ import {
 } from '@/actions/sales/pos-product/hooks'
 import { POSProductItem } from '@/actions/sales/pos-product/actions'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PRICING_TABLES } from '@/constants/pricing'
+import { PRICING_TABLES } from '@/constants/billing/pricing'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { SectionHeader } from '@/components/SectionHeader'

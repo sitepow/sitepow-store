@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import {
   PERMISSION_DESCRIPTIONS,
   PERMISSION_MAPPING,
-} from '@/constants/permission'
+} from '@/constants/store/permission'
 import { PermissionKey } from '@/types/permission'
 import { IconKey } from '@tabler/icons-react'
 

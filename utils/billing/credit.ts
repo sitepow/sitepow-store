@@ -1,4 +1,4 @@
-import { CREDIT_TIERS } from '@/constants/credit'
+import { CREDIT_TIERS } from '@/constants/billing/credit'
 
 export const getCredits = (amount: number) => {
   const tier =

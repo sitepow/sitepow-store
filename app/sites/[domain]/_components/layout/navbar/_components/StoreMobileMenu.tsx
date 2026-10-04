@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { STORE_NAVBAR_ITEMS } from '@/constants/sites/navbar'
+import { STORE_NAVBAR_ITEMS } from '@/constants/storefront/navbar'
 import { LockKeyholeIcon, SearchIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

@@ -1,7 +1,7 @@
 'use server'
 
-import { GEMINI_MODEL } from '@/constants/ai'
-import { getRelevantInfo } from '@/constants/help-center'
+import { GEMINI_MODEL } from '@/constants/ai/config'
+import { getRelevantInfo } from '@/constants/ai/support-context'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)

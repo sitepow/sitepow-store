@@ -1,6 +1,6 @@
 import { ComponentProps } from 'react'
 
-import { BASE_CREDIT_VALUE_THB } from '@/constants/ai'
+import { BASE_CREDIT_VALUE_THB } from '@/constants/ai/config'
 import { IconInfoCircle } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'

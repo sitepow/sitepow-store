@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { NAVBAR_ITEMS } from '@/constants/navbar'
+import { NAVBAR_ITEMS } from '@/constants/landing/navbar'
 import { LockIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { IconBuildingStore, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

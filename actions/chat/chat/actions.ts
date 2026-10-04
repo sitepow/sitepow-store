@@ -1,9 +1,9 @@
 'use server'
 
 import { checkAccessWithCache } from '@/app/api/sse/chat/[conversationId]/route'
-import { GEMINI_MODEL } from '@/constants/ai'
-import { BAD_WORD_LISTS } from '@/constants/badwords'
-import { PLAN_DETAILS } from '@/constants/plan'
+import { GEMINI_MODEL } from '@/constants/ai/config'
+import { BAD_WORD_LISTS } from '@/constants/moderation/badwords'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 import {
   AI_BOT_ID,
   LATEST_MESSAGES_CACHE_TTL_SECONDS,

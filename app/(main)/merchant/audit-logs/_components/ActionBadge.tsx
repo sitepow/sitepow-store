@@ -1,6 +1,6 @@
 'use client'
 
-import { LOG_ACTION_TH } from '@/constants/translate'
+import { LOG_ACTION_TH } from '@/constants/i18n/translate'
 import { LogAction } from '@/generated/prisma/enums'
 
 import { Badge } from '@/components/ui/badge'

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { PLAN_DETAILS } from '@/constants/plan'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 import { DAY, OVERDUE_INVOICE_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { InvoiceStatus, Plan, SubStatus } from '@/generated/prisma/enums'

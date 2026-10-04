@@ -1,7 +1,7 @@
 'use client'
 
 
-import { SECURITY_FEATURES } from '@/constants/security-trust'
+import { SECURITY_FEATURES } from '@/constants/landing/sections/security'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

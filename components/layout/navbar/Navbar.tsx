@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
-import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION, SUPPORT_NAVIGATION } from '@/constants/store/navigation'
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'

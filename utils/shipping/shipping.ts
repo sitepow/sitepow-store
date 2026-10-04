@@ -1,5 +1,5 @@
 import { StoreShippingPayload } from '@/actions/store/shipping/actions'
-import { REGION_MAP, REMOTE_AREAS } from '@/constants/shipping'
+import { REGION_MAP, REMOTE_AREAS } from '@/constants/store/shipping'
 import { Prisma } from '@/generated/prisma/client'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { ShippingFormValues } from '@/zod/store/shipping-settings'

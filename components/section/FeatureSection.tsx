@@ -1,7 +1,7 @@
 'use client'
 
 
-import { NAVBAR_ITEMS } from '@/constants/navbar'
+import { NAVBAR_ITEMS } from '@/constants/landing/navbar'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

@@ -8,8 +8,8 @@ import {
   GEMINI_MODEL,
   PRODUCT_SCHEMA,
   PRODUCT_SCHEMA_PARTS,
-} from '@/constants/ai'
-import { PLAN_DETAILS } from '@/constants/plan'
+} from '@/constants/ai/config'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 import { Plan, TransactionType } from '@/generated/prisma/enums'
 import { AiGenTask, CreditUsageType } from '@/types/ai'
 import {

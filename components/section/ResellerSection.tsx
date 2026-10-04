@@ -1,7 +1,7 @@
 'use client'
 
 
-import { RESELLER_FEATURES } from '@/constants/reseller'
+import { RESELLER_FEATURES } from '@/constants/landing/sections/reseller'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

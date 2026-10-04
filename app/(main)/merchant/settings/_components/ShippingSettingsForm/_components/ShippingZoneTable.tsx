@@ -1,6 +1,6 @@
 'use client'
 
-import { ZONE_LABELS } from '@/constants/shipping'
+import { ZONE_LABELS } from '@/constants/store/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { getProvincesForZone, getRegionKey } from '@/utils/shipping/shipping'
 

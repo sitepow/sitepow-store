@@ -2,8 +2,8 @@
 
 import { cache } from 'react'
 
-import { PLAN_DETAILS } from '@/constants/plan'
-import { PRICING_VALUE } from '@/constants/pricing'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
+import { PRICING_VALUE } from '@/constants/billing/pricing'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,

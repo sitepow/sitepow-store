@@ -167,9 +167,15 @@ export const FIELD_LABELS: Record<string, string> = {
   addons: 'บริการเสริม (Addons)',
   tags: 'แท็กสินค้า (Tags)',
 }
-export const FALLBACK_IMAGE = '/images/navigation/navigation-header.jpeg'
-export const FALLBACK_MERCHANT_BANNER_IMAGE = '/images/pos-cart.jpeg'
-export const FALLBACK_MERCHANT_LOGO_IMAGE = '/images/merchant-logo.png'
+
+export {
+  BASE_FAVICON,
+  FALLBACK_IMAGE,
+  FALLBACK_MERCHANT_BANNER_IMAGE,
+  FALLBACK_MERCHANT_LOGO_IMAGE,
+  USER_ICON,
+} from '@/constants/shared/assets'
+
 export const PRIMARY_COLOR_OPTIONS = [
   { label: 'Neutral', value: '#737373' },
   { label: 'Amber', value: '#f59e0b' },

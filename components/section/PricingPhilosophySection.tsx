@@ -1,7 +1,7 @@
 'use client'
 
 
-import { PHILOSOPHY_FEATURES } from '@/constants/pricing-philosophy'
+import { PHILOSOPHY_FEATURES } from '@/constants/landing/sections/philosophy'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

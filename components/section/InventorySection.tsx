@@ -1,7 +1,7 @@
 'use client'
 
 
-import { INVENTORY_FEATURES } from '@/constants/inventory'
+import { INVENTORY_FEATURES } from '@/constants/landing/sections/inventory'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

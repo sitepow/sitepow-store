@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useCheckout } from '@/actions/billing/checkout/hooks'
-import { CREDIT_TIERS, PACKAGES } from '@/constants/credit'
+import { CREDIT_TIERS, PACKAGES } from '@/constants/billing/credit'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CheckoutType } from '@/types/checkout'

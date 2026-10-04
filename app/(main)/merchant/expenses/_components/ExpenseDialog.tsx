@@ -11,7 +11,7 @@ import {
   useUpdateExpense,
 } from '@/actions/finance/expense/hooks'
 import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
-import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
+import { EXPENSE_CATEGORY_TH } from '@/constants/i18n/translate'
 import { ExpenseCategory } from '@/generated/prisma/enums'
 import { ALL_BRANCHES } from '@/stores/use-branch-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'

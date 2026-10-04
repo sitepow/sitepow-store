@@ -1,6 +1,6 @@
 'use client'
 
-import { PAYMENT_METHOD_TH } from '@/constants/translate'
+import { PAYMENT_METHOD_TH } from '@/constants/i18n/translate'
 import { PaymentMethod } from '@/generated/prisma/enums'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { ACTOR_TYPE_TH, LOG_ACTION_TH } from '@/constants/translate'
+import { ACTOR_TYPE_TH, LOG_ACTION_TH } from '@/constants/i18n/translate'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconFilter, IconSearch } from '@tabler/icons-react'
 

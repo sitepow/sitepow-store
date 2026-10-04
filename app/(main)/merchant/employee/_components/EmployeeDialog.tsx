@@ -10,7 +10,7 @@ import {
   useUpdateEmployee,
 } from '@/actions/store/employee/hooks'
 import { usePermissions, useRoleOptions } from '@/actions/store/role/hooks'
-import { DEFAULT_ROLE_TH } from '@/constants/translate'
+import { DEFAULT_ROLE_TH } from '@/constants/i18n/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {

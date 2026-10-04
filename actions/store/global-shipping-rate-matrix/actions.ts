@@ -1,6 +1,6 @@
 'use server'
 
-import { COURIERS_LIST } from '@/constants/shipping'
+import { COURIERS_LIST } from '@/constants/store/shipping'
 import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
 import {
   AggregatedRate,

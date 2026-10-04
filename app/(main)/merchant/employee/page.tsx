@@ -7,7 +7,7 @@ import {
   useResetStoreRolePermissions,
   useSyncStoreRolesAndPermissions,
 } from '@/actions/store/permission/hooks'
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useBranchFilter } from '@/stores/use-branch-filter'

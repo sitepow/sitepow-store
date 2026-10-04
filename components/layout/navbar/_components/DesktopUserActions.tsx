@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { UserAvatarDropdown } from '@/app/sites/[domain]/_components/UserAvatarDropdown'
-import { NavigationItem } from '@/constants/navigation'
+import { NavigationItem } from '@/constants/store/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { IconLock } from '@tabler/icons-react'
 

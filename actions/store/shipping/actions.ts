@@ -1,6 +1,6 @@
 'use server'
 
-import { REMOTE_AREAS } from '@/constants/shipping'
+import { REMOTE_AREAS } from '@/constants/store/shipping'
 import { Prisma } from '@/generated/prisma/client'
 import {
   ActorType,

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-import { thDictionary } from '@/constants/blocknote'
+import { thDictionary } from '@/constants/editor/blocknote'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteView } from '@blocknote/shadcn'
 import '@blocknote/shadcn/style.css'

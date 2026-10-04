@@ -1,7 +1,7 @@
 'use server'
 
-import { PLAN_DETAILS, PLAN_RANK } from '@/constants/plan'
-import { PRICING_VALUE } from '@/constants/pricing'
+import { PLAN_DETAILS, PLAN_RANK } from '@/constants/billing/plan'
+import { PRICING_VALUE } from '@/constants/billing/pricing'
 import {
   ActorType,
   InvoiceStatus,

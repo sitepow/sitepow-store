@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { SettingsTab } from '@/constants/settings'
+import { SettingsTab } from '@/constants/store/settings'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useMerchantStoreSetupStore } from '@/stores/use-merchant-store-setup-store'
 import { AlertCircleIcon } from 'lucide-react'

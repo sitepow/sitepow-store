@@ -2,8 +2,8 @@
 
 import { Suspense } from 'react'
 
-import { BUYER_NAVIGATION } from '@/constants/navigation'
-import { UserSettingsTab } from '@/constants/settings'
+import { BUYER_NAVIGATION } from '@/constants/store/navigation'
+import { UserSettingsTab } from '@/constants/store/settings'
 import { useQueryParam } from '@/hooks/use-query-param'
 import {
   IconBell,

@@ -4,7 +4,7 @@ import {
   useCancelPendingPlanChange,
   useStoreSubscriptions,
 } from '@/actions/billing/subscription/hooks'
-import { PLAN_DETAILS } from '@/constants/plan'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 import { useSession } from '@/hooks/use-session'
 import { formatDate } from '@/utils/formatting/date'
 import { formatCurrency } from '@/utils/formatting/number'

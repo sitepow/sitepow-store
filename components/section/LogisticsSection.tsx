@@ -1,7 +1,7 @@
 'use client'
 
 
-import { LOGISTICS_FEATURES } from '@/constants/logistics'
+import { LOGISTICS_FEATURES } from '@/constants/landing/sections/logistics'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

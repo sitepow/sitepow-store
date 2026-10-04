@@ -1,7 +1,7 @@
 'use client'
 
 
-import { PRODUCT_TYPE_FEATURES } from '@/constants/product-types'
+import { PRODUCT_TYPE_FEATURES } from '@/constants/landing/sections/product-types'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

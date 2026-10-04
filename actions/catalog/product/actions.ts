@@ -1,7 +1,7 @@
 'use server'
 
 import { invalidateStorefrontProductCache } from '@/actions/storefront/product/invalidation'
-import { PLAN_DETAILS } from '@/constants/plan'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 import {
   ActorType,
   LogAction,

@@ -1,7 +1,7 @@
 'use client'
 
 
-import { CHAT_FEATURES } from '@/constants/chat'
+import { CHAT_FEATURES } from '@/constants/landing/sections/chat'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

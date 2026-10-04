@@ -1,7 +1,7 @@
 'use client'
 
 
-import { CUSTOMIZATION_FEATURES } from '@/constants/store-customization'
+import { CUSTOMIZATION_FEATURES } from '@/constants/landing/sections/customization'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

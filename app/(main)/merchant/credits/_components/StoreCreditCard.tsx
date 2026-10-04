@@ -1,7 +1,7 @@
 'use client'
 
 import { useStoreCredit } from '@/actions/billing/credit/hooks'
-import { AVG_INPUT_TOKENS, AVG_OUTPUT_TOKENS } from '@/constants/ai'
+import { AVG_INPUT_TOKENS, AVG_OUTPUT_TOKENS } from '@/constants/ai/config'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

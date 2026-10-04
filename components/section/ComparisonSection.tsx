@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PROFIT_COMPARISON } from '@/constants/pricing'
+import { PROFIT_COMPARISON } from '@/constants/billing/pricing'
 
 import { CheckCircleIcon } from '@/components/icon/CheckCircle'
 import { CloseCircleIcon } from '@/components/icon/CloseCircle'

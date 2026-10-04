@@ -4,7 +4,7 @@ import {
   isServer,
 } from '@tanstack/react-query'
 
-import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/query'
+import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/shared/query'
 
 function makeQueryClient() {
   return new QueryClient({

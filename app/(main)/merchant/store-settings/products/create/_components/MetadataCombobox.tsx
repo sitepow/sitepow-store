@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+import { PRODUCT_METADATA_MASTER } from '@/constants/storefront/metadata'
 import { Check, ChevronDownIcon } from 'lucide-react'
 
 import {

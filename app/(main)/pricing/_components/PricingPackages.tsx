@@ -1,4 +1,4 @@
-import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/pricing'
+import { COMMON_FEATURES, PRICING_PLANS } from '@/constants/billing/pricing'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { SectionHeader } from '@/components/SectionHeader'

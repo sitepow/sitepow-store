@@ -4,8 +4,8 @@ import { ComponentProps, Fragment } from 'react'
 
 import Link from 'next/link'
 
-import { USER_ICON } from '@/constants/favicon'
-import { NavigationItem } from '@/constants/navigation'
+import { USER_ICON } from '@/constants/shared/assets'
+import { NavigationItem } from '@/constants/store/navigation'
 import { useSession } from '@/hooks/use-session'
 import { IconLogout } from '@tabler/icons-react'
 

@@ -1,5 +1,5 @@
 import { GetSubscriptionItemSerialized } from '@/actions/billing/subscription/actions'
-import { PRICING_OPTIONS } from '@/constants/pricing'
+import { PRICING_OPTIONS } from '@/constants/billing/pricing'
 import { SubStatus } from '@/generated/prisma/enums'
 import { differenceInDays, differenceInMonths } from 'date-fns'
 

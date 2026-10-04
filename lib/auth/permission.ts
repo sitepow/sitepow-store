@@ -2,7 +2,7 @@ import { employeeKeys } from '@/actions/store/employee/query-keys'
 import {
   PERMISSION_MAPPING,
   ROLE_PERMISSION_PRESETS,
-} from '@/constants/permission'
+} from '@/constants/store/permission'
 import {
   DEFAULT_PASSWORD_EMPLOYEE,
   PERMISSION_CACHE_TTL_SECONDS,

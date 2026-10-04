@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 import { useSearchParams } from 'next/navigation'
 
-import { LOGIN_PROVIDERS } from '@/constants/login'
+import { LOGIN_PROVIDERS } from '@/constants/auth/providers'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { LoginFormInputs } from '@/types/login'

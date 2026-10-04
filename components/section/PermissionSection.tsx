@@ -1,7 +1,7 @@
 'use client'
 
 
-import { PERMISSION_FEATURES } from '@/constants/permissions'
+import { PERMISSION_FEATURES } from '@/constants/landing/sections/permission'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

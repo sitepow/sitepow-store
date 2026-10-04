@@ -1,4 +1,4 @@
-import { EXPENSE_CATEGORY_TH } from '@/constants/translate'
+import { EXPENSE_CATEGORY_TH } from '@/constants/i18n/translate'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { IconCategory } from '@tabler/icons-react'
 

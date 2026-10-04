@@ -3,7 +3,7 @@
 import {
   PERMISSION_MAPPING,
   ROLE_PERMISSION_PRESETS,
-} from '@/constants/permission'
+} from '@/constants/store/permission'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { PermissionKey } from '@/types/permission'
 

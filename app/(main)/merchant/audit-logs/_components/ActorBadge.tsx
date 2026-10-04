@@ -1,6 +1,6 @@
 'use client'
 
-import { ACTOR_TYPE_TH } from '@/constants/translate'
+import { ACTOR_TYPE_TH } from '@/constants/i18n/translate'
 import { ActorType } from '@/generated/prisma/enums'
 
 import { Badge } from '@/components/ui/badge'

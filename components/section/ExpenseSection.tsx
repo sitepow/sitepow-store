@@ -1,7 +1,7 @@
 'use client'
 
 
-import { EXPENSE_FEATURES } from '@/constants/expenses'
+import { EXPENSE_FEATURES } from '@/constants/landing/sections/expense'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

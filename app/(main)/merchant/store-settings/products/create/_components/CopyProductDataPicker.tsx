@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 import { useProductOptions } from '@/actions/catalog/product/hooks'
 import { getProductById } from '@/actions/catalog/product/actions'
-import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+import { PRODUCT_METADATA_MASTER } from '@/constants/storefront/metadata'
 import { FIELD_LABELS } from '@/constants/system'
 import { DiscountType } from '@/generated/prisma/enums'
 import { ProductFormValues } from '@/zod/catalog/product'

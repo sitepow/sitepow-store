@@ -1,8 +1,8 @@
 'use server'
 
-import { SLIP_CREDIT_COST } from '@/constants/ai'
-import { mapBankCodeToSlip2Go } from '@/constants/bank'
-import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/slip'
+import { SLIP_CREDIT_COST } from '@/constants/ai/config'
+import { mapBankCodeToSlip2Go } from '@/constants/payment/bank'
+import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/payment/slip'
 import { DAY, FAKE_SLIP_BLOCK_DAYS } from '@/constants/system'
 import {
   ActorType,

@@ -1,4 +1,4 @@
-import { PRICING_PLANS } from '@/constants/pricing'
+import { PRICING_PLANS } from '@/constants/billing/pricing'
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'

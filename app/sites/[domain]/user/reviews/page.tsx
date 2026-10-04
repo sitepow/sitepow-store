@@ -1,6 +1,6 @@
 'use client'
 
-import { BUYER_NAVIGATION } from '@/constants/navigation'
+import { BUYER_NAVIGATION } from '@/constants/store/navigation'
 import { IconStar } from '@tabler/icons-react'
 
 import { PageTabHeader } from '@/components/PageTabHeader'

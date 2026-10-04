@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import toast from 'react-hot-toast'
 
-import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/query'
+import { QUERY_RETRY_COUNT, QUERY_TIMES } from '@/constants/shared/query'
 import { SERVER_ERROR_MESSAGE } from '@/constants/system'
 import {
   MutationCache,

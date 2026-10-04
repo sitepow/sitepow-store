@@ -5,7 +5,7 @@
 import { ComponentProps } from 'react'
 
 import { useProfile } from '@/actions/account/profile/hooks'
-import { USER_ICON } from '@/constants/favicon'
+import { USER_ICON } from '@/constants/shared/assets'
 import { formatDateTime } from '@/utils/formatting/date'
 import { IconCamera } from '@tabler/icons-react'
 

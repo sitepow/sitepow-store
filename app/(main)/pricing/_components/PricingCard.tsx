@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 
-import { PRICING_VALUE } from '@/constants/pricing'
+import { PRICING_VALUE } from '@/constants/billing/pricing'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useRandomGradient } from '@/hooks/use-random-gradient'
 import { PricingPlanProps } from '@/types/pricing'

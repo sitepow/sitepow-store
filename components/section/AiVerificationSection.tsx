@@ -1,7 +1,7 @@
 'use client'
 
 
-import { AI_VERIFICATION_FEATURES } from '@/constants/aiVerification'
+import { AI_VERIFICATION_FEATURES } from '@/constants/landing/sections/ai-verification'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

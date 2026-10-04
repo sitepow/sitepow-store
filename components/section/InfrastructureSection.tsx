@@ -1,7 +1,7 @@
 'use client'
 
 
-import { INFRASTRUCTURE_FEATURES } from '@/constants/infrastructure'
+import { INFRASTRUCTURE_FEATURES } from '@/constants/landing/sections/infrastructure'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

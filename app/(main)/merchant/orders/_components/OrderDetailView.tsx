@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useUpdateOrderStatus } from '@/actions/sales/order/hooks'
 import { GetOrdersItem, ShippingAddressSnapshot } from '@/actions/sales/order/actions'
-import { ORDER_STATUS_TH } from '@/constants/translate'
+import { ORDER_STATUS_TH } from '@/constants/i18n/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { formatFullAddress } from '@/utils/formatting/full-address'

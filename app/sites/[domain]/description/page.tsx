@@ -1,4 +1,4 @@
-import { HOW_TO_ORDER_PAGE } from '@/constants/sites/page'
+import { HOW_TO_ORDER_PAGE } from '@/constants/storefront/page'
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { SectionContainer } from '@/components/SectionContainer'

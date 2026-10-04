@@ -1,4 +1,4 @@
-import { PRIVATE_POLICY_PAGE } from '@/constants/sites/page'
+import { PRIVATE_POLICY_PAGE } from '@/constants/storefront/page'
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { SectionContainer } from '@/components/SectionContainer'

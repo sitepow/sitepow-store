@@ -6,9 +6,9 @@ import {
   SLIP_CREDIT_COST,
   TOKENS_PER_UNIT,
   USD_TO_THB_RATE,
-} from '@/constants/ai'
-import { PLAN_DETAILS } from '@/constants/plan'
-import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
+} from '@/constants/ai/config'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
+import { PRODUCT_METADATA_MASTER } from '@/constants/storefront/metadata'
 import { Plan } from '@/generated/prisma/enums'
 import { AiGenTask, CreditUsageType } from '@/types/ai'
 

@@ -1,7 +1,7 @@
 'use client'
 
 
-import { POS_FEATURES } from '@/constants/pos'
+import { POS_FEATURES } from '@/constants/landing/sections/pos'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

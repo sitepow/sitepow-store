@@ -1,4 +1,4 @@
-import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
+import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/i18n/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { formatDateTime } from '@/utils/formatting/date'
 

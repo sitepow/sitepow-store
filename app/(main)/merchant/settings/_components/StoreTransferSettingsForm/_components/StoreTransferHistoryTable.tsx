@@ -2,7 +2,7 @@
 
 import { useTransferRequests } from '@/actions/store/ownership-transfer/hooks'
 import { useCancelTransferRequest } from '@/actions/store/ownership-transfer/hooks'
-import { TRANSFER_STATUS_TH } from '@/constants/translate'
+import { TRANSFER_STATUS_TH } from '@/constants/i18n/translate'
 import { TransferStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { useStoreFilter } from '@/stores/use-store-filter'

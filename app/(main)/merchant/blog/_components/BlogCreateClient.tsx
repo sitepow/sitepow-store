@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { MERCHANT_NAVIGATION } from '@/constants/navigation'
+import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconPlus } from '@tabler/icons-react'

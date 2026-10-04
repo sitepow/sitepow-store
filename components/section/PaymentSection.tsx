@@ -1,7 +1,7 @@
 'use client'
 
 
-import { PAYMENTS_FEATURES } from '@/constants/payment'
+import { PAYMENTS_FEATURES } from '@/constants/landing/sections/payment'
 
 import { SectionHeader } from '../SectionHeader'
 import { FeatureDisplay } from './_components/FeatureDisplay'

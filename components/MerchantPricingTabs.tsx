@@ -1,7 +1,7 @@
 'use client'
 
 import { usePricingStore } from '@/app/(main)/pricing/store'
-import { PRICING_OPTIONS } from '@/constants/pricing'
+import { PRICING_OPTIONS } from '@/constants/billing/pricing'
 import { RESPONSIVE_DEVICE } from '@/constants/system'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMediaQuery } from '@/hooks/use-media-query'

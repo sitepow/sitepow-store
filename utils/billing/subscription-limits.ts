@@ -1,4 +1,4 @@
-import { PLAN_DETAILS } from '@/constants/plan'
+import { PLAN_DETAILS } from '@/constants/billing/plan'
 
 import { prisma } from '@/lib/db/prisma'
 

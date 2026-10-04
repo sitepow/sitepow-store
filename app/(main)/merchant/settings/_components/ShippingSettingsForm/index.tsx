@@ -13,7 +13,7 @@ import {
   useStoreShippingSettings,
   useUpdateShippingSettings,
 } from '@/actions/store/shipping/hooks'
-import { COURIERS_LIST } from '@/constants/shipping'
+import { COURIERS_LIST } from '@/constants/store/shipping'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { ShippingFormValues, shippingFormSchema } from '@/zod/store/shipping-settings'

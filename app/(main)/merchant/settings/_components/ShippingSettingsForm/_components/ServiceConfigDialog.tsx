@@ -8,7 +8,7 @@ import {
   DEFAULT_WEIGHT_STEP,
   INITIAL_MIN_WEIGHT,
   ZONE_LABELS,
-} from '@/constants/shipping'
+} from '@/constants/store/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
 import { ShippingFormValues } from '@/zod/store/shipping-settings'
 import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'

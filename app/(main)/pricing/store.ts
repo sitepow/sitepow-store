@@ -1,4 +1,4 @@
-import { PRICING_VALUE } from '@/constants/pricing'
+import { PRICING_VALUE } from '@/constants/billing/pricing'
 import { create } from 'zustand'
 
 interface PricingState {

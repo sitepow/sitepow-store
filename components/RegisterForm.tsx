@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { useSearchParams } from 'next/navigation'
 
 import { registerUser } from '@/actions/account/auth/actions'
-import { REGISTER_PROVIDERS } from '@/constants/register'
+import { REGISTER_PROVIDERS } from '@/constants/auth/providers'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
 import { RegisterFormInputs } from '@/types/register'
