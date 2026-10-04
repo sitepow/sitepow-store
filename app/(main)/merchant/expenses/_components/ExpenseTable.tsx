@@ -102,7 +102,7 @@ export function ExpenseTable({
             ) : (
               expenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell>{formatDateTime(expense.expenseDate)}</TableCell>
+                  <TableCell>{formatDateTime(expense.expenseDate, 'UTC')}</TableCell>
                   <TableCell className="max-w-72 min-w-72 wrap-break-word whitespace-pre-line">
                     {expense.title}
                   </TableCell>
