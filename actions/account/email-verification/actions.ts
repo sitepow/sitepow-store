@@ -6,7 +6,7 @@ import {
   OTP_RESEND_COOLDOWN_SECONDS,
   SECOND,
 } from '@/constants/system'
-import OtpEmail from '@/emails/OtpEmail'
+import OtpEmail from '@/emails/account/OtpEmail'
 import { generateOtp } from '@/utils/auth/otp'
 
 import { getCurrentUser } from '@/lib/auth/server'

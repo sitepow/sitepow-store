@@ -1,5 +1,3 @@
-import { PAYMENT_METHOD_TH } from '@/constants/translate'
-import { PaymentMethod } from '@/generated/prisma/enums'
 import {
   Body,
   Container,
@@ -14,90 +12,92 @@ import {
   Text,
 } from '@react-email/components'
 
-import { EmailFooter } from './_components/EmailFooter'
+import { EmailFooter } from '@/emails/components/EmailFooter'
 
-interface OrderItem {
+interface TopSellingItem {
   title: string
   quantity: number
-  price: string
+  revenue: string
 }
 
-interface NewOrderNotificationEmailProps {
-  orderNumber?: string
+interface DailySalesSummaryEmailProps {
   storeName?: string
-  customerName?: string
-  totalAmount?: string
-  paymentMethod?: PaymentMethod
-  items?: OrderItem[]
+  date?: string
+  totalRevenue?: string
+  totalOrders?: number
+  topItems?: TopSellingItem[]
   dashboardUrl?: string
 }
 
-export default function NewOrderNotificationEmail({
-  orderNumber = 'SP2058-29583-92984',
+export default function DailySalesSummaryEmail({
   storeName = 'Sitepow Store',
-  customerName = 'คุณลูกค้า',
-  totalAmount = '฿1,130.00',
-  paymentMethod = PaymentMethod.STRIPE_QR_PROMPTPAY,
-  items = [
+  date = '1 ส.ค. 2026',
+  totalRevenue = '฿12,450.00',
+  totalOrders = 18,
+  topItems = [
     {
       title: 'เสื้อยืด Oversized Cotton 100%',
-      quantity: 2,
-      price: '฿780.00',
+      quantity: 12,
+      revenue: '฿4,680.00',
     },
     {
       title: 'กระเป๋าผ้า Canvas Bag',
-      quantity: 1,
-      price: '฿350.00',
+      quantity: 8,
+      revenue: '฿2,800.00',
     },
   ],
   dashboardUrl = '/',
-}: NewOrderNotificationEmailProps) {
+}: DailySalesSummaryEmailProps) {
   return (
     <Html>
       <Head />
       <Preview>
-        มีออเดอร์ใหม่เข้ามา! #{orderNumber} - {storeName}
+        สรุปยอดขายประจำวัน {date} - {storeName}
       </Preview>
       <Tailwind>
         <Body>
           <Container className="mx-auto my-0 max-w-125 px-5 py-10 text-center">
             <Heading className="mb-2 text-2xl font-normal tracking-tight">
-              มีคำสั่งซื้อใหม่เข้ามา!
+              สรุปยอดขายประจำวัน
             </Heading>
             <Text className="m-0 text-sm leading-6 opacity-60">
-              ร้านค้า {storeName} ได้รับคำสั่งซื้อใหม่จาก {customerName}
+              รายงานยอดขายประจำวันที่ {date} สำหรับร้าน {storeName}
             </Text>
             <Text className="my-4 text-xs tracking-widest opacity-30">•••</Text>
             <Text className="mb-1 text-sm font-medium opacity-70">
-              ยอดรวมคำสั่งซื้อ:
+              ยอดขายรวมวันนี้:
             </Text>
             <Text className="my-2 text-4xl font-semibold tracking-tight">
-              {totalAmount}
+              {totalRevenue}
             </Text>
-            <Text className="text-xs opacity-50">
-              หมายเลข: #{orderNumber} <br />
-              {PAYMENT_METHOD_TH[paymentMethod]}
+            <Text className="text-sm opacity-50">
+              จำนวนคำสั่งซื้อทั้งหมด: {totalOrders} ออเดอร์
             </Text>
             <Section className="my-6">
               <Link
                 href={dashboardUrl}
                 className="inline-block rounded-md bg-black px-6 py-3 text-sm font-medium text-white no-underline"
               >
-                ดูและจัดการคำสั่งซื้อ
+                ดูรายงานแบบเต็มใน Dashboard
               </Link>
             </Section>
             <Section className="my-8 text-left text-sm">
               <Text className="mb-3 text-center font-medium opacity-70">
-                สรุปรายการสินค้า
+                สินค้ายอดนิยมประจำวัน
               </Text>
               <Hr className="my-3 opacity-20" />
-              {items.map((item, index) => (
+              {topItems.map((item, index) => (
                 <div key={index} className="my-3 flex justify-between">
-                  <Text className="m-0 font-medium opacity-90">
-                    {item.title} × {item.quantity}
-                  </Text>
+                  <div>
+                    <Text className="m-0 font-medium opacity-90">
+                      {item.title}
+                    </Text>
+                    <Text className="m-0 text-xs opacity-50">
+                      ขายได้ {item.quantity} ชิ้น
+                    </Text>
+                  </div>
                   <Text className="m-0 font-medium opacity-80">
-                    {item.price}
+                    {item.revenue}
                   </Text>
                 </div>
               ))}
@@ -105,7 +105,7 @@ export default function NewOrderNotificationEmail({
             </Section>
             <Section className="mt-12 text-xs opacity-40">
               <Text className="m-0 leading-5">
-                อีเมลนี้แจ้งเตือนไปยังเจ้าของร้านและพนักงานที่ได้รับสิทธิ์ดูแลคำสั่งซื้อ
+                อีเมลนี้แจ้งเตือนอัตโนมัติประจำวันเนื่องจากคุณเปิดใช้งานระบบรายงานสรุปยอดขาย
               </Text>
               <EmailFooter />
             </Section>

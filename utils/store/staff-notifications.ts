@@ -1,4 +1,4 @@
-import NewOrderNotificationEmail from '@/emails/NewOrderNotificationEmail'
+import NewOrderNotificationEmail from '@/emails/sales/NewOrderNotificationEmail'
 import {
   PaymentMethod,
   PermissionAction,

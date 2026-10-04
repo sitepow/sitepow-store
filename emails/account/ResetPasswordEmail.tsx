@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components'
 
-import { EmailFooter } from './_components/EmailFooter'
+import { EmailFooter } from '@/emails/components/EmailFooter'
 
 interface ResetPasswordEmailProps {
   resetLink?: string

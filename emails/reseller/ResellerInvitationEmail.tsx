@@ -11,19 +11,19 @@ import {
   Text,
 } from '@react-email/components'
 
-import { EmailFooter } from './_components/EmailFooter'
+import { EmailFooter } from '@/emails/components/EmailFooter'
 
-interface ResellerInviteEmailProps {
+interface ResellerInvitationEmailProps {
   supplierStoreName?: string
   inviteLink?: string
   expiryDays?: number
 }
 
-export default function ResellerInviteEmail({
+export default function ResellerInvitationEmail({
   supplierStoreName = 'My Awesome Supplier',
   inviteLink = '/',
   expiryDays = 7,
-}: ResellerInviteEmailProps) {
+}: ResellerInvitationEmailProps) {
   return (
     <Html>
       <Head />
