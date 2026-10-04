@@ -31,7 +31,7 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { StorePagination } from '../../../_components/Pagination'
+import { StorePagination } from '../../../_components/shared/Pagination'
 import { OrderDetailView } from './OrderDetailView'
 import { UploadSlipDialog } from './UploadSlipDialog'
 

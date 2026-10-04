@@ -6,7 +6,7 @@ import { useCarousel } from '@/hooks/use-carousel'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { SeeMoreButton } from '../../../_components/SeeMoreButton'
+import { SeeMoreButton } from '../../../_components/shared/SeeMoreButton'
 import { ProductCard } from '../../../_components/product/ProductCard'
 import { useProductPurchaseStore } from '../../store'
 

@@ -12,7 +12,7 @@ import { SectionContainer } from '@/components/layout/SectionContainer'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { SeeMoreButton } from '../SeeMoreButton'
+import { SeeMoreButton } from '../shared/SeeMoreButton'
 import { ProductCard } from '../product/ProductCard'
 
 interface CategorySectionProps {

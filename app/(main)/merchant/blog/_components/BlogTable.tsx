@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 import { useBlogs, useDeleteBlog } from '@/actions/catalog/blog/hooks'
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit, IconTag } from '@tabler/icons-react'
 

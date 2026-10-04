@@ -6,7 +6,7 @@ import {
   useResellerPayoutSummary,
   useResellerStocks,
 } from '@/actions/reseller/reseller/hooks'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/formatting/number'

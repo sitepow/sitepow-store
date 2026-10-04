@@ -7,7 +7,7 @@ import {
   useEmployeePermission,
   useEmployees,
 } from '@/actions/store/employee/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { DEFAULT_ROLE_TH } from '@/constants/i18n/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

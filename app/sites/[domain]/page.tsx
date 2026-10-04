@@ -8,9 +8,9 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { TenantStoreJsonLd } from '@/components/seo/TenantStoreJsonLd'
 
 import { StoreLayout } from './_components/layout/Layout'
-import { BlogsSection } from './_components/section/Blogs'
-import { CategoriesSection } from './_components/section/Categories'
-import { ProductsSection } from './_components/section/Products'
+import { BlogsSection } from './_components/section/BlogsSection'
+import { CategoriesSection } from './_components/section/CategoriesSection'
+import { ProductsSection } from './_components/section/ProductsSection'
 
 export const revalidate = 60
 

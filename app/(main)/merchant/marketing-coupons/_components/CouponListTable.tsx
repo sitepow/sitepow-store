@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { useCoupons, useDeleteCoupon } from '@/actions/sales/coupon/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatShortDate } from '@/utils/formatting/date'
 import { IconCalendar, IconHierarchy } from '@tabler/icons-react'

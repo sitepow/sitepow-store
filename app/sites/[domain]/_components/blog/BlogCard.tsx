@@ -6,11 +6,9 @@ import { isVideoUrl } from '@/utils/media/video'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { ArrowRightIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-
 import { cn } from '@/lib/utils'
 
-import { EmptyImage } from '../EmptyImage'
+import { EmptyImage } from '../shared/EmptyImage'
 
 const blogCardVariants = cva(
   'h-full rounded-xl transition-all overflow-hidden dark:bg-foreground/5 text-foreground group flex flex-col',

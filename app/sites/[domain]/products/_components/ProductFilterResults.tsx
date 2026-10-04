@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { StorePagination } from '../../_components/Pagination'
+import { StorePagination } from '../../_components/shared/Pagination'
 import { ProductCard } from '../../_components/product/ProductCard'
 
 export function ProductFilterResults({ storeSlug }: { storeSlug: string }) {

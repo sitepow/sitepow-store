@@ -17,7 +17,7 @@ export const STORE_NAVBAR_ITEMS = [
       },
       {
         title: 'วิธีการสั่งซื้อ',
-        href: '/description',
+        href: '/how-to-order',
       },
       {
         title: 'นโยบายความเป็นส่วนตัว',

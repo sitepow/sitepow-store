@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 
 import { useStorefrontDashboard } from '@/actions/storefront/dashboard/hooks'
 import { AnalyticsCardShell } from '@/app/(main)/merchant/analytics/_components/_components/AnalyticsCardShell'
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
 import { BUYER_NAVIGATION } from '@/constants/store/navigation'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'

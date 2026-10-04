@@ -47,6 +47,7 @@ Allow: /category
 Allow: /blogs
 Allow: /about
 Allow: /faqs
+Allow: /how-to-order
 Allow: /privacy-policy
 Allow: /refund-return-policy
 Allow: /customer-reviews

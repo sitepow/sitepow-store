@@ -1,5 +1,5 @@
-import { StoreLayout } from '../_components/layout/Layout'
+import { redirect } from 'next/navigation'
 
 export default function StoreCustomerPage() {
-  return <StoreLayout></StoreLayout>
+  redirect('/user/dashboard')
 }

@@ -149,6 +149,7 @@ export async function GET(
     })),
     { loc: `${baseUrl}/about`, changefreq: 'monthly', priority: 0.5 },
     { loc: `${baseUrl}/faqs`, changefreq: 'monthly', priority: 0.5 },
+    { loc: `${baseUrl}/how-to-order`, changefreq: 'monthly', priority: 0.5 },
     { loc: `${baseUrl}/privacy-policy`, changefreq: 'yearly', priority: 0.3 },
     {
       loc: `${baseUrl}/refund-return-policy`,

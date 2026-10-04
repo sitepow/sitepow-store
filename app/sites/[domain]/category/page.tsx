@@ -1,5 +1,17 @@
-import { StoreLayout } from '../_components/layout/Layout'
+import { redirect } from 'next/navigation'
 
-export default function StoreCategoryPage() {
-  return <StoreLayout></StoreLayout>
+interface CategoryPageProps {
+  searchParams: Promise<{
+    category?: string
+  }>
+}
+
+export default async function StoreCategoryPage({
+  searchParams,
+}: CategoryPageProps) {
+  const resolved = await searchParams
+  if (resolved?.category) {
+    redirect(`/products?category=${resolved.category}`)
+  }
+  redirect('/products')
 }

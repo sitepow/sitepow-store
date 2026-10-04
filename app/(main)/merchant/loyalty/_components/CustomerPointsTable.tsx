@@ -3,7 +3,7 @@
 import { ComponentProps, useState } from 'react'
 
 import { useCustomerPoints, useLoyaltySettings } from '@/actions/store/loyalty/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { formatPromptPay } from '@/utils/formatting/promptpay-phone'

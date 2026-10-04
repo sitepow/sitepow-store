@@ -8,7 +8,7 @@ import { ButtonGroup } from '@/components/ui/button-group'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 
-import { CategoryDropdown } from '../../../CategoryDropdown'
+import { CategoryDropdown } from '../../../category/CategoryDropdown'
 
 interface StoreMobileMenuProps {
   storeSlug?: string

@@ -1,6 +1,6 @@
 'use client'
 
-import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
+import { StatsCard } from '@/app/sites/[domain]/_components/shared/StatsCard'
 import { formatNumber } from '@/utils/formatting/number'
 import { IconArrowUpRight, IconUserCheck, IconUsers } from '@tabler/icons-react'
 

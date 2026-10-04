@@ -4,7 +4,7 @@ import { isVideoUrl } from '@/utils/media/video'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { EmptyImage } from '../../../_components/EmptyImage'
+import { EmptyImage } from '../../../_components/shared/EmptyImage'
 import { useProductPurchaseStore } from '../../store'
 
 interface Props {

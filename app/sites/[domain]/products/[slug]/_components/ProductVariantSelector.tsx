@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react'
 
 import Image from 'next/image'
 
-import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
+import { EmptyImage } from '@/app/sites/[domain]/_components/shared/EmptyImage'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
 import { formatCurrency } from '@/utils/formatting/number'
 import { calculateNetPrice, getStockQuantity } from '@/utils/product/product-calculation'

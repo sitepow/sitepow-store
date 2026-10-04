@@ -23,8 +23,8 @@ import {
 
 import { cn } from '@/lib/utils'
 
-import { CategoryDropdown } from '../../CategoryDropdown'
-import { UserAvatarDropdown } from '../../UserAvatarDropdown'
+import { CategoryDropdown } from '../../category/CategoryDropdown'
+import { UserAvatarDropdown } from '../../shared/UserAvatarDropdown'
 import { CartDrawer } from '../../cart/CartDrawer'
 import { StoreHeaderBackground } from './_components/StoreHeaderBackground'
 import { StoreMenuItems } from './_components/StoreMenuItems'

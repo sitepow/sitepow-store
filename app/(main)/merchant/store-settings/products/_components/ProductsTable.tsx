@@ -9,7 +9,7 @@ import {
   useProductQuota,
   useProducts,
 } from '@/actions/catalog/product/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatCurrency } from '@/utils/formatting/number'

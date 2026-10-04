@@ -7,7 +7,7 @@ import { SectionContainer } from '@/components/layout/SectionContainer'
 import { SectionHeader } from '@/components/layout/SectionHeader'
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { SeeMoreButton } from '../SeeMoreButton'
+import { SeeMoreButton } from '../shared/SeeMoreButton'
 import { ProductCard } from '../product/ProductCard'
 
 export function ProductsSection({ storeSlug }: { storeSlug: string }) {

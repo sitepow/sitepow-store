@@ -6,7 +6,7 @@ import { useStorefrontBlogs } from '@/actions/storefront/blog/hooks'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 
-import { StorePagination } from '../../_components/Pagination'
+import { StorePagination } from '../../_components/shared/Pagination'
 import { BlogCard } from '../../_components/blog/BlogCard'
 
 export function BlogsList({ storeSlug }: { storeSlug: string }) {

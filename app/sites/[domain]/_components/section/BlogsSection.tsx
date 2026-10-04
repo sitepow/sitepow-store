@@ -5,7 +5,7 @@ import { useStorefrontBlogs } from '@/actions/storefront/blog/hooks'
 import { SectionContainer } from '@/components/layout/SectionContainer'
 import { SectionHeader } from '@/components/layout/SectionHeader'
 
-import { SeeMoreButton } from '../SeeMoreButton'
+import { SeeMoreButton } from '../shared/SeeMoreButton'
 import { BlogCard } from '../blog/BlogCard'
 
 export function BlogsSection({ storeSlug }: { storeSlug: string }) {

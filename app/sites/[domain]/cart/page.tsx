@@ -50,7 +50,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { RadioGroup } from '@/components/ui/radio-group'
 
-import { CircularProgress } from '../_components/CircularProgress'
+import { CircularProgress } from '../_components/shared/CircularProgress'
 import { CartItemCard } from '../_components/cart/_components/CartItemCard'
 import { CartSummary } from '../_components/cart/_components/CartSummary'
 import { SummaryRow } from '../_components/cart/_components/SummaryRow'

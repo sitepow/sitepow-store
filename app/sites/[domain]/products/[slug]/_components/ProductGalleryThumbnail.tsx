@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { cn } from '@/lib/utils'
 
-import { EmptyImage } from '../../../_components/EmptyImage'
+import { EmptyImage } from '../../../_components/shared/EmptyImage'
 import { useProductPurchaseStore } from '../../store'
 
 export function ProductGalleryThumbnail() {

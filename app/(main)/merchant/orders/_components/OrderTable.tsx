@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useStoreCheckout } from '@/actions/billing/checkout/hooks'
 import { useOrders } from '@/actions/sales/order/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { UploadSlipDialog } from '@/app/sites/[domain]/user/orders/_components/UploadSlipDialog'
 import { ORDER_STATUS_TH } from '@/constants/i18n/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'

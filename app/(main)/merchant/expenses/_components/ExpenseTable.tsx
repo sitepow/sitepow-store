@@ -3,7 +3,7 @@
 
 import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { useDeleteExpense, useExpenses } from '@/actions/finance/expense/hooks'
-import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
+import { StorePagination } from '@/app/sites/[domain]/_components/shared/Pagination'
 import { EXPENSE_CATEGORY_TH } from '@/constants/i18n/translate'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
