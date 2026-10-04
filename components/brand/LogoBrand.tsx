@@ -37,10 +37,10 @@ export function LogoBrand({
           alt="sitepow-logo"
         />
       )}
-      <div className="relative">
+      <span className="relative inline-block">
         <span>Sitepow</span>
         <span className="absolute -top-2 right-0 text-xs before:content-['Store']"></span>
-      </div>
+      </span>
     </Link>
   )
 }

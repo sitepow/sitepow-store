@@ -26,9 +26,9 @@ export function HeroHeader({
       </h1>
 
       {subtitle && (
-        <p className="-mt-4 flex flex-wrap items-center justify-center gap-2.5 text-xl font-medium opacity-60 sm:text-2xl">
+        <div className="-mt-4 flex flex-wrap items-center justify-center gap-2.5 text-xl font-medium opacity-60 sm:text-2xl">
           {subtitle}
-        </p>
+        </div>
       )}
     </header>
   )

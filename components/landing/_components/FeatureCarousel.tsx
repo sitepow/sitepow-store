@@ -2,6 +2,8 @@
 import { useMemo } from 'react'
 import { useMediaQuery } from '@/hooks/use-media-query'
 
+import { cn } from '@/lib/utils'
+
 import { FeatureCard } from './FeatureCard'
 
 export const FeatureCarousel = ({ features, emblaRef }: any) => {
@@ -25,11 +27,11 @@ export const FeatureCarousel = ({ features, emblaRef }: any) => {
         {groupedFeatures.map((group: any, groupIdx: number) => (
           <div
             key={groupIdx}
-            className={`grid min-w-0 flex-[0_0_100%] gap-4 p-2 ${
-              shouldShowGrid
-                ? `grid-cols-2 ${group?.length < 3 && 'h-fit'}`
-                : 'grid-cols-1'
-            }`}
+            className={cn(
+              'grid min-w-0 flex-[0_0_100%] gap-4 p-2',
+              shouldShowGrid ? 'grid-cols-2' : 'grid-cols-1',
+              shouldShowGrid && group?.length < 3 && 'h-fit',
+            )}
           >
             {group.map((feature: any, idx: number) => (
               <FeatureCard key={idx} {...feature} />

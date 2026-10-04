@@ -8,13 +8,15 @@ export function PointerHighlight({
   rectangleClassName,
   pointerClassName,
   containerClassName,
+  as = "span",
 }: {
   children: React.ReactNode;
   rectangleClassName?: string;
   pointerClassName?: string;
   containerClassName?: string;
+  as?: "span" | "div";
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -41,20 +43,27 @@ export function PointerHighlight({
     };
   }, []);
 
+  const Component = as;
+  const MotionComponent = as === "div" ? motion.div : motion.span;
+
   return (
-    <div
-      className={cn("relative w-fit", containerClassName)}
-      ref={containerRef}
+    <Component
+      className={cn(
+        "relative w-fit",
+        as === "span" && "inline-block",
+        containerClassName,
+      )}
+      ref={containerRef as any}
     >
       {children}
       {dimensions.width > 0 && dimensions.height > 0 && (
-        <motion.div
+        <MotionComponent
           className="pointer-events-none absolute inset-0 z-0"
           initial={{ opacity: 0, scale: 0.95, originX: 0, originY: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <motion.div
+          <MotionComponent
             className={cn(
               "absolute inset-0 border border-neutral-800 dark:border-neutral-200",
               rectangleClassName,
@@ -72,7 +81,7 @@ export function PointerHighlight({
               ease: "easeInOut",
             }}
           />
-          <motion.div
+          <MotionComponent
             className="pointer-events-none absolute"
             initial={{ opacity: 0 }}
             whileInView={{
@@ -92,10 +101,10 @@ export function PointerHighlight({
             <Pointer
               className={cn("h-5 w-5 text-blue-500", pointerClassName)}
             />
-          </motion.div>
-        </motion.div>
+          </MotionComponent>
+        </MotionComponent>
       )}
-    </div>
+    </Component>
   );
 }
 
