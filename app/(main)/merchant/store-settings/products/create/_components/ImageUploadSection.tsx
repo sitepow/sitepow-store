@@ -3,7 +3,7 @@
 
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 import { ImagePlus, Star, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

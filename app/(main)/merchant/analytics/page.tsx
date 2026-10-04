@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 
-import { useAnalyticsAi } from '@/actions/hooks/ai'
-import { useAnalyticsOverview } from '@/actions/hooks/analytics'
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useAnalyticsAi } from '@/actions/ai/ai/hooks'
+import { useAnalyticsOverview } from '@/actions/analytics/analytics/hooks'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
   IconArrowUpRight,
   IconLock,

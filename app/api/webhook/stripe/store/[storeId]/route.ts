@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 import { OrderStatus } from '@/generated/prisma/enums'
 import Stripe from 'stripe'
 
-import { OrderEventPayload, appEvents } from '@/lib/events'
-import { prisma } from '@/lib/prisma'
-import { getStripeInstance } from '@/lib/stripe'
+import { OrderEventPayload, appEvents } from '@/lib/redis/events'
+import { prisma } from '@/lib/db/prisma'
+import { getStripeInstance } from '@/lib/integrations/stripe'
 
 interface RouteParams {
   params: Promise<{

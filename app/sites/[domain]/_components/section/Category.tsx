@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { SectionProductItem } from '@/actions/storefront/sections'
+import { SectionProductItem } from '@/actions/storefront/sections/actions'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useLandingImages } from '@/hooks/use-landing-images'
-import { isVideoUrl } from '@/utils/media'
+import { isVideoUrl } from '@/utils/media/video'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { SectionContainer } from '@/components/SectionContainer'

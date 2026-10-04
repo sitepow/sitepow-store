@@ -1,4 +1,4 @@
-import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 import { ProductType } from '@/generated/prisma/enums'
 
 export type CartVariant = StorefrontProductDetail['variants'][number]

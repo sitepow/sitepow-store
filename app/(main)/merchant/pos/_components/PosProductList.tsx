@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 
-import { POSProductItem } from '@/actions/pos/product'
-import { SectionProductItem } from '@/actions/storefront/sections'
+import { POSProductItem } from '@/actions/sales/pos-product/actions'
+import { SectionProductItem } from '@/actions/storefront/sections/actions'
 import { ProductCard } from '@/app/sites/[domain]/_components/product/ProductCard'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
-import { getRemainingStock } from '@/utils/cart'
+import { getRemainingStock } from '@/utils/cart/cart-calculation'
 import { IconSearch } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

@@ -3,11 +3,11 @@
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
-import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
-import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
-import { getPathR2FromUrl } from '@/utils/image'
-import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
-import { UpdateProfileSchema } from '@/zod/profile'
+import { useProfile, useUpdateProfile } from '@/actions/account/profile/hooks'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
+import { getPathR2FromUrl } from '@/utils/media/image'
+import { formatPhoneInput, formatPromptPay } from '@/utils/formatting/promptpay-phone'
+import { UpdateProfileSchema } from '@/zod/account/profile'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

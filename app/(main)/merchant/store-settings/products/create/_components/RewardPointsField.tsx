@@ -2,7 +2,7 @@
 
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'

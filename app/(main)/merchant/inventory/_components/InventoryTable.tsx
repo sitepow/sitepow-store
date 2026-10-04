@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
-import { useInventory } from '@/actions/hooks/inventory'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
+import { useInventory } from '@/actions/inventory/stock/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
   IconAlertCircle,
   IconAlertTriangle,

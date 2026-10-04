@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AUTH_TICKET_TTL_SECONDS } from '@/constants/system'
 import crypto from 'crypto'
 
-import { redis } from '@/lib/redis'
+import { redis } from '@/lib/redis/client'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)

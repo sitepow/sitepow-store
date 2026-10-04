@@ -4,21 +4,21 @@ import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { handleUserPrompt } from '@/actions/ai'
-import { useCategoryAi } from '@/actions/hooks/ai'
+import { handleUserPrompt } from '@/actions/ai/ai/actions'
+import { useCategoryAi } from '@/actions/ai/ai/hooks'
 import {
   useCategory,
   useCreateCategory,
   useUpdateCategory,
-} from '@/actions/hooks/category'
-import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
+} from '@/actions/catalog/category/hooks'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { buildCategoryPrompt } from '@/utils/ai'
-import { getPathR2FromUrl } from '@/utils/image'
-import { formatSlug } from '@/utils/slug'
-import { CreateCategoryFormValues, createCategorySchema } from '@/zod/category'
+import { buildCategoryPrompt } from '@/utils/ai/ai-helpers'
+import { getPathR2FromUrl } from '@/utils/media/image'
+import { formatSlug } from '@/utils/formatting/slug'
+import { CreateCategoryFormValues, createCategorySchema } from '@/zod/catalog/category'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus, IconWand } from '@tabler/icons-react'
 

@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import {
   useAcceptResellerStock,
   useAllResellerAgreements,
   useUpsertResellerCustomPrice,
-} from '@/actions/hooks/reseller'
+} from '@/actions/reseller/reseller/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useResellerSSE } from '@/hooks/use-reseller-sse'
 import { useAlertStore } from '@/stores/use-alert-store'

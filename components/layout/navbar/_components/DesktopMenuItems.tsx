@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { NAVBAR_ITEMS } from '@/constants/navbar'
-import { cleanTag } from '@/utils/format'
+import { cleanTag } from '@/utils/formatting/text'
 
 import {
   NavigationMenuContent,

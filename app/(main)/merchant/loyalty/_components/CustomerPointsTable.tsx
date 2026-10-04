@@ -2,11 +2,11 @@
 
 import { ComponentProps, useState } from 'react'
 
-import { useCustomerPoints, useLoyaltySettings } from '@/actions/hooks/loyalty'
+import { useCustomerPoints, useLoyaltySettings } from '@/actions/store/loyalty/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { formatPromptPay } from '@/utils/slip'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconHistory, IconSearch } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'

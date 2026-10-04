@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useBranches } from '@/actions/hooks/branch'
+import { useBranches } from '@/actions/store/branch/hooks'
 import { Plan } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
 import { OpeningHours } from '@/types/branch'

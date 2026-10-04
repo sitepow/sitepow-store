@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { MINUTE, ORDER_EXPIRY_MINUTES } from '@/constants/system'
 import { ActorType, OrderStatus } from '@/generated/prisma/enums'
-import { ago } from '@/utils/date'
+import { ago } from '@/utils/formatting/date'
 
 import { cancelOrderCore } from '@/lib/order'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')

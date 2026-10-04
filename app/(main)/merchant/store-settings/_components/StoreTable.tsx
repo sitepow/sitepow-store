@@ -4,14 +4,14 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
-import { useDeleteStore, useStores } from '@/actions/hooks/store'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
+import { useDeleteStore, useStores } from '@/actions/store/management/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { StoreStatus } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatDateTime } from '@/utils/date'
-import { getSubscriptionStatusInfo } from '@/utils/pricing'
+import { formatDateTime } from '@/utils/formatting/date'
+import { getSubscriptionStatusInfo } from '@/utils/billing/subscription-pricing'
 import {
   IconAlertTriangle,
   IconCreditCard,

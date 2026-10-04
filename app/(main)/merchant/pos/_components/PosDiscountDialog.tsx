@@ -4,19 +4,19 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm, useFormContext } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useCreateCustomer, useSearchCustomer } from '@/actions/hooks/customer'
+import { useCreateCustomer, useSearchCustomer } from '@/actions/sales/customer/hooks'
 import {
   useStorefrontLoyalty,
   useValidateCoupon,
-} from '@/actions/hooks/storefront/discount'
+} from '@/actions/storefront/discount/hooks'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
 import { SummaryTotal } from '@/app/sites/[domain]/_components/cart/_components/SummaryTotal'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { calculateMaxUsablePoints } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { formatPhoneInput, formatPromptPay } from '@/utils/slip'
-import { CreateCustomerInput, createCustomerSchema } from '@/zod/customer'
-import { POSCheckoutInput } from '@/zod/order'
+import { calculateMaxUsablePoints } from '@/utils/cart/cart-calculation'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { formatPhoneInput, formatPromptPay } from '@/utils/formatting/promptpay-phone'
+import { CreateCustomerInput, createCustomerSchema } from '@/zod/sales/customer'
+import { POSCheckoutInput } from '@/zod/sales/pos-checkout'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconDiscount2,

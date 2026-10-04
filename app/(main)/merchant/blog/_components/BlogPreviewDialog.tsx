@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { arrayToString, stringToArray } from '@/utils/format'
+import { arrayToString, stringToArray } from '@/utils/formatting/text'
 
 export function BlogPreviewContent() {
   const { control } = useFormContext()

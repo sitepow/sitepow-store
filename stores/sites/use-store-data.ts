@@ -1,4 +1,4 @@
-import { StoreData } from '@/actions/store'
+import { StoreData } from '@/actions/store/management/actions'
 import { create } from 'zustand'
 
 interface StoreState {

@@ -6,12 +6,12 @@ import { FormProvider, useForm } from 'react-hook-form'
 import {
   useNotificationSettings,
   useUpdateNotificationSettings,
-} from '@/actions/hooks/notification-settings'
+} from '@/actions/account/notification-settings/hooks'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   NotificationSettingsFormValues,
   notificationSettingsSchema,
-} from '@/zod/notification-settings'
+} from '@/zod/account/notification-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBell } from '@tabler/icons-react'
 

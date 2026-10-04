@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useBranches } from '@/actions/hooks/branch'
-import { useCreateCoupon } from '@/actions/hooks/coupon'
+import { useBranches } from '@/actions/store/branch/hooks'
+import { useCreateCoupon } from '@/actions/sales/coupon/hooks'
 import { DiscountType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { CreateCouponFormValues, createCouponSchema } from '@/zod/coupon'
+import { CreateCouponFormValues, createCouponSchema } from '@/zod/sales/coupon'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 

@@ -4,7 +4,7 @@
 import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 
-import { formatCurrency } from '@/utils/pricing'
+import { formatCurrency } from '@/utils/formatting/number'
 import { IconX } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

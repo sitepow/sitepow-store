@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
+import { useStorefrontProductDetail } from '@/actions/storefront/product/hooks'
 
 import { useProductPurchaseStore } from '../../store'
 import { ProductAddToCart } from './ProductAddToCart'

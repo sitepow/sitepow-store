@@ -2,8 +2,8 @@ import { NextRequest } from 'next/server'
 
 import { SSE_KEEP_ALIVE_INTERVAL } from '@/constants/system'
 
-import { getCurrentUser } from '@/lib/auth-server'
-import { ResellerEventPayload, appEvents } from '@/lib/events'
+import { getCurrentUser } from '@/lib/auth/server'
+import { ResellerEventPayload, appEvents } from '@/lib/redis/events'
 
 export async function GET(
   req: NextRequest,

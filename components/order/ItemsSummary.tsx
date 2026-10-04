@@ -2,11 +2,11 @@
 
 import { useMemo } from 'react'
 
-import { GetOrdersItem } from '@/actions/order'
-import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
+import { GetOrdersItem } from '@/actions/sales/order/actions'
+import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order/actions'
 import { SummaryRow } from '@/app/sites/[domain]/_components/cart/_components/SummaryRow'
-import { calculateOrderSummary } from '@/utils/order'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { calculateOrderSummary } from '@/utils/order/order-calculation'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 
 import { HighlightText } from '../HighlightText'
 import { ProductImage } from '../ProductImage'

@@ -3,16 +3,16 @@
 
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form'
 
-import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
-import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
+import { useReviewRewardConfig } from '@/actions/store/review-reward/hooks'
 import {
   useCreateReview,
   useUpdateReview,
-} from '@/actions/hooks/storefront/review'
+} from '@/actions/storefront/review/hooks'
 import { ImageUploadSection } from '@/app/(main)/merchant/store-settings/products/create/_components/ImageUploadSection'
-import { getPathR2FromUrl } from '@/utils/image'
-import { formatNumber } from '@/utils/pricing'
-import { calculateReviewPoints } from '@/utils/review-points'
+import { getPathR2FromUrl } from '@/utils/media/image'
+import { formatNumber } from '@/utils/formatting/number'
+import { calculateReviewPoints } from '@/utils/review/review-points'
 import { ReviewFormValues, reviewFormSchema } from '@/zod/storefront/review'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSparkles, IconStar, IconStarFilled } from '@tabler/icons-react'

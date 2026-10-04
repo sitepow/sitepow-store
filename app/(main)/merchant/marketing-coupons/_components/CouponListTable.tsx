@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 
-import { useCoupons, useDeleteCoupon } from '@/actions/hooks/coupon'
+import { useCoupons, useDeleteCoupon } from '@/actions/sales/coupon/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatShortDate } from '@/utils/date'
+import { formatShortDate } from '@/utils/formatting/date'
 import { IconCalendar, IconHierarchy } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'

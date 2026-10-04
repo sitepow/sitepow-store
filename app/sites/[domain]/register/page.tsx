@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 
 import { RegisterForm } from '@/components/RegisterForm'
 
-import { getCurrentUser } from '@/lib/auth-server'
+import { getCurrentUser } from '@/lib/auth/server'
 
 interface RegisterPageProps {
   searchParams: Promise<{

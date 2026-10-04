@@ -1,6 +1,6 @@
 import { ORDER_STATUS_TH, PAYMENT_METHOD_TH } from '@/constants/translate'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
-import { formatDateTime } from '@/utils/date'
+import { formatDateTime } from '@/utils/formatting/date'
 
 import { Badge } from '@/components/ui/badge'
 

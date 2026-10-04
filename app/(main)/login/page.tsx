@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { LoginForm } from '@/components/LoginForm'
 
-import { getCurrentUser } from '@/lib/auth-server'
+import { getCurrentUser } from '@/lib/auth/server'
 
 const BASE_URL =
   process.env.NODE_ENV === 'production'

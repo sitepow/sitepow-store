@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { getLandingStores, StoreLandingItem } from '@/actions/store'
+import { getLandingStores, StoreLandingItem } from '@/actions/store/management/actions'
 
 import { MainLayout } from '@/components/layout/Layout'
 import { AiVerificationSection } from '@/components/section/AiVerificationSection'

@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import {
   useAllResellerAgreements,
   useResellerAgreements,
-} from '@/actions/hooks/reseller'
+} from '@/actions/reseller/reseller/hooks'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'

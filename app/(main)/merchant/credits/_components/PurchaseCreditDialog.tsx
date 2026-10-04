@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useCheckout } from '@/actions/hooks/checkout'
+import { useCheckout } from '@/actions/billing/checkout/hooks'
 import { CREDIT_TIERS, PACKAGES } from '@/constants/credit'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CheckoutType } from '@/types/checkout'
-import { getCredits } from '@/utils/credit'
-import { formatNumber } from '@/utils/pricing'
-import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/credit'
+import { getCredits } from '@/utils/billing/credit'
+import { formatNumber } from '@/utils/formatting/number'
+import { PurchaseCreditSchema, purchaseCreditSchema } from '@/zod/billing/purchase-credit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconCoins, IconPlus } from '@tabler/icons-react'
 

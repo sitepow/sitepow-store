@@ -1,6 +1,6 @@
 import { UserRole } from '@/generated/prisma/enums'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 
 export function useSession() {
   const {

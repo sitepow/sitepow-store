@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 
-import { useUpdatePassword } from '@/actions/hooks/storefront/security'
+import { useUpdatePassword } from '@/actions/storefront/security/hooks'
 import {
   ChangePasswordFormValues,
   changePasswordSchema,

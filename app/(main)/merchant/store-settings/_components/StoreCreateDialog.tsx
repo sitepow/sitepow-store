@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useCheckout } from '@/actions/hooks/checkout'
-import { useCreateStore } from '@/actions/hooks/store'
+import { useCheckout } from '@/actions/billing/checkout/hooks'
+import { useCreateStore } from '@/actions/store/management/hooks'
 import { usePricingStore } from '@/app/(main)/pricing/store'
 import { Plan } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { CheckoutType } from '@/types/checkout'
-import { formatSlug } from '@/utils/slug'
-import { CreateStoreFormValues, createStoreSchema } from '@/zod/store'
+import { formatSlug } from '@/utils/formatting/slug'
+import { CreateStoreFormValues, createStoreSchema } from '@/zod/store/create-store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 

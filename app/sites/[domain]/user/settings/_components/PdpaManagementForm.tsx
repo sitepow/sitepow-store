@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import {
   useDeleteUserAccount,
   useExportUserData,
-} from '@/actions/hooks/storefront/pdpa'
+} from '@/actions/storefront/pdpa/hooks'
 import { IconShieldLock } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'
@@ -13,7 +13,7 @@ import { PageTabHeader } from '@/components/PageTabHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 
 export function PdpaManagementForm() {
   const router = useRouter()

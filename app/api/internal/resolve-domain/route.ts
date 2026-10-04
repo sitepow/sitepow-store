@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { DomainStatus } from '@/generated/prisma/enums'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 
 export async function GET(request: Request) {
   const secret = request.headers.get('x-internal-secret')

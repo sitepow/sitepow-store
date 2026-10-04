@@ -7,11 +7,11 @@ import { useParams } from 'next/navigation'
 import {
   useStorefrontLoyalty,
   useValidateCoupon,
-} from '@/actions/hooks/storefront/discount'
+} from '@/actions/storefront/discount/hooks'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { calculateMaxUsablePoints } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { calculateMaxUsablePoints } from '@/utils/cart/cart-calculation'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
   IconDiscount2,
   IconTicket,

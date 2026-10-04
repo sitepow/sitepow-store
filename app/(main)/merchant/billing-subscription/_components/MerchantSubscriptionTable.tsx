@@ -3,15 +3,12 @@
 import {
   useCancelPendingPlanChange,
   useStoreSubscriptions,
-} from '@/actions/hooks/subscription'
+} from '@/actions/billing/subscription/hooks'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { useSession } from '@/hooks/use-session'
-import { formatDate } from '@/utils/date'
-import {
-  calculateMonthlyAverage,
-  formatCurrency,
-  getSubscriptionStatusInfo,
-} from '@/utils/pricing'
+import { formatDate } from '@/utils/formatting/date'
+import { formatCurrency } from '@/utils/formatting/number'
+import { calculateMonthlyAverage, getSubscriptionStatusInfo } from '@/utils/billing/subscription-pricing'
 import { IconAlertTriangle, IconX } from '@tabler/icons-react'
 import { differenceInDays } from 'date-fns'
 

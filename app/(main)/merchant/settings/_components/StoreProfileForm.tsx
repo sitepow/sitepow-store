@@ -5,15 +5,15 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
 import {
   useStoreProfile,
   useUpdateStoreProfile,
-} from '@/actions/hooks/store-profile'
+} from '@/actions/store/profile/hooks'
 import { PRIMARY_COLOR_OPTIONS } from '@/constants/system'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { getPathR2FromUrl } from '@/utils/image'
-import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store-profile'
+import { getPathR2FromUrl } from '@/utils/media/image'
+import { StoreProfileFormValues, storeProfileSchema } from '@/zod/store/store-profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBuildingStore } from '@tabler/icons-react'
 

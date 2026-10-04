@@ -1,7 +1,7 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { formatSlug } from '@/utils/slug'
-import { CreateStoreFormValues } from '@/zod/store'
+import { formatSlug } from '@/utils/formatting/slug'
+import { CreateStoreFormValues } from '@/zod/store/create-store'
 
 import { FieldDescription } from '@/components/ui/field'
 

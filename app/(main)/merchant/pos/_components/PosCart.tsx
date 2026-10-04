@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
+import { useStorefrontLoyalty } from '@/actions/storefront/discount/hooks'
 import { CartItemCard } from '@/app/sites/[domain]/_components/cart/_components/CartItemCard'
 import { CartSummary } from '@/app/sites/[domain]/_components/cart/_components/CartSummary'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
@@ -13,10 +13,10 @@ import {
   calculateCartSummary,
   calculateGrandTotal,
   getRemainingStock,
-} from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { formatPromptPay } from '@/utils/slip'
-import { POSCheckoutInput, posCheckoutSchema } from '@/zod/order'
+} from '@/utils/cart/cart-calculation'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
+import { POSCheckoutInput, posCheckoutSchema } from '@/zod/sales/pos-checkout'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 

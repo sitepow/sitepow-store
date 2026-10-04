@@ -1,6 +1,6 @@
 'use client'
 
-import { useCreateTransferRequest } from '@/actions/hooks/store-transfer'
+import { useCreateTransferRequest } from '@/actions/store/ownership-transfer/hooks'
 import { useSession } from '@/hooks/use-session'
 import { IconAlertTriangle } from '@tabler/icons-react'
 

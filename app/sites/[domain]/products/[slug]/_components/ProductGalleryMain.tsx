@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
-import { isVideoUrl } from '@/utils/media'
+import { useStorefrontProductDetail } from '@/actions/storefront/product/hooks'
+import { isVideoUrl } from '@/utils/media/video'
 
 import { Skeleton } from '@/components/ui/skeleton'
 

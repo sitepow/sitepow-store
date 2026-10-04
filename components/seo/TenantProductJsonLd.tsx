@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { StorefrontProductDetail } from '@/actions/storefront/product'
+import type { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 
 interface TenantProductJsonLdProps {
   product: StorefrontProductDetail

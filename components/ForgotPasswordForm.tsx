@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useRequestForgotPasswordOtp,
   useResetPasswordWithOtp,
-} from '@/actions/hooks/auth'
+} from '@/actions/account/auth/hooks'
 import { ArrowLeftIcon, MailIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/input-otp'
 import { Spinner } from '@/components/ui/spinner'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 
 interface Step1Inputs {
   email: string

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { useCreateResellerAgreement } from '@/actions/hooks/reseller'
+import { useCreateResellerAgreement } from '@/actions/reseller/reseller/hooks'
 import { ResellerType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconX } from '@tabler/icons-react'

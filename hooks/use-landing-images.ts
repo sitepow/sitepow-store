@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { SECOND } from '@/constants/system'
-import { getLandingImages } from '@/utils/landing-images'
+import { getLandingImages } from '@/utils/storefront/landing-images'
 
 const DEFAULT_IMAGES: Record<string, string[]> = {
   'hero-section': [

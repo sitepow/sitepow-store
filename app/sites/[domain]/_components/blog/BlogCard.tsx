@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 
-import { StorefrontBlogListItem } from '@/actions/storefront/blog'
-import { isVideoUrl } from '@/utils/media'
+import { StorefrontBlogListItem } from '@/actions/storefront/blog/actions'
+import { isVideoUrl } from '@/utils/media/video'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { ArrowRightIcon } from 'lucide-react'
 

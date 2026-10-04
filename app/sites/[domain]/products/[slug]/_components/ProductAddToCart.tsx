@@ -6,9 +6,9 @@ import {
   calculateRewardPoints,
   mapSelectedOptions,
   validateRequiredOptions,
-} from '@/utils/cart'
-import { formatNumber } from '@/utils/pricing'
-import { getStockQuantity } from '@/utils/product'
+} from '@/utils/cart/cart-calculation'
+import { formatNumber } from '@/utils/formatting/number'
+import { getStockQuantity } from '@/utils/product/product-calculation'
 import { PackageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

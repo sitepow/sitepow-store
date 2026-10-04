@@ -7,11 +7,11 @@ import {
   useBranch,
   useCreateBranch,
   useUpdateBranch,
-} from '@/actions/hooks/branch'
+} from '@/actions/store/branch/hooks'
 import { THAI_DAYS } from '@/constants/system'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { OpeningHours } from '@/types/branch'
-import { CreateBranchFormValues, createBranchSchema } from '@/zod/branch'
+import { CreateBranchFormValues, createBranchSchema } from '@/zod/store/branch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPlus } from '@tabler/icons-react'
 
@@ -31,7 +31,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 
-import { Address } from '@/lib/address/logic'
+import { Address } from '@/lib/address/thai-address-finder'
 
 const InputThaiAddress = CreateInput()
 

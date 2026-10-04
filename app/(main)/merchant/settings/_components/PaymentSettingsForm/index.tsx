@@ -6,10 +6,10 @@ import { Controller, useForm } from 'react-hook-form'
 import {
   usePaymentSetting,
   useUpsertPaymentSetting,
-} from '@/actions/hooks/payment'
+} from '@/actions/store/payment/hooks'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/payment'
+import { PaymentSettingFormValues, paymentSettingSchema } from '@/zod/store/payment-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   IconCheck,

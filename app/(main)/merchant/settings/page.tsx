@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { SettingsTab } from '@/constants/settings'
 import { useQueryParam } from '@/hooks/use-query-param'

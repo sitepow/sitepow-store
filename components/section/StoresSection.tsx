@@ -3,8 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useLandingStores } from '@/actions/hooks/store'
-import { StoreLandingItem } from '@/actions/store'
+import { useLandingStores } from '@/actions/store/management/hooks'
+import { StoreLandingItem } from '@/actions/store/management/actions'
 import { FALLBACK_IMAGE } from '@/constants/system'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'

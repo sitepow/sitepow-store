@@ -11,15 +11,15 @@ import {
   useSearchParams,
 } from 'next/navigation'
 
-import { useStoreCheckout } from '@/actions/hooks/checkout'
-import { useAddressOptions } from '@/actions/hooks/storefront/address'
-import { useStorefrontLoyalty } from '@/actions/hooks/storefront/discount'
-import { useCreateOrder } from '@/actions/hooks/storefront/order'
-import { useStorefrontPaymentOptions } from '@/actions/hooks/storefront/payment'
+import { useStoreCheckout } from '@/actions/billing/checkout/hooks'
+import { useAddressOptions } from '@/actions/storefront/address/hooks'
+import { useStorefrontLoyalty } from '@/actions/storefront/discount/hooks'
+import { useCreateOrder } from '@/actions/storefront/order/hooks'
+import { useStorefrontPaymentOptions } from '@/actions/storefront/payment/hooks'
 import {
   useShippingCalculation,
   useStorefrontShippingOptions,
-} from '@/actions/hooks/storefront/shipping'
+} from '@/actions/storefront/shipping/hooks'
 import {
   BankAccountType,
   PaymentMethod,
@@ -29,9 +29,9 @@ import {
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { calculateGrandTotal, getRemainingStock } from '@/utils/cart'
-import { formatCurrency } from '@/utils/pricing'
-import { formatBankAccount, formatPromptPay } from '@/utils/slip'
+import { calculateGrandTotal, getRemainingStock } from '@/utils/cart/cart-calculation'
+import { formatCurrency } from '@/utils/formatting/number'
+import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import {
   IconAlertCircle,
   IconArrowRight,

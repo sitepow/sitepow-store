@@ -1,8 +1,8 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     try {
-      const { prisma } = await import('@/lib/prisma')
-      const { redis } = await import('@/lib/redis')
+      const { prisma } = await import('@/lib/db/prisma')
+      const { redis } = await import('@/lib/redis/client')
       const { DomainStatus } = await import('@/generated/prisma/enums')
 
       const stores = await prisma.store.findMany({

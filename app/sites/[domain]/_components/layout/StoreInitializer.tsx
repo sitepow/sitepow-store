@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-import { StoreData } from '@/actions/store'
+import { StoreData } from '@/actions/store/management/actions'
 import { useStoreData } from '@/stores/sites/use-store-data'
 
 export function StoreInitializer({ store }: { store: StoreData }) {

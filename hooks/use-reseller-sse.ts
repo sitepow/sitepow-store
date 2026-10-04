@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react'
 
-import { posProductKeys } from '@/actions/query-keys/pos/product'
-import { productKeys } from '@/actions/query-keys/product'
-import { resellerKeys } from '@/actions/query-keys/reseller'
+import { posProductKeys } from '@/actions/sales/pos-product/query-keys'
+import { productKeys } from '@/actions/catalog/product/query-keys'
+import { resellerKeys } from '@/actions/reseller/reseller/query-keys'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { ResellerEventPayload } from '@/lib/events'
+import { ResellerEventPayload } from '@/lib/redis/events'
 
 export function useResellerSSE(storeId?: string) {
   const queryClient = useQueryClient()

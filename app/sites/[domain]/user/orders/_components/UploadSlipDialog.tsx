@@ -5,16 +5,16 @@ import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import { useR2DeleteImage, useR2UploadImage } from '@/actions/hooks/r2'
-import { useVerifySlip } from '@/actions/hooks/verify-slip'
+import { useR2DeleteImage, useR2UploadImage } from '@/actions/shared/r2/hooks'
+import { useVerifySlip } from '@/actions/sales/payment-verification/hooks'
 import { ORDER_EXPIRY_MINUTES } from '@/constants/system'
 import { BankAccount, BankAccountType } from '@/generated/prisma/browser'
 import { useOrderCountdown } from '@/hooks/use-order-countdown'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { getPathR2FromUrl } from '@/utils/image'
-import { formatCurrency } from '@/utils/pricing'
-import { formatBankAccount, formatPromptPay } from '@/utils/slip'
+import { getPathR2FromUrl } from '@/utils/media/image'
+import { formatCurrency } from '@/utils/formatting/number'
+import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import {
   IconClock,
   IconPhoto,

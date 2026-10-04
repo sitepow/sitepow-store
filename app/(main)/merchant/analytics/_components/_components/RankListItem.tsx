@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 
-import { formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/formatting/number'
 
 import { RankBadge } from './RankBadge'
 import { RankProgressBar } from './RankProgressBar'

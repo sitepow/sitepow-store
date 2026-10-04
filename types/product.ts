@@ -1,5 +1,5 @@
 import { Prisma } from '@/generated/prisma/client'
-import { DecimalToNumber } from '@/utils/decimal'
+import { DecimalToNumber } from '@/utils/shared/decimal'
 
 export type ProductWithRelations = DecimalToNumber<
   Prisma.ProductGetPayload<{

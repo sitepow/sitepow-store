@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useCreateAddress } from '@/actions/hooks/storefront/address'
+import { useCreateAddress } from '@/actions/storefront/address/hooks'
 import { AddressType } from '@/generated/prisma/enums'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { formatPhoneInput } from '@/utils/slip'
-import { AddressSchema, addressSchema } from '@/zod/address'
+import { formatPhoneInput } from '@/utils/formatting/promptpay-phone'
+import { AddressSchema, addressSchema } from '@/zod/shared/address'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 
@@ -28,7 +28,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 
-import { Address } from '@/lib/address/logic'
+import { Address } from '@/lib/address/thai-address-finder'
 
 const InputThaiAddress = CreateInput()
 

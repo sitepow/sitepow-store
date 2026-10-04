@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 
-import { Address, Config, ThaiAddressFinder } from '@/lib/address/logic'
+import { Address, Config, ThaiAddressFinder } from '@/lib/address/thai-address-finder'
 import { cn } from '@/lib/utils'
 
 import { Input } from './ui/input'

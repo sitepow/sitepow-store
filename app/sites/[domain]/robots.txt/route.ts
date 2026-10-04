@@ -2,8 +2,8 @@ import { NextRequest } from 'next/server'
 
 import { StoreStatus } from '@/generated/prisma/enums'
 
-import { prisma } from '@/lib/prisma'
-import { getTenantBaseUrl } from '@/lib/tenant-seo'
+import { prisma } from '@/lib/db/prisma'
+import { getTenantBaseUrl } from '@/lib/tenant/seo'
 
 export const dynamic = 'force-dynamic'
 

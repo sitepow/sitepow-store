@@ -1,0 +1,128 @@
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+
+import {
+  CreateBranchInput,
+  UpdateBranchInput,
+  createBranch,
+  deleteBranch,
+  getBranch,
+  getBranchOptions,
+  getBranches,
+  setMainBranch,
+  updateBranch,
+} from '@/actions/store/branch/actions'
+import { branchKeys } from '@/actions/store/branch/query-keys'
+
+interface UseBranchesParams {
+  storeId: string
+  page?: number
+  limit?: number
+  search?: string
+}
+
+export function useBranches({
+  storeId,
+  page = 1,
+  limit = 10,
+  search,
+}: UseBranchesParams) {
+  const filters = { storeId, page, limit, search }
+
+  return useQuery(
+    queryOptions({
+      queryKey: branchKeys.list(filters),
+      queryFn: async () => await getBranches(filters),
+      enabled: !!storeId,
+      placeholderData: (previousData) => previousData,
+    }),
+  )
+}
+
+export function useBranch(id: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: branchKeys.detail(id),
+      queryFn: async () => await getBranch(id),
+      enabled: !!id,
+    }),
+  )
+}
+
+export function useCreateBranch() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: CreateBranchInput) => await createBranch(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: branchKeys.lists(),
+      })
+    },
+  })
+}
+
+export function useUpdateBranch() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: string
+      input: UpdateBranchInput
+    }) => await updateBranch(id, input),
+    onSuccess: (result) => {
+      if (!result.success || !result.data) {
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() })
+      queryClient.invalidateQueries({
+        queryKey: branchKeys.detail(result.data.id),
+      })
+    },
+  })
+}
+
+export function useSetMainBranch() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, storeId }: { id: string; storeId: string }) =>
+      await setMainBranch(id, storeId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() })
+      queryClient.invalidateQueries({
+        queryKey: branchKeys.detail(variables.id),
+      })
+    },
+  })
+}
+
+export function useDeleteBranch() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, storeId }: { id: string; storeId: string }) =>
+      await deleteBranch(id, storeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() })
+    },
+  })
+}
+
+export function useBranchOptions(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: branchKeys.options(storeId),
+      queryFn: async () => await getBranchOptions(storeId),
+      enabled: !!storeId,
+    }),
+  )
+}

@@ -3,7 +3,7 @@
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
-import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
+import { UpdateProfileSchema, updateProfileSchema } from '@/zod/account/profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconUser } from '@tabler/icons-react'
 

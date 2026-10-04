@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { useMessages } from '@/actions/hooks/chat'
+import { useMessages } from '@/actions/chat/chat/hooks'
 
 export function useChatMessages(conversationId: string) {
   const { data, ...rest } = useMessages(conversationId)

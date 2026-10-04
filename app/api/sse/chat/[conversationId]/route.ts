@@ -3,10 +3,10 @@ import { NextRequest } from 'next/server'
 import { REDIS_CACHE_TTL_SECONDS } from '@/constants/system'
 import { ConversationType, UserRole } from '@/generated/prisma/enums'
 
-import { getCurrentUser } from '@/lib/auth-server'
+import { getCurrentUser } from '@/lib/auth/server'
 import { withCache } from '@/lib/cache'
-import { appEvents } from '@/lib/events'
-import { prisma } from '@/lib/prisma'
+import { appEvents } from '@/lib/redis/events'
+import { prisma } from '@/lib/db/prisma'
 
 export async function GET(
   req: NextRequest,

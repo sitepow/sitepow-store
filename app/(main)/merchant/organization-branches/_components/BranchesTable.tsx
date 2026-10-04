@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useBranches, useDeleteBranch } from '@/actions/hooks/branch'
+import { useBranches, useDeleteBranch } from '@/actions/store/branch/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'

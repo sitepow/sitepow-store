@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 
-import { GetActivityLogItem } from '@/actions/activity-log'
-import { useActivityLogs } from '@/actions/hooks/activity-log'
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { GetActivityLogItem } from '@/actions/analytics/activity-log/actions'
+import { useActivityLogs } from '@/actions/analytics/activity-log/hooks'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDateTime } from '@/utils/date'
+import { formatDateTime } from '@/utils/formatting/date'
 import { IconEye, IconHistory, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

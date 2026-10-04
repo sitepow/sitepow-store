@@ -3,11 +3,11 @@
 import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useProductAi } from '@/actions/hooks/ai'
+import { useProductAi } from '@/actions/ai/ai/hooks'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { AiGenTask } from '@/types/ai'
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 import { IconWand } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

@@ -1,6 +1,6 @@
 'use client'
 
-import { GetActivityLogItem } from '@/actions/activity-log'
+import { GetActivityLogItem } from '@/actions/analytics/activity-log/actions'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { IconTerminal } from '@tabler/icons-react'
 

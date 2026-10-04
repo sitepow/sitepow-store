@@ -3,19 +3,19 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import {
   usePOSProducts,
   useResellerPOSProducts,
-} from '@/actions/hooks/pos/product'
-import { POSProductItem } from '@/actions/pos/product'
+} from '@/actions/sales/pos-product/hooks'
+import { POSProductItem } from '@/actions/sales/pos-product/actions'
 import { useCartStore } from '@/app/sites/[domain]/cart/store'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
+import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart/cart-calculation'
 import { IconCashRegister, IconLock } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

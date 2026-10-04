@@ -10,7 +10,7 @@ import {
   ZONE_LABELS,
 } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
-import { ShippingFormValues } from '@/zod/shipping'
+import { ShippingFormValues } from '@/zod/store/shipping-settings'
 import { IconPlus, IconSettings, IconTrash } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'

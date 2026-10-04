@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useUpdateStock } from '@/actions/hooks/inventory'
-import { GetInventoryItem } from '@/actions/inventory'
-import { DecimalToNumber } from '@/utils/decimal'
-import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory'
+import { useUpdateStock } from '@/actions/inventory/stock/hooks'
+import { GetInventoryItem } from '@/actions/inventory/stock/actions'
+import { DecimalToNumber } from '@/utils/shared/decimal'
+import { UpdateStockFormValues, updateStockSchema } from '@/zod/inventory/stock-update'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSettings } from '@tabler/icons-react'
 

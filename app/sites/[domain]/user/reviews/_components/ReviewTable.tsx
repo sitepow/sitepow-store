@@ -5,9 +5,9 @@ import { useState } from 'react'
 
 import { useParams } from 'next/navigation'
 
-import { useReviewRewardConfig } from '@/actions/hooks/store-reward-review'
-import { usePurchasableProducts } from '@/actions/hooks/storefront/review'
-import { formatDateTime } from '@/utils/date'
+import { useReviewRewardConfig } from '@/actions/store/review-reward/hooks'
+import { usePurchasableProducts } from '@/actions/storefront/review/hooks'
+import { formatDateTime } from '@/utils/formatting/date'
 import { IconMessagePlus, IconStarFilled } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'

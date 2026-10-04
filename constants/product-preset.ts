@@ -1,5 +1,5 @@
 import { DiscountType } from '@/generated/prisma/enums'
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 
 export const PRODUCT_PRESETS_MASTER = [
   {

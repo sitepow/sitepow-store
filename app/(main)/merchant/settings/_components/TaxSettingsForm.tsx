@@ -3,9 +3,9 @@
 import { useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useTaxSetting, useUpdateTaxSetting } from '@/actions/hooks/tax'
+import { useTaxSetting, useUpdateTaxSetting } from '@/actions/store/tax/hooks'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { TaxSettingFormValues, taxSettingSchema } from '@/zod/tax'
+import { TaxSettingFormValues, taxSettingSchema } from '@/zod/store/tax-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy, IconReceiptTax } from '@tabler/icons-react'
 

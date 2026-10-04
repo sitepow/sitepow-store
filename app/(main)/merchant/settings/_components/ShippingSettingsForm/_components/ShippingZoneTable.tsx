@@ -2,7 +2,7 @@
 
 import { ZONE_LABELS } from '@/constants/shipping'
 import { ShippingZoneType } from '@/generated/prisma/enums'
-import { getProvincesForZone, getRegionKey } from '@/utils/shipping'
+import { getProvincesForZone, getRegionKey } from '@/utils/shipping/shipping'
 
 import {
   Table,

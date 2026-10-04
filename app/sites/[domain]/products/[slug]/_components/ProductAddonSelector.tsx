@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react'
 
-import { formatCurrency } from '@/utils/pricing'
-import { getStockQuantity } from '@/utils/product'
+import { formatCurrency } from '@/utils/formatting/number'
+import { getStockQuantity } from '@/utils/product/product-calculation'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'

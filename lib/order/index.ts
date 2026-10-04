@@ -6,17 +6,17 @@ import {
   PaymentMethod,
   ProductType,
 } from '@/generated/prisma/enums'
-import { calculateDiscounts, calculateEarnedPoints } from '@/utils/cart'
+import { calculateDiscounts, calculateEarnedPoints } from '@/utils/cart/cart-calculation'
 import {
   calculateGroupShare,
   checkIsSplitOrder,
   classifyOrderItems,
   generateOrderNumber,
-} from '@/utils/order'
-import { deductCustomerPoints, refundCustomerPoints } from '@/utils/points'
+} from '@/utils/order/order-calculation'
+import { deductCustomerPoints, refundCustomerPoints } from '@/utils/points/customer-points'
 
-import { createLog } from '@/lib/activity-log'
-import { prisma } from '@/lib/prisma'
+import { createLog } from '@/lib/activity/log'
+import { prisma } from '@/lib/db/prisma'
 
 import { CancelOrderCoreInput, CreateOrderCoreInput } from './types'
 import { calculateOrderDimensions } from './utils'

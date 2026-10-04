@@ -7,7 +7,7 @@ import {
   useRemoveStoreDomain,
   useStoreDomain,
   useVerifyStoreDomain,
-} from '@/actions/hooks/domain'
+} from '@/actions/store/domain/hooks'
 import { DomainStatus } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {

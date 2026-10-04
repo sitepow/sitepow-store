@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 
-import { getStorefrontBlogDetail } from '@/actions/storefront/blog'
+import { getStorefrontBlogDetail } from '@/actions/storefront/blog/actions'
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { SectionContainer } from '@/components/SectionContainer'

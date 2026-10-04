@@ -10,12 +10,12 @@ import {
 } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import { usePOSProducts } from '@/actions/hooks/pos/product'
-import { useAllocateResellerStock } from '@/actions/hooks/reseller'
+import { usePOSProducts } from '@/actions/sales/pos-product/hooks'
+import { useAllocateResellerStock } from '@/actions/reseller/reseller/hooks'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { useResellerFilter } from '@/stores/use-reseller-filter'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import { IconCheck, IconPackage, IconSearch, IconX } from '@tabler/icons-react'
 
 import { BranchSelectField } from '@/components/BranchSelectField'

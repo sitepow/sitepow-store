@@ -1,4 +1,4 @@
-import { formatDateTime } from '@/utils/date'
+import { formatDateTime } from '@/utils/formatting/date'
 import { CalendarIcon, Clock, User2 } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

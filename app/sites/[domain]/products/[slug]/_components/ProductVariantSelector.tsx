@@ -6,8 +6,8 @@ import Image from 'next/image'
 
 import { EmptyImage } from '@/app/sites/[domain]/_components/EmptyImage'
 import { DiscountType, ProductType } from '@/generated/prisma/enums'
-import { formatCurrency } from '@/utils/pricing'
-import { calculateNetPrice, getStockQuantity } from '@/utils/product'
+import { formatCurrency } from '@/utils/formatting/number'
+import { calculateNetPrice, getStockQuantity } from '@/utils/product/product-calculation'
 
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'

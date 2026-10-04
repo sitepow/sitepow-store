@@ -7,7 +7,7 @@ import {
   useSecuritySettings,
   useUpdateSecuritySettings,
   useUpdateTwoFactor,
-} from '@/actions/hooks/security-settings'
+} from '@/actions/account/security/hooks'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
@@ -15,7 +15,7 @@ import {
   TwoFactorFormValues,
   changePasswordSchema,
   twoFactorSchema,
-} from '@/zod/security-settings'
+} from '@/zod/account/security'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconLock, IconShield } from '@tabler/icons-react'
 

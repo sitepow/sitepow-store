@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 
-import { useCheckout } from '@/actions/hooks/checkout'
-import { useSubscriptionInvoices } from '@/actions/hooks/subscription'
-import { GetSubscriptionInvoiceItemSerialized } from '@/actions/subscription'
+import { useCheckout } from '@/actions/billing/checkout/hooks'
+import { useSubscriptionInvoices } from '@/actions/billing/subscription/hooks'
+import { GetSubscriptionInvoiceItemSerialized } from '@/actions/billing/subscription/actions'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { PLAN_DETAILS } from '@/constants/plan'
 import { getLabel } from '@/constants/translate'
@@ -12,8 +12,8 @@ import { InvoiceStatus } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import { CheckoutType } from '@/types/checkout'
-import { formatDate } from '@/utils/date'
-import { formatCurrency } from '@/utils/pricing'
+import { formatDate } from '@/utils/formatting/date'
+import { formatCurrency } from '@/utils/formatting/number'
 import { IconArrowRight, IconDownload } from '@tabler/icons-react'
 
 import { TableEmptyRow } from '@/components/TableEmptyRow'

@@ -1,6 +1,6 @@
 'use client'
 
-import { useStorefrontCategoriesProductsSections } from '@/actions/hooks/storefront/sections'
+import { useStorefrontCategoriesProductsSections } from '@/actions/storefront/sections/hooks'
 
 import { CategorySection } from './Category'
 

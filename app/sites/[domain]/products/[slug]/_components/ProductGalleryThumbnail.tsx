@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useCarousel } from '@/hooks/use-carousel'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import { useMediaQuery } from '@/hooks/use-media-query'
-import { isVideoUrl } from '@/utils/media'
+import { isVideoUrl } from '@/utils/media/video'
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

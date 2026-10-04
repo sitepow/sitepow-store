@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import Image from 'next/image'
 
-import { useApproveSlipManual } from '@/actions/hooks/verify-slip'
+import { useApproveSlipManual } from '@/actions/sales/payment-verification/hooks'
 import { SlipVerificationAction } from '@/types/slip'
-import { formatCurrency } from '@/utils/pricing'
-import { formatBankAccount } from '@/utils/slip'
+import { formatCurrency } from '@/utils/formatting/number'
+import { formatBankAccount } from '@/utils/formatting/promptpay-phone'
 import { IconCheck, IconSearch, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

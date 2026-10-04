@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 
-import { getCurrentUser } from '@/lib/auth-server'
-import { OrderEventPayload, appEvents } from '@/lib/events'
+import { getCurrentUser } from '@/lib/auth/server'
+import { OrderEventPayload, appEvents } from '@/lib/redis/events'
 
 export async function GET(
   req: NextRequest,

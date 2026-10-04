@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { useCategories, useDeleteCategory } from '@/actions/hooks/category'
+import { useCategories, useDeleteCategory } from '@/actions/catalog/category/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import { IconEdit } from '@tabler/icons-react'

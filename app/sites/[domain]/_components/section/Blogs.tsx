@@ -1,6 +1,6 @@
 'use client'
 
-import { useStorefrontBlogs } from '@/actions/hooks/storefront/blog'
+import { useStorefrontBlogs } from '@/actions/storefront/blog/hooks'
 
 import { SectionContainer } from '@/components/SectionContainer'
 import { SectionHeader } from '@/components/SectionHeader'

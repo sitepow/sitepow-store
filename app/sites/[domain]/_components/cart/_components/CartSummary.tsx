@@ -3,7 +3,7 @@
 import { ComponentProps } from 'react'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 
 import { HighlightText } from '@/components/HighlightText'
 import { Separator } from '@/components/ui/separator'

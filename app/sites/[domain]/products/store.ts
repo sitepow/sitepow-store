@@ -1,10 +1,10 @@
-import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 import {
   CalculatedProduct,
   calculateNetPrice,
   getStockQuantity,
-} from '@/utils/product'
-import { calculateProduct } from '@/utils/product'
+} from '@/utils/product/product-calculation'
+import { calculateProduct } from '@/utils/product/product-calculation'
 import { create } from 'zustand'
 
 type StorefrontVariant = StorefrontProductDetail['variants'][number]

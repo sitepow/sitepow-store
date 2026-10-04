@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 
-import { useDashboard } from '@/actions/hooks/dashboard'
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useDashboard } from '@/actions/analytics/dashboard/hooks'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StatsCard } from '@/app/sites/[domain]/_components/StatsCard'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
 import {
   IconBuildingStore,
   IconCurrencyDollar,

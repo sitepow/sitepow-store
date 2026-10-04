@@ -1,6 +1,6 @@
 'use client'
 
-import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
+import { useStorefrontProductDetail } from '@/actions/storefront/product/hooks'
 import { Separator } from '@/components/ui/separator'
 
 import { useProductPurchaseStore } from '../../store'

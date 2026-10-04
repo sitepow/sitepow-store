@@ -7,7 +7,7 @@ import {
   useMarkAsRead,
   useOrCreateStoreConversation,
   useUnreadCount,
-} from '@/actions/hooks/chat'
+} from '@/actions/chat/chat/hooks'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { ConversationType } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
-import { useStorefrontCategoryOptions } from '@/actions/hooks/storefront/category'
+import { useStorefrontCategoryOptions } from '@/actions/storefront/category/hooks'
 
 import {
   Accordion,

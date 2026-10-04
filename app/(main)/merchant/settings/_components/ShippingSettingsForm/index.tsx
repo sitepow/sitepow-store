@@ -12,11 +12,11 @@ import toast from 'react-hot-toast'
 import {
   useStoreShippingSettings,
   useUpdateShippingSettings,
-} from '@/actions/hooks/shipping'
+} from '@/actions/store/shipping/hooks'
 import { COURIERS_LIST } from '@/constants/shipping'
 import { ALL_BRANCHES, useBranchFilter } from '@/stores/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { ShippingFormValues, shippingFormSchema } from '@/zod/shipping'
+import { ShippingFormValues, shippingFormSchema } from '@/zod/store/shipping-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy, IconTruck } from '@tabler/icons-react'
 

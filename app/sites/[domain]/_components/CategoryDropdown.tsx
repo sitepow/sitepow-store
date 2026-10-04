@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { useStorefrontCategoryOptions } from '@/actions/hooks/storefront/category'
+import { useStorefrontCategoryOptions } from '@/actions/storefront/category/hooks'
 import { ChevronDownIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

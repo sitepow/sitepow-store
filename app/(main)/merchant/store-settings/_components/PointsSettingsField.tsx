@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Plan } from '@/generated/prisma/enums'
-import { CreateStoreFormValues } from '@/zod/store'
+import { CreateStoreFormValues } from '@/zod/store/create-store'
 import { IconLock } from '@tabler/icons-react'
 
 import { Badge } from '@/components/ui/badge'

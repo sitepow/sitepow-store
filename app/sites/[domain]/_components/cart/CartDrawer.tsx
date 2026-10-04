@@ -3,8 +3,8 @@
 import Link from 'next/link'
 
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { getRemainingStock } from '@/utils/cart'
-import { formatCurrency } from '@/utils/pricing'
+import { getRemainingStock } from '@/utils/cart/cart-calculation'
+import { formatCurrency } from '@/utils/formatting/number'
 import { ShoppingCartIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

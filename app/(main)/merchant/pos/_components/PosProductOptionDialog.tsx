@@ -3,14 +3,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { POSProductItem } from '@/actions/pos/product'
+import { POSProductItem } from '@/actions/sales/pos-product/actions'
 import { QuantitySelector } from '@/app/sites/[domain]/products/[slug]/_components/QuantitySelector'
 import { DiscountType } from '@/generated/prisma/enums'
 import { useBranchFilter } from '@/stores/use-branch-filter'
 import { CartItem } from '@/types/sites/cart'
-import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { calculateNetPrice } from '@/utils/product'
+import { calculateCartUnitPrice, getRemainingStock } from '@/utils/cart/cart-calculation'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { calculateNetPrice } from '@/utils/product/product-calculation'
 
 import { ProductImage } from '@/components/ProductImage'
 import { Badge } from '@/components/ui/badge'

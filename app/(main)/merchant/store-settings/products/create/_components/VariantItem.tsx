@@ -9,10 +9,10 @@ import {
   useWatch,
 } from 'react-hook-form'
 
-import { useBranches } from '@/actions/hooks/branch'
+import { useBranches } from '@/actions/store/branch/hooks'
 import { ProductType } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 import { IconTrash } from '@tabler/icons-react'
 import { ImagePlus, PlusCircle, X } from 'lucide-react'
 

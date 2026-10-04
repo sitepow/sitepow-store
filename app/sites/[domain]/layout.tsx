@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getStoreByDomain } from '@/lib/data/store'
+import { getStoreByDomain } from '@/lib/tenant/store'
 import { BASE_FAVICON } from '@/constants/favicon'
 import { StoreStatus } from '@/generated/prisma/enums'
 
-import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant-seo'
+import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant/seo'
 
 import { AlertLayout } from '@/components/layout/AlertLayout'
 

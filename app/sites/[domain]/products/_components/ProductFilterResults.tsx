@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
-import { useStorefrontProducts } from '@/actions/hooks/storefront/product'
+import { useStorefrontProducts } from '@/actions/storefront/product/hooks'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'
 import {

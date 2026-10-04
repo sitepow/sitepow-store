@@ -1,7 +1,7 @@
 'use client'
 
-import { StorefrontProductDetail } from '@/actions/storefront/product'
-import { getRatingLabel } from '@/utils/review'
+import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
+import { getRatingLabel } from '@/utils/review/rating-label'
 import { CheckCircle2, User2Icon } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

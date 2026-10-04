@@ -2,14 +2,14 @@ import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { storefrontProductKeys } from '@/actions/query-keys/storefront/product'
+import { storefrontProductKeys } from '@/actions/storefront/product/query-keys'
 import {
   getProductBySlug,
   type StorefrontProductDetail,
-} from '@/lib/data/product'
-import { getStoreByDomain } from '@/lib/data/store'
-import { getQueryClient } from '@/lib/get-query-client'
-import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant-seo'
+} from '@/lib/storefront/product'
+import { getStoreByDomain } from '@/lib/tenant/store'
+import { getQueryClient } from '@/lib/query/get-query-client'
+import { cleanDescription, getTenantBaseUrl } from '@/lib/tenant/seo'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
 import { SectionContainer } from '@/components/SectionContainer'

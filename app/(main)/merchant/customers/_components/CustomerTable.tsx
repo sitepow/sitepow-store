@@ -6,13 +6,13 @@ import {
   useBlockCustomer,
   useCustomers,
   useUnblockCustomer,
-} from '@/actions/hooks/customer'
-import { useEmployeePermission } from '@/actions/hooks/employee'
+} from '@/actions/sales/customer/hooks'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { formatDateTime, getBlockMessage } from '@/utils/date'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { formatPromptPay } from '@/utils/slip'
+import { formatDateTime, getBlockMessage } from '@/utils/formatting/date'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconLock, IconLockOpen } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

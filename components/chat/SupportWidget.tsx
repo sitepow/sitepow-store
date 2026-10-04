@@ -6,7 +6,7 @@ import {
   useMarkAsRead,
   useSupportConversations,
   useUnreadCount,
-} from '@/actions/hooks/chat'
+} from '@/actions/chat/chat/hooks'
 import { CartBadge } from '@/app/sites/[domain]/_components/cart/CartBadge'
 import { useSession } from '@/hooks/use-session'
 import { useChatStore } from '@/stores/use-chat-store'

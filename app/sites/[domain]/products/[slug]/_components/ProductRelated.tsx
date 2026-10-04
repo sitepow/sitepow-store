@@ -1,6 +1,6 @@
 'use client'
 
-import { useRelatedProducts } from '@/actions/hooks/storefront/product'
+import { useRelatedProducts } from '@/actions/storefront/product/hooks'
 import { useCarousel } from '@/hooks/use-carousel'
 
 import { Separator } from '@/components/ui/separator'

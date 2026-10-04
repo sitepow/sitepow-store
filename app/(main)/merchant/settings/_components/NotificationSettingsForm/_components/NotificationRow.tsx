@@ -2,7 +2,7 @@
 
 import { useFormContext } from 'react-hook-form'
 
-import { NotificationSettingsFormValues } from '@/zod/notification-settings'
+import { NotificationSettingsFormValues } from '@/zod/account/notification-settings'
 
 import { Switch } from '@/components/ui/switch'
 

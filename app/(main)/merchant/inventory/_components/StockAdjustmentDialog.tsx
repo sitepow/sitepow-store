@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useCreateStockAdjustment } from '@/actions/hooks/stock-adjustment'
+import { useCreateStockAdjustment } from '@/actions/inventory/stock-adjustment/hooks'
 import { STOCK_ADJUSTMENT_REASON_OPTIONS } from '@/constants/translate'
 import { StockAdjustmentReason } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   CreateStockAdjustmentFormValues,
   createStockAdjustmentSchema,
-} from '@/zod/stock-adjustment'
+} from '@/zod/inventory/stock-adjustment'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageImport } from '@tabler/icons-react'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { StorefrontProductDetail } from '@/actions/storefront/product'
+import { StorefrontProductDetail } from '@/actions/storefront/product/actions'
 
 import { Progress } from '@/components/ui/progress'
 

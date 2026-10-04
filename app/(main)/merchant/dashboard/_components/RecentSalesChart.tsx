@@ -1,7 +1,7 @@
 'use client'
 
-import { formatDateTime } from '@/utils/date'
-import { formatCurrency } from '@/utils/pricing'
+import { formatDateTime } from '@/utils/formatting/date'
+import { formatCurrency } from '@/utils/formatting/number'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import {

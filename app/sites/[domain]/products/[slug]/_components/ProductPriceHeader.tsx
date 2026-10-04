@@ -1,6 +1,6 @@
-import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
-import { formatCurrency, formatNumber } from '@/utils/pricing'
-import { calculateNetPrice } from '@/utils/product'
+import { useStorefrontProductDetail } from '@/actions/storefront/product/hooks'
+import { formatCurrency, formatNumber } from '@/utils/formatting/number'
+import { calculateNetPrice } from '@/utils/product/product-calculation'
 
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'

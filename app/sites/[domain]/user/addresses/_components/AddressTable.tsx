@@ -6,8 +6,8 @@ import {
   useAddresses,
   useDeleteAddress,
   useSetDefaultAddress,
-} from '@/actions/hooks/storefront/address'
-import { formatPromptPay } from '@/utils/slip'
+} from '@/actions/storefront/address/hooks'
+import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import { IconArrowForward, IconBriefcase, IconHome } from '@tabler/icons-react'
 
 import { DeleteButton } from '@/components/DeleteButton'

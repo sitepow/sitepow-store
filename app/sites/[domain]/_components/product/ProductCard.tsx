@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 
-import { SectionProductItem } from '@/actions/storefront/sections'
-import { isVideoUrl } from '@/utils/media'
-import { formatCurrency } from '@/utils/pricing'
-import { calculateProduct } from '@/utils/product'
+import { SectionProductItem } from '@/actions/storefront/sections/actions'
+import { isVideoUrl } from '@/utils/media/video'
+import { formatCurrency } from '@/utils/formatting/number'
+import { calculateProduct } from '@/utils/product/product-calculation'
 import { IconAlertCircle, IconBuildingStore } from '@tabler/icons-react'
 import { type VariantProps, cva } from 'class-variance-authority'
 

@@ -1,4 +1,4 @@
-import { redis } from '@/lib/redis'
+import { redis } from '@/lib/redis/client'
 
 function validateCachePattern(pattern: string): void {
   if (!pattern || typeof pattern !== 'string') {

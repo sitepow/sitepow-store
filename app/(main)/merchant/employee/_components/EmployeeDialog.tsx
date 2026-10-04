@@ -3,21 +3,21 @@
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
-import { useBranchOptions } from '@/actions/hooks/branch'
+import { useBranchOptions } from '@/actions/store/branch/hooks'
 import {
   useCreateEmployee,
   useEmployee,
   useUpdateEmployee,
-} from '@/actions/hooks/employee'
-import { usePermissions, useRoleOptions } from '@/actions/hooks/role'
+} from '@/actions/store/employee/hooks'
+import { usePermissions, useRoleOptions } from '@/actions/store/role/hooks'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   getPresetPermissionIds,
   mapEmployeeDataToFormValues,
-} from '@/utils/employee'
-import { createEmployeeSchema } from '@/zod/employee'
+} from '@/utils/store/employee'
+import { createEmployeeSchema } from '@/zod/store/employee'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconKey, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 

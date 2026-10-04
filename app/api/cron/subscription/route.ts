@@ -4,11 +4,11 @@ import { PLAN_DETAILS } from '@/constants/plan'
 import { DAY, OVERDUE_INVOICE_DAYS } from '@/constants/system'
 import { Prisma } from '@/generated/prisma/client'
 import { InvoiceStatus, Plan, SubStatus } from '@/generated/prisma/enums'
-import { ago, formatDate } from '@/utils/date'
-import { calculatePlanPrice } from '@/utils/pricing'
+import { ago, formatDate } from '@/utils/formatting/date'
+import { calculatePlanPrice } from '@/utils/billing/subscription-pricing'
 import { addMonths } from 'date-fns'
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db/prisma'
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')

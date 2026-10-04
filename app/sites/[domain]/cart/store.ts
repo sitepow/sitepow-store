@@ -8,8 +8,8 @@ import {
   getRemainingStock,
   getStockByBranch,
   isSameCartItem,
-} from '@/utils/cart'
-import { getStockQuantity } from '@/utils/product'
+} from '@/utils/cart/cart-calculation'
+import { getStockQuantity } from '@/utils/product/product-calculation'
 import { uuidv7 } from 'uuidv7'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'

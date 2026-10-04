@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useSendMessage, useToggleConversationAi } from '@/actions/hooks/chat'
+import { useSendMessage, useToggleConversationAi } from '@/actions/chat/chat/hooks'
 import { useChatMessages } from '@/hooks/use-chat-messages'
 import { useChatScroll } from '@/hooks/use-chat-scroll'
 import { useChatStream } from '@/hooks/use-chat-stream'

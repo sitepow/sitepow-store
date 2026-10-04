@@ -2,7 +2,7 @@
 
 import { useFormContext } from 'react-hook-form'
 
-import { CreateStoreFormValues } from '@/zod/store'
+import { CreateStoreFormValues } from '@/zod/store/create-store'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'

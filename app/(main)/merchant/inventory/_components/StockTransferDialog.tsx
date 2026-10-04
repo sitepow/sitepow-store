@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { useBranches } from '@/actions/hooks/branch'
-import { useCreateStockTransfer } from '@/actions/hooks/stock-transfer'
+import { useBranches } from '@/actions/store/branch/hooks'
+import { useCreateStockTransfer } from '@/actions/inventory/stock-transfer/hooks'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   CreateStockTransferFormValues,
   createStockTransferSchema,
-} from '@/zod/stock-transfer'
+} from '@/zod/inventory/stock-transfer'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconPackageExport } from '@tabler/icons-react'
 

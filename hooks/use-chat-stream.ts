@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 
-import { ChatData } from '@/actions/hooks/chat'
-import { chatKeys } from '@/actions/query-keys/chat'
+import { ChatData } from '@/actions/chat/chat/hooks'
+import { chatKeys } from '@/actions/chat/chat/query-keys'
 import { useQueryClient } from '@tanstack/react-query'
 import { InfiniteData } from '@tanstack/react-query'
 

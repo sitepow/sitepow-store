@@ -1,7 +1,7 @@
 'use client'
 
 import { CartItem } from '@/types/sites/cart'
-import { formatCurrency } from '@/utils/pricing'
+import { formatCurrency } from '@/utils/formatting/number'
 import { MinusIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 
 import { ProductImage } from '@/components/ProductImage'

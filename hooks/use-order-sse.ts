@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react'
 
-import { orderKeys } from '@/actions/query-keys/order'
-import { posProductKeys } from '@/actions/query-keys/pos/product'
-import { productKeys } from '@/actions/query-keys/product'
-import { storefrontOrderKeys } from '@/actions/query-keys/storefront/order'
+import { orderKeys } from '@/actions/sales/order/query-keys'
+import { posProductKeys } from '@/actions/sales/pos-product/query-keys'
+import { productKeys } from '@/actions/catalog/product/query-keys'
+import { storefrontOrderKeys } from '@/actions/storefront/order/query-keys'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { OrderEventPayload } from '@/lib/events'
+import { OrderEventPayload } from '@/lib/redis/events'
 
 export function useOrderSSE(storeId?: string) {
   const queryClient = useQueryClient()

@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 import { useSearchParams } from 'next/navigation'
 
-import { registerUser } from '@/actions/auth'
+import { registerUser } from '@/actions/account/auth/actions'
 import { REGISTER_PROVIDERS } from '@/constants/register'
 import { UserRole } from '@/generated/prisma/enums'
 import { useLandingImages } from '@/hooks/use-landing-images'
@@ -29,7 +29,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 
 export function RegisterForm() {
   const searchParams = useSearchParams()

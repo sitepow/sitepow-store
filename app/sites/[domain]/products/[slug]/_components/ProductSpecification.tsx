@@ -1,6 +1,6 @@
 'use client'
 
-import { useStorefrontProductDetail } from '@/actions/hooks/storefront/product'
+import { useStorefrontProductDetail } from '@/actions/storefront/product/hooks'
 import { PRODUCT_METADATA_MASTER } from '@/constants/sites/metadata'
 import { TagIcon } from 'lucide-react'
 

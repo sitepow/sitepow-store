@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 
-import { formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/formatting/number'
 import { ArrowRight } from 'lucide-react'
 
 import { ProductImage } from '@/components/ProductImage'

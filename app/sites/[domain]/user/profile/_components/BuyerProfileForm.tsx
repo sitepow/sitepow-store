@@ -3,9 +3,9 @@
 import { ComponentProps, useCallback, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useProfile, useUpdateProfile } from '@/actions/hooks/profile'
-import { formatPromptPay } from '@/utils/slip'
-import { UpdateProfileSchema, updateProfileSchema } from '@/zod/profile'
+import { useProfile, useUpdateProfile } from '@/actions/account/profile/hooks'
+import { formatPromptPay } from '@/utils/formatting/promptpay-phone'
+import { UpdateProfileSchema, updateProfileSchema } from '@/zod/account/profile'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 

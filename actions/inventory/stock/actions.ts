@@ -1,0 +1,355 @@
+'use server'
+
+import { ActorType, LogAction, Prisma } from '@/generated/prisma/client'
+import { ALL_STORES } from '@/stores/use-store-filter'
+import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
+
+import { createLog } from '@/lib/activity/log'
+import { getCurrentUser } from '@/lib/auth/server'
+import { invalidateInventoryStock } from '@/lib/cache'
+import { verifyEmployeePermission } from '@/lib/auth/permission'
+import { prisma } from '@/lib/db/prisma'
+
+interface GetInventoryParams {
+  storeId: string
+  branchId?: string
+  page?: number
+  limit?: number
+  search?: string
+}
+
+const productInventorySelect = (branchId?: string) =>
+  ({
+    id: true,
+    title: true,
+    slug: true,
+    images: {
+      where: { isPrimary: true },
+      select: { url: true },
+      take: 1,
+    },
+    variants: {
+      select: {
+        id: true,
+        title: true,
+        sku: true,
+        price: true,
+        image: true,
+        stocks: {
+          where: branchId && branchId !== ALL_STORES ? { branchId } : undefined,
+          select: {
+            id: true,
+            quantity: true,
+            minStock: true,
+            updatedAt: true,
+            branch: {
+              select: {
+                id: true,
+                name: true,
+                isMain: true,
+                storeId: true,
+              },
+            },
+          },
+        },
+      },
+    },
+  }) satisfies Prisma.ProductSelect
+
+export type GetInventoryItem = Prisma.ProductGetPayload<{
+  select: ReturnType<typeof productInventorySelect>
+}>
+
+export interface GetInventoryResponse {
+  data: DecimalToNumber<GetInventoryItem[]>
+  meta: {
+    currentPage: number
+    limit: number
+    totalItems: number
+    totalPages: number
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+  }
+}
+
+export interface UpdateStockInput {
+  minStock: number
+}
+
+export interface UpsertStockInput {
+  variantId: string
+  branchId: string
+  quantity: number
+  minStock?: number
+}
+
+export async function getInventory({
+  storeId,
+  branchId,
+  page = 1,
+  limit = 10,
+  search,
+}: GetInventoryParams): Promise<GetInventoryResponse> {
+  const emptyResponse: GetInventoryResponse = {
+    data: [],
+    meta: {
+      currentPage: page,
+      limit,
+      totalItems: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  }
+
+  const userSession = await getCurrentUser()
+  const userId = userSession?.id
+
+  if (!userId) {
+    return emptyResponse
+  }
+
+  try {
+    const sanitizedPage = Math.max(1, page)
+    const sanitizedLimit = Math.max(1, Math.min(20, limit))
+    const skip = (sanitizedPage - 1) * sanitizedLimit
+
+    const whereClause: Prisma.ProductWhereInput = {}
+
+    if (storeId && storeId !== ALL_STORES && storeId !== '') {
+      const authCheck = await verifyEmployeePermission({
+        userId,
+        storeId,
+        permission: 'canViewInventory',
+      })
+
+      if (!authCheck.isAuthorized) {
+        return emptyResponse
+      }
+
+      whereClause.storeId = storeId
+    } else {
+      const userStores = await prisma.store.findMany({
+        where: {
+          OR: [
+            { ownerId: userId },
+            { employeeStores: { some: { employee: { userId } } } },
+          ],
+        },
+        select: { id: true },
+      })
+
+      const storeIds = userStores.map((s) => s.id)
+      whereClause.storeId = { in: storeIds }
+    }
+
+    if (branchId && branchId !== ALL_STORES) {
+      whereClause.variants = {
+        some: {
+          stocks: {
+            some: { branchId },
+          },
+        },
+      }
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        {
+          variants: {
+            some: { title: { contains: search, mode: 'insensitive' } },
+          },
+        },
+        {
+          variants: {
+            some: { sku: { contains: search, mode: 'insensitive' } },
+          },
+        },
+      ]
+    }
+
+    const [totalItems, products] = await Promise.all([
+      prisma.product.count({ where: whereClause }),
+      prisma.product.findMany({
+        where: whereClause,
+        skip,
+        take: sanitizedLimit,
+        orderBy: { updatedAt: 'desc' },
+        select: productInventorySelect(branchId),
+      }),
+    ])
+
+    const totalPages = Math.ceil(totalItems / sanitizedLimit)
+
+    return {
+      data: serializeDecimal(products),
+      meta: {
+        currentPage: sanitizedPage,
+        limit: sanitizedLimit,
+        totalItems,
+        totalPages,
+        hasNextPage: sanitizedPage < totalPages,
+        hasPreviousPage: sanitizedPage > 1,
+      },
+    }
+  } catch {
+    return emptyResponse
+  }
+}
+
+export async function updateStock(id: string, input: UpdateStockInput) {
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบ Stock ID' }
+    }
+
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const stockItem = await prisma.productStock.findUnique({
+      where: { id },
+      select: { branch: { select: { storeId: true } } },
+    })
+
+    if (!stockItem) {
+      return { success: false, message: 'ไม่พบข้อมูลสต็อก' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: stockItem.branch.storeId,
+      permission: 'canUpdateInventory',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const updatedStock = await prisma.productStock.update({
+      where: { id },
+      data: input,
+      select: {
+        id: true,
+        variantId: true,
+        quantity: true,
+        minStock: true,
+        updatedAt: true,
+        branch: {
+          select: { storeId: true, id: true, name: true, isMain: true },
+        },
+        variant: {
+          select: { productId: true },
+        },
+      },
+    })
+
+    await invalidateInventoryStock(
+      updatedStock.branch.storeId,
+      updatedStock.branch.id,
+      {
+        variantId: updatedStock.variantId,
+        productId: updatedStock.variant?.productId,
+      },
+    )
+
+    await createLog({
+      action: LogAction.UPDATE_STOCK,
+      actorType: ActorType.MERCHANT,
+      storeId: updatedStock.branch.storeId,
+      entity: 'ProductStock',
+      entityId: id,
+      details: { minStock: input.minStock, type: 'updated' },
+    })
+
+    return {
+      success: true,
+      message: 'อัปเดตสต็อกสำเร็จ',
+      data: serializeDecimal(updatedStock),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}
+
+export async function upsertStock(input: UpsertStockInput) {
+  try {
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const { variantId, branchId, quantity, minStock = 0 } = input
+
+    const branch = await prisma.branch.findUnique({
+      where: { id: branchId },
+      select: { storeId: true },
+    })
+
+    if (!branch) {
+      return { success: false, message: 'ไม่พบข้อมูลสาขา' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: branch.storeId,
+      permission: 'canUpdateInventory',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const stock = await prisma.productStock.upsert({
+      where: { branchId_variantId: { branchId, variantId } },
+      update: { quantity, minStock },
+      create: { variantId, branchId, quantity, minStock },
+      select: {
+        id: true,
+        quantity: true,
+        minStock: true,
+        updatedAt: true,
+        branch: {
+          select: { id: true, name: true, isMain: true, storeId: true },
+        },
+      },
+    })
+
+    await invalidateInventoryStock(
+      branch.storeId,
+      branchId,
+      { variantId },
+    )
+
+    await createLog({
+      action: LogAction.UPDATE_STOCK,
+      actorType: ActorType.MERCHANT,
+      storeId: branch.storeId,
+      entity: 'ProductStock',
+      entityId: stock.id,
+      details: { variantId, branchId, quantity, minStock, type: 'upserted' },
+    })
+
+    return {
+      success: true,
+      message: 'บันทึกสต็อกสำเร็จ',
+      data: serializeDecimal(stock),
+    }
+  } catch (error) {
+    console.error(error)
+    return { success: false }
+  }
+}

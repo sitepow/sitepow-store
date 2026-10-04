@@ -3,7 +3,7 @@
 
 import { ComponentProps, useEffect, useState } from 'react'
 
-import { formatShortDate, formatShortTime } from '@/utils/date'
+import { formatShortDate, formatShortTime } from '@/utils/formatting/date'
 import { IconClock } from '@tabler/icons-react'
 
 import { cn } from '@/lib/utils'

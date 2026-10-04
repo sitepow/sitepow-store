@@ -1,8 +1,8 @@
-import { storefrontProductKeys } from '@/actions/query-keys/storefront/product'
-import { getStorefrontProducts } from '@/actions/storefront/product'
-import { getStoreByDomain } from '@/lib/data/store'
-import { getQueryClient } from '@/lib/get-query-client'
-import { getTenantBaseUrl } from '@/lib/tenant-seo'
+import { storefrontProductKeys } from '@/actions/storefront/product/query-keys'
+import { getStorefrontProducts } from '@/actions/storefront/product/actions'
+import { getStoreByDomain } from '@/lib/tenant/store'
+import { getQueryClient } from '@/lib/query/get-query-client'
+import { getTenantBaseUrl } from '@/lib/tenant/seo'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
 import { TenantStoreJsonLd } from '@/components/seo/TenantStoreJsonLd'

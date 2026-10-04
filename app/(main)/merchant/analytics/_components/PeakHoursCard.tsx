@@ -1,6 +1,6 @@
 'use client'
 
-import { formatNumber } from '@/utils/pricing'
+import { formatNumber } from '@/utils/formatting/number'
 import { IconTrendingUp } from '@tabler/icons-react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 

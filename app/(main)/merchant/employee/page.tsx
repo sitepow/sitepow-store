@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 
-import { useEmployeePermission } from '@/actions/hooks/employee'
+import { useEmployeePermission } from '@/actions/store/employee/hooks'
 import {
   useResetStoreRolePermissions,
   useSyncStoreRolesAndPermissions,
-} from '@/actions/hooks/permission'
+} from '@/actions/store/permission/hooks'
 import { MERCHANT_NAVIGATION } from '@/constants/navigation'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { useSession } from '@/hooks/use-session'

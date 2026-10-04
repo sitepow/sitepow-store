@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import {
   useNotificationSettings,
   useUpdateNotificationSettings,
-} from '@/actions/hooks/storefront/notification'
+} from '@/actions/storefront/notification/hooks'
 import {
   NotificationSettingsFormValues,
   notificationSettingsSchema,

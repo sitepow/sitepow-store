@@ -6,12 +6,12 @@ import { Controller, useForm } from 'react-hook-form'
 import {
   useReviewRewardConfig,
   useUpdateReviewRewardConfig,
-} from '@/actions/hooks/store-reward-review'
+} from '@/actions/store/review-reward/hooks'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
 import {
   ReviewRewardConfigFormValues,
   reviewRewardConfigSchema,
-} from '@/zod/review-reward'
+} from '@/zod/store/review-reward-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconStar } from '@tabler/icons-react'
 

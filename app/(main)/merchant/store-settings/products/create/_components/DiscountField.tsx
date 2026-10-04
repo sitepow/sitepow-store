@@ -3,7 +3,7 @@
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 
 import { DiscountType } from '@/generated/prisma/enums'
-import { ProductFormValues } from '@/zod/product'
+import { ProductFormValues } from '@/zod/catalog/product'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'

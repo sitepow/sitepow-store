@@ -1,8 +1,8 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-import { purchaseCredit } from '@/actions/credit'
-import { invalidateStoreCache } from '@/actions/query-keys/invalidation/store'
+import { purchaseCredit } from '@/actions/billing/credit/actions'
+import { invalidateStoreCache } from '@/actions/store/management/invalidation'
 import { Prisma } from '@/generated/prisma/client'
 import {
   InvoiceStatus,
@@ -14,8 +14,8 @@ import { CheckoutParams, CheckoutType } from '@/types/checkout'
 import { addMonths } from 'date-fns'
 import Stripe from 'stripe'
 
-import { prisma } from '@/lib/prisma'
-import { stripe } from '@/lib/stripe'
+import { prisma } from '@/lib/db/prisma'
+import { stripe } from '@/lib/integrations/stripe'
 
 async function clearStoreCache(storeId: string) {
   const store = await prisma.store.findUnique({

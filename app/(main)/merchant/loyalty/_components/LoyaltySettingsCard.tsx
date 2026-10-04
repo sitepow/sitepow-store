@@ -6,12 +6,12 @@ import { useForm } from 'react-hook-form'
 import {
   useLoyaltySettings,
   useUpdateLoyaltySettings,
-} from '@/actions/hooks/loyalty'
+} from '@/actions/store/loyalty/hooks'
 import { useStoreFilter } from '@/stores/use-store-filter'
 import {
   UpdateLoyaltySettingsFormValues,
   updateLoyaltySettingsSchema,
-} from '@/zod/loyalty'
+} from '@/zod/store/loyalty-settings'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 

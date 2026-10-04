@@ -6,12 +6,12 @@ import {
   useDeleteEmployee,
   useEmployeePermission,
   useEmployees,
-} from '@/actions/hooks/employee'
+} from '@/actions/store/employee/hooks'
 import { StorePagination } from '@/app/sites/[domain]/_components/Pagination'
 import { DEFAULT_ROLE_TH } from '@/constants/translate'
 import { DefaultRole } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/use-store-filter'
-import { extractEmployeeStoreData } from '@/utils/employee'
+import { extractEmployeeStoreData } from '@/utils/store/employee'
 import { IconKey, IconLock, IconSettings } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/ActionRequiredAlert'

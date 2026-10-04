@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { SESSION_COOKIE_MAX_AGE_SECONDS } from '@/constants/system'
 
-import { redis } from '@/lib/redis'
+import { redis } from '@/lib/redis/client'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)

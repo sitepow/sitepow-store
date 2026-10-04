@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarDropdownProps extends ComponentProps<typeof Avatar> {

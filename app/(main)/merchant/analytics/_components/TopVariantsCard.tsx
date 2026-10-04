@@ -1,6 +1,6 @@
 'use client'
 
-import { formatCurrency } from '@/utils/pricing'
+import { formatCurrency } from '@/utils/formatting/number'
 import {
   Area,
   AreaChart,

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
-import { useResendOtp, useVerifyOtp } from '@/actions/hooks/email'
+import { useResendOtp, useVerifyOtp } from '@/actions/account/email-verification/hooks'
 import { OTP_RESEND_COOLDOWN_SECONDS, SECOND } from '@/constants/system'
 import { useSession } from '@/hooks/use-session'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { maskEmail } from '@/utils/email'
+import { maskEmail } from '@/utils/formatting/mask-email'
 import { AlertCircleIcon } from 'lucide-react'
 
 import { Alert, AlertTitle } from './ui/alert'

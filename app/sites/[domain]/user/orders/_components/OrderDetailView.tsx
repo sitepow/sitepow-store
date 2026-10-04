@@ -2,15 +2,15 @@
 
 import { useState } from 'react'
 
-import { ShippingAddressSnapshot } from '@/actions/order'
-import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order'
+import { ShippingAddressSnapshot } from '@/actions/sales/order/actions'
+import { GetStorefrontOrderItemSerialized } from '@/actions/storefront/order/actions'
 import { OrderStatus, PaymentMethod } from '@/generated/prisma/enums'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { useStoreData } from '@/stores/sites/use-store-data'
-import { formatFullAddress } from '@/utils/address'
-import { formatDateTime } from '@/utils/date'
-import { formatNumber } from '@/utils/pricing'
-import { formatBankAccount, formatPromptPay } from '@/utils/slip'
+import { formatFullAddress } from '@/utils/formatting/full-address'
+import { formatDateTime } from '@/utils/formatting/date'
+import { formatNumber } from '@/utils/formatting/number'
+import { formatBankAccount, formatPromptPay } from '@/utils/formatting/promptpay-phone'
 import {
   IconCheck,
   IconCopy,
