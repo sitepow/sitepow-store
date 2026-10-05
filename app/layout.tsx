@@ -1,7 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 
 import type { Metadata, Viewport } from 'next'
-import { IBM_Plex_Sans_Thai_Looped } from 'next/font/google'
+import { IBM_Plex_Sans_Thai } from 'next/font/google'
 
 import '@/app/globals.css'
 import { QueryProviders } from '@/providers/QueryProviders'
@@ -10,7 +10,7 @@ import { ThemeProvider } from '@/components/shared/ThemeProvider'
 
 import { cn } from '@/lib/utils'
 
-const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai_Looped({
+const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai({
   subsets: ['latin', 'thai'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
