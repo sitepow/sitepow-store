@@ -7,6 +7,7 @@ import Stripe from 'stripe'
 import { OrderEventPayload, appEvents } from '@/lib/redis/events'
 import { prisma } from '@/lib/db/prisma'
 import { getStripeInstance } from '@/lib/integrations/stripe'
+import { dispatchOrderWebhook } from '@/lib/webhook/dispatcher'
 
 interface RouteParams {
   params: Promise<{
@@ -144,6 +145,12 @@ export async function POST(req: Request, props: RouteParams) {
               type: 'ORDER_UPDATED',
               orderId: order.id,
             })
+
+            dispatchOrderWebhook({
+              storeId: order.storeId,
+              event: 'order.paid',
+              orderId: order.id,
+            }).catch((err) => console.error('Webhook dispatch error:', err))
           }
         }
       }

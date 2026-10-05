@@ -3,15 +3,16 @@
 import { Prisma } from '@/generated/prisma/client'
 import { ActorType, LogAction, OrderStatus } from '@/generated/prisma/enums'
 import { ALL_STORES } from '@/stores/merchant/use-store-filter'
-import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
 import { earnCustomerPoints } from '@/utils/points/customer-points'
+import { DecimalToNumber, serializeDecimal } from '@/utils/shared/decimal'
 
 import { createLog } from '@/lib/activity/log'
-import { getCurrentUser } from '@/lib/auth/server'
-import { OrderEventPayload, appEvents } from '@/lib/redis/events'
-import { cancelOrderCore } from '@/lib/order'
 import { verifyEmployeePermission } from '@/lib/auth/permission'
+import { getCurrentUser } from '@/lib/auth/server'
 import { prisma } from '@/lib/db/prisma'
+import { cancelOrderCore } from '@/lib/order'
+import { OrderEventPayload, appEvents } from '@/lib/redis/events'
+import { dispatchOrderWebhook } from '@/lib/webhook/dispatcher'
 
 interface GetOrdersParams {
   storeId: string
@@ -456,6 +457,26 @@ export async function updateOrderStatus(
       orderId: id,
     })
 
+    if (status === OrderStatus.PAID) {
+      dispatchOrderWebhook({
+        storeId: order.storeId,
+        event: 'order.paid',
+        orderId: id,
+      }).catch((err) => console.error('Webhook dispatch error:', err))
+    } else if (status === OrderStatus.SHIPPED) {
+      dispatchOrderWebhook({
+        storeId: order.storeId,
+        event: 'order.shipped',
+        orderId: id,
+      }).catch((err) => console.error('Webhook dispatch error:', err))
+    }
+
+    dispatchOrderWebhook({
+      storeId: order.storeId,
+      event: 'order.updated',
+      orderId: id,
+    }).catch((err) => console.error('Webhook dispatch error:', err))
+
     return { success: true, message: 'อัปเดตสถานะออเดอร์สำเร็จ' }
   } catch (error) {
     console.error(error)
@@ -644,7 +665,9 @@ export async function updateOrderTaxInfo(
       updateData.taxAddress = input.taxAddress ? input.taxAddress.trim() : null
     }
     if (input.taxBranchCode !== undefined) {
-      updateData.taxBranchCode = input.taxBranchCode ? input.taxBranchCode.trim() : null
+      updateData.taxBranchCode = input.taxBranchCode
+        ? input.taxBranchCode.trim()
+        : null
     }
 
     const updated = await prisma.order.update({

@@ -6,17 +6,24 @@ import {
   PaymentMethod,
   ProductType,
 } from '@/generated/prisma/enums'
-import { calculateDiscounts, calculateEarnedPoints } from '@/utils/cart/cart-calculation'
+import {
+  calculateDiscounts,
+  calculateEarnedPoints,
+} from '@/utils/cart/cart-calculation'
 import {
   calculateGroupShare,
   checkIsSplitOrder,
   classifyOrderItems,
   generateOrderNumber,
 } from '@/utils/order/order-calculation'
-import { deductCustomerPoints, refundCustomerPoints } from '@/utils/points/customer-points'
+import {
+  deductCustomerPoints,
+  refundCustomerPoints,
+} from '@/utils/points/customer-points'
 
 import { createLog } from '@/lib/activity/log'
 import { prisma } from '@/lib/db/prisma'
+import { dispatchOrderWebhook } from '@/lib/webhook/dispatcher'
 
 import { CancelOrderCoreInput, CreateOrderCoreInput } from './types'
 import { calculateOrderDimensions } from './utils'
@@ -581,6 +588,25 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     },
   })
 
+  for (const order of createdOrders) {
+    dispatchOrderWebhook({
+      storeId: store.id,
+      event: 'order.created',
+      orderId: order.id,
+    }).catch((err) => console.error('Webhook dispatch error:', err))
+
+    if (
+      order.status === OrderStatus.PAID ||
+      order.status === OrderStatus.SHIPPED
+    ) {
+      dispatchOrderWebhook({
+        storeId: store.id,
+        event: 'order.paid',
+        orderId: order.id,
+      }).catch((err) => console.error('Webhook dispatch error:', err))
+    }
+  }
+
   return createdOrders
 }
 
@@ -763,6 +789,12 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
       to: OrderStatus.CANCELLED,
     },
   })
+
+  dispatchOrderWebhook({
+    storeId: order.storeId,
+    event: 'order.cancelled',
+    orderId: order.id,
+  }).catch((err) => console.error('Webhook dispatch error:', err))
 
   return true
 }

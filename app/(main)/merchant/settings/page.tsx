@@ -17,14 +17,15 @@ import {
   IconSettings,
   IconStar,
   IconTruck,
+  IconWebhook,
   IconWorld,
 } from '@tabler/icons-react'
 
-import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { BranchSelectField } from '@/components/form/BranchSelectField'
-import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { StoreSelectField } from '@/components/form/StoreSelectField'
+import { PageTabHeader } from '@/components/layout/PageTabHeader'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { DomainSettingsForm } from './_components/DomainSettingsForm'
@@ -36,6 +37,7 @@ import { ShippingSettingsForm } from './_components/ShippingSettingsForm'
 import { StoreProfileForm } from './_components/StoreProfileForm'
 import { StoreTransferSettingsForm } from './_components/StoreTransferSettingsForm'
 import { TaxSettingsForm } from './_components/TaxSettingsForm'
+import { WebhookSettingsForm } from './_components/WebhookSettingsForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +58,7 @@ function MerchantSettingsContent() {
     canViewShipping,
     canViewPayment,
     canViewReviews,
+    canViewStoreSettings,
     isLoading: isPermissionLoading,
   } = useEmployeePermission()
 
@@ -108,6 +111,9 @@ function MerchantSettingsContent() {
             </TabsTrigger>
             <TabsTrigger value={SettingsTab.REVIEW_REWARD}>
               <IconStar size={14} /> คะแนนการรีวิว
+            </TabsTrigger>
+            <TabsTrigger value={SettingsTab.WEBHOOK}>
+              <IconWebhook size={14} /> เว็บฮุก (Webhook)
             </TabsTrigger>
           </TabsList>
           <TabsContent value={SettingsTab.STORE_PROFILE} className="flex-1">
@@ -207,6 +213,19 @@ function MerchantSettingsContent() {
               />
             ) : (
               <ReviewRewardSettingsForm />
+            )}
+          </TabsContent>
+          <TabsContent value={SettingsTab.WEBHOOK} className="flex-1">
+            {!isPermissionLoading &&
+            !canViewStoreSettings &&
+            !canViewStoreProfile ? (
+              <ActionRequiredAlert
+                icon={<IconLock />}
+                title="ไม่มีสิทธิ์เข้าถึง"
+                description="คุณไม่มีสิทธิ์ในการดูข้อมูลการตั้งค่า Webhook ของสาขาหรือร้านค้านี้"
+              />
+            ) : (
+              <WebhookSettingsForm />
             )}
           </TabsContent>
         </Tabs>

@@ -8,6 +8,7 @@ export enum SettingsTab {
   PAYMENT = 'settings-payment',
   REVIEW_REWARD = 'review-reward',
   DOMAIN = 'domain',
+  WEBHOOK = 'webhook',
 }
 
 export enum UserSettingsTab {

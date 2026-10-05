@@ -1,8 +1,13 @@
 'use server'
 
+import { r2DeleteImage } from '@/actions/shared/r2/actions'
 import { SLIP_CREDIT_COST } from '@/constants/ai/config'
 import { mapBankCodeToSlip2Go } from '@/constants/payment/bank'
-import { SLIP2GO_API, SLIP_CODE, getSlipErrorMessage } from '@/constants/payment/slip'
+import {
+  SLIP2GO_API,
+  SLIP_CODE,
+  getSlipErrorMessage,
+} from '@/constants/payment/slip'
 import { DAY, FAKE_SLIP_BLOCK_DAYS } from '@/constants/system'
 import {
   ActorType,
@@ -17,11 +22,10 @@ import { getPathR2FromUrl } from '@/utils/media/image'
 import axios from 'axios'
 
 import { createLog } from '@/lib/activity/log'
-import { getCurrentUser } from '@/lib/auth/server'
 import { verifyEmployeePermission } from '@/lib/auth/permission'
+import { getCurrentUser } from '@/lib/auth/server'
 import { prisma } from '@/lib/db/prisma'
-
-import { r2DeleteImage } from '@/actions/shared/r2/actions'
+import { dispatchOrderWebhook } from '@/lib/webhook/dispatcher'
 
 export async function verifySlip(
   orderId: string,
@@ -282,6 +286,14 @@ export async function verifySlip(
     }
   })
 
+  if (isSlipValid) {
+    dispatchOrderWebhook({
+      storeId,
+      event: 'order.paid',
+      orderId,
+    }).catch((err) => console.error('Webhook dispatch error:', err))
+  }
+
   return {
     success: isSlipValid,
     shouldDeleteImage: !isSlipValid,
@@ -381,6 +393,14 @@ export async function approveSlipManual(
         action: logActionText,
       },
     })
+
+    if (action === SlipVerificationAction.APPROVE) {
+      dispatchOrderWebhook({
+        storeId: order.storeId,
+        event: 'order.paid',
+        orderId,
+      }).catch((err) => console.error('Webhook dispatch error:', err))
+    }
 
     return {
       success: true,
