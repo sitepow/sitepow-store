@@ -40,6 +40,31 @@ const orderSelect = {
   codFee: true,
   earnedPoints: true,
   storeId: true,
+  store: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      email: true,
+      phone: true,
+      logo: true,
+      taxId: true,
+      isVatRegistered: true,
+      vatRate: true,
+      branches: {
+        select: {
+          id: true,
+          name: true,
+          isMain: true,
+          address: true,
+          province: true,
+          district: true,
+          subDistrict: true,
+          postcode: true,
+        },
+      },
+    },
+  },
   pointRedeemRateSnapshot: true,
   pointEarningRateSnapshot: true,
   shippingAddrSnapshot: true,
@@ -409,6 +434,8 @@ export async function updateOrderStatus(
       }
     })
 
+    const trackingMsg = trackingNumber ? ` (เลขพัสดุ: ${trackingNumber})` : ''
+
     await createLog({
       action: LogAction.UPDATE_ORDER_STATUS,
       actorType: ActorType.MERCHANT,
@@ -416,6 +443,7 @@ export async function updateOrderStatus(
       entity: 'Order',
       entityId: id,
       details: {
+        summary: `อัปเดตคำสั่งซื้อ #${order.orderNumber} จาก "${order.status}" เป็น "${status}"${trackingMsg}`,
         orderNumber: order.orderNumber,
         from: order.status,
         to: status,
@@ -546,5 +574,105 @@ export async function cancelOrder(id: string) {
       success: false,
       message: errorMessage,
     }
+  }
+}
+
+export interface UpdateOrderTaxInfoInput {
+  isTaxInvoiceRequested?: boolean
+  taxName?: string | null
+  taxId?: string | null
+  taxAddress?: string | null
+  taxBranchCode?: string | null
+}
+
+export async function updateOrderTaxInfo(
+  id: string,
+  input: UpdateOrderTaxInfoInput,
+) {
+  try {
+    if (!id) {
+      return { success: false, message: 'ไม่พบหมายเลขคำสั่งซื้อ' }
+    }
+
+    const userSession = await getCurrentUser()
+    const userId = userSession?.id
+
+    if (!userId) {
+      return { success: false, message: 'กรุณาเข้าสู่ระบบก่อนทำรายการ' }
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: { storeId: true, orderNumber: true },
+    })
+
+    if (!order) {
+      return { success: false, message: 'ไม่พบข้อมูลคำสั่งซื้อ' }
+    }
+
+    const authCheck = await verifyEmployeePermission({
+      userId,
+      storeId: order.storeId,
+      permission: 'canUpdateOrders',
+    })
+
+    if (!authCheck.isAuthorized) {
+      return {
+        success: false,
+        message: authCheck.message || 'สิทธิ์การใช้งานของคุณไม่เพียงพอ',
+      }
+    }
+
+    const updateData: {
+      isTaxInvoiceRequested?: boolean
+      taxName?: string | null
+      taxId?: string | null
+      taxAddress?: string | null
+      taxBranchCode?: string | null
+    } = {}
+
+    if (input.isTaxInvoiceRequested !== undefined) {
+      updateData.isTaxInvoiceRequested = input.isTaxInvoiceRequested
+    }
+    if (input.taxName !== undefined) {
+      updateData.taxName = input.taxName ? input.taxName.trim() : null
+    }
+    if (input.taxId !== undefined) {
+      updateData.taxId = input.taxId ? input.taxId.trim() : null
+    }
+    if (input.taxAddress !== undefined) {
+      updateData.taxAddress = input.taxAddress ? input.taxAddress.trim() : null
+    }
+    if (input.taxBranchCode !== undefined) {
+      updateData.taxBranchCode = input.taxBranchCode ? input.taxBranchCode.trim() : null
+    }
+
+    const updated = await prisma.order.update({
+      where: { id },
+      data: updateData,
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_ORDER_STATUS,
+      actorType: ActorType.MERCHANT,
+      storeId: order.storeId,
+      entity: 'Order',
+      entityId: id,
+      details: {
+        summary: `แก้ไขข้อมูลใบกำกับภาษี คำสั่งซื้อ #${order.orderNumber}`,
+        type: 'UPDATE_TAX_INFO',
+        orderNumber: order.orderNumber,
+        ...input,
+      } as Prisma.InputJsonObject,
+    })
+
+    return {
+      success: true,
+      message: 'บันทึกข้อมูลใบกำกับภาษีเรียบร้อยแล้ว',
+      data: serializeDecimal(updated),
+    }
+  } catch (error) {
+    console.error('Error updating order tax info:', error)
+    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' }
   }
 }

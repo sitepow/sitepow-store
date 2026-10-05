@@ -560,6 +560,9 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     return orders
   })
 
+  const orderNums = createdOrders.map((o) => o.orderNumber).join(', ')
+  const channel = input.isPOS ? 'POS หน้าร้าน' : 'หน้าร้านออนไลน์'
+
   await createLog({
     action: LogAction.CREATE_ORDER,
     actorType: input.isPOS ? ActorType.MERCHANT : ActorType.SYSTEM,
@@ -567,10 +570,12 @@ export async function createOrderCore(input: CreateOrderCoreInput) {
     entity: 'Order',
     entityId: createdOrders[0]?.id || '',
     details: {
+      summary: `สร้างคำสั่งซื้อใหม่ #${orderNums} (${channel}) ยอดรวม ฿${grandTotal.toLocaleString()}`,
       type: input.isPOS ? 'POS' : 'STOREFRONT',
       orderCount: createdOrders.length,
       orderNumbers: createdOrders.map((o) => o.orderNumber),
       paymentMethod: input.paymentMethod,
+      totalAmount: grandTotal,
       receivedAmount: input.receivedAmount,
       changeAmount: input.changeAmount,
     },
@@ -752,6 +757,7 @@ export async function cancelOrderCore(input: CancelOrderCoreInput) {
     entity: 'Order',
     entityId: order.id,
     details: {
+      summary: `ยกเลิกคำสั่งซื้อ #${order.orderNumber} (สถานะเดิม: ${order.status})`,
       orderNumber: order.orderNumber,
       from: order.status,
       to: OrderStatus.CANCELLED,

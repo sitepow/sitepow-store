@@ -6,7 +6,13 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import { cancelOrder, getOrders, updateOrderStatus } from '@/actions/sales/order/actions'
+import {
+  cancelOrder,
+  getOrders,
+  updateOrderStatus,
+  updateOrderTaxInfo,
+  UpdateOrderTaxInfoInput,
+} from '@/actions/sales/order/actions'
 import { orderKeys } from '@/actions/sales/order/query-keys'
 import { posProductKeys } from '@/actions/sales/pos-product/query-keys'
 import { productKeys } from '@/actions/catalog/product/query-keys'
@@ -77,6 +83,26 @@ export function useCancelOrder() {
         queryClient.invalidateQueries({ queryKey: storefrontOrderKeys.all }),
         queryClient.invalidateQueries({ queryKey: posProductKeys.all }),
         queryClient.invalidateQueries({ queryKey: productKeys.all }),
+      ])
+    },
+  })
+}
+
+export function useUpdateOrderTaxInfo() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: string
+      input: UpdateOrderTaxInfoInput
+    }) => await updateOrderTaxInfo(id, input),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: orderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: storefrontOrderKeys.all }),
       ])
     },
   })

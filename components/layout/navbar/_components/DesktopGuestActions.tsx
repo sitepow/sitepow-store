@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 
 interface DesktopGuestActionsProps {
@@ -22,7 +21,6 @@ export function DesktopGuestActions({
       <Link href={registerHref}>
         <Button className="font-bold">สมัครเปิดร้าน</Button>
       </Link>
-      <ThemeSwitcher buttonVariant="secondary" />
     </>
   )
 }

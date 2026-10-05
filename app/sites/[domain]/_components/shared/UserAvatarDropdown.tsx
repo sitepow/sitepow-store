@@ -7,7 +7,14 @@ import Link from 'next/link'
 import { USER_ICON } from '@/constants/shared/assets'
 import { NavigationItem } from '@/constants/store/navigation'
 import { useSession } from '@/hooks/use-session'
-import { IconLogout } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconLogout,
+  IconMoon,
+  IconSun,
+  IconSunMoon,
+} from '@tabler/icons-react'
+import { useTheme } from '@teispace/next-themes'
 
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -16,6 +23,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
@@ -34,6 +44,7 @@ export function UserAvatarDropdown({
   ...props
 }: UserAvatarDropdownProps) {
   const { user } = useSession()
+  const { theme, setTheme } = useTheme()
 
   const handleLogout = async () => {
     const isCentralDomain =
@@ -101,6 +112,39 @@ export function UserAvatarDropdown({
             </Fragment>
           )
         })}
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="cursor-pointer">
+            <IconSunMoon className="mr-2 stroke-[1.5]" size={18} />
+            <span>ธีม</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-36">
+            <DropdownMenuItem
+              onClick={() => setTheme('light')}
+              className="cursor-pointer"
+            >
+              <IconSun className="mr-2 size-4" />
+              <span>สว่าง</span>
+              {theme === 'light' && <IconCheck className="ml-auto size-4" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTheme('dark')}
+              className="cursor-pointer"
+            >
+              <IconMoon className="mr-2 size-4" />
+              <span>มืด</span>
+              {theme === 'dark' && <IconCheck className="ml-auto size-4" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setTheme('system')}
+              className="cursor-pointer"
+            >
+              <IconSunMoon className="mr-2 size-4" />
+              <span>ระบบ</span>
+              {theme === 'system' && <IconCheck className="ml-auto size-4" />}
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"

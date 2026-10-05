@@ -352,6 +352,7 @@ export async function createBranch(input: CreateBranchInput) {
       entity: 'Branch',
       entityId: branch.id,
       details: {
+        summary: `สร้างสาขาใหม่ "${input.name}"${input.isMain ? ' (สาขาหลัก)' : ''}`,
         name: input.name,
         isMain: input.isMain ?? false,
         type: 'created',
@@ -416,7 +417,12 @@ export async function updateBranch(id: string, input: UpdateBranchInput) {
       storeId: updatedBranch.storeId,
       entity: 'Branch',
       entityId: id,
-      details: { updatedFields: Object.keys(input), type: 'updated' },
+      details: {
+        summary: `แก้ไขข้อมูลสาขา "${updatedBranch.name}"`,
+        name: updatedBranch.name,
+        updatedFields: Object.keys(input),
+        type: 'updated',
+      },
     })
 
     return { success: true, data: updatedBranch }
@@ -475,7 +481,11 @@ export async function setMainBranch(id: string, storeId: string) {
       storeId,
       entity: 'Branch',
       entityId: id,
-      details: { type: 'set_main' },
+      details: {
+        summary: `ตั้งสาขา "${updatedBranch?.name || id}" เป็นสาขาหลัก`,
+        name: updatedBranch?.name,
+        type: 'set_main',
+      },
     })
 
     return { success: true, data: updatedBranch }
@@ -513,7 +523,7 @@ export async function deleteBranch(id: string, storeId: string) {
 
     const branch = await prisma.branch.findUnique({
       where: { id },
-      select: { isMain: true },
+      select: { name: true, isMain: true },
     })
 
     if (branch?.isMain) {
@@ -540,7 +550,11 @@ export async function deleteBranch(id: string, storeId: string) {
       storeId,
       entity: 'Branch',
       entityId: id,
-      details: { type: 'deleted' },
+      details: {
+        summary: `ลบสาขา "${branch?.name || id}" ออกจากระบบ`,
+        name: branch?.name,
+        type: 'deleted',
+      },
     })
 
     await invalidateEmployeePermissionCache(userId, storeId)

@@ -4,6 +4,7 @@ import {
   IconBuildingStore,
   IconCashRegister,
   IconChartBar,
+  IconClipboardList,
   IconCoin,
   IconCreditCard,
   IconHierarchy2,
@@ -134,6 +135,13 @@ export const MERCHANT_NAVIGATION: NavigationItem[] = [
     label: 'คลังสินค้า',
     tab: 'inventory',
     icon: IconBox,
+    permissionKey: 'canViewInventory',
+  },
+  {
+    value: 'procurement',
+    label: 'ใบสั่งซื้อสินค้า',
+    tab: 'procurement',
+    icon: IconClipboardList,
     permissionKey: 'canViewInventory',
   },
   {

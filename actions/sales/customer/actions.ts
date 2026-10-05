@@ -182,7 +182,17 @@ export async function unblockCustomer(customerId: string, storeId: string) {
         fakeSlipCount: 0,
         blockedUntil: null,
       },
+      include: {
+        customer: {
+          select: { name: true, phone: true },
+        },
+      },
     })
+
+    const who =
+      updatedCustomerStore.customer.name ||
+      updatedCustomerStore.customer.phone ||
+      customerId
 
     await createLog({
       action: LogAction.UNBLOCK_CUSTOMER,
@@ -190,6 +200,11 @@ export async function unblockCustomer(customerId: string, storeId: string) {
       storeId,
       entity: 'CustomerStore',
       entityId: updatedCustomerStore.id,
+      details: {
+        summary: `ปลดระงับการใช้งานลูกค้า "${who}"`,
+        customerName: updatedCustomerStore.customer.name,
+        phone: updatedCustomerStore.customer.phone,
+      },
     })
 
     return { success: true, message: 'ปลดล็อกลูกค้าสำเร็จ' }
@@ -228,7 +243,17 @@ export async function blockCustomer(customerId: string, storeId: string) {
         isBlocked: true,
         blockedUntil: null,
       },
+      include: {
+        customer: {
+          select: { name: true, phone: true },
+        },
+      },
     })
+
+    const who =
+      updatedCustomerStore.customer.name ||
+      updatedCustomerStore.customer.phone ||
+      customerId
 
     await createLog({
       action: LogAction.BLOCK_CUSTOMER,
@@ -236,6 +261,11 @@ export async function blockCustomer(customerId: string, storeId: string) {
       storeId,
       entity: 'CustomerStore',
       entityId: updatedCustomerStore.id,
+      details: {
+        summary: `ระงับการใช้งานลูกค้า "${who}"`,
+        customerName: updatedCustomerStore.customer.name,
+        phone: updatedCustomerStore.customer.phone,
+      },
     })
 
     return { success: true, message: 'บล็อกลูกค้าสำเร็จ' }

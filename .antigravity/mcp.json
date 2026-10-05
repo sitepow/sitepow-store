@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "inspomcp": {
+      "command": "npx",
+      "args": ["-y", "@inspomcp/server"]
+    }
+  }
+}

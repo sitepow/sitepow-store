@@ -5,7 +5,6 @@ import { NavigationItem } from '@/constants/store/navigation'
 import { UserRole } from '@/generated/prisma/enums'
 import { IconLock } from '@tabler/icons-react'
 
-import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 
 interface DesktopUserActionsProps {
@@ -32,7 +31,6 @@ export function DesktopUserActions({
           </Link>
         </Button>
       )}
-      <ThemeSwitcher buttonVariant="secondary" />
     </>
   )
 }

@@ -6,6 +6,31 @@ import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { getServerSession } from '@/lib/auth/server'
 import { prisma } from '@/lib/db/prisma'
 
+export interface LogDetails {
+  summary?: string
+  title?: string
+  description?: string
+  message?: string
+  actionType?: string
+  changes?:
+    | Record<string, { before?: unknown; after?: unknown }>
+    | Array<{ field: string; from?: unknown; to?: unknown }>
+  metadata?: Record<string, unknown>
+  [key: string]: unknown
+}
+
+export interface CreateLogParams {
+  action: LogAction
+  actorType: ActorType
+  storeId?: string
+  entity: string
+  entityId?: string
+  details?: Prisma.InputJsonValue | LogDetails
+  userId?: string
+  employeeId?: string
+  ipAddress?: string
+}
+
 export async function createLog({
   action,
   actorType,
@@ -13,30 +38,29 @@ export async function createLog({
   entity,
   entityId,
   details,
-}: {
-  action: LogAction
-  actorType: ActorType
-  storeId?: string
-  entity: string
-  entityId?: string
-  details?: Prisma.InputJsonValue
-}) {
+  userId: explicitUserId,
+  employeeId: explicitEmployeeId,
+  ipAddress: explicitIpAddress,
+}: CreateLogParams) {
   try {
     const [session, headersList] = await Promise.all([
       getServerSession(),
       headers(),
     ])
 
-    const userId = session?.user?.id
-    const employee = userId
-      ? await prisma.employee.findUnique({
-          where: { userId },
-          select: { id: true },
-        })
-      : null
-    const employeeId = employee?.id ?? undefined
+    const userId = explicitUserId ?? session?.user?.id
+
+    let employeeId = explicitEmployeeId
+    if (!employeeId && userId) {
+      const employee = await prisma.employee.findUnique({
+        where: { userId },
+        select: { id: true },
+      })
+      employeeId = employee?.id ?? undefined
+    }
 
     const ip =
+      explicitIpAddress ??
       headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       headersList.get('x-real-ip') ??
       undefined
@@ -50,7 +74,7 @@ export async function createLog({
         userId,
         entity,
         entityId,
-        details,
+        details: details as Prisma.InputJsonValue | undefined,
         ipAddress: ip,
       },
     })
@@ -58,3 +82,4 @@ export async function createLog({
     console.error('[createLog]', error)
   }
 }
+

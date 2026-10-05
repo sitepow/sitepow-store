@@ -224,7 +224,11 @@ export async function verifySlip(
             storeId,
             entity: 'CustomerStore',
             entityId: updatedCustomerStore.id,
-            details: { message: 'ระบบบล็อกถาวรเนื่องจากพบสลิปปลอมครบ 5 ครั้ง' },
+            details: {
+              summary: 'ระบบบล็อกลูกค้าถาวรเนื่องจากพบสลิปปลอมครบ 5 ครั้ง',
+              message: 'ระบบบล็อกถาวรเนื่องจากพบสลิปปลอมครบ 5 ครั้ง',
+              fakeSlipCount: updatedCustomerStore.fakeSlipCount,
+            },
           },
         })
       } else if (updatedCustomerStore.fakeSlipCount >= 3) {
@@ -246,7 +250,9 @@ export async function verifySlip(
             entity: 'CustomerStore',
             entityId: updatedCustomerStore.id,
             details: {
+              summary: `ระบบบล็อกลูกค้าชั่วคราว 7 วัน (พบสลิปปลอมครั้งที่ ${updatedCustomerStore.fakeSlipCount})`,
               message: `ระบบบล็อกชั่วคราว 7 วัน (ครบ ${updatedCustomerStore.fakeSlipCount} ครั้ง)`,
+              fakeSlipCount: updatedCustomerStore.fakeSlipCount,
             },
           },
         })
@@ -358,6 +364,11 @@ export async function approveSlipManual(
       data: updatedData,
     })
 
+    const actionSummary =
+      action === SlipVerificationAction.APPROVE
+        ? 'อนุมัติสลิปและยืนยันการชำระเงิน'
+        : 'ปฏิเสธสลิปและรีเซ็ตคำสั่งซื้อ'
+
     await createLog({
       action: LogAction.UPDATE_ORDER_STATUS,
       actorType: ActorType.MERCHANT,
@@ -365,6 +376,7 @@ export async function approveSlipManual(
       entity: 'Order',
       entityId: orderId,
       details: {
+        summary: `ตรวจสอบสลิปคำสั่งซื้อ #${order.orderNumber}: ${actionSummary}`,
         orderNumber: order.orderNumber,
         action: logActionText,
       },

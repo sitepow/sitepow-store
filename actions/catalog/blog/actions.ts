@@ -219,7 +219,11 @@ export async function createBlog(input: CreateBlogInput) {
       storeId: input.storeId,
       entity: 'Blog',
       entityId: blog.id,
-      details: { title: blog.title, slug: blog.slug },
+      details: {
+        summary: `สร้างบทความใหม่ "${blog.title}"`,
+        title: blog.title,
+        slug: blog.slug,
+      },
     })
 
     await invalidateBlogCache(blog.store.slug)
@@ -334,7 +338,11 @@ export async function updateBlog(id: string, input: CreateBlogInput) {
       storeId: existingBlog.storeId,
       entity: 'Blog',
       entityId: id,
-      details: { title: updatedBlog.title, slug: updatedBlog.slug },
+      details: {
+        summary: `แก้ไขบทความ "${updatedBlog.title}"`,
+        title: updatedBlog.title,
+        slug: updatedBlog.slug,
+      },
     })
 
     await invalidateBlogCache(updatedBlog.store.slug)
@@ -410,7 +418,10 @@ export async function deleteBlog(id: string) {
       storeId: blog.storeId,
       entity: 'Blog',
       entityId: id,
-      details: { title: blog.title },
+      details: {
+        summary: `ลบบทความ "${blog.title}" ออกจากระบบ`,
+        title: blog.title,
+      },
     })
 
     await invalidateBlogCache(blog.store.slug)

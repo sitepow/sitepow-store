@@ -104,7 +104,11 @@ export async function upsertPaymentSetting(
       storeId,
       entity: 'PaymentSetting',
       entityId: storeId,
-      details: { setting: 'payment', updatedFields: Object.keys(data) },
+      details: {
+        summary: 'แก้ไขการตั้งค่าการชำระเงินของร้านค้า',
+        setting: 'payment',
+        updatedFields: Object.keys(data),
+      },
     })
 
     return {
@@ -175,8 +179,11 @@ export async function createBankAccount(
       entity: 'BankAccount',
       entityId: account.id,
       details: {
+        summary: `เพิ่มบัญชีธนาคาร ${data.bankName} (${data.accountNumber || data.promptPayId || ''})`,
         setting: 'bank_account',
         bankName: data.bankName,
+        accountNumber: data.accountNumber,
+        promptPayId: data.promptPayId,
         type: 'created',
       },
     })
@@ -207,6 +214,9 @@ export async function updateBankAccount(
     const account = await prisma.bankAccount.findUnique({
       where: { id },
       select: {
+        bankName: true,
+        accountNumber: true,
+        promptPayId: true,
         paymentSettingId: true,
         paymentSetting: { select: { storeId: true } },
       },
@@ -252,7 +262,12 @@ export async function updateBankAccount(
       storeId: account.paymentSetting.storeId,
       entity: 'BankAccount',
       entityId: id,
-      details: { setting: 'bank_account', type: 'updated' },
+      details: {
+        summary: `แก้ไขข้อมูลบัญชีธนาคาร ${account.bankName} (${account.accountNumber || account.promptPayId || ''})`,
+        setting: 'bank_account',
+        bankName: account.bankName,
+        type: 'updated',
+      },
     })
 
     return {
@@ -281,7 +296,11 @@ export async function deleteBankAccount(id: string) {
 
     const account = await prisma.bankAccount.findUnique({
       where: { id },
-      select: { paymentSetting: { select: { storeId: true } } },
+      select: {
+        bankName: true,
+        accountNumber: true,
+        paymentSetting: { select: { storeId: true } },
+      },
     })
 
     if (!account) {
@@ -309,7 +328,13 @@ export async function deleteBankAccount(id: string) {
       storeId: account.paymentSetting.storeId,
       entity: 'BankAccount',
       entityId: id,
-      details: { setting: 'bank_account', type: 'deleted' },
+      details: {
+        summary: `ลบบัญชีธนาคาร ${account.bankName} (${account.accountNumber || ''})`,
+        setting: 'bank_account',
+        bankName: account.bankName,
+        accountNumber: account.accountNumber,
+        type: 'deleted',
+      },
     })
 
     return { success: true, message: 'ลบบัญชีธนาคารสำเร็จ' }

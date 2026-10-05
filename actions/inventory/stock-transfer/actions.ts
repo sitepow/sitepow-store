@@ -254,6 +254,13 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
       }),
     ])
 
+    const itemTitle = transfer.variant?.product?.title
+      ? `${transfer.variant.product.title} (${transfer.variant.title})`
+      : transfer.variant?.title || 'สินค้า'
+
+    const fromName = transfer.fromBranch?.name || ''
+    const toName = transfer.toBranch?.name || ''
+
     await createLog({
       action: LogAction.STOCK_TRANSFER,
       actorType: ActorType.MERCHANT,
@@ -261,9 +268,11 @@ export async function createStockTransfer(input: CreateStockTransferInput) {
       entity: 'StockTransfer',
       entityId: transfer.id,
       details: {
-        variantId,
-        fromBranchId,
-        toBranchId,
+        summary: `โอนย้ายสต็อก "${itemTitle}" จำนวน ${quantity} ชิ้น จากสาขา "${fromName}" ไปยัง "${toName}"`,
+        productTitle: transfer.variant?.product?.title,
+        variantTitle: transfer.variant?.title,
+        fromBranchName: fromName,
+        toBranchName: toName,
         quantity,
         note,
       },

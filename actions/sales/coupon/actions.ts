@@ -216,6 +216,11 @@ export async function createCoupon(input: CreateCouponInput) {
       select: couponSelect,
     })
 
+    const discStr =
+      input.discountType === 'PERCENTAGE'
+        ? `${input.discountAmount}%`
+        : `฿${input.discountAmount}`
+
     await createLog({
       action: LogAction.UPDATE_STORE_SETTING,
       actorType: ActorType.MERCHANT,
@@ -223,8 +228,10 @@ export async function createCoupon(input: CreateCouponInput) {
       entity: 'Coupon',
       entityId: coupon.id,
       details: {
+        summary: `สร้างคูปองส่วนลด "${input.code}" (ลด ${discStr})`,
         code: input.code,
         discountType: input.discountType,
+        discountAmount: Number(input.discountAmount),
         type: 'created',
       },
     })
@@ -310,7 +317,12 @@ export async function updateCoupon(id: string, input: UpdateCouponInput) {
       storeId: updated.storeId,
       entity: 'Coupon',
       entityId: id,
-      details: { updatedFields: Object.keys(input), type: 'updated' },
+      details: {
+        summary: `แก้ไขคูปองส่วนลด "${updated.code}"`,
+        code: updated.code,
+        updatedFields: Object.keys(input),
+        type: 'updated',
+      },
     })
 
     return {
@@ -367,7 +379,11 @@ export async function deleteCoupon(id: string) {
       storeId: coupon.storeId,
       entity: 'Coupon',
       entityId: id,
-      details: { code: coupon.code, type: 'deleted' },
+      details: {
+        summary: `ลบคูปองส่วนลด "${coupon.code}"`,
+        code: coupon.code,
+        type: 'deleted',
+      },
     })
 
     return { success: true, message: 'ลบคูปองสำเร็จ' }

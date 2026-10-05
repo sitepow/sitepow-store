@@ -13,7 +13,7 @@ import { useBranchFilter } from '@/stores/merchant/use-branch-filter'
 import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
 import { formatCurrency } from '@/utils/formatting/number'
-import { IconCreditCard } from '@tabler/icons-react'
+import { IconCreditCard, IconPrinter } from '@tabler/icons-react'
 import { Store, User2 } from 'lucide-react'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/table'
 
 import { cn } from '@/lib/utils'
+import { OrderDocumentDialog } from '@/components/order/documents'
 
 import { OrderDetailView } from './OrderDetailView'
 import { VerifySlipMerchantDialog } from './VerifySlipMerchantDialog'
@@ -295,6 +296,18 @@ export function OrderTable() {
                       {order.status === OrderStatus.MANUAL_CHECK && (
                         <VerifySlipMerchantDialog order={order} />
                       )}
+                      <OrderDocumentDialog
+                        order={order}
+                        trigger={
+                          <Button
+                            variant="outline"
+                            size="icon-lg"
+                            title="พิมพ์เอกสาร (ใบเสร็จ, ใบกำกับภาษี, ใบส่งของ)"
+                          >
+                            <IconPrinter size={16} />
+                          </Button>
+                        }
+                      />
                       <OrderDetailView order={order} />
                     </TableCell>
                   </TableRow>

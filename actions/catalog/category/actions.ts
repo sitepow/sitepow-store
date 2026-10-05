@@ -290,7 +290,12 @@ export async function createCategory(input: CreateCategoryInput) {
       storeId: input.storeId,
       entity: 'Category',
       entityId: category.id,
-      details: { title: input.title, slug: input.slug, type: 'created' },
+      details: {
+        summary: `สร้างหมวดหมู่สินค้าใหม่ "${input.title}"`,
+        title: input.title,
+        slug: input.slug,
+        type: 'created',
+      },
     })
 
     return { success: true, message: 'สร้างหมวดหมู่สำเร็จแล้ว', data: category }
@@ -339,6 +344,8 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       where: { id },
       data: input,
       select: {
+        title: true,
+        slug: true,
         store: {
           select: {
             id: true,
@@ -354,7 +361,13 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
       storeId: category.store.id,
       entity: 'Category',
       entityId: id,
-      details: { updatedFields: Object.keys(input), type: 'updated' },
+      details: {
+        summary: `แก้ไขหมวดหมู่สินค้า "${category.title}"`,
+        title: category.title,
+        slug: category.slug,
+        updatedFields: Object.keys(input),
+        type: 'updated',
+      },
     })
 
     if (category) {
@@ -425,7 +438,11 @@ export async function deleteCategory(id: string) {
       storeId: category?.storeId,
       entity: 'Category',
       entityId: id,
-      details: { title: category?.title, type: 'deleted' },
+      details: {
+        summary: `ลบหมวดหมู่สินค้า "${category?.title}" ออกจากระบบ`,
+        title: category?.title,
+        type: 'deleted',
+      },
     })
 
     if (category) {

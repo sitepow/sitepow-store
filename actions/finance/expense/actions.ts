@@ -208,15 +208,16 @@ export async function createExpense(input: CreateExpenseInput) {
     })
 
     await createLog({
-      action: LogAction.UPDATE_STORE_SETTING,
+      action: LogAction.CREATE_EXPENSE,
       actorType: ActorType.MERCHANT,
       storeId: input.storeId,
       entity: 'Expense',
       entityId: expense.id,
       details: {
-        action: LogAction.CREATE_EXPENSE,
+        summary: `บันทึกค่าใช้จ่าย "${expense.title}" จำนวน ฿${Number(expense.amount).toLocaleString()}`,
         title: expense.title,
-        amount: expense.amount,
+        amount: Number(expense.amount),
+        category: expense.category,
       },
     })
 
@@ -289,14 +290,16 @@ export async function updateExpense(input: UpdateExpenseInput) {
     })
 
     await createLog({
-      action: LogAction.UPDATE_STORE_SETTING,
+      action: LogAction.UPDATE_EXPENSE,
       actorType: ActorType.MERCHANT,
       storeId: input.storeId,
       entity: 'Expense',
       entityId: updatedExpense.id,
       details: {
-        action: LogAction.UPDATE_EXPENSE,
+        summary: `แก้ไขรายการค่าใช้จ่าย "${updatedExpense.title}"`,
         title: updatedExpense.title,
+        amount: Number(updatedExpense.amount),
+        category: updatedExpense.category,
       },
     })
 
@@ -352,13 +355,13 @@ export async function deleteExpense(expenseId: string, storeId: string) {
     })
 
     await createLog({
-      action: LogAction.UPDATE_STORE_SETTING,
+      action: LogAction.DELETE_EXPENSE,
       actorType: ActorType.MERCHANT,
       storeId,
       entity: 'Expense',
       entityId: expenseId,
       details: {
-        action: LogAction.DELETE_EXPENSE,
+        summary: `ลบรายการค่าใช้จ่าย "${expense.title}"`,
         title: expense.title,
       },
     })

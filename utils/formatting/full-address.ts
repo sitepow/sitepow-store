@@ -1,9 +1,11 @@
 export interface AddressLike {
   addressLine?: string | null
+  address?: string | null
   subDistrict?: string | null
   district?: string | null
   province?: string | null
   postalCode?: string | null
+  postcode?: string | null
 }
 
 export function formatFullAddress(address?: AddressLike | null): string {
@@ -12,11 +14,11 @@ export function formatFullAddress(address?: AddressLike | null): string {
   }
 
   return [
-    address.addressLine,
+    address.addressLine || address.address,
     address.subDistrict,
     address.district,
     address.province,
-    address.postalCode,
+    address.postalCode || address.postcode,
   ]
     .filter(Boolean)
     .join(' ')

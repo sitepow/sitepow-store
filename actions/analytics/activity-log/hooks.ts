@@ -1,12 +1,16 @@
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { getActivityLogs } from '@/actions/analytics/activity-log/actions'
+import {
+  getActivityLogs,
+  getActivityLogStats,
+} from '@/actions/analytics/activity-log/actions'
 import { activityLogKeys } from '@/actions/analytics/activity-log/query-keys'
 
 export function useActivityLogs({
   storeId,
   action,
+  actions,
   actorType,
   search,
   page = 1,
@@ -14,12 +18,13 @@ export function useActivityLogs({
 }: {
   storeId: string
   action?: LogAction
+  actions?: LogAction[]
   actorType?: ActorType
   search?: string
   page?: number
   limit?: number
 }) {
-  const filters = { storeId, action, actorType, search, page, limit }
+  const filters = { storeId, action, actions, actorType, search, page, limit }
 
   return useQuery(
     queryOptions({
@@ -30,3 +35,15 @@ export function useActivityLogs({
     }),
   )
 }
+
+export function useActivityLogStats(storeId: string) {
+  return useQuery(
+    queryOptions({
+      queryKey: activityLogKeys.stats(storeId),
+      queryFn: async () => await getActivityLogStats(storeId),
+      enabled: !!storeId,
+      staleTime: 30_000,
+    }),
+  )
+}
+

@@ -286,6 +286,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
       entity: 'Employee',
       entityId: employee.id,
       details: {
+        summary: `เพิ่มพนักงานใหม่ "${input.name}" (${input.email})`,
         name: input.name,
         email: input.email,
         assignments: input.assignments,
@@ -338,7 +339,7 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       where: { id },
       select: {
         employeeId: true,
-        employee: { select: { userId: true } },
+        employee: { select: { userId: true, name: true, email: true } },
         store: { select: { ownerId: true } },
       },
     })
@@ -413,7 +414,13 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput) {
       storeId: input.storeId,
       entity: 'Employee',
       entityId: existingEmployeeStore.employeeId,
-      details: { updatedFields: Object.keys(input), type: 'updated' },
+      details: {
+        summary: `แก้ไขข้อมูลพนักงาน "${existingEmployeeStore.employee.name}" (${existingEmployeeStore.employee.email})`,
+        name: existingEmployeeStore.employee.name,
+        email: existingEmployeeStore.employee.email,
+        updatedFields: Object.keys(input),
+        type: 'updated',
+      },
     })
 
     return { success: true, message: 'บันทึกข้อมูลสำเร็จแล้ว', data: updated }
@@ -437,6 +444,8 @@ export async function deleteEmployee(id: string) {
         employee: {
           select: {
             userId: true,
+            name: true,
+            email: true,
           },
         },
         store: {
@@ -533,7 +542,12 @@ export async function deleteEmployee(id: string) {
       storeId: employeeStore.storeId,
       entity: 'Employee',
       entityId: targetEmployeeId,
-      details: { type: 'deleted' },
+      details: {
+        summary: `ลบพนักงาน "${employeeStore.employee.name}" (${employeeStore.employee.email}) ออกจากร้านค้า`,
+        name: employeeStore.employee.name,
+        email: employeeStore.employee.email,
+        type: 'deleted',
+      },
     })
 
     return {

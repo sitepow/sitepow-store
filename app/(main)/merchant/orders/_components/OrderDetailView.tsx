@@ -19,11 +19,13 @@ import {
   IconEye,
   IconMapPin,
   IconPackage,
+  IconPrinter,
   IconReceipt,
   IconUser,
 } from '@tabler/icons-react'
 
 import { CustomerCard } from '@/components/customer/CustomerCard'
+import { OrderDocumentDialog } from '@/components/order/documents'
 import { OrderItemsSummary } from '@/components/order/ItemsSummary'
 import { OrderStatusBadges } from '@/components/order/StatusBadges'
 import { OrderTrackingForm } from '@/components/order/TrackingForm'
@@ -139,6 +141,26 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
             </SelectContent>
           </Select>
         </div>
+        <div className="flex items-center justify-between gap-3 p-3 bg-muted/40 rounded-lg border">
+          <div className="space-y-0.5">
+            <p className="text-sm font-semibold flex items-center gap-1.5">
+              <IconReceipt size={16} className="text-primary" />
+              พิมพ์เอกสารคำสั่งซื้อ
+            </p>
+            <p className="text-xs text-muted-foreground">
+              ใบเสร็จรับเงิน, ใบกำกับภาษีเต็มรูป/ย่อ, ใบแจ้งหนี้, ใบส่งของ
+            </p>
+          </div>
+          <OrderDocumentDialog
+            order={order}
+            trigger={
+              <Button size="sm" className="gap-1.5 h-8 text-xs font-medium">
+                <IconPrinter size={15} />
+                พิมพ์เอกสาร
+              </Button>
+            }
+          />
+        </div>
         <CustomerCard
           icon={<IconUser />}
           title="ข้อมูลลูกค้า"
@@ -249,6 +271,18 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
           <CustomerCard
             icon={<IconReceipt />}
             title="ข้อมูลใบกำกับภาษี"
+            action={
+              <OrderDocumentDialog
+                order={order}
+                defaultDocType="TAX_INVOICE_FULL"
+                trigger={
+                  <Button variant="outline" size="sm" className="gap-1 text-xs h-7">
+                    <IconPrinter size={13} />
+                    พิมพ์ใบกำกับภาษี
+                  </Button>
+                }
+              />
+            }
             content={
               <>
                 ชื่อ/บริษัท: {order.taxName || '-'}

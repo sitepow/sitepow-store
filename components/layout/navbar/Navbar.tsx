@@ -16,7 +16,6 @@ import { Menu, X } from 'lucide-react'
 
 import { EmailVerified } from '@/components/auth/EmailVerified'
 import { LogoBrand } from '@/components/brand/LogoBrand'
-import { ThemeSwitcher } from '@/components/shared/ThemeSwitcher'
 import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,
@@ -124,7 +123,6 @@ export function Navbar() {
                   </Link>
                 </Button>
               )}
-              <ThemeSwitcher buttonVariant="secondary" />
               <Button
                 variant="secondary"
                 size="icon-lg"

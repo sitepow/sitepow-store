@@ -260,6 +260,14 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
       },
     )
 
+    const itemTitle = adjustment.variant?.product?.title
+      ? `${adjustment.variant.product.title} (${adjustment.variant.title})`
+      : adjustment.variant?.title || 'สินค้า'
+
+    const branchName = adjustment.branch?.name || ''
+    const qtySign = quantity > 0 ? `+${quantity}` : `${quantity}`
+    const noteSuffix = note ? `: ${note}` : ''
+
     await createLog({
       action: LogAction.UPDATE_STOCK,
       actorType: ActorType.MERCHANT,
@@ -267,8 +275,10 @@ export async function createStockAdjustment(input: CreateStockAdjustmentInput) {
       entity: 'StockAdjustment',
       entityId: adjustment.id,
       details: {
-        variantId,
-        branchId,
+        summary: `ปรับยอดสต็อก "${itemTitle}" ที่สาขา "${branchName}" จำนวน ${qtySign} ชิ้น (${reason}${noteSuffix})`,
+        productTitle: adjustment.variant?.product?.title,
+        variantTitle: adjustment.variant?.title,
+        branchName,
         quantity,
         reason,
         note,

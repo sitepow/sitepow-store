@@ -246,7 +246,11 @@ export async function updateStock(id: string, input: UpdateStockInput) {
           select: { storeId: true, id: true, name: true, isMain: true },
         },
         variant: {
-          select: { productId: true },
+          select: {
+            productId: true,
+            title: true,
+            product: { select: { title: true } },
+          },
         },
       },
     })
@@ -260,13 +264,24 @@ export async function updateStock(id: string, input: UpdateStockInput) {
       },
     )
 
+    const itemTitle = updatedStock.variant?.product?.title
+      ? `${updatedStock.variant.product.title} (${updatedStock.variant.title})`
+      : updatedStock.variant?.title || 'สินค้า'
+
     await createLog({
       action: LogAction.UPDATE_STOCK,
       actorType: ActorType.MERCHANT,
       storeId: updatedStock.branch.storeId,
       entity: 'ProductStock',
       entityId: id,
-      details: { minStock: input.minStock, type: 'updated' },
+      details: {
+        summary: `ตั้งค่าสต็อกขั้นต่ำของ "${itemTitle}" ที่สาขา "${updatedStock.branch.name}" เป็น ${input.minStock} ชิ้น`,
+        productTitle: updatedStock.variant?.product?.title,
+        variantTitle: updatedStock.variant?.title,
+        branchName: updatedStock.branch.name,
+        minStock: input.minStock,
+        type: 'updated',
+      },
     })
 
     return {
@@ -325,6 +340,9 @@ export async function upsertStock(input: UpsertStockInput) {
         branch: {
           select: { id: true, name: true, isMain: true, storeId: true },
         },
+        variant: {
+          select: { title: true, product: { select: { title: true } } },
+        },
       },
     })
 
@@ -334,13 +352,25 @@ export async function upsertStock(input: UpsertStockInput) {
       { variantId },
     )
 
+    const itemTitle = stock.variant?.product?.title
+      ? `${stock.variant.product.title} (${stock.variant.title})`
+      : stock.variant?.title || 'สินค้า'
+
     await createLog({
       action: LogAction.UPDATE_STOCK,
       actorType: ActorType.MERCHANT,
       storeId: branch.storeId,
       entity: 'ProductStock',
       entityId: stock.id,
-      details: { variantId, branchId, quantity, minStock, type: 'upserted' },
+      details: {
+        summary: `ปรับสต็อก "${itemTitle}" ที่สาขา "${stock.branch.name}" เป็น ${quantity} ชิ้น (แจ้งเตือนขั้นต่ำ ${minStock})`,
+        productTitle: stock.variant?.product?.title,
+        variantTitle: stock.variant?.title,
+        branchName: stock.branch.name,
+        quantity,
+        minStock,
+        type: 'upserted',
+      },
     })
 
     return {

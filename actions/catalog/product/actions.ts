@@ -383,7 +383,14 @@ export async function createProduct(input: CreateProductInput) {
       storeId,
       entity: 'Product',
       entityId: product.id,
-      details: { title: rest.title, slug: rest.slug, categoryId },
+      details: {
+        summary: `เพิ่มสินค้าใหม่ "${rest.title}" (${variants.length} รายการตัวเลือก)`,
+        title: rest.title,
+        slug: rest.slug,
+        categoryId,
+        variantCount: variants.length,
+        price: variants[0]?.price,
+      },
     })
 
     return { success: true, message: 'สร้างสินค้าสำเร็จแล้ว' }
@@ -512,7 +519,11 @@ export async function deleteProduct(id: string) {
       storeId: product.storeId,
       entity: 'Product',
       entityId: id,
-      details: { title: product.title },
+      details: {
+        summary: `ลบสินค้า "${product.title}" ออกจากระบบ`,
+        title: product.title,
+        slug: product.slug,
+      },
     })
 
     return { success: true, message: 'ลบสินค้าสำเร็จ' }
@@ -830,6 +841,20 @@ export async function updateProduct(id: string, input: CreateProductInput) {
           slug: input.slug,
         })
       }
+    })
+
+    await createLog({
+      action: LogAction.UPDATE_STORE_SETTING,
+      actorType: ActorType.MERCHANT,
+      storeId: existingProduct.storeId,
+      entity: 'Product',
+      entityId: id,
+      details: {
+        summary: `แก้ไขข้อมูลสินค้า "${rest.title}"`,
+        title: rest.title,
+        slug: input.slug,
+        type: 'updated',
+      },
     })
 
     return { success: true, message: 'อัปเดตสินค้าสำเร็จ' }
