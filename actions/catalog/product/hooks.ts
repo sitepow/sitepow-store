@@ -111,3 +111,32 @@ export function useProductQuota(storeId: string) {
     }),
   )
 }
+
+export function useBulkImportProducts() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      storeId,
+      products,
+    }: {
+      storeId: string
+      products: import('@/lib/csv/product-csv').ParsedProduct[]
+    }) =>
+      import('@/actions/catalog/product/bulk-import').then((mod) =>
+        mod.bulkImportProducts(storeId, products),
+      ),
+    onSuccess: (res, variables) => {
+      if (res.success) {
+        invalidateClientProductQueries(queryClient, variables.storeId)
+        queryClient.invalidateQueries({
+          queryKey: productKeys.quota(variables.storeId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: productKeys.all,
+        })
+      }
+    },
+  })
+}
+

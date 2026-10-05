@@ -19,6 +19,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Button } from '@/components/ui/button'
 import { PurchaseOrderHistoryDialog } from '@/components/procurement'
 
+import { BulkImportProductDialog } from './_components/BulkImportProductDialog'
 import { ProductsTable } from './_components/ProductsTable'
 
 export default function MerchantStoreSettingsProductsPage() {
@@ -50,12 +51,15 @@ export default function MerchantStoreSettingsProductsPage() {
               </>
             )}
             {canCreateProducts && (
-              <Button asChild variant="outline">
-                <Link href={'/merchant/store-settings/products/create'}>
-                  <IconPlus />
-                  เพิ่มสินค้าใหม่
-                </Link>
-              </Button>
+              <>
+                <BulkImportProductDialog />
+                <Button asChild variant="outline">
+                  <Link href={'/merchant/store-settings/products/create'}>
+                    <IconPlus />
+                    เพิ่มสินค้าใหม่
+                  </Link>
+                </Button>
+              </>
             )}
           </div>
         }
