@@ -33,7 +33,13 @@ export function StoreTransferConfirmDialog({
   const handleConfirm = () => {
     createMutation.mutate(
       { storeId, fromOwnerId: user?.id ?? '', toEmail },
-      { onSuccess: () => onClose() },
+      {
+        onSuccess: (res) => {
+          if (res.success) {
+            onClose()
+          }
+        },
+      },
     )
   }
 

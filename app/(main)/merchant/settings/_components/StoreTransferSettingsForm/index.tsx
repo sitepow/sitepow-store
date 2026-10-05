@@ -50,6 +50,9 @@ export function StoreTransferSettingsForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                <p className="text-muted-foreground text-xs">
+                  ระบบจะส่งอีเมลคำขอยืนยันไปที่ผู้รับ (หากไม่พบในกล่องข้อความ ให้ตรวจสอบโฟลเดอร์ <strong>Junk / Spam (เมลขยะ)</strong> หรือสามารถคัดลอกลิงก์คำขอด้านล่างส่งให้ผู้รับโดยตรงได้เช่นกัน)
+                </p>
               </Field>
             </CardContent>
 
