@@ -35,7 +35,6 @@ import {
   Sidebar as RootSidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -132,14 +131,7 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
               return (
                 <Fragment key={item.value}>
                   {item.hasSeparatorBefore && (
-                    <>
                       <Separator className="my-2" />
-                      {item.groupLabel && (
-                        <SidebarGroupLabel className="px-2 text-xs opacity-80">
-                          {item.groupLabel}
-                        </SidebarGroupLabel>
-                      )}
-                    </>
                   )}
                   {item.items && item.items.length > 0 ? (
                     <Collapsible
@@ -216,13 +208,13 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                       >
                         {hasMainPermission ? (
                           <Link href={mainUrl}>
-                            <item.icon className="size-4" />
-                            <span>{item.label}</span>
+                            <item.icon className="size-5! opacity-70" />
+                            <span className='font-semibold'>{item.label}</span>
                           </Link>
                         ) : (
                           <div className="flex w-full items-center gap-2">
-                            <item.icon className="size-4" />
-                            <span className="flex-1 text-left">
+                            <item.icon className="size-5! opacity-70" />
+                            <span className="flex-1 font-semibold text-left">
                               {item.label}
                             </span>
                             <IconLock className="size-3.5" />
