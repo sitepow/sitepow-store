@@ -208,12 +208,12 @@ export function Sidebar({ items, redirectPath, children }: SidebarProps) {
                         {hasMainPermission ? (
                           <Link href={mainUrl}>
                             <item.icon className="size-5! opacity-70" />
-                            <span className='font-semibold'>{item.label}</span>
+                            <span>{item.label}</span>
                           </Link>
                         ) : (
                           <div className="flex w-full items-center gap-2">
                             <item.icon className="size-5! opacity-70" />
-                            <span className="flex-1 font-semibold text-left">
+                            <span className="flex-1 text-left">
                               {item.label}
                             </span>
                             <IconLock className="size-3.5" />

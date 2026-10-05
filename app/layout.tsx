@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 
 const ibmPlexSansThaiLooped = IBM_Plex_Sans_Thai({
   subsets: ['latin', 'thai'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 })
