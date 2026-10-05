@@ -9,8 +9,8 @@ import { useStoreData } from '@/stores/storefront/use-store-data'
 import { maskEmail } from '@/utils/formatting/mask-email'
 import { AlertCircleIcon } from 'lucide-react'
 
-import { Alert, AlertTitle } from '@/components/./ui/alert'
-import { Button } from '@/components/./ui/button'
+import { Alert, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/./ui/dialog'
+} from '@/components/ui/dialog'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from '@/components/./ui/input-otp'
-import { Spinner } from '@/components/./ui/spinner'
+} from '@/components/ui/input-otp'
+import { Spinner } from '@/components/ui/spinner'
 
 export function EmailVerified() {
   const { store } = useStoreData()

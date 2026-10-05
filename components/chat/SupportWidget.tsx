@@ -81,7 +81,7 @@ export function SupportWidget({ storeId }: { storeId?: string } = {}) {
         {isOpen ? <X aria-hidden="true" /> : <MessageCircle aria-hidden="true" />}
         {unreadCount > 0 && (
           <CartBadge
-            className="border-primary text-primary border bg-white"
+            className="border-primary text-primary border bg-background"
             total={unreadCount}
           />
         )}

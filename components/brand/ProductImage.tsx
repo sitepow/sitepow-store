@@ -21,7 +21,7 @@ export function ProductImage({
   return (
     <div
       className={cn(
-        'relative aspect-square size-16 flex-none shrink-0 cursor-pointer overflow-hidden md:size-20',
+        'relative aspect-square size-16 flex-none shrink-0 cursor-pointer overflow-hidden rounded-lg border border-border/60 bg-muted/20 md:size-20',
         className,
       )}
     >

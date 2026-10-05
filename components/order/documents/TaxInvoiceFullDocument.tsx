@@ -74,7 +74,7 @@ export function TaxInvoiceFullDocument({
             </p>
             <p>
               <span className="font-semibold text-neutral-900">เลขประจำตัวผู้เสียภาษี: </span>
-              <span className="font-mono font-medium tracking-wide">
+              <span className=" font-medium tracking-wide">
                 {customer.taxId !== '-' ? formatPromptPay(customer.taxId) : '-'}
               </span>
             </p>

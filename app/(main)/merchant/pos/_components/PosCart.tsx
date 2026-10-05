@@ -22,6 +22,7 @@ import { IconShoppingCart, IconTrash, IconX } from '@tabler/icons-react'
 
 import { ActionRequiredAlert } from '@/components/shared/ActionRequiredAlert'
 import { CustomerCard } from '@/components/customer/CustomerCard'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -202,7 +203,9 @@ export function PosCart({
                   ล้างตะกร้า
                 </Button>
               )}
-              <Button size="icon-sm">{totalItems}</Button>
+              <Badge variant="secondary" className="rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                {totalItems}
+              </Badge>
             </div>
           </CardTitle>
           {!isResellerMode && customerId && (

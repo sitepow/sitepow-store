@@ -51,22 +51,22 @@ export function BlogPreviewContent() {
 
   return (
     <div className="text-foreground space-y-6">
-      <div className="dark:bg-foreground/5 rounded-lg border p-4">
-        <p className="mb-2 text-xs font-semibold uppercase opacity-60">
+      <div className="bg-card text-card-foreground rounded-xl border border-border p-4 shadow-xs">
+        <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
           Google Search (ตัวอย่าง)
         </p>
         <div className="space-y-1">
-          <p className="text-sm text-emerald-700">
+          <p className="text-sm text-emerald-600 dark:text-emerald-400  text-xs">
             https://{selectedStoreSlug}.sitepow.store › blogs › {displaySlug}
           </p>
-          <p className="cursor-pointer text-xl text-purple-600 hover:underline">
+          <p className="cursor-pointer text-xl text-primary font-semibold hover:underline">
             {displayTitle}
           </p>
-          <p className="line-clamp-2 text-sm opacity-60">{description}</p>
+          <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
-      <div className="dark:bg-foreground/5 overflow-hidden rounded-lg border">
-        <p className="border-b p-3 text-xs font-semibold uppercase opacity-40">
+      <div className="bg-card text-card-foreground overflow-hidden rounded-xl border border-border shadow-xs">
+        <p className="border-b border-border p-3 text-xs font-semibold uppercase text-muted-foreground">
           Social Share (ตัวอย่าง)
         </p>
         <Image
@@ -77,12 +77,12 @@ export function BlogPreviewContent() {
           alt="preview-image"
           unoptimized={image instanceof File}
         />
-        <div className="p-3">
-          <p className="text-[12px] text-emerald-700 uppercase">
+        <div className="p-4 space-y-1">
+          <p className="text-[12px] text-emerald-600 dark:text-emerald-400  uppercase">
             https://{selectedStoreSlug}.sitepow.store
           </p>
-          <p className="font-bold">{displayTitle}</p>
-          <p className="line-clamp-1 text-sm opacity-60">{description}</p>
+          <p className="font-bold text-foreground text-base">{displayTitle}</p>
+          <p className="line-clamp-2 text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
     </div>

@@ -76,7 +76,7 @@ export function PickingPackingDocument({
             {order.shippingMethod || 'จัดส่งมาตรฐาน'}
           </p>
           {order.trackingNumber && (
-            <p className="text-neutral-700 font-mono">
+            <p className="text-neutral-700 ">
               Track: {order.trackingNumber}
             </p>
           )}

@@ -8,10 +8,11 @@ import {
 
 import { IconUser } from '@tabler/icons-react'
 
+import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 export interface CustomerCardProps extends Omit<
-  ComponentProps<'div'>,
+  ComponentProps<typeof Card>,
   'title' | 'content'
 > {
   icon?: ReactNode
@@ -38,27 +39,27 @@ export function CustomerCard({
     : icon
 
   return (
-    <div
+    <Card
       className={cn(
-        'border-border flex items-center justify-between gap-3 rounded-xl border p-3.5',
+        'border-border bg-card text-card-foreground flex flex-row items-center justify-between gap-3 rounded-xl border p-3.5 shadow-xs',
         className,
       )}
       {...props}
     >
       <div className="flex items-center gap-3">
-        <div className="border-border text-primary flex size-9 shrink-0 items-center justify-center rounded-full border">
+        <div className="bg-primary/10 text-primary ring-primary/20 flex size-9 shrink-0 items-center justify-center rounded-xl ring-1">
           {renderedIcon}
         </div>
-        <div className="space-y-2.5">
-          <p className="text-foreground text-sm leading-none font-bold">
+        <div className="space-y-1">
+          <p className="text-foreground text-sm font-semibold leading-tight">
             {title}
           </p>
           {content && (
-            <div className="text-muted-foreground text-xs">{content}</div>
+            <div className="text-muted-foreground text-xs leading-normal">{content}</div>
           )}
         </div>
       </div>
-      {action}
-    </div>
+      {action && <div className="shrink-0">{action}</div>}
+    </Card>
   )
 }

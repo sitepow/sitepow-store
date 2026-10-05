@@ -315,7 +315,7 @@ export function PosCheckoutModal({
                   </span>
                   {!isResellerMode && (
                     <Link
-                      href="http://lvh.me:3000/merchant/settings?tab=settings-payment"
+                      href="/merchant/settings?tab=settings-payment"
                       target="_blank"
                       className="text-primary flex items-center gap-1 text-xs font-semibold hover:underline"
                     >

@@ -146,7 +146,7 @@ export function OrderDocumentDialog({
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-1.5 hover:bg-neutral-100"
+            className="flex items-center gap-1.5"
             title="พิมพ์เอกสารคำสั่งซื้อ"
           >
             <IconPrinter size={15} />
@@ -157,13 +157,13 @@ export function OrderDocumentDialog({
 
       <DialogContent className="max-w-5xl! w-[95vw] h-[92vh] max-h-[92vh] p-0 flex flex-col overflow-hidden">
         {/* Top Header */}
-        <div className="px-6 py-3.5 border-b flex items-center justify-between bg-neutral-50/70">
+        <div className="px-6 py-3.5 border-b flex items-center justify-between bg-muted/40">
           <div>
-            <DialogTitle className="text-base font-bold flex items-center gap-2">
+            <DialogTitle className="text-base font-bold flex items-center gap-2 text-foreground">
               <IconFileInvoice className="size-5 text-primary" />
               พิมพ์เอกสารคำสั่งซื้อ #{order.orderNumber}
             </DialogTitle>
-            <DialogDescription className="text-xs text-neutral-500 mt-0.5">
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
               เลือกประเภทเอกสารที่ต้องการดูตัวอย่างหรือสั่งพิมพ์ตามมาตรฐานร้านค้า
             </DialogDescription>
           </div>
@@ -182,7 +182,7 @@ export function OrderDocumentDialog({
             <Button
               size="sm"
               onClick={handlePrint}
-              className="text-xs h-8 bg-neutral-900 text-white hover:bg-neutral-800 gap-1.5 shadow-sm"
+              className="text-xs h-8 gap-1.5 shadow-xs"
             >
               <IconPrinter size={15} />
               <span>พิมพ์เอกสาร (Print)</span>
@@ -191,7 +191,7 @@ export function OrderDocumentDialog({
         </div>
 
         {/* Document Tabs Selector */}
-        <div className="px-6 py-2 border-b bg-white flex flex-wrap gap-1.5 overflow-x-auto">
+        <div className="px-6 py-2 border-b bg-card flex flex-wrap gap-1.5 overflow-x-auto">
           <Button
             variant={docType === 'RECEIPT' ? 'default' : 'ghost'}
             size="sm"
@@ -256,10 +256,10 @@ export function OrderDocumentDialog({
         {/* Content Body: Sidebar Settings + Live Preview */}
         <div className="flex-1 flex overflow-hidden">
           {/* Options Sidebar */}
-          <div className="w-72 shrink-0 border-r bg-neutral-50/50 p-4 overflow-y-auto space-y-4 text-xs">
+          <div className="w-72 shrink-0 border-r bg-muted/20 p-4 overflow-y-auto space-y-4 text-xs">
             {/* Paper Size selector */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-neutral-800">
+              <Label className="text-xs font-semibold text-foreground">
                 ขนาดกระดาษ (Paper Format)
               </Label>
               <div className="grid grid-cols-2 gap-1.5">
@@ -293,7 +293,7 @@ export function OrderDocumentDialog({
             {/* Toggle Switches */}
             <div className="space-y-3 pt-2 border-t">
               <div className="flex items-center justify-between">
-                <span className="text-neutral-700">ระบุเป็นสำเนา (Copy)</span>
+                <span className="text-foreground">ระบุเป็นสำเนา (Copy)</span>
                 <Switch
                   checked={options.isCopy}
                   onCheckedChange={(checked) =>
@@ -303,7 +303,7 @@ export function OrderDocumentDialog({
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-neutral-700">แสดงโลโก้ร้านค้า</span>
+                <span className="text-foreground">แสดงโลโก้ร้านค้า</span>
                 <Switch
                   checked={options.showLogo}
                   onCheckedChange={(checked) =>
@@ -313,7 +313,7 @@ export function OrderDocumentDialog({
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-neutral-700">แสดงช่องลงนาม</span>
+                <span className="text-foreground">แสดงช่องลงนาม</span>
                 <Switch
                   checked={options.showSignatures}
                   onCheckedChange={(checked) =>
@@ -325,7 +325,7 @@ export function OrderDocumentDialog({
 
             {/* Custom Note input */}
             <div className="space-y-1.5 pt-2 border-t">
-              <Label className="text-xs font-semibold text-neutral-800">
+              <Label className="text-xs font-semibold text-foreground">
                 หมายเหตุเพิ่มเติมบนเอกสาร
               </Label>
               <Textarea
@@ -343,7 +343,7 @@ export function OrderDocumentDialog({
             {(docType === 'TAX_INVOICE_FULL' || order.isTaxInvoiceRequested) && (
               <div className="pt-2 border-t space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-neutral-800">
+                  <span className="font-semibold text-foreground">
                     ข้อมูลใบกำกับภาษี
                   </span>
                   <Button
@@ -358,7 +358,7 @@ export function OrderDocumentDialog({
                 </div>
 
                 {isEditingTax ? (
-                  <div className="space-y-2 p-2.5 bg-white border rounded shadow-xs">
+                  <div className="space-y-2 p-2.5 bg-background border rounded-lg shadow-xs">
                     <div>
                       <Label className="text-[11px]">ชื่อ/บริษัทผู้ซื้อ</Label>
                       <Input
@@ -411,8 +411,8 @@ export function OrderDocumentDialog({
                     </Button>
                   </div>
                 ) : (
-                  <div className="text-[11px] text-neutral-600 space-y-0.5 bg-white p-2 rounded border">
-                    <p className="font-semibold text-neutral-900">
+                  <div className="text-[11px] text-muted-foreground space-y-0.5 bg-background p-2.5 rounded-lg border">
+                    <p className="font-semibold text-foreground">
                       {order.taxName || 'ยังไม่ระบุ'}
                     </p>
                     <p>เลขผู้เสียภาษี: {order.taxId || '-'}</p>
@@ -424,10 +424,10 @@ export function OrderDocumentDialog({
           </div>
 
           {/* Document Preview Canvas */}
-          <div className="flex-1 bg-neutral-200/70 p-6 overflow-y-auto flex justify-center items-start">
+          <div className="flex-1 bg-muted/30 p-6 overflow-y-auto flex justify-center items-start">
             <div
               id="printable-document"
-              className={`bg-white shadow-xl rounded-sm transition-all duration-200 ${
+              className={`bg-white text-neutral-900 shadow-xl rounded-sm transition-all duration-200 ${
                 options.paperSize === 'SLIP_80MM'
                   ? 'w-[80mm] min-h-[140mm]'
                   : 'w-[210mm] min-h-[297mm]'

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { Field, FieldLabel } from '@/components/./ui/field'
+import { Field, FieldLabel } from '@/components/ui/field'
 
 interface ExpenseCategorySelectFieldProps {
   value: string

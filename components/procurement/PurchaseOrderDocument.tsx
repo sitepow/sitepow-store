@@ -221,7 +221,7 @@ export function PurchaseOrderDocument({
                 href={webUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary hover:underline font-mono truncate block text-[9px]"
+                className="text-primary hover:underline  truncate block text-[9px]"
               >
                 เปิดลิงก์บนเว็บ
               </a>
@@ -284,7 +284,7 @@ export function PurchaseOrderDocument({
                     </div>
                   )}
                 </td>
-                <td className="py-2 px-2.5 text-center border-r border-neutral-300 font-mono text-[11px] text-neutral-600">
+                <td className="py-2 px-2.5 text-center border-r border-neutral-300  text-[11px] text-neutral-600">
                   {item.sku || '-'}
                 </td>
                 <td className="py-2 px-2.5 text-center border-r border-neutral-300 font-bold text-neutral-900">

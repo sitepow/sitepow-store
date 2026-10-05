@@ -58,7 +58,7 @@ export function TaxInvoiceAbbrDocument({
 
   return (
     <div
-      className={`mx-auto bg-white text-neutral-900 font-mono print:text-black ${
+      className={`mx-auto bg-white text-neutral-900  print:text-black ${
         isThermal
           ? 'w-[78mm] max-w-[78mm] p-3 text-[11px] leading-tight thermal-slip-print'
           : 'w-full max-w-xl p-8 text-xs leading-normal font-sans border rounded'

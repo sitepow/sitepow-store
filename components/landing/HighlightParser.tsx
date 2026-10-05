@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 
-import { PointerHighlight } from '@/components/./ui/pointer-highlight'
+import { PointerHighlight } from '@/components/ui/pointer-highlight'
 
 interface HighlightParserProps {
   text: string

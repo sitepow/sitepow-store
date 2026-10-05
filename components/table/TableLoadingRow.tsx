@@ -1,6 +1,6 @@
 import { IconLoader2 } from '@tabler/icons-react'
 
-import { TableCell, TableRow } from '@/components/./ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 
 interface TableLoadingRowProps {
   colSpan: number

@@ -10,15 +10,7 @@ import { MERCHANT_NAVIGATION } from '@/constants/store/navigation'
 import { ActorType, LogAction } from '@/generated/prisma/enums'
 import { ALL_STORES, useStoreFilter } from '@/stores/merchant/use-store-filter'
 import { formatDateTime } from '@/utils/formatting/date'
-import {
-  IconCheck,
-  IconCopy,
-  IconEye,
-  IconHistory,
-  IconLock,
-  IconNetwork,
-} from '@tabler/icons-react'
-import toast from 'react-hot-toast'
+import { IconEye, IconHistory, IconLock } from '@tabler/icons-react'
 
 import {
   ENTITY_LABEL_TH,
@@ -57,9 +49,8 @@ export default function MerchantAuditLogsPage() {
   const [actorFilter, setActorFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [activeLogItem, setActiveLogItem] = useState<GetActivityLogItem | null>(
     null,
   )
@@ -67,7 +58,6 @@ export default function MerchantAuditLogsPage() {
   const { canViewActivityLogs, isLoading: isPermissionLoading } =
     useEmployeePermission()
 
-  // Actions for category filter if selected
   const categoryActions =
     selectedCategory !== 'all' && LOG_CATEGORIES[selectedCategory as LogCategory]
       ? LOG_CATEGORIES[selectedCategory as LogCategory].actions
@@ -80,12 +70,12 @@ export default function MerchantAuditLogsPage() {
     actorType: actorFilter !== 'all' ? (actorFilter as ActorType) : undefined,
     search: searchQuery.trim() || undefined,
     page,
-    limit: 15,
+    limit: 10,
   })
 
   const handleOpenDetails = (log: GetActivityLogItem) => {
     setActiveLogItem(log)
-    setIsDialogOpen(true)
+    setOpen(true)
   }
 
   const handleResetFilters = () => {
@@ -96,20 +86,12 @@ export default function MerchantAuditLogsPage() {
     setPage(1)
   }
 
-  const handleCopyEntityId = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
-    navigator.clipboard.writeText(id)
-    setCopiedId(id)
-    toast.success('คัดลอกรหัสอ้างอิงแล้ว')
-    setTimeout(() => setCopiedId(null), 2000)
-  }
-
   return (
     <Sidebar redirectPath="merchant" items={MERCHANT_NAVIGATION}>
       <PageTabHeader
         icon={IconHistory}
-        title="บันทึกประวัติการใช้งาน (Audit Logs)"
-        description="ติดตามทุกกิจกรรม การเปลี่ยนแปลงข้อมูล และการเข้าถึงระบบแบบเรียลไทม์ เพื่อความโปร่งใสและมาตรฐานความปลอดภัยระดับองค์กร"
+        title="บันทึกประวัติการใช้งาน"
+        description="ติดตามทุกกิจกรรม การเปลี่ยนแปลงข้อมูล และการเข้าถึงระบบเพื่อความโปร่งใสและตรวจสอบได้"
         endContent={<StoreSelectField />}
       />
 
@@ -118,15 +100,13 @@ export default function MerchantAuditLogsPage() {
       ) : !isPermissionLoading && !canViewActivityLogs ? (
         <ActionRequiredAlert
           icon={<IconLock />}
-          title="ไม่มีสิทธิ์เข้าถึงข้อมูล Audit Logs"
-          description="บัญชีของคุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของร้านค้านี้ กรุณาติดต่อผู้ดูแลระบบหรือเจ้าของร้าน"
+          title="ไม่มีสิทธิ์เข้าถึง"
+          description="คุณไม่มีสิทธิ์ในการเข้าถึงข้อมูลประวัติกิจกรรมของร้านค้านี้"
         />
       ) : (
-        <div className="space-y-4">
-          {/* SaaS KPI Metric Cards */}
+        <div className="space-y-6">
           <AuditLogStats storeId={selectedStoreId} />
 
-          {/* Search & Category Filter Controls */}
           <AuditLogFilters
             searchQuery={searchQuery}
             onSearchQueryChange={(v) => {
@@ -148,33 +128,19 @@ export default function MerchantAuditLogsPage() {
               setSelectedCategory(cat)
               setPage(1)
             }}
-            totalCount={meta?.totalItems}
             onReset={handleResetFilters}
           />
 
-          {/* Audit Logs Table */}
-          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                  <TableHead className="w-[170px] text-xs font-semibold">
-                    วันและเวลา
-                  </TableHead>
-                  <TableHead className="w-[180px] text-xs font-semibold">
-                    ประเภทเหตุการณ์
-                  </TableHead>
-                  <TableHead className="min-w-[280px] text-xs font-semibold">
-                    รายละเอียดกิจกรรม (Action Details)
-                  </TableHead>
-                  <TableHead className="w-[200px] text-xs font-semibold">
-                    ผู้ดำเนินการ (Actor)
-                  </TableHead>
-                  <TableHead className="w-[130px] text-xs font-semibold">
-                    IP Address
-                  </TableHead>
-                  <TableHead className="w-[70px] text-right text-xs font-semibold">
-                    ดูข้อมูล
-                  </TableHead>
+                <TableRow>
+                  <TableHead>วันและเวลา</TableHead>
+                  <TableHead>ประเภทเหตุการณ์</TableHead>
+                  <TableHead>รายละเอียดกิจกรรม</TableHead>
+                  <TableHead>ผู้ดำเนินการ</TableHead>
+                  <TableHead>IP Address</TableHead>
+                  <TableHead className="text-right">จัดการ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -182,133 +148,98 @@ export default function MerchantAuditLogsPage() {
                   <TableLoadingRow colSpan={6} />
                 ) : logs.length === 0 ? (
                   <TableEmptyRow
-                    title="ไม่พบประวัติกิจกรรม"
+                    title="ยังไม่มีประวัติกิจกรรม"
                     description="ไม่พบข้อมูลที่ตรงกับตัวกรองหรือคำค้นหาของคุณในขณะนี้"
                     colSpan={6}
                   />
                 ) : (
                   logs.map((log) => {
                     const summary = formatAuditLogSummary(log)
-                    const entityLabel = ENTITY_LABEL_TH[log.entity] || log.entity
+                    const entityLabel =
+                      ENTITY_LABEL_TH[log.entity] || log.entity
                     const actorName =
                       log.employee?.name ||
                       log.user?.name ||
-                      (log.actorType === 'SYSTEM' ? 'ระบบอัตโนมัติ' : 'ผู้ใช้งาน')
+                      (log.actorType === 'SYSTEM'
+                        ? 'ระบบอัตโนมัติ'
+                        : 'ผู้ใช้งาน')
                     const actorEmail =
                       log.employee?.email || log.user?.email || null
                     const actorImage = log.user?.image || null
 
                     return (
-                      <TableRow
-                        key={log.id}
-                        onClick={() => handleOpenDetails(log)}
-                        className="cursor-pointer transition-colors hover:bg-muted/50 group"
-                      >
-                        {/* Timestamp */}
-                        <TableCell className="align-top py-3.5">
-                          <span className="font-mono text-xs font-medium text-foreground">
-                            {formatDateTime(log.createdAt)}
-                          </span>
+                      <TableRow key={log.id}>
+                        <TableCell className="whitespace-nowrap">
+                          {formatDateTime(log.createdAt)}
                         </TableCell>
 
-                        {/* Action Badge */}
-                        <TableCell className="align-top py-3.5">
+                        <TableCell className="whitespace-nowrap">
                           <ActionBadge action={log.action} />
                         </TableCell>
 
-                        {/* Summary & Entity */}
-                        <TableCell className="align-top py-3.5">
-                          <div className="space-y-1.5">
-                            <p className="text-xs font-medium text-foreground leading-snug group-hover:text-primary transition-colors">
+                        <TableCell className="max-w-md">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-medium leading-snug">
                               {summary}
-                            </p>
-                            <div className="flex flex-wrap items-center gap-1.5">
+                            </span>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <Badge
                                 variant="secondary"
-                                className="text-[10px] font-normal py-0 px-1.5 h-4 bg-muted text-muted-foreground"
+                                className="px-1.5 py-0 text-[10px] font-normal"
                               >
                                 {entityLabel}
                               </Badge>
                               {log.entityId && (
-                                <div
-                                  onClick={(e) =>
-                                    handleCopyEntityId(e, log.entityId!)
-                                  }
-                                  className="inline-flex items-center gap-1 rounded border bg-background px-1.5 py-0 text-[10px] font-mono text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                                  title="คลิกเพื่อคัดลอก Entity ID"
-                                >
-                                  <span className="max-w-[100px] truncate">
-                                    {log.entityId}
-                                  </span>
-                                  {copiedId === log.entityId ? (
-                                    <IconCheck
-                                      size={10}
-                                      className="text-emerald-500 shrink-0"
-                                    />
-                                  ) : (
-                                    <IconCopy size={10} className="shrink-0 opacity-60" />
-                                  )}
-                                </div>
+                                <span className=" text-[11px] opacity-75">
+                                  #{log.entityId}
+                                </span>
                               )}
                             </div>
                           </div>
                         </TableCell>
 
-                        {/* Actor */}
-                        <TableCell className="align-top py-3.5">
-                          <div className="flex items-start gap-2">
-                            <Avatar className="h-6 w-6 border shrink-0 mt-0.5">
+                        <TableCell className="whitespace-nowrap">
+                          <div className="flex items-center gap-2.5">
+                            <Avatar className="size-7">
                               {actorImage && (
-                                <AvatarImage src={actorImage} alt={actorName} />
+                                <AvatarImage
+                                  src={actorImage}
+                                  alt={actorName}
+                                />
                               )}
-                              <AvatarFallback className="text-[10px] font-semibold bg-primary/10 text-primary">
+                              <AvatarFallback className="bg-muted text-muted-foreground text-xs">
                                 {actorName.slice(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="min-w-0 space-y-0.5">
-                              <p className="text-xs font-medium text-foreground truncate">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">
                                 {actorName}
-                              </p>
+                              </span>
                               {actorEmail ? (
-                                <p className="text-[10px] text-muted-foreground truncate font-mono">
+                                <span className="text-xs text-muted-foreground">
                                   {actorEmail}
-                                </p>
+                                </span>
                               ) : (
                                 <ActorBadge
                                   actorType={log.actorType}
-                                  showIcon={false}
-                                  className="text-[9px] py-0 px-1"
+                                  className="w-fit text-[10px] px-1 py-0"
                                 />
                               )}
                             </div>
                           </div>
                         </TableCell>
 
-                        {/* IP Address */}
-                        <TableCell className="align-top py-3.5">
-                          {log.ipAddress ? (
-                            <div className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground">
-                              <IconNetwork size={12} className="opacity-60 shrink-0" />
-                              <span>{log.ipAddress}</span>
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-muted-foreground">-</span>
-                          )}
+                        <TableCell className="whitespace-nowrap  text-xs">
+                          {log.ipAddress || '-'}
                         </TableCell>
 
-                        {/* Action View Button */}
-                        <TableCell className="align-top py-3 text-right">
+                        <TableCell className="text-right whitespace-nowrap">
                           <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground group-hover:text-foreground hover:bg-background"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleOpenDetails(log)
-                            }}
-                            title="เปิดดูรายละเอียดเชิงลึก"
+                            variant="outline"
+                            size="icon-lg"
+                            onClick={() => handleOpenDetails(log)}
                           >
-                            <IconEye size={15} />
+                            <IconEye />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -319,11 +250,11 @@ export default function MerchantAuditLogsPage() {
             </Table>
           </div>
 
-          {/* Pagination Controls */}
           {meta && meta.totalPages > 1 && (
-            <div className="flex items-center justify-between border-t pt-3">
-              <span className="text-xs text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-muted-foreground text-xs">
                 แสดงหน้า {meta.currentPage} จากทั้งหมด {meta.totalPages} หน้า
+                ({meta.totalItems.toLocaleString()} รายการ)
               </span>
               <StorePagination
                 currentPage={meta.currentPage}
@@ -335,11 +266,10 @@ export default function MerchantAuditLogsPage() {
             </div>
           )}
 
-          {/* Audit Log Detail Dialog / Inspector */}
           <AuditLogDetailDialog
-            isOpen={isDialogOpen}
-            onOpenChange={setIsDialogOpen}
             logItem={activeLogItem}
+            open={open}
+            setOpen={setOpen}
           />
         </div>
       )}

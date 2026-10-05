@@ -8,9 +8,9 @@ interface TableImageProps {
 
 export function TableImage({ imageUrl }: TableImageProps) {
   return (
-    <div className="flex size-20 shrink-0 items-center">
+    <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-muted/20">
       <img
-        className="size-full rounded-xl object-cover"
+        className="size-full object-cover"
         src={imageUrl || FALLBACK_IMAGE}
       />
     </div>

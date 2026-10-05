@@ -72,7 +72,7 @@ export function PurchaseOrderHistoryDialog({
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 text-xs h-9 text-neutral-700 hover:text-neutral-900"
+              className="gap-1.5 text-xs h-9"
             >
               <IconHistory size={16} />
               <span>ประวัติใบสั่งซื้อ ({purchaseOrders.length})</span>
@@ -81,13 +81,13 @@ export function PurchaseOrderHistoryDialog({
         </DialogTrigger>
 
         <DialogContent className="max-w-4xl! w-[92vw] max-h-[85vh] p-0 flex flex-col overflow-hidden">
-          <div className="px-6 py-4 border-b flex items-center justify-between bg-neutral-50">
+          <div className="px-6 py-4 border-b flex items-center justify-between bg-muted/40">
             <div>
-              <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <DialogTitle className="text-base font-bold flex items-center gap-2 text-foreground">
                 <IconHistory className="size-5 text-primary" />
                 ประวัติใบสั่งซื้อสินค้า / รายการซื้อของ (Purchase Orders)
               </DialogTitle>
-              <DialogDescription className="text-xs text-neutral-500 mt-0.5">
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
                 ดูประวัติ ตรวจสอบสถานะการซื้อ และสั่งพิมพ์ใบสั่งซื้อย้อนหลัง
               </DialogDescription>
             </div>
@@ -95,17 +95,17 @@ export function PurchaseOrderHistoryDialog({
 
           <div className="flex-1 overflow-y-auto p-6">
             {isLoading ? (
-              <div className="py-12 flex flex-col items-center justify-center text-neutral-500 text-xs">
+              <div className="py-12 flex flex-col items-center justify-center text-muted-foreground text-xs">
                 <Spinner className="size-6 text-primary mb-2" />
                 <p>กำลังโหลดประวัติใบสั่งซื้อ...</p>
               </div>
             ) : purchaseOrders.length === 0 ? (
-              <div className="py-16 text-center text-neutral-400 space-y-2">
-                <IconShoppingCart className="size-12 mx-auto text-neutral-300" />
-                <p className="font-semibold text-neutral-700 text-sm">
+              <div className="py-16 text-center text-muted-foreground space-y-2">
+                <IconShoppingCart className="size-12 mx-auto text-muted-foreground/40" />
+                <p className="font-semibold text-foreground text-sm">
                   ยังไม่มีประวัติใบสั่งซื้อ
                 </p>
-                <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                   คุณสามารถติ๊กเลือกสินค้าในตารางเพื่อออกใบสั่งซื้อของใหม่ได้ทันที
                 </p>
               </div>
@@ -113,7 +113,7 @@ export function PurchaseOrderHistoryDialog({
               <div className="border rounded-lg overflow-hidden">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="bg-neutral-100 text-neutral-700 font-semibold border-b">
+                    <tr className="bg-muted/50 text-muted-foreground font-semibold border-b">
                       <th className="py-2.5 px-3 text-left">เลขที่ / วันที่</th>
                       <th className="py-2.5 px-3 text-left">หัวข้อ / แหล่งซื้อ</th>
                       <th className="py-2.5 px-2 text-center">ความคืบหน้า</th>
@@ -135,39 +135,39 @@ export function PurchaseOrderHistoryDialog({
                       return (
                         <tr
                           key={po.id}
-                          className="border-b last:border-0 hover:bg-neutral-50 transition-colors"
+                          className="border-b last:border-0 hover:bg-muted/50 transition-colors"
                         >
                           <td className="py-3 px-3">
-                            <span className="font-bold text-neutral-900 block font-mono">
+                            <span className="font-bold text-foreground block ">
                               {po.orderNumber}
                             </span>
-                            <span className="text-[11px] text-neutral-500">
+                            <span className="text-[11px] text-muted-foreground">
                               {formatDateTime(po.createdAt)}
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className="font-semibold text-neutral-900 block">
+                            <span className="font-semibold text-foreground block">
                               {po.title || 'รายการสั่งซื้อสินค้า'}
                             </span>
-                            <span className="text-[11px] text-neutral-500">
+                            <span className="text-[11px] text-muted-foreground">
                               แหล่งซื้อ: {po.supplier || 'ร้านค้าทั่วไป'}
                               {po.buyerName ? ` | ผู้ซื้อ: ${po.buyerName}` : ''}
                             </span>
                           </td>
                           <td className="py-3 px-2 text-center">
-                            <span className="font-semibold text-neutral-800 block text-[11px]">
+                            <span className="font-semibold text-foreground block text-[11px]">
                               {purchasedCount}/{totalItems} รายการ
                             </span>
-                            <span className="text-[10px] text-neutral-500">
+                            <span className="text-[10px] text-muted-foreground">
                               ({percent}%)
                             </span>
                           </td>
                           <td className="py-3 px-3 text-right">
-                            <span className="font-bold text-neutral-900 block">
+                            <span className="font-bold text-foreground block">
                               {formatCurrency(Number(po.totalEstimatedAmount))}
                             </span>
                             {Number(po.totalActualAmount) > 0 && (
-                              <span className="text-[10px] text-emerald-700 block">
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-medium">
                                 ซื้อจริง: {formatCurrency(Number(po.totalActualAmount))}
                               </span>
                             )}
@@ -225,7 +225,7 @@ export function PurchaseOrderHistoryDialog({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-7 px-1.5 text-neutral-400 hover:text-rose-600"
+                              className="h-7 px-1.5 text-muted-foreground/60 hover:text-destructive"
                               onClick={() => handleDelete(po.id, po.orderNumber)}
                               disabled={deleteMutation.isPending}
                               title="ลบใบสั่งซื้อ"
@@ -250,25 +250,25 @@ export function PurchaseOrderHistoryDialog({
           onOpenChange={() => setSelectedPoForPrint(null)}
         >
           <DialogContent className="max-w-4xl! w-[92vw] h-[90vh] max-h-[90vh] p-0 flex flex-col overflow-hidden">
-            <div className="px-6 py-3 border-b flex items-center justify-between bg-neutral-50">
-              <DialogTitle className="text-base font-bold flex items-center gap-2">
+            <div className="px-6 py-3 border-b flex items-center justify-between bg-muted/40">
+              <DialogTitle className="text-base font-bold flex items-center gap-2 text-foreground">
                 <IconPrinter className="size-5 text-primary" />
                 พิมพ์ใบสั่งซื้อสินค้า #{selectedPoForPrint.orderNumber}
               </DialogTitle>
               <Button
                 size="sm"
                 onClick={() => window.print()}
-                className="bg-neutral-900 text-white hover:bg-neutral-800 gap-1.5 h-8 text-xs"
+                className="gap-1.5 h-8 text-xs"
               >
                 <IconPrinter size={15} />
                 <span>สั่งพิมพ์ (Print)</span>
               </Button>
             </div>
 
-            <div className="flex-1 bg-neutral-200/70 p-6 overflow-y-auto flex justify-center items-start">
+            <div className="flex-1 bg-muted/30 p-6 overflow-y-auto flex justify-center items-start">
               <div
                 id="printable-document"
-                className="bg-white shadow-xl rounded-sm w-[210mm] min-h-[297mm]"
+                className="bg-white text-neutral-900 shadow-xl rounded-sm w-[210mm] min-h-[297mm]"
               >
                 <PurchaseOrderDocument po={selectedPoForPrint} />
               </div>

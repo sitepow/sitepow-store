@@ -137,12 +137,12 @@ export function ReviewTable() {
                           {item.images.map((img: string, idx: number) => (
                             <div
                               key={idx}
-                              className="border-primary border border-dashed p-1"
+                              className="overflow-hidden rounded-lg border border-border/70 bg-muted/20 shadow-2xs"
                             >
                               <img
                                 src={img}
                                 alt="Review"
-                                className="size-14 object-cover"
+                                className="size-12 object-cover"
                               />
                             </div>
                           ))}

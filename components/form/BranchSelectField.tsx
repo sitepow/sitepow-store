@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { Field, FieldLabel } from '@/components/./ui/field'
+import { Field, FieldLabel } from '@/components/ui/field'
 
 export function BranchSelectField() {
   const isMounted = useIsMounted()

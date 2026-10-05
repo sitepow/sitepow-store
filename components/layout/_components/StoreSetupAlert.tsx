@@ -30,7 +30,7 @@ export function StoreSetupAlert() {
 
   return (
     <Alert
-      className="border-l-primary w-full rounded-none border-l-4 shadow-none"
+      className="border-primary/20 bg-primary/5 w-full rounded-xl border shadow-xs"
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
       <AlertCircleIcon className="text-primary size-5" />

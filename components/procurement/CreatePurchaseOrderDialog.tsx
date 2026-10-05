@@ -181,7 +181,7 @@ export function CreatePurchaseOrderDialog({
           {trigger || (
             <Button
               size="sm"
-              className="gap-1.5 bg-neutral-900 text-white hover:bg-neutral-800"
+              className="gap-1.5"
             >
               <IconShoppingCart size={15} />
               <span>ออกใบสั่งซื้อของ ({selectedProducts.length})</span>
@@ -190,13 +190,13 @@ export function CreatePurchaseOrderDialog({
         </DialogTrigger>
 
         <DialogContent className="max-w-4xl! w-[92vw] max-h-[90vh] p-0 flex flex-col overflow-hidden">
-          <div className="px-6 py-4 border-b flex items-center justify-between bg-neutral-50">
+          <div className="px-6 py-4 border-b flex items-center justify-between bg-muted/40">
             <div>
-              <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <DialogTitle className="text-base font-bold flex items-center gap-2 text-foreground">
                 <IconFileInvoice className="size-5 text-primary" />
                 สร้างใบสั่งซื้อสินค้า / รายการซื้อของ (Purchase Order)
               </DialogTitle>
-              <DialogDescription className="text-xs text-neutral-500 mt-0.5">
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
                 จัดทำใบสั่งซื้อสำหรับไปซื้อของหน้าร้าน/ตลาด พร้อม QR Code และลิงก์สำหรับติ๊กรายการที่ซื้อแล้ว
               </DialogDescription>
             </div>
@@ -204,7 +204,7 @@ export function CreatePurchaseOrderDialog({
 
           {!createdPo ? (
             <div className="flex-1 overflow-y-auto p-6 space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-neutral-50/70 p-3.5 rounded-lg border">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-muted/20 p-3.5 rounded-lg border">
                 <div className="space-y-1 sm:col-span-2">
                   <Label className="text-xs font-semibold">หัวข้อเอกสาร</Label>
                   <Input
@@ -260,10 +260,10 @@ export function CreatePurchaseOrderDialog({
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold text-neutral-800">
+                  <Label className="text-xs font-bold text-foreground">
                     รายการสินค้าที่เลือก ({items.length} รายการ)
                   </Label>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-xs text-muted-foreground">
                     ปรับจำนวนและราคาต้นทุนโดยประมาณได้
                   </span>
                 </div>
@@ -271,7 +271,7 @@ export function CreatePurchaseOrderDialog({
                 <div className="border rounded-lg overflow-hidden">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="bg-neutral-100 text-neutral-700 font-semibold border-b">
+                      <tr className="bg-muted/50 text-muted-foreground font-semibold border-b">
                         <th className="py-2 px-2 text-center w-12">ลำดับ</th>
                         <th className="py-2 px-2 text-center w-12">รูป</th>
                         <th className="py-2 px-3 text-left">สินค้า / ตัวเลือก</th>
@@ -287,8 +287,8 @@ export function CreatePurchaseOrderDialog({
                         const lineTotal =
                           (Number(item.costPrice) || 0) * (item.quantity || 1)
                         return (
-                          <tr key={idx} className="border-b last:border-0 hover:bg-neutral-50">
-                            <td className="py-2 px-2 text-center text-neutral-500">
+                          <tr key={idx} className="border-b last:border-0 hover:bg-muted/50">
+                            <td className="py-2 px-2 text-center text-muted-foreground">
                               {idx + 1}
                             </td>
                             <td className="py-1.5 px-2 text-center">
@@ -303,15 +303,15 @@ export function CreatePurchaseOrderDialog({
                                   />
                                 </div>
                               ) : (
-                                <div className="size-8 mx-auto rounded bg-neutral-100 flex items-center justify-center text-[8px] text-neutral-400">
+                                <div className="size-8 mx-auto rounded bg-muted flex items-center justify-center text-[8px] text-muted-foreground">
                                   -
                                 </div>
                               )}
                             </td>
                             <td className="py-2 px-3">
-                              <p className="font-semibold text-neutral-900">{item.title}</p>
+                              <p className="font-semibold text-foreground">{item.title}</p>
                               {item.variantTitle && (
-                                <p className="text-[11px] text-neutral-500">
+                                <p className="text-[11px] text-muted-foreground">
                                   ตัวเลือก: {item.variantTitle}
                                 </p>
                               )}
@@ -357,18 +357,20 @@ export function CreatePurchaseOrderDialog({
                                 className="h-7 text-xs text-right w-24 ml-auto"
                               />
                             </td>
-                            <td className="py-2 px-3 text-right font-medium text-neutral-900">
+                            <td className="py-2 px-3 text-right font-medium text-foreground">
                               {formatDecimal(lineTotal)}
                             </td>
                             <td className="py-2 px-2 text-center">
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon-xs"
                                 onClick={() => handleRemoveItem(idx)}
-                                className="text-neutral-400 hover:text-rose-600 transition-colors p-1"
+                                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                 title="ลบรายการนี้"
                               >
                                 <IconTrash size={15} />
-                              </button>
+                              </Button>
                             </td>
                           </tr>
                         )
@@ -378,38 +380,38 @@ export function CreatePurchaseOrderDialog({
                 </div>
               </div>
 
-              <div className="flex justify-between items-center bg-neutral-900 text-white p-3.5 rounded-lg">
-                <span className="font-semibold text-sm">
+              <div className="flex justify-between items-center bg-card text-card-foreground border border-border p-3.5 rounded-lg shadow-xs">
+                <span className="font-semibold text-sm text-foreground">
                   งบประมาณประมาณการรวมทั้งหมด:
                 </span>
-                <span className="text-lg font-extrabold">
+                <span className="text-lg font-extrabold text-primary">
                   {formatCurrency(totalEstimatedAmount)}
                 </span>
               </div>
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto p-6 space-y-6 text-center">
-              <div className="size-14 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
+              <div className="size-14 bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto">
                 <IconCheck size={32} />
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-neutral-900">
+                <h3 className="text-lg font-bold text-foreground">
                   สร้างใบสั่งซื้อสินค้าเรียบร้อยแล้ว!
                 </h3>
-                <p className="text-xs text-neutral-500">
-                  เลขที่เอกสาร: <strong className="text-neutral-900">{createdPo.orderNumber}</strong>
+                <p className="text-xs text-muted-foreground">
+                  เลขที่เอกสาร: <strong className="text-foreground">{createdPo.orderNumber}</strong>
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto text-left">
-                <div className="border rounded-xl p-4 bg-neutral-50 space-y-3">
+                <div className="border rounded-xl p-4 bg-muted/20 space-y-3">
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-neutral-900 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <IconExternalLink size={16} className="text-primary" />
                       เปิดดูเช็คลิสต์บนเว็บ
                     </span>
-                    <p className="text-[11px] text-neutral-500">
+                    <p className="text-[11px] text-muted-foreground">
                       เปิดหน้าเว็บเพื่อติ๊กสินค้าที่ซื้อแล้ว ระบุราคาจริงที่ซื้อได้แบบเรียลไทม์
                     </p>
                   </div>
@@ -438,13 +440,13 @@ export function CreatePurchaseOrderDialog({
                   </div>
                 </div>
 
-                <div className="border rounded-xl p-4 bg-neutral-50 space-y-3">
+                <div className="border rounded-xl p-4 bg-muted/20 space-y-3">
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-neutral-900 flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <IconPrinter size={16} className="text-primary" />
                       พิมพ์เอกสาร / บันทึก PDF
                     </span>
-                    <p className="text-[11px] text-neutral-500">
+                    <p className="text-[11px] text-muted-foreground">
                       มี QR Code ในตัวเอกสาร ให้พนักงานสามารถใช้มือถือสแกนเปิดเช็คลิสต์ได้ทันที
                     </p>
                   </div>
@@ -452,7 +454,7 @@ export function CreatePurchaseOrderDialog({
                     size="sm"
                     variant="outline"
                     onClick={() => setIsPrintModalOpen(true)}
-                    className="w-full gap-1.5 text-xs h-8 bg-white"
+                    className="w-full gap-1.5 text-xs h-8 bg-background"
                   >
                     <IconPrinter size={14} />
                     ดูตัวอย่าง & พิมพ์ใบสั่งซื้อ
@@ -462,7 +464,7 @@ export function CreatePurchaseOrderDialog({
             </div>
           )}
 
-          <div className="px-6 py-3 border-t bg-neutral-50 flex justify-end gap-2">
+          <div className="px-6 py-3 border-t bg-muted/40 flex justify-end gap-2">
             {!createdPo ? (
               <>
                 <Button
@@ -479,7 +481,7 @@ export function CreatePurchaseOrderDialog({
                   size="sm"
                   onClick={handleSubmit}
                   disabled={createMutation.isPending}
-                  className="text-xs h-8 bg-neutral-900 text-white gap-1.5"
+                  className="text-xs h-8 gap-1.5"
                 >
                   {createMutation.isPending ? <Spinner className="size-3" /> : null}
                   สร้างใบสั่งซื้อสินค้า
@@ -502,9 +504,9 @@ export function CreatePurchaseOrderDialog({
       {createdPo && isPrintModalOpen && (
         <Dialog open={isPrintModalOpen} onOpenChange={setIsPrintModalOpen}>
           <DialogContent className="max-w-4xl! w-[92vw] h-[90vh] max-h-[90vh] p-0 flex flex-col overflow-hidden">
-            <div className="px-6 py-3 border-b flex items-center justify-between bg-neutral-50">
+            <div className="px-6 py-3 border-b flex items-center justify-between bg-muted/40">
               <div>
-                <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <DialogTitle className="text-base font-bold flex items-center gap-2 text-foreground">
                   <IconPrinter className="size-5 text-primary" />
                   พิมพ์ใบสั่งซื้อสินค้า #{createdPo.orderNumber}
                 </DialogTitle>
@@ -512,17 +514,17 @@ export function CreatePurchaseOrderDialog({
               <Button
                 size="sm"
                 onClick={() => window.print()}
-                className="bg-neutral-900 text-white hover:bg-neutral-800 gap-1.5 h-8 text-xs"
+                className="gap-1.5 h-8 text-xs"
               >
                 <IconPrinter size={15} />
                 <span>สั่งพิมพ์ (Print)</span>
               </Button>
             </div>
 
-            <div className="flex-1 bg-neutral-200/70 p-6 overflow-y-auto flex justify-center items-start">
+            <div className="flex-1 bg-muted/30 p-6 overflow-y-auto flex justify-center items-start">
               <div
                 id="printable-document"
-                className="bg-white shadow-xl rounded-sm w-[210mm] min-h-[297mm]"
+                className="bg-white text-neutral-900 shadow-xl rounded-sm w-[210mm] min-h-[297mm]"
               >
                 <PurchaseOrderDocument po={createdPo} />
               </div>

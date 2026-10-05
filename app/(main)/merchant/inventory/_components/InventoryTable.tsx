@@ -231,11 +231,14 @@ export function InventoryTable() {
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2">
                                 {isOut ? (
-                                  <Badge variant="destructive">
+                                  <Badge variant="destructive" className="gap-1">
                                     <IconAlertCircle size={12} /> หมด
                                   </Badge>
                                 ) : isLow ? (
-                                  <Badge className="bg-yellow-500 hover:bg-yellow-500">
+                                  <Badge
+                                    variant="outline"
+                                    className="border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"
+                                  >
                                     <IconAlertTriangle size={12} /> ใกล้หมด
                                   </Badge>
                                 ) : (

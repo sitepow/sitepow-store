@@ -207,13 +207,12 @@ export function BankAccountDialog({
                   return (
                     <Popover>
                       <PopoverTrigger asChild>
-                        <button
+                        <Button
+                          variant="outline"
                           type="button"
                           className={cn(
-                            'border-input bg-input/30 flex h-fit w-full min-w-0 items-center justify-between gap-1.5 rounded-2xl border px-3 py-2 text-sm transition-colors outline-none',
-                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                            'flex h-auto w-full min-w-0 items-center justify-between gap-1.5 px-3 py-2 text-sm font-normal',
                             !field.value && 'text-muted-foreground',
-                            'hover:bg-input/50',
                           )}
                         >
                           <span className="min-w-0 flex-1 truncate text-left whitespace-pre-line">
@@ -223,7 +222,7 @@ export function BankAccountDialog({
                               : 'เลือกธนาคาร...'}
                           </span>
                           <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0" />
-                        </button>
+                        </Button>
                       </PopoverTrigger>
                       <PopoverContent
                         className="w-(--radix-popover-trigger-width) min-w-(--radix-popover-trigger-width) p-0"

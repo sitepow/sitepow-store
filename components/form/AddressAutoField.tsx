@@ -15,7 +15,7 @@ import {
 import { Address, Config, ThaiAddressFinder } from '@/lib/address/thai-address-finder'
 import { cn } from '@/lib/utils'
 
-import { Input } from '@/components/./ui/input'
+import { Input } from '@/components/ui/input'
 
 export interface Props {
   scope?: 'district' | 'amphoe' | 'province' | 'zipcode'

@@ -118,7 +118,6 @@ export function MerchantInvoiceTable() {
                       {getLabel.invoiceStatus(inv.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell></TableCell>
                   <TableCell className="text-right">
                     {inv.status === InvoiceStatus.UNPAID ? (
                       <Button

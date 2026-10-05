@@ -21,6 +21,7 @@ import { TableEmptyRow } from '@/components/table/TableEmptyRow'
 import { TableLoadingRow } from '@/components/table/TableLoadingRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ProductQuotaCard } from './ProductQuotaCard'
 import {
   Table,
@@ -81,7 +82,7 @@ export function ProductsTable() {
     <div className="space-y-6">
       <ProductQuotaCard />
       {selectedProductIds.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-neutral-900 text-white rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-card text-card-foreground border border-border rounded-xl shadow-sm animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2.5">
             <span className="inline-flex items-center justify-center size-6 rounded-full bg-primary text-primary-foreground font-bold text-xs">
               {selectedProductIds.length}
@@ -92,10 +93,10 @@ export function ProductsTable() {
           </div>
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => setSelectedProductIds([])}
-              className="text-neutral-300 hover:text-white hover:bg-neutral-800 text-xs h-8"
+              className="text-xs h-8"
             >
               ล้างการเลือก
             </Button>
@@ -106,7 +107,7 @@ export function ProductsTable() {
               trigger={
                 <Button
                   size="sm"
-                  className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs h-8 font-semibold shadow-xs"
+                  className="gap-1.5 text-xs h-8 font-semibold shadow-xs"
                 >
                   <IconShoppingCart size={15} />
                   <span>ออกใบสั่งซื้อของ ({selectedProductIds.length})</span>
@@ -121,13 +122,13 @@ export function ProductsTable() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-12 text-center bg-background sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                <input
-                  type="checkbox"
-                  checked={isAllSelected}
-                  onChange={handleToggleSelectAll}
-                  aria-label="เลือกทั้งหมดในหน้านี้"
-                  className="size-4 rounded accent-primary cursor-pointer align-middle"
-                />
+                <div className="flex items-center justify-center">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleToggleSelectAll}
+                    aria-label="เลือกทั้งหมดในหน้านี้"
+                  />
+                </div>
               </TableHead>
               <TableHead className="bg-background sticky left-12 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                 รูปภาพสินค้า
@@ -158,13 +159,13 @@ export function ProductsTable() {
                     className={`hover:bg-muted/50 ${isSelected ? 'bg-primary/5' : ''}`}
                   >
                     <TableCell className="text-center bg-background hover:bg-muted/50 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleToggleSelect(product.id)}
-                        aria-label={`เลือก ${product.title}`}
-                        className="size-4 rounded accent-primary cursor-pointer align-middle"
-                      />
+                      <div className="flex items-center justify-center">
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => handleToggleSelect(product.id)}
+                          aria-label={`เลือก ${product.title}`}
+                        />
+                      </div>
                     </TableCell>
                     <TableCell className="bg-background hover:bg-muted/50 sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       <ProductImage src={product.images?.[0]?.url} />
@@ -204,7 +205,6 @@ export function ProductsTable() {
                             variant="outline"
                             size="icon-lg"
                             title="ออกใบสั่งซื้อสินค้านี้"
-                            className="text-neutral-700 hover:text-neutral-900"
                           >
                             <IconShoppingCart size={16} />
                           </Button>

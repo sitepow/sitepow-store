@@ -207,7 +207,7 @@ export function InvoiceBillDocument({ order, options }: InvoiceBillDocumentProps
                   </p>
                   <p>
                     <span className="font-semibold text-neutral-900">เลขที่บัญชี: </span>
-                    <span className="font-mono font-bold text-neutral-900">
+                    <span className=" font-bold text-neutral-900">
                       {formatBankAccount(bankAccount.accountNumber)}
                     </span>
                   </p>

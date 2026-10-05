@@ -63,14 +63,16 @@ export function FileUpload({
               }}
             />
           )}
-          <button
+          <Button
             type="button"
-            className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white hover:bg-black/70"
+            variant="destructive"
+            size="icon-xs"
+            className="absolute top-1.5 right-1.5 size-6 rounded-full shadow-xs"
             onClick={() => setValue(name, '')}
             aria-label="ลบรูปภาพ"
           >
-            <IconX size={14} aria-hidden="true" />
-          </button>
+            <IconX size={12} aria-hidden="true" />
+          </Button>
         </div>
       ) : (
         <Button

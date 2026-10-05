@@ -72,8 +72,8 @@ export function OrderItemsSummary({ order }: OrderItemsSummaryProps) {
   } = order
 
   return (
-    <div className="space-y-2 rounded-lg border p-4">
-      <div className="text-sm font-semibold">รายการสินค้า</div>
+    <div className="border-border bg-card text-card-foreground space-y-3 rounded-xl border p-4 shadow-xs">
+      <div className="text-foreground text-sm font-semibold">รายการสินค้า</div>
 
       {items.map((item, idx) => {
         const itemKey = item.id || `${item.title}-${item.variantTitle}-${idx}`

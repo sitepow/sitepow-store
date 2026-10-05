@@ -157,7 +157,7 @@ export function DeliveryShippingDocument({
               <span className="text-[11px] font-bold text-neutral-700">
                 รหัสไปรษณีย์:
               </span>
-              <div className="flex gap-1 font-mono text-base font-extrabold">
+              <div className="flex gap-1  text-base font-extrabold">
                 {postalCode.split('').map((char, i) => (
                   <span
                     key={i}
@@ -197,7 +197,7 @@ export function DeliveryShippingDocument({
       {/* Dotted Cut Line */}
       <div className="relative my-4 text-center">
         <div className="border-t-2 border-dashed border-neutral-400 w-full absolute top-1/2" />
-        <span className="relative bg-white px-3 text-[10px] text-neutral-500 font-mono">
+        <span className="relative bg-white px-3 text-[10px] text-neutral-500 ">
           ✂ ตัดตามรอยประ (แนบใบส่งของด้านล่างในกล่องพัสดุ)
         </span>
       </div>

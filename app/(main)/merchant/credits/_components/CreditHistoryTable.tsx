@@ -83,35 +83,35 @@ export function CreditHistoryTable() {
                     <TableCell>{tx.id}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="shrink-0 rounded-md border p-1">
+                        <div className="shrink-0 rounded-md border border-border/70 bg-muted/20 p-1 text-muted-foreground">
                           {tx.type === TransactionType.AI_USAGE && (
                             <IconCpu size={14} />
                           )}
                           {tx.type === TransactionType.SLIP_VERIFY && (
                             <IconReceipt size={14} />
                           )}
-                          {isIncome && <IconArrowDownLeft size={14} />}
+                          {isIncome && <IconArrowDownLeft size={14} className="text-emerald-600 dark:text-emerald-400" />}
                           {!isIncome &&
                             tx.type !== TransactionType.AI_USAGE &&
                             tx.type !== TransactionType.SLIP_VERIFY && (
                               <IconHistory size={14} />
                             )}
                         </div>
-                        <span>{getLabel.transactionType(tx.type)}</span>
+                        <span className="font-medium">{getLabel.transactionType(tx.type)}</span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
                       {formatDateTime(new Date(tx.createdAt))}
                     </TableCell>
                     <TableCell
                       className={cn(
-                        'text-right',
-                        isIncome ? 'text-green-600' : 'text-foreground',
+                        'text-right font-medium',
+                        isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground',
                       )}
                     >
                       {isIncome
-                        ? `+ ${formatNumber(tx.amount)}`
-                        : `- ${formatNumber(tx.amount)}`}
+                        ? `+${formatNumber(tx.amount)}`
+                        : `-${formatNumber(tx.amount)}`}
                     </TableCell>
                   </TableRow>
                 )

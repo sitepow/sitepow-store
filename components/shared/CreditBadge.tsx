@@ -3,9 +3,10 @@ import { ComponentProps } from 'react'
 import { BASE_CREDIT_VALUE_THB } from '@/constants/ai/config'
 import { IconInfoCircle } from '@tabler/icons-react'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-export interface CreditBadgeProps extends ComponentProps<'div'> {
+export interface CreditBadgeProps extends ComponentProps<typeof Badge> {
   rate?: number
   unitName?: string
   currencySymbol?: string
@@ -21,9 +22,10 @@ export function CreditBadge({
   ...props
 }: CreditBadgeProps) {
   return (
-    <div
+    <Badge
+      variant="outline"
       className={cn(
-        'border-primary/20 bg-primary/5 text-primary flex w-fit items-center gap-2 rounded-full border p-3 text-xs font-medium',
+        'border-primary/25 bg-primary/5 text-primary flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
         className,
       )}
       {...props}
@@ -32,6 +34,6 @@ export function CreditBadge({
       <span>
         {baseAmount} {unitName} = {rate} {currencySymbol}
       </span>
-    </div>
+    </Badge>
   )
 }

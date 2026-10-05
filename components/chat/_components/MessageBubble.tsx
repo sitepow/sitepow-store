@@ -34,15 +34,19 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
       )}
       style={{ '--primary': store?.primaryColor } as React.CSSProperties}
     >
-      {isBot && <span className="mb-1 text-xs">AI Assistant</span>}
+      {isBot && (
+        <span className="text-muted-foreground mb-1 text-xs font-medium">
+          AI Assistant
+        </span>
+      )}
       <div
         className={cn(
-          'max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm',
+          'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm shadow-xs leading-relaxed',
           !isLeft
-            ? 'rounded-tr-none bg-blue-600 text-white'
+            ? 'rounded-tr-none bg-primary text-primary-foreground'
             : isBot
-              ? 'bg-primary dark:bg-primary/50 rounded-tl-none border text-white'
-              : 'dark:bg-foreground/5 dark:text-foreground border-border rounded-tl-none border bg-white text-slate-800',
+              ? 'bg-secondary text-secondary-foreground border-border rounded-tl-none border'
+              : 'bg-card text-card-foreground border-border rounded-tl-none border',
         )}
       >
         <MarkdownRenderer
@@ -51,8 +55,8 @@ export function MessageBubble({ msg, isMySender }: MessageBubbleProps) {
         />
         <span
           className={cn(
-            'mt-1 block text-[10px] opacity-70',
-            !isLeft ? 'text-blue-100' : isBot ? 'text-white' : 'text-slate-500',
+            'mt-1 block text-[10px] opacity-75',
+            !isLeft ? 'text-primary-foreground/80' : 'text-muted-foreground',
           )}
         >
           {new Date(msg.createdAt).toLocaleTimeString([], {
